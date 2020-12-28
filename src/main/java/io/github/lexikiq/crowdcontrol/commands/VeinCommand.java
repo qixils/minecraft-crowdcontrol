@@ -24,8 +24,8 @@ public class VeinCommand extends ChatCommand {
     }
 
     @Override
-    public void execute(ChannelMessageEvent event, Collection<? extends Player> players) {
-        super.execute(event, players);
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
         // TODO: spawns a vein of ores (or silverfish blocks) around players
+        return false;
     }
 }

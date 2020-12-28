@@ -1,9 +1,6 @@
 package io.github.lexikiq.crowdcontrol;
 
-import io.github.lexikiq.crowdcontrol.commands.DifficultyCommand;
-import io.github.lexikiq.crowdcontrol.commands.SoundCommand;
-import io.github.lexikiq.crowdcontrol.commands.SummonEntityCommand;
-import io.github.lexikiq.crowdcontrol.commands.VeinCommand;
+import io.github.lexikiq.crowdcontrol.commands.*;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.EntityType;
 
@@ -95,7 +92,8 @@ public class RegisterCommands {
         // register normal commands
         Set<ChatCommand> commands = new HashSet<>(Set.of(
                 new VeinCommand(plugin),
-                new SoundCommand(plugin)
+                new SoundCommand(plugin),
+                new ChargedCreeperCommand(plugin)
         ));
 
         // register entity commands

@@ -6,6 +6,8 @@ import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -27,6 +29,12 @@ public class SummonEntityCommand extends ChatCommand {
     }
 
     @Override
+    public void setCooldown() {
+        super.setCooldown();
+        globalUsage = LocalDateTime.now();
+    }
+
+    @Override
     public @NotNull String getCommand() {
         return entityType.name();
     }
@@ -42,21 +50,24 @@ public class SummonEntityCommand extends ChatCommand {
     }
 
     @Override
-    public void execute(ChannelMessageEvent event, Collection<? extends Player> players) {
-        super.execute(event, players);
-        globalUsage = LocalDateTime.now();
-
-        Player player = (Player) RandomUtil.randomElementFrom(players);
-        assert player != null;
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
+        Player player = (Player) RandomUtil.randomElementFrom(players); // get random pokemon
+        assert player != null;  // make IDE stop yelling at me
         Location loc = getSpawnLocation(player.getLocation());
         if (loc != null) {
             new BukkitRunnable(){
                 @Override
                 public void run() {
-                    player.getWorld().spawnEntity(loc, entityType);
+                    spawnEntity(player, loc);
                 }
             }.runTask(plugin);
+            return true;
         }
+        return false;
+    }
+
+    public Entity spawnEntity(Player player, Location location) {
+        return player.getWorld().spawnEntity(location, entityType);
     }
 
     private static Location getSpawnLocation(Location location) {

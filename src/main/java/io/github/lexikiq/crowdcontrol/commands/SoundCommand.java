@@ -37,12 +37,12 @@ public class SoundCommand extends ChatCommand {
     }
 
     @Override
-    public void execute(ChannelMessageEvent event, Collection<? extends Player> players) {
-        super.execute(event, players);
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
         Sound sound = (Sound) RandomUtil.randomElementFrom(SOUNDS);
         for (Player player : players) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
             player.playSound(playAt, sound, SoundCategory.HOSTILE, 1.0f, 1.0f);
         }
+        return true;
     }
 }

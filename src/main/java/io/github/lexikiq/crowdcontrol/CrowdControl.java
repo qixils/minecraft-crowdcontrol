@@ -55,8 +55,10 @@ public final class CrowdControl extends JavaPlugin {
             Collection<? extends Player> players = getPlayers();
             ChatCommand chatCommand = commands.get(command);
             if (!players.isEmpty() && chatCommand.canUse()) {
-                getServer().broadcastMessage(USER_COLOR+event.getUser().getName()+ChatColor.RESET+" used command "+CMD_COLOR+event.getMessage());
-                chatCommand.execute(event, players);
+                if (chatCommand.execute(event, players)) {
+                    chatCommand.setCooldown();
+                    getServer().broadcastMessage(USER_COLOR + event.getUser().getName() + ChatColor.RESET + " used command " + CMD_COLOR + event.getMessage());
+                }
             }
         }
     }

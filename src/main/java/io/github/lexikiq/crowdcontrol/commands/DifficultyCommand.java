@@ -29,10 +29,10 @@ public class DifficultyCommand extends ChatCommand {
     }
 
     @Override
-    public void execute(ChannelMessageEvent event, Collection<? extends Player> players) {
-        super.execute(event, players);
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
         for (World world : plugin.getServer().getWorlds()) {
             world.setDifficulty(difficulty);
         }
+        return true;
     }
 }

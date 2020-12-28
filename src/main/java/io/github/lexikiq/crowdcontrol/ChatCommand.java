@@ -16,12 +16,13 @@ public abstract class ChatCommand {
     public boolean canUse() {
         return used == null || used.plusSeconds(getCooldownSeconds()).isBefore(LocalDateTime.now());
     }
+    public void setCooldown() {
+        used = LocalDateTime.now();
+    }
 
     public abstract @NotNull String getCommand();
 
-    public void execute(ChannelMessageEvent event, Collection<? extends Player> players){
-        used = LocalDateTime.now();
-    }
+    public abstract boolean execute(ChannelMessageEvent event, Collection<? extends Player> players);
 
     protected final CrowdControl plugin;
     public ChatCommand(CrowdControl plugin) {
