@@ -1,0 +1,8 @@
+name: CrowdControl
+version: ${project.version}
+main: io.github.lexikiq.crowdcontrol.CrowdControl
+api-version: 1.16
+prefix: MCCC
+authors: [ lexikiq ]
+description: Allows viewers to interact with your Minecraft world
+website: https://github.com/lexikiq/minecraft-crowdcontrol
