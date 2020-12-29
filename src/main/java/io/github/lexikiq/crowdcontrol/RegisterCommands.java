@@ -3,6 +3,7 @@ package io.github.lexikiq.crowdcontrol;
 import io.github.lexikiq.crowdcontrol.commands.*;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -106,9 +107,14 @@ public class RegisterCommands {
             commands.add(new DifficultyCommand(plugin, difficulty));
         }
 
+        // potions
+        for (PotionEffectType potionEffectType : PotionEffectType.values()) {
+            commands.add(new PotionCommand(plugin, potionEffectType));
+        }
+
         // actually register the commands
         for (ChatCommand cmd : commands) {
-            String name = cmd.getCommand().toLowerCase();
+            String name = cmd.getCommand().toLowerCase(java.util.Locale.ENGLISH);
             try {
                 plugin.registerCommand(name, cmd);
             } catch (AlreadyRegisteredException e) {

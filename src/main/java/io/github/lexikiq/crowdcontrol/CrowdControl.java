@@ -50,7 +50,7 @@ public final class CrowdControl extends JavaPlugin {
     public void handleMessage(ChannelMessageEvent event) {
         String message = event.getMessage();
         if (!message.startsWith(PREFIX)) {return;}
-        String command = message.substring(PREFIX.length()).toLowerCase();
+        String command = message.substring(PREFIX.length()).toLowerCase(java.util.Locale.ENGLISH);
         if (commands.containsKey(command)) {
             Collection<? extends Player> players = getPlayers();
             ChatCommand chatCommand = commands.get(command);
@@ -68,7 +68,7 @@ public final class CrowdControl extends JavaPlugin {
     }
 
     public void registerCommand(String name, ChatCommand command) throws AlreadyRegisteredException {
-        name = name.toLowerCase();
+//        name = name.toLowerCase(java.util.Locale.ENGLISH);
         if (commands.containsKey(name)) {
             throw new AlreadyRegisteredException(name);
         }

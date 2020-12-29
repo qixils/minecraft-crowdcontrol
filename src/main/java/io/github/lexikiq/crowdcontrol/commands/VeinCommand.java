@@ -103,7 +103,7 @@ public class VeinCommand extends ChatCommand {
             if (setBlocks.size() > 0) {
                 didSomething = true;
                 List<Location> trueSetBlocks = new ArrayList<>();
-                int maxBlocks = 1+rand.nextInt(setBlocks.size()-1);
+                int maxBlocks = 1+rand.nextInt(setBlocks.size());
                 plugin.getServer().broadcastMessage(String.valueOf(maxBlocks));
                 int blocksSet = 0;
                 for (int i = 0; i < setBlocks.size() && blocksSet < maxBlocks; ++i) {
