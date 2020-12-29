@@ -98,7 +98,8 @@ public class RegisterCommands {
                 new FireCommand(plugin),
                 new GiveItem(plugin),
                 new TakeItem(plugin),
-                new SwapCommand(plugin)
+                new SwapCommand(plugin),
+                new DinnerboneCommand(plugin)
         ));
 
         // register entity commands
