@@ -97,7 +97,8 @@ public class RegisterCommands {
                 new ChargedCreeperCommand(plugin),
                 new FireCommand(plugin),
                 new GiveItem(plugin),
-                new TakeItem(plugin)
+                new TakeItem(plugin),
+                new SwapCommand(plugin)
         ));
 
         // register entity commands

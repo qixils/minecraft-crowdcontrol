@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 public class GiveItem extends ChatCommand {
@@ -32,7 +32,7 @@ public class GiveItem extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
+    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         if (args.length == 0) {
             return false;
         }

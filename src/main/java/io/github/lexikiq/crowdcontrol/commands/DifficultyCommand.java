@@ -8,7 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.List;
 
 public class DifficultyCommand extends ChatCommand {
     private final Difficulty difficulty;
@@ -29,7 +29,7 @@ public class DifficultyCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
+    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         for (World world : plugin.getServer().getWorlds()) {
             world.setDifficulty(difficulty);
         }

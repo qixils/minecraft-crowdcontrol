@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.List;
 
 public class SummonEntityCommand extends ChatCommand {
     private final EntityType entityType;
@@ -40,9 +40,8 @@ public class SummonEntityCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
-        Player player = (Player) RandomUtil.randomElementFrom(players); // get random pokemon
-        assert player != null;  // make IDE stop yelling at me
+    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+        Player player = (Player) RandomUtil.randomElementFrom(players); // get random player
         Location loc = getSpawnLocation(player.getLocation());
         if (loc != null) {
             new BukkitRunnable(){

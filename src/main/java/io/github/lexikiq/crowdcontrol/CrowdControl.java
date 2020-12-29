@@ -5,6 +5,7 @@ import com.github.philippheuer.events4j.simple.domain.EventSubscriber;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.google.common.collect.ImmutableList;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,8 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class CrowdControl extends JavaPlugin {
@@ -74,7 +75,7 @@ public final class CrowdControl extends JavaPlugin {
             return;
         }
 
-        Collection<? extends Player> players = getPlayers();
+        List<Player> players = getPlayers();
         ChatCommand chatCommand = commands.get(command);
 
         // global cooldowns
@@ -115,8 +116,8 @@ public final class CrowdControl extends JavaPlugin {
         }
     }
 
-    public Collection<? extends Player> getPlayers() {
-        return getServer().getOnlinePlayers();
+    public List<Player> getPlayers() {
+        return ImmutableList.copyOf(getServer().getOnlinePlayers());
     }
 
     public void registerCommand(String name, ChatCommand command) throws AlreadyRegisteredException {

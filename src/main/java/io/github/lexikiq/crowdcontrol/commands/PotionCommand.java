@@ -10,7 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.List;
 
 public class PotionCommand extends ChatCommand {
     private final PotionEffectType potionEffectType;
@@ -40,7 +40,7 @@ public class PotionCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
+    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         PotionEffect potionEffect = potionEffectType.createEffect(duration, rand.nextInt(2));
         new BukkitRunnable(){
             @Override

@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class VeinCommand extends ChatCommand {
@@ -69,7 +68,7 @@ public class VeinCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
+    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         // Weighted random code based off of https://stackoverflow.com/a/6737362
         Ores[] items = Ores.values();
         int idx = 0;
@@ -79,7 +78,6 @@ public class VeinCommand extends ChatCommand {
         }
         Material ore = items[idx].getBlock();
 
-        plugin.getLogger().info("avery is hot");
         boolean didSomething = false;
         for (Player player : players) {
             List<Location> setBlocks = new ArrayList<>();
@@ -87,7 +85,6 @@ public class VeinCommand extends ChatCommand {
             if (oreLocation == null) {
                 continue;
             }
-            plugin.getLogger().info("pogchamp");
             // get 2x2 chunk of blocks
             for (int x = 0; x <= 1; ++x) {
                 for (int y = 0; y <= 1; ++y) {
@@ -99,13 +96,11 @@ public class VeinCommand extends ChatCommand {
                     }
                 }
             }
-            plugin.getLogger().info(String.valueOf(setBlocks.size()));
             // if we found viable blocks (idk how we wouldn't have atleast one but justincase??)
             if (setBlocks.size() > 0) {
                 didSomething = true;
                 List<Location> trueSetBlocks = new ArrayList<>();
                 int maxBlocks = 1+rand.nextInt(setBlocks.size());
-                plugin.getServer().broadcastMessage(String.valueOf(maxBlocks));
                 int blocksSet = 0;
                 for (int i = 0; i < setBlocks.size() && blocksSet < maxBlocks; ++i) {
                     int blocksRemaining = maxBlocks-blocksSet;
@@ -115,7 +110,6 @@ public class VeinCommand extends ChatCommand {
                         trueSetBlocks.add(setBlocks.get(i));
                     }
                 }
-                plugin.getLogger().info(String.valueOf(trueSetBlocks.size()));
 
                 // probably needs to be run synchronously
                 new BukkitRunnable(){
@@ -126,7 +120,6 @@ public class VeinCommand extends ChatCommand {
                         }
                     }
                 }.runTask(plugin);
-                plugin.getLogger().info("---");
             }
         }
         return didSomething;

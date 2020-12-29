@@ -10,7 +10,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 
 public class SoundCommand extends ChatCommand {
@@ -37,7 +36,7 @@ public class SoundCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
+    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         Sound sound = (Sound) RandomUtil.randomElementFrom(SOUNDS);
         for (Player player : players) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());

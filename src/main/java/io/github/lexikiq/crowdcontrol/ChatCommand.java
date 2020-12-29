@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 public abstract class ChatCommand {
@@ -25,7 +25,7 @@ public abstract class ChatCommand {
 
     public abstract @NotNull String getCommand();
 
-    public abstract boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args);
+    public abstract boolean execute(ChannelMessageEvent event, List<Player> players, String... args);
 
     protected final CrowdControl plugin;
     public ChatCommand(CrowdControl plugin) {
