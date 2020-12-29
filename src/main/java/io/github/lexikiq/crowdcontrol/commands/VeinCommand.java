@@ -28,8 +28,7 @@ public class VeinCommand extends ChatCommand {
             Material.DIRT,
             Material.GRAVEL,
             Material.GRANITE,
-            Material.NETHERRACK,
-            Material.GLASS
+            Material.NETHERRACK
     };
 
     public enum Ores {
