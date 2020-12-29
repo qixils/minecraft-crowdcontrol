@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RegisterCommands {
-    public static final EntityType[] SAFE_ENTITIES = new EntityType[]{
+    public static final Set<EntityType> SAFE_ENTITIES = Set.of(
             EntityType.CREEPER,
             EntityType.SKELETON,
             EntityType.ZOMBIE,
@@ -86,7 +86,7 @@ public class RegisterCommands {
             EntityType.RAVAGER,
             EntityType.RABBIT,
             EntityType.ARMOR_STAND
-    };
+    );
 
     public static void register(CrowdControl plugin) {
         // register normal commands

@@ -71,22 +71,6 @@ public class SummonEntityCommand extends ChatCommand {
     }
 
     private static Location getSpawnLocation(Location location) {
-        List<Location> locations = new ArrayList<>();
-        for (int x = -SPAWN_RADIUS; x <= SPAWN_RADIUS; x++) {
-            for (int y = -1; y <= SPAWN_RADIUS; y++) {
-                for (int z = -SPAWN_RADIUS; z <= SPAWN_RADIUS; z++) {
-                    Location base = location.clone().add(x, y, z);
-                    Material above = base.clone().add(0, 1, 0).getBlock().getType();
-                    Material below = base.clone().add(0, -1, 0).getBlock().getType();
-                    if (base.getBlock().getType() == Material.AIR && above == Material.AIR && below != Material.AIR) {
-                        locations.add(base);
-                    }
-                }
-            }
-        }
-        if (locations.size() > 0) {
-            return (Location) RandomUtil.randomElementFrom(locations);
-        }
-        return null;
+        return RandomUtil.randomNearbyBlock(location, SPAWN_RADIUS, true, Material.AIR);
     }
 }
