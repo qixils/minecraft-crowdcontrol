@@ -40,7 +40,7 @@ public class PotionCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
         PotionEffect potionEffect = potionEffectType.createEffect(duration, rand.nextInt(2));
         new BukkitRunnable(){
             @Override

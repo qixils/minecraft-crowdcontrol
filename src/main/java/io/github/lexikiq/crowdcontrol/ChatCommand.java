@@ -25,7 +25,7 @@ public abstract class ChatCommand {
 
     public abstract @NotNull String getCommand();
 
-    public abstract boolean execute(ChannelMessageEvent event, Collection<? extends Player> players);
+    public abstract boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args);
 
     protected final CrowdControl plugin;
     public ChatCommand(CrowdControl plugin) {

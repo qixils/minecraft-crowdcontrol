@@ -95,7 +95,9 @@ public class RegisterCommands {
                 new VeinCommand(plugin),
                 new SoundCommand(plugin),
                 new ChargedCreeperCommand(plugin),
-                new FireCommand(plugin)
+                new FireCommand(plugin),
+                new GiveItem(plugin),
+                new TakeItem(plugin)
         ));
 
         // register entity commands

@@ -41,7 +41,8 @@ public class VeinCommand extends ChatCommand {
         LAPIS(Material.LAPIS_ORE, 3),
         QUARTZ(Material.NETHER_QUARTZ_ORE, 1),
         NETHER_GOLD(Material.NETHER_GOLD_ORE, 1),
-        SILVERFISH(Material.INFESTED_STONE, 23)
+        SILVERFISH(Material.INFESTED_STONE, 16),
+        LAVA(Material.LAVA, 7)
         ;
 
         public final @Getter Material block;
@@ -64,11 +65,11 @@ public class VeinCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*5;
+        return 60*3;
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
         // Weighted random code based off of https://stackoverflow.com/a/6737362
         Ores[] items = Ores.values();
         int idx = 0;

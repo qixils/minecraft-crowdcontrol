@@ -40,7 +40,7 @@ public class SummonEntityCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
         Player player = (Player) RandomUtil.randomElementFrom(players); // get random pokemon
         assert player != null;  // make IDE stop yelling at me
         Location loc = getSpawnLocation(player.getLocation());

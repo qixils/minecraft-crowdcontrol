@@ -27,7 +27,7 @@ public class FireCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players) {
+    public boolean execute(ChannelMessageEvent event, Collection<? extends Player> players, String... args) {
         boolean didSomething = false;
         for (Player player : players) {
             Block block = player.getLocation().getBlock();

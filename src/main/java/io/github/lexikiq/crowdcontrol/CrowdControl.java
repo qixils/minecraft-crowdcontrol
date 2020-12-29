@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,41 +61,57 @@ public final class CrowdControl extends JavaPlugin {
 
     @EventSubscriber
     public void handleMessage(ChannelMessageEvent event) {
+        // get command/message
         String message = event.getMessage();
         if (!message.startsWith(PREFIX)) {return;}
-        String command = message.substring(PREFIX.length()).toLowerCase(java.util.Locale.ENGLISH);
-        if (commands.containsKey(command)) {
-            Collection<? extends Player> players = getPlayers();
-            ChatCommand chatCommand = commands.get(command);
-            // global cooldowns
-            ClassCooldowns cooldownType = chatCommand.getClassCooldown();
-            boolean cooldownUsable = cooldownType == null || cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds()).isBefore(LocalDateTime.now());
-            if (!players.isEmpty() && chatCommand.canUse() && cooldownUsable) {
-                boolean executed = chatCommand.execute(event, players);
-                if (executed) {
-                    chatCommand.setCooldown();
-                    getServer().broadcastMessage(USER_COLOR + event.getUser().getName() + ChatColor.RESET + " used command " + CMD_COLOR + event.getMessage());
-                    // display when command is usable
-                    if (chatCommand.getCooldownSeconds() > 0) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                getServer().broadcastMessage(CMD_COLOR + ChatColor.ITALIC.toString() + PREFIX + chatCommand.getCommand().toLowerCase(java.util.Locale.ENGLISH) + ChatColor.RESET + ChatColor.ITALIC + " has refreshed.");
-                            }
-                        }.runTaskLaterAsynchronously(this, 20L*chatCommand.getCooldownSeconds());
-                    }
-                    // display when command group is usable
-                    if (cooldownType != null) {
-                        cooldowns.put(cooldownType, LocalDateTime.now());
-                        new BukkitRunnable(){
-                            @Override
-                            public void run() {
-                                getServer().broadcastMessage(CMD_COLOR + ChatColor.ITALIC.toString() + WordUtils.capitalizeFully(cooldownType.name().replace('_',' ')) + ChatColor.RESET + ChatColor.ITALIC + " commands have refreshed.");
-                            }
-                        }.runTaskLaterAsynchronously(this, 20L*cooldownType.getSeconds());
-                    }
+        String text = message.substring(PREFIX.length()).toLowerCase(java.util.Locale.ENGLISH);
+        String[] split = text.split(" ");
+        String command = split[0];
+        String[] args = Arrays.copyOfRange(split, 1, split.length);
+
+        // if message isn't command, exit
+        if (!commands.containsKey(command)) {
+            return;
+        }
+
+        Collection<? extends Player> players = getPlayers();
+        ChatCommand chatCommand = commands.get(command);
+
+        // global cooldowns
+        ClassCooldowns cooldownType = chatCommand.getClassCooldown();
+        boolean cooldownUsable = cooldownType == null || cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds()).isBefore(LocalDateTime.now());
+        if (!(!players.isEmpty() && chatCommand.canUse() && cooldownUsable)) {
+            return;
+        }
+
+        // actually execute the command!
+        boolean executed = chatCommand.execute(event, players, args);
+        // exit if execution failed
+        if (!executed) {
+            return;
+        }
+
+        // set cooldown & display output
+        chatCommand.setCooldown();
+        getServer().broadcastMessage(USER_COLOR + event.getUser().getName() + ChatColor.RESET + " used command " + CMD_COLOR + event.getMessage());
+        // display when command is usable
+        if (chatCommand.getCooldownSeconds() > 0) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    getServer().broadcastMessage(CMD_COLOR + ChatColor.ITALIC.toString() + PREFIX + chatCommand.getCommand().toLowerCase(java.util.Locale.ENGLISH) + ChatColor.RESET + ChatColor.ITALIC + " has refreshed.");
                 }
-            }
+            }.runTaskLaterAsynchronously(this, 20L*chatCommand.getCooldownSeconds());
+        }
+        // display when command group is usable
+        if (cooldownType != null) {
+            cooldowns.put(cooldownType, LocalDateTime.now());
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    getServer().broadcastMessage(CMD_COLOR + ChatColor.ITALIC.toString() + WordUtils.capitalizeFully(cooldownType.name().replace('_',' ')) + ChatColor.RESET + ChatColor.ITALIC + " commands have refreshed.");
+                }
+            }.runTaskLaterAsynchronously(this, 20L*cooldownType.getSeconds());
         }
     }
 
