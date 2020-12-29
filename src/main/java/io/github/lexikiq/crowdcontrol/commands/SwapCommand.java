@@ -47,7 +47,7 @@ public class SwapCommand extends ChatCommand {
             @Override
             public void run() {
                 for (Map.Entry<Player, Location> entry : destinations.entrySet()) {
-                    entry.getKey().teleportAsync(entry.getValue());
+                    entry.getKey().teleport(entry.getValue());
                 }
             }
         }.runTask(plugin);
