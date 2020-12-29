@@ -1,5 +1,6 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
+import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -23,6 +24,11 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
     @Override
     public int getCooldownSeconds() {
         return 60*30;
+    }
+
+    @Override
+    public ClassCooldowns getClassCooldown() {
+        return super.getClassCooldown();
     }
 
     @Override

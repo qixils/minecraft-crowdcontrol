@@ -33,7 +33,7 @@ public class SoundCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*10;
+        return 60*5;
     }
 
     @Override

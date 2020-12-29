@@ -11,10 +11,13 @@ import java.util.Random;
 public abstract class ChatCommand {
     public static final Random rand = new Random();
 
-    protected LocalDateTime used = null;
+    protected LocalDateTime used = LocalDateTime.MIN;
     public abstract int getCooldownSeconds();
+    public ClassCooldowns getClassCooldown() {
+        return null;
+    }
     public boolean canUse() {
-        return used == null || used.plusSeconds(getCooldownSeconds()).isBefore(LocalDateTime.now());
+        return used.plusSeconds(getCooldownSeconds()).isBefore(LocalDateTime.now());
     }
     public void setCooldown() {
         used = LocalDateTime.now();

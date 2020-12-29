@@ -94,7 +94,8 @@ public class RegisterCommands {
         Set<ChatCommand> commands = new HashSet<>(Set.of(
                 new VeinCommand(plugin),
                 new SoundCommand(plugin),
-                new ChargedCreeperCommand(plugin)
+                new ChargedCreeperCommand(plugin),
+                new FireCommand(plugin)
         ));
 
         // register entity commands
