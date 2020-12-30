@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class VeinCommand extends ChatCommand {
     public VeinCommand(CrowdControl plugin) {
@@ -31,7 +32,7 @@ public class VeinCommand extends ChatCommand {
             Material.NETHERRACK
     };
 
-    public static final List<Material> STONES_LIST = ImmutableList.copyOf(STONES);
+    public static final Set<Material> STONES_SET = ImmutableSet.copyOf(STONES);
 
     public enum Ores {
         DIAMOND(Material.DIAMOND_ORE, 3),
@@ -93,7 +94,7 @@ public class VeinCommand extends ChatCommand {
                 for (int y = 0; y <= 1; ++y) {
                     for (int z = 0; z <= 1; ++z) {
                         Location loc = oreLocation.clone().add(x, y, z);
-                        if (STONES_LIST.contains(loc.getBlock().getType())) {
+                        if (STONES_SET.contains(loc.getBlock().getType())) {
                             setBlocks.add(loc);
                         }
                     }

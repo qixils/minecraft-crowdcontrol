@@ -103,7 +103,8 @@ public class RegisterCommands {
                 new ClutterCommand(plugin),
                 new LootboxCommand(plugin),
                 new TeleportCommand(plugin),
-                new ToastCommand(plugin)
+                new ToastCommand(plugin),
+                new SuffocateCommand(plugin)
         ));
 
         // register entity commands
