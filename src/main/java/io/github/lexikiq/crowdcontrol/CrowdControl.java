@@ -6,8 +6,10 @@ import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,12 +17,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.awt.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class CrowdControl extends JavaPlugin {
+    public static final Set<Material> AIR_BLOCKS = ImmutableSet.of(Material.AIR, Material.CAVE_AIR, Material.VOID_AIR); // used by some commands lol
     public static final String PREFIX = "!";
     private final Map<String, ChatCommand> commands = new HashMap<>();
     private TwitchClient twitchClient;
