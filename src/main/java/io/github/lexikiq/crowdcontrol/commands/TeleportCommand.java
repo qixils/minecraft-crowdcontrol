@@ -4,7 +4,10 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +32,7 @@ public class TeleportCommand extends ChatCommand {
     @Override
     public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         for (Player player : players) {
-            Location destination = RandomUtil.randomNearbyBlock(player.getLocation(), 3, 15, true, Material.AIR, Material.CAVE_AIR, Material.VOID_AIR);
+            Location destination = RandomUtil.randomNearbyBlock(player.getLocation(), 3, 15, true, CrowdControl.AIR_ARRAY);
             if (destination == null) {
                 continue;
             }

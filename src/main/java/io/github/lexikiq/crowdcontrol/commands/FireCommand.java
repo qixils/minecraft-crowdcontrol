@@ -31,7 +31,7 @@ public class FireCommand extends ChatCommand {
         boolean didSomething = false;
         for (Player player : players) {
             Block block = player.getLocation().getBlock();
-            if (block.getType() == Material.AIR) {
+            if (CrowdControl.AIR_BLOCKS.contains(block.getType())) {
                 didSomething = true;
                 new BukkitRunnable(){
                     @Override

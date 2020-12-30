@@ -21,7 +21,10 @@ import java.util.List;
 import java.util.*;
 
 public final class CrowdControl extends JavaPlugin {
-    public static final Set<Material> AIR_BLOCKS = ImmutableSet.of(Material.AIR, Material.CAVE_AIR, Material.VOID_AIR); // used by some commands lol
+    // used by some commands lol
+    public static final Material[] AIR_ARRAY = new Material[]{Material.AIR, Material.CAVE_AIR, Material.VOID_AIR};
+    public static final Set<Material> AIR_BLOCKS = ImmutableSet.copyOf(AIR_ARRAY);
+    // actual stuff
     public static final String PREFIX = "!";
     private final Map<String, ChatCommand> commands = new HashMap<>();
     private TwitchClient twitchClient;

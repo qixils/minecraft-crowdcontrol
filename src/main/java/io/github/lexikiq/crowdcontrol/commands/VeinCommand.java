@@ -101,7 +101,7 @@ public class VeinCommand extends ChatCommand {
                 }
             }
             // if we found viable blocks (idk how we wouldn't have atleast one but justincase??)
-            if (setBlocks.size() > 0) {
+            if (!setBlocks.isEmpty()) {
                 didSomething = true;
                 List<Location> trueSetBlocks = new ArrayList<>();
                 int maxBlocks = 1+rand.nextInt(setBlocks.size());

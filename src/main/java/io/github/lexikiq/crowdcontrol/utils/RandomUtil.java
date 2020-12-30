@@ -22,10 +22,11 @@ public class RandomUtil {
     }
 
     public static Object randomElementFrom(List<?> from) {
+        // todo: can i make the return a wildcard
         return from.get(rand.nextInt(from.size()));
     }
 
-    public static Location randomNearbyBlock(Location origin, int minRadius, int maxRadius, boolean spawningSpace, Material... materials) {
+    public static List<Location> randomNearbyBlocks(Location origin, int minRadius, int maxRadius, boolean spawningSpace, Material... materials) {
         List<Location> locations = new ArrayList<>();
         // fun 3D iteration
         for (int x = -maxRadius; x <= maxRadius; x++) {
@@ -52,7 +53,16 @@ public class RandomUtil {
                 }
             }
         }
-        if (locations.size() > 0) {
+        return locations;
+    }
+
+    public static List<Location> randomNearbyBlocks(Location origin, int maxRadius, boolean spawningSpace, Material... materials) {
+        return randomNearbyBlocks(origin, 0, maxRadius, spawningSpace, materials);
+    }
+
+    public static Location randomNearbyBlock(Location origin, int minRadius, int maxRadius, boolean spawningSpace, Material... materials) {
+        List<Location> locations = randomNearbyBlocks(origin, minRadius, maxRadius, spawningSpace, materials);
+        if (!locations.isEmpty()) {
             return (Location) randomElementFrom(locations);
         }
         return null;
