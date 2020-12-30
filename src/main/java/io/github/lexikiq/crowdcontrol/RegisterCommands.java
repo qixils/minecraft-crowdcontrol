@@ -102,7 +102,8 @@ public class RegisterCommands {
                 new DinnerboneCommand(plugin),
                 new ClutterCommand(plugin),
                 new LootboxCommand(plugin),
-                new TeleportCommand(plugin)
+                new TeleportCommand(plugin),
+                new ToastCommand(plugin)
         ));
 
         // register entity commands
