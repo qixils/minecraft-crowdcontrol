@@ -18,7 +18,9 @@ public class SoundCommand extends ChatCommand {
             Sound.ENTITY_ENDERMAN_STARE,
             Sound.ENTITY_ENDERMAN_SCREAM,
             Sound.ENTITY_ENDER_DRAGON_GROWL,
-            Sound.ENTITY_GHAST_HURT
+            Sound.ENTITY_GHAST_HURT,
+            Sound.ENTITY_GENERIC_EXPLODE,
+            Sound.AMBIENT_CAVE
     );
 
     public SoundCommand(CrowdControl plugin) {

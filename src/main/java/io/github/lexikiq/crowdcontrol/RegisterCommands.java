@@ -1,7 +1,9 @@
 package io.github.lexikiq.crowdcontrol;
 
+import com.google.common.collect.ImmutableSet;
 import io.github.lexikiq.crowdcontrol.commands.*;
 import org.bukkit.Difficulty;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -9,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RegisterCommands {
-    public static final Set<EntityType> SAFE_ENTITIES = Set.of(
+    public static final Set<EntityType> SAFE_ENTITIES = ImmutableSet.of(
             EntityType.CREEPER,
             EntityType.SKELETON,
             EntityType.ZOMBIE,
@@ -89,13 +91,27 @@ public class RegisterCommands {
             EntityType.ARMOR_STAND
     );
 
+    public static final Set<Material> SET_BLOCKS = ImmutableSet.of(
+            Material.TNT,
+            Material.FIRE,
+            Material.COBWEB,
+            Material.REDSTONE_TORCH,
+            Material.WITHER_ROSE
+    );
+
+    public static final Set<Material> SET_FALLING_BLOCKS = ImmutableSet.of(
+            Material.ANVIL,
+            Material.SAND,
+            Material.RED_SAND,
+            Material.GRAVEL
+    );
+
     public static void register(CrowdControl plugin) {
         // register normal commands
         Set<ChatCommand> commands = new HashSet<>(Set.of(
                 new VeinCommand(plugin),
                 new SoundCommand(plugin),
                 new ChargedCreeperCommand(plugin),
-                new FireCommand(plugin),
                 new GiveItem(plugin),
                 new TakeItem(plugin),
                 new SwapCommand(plugin),
@@ -105,9 +121,10 @@ public class RegisterCommands {
                 new TeleportCommand(plugin),
                 new ToastCommand(plugin),
                 new SuffocateCommand(plugin),
-                new AnvilCommand(plugin),
                 new FlowerCommand(plugin),
-                new ParticleCommand(plugin)
+                new ParticleCommand(plugin),
+                new MoveCommand(plugin, 0, 1, 0, "up"),
+                new MoveCommand(plugin, 0, -1, 0, "down")
         ));
 
         // register entity commands
@@ -123,6 +140,14 @@ public class RegisterCommands {
         // potions
         for (PotionEffectType potionEffectType : PotionEffectType.values()) {
             commands.add(new PotionCommand(plugin, potionEffectType));
+        }
+
+        // block sets
+        for (Material material : SET_BLOCKS) {
+            commands.add(new BlockCommand(plugin, material));
+        }
+        for (Material material : SET_FALLING_BLOCKS) {
+            commands.add(new FallingBlockCommand(plugin, material));
         }
 
         // actually register the commands

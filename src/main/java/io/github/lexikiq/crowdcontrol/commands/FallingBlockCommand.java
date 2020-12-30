@@ -2,6 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
+import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,35 +13,43 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class AnvilCommand extends ChatCommand {
-    public AnvilCommand(CrowdControl plugin) {
+public class FallingBlockCommand extends ChatCommand {
+    protected final Material blockMaterial;
+    public FallingBlockCommand(CrowdControl plugin, Material blockMaterial) {
         super(plugin);
+        this.blockMaterial = blockMaterial;
     }
 
     @Override
     public int getCooldownSeconds() {
-        return (int) (60*2.5);
+        return (60*5);
+    }
+
+    @Override
+    public ClassCooldowns getClassCooldown() {
+        return ClassCooldowns.FALLING_BLOCK;
     }
 
     @Override
     public @NotNull String getCommand() {
-        return "anvil";
+        return blockMaterial.name();
     }
 
     @Override
     public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         // input parsing
-        if (args.length < 1) {
-            return false;
-        }
         int y;
-        try {
-            y = Integer.parseInt(args[0]);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        if (y < 1) {
-            return false;
+        if (args.length < 1) {
+            y = 5;
+        } else {
+            try {
+                y = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+            if (y < 1) {
+                return false;
+            }
         }
 
         // spawn the damn anvil
@@ -52,7 +61,7 @@ public class AnvilCommand extends ChatCommand {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        block.setType(Material.ANVIL, true);
+                        block.setType(blockMaterial, true);
                     }
                 }.runTask(plugin);
             }

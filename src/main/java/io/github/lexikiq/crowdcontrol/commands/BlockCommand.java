@@ -2,6 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
+import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,19 +12,26 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class FireCommand extends ChatCommand {
-    public FireCommand(CrowdControl plugin) {
+public class BlockCommand extends ChatCommand {
+    protected final Material material;
+    public BlockCommand(CrowdControl plugin, Material block) {
         super(plugin);
+        this.material = block;
     }
 
     @Override
     public int getCooldownSeconds() {
-        return 45;
+        return 60*5;
+    }
+
+    @Override
+    public ClassCooldowns getClassCooldown() {
+        return ClassCooldowns.BLOCK;
     }
 
     @Override
     public @NotNull String getCommand() {
-        return "fire";
+        return material.name();
     }
 
     @Override
@@ -36,7 +44,7 @@ public class FireCommand extends ChatCommand {
                 new BukkitRunnable(){
                     @Override
                     public void run() {
-                        block.setType(Material.FIRE);
+                        block.setType(material);
                     }
                 }.runTask(plugin);
             }
