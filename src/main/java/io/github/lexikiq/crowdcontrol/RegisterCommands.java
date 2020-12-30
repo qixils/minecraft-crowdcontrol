@@ -106,7 +106,8 @@ public class RegisterCommands {
                 new ToastCommand(plugin),
                 new SuffocateCommand(plugin),
                 new AnvilCommand(plugin),
-                new FlowerCommand(plugin)
+                new FlowerCommand(plugin),
+                new ParticleCommand(plugin)
         ));
 
         // register entity commands

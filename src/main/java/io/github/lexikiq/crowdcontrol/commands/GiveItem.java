@@ -62,12 +62,10 @@ public class GiveItem extends ChatCommand {
 
     public static @Nullable Material getItemByEvent(String[] args) {
         String itemText = String.join("_", args).toUpperCase(Locale.ENGLISH);
-        System.out.println(itemText);
         if (itemText.isEmpty()) {
             return null;
         }
         Material material = Material.getMaterial(itemText);
-        System.out.println(material);
         if (material == null || !material.isItem()) {
             return null;
         }

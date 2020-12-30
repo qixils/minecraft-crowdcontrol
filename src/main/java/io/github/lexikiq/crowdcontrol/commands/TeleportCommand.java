@@ -3,6 +3,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.ParticleUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -40,8 +41,7 @@ public class TeleportCommand extends ChatCommand {
                 @Override
                 public void run() {
                     player.teleport(destination);
-                    destination.setY(Math.ceil(destination.getY()));
-                    Particle.PORTAL.builder().location(destination).offset(.5d, 1d, .5d).source(player).receivers(75).count(100).spawn();
+                    ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);
                     player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.AMBIENT, 1.0f, 1.0f);
                 }
             }.runTask(plugin);
