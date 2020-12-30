@@ -60,6 +60,6 @@ public class SummonEntityCommand extends ChatCommand {
     }
 
     private static Location getSpawnLocation(Location location) {
-        return RandomUtil.randomNearbyBlock(location, SPAWN_RADIUS, true, Material.AIR);
+        return RandomUtil.randomNearbyBlock(location, SPAWN_RADIUS, true, Material.AIR, Material.CAVE_AIR, Material.VOID_AIR);
     }
 }

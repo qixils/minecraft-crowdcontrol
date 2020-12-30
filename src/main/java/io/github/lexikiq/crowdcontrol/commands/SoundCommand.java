@@ -40,7 +40,7 @@ public class SoundCommand extends ChatCommand {
         Sound sound = (Sound) RandomUtil.randomElementFrom(SOUNDS);
         for (Player player : players) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
-            player.playSound(playAt, sound, SoundCategory.HOSTILE, 1.0f, 1.0f);
+            player.getWorld().playSound(playAt, sound, SoundCategory.HOSTILE, 1.0f, 1.0f);
         }
         return true;
     }

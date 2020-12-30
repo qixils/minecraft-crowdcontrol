@@ -101,7 +101,8 @@ public class RegisterCommands {
                 new SwapCommand(plugin),
                 new DinnerboneCommand(plugin),
                 new ClutterCommand(plugin),
-                new LootboxCommand(plugin)
+                new LootboxCommand(plugin),
+                new TeleportCommand(plugin)
         ));
 
         // register entity commands

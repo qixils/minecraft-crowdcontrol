@@ -35,7 +35,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
     public Entity spawnEntity(Player player, Location location) {
         Creeper creeper = (Creeper) super.spawnEntity(player, location);
         creeper.setPowered(true);
-        player.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
+        player.getWorld().playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
         return creeper;
     }
 }
