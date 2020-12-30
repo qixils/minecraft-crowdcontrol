@@ -49,7 +49,6 @@ public class TakeItem extends ChatCommand {
                         }
                     }
                     player.updateInventory();
-                    player.openInventory(player.getInventory());
                 }
             }
         }.runTask(plugin);
