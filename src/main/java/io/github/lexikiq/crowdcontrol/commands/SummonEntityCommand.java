@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class SummonEntityCommand extends ChatCommand {
-    private final EntityType entityType;
-    private static final int SPAWN_RADIUS = 7;
+    protected final EntityType entityType;
+    protected static final int SPAWN_RADIUS = 7;
 
     public SummonEntityCommand(CrowdControl plugin, EntityType entityType) {
         super(plugin);
@@ -55,11 +55,11 @@ public class SummonEntityCommand extends ChatCommand {
         return false;
     }
 
-    public Entity spawnEntity(Player player, Location location) {
+    protected Entity spawnEntity(Player player, Location location) {
         return player.getWorld().spawnEntity(location, entityType);
     }
 
-    private static Location getSpawnLocation(Location location) {
+    protected Location getSpawnLocation(Location location) {
         return RandomUtil.randomNearbyBlock(location, SPAWN_RADIUS, true, Material.AIR, Material.CAVE_AIR, Material.VOID_AIR);
     }
 }

@@ -2,7 +2,9 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Creeper;
@@ -32,10 +34,15 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
     }
 
     @Override
-    public Entity spawnEntity(Player player, Location location) {
+    protected Entity spawnEntity(Player player, Location location) {
         Creeper creeper = (Creeper) super.spawnEntity(player, location);
         creeper.setPowered(true);
         player.getWorld().playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
         return creeper;
+    }
+
+    @Override
+    protected Location getSpawnLocation(Location location) {
+        return RandomUtil.randomNearbyBlock(location, 5, SPAWN_RADIUS, true, Material.AIR, Material.CAVE_AIR, Material.VOID_AIR);
     }
 }
