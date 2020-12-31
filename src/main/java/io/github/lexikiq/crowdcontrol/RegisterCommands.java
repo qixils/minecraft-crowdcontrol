@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import io.github.lexikiq.crowdcontrol.commands.*;
 import org.bukkit.Difficulty;
 import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -148,6 +149,11 @@ public class RegisterCommands {
         }
         for (Material material : SET_FALLING_BLOCKS) {
             commands.add(new FallingBlockCommand(plugin, material));
+        }
+
+        // wwwwwwww
+        for (WeatherType weatherType : WeatherType.values()) {
+            commands.add(new WeatherCommand(plugin, weatherType));
         }
 
         // actually register the commands
