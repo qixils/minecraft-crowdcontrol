@@ -13,7 +13,7 @@ import java.util.List;
 
 public class WeatherCommand extends ChatCommand {
     protected final WeatherType weatherType;
-    protected static final int DURATION = 600;
+    protected static final int DURATION = 20*60*60;
     public WeatherCommand(CrowdControl plugin, WeatherType weatherType) {
         super(plugin);
         this.weatherType = weatherType;
