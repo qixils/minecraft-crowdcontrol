@@ -4,6 +4,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -39,7 +40,7 @@ public class BlockCommand extends ChatCommand {
         boolean didSomething = false;
         for (Player player : players) {
             Block block = player.getLocation().getBlock();
-            if (CrowdControl.AIR_BLOCKS.contains(block.getType())) {
+            if (BlockUtil.AIR_BLOCKS.contains(block.getType())) {
                 didSomething = true;
                 new BukkitRunnable(){
                     @Override

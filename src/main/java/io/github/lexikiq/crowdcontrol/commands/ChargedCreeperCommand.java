@@ -2,6 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -42,6 +43,6 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 
     @Override
     protected Location getSpawnLocation(Location location) {
-        return RandomUtil.randomNearbyBlock(location, 5, SPAWN_RADIUS, true, CrowdControl.AIR_ARRAY);
+        return RandomUtil.randomNearbyBlock(location, 5, SPAWN_RADIUS, true, BlockUtil.AIR_ARRAY);
     }
 }

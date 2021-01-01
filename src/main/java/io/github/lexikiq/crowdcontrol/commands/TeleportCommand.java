@@ -3,6 +3,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.ParticleUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
@@ -33,7 +34,7 @@ public class TeleportCommand extends ChatCommand {
     @Override
     public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         for (Player player : players) {
-            Location destination = RandomUtil.randomNearbyBlock(player.getLocation(), 3, 15, true, CrowdControl.AIR_ARRAY);
+            Location destination = RandomUtil.randomNearbyBlock(player.getLocation(), 3, 15, true, BlockUtil.AIR_ARRAY);
             if (destination == null) {
                 continue;
             }

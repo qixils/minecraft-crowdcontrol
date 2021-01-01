@@ -4,6 +4,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -57,7 +58,7 @@ public class FallingBlockCommand extends ChatCommand {
             Location destination = player.getEyeLocation();
             destination.setY(Math.min(destination.getY()+y, player.getWorld().getMaxHeight()-1));
             Block block = destination.getBlock();
-            if (CrowdControl.AIR_BLOCKS.contains(block.getType())) {
+            if (BlockUtil.AIR_BLOCKS.contains(block.getType())) {
                 new BukkitRunnable() {
                     @Override
                     public void run() {

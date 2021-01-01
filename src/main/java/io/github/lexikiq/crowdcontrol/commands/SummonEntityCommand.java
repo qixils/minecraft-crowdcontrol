@@ -4,6 +4,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -59,6 +60,6 @@ public class SummonEntityCommand extends ChatCommand {
     }
 
     protected Location getSpawnLocation(Location location) {
-        return RandomUtil.randomNearbyBlock(location, 3, SPAWN_RADIUS, true, CrowdControl.AIR_ARRAY);
+        return RandomUtil.randomNearbyBlock(location, 3, SPAWN_RADIUS, true, BlockUtil.AIR_ARRAY);
     }
 }

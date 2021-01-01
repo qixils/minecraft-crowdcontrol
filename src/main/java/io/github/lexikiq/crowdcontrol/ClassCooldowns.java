@@ -7,7 +7,8 @@ public enum ClassCooldowns {
     POTION(30),
     BLOCK(5),
     FALLING_BLOCK(30),
-    WEATHER(30)
+    WEATHER(30),
+    TORCH(60)
     ;
 
     private final @Getter int seconds;

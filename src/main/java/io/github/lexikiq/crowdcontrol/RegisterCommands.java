@@ -125,7 +125,9 @@ public class RegisterCommands {
                 new FlowerCommand(plugin),
                 new ParticleCommand(plugin),
                 new MoveCommand(plugin, 0, 1, 0, "up"),
-                new MoveCommand(plugin, 0, -1, 0, "down")
+                new MoveCommand(plugin, 0, -1, 0, "down"),
+                new TorchCommand(plugin, true),
+                new TorchCommand(plugin, false)
         ));
 
         // register entity commands

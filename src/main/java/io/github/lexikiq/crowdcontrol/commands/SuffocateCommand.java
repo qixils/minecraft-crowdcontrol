@@ -3,6 +3,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -13,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class SuffocateCommand extends ChatCommand {
-    protected static final Material STONE_MATERIAL = Material.STONE;
-    protected static final int RADIUS = 1;
+    protected static final Material SET_MATERIAL = Material.GLASS;
+    protected static final double RADIUS = 1.5;
 
     public SuffocateCommand(CrowdControl plugin) {
         super(plugin);
@@ -27,7 +28,7 @@ public class SuffocateCommand extends ChatCommand {
 
     @Override
     public @NotNull String getCommand() {
-        return "suffocate";
+        return "freeze";
     }
 
     @Override
@@ -37,13 +38,13 @@ public class SuffocateCommand extends ChatCommand {
                 @Override
                 public void run() {
                     Location base = player.getLocation();
-                    for (int x = -RADIUS; x <= RADIUS; ++x) {
+                    for (double x = -RADIUS; x <= RADIUS; ++x) {
                         for (int y = -1; y <= 2; ++y) {
-                            for (int z = -RADIUS; z <= RADIUS; ++z) {
+                            for (double z = -RADIUS; z <= RADIUS; ++z) {
                                 Location location = base.clone().add(x, y, z);
                                 Block block = location.getBlock();
-                                if (CrowdControl.AIR_BLOCKS.contains(block.getType())) {
-                                    location.getBlock().setType(STONE_MATERIAL);
+                                if (BlockUtil.AIR_BLOCKS.contains(block.getType())) {
+                                    location.getBlock().setType(SET_MATERIAL);
                                 }
                             }
                         }
