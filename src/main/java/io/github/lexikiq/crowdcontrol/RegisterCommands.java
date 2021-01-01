@@ -127,7 +127,8 @@ public class RegisterCommands {
                 new MoveCommand(plugin, 0, 1, 0, "up"),
                 new MoveCommand(plugin, 0, -1, 0, "down"),
                 new TorchCommand(plugin, true),
-                new TorchCommand(plugin, false)
+                new TorchCommand(plugin, false),
+                new GravelCommand(plugin)
         ));
 
         // register entity commands

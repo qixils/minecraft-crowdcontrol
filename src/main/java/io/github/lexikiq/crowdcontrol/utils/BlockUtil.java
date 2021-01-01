@@ -48,6 +48,7 @@ public class BlockUtil {
     };
     public static final Set<Material> TORCH_SET = ImmutableSet.copyOf(TORCH_ARRAY);
 
+    // these should honestly probably return a list (set?) of blocks but i'm too lazy to fix all the instances
     public static List<Location> getNearbyBlocks(Location origin, int minRadius, int maxRadius, boolean spawningSpace, Material... materials) {
         List<Location> locations = new ArrayList<>();
         // fun 3D iteration
