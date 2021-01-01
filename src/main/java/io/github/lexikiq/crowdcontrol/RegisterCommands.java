@@ -131,7 +131,8 @@ public class RegisterCommands {
                 new TorchCommand(plugin, false),
                 new GravelCommand(plugin),
                 new DigCommand(plugin),
-                new TimeCommand(plugin)
+                new TimeCommand(plugin),
+                new NameCommand(plugin)
         ));
 
         // register entity commands

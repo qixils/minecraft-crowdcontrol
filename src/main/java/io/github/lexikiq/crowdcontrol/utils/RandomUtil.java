@@ -42,7 +42,7 @@ public class RandomUtil {
     }
 
     public static Location randomNearbyBlock(Location origin, int minRadius, int maxRadius, boolean spawningSpace, Material... materials) {
-        List<Location> locations = randomNearbyBlocks(origin, minRadius, maxRadius, spawningSpace, materials);
+        List<Location> locations = BlockUtil.getNearbyBlocks(origin, minRadius, maxRadius, spawningSpace, materials);
         if (!locations.isEmpty()) {
             return (Location) randomElementFrom(locations);
         }
