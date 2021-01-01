@@ -3,6 +3,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -11,11 +12,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class LootboxCommand extends ChatCommand {
+    protected static List<Material> ITEMS = List.copyOf(BlockUtil.MATERIAL_SET);
+
     public LootboxCommand(CrowdControl plugin) {
         super(plugin);
     }
@@ -34,12 +36,12 @@ public class LootboxCommand extends ChatCommand {
     public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         for (Player player : players) {
             Inventory lootbox = Bukkit.createInventory(null, 27, event.getUser().getName()+" has gifted you...");
-            List<Material> items = Arrays.asList(Material.values());
-            Collections.shuffle(items, rand);
+            Collections.shuffle(ITEMS, rand);
             Material item = null;
-            for (Material i : items) {
+            for (Material i : ITEMS) {
                 if (i.isItem()) {
                     item = i;
+                    break;
                 }
             }
             assert item != null;

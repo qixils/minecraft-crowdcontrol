@@ -69,6 +69,7 @@ public class BlockUtil {
             Material.SOUL_WALL_TORCH
     };
     public static final Set<Material> TORCH_SET = ImmutableSet.copyOf(TORCH_ARRAY);
+    public static final Set<Material> MATERIAL_SET = ImmutableSet.copyOf(Material.values());
 
     // these should honestly probably return a list (set?) of blocks but i'm too lazy to fix all the instances
     public static List<Location> getNearbyBlocks(Location origin, int minRadius, int maxRadius, boolean spawningSpace, Material... materials) {
