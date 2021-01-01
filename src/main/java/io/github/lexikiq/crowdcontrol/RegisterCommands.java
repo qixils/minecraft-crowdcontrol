@@ -5,6 +5,7 @@ import io.github.lexikiq.crowdcontrol.commands.*;
 import org.bukkit.Difficulty;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -159,6 +160,10 @@ public class RegisterCommands {
         // wwwwwwww
         for (WeatherType weatherType : WeatherType.values()) {
             commands.add(new WeatherCommand(plugin, weatherType));
+        }
+
+        for (Enchantment enchantment : Enchantment.values()) {
+            commands.add(new EnchantmentCommand(plugin, enchantment));
         }
 
         // actually register the commands
