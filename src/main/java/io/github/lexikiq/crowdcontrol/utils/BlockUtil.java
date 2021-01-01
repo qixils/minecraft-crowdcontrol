@@ -35,7 +35,29 @@ public class BlockUtil {
             Material.DIRT,
             Material.GRAVEL,
             Material.GRANITE,
-            Material.NETHERRACK
+            Material.NETHERRACK,
+            Material.GRASS_BLOCK,
+            Material.SAND,
+            Material.RED_SAND,
+            Material.SANDSTONE,
+            Material.TERRACOTTA,
+            Material.RED_SANDSTONE,
+            Material.ORANGE_TERRACOTTA,
+            Material.BLACK_TERRACOTTA,
+            Material.BLUE_TERRACOTTA,
+            Material.BROWN_TERRACOTTA,
+            Material.CYAN_TERRACOTTA,
+            Material.GRAY_TERRACOTTA,
+            Material.GREEN_TERRACOTTA,
+            Material.LIGHT_BLUE_TERRACOTTA,
+            Material.LIGHT_GRAY_TERRACOTTA,
+            Material.LIME_TERRACOTTA,
+            Material.MAGENTA_TERRACOTTA,
+            Material.PINK_TERRACOTTA,
+            Material.PURPLE_TERRACOTTA,
+            Material.RED_TERRACOTTA,
+            Material.WHITE_TERRACOTTA,
+            Material.YELLOW_TERRACOTTA
     };
     public static final Set<Material> STONES_SET = ImmutableSet.copyOf(STONES);
     public static final Material[] TORCH_ARRAY = new Material[]{
