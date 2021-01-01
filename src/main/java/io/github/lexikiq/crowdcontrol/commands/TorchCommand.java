@@ -76,7 +76,7 @@ public class TorchCommand extends ChatCommand {
         return true;
     }
 
-    protected boolean placeTorch(Location location) {
+    protected void placeTorch(Location location) {
         Block block = location.getBlock();
         BlockFace placeFace = null;
         for (BlockFace blockFace : BLOCK_FACES) {
@@ -91,7 +91,7 @@ public class TorchCommand extends ChatCommand {
                 }
             }
         }
-        if (placeFace == null) {return false;}
+        if (placeFace == null) {return;}
         boolean facingDown = placeFace == BlockFace.DOWN;
         Material placeBlock = facingDown ? Material.TORCH : Material.WALL_TORCH;
         block.setType(placeBlock);
@@ -100,6 +100,5 @@ public class TorchCommand extends ChatCommand {
             data.setFacing(placeFace);
             block.setBlockData(data, false);
         }
-        return true;
     }
 }
