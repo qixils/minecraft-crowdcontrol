@@ -4,6 +4,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
+import io.github.lexikiq.crowdcontrol.utils.WeightedEnum;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,7 +24,7 @@ public class VeinCommand extends ChatCommand {
         super(plugin);
     }
 
-    public enum Ores {
+    public enum Ores implements WeightedEnum {
         DIAMOND(Material.DIAMOND_ORE, 3),
         IRON(Material.IRON_ORE, 3),
         COAL(Material.COAL_ORE, 3),
@@ -37,8 +38,8 @@ public class VeinCommand extends ChatCommand {
         LAVA(Material.LAVA, 7)
         ;
 
-        public final @Getter Material block;
-        public final @Getter int weight;
+        private final @Getter Material block;
+        private final @Getter int weight;
         Ores(Material block, int weight) {
             this.block = block;
             this.weight = weight;
@@ -62,14 +63,7 @@ public class VeinCommand extends ChatCommand {
 
     @Override
     public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
-        // Weighted random code based off of https://stackoverflow.com/a/6737362
-        Ores[] items = Ores.values();
-        int idx = 0;
-        for (double r = Math.random() * Ores.TOTAL_WEIGHTS; idx < items.length - 1; ++idx) {
-            r -= items[idx].getWeight();
-            if (r <= 0.0) break;
-        }
-        Material ore = items[idx].getBlock();
+        Material ore = ((Ores) RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS)).getBlock();
 
         boolean didSomething = false;
         for (Player player : players) {

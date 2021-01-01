@@ -52,4 +52,14 @@ public class RandomUtil {
     public static Location randomNearbyBlock(Location origin, int maxRadius, boolean spawningSpace, Material... materials) {
         return randomNearbyBlock(origin, 0, maxRadius, spawningSpace, materials);
     }
+
+    public static Object weightedRandom(WeightedEnum[] weightedEnum, int totalWeights) {
+        // Weighted random code based off of https://stackoverflow.com/a/6737362
+        int idx = 0;
+        for (double r = Math.random() * totalWeights; idx < weightedEnum.length - 1; ++idx) {
+            r -= weightedEnum[idx].getWeight();
+            if (r <= 0.0) break;
+        }
+        return weightedEnum[idx];
+    }
 }
