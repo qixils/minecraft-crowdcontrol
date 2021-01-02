@@ -50,10 +50,9 @@ public class SummonEntityCommand extends ChatCommand {
                         spawnEntity(player, loc);
                     }
                 }.runTask(plugin);
-                return true;
             }
         }
-        return false;
+        return true;
     }
 
     protected Entity spawnEntity(Player player, Location location) {
