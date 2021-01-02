@@ -2,24 +2,26 @@
 Minecraft Crowd Control is a plugin for [Paper](https://papermc.io/) 1.16.4 that allows your Twitch community to interact with your game.
 
 This plugin is currently aimed towards streamers without features like channel points or bits, as commands are simply used by typing in chat and work off a cooldown system.
-Most commands have some sort of cooldown to prevent them from being used every second, though most are in the range of half a minute to 15 minutes.
+Most commands have some sort of cooldown to prevent them from being used every second, though generally these are in the range of half a minute to 15 minutes.
 Cooldowns are global, meaning once one person uses a specific command, nobody else can use it until it has recharged.
 
 Commands used are posted to chat along with who used them. The plugin also posts when cooldowns have expired.
 
-Commands are fully compatible for a multiplayer server, i.e. they will effect everyone (or rarely only one person). There's even a multiplayer-only command or two.
+Commands are fully compatible with a multiplayer server, i.e. they will affect everyone (or rarely only one person). There's even a multiplayer-only command or two.
 
 ## Installation
 
 Download the [latest plugin jar](https://github.com/lexikiq/minecraft-crowdcontrol/releases/latest) and place it in your plugins folder.
-You wil also need to be using Paper (or Tuinity). Spigot support may come later if heavily requested.
+You will also need to be using [Paper](https://papermc.io/) (or [Tuinity](https://github.com/Spottedleaf/Tuinity)).
 
-To set your Twitch channel, run the plugin once so it can generate its default config file, then replace `lexikiq` in .\plugins\CrowdControl\plugin.yml with your Twitch channel name.
+For those unaware, Paper is a fork (a variation) of Spigot that vastly improves server performance. You should be able to upgrade from Spigot to Paper with no hassle.
+
+To set your Twitch channel, run the plugin once, so it can generate its default config file, then replace `lexikiq` in `.\plugins\CrowdControl\plugin.yml` with your Twitch channel name.
 
 ## Commands
 List may not be fully complete as it is sort-of manually generated.
 
-This description was largely written with my own stream in mind, so the wording assumes multiplayer.
+This description was largely written with my own stream in mind, so the wording assumes you are playing with friends.
 
 ### Miscellaneous
 - `!dig` -- dig a 2 block hole under us
@@ -34,12 +36,86 @@ This description was largely written with my own stream in mind, so the wording 
 
 #### Particles
 - `!particle <particle>` -- spawns particles around us
-Valid particles: [TODO]
+
+<details>
+<summary>Valid Particle Effects:</summary>
+
+- ash
+- barrier
+- bubble_column_up
+- bubble_pop
+- campfire_cosy_smoke
+- campfire_signal_smoke
+- cloud
+- composter
+- crimson_spore
+- crit
+- crit_magic
+- current_down
+- damage_indicator
+- dolphin
+- dragon_breath
+- dripping_honey
+- dripping_obsidian_tear
+- drip_lava
+- drip_water
+- enchantment_table
+- end_rod
+- explosion_huge
+- explosion_large
+- explosion_normal
+- falling_honey
+- falling_lava
+- falling_nectar
+- falling_obsidian_tear
+- falling_water
+- fireworks_spark
+- flame
+- flash
+- heart
+- landing_honey
+- landing_lava
+- landing_obsidian_tear
+- lava
+- mob_appearance
+- nautilus
+- note
+- portal
+- reverse_portal
+- slime
+- smoke_large
+- smoke_normal
+- sneeze
+- snowball
+- snow_shovel
+- soul
+- soul_fire_flame
+- spell
+- spell_instant
+- spell_mob
+- spell_mob_ambient
+- spell_witch
+- spit
+- squid_ink
+- suspended
+- suspended_depth
+- sweep_attack
+- totem
+- town_aura
+- villager_angry
+- villager_happy
+- warped_spore
+- water_bubble
+- water_drop
+- water_splash
+- water_wake
+- white_ash
+</details>
 
 #### Inventory
 - `!clutter` -- swaps the item in our main with a random item in our inventory
-- `!give <item_name>` -- gives us 1 item (don't include the <>'s)
-- `!take <item_name>` -- takes 1 item (don't include the <>'s)
+- `!give <item name>` -- gives us 1 item (don't include the <>'s)
+- `!take <item name>` -- takes 1 item (don't include the <>'s)
 - `!lootbox` -- gives us a random amount of a random item (possibly with enchantments and other stuff!)
 - `!name <name>` -- renames our held item (don't include the <>'s)
 
@@ -57,7 +133,8 @@ Sets a block at our feet
 - `!wither_rose`
 
 #### Falling Blocks
-What's that falling from the sky?  
+What's that falling from the sky?
+
 Optionally supports setting its relative height by typing i.e. `!anvil 10` (spawns an anvil 10 blocks above our heads)
 - `!anvil [height]`
 - `!gravel [height]`
