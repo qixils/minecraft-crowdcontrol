@@ -167,14 +167,41 @@ public class RegisterCommands {
             commands.add(new EnchantmentCommand(plugin, enchantment));
         }
 
+        // generate template commands.txt
+//        FileWriter fileWriter = null;
+//        try {
+//            fileWriter = new FileWriter("crowdcontrol_commands.txt");
+//        } catch (IOException e) {
+//            plugin.getLogger().warning("Failed to write commands to file.");
+//            e.printStackTrace();
+//        }
+
         // actually register the commands
         for (ChatCommand cmd : commands) {
             String name = cmd.getCommand().toLowerCase(java.util.Locale.ENGLISH);
             try {
                 plugin.registerCommand(name, cmd);
+//                if (fileWriter != null) {
+//                    try {
+//                        fileWriter.write("!" + name + "\n");
+//                    } catch (IOException e) {
+//                        plugin.getLogger().warning("Failed to save command "+name+".");
+//                        e.printStackTrace();
+//                    }
+//                }
             } catch (AlreadyRegisteredException e) {
                 plugin.getLogger().warning("Tried to register Twitch command '"+name+"' but it was already registered.");
             }
         }
+
+        // groan
+//        if (fileWriter != null) {
+//            try {
+//                fileWriter.close();
+//            } catch (IOException e) {
+//                plugin.getLogger().warning("Failed to close file???");
+//                e.printStackTrace();
+//            }
+//        }
     }
 }

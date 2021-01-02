@@ -127,6 +127,6 @@ public final class CrowdControl extends JavaPlugin {
             throw new AlreadyRegisteredException(name);
         }
         commands.put(name, command);
-        getLogger().info("Registered Twitch command '"+name+"'");
+        getLogger().fine("Registered Twitch command '"+name+"'");
     }
 }
