@@ -41,16 +41,17 @@ public class SummonEntityCommand extends ChatCommand {
 
     @Override
     public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
-        Player player = (Player) RandomUtil.randomElementFrom(players); // get random player
-        Location loc = getSpawnLocation(player.getLocation());
-        if (loc != null) {
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    spawnEntity(player, loc);
-                }
-            }.runTask(plugin);
-            return true;
+        for (Player player : players) {
+            Location loc = getSpawnLocation(player.getLocation());
+            if (loc != null) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        spawnEntity(player, loc);
+                    }
+                }.runTask(plugin);
+                return true;
+            }
         }
         return false;
     }
