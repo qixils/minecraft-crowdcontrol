@@ -3,12 +3,12 @@ package io.github.lexikiq.crowdcontrol;
 import lombok.Getter;
 
 public enum ClassCooldowns {
-    ENTITY(30),
-    POTION(30),
+    ENTITY(20),
+    POTION(20),
     BLOCK(5),
-    FALLING_BLOCK(30),
-    WEATHER(30),
-    TORCH(60),
+    FALLING_BLOCK(20),
+    WEATHER(20),
+    TORCH(20),
     ENCHANTMENT(20)
     ;
 
