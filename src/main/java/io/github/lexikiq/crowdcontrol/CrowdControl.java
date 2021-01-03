@@ -24,6 +24,9 @@ public final class CrowdControl extends JavaPlugin {
     // actual stuff
     public static final String PREFIX = "!";
     private final Map<String, ChatCommand> commands = new HashMap<>();
+    private final Map<Integer, ChatCommand> bitCommands = new HashMap<>();
+    private final Map<Integer, ChatCommand> pointCommands = new HashMap<>();
+
     private TwitchClient twitchClient;
     private final FileConfiguration config = getConfig();
     public static final ChatColor USER_COLOR = ChatColor.of(new Color(0x9f44db));
@@ -98,7 +101,12 @@ public final class CrowdControl extends JavaPlugin {
         ChatCommand chatCommand = commands.get(command);
         if (!chatCommand.canUse()) {
             if (hasChatToken && config.getBoolean("command_replies")) {
-                sendMessage(event, event.getUser().getName() + ": !" + command + " is on cooldown for " + formatTime(chatCommand.refreshesAt()));
+                sendMessage(event, String.format(
+                        "%s: !%s is on cooldown for %s",
+                        event.getUser().getName(),
+                        command,
+                        formatTime(chatCommand.refreshesAt())
+                ));
             }
             return;
         }
