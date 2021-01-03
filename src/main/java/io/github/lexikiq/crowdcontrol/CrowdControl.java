@@ -59,7 +59,10 @@ public final class CrowdControl extends JavaPlugin {
                 .withEnableChat(true);
         if (hasChatToken) {
             OAuth2Credential credential = new OAuth2Credential("twitch", Objects.requireNonNull(config.getString("irc")));
-            twitchClientBuilder = twitchClientBuilder.withChatAccount(credential).withEnablePubSub(true);
+            twitchClientBuilder = twitchClientBuilder
+                    .withChatAccount(credential)
+                    // .withEnablePubSub(true)
+            ;
         }
         twitchClient = twitchClientBuilder.build();
         twitchClient.getChat().joinChannel(config.getString("channel"));

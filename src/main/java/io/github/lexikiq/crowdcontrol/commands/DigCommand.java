@@ -16,13 +16,14 @@ import java.util.Set;
 import static io.github.lexikiq.crowdcontrol.utils.BlockUtil.STONES_SET;
 
 public class DigCommand extends ChatCommand {
+    private final static double RADIUS = .5D;
     public DigCommand(CrowdControl plugin) {
         super(plugin);
     }
 
     @Override
     public int getCooldownSeconds() {
-        return 60*3;
+        return (int) (60*2.5);
     }
 
     @Override
@@ -33,11 +34,16 @@ public class DigCommand extends ChatCommand {
     @Override
     public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
         Set<Block> blocks = new HashSet<>();
+        int depth = -(2 + rand.nextInt(4));
         for (Player player : players) {
-            for (int y = -2; y < 0; ++y){
-                Block block = player.getLocation().add(0, y, 0).getBlock();
-                if (STONES_SET.contains(block.getType())) {
-                    blocks.add(block);
+            for (double x = -RADIUS; x <= RADIUS; ++x) {
+                for (int y = depth; y < 0; ++y) {
+                    for (double z = -RADIUS; z <= RADIUS; ++z) {
+                        Block block = player.getLocation().add(x, y, z).getBlock();
+                        if (STONES_SET.contains(block.getType())) {
+                            blocks.add(block);
+                        }
+                    }
                 }
             }
         }

@@ -57,7 +57,23 @@ public class BlockUtil {
             Material.PURPLE_TERRACOTTA,
             Material.RED_TERRACOTTA,
             Material.WHITE_TERRACOTTA,
-            Material.YELLOW_TERRACOTTA
+            Material.YELLOW_TERRACOTTA,
+            Material.GRASS,
+            Material.GRASS_PATH,
+            Material.TALL_GRASS,
+            Material.POPPY,
+            Material.DANDELION,
+            Material.BLUE_ORCHID,
+            Material.ALLIUM,
+            Material.AZURE_BLUET,
+            Material.ORANGE_TULIP,
+            Material.RED_TULIP,
+            Material.PINK_TULIP,
+            Material.WHITE_TULIP,
+            Material.OXEYE_DAISY,
+            Material.CORNFLOWER,
+            Material.LILY_OF_THE_VALLEY,
+            Material.WITHER_ROSE
     };
     public static final Set<Material> STONES_SET = ImmutableSet.copyOf(STONES);
     public static final Material[] TORCH_ARRAY = new Material[]{
