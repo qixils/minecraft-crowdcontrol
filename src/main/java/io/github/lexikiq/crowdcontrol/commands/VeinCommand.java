@@ -58,7 +58,7 @@ public class VeinCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*3;
+        return 20;
     }
 
     @Override

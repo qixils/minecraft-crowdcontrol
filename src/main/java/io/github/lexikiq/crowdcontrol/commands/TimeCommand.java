@@ -20,7 +20,7 @@ public class TimeCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60;
+        return 30;
     }
 
     @Override

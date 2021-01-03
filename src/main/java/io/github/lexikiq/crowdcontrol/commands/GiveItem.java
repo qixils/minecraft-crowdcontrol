@@ -23,7 +23,7 @@ public class GiveItem extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*3;
+        return (int) (60*2.5);
     }
 
     @Override

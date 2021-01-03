@@ -17,7 +17,7 @@ public class ClutterCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*2;
+        return 60;
     }
 
     @Override

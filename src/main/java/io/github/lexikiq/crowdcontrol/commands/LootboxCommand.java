@@ -65,7 +65,7 @@ public class LootboxCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60;
+        return 30;
     }
 
     @Override

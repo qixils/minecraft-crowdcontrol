@@ -150,7 +150,11 @@ Sets the weather on the server
 
 #### Teleport
 - `!up` -- teleports us up by one block
-- `!down` -- teleports us down by only block
+- `!down` -- teleports us down by one block
+- `!x+` -- teleports us positively in the x direction
+- `!x-`
+- `!z+`
+- `!z-`
 - `!swap` -- multiplayer only! swaps the positions of online players
 - `!tp` -- acts like the players ate a chorus fruit
 
