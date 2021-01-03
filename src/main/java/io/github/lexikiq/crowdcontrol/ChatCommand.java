@@ -17,11 +17,12 @@ public abstract class ChatCommand {
         return null;
     }
     public boolean canUse() {
-        return used.plusSeconds(getCooldownSeconds()).isBefore(LocalDateTime.now());
+        return refreshesAt().isBefore(LocalDateTime.now());
     }
     public void setCooldown() {
         used = LocalDateTime.now();
     }
+    public LocalDateTime refreshesAt() {return used.plusSeconds(getCooldownSeconds());}
 
     public abstract @NotNull String getCommand();
 

@@ -18,6 +18,8 @@ For those unaware, Paper is a fork (a variation) of Spigot that vastly improves 
 
 To set your Twitch channel, run the plugin once, so it can generate its default config file, then replace `lexikiq` in `.\plugins\CrowdControl\plugin.yml` with your Twitch channel name.
 
+To have your account respond when commands are on cooldowns and to use bit donations (coming eventually), replace `YOUR_IRC_TOKEN` with a token generated from [here](http://twitchapps.com/tmi/).
+
 ## Commands
 List may not be fully complete as it is sort-of manually generated.
 
@@ -241,7 +243,7 @@ Spawns the specified entity close to us.
 - `!zombified_piglin`
 
 ### Enchantments
-Applies an enchantment to our held item
+Applies an enchantment to our held item. Optionally allows setting an enchantment level from 1 to 32767.
 - `!aqua_affinity`
 - `!bane_of_arthropods`
 - `!bind` -- curse of binding

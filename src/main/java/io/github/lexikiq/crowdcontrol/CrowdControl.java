@@ -1,5 +1,6 @@
 package io.github.lexikiq.crowdcontrol;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.philippheuer.events4j.simple.domain.EventSubscriber;
 import com.github.twitch4j.TwitchClient;
@@ -15,10 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.awt.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class CrowdControl extends JavaPlugin {
     // actual stuff
@@ -29,10 +29,13 @@ public final class CrowdControl extends JavaPlugin {
     public static final ChatColor USER_COLOR = ChatColor.of(new Color(0x9f44db));
     public static final ChatColor CMD_COLOR = ChatColor.of(new Color(0xb15be3));
     private final Map<ClassCooldowns, LocalDateTime> cooldowns = new HashMap<>();
+    private final boolean hasChatToken;
 
     public CrowdControl() {
         // default config
         config.addDefault("channel", "lexikiq");
+        String ircDefault = "YOUR_IRC_TOKEN";
+        config.addDefault("irc", ircDefault);
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -41,6 +44,9 @@ public final class CrowdControl extends JavaPlugin {
             cooldowns.put(cooldown, LocalDateTime.MIN);
         }
 
+        String ircToken = config.getString("irc");
+        hasChatToken = ircToken != null && !ircToken.equals(ircDefault);
+
         // register twitch commands
         RegisterCommands.register(this);
     }
@@ -48,9 +54,13 @@ public final class CrowdControl extends JavaPlugin {
     @Override
     public void onEnable() {
         // twitch stuff
-        twitchClient = TwitchClientBuilder.builder()
-                .withEnableChat(true)
-                .build();
+        TwitchClientBuilder twitchClientBuilder = TwitchClientBuilder.builder()
+                .withEnableChat(true);
+        if (hasChatToken) {
+            OAuth2Credential credential = new OAuth2Credential("twitch", Objects.requireNonNull(config.getString("irc")));
+            twitchClientBuilder = twitchClientBuilder.withChatAccount(credential).withEnablePubSub(true);
+        }
+        twitchClient = twitchClientBuilder.build();
         twitchClient.getChat().joinChannel(config.getString("channel"));
         twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(this); // registers all events with @EventSubscriber
     }
@@ -77,13 +87,30 @@ public final class CrowdControl extends JavaPlugin {
         }
 
         List<Player> players = getPlayers();
+        if (players.isEmpty()) {
+            return;
+        }
+
         ChatCommand chatCommand = commands.get(command);
+        if (!chatCommand.canUse()) {
+            if (hasChatToken) {
+                sendMessage(event, event.getUser().getName() + ": !" + command + " is on cooldown for " + formatTime(chatCommand.refreshesAt()));
+            }
+            return;
+        }
 
         // global cooldowns
         ClassCooldowns cooldownType = chatCommand.getClassCooldown();
-        boolean cooldownUsable = cooldownType == null || cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds()).isBefore(LocalDateTime.now());
-        if (!(!players.isEmpty() && chatCommand.canUse() && cooldownUsable)) {
-            return;
+        String cooldownTypeName;
+        if (cooldownType != null) {
+            cooldownTypeName = WordUtils.capitalizeFully(cooldownType.name().replace('_',' '));
+            LocalDateTime refreshesAt = cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds());
+            if (LocalDateTime.now().isBefore(refreshesAt)) {
+                if (hasChatToken) {
+                    sendMessage(event, event.getUser().getName() + ": " + cooldownTypeName + " commands are on cooldown for " + formatTime(refreshesAt));
+                }
+                return;
+            }
         }
 
         // actually execute the command!
@@ -96,6 +123,7 @@ public final class CrowdControl extends JavaPlugin {
         // set cooldown & display output
         chatCommand.setCooldown();
         getServer().broadcastMessage(USER_COLOR + event.getUser().getName() + ChatColor.RESET + " used command " + CMD_COLOR + event.getMessage());
+
         // display when command is usable
         if (chatCommand.getCooldownSeconds() > 0) {
             new BukkitRunnable() {
@@ -105,6 +133,7 @@ public final class CrowdControl extends JavaPlugin {
                 }
             }.runTaskLaterAsynchronously(this, 20L*chatCommand.getCooldownSeconds());
         }
+
         // display when command group is usable
         if (cooldownType != null) {
             cooldowns.put(cooldownType, LocalDateTime.now());
@@ -128,5 +157,24 @@ public final class CrowdControl extends JavaPlugin {
         }
         commands.put(name, command);
         getLogger().fine("Registered Twitch command '"+name+"'");
+    }
+
+    public static String formatTime(LocalDateTime dateTime) {
+        LocalDateTime now = LocalDateTime.now();
+        int totalSeconds = (int) now.until(dateTime, ChronoUnit.SECONDS);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        String output = "";
+        if (minutes > 0) {
+            output += minutes + "m";
+        }
+        if (seconds > 0 || output.isEmpty()) {
+            output += seconds + "s";
+        }
+        return output;
+    }
+
+    public static void sendMessage(ChannelMessageEvent event, String message) {
+        event.getTwitchChat().sendMessage(event.getChannel().getName(), message);
     }
 }
