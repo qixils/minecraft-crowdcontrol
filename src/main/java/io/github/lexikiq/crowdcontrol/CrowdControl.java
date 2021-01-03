@@ -36,6 +36,7 @@ public final class CrowdControl extends JavaPlugin {
         config.addDefault("channel", "lexikiq");
         String ircDefault = "YOUR_IRC_TOKEN";
         config.addDefault("irc", ircDefault);
+        config.addDefault("command_replies", true);
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -93,7 +94,7 @@ public final class CrowdControl extends JavaPlugin {
 
         ChatCommand chatCommand = commands.get(command);
         if (!chatCommand.canUse()) {
-            if (hasChatToken) {
+            if (hasChatToken && config.getBoolean("command_replies")) {
                 sendMessage(event, event.getUser().getName() + ": !" + command + " is on cooldown for " + formatTime(chatCommand.refreshesAt()));
             }
             return;
@@ -106,7 +107,7 @@ public final class CrowdControl extends JavaPlugin {
             cooldownTypeName = WordUtils.capitalizeFully(cooldownType.name().replace('_',' '));
             LocalDateTime refreshesAt = cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds());
             if (LocalDateTime.now().isBefore(refreshesAt)) {
-                if (hasChatToken) {
+                if (hasChatToken && config.getBoolean("command_replies")) {
                     sendMessage(event, event.getUser().getName() + ": " + cooldownTypeName + " commands are on cooldown for " + formatTime(refreshesAt));
                 }
                 return;
