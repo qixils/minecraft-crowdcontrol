@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
@@ -18,7 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.lexikiq.crowdcontrol.utils.BlockUtil.*;
+import static io.github.lexikiq.crowdcontrol.utils.BlockUtil.AIR_ARRAY;
+import static io.github.lexikiq.crowdcontrol.utils.BlockUtil.TORCH_ARRAY;
 
 public class TorchCommand extends ChatCommand {
     protected final boolean placeTorches;
@@ -53,7 +53,7 @@ public class TorchCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         Material[] materials = placeTorches ? AIR_ARRAY : TORCH_ARRAY;
         List<Location> nearbyBlocks = new ArrayList<>();
         for (Player player : players) {
@@ -84,7 +84,7 @@ public class TorchCommand extends ChatCommand {
             Vector value = facingDown ? blockFace.getDirection() : blockFace.getOppositeFace().getDirection();
             if (!facingDown && placeFace != null) {continue;} // down takes priority
             Material type = location.clone().add(value).getBlock().getType();
-            if (!AIR_BLOCKS.contains(type) && !TORCH_SET.contains(type)) {
+            if (type.isSolid()) {
                 placeFace = blockFace;
                 if (facingDown) { // down takes priority
                     break;

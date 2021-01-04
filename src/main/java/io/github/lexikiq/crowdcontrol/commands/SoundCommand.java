@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
@@ -38,7 +37,7 @@ public class SoundCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         Sound sound = (Sound) RandomUtil.randomElementFrom(SOUNDS);
         for (Player player : players) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());

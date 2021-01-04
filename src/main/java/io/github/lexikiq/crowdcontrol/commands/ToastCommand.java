@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import org.bukkit.NamespacedKey;
@@ -27,7 +26,7 @@ public class ToastCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         for (Player player : players) {
             Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
             new BukkitRunnable() {

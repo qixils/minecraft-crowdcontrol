@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
@@ -35,7 +34,7 @@ public class WeatherCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         for (Player player : players) {
             World world = player.getWorld();
             if (weatherType == WeatherType.CLEAR) {

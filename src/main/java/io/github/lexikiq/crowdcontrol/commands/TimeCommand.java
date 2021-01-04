@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import org.bukkit.World;
@@ -29,7 +28,7 @@ public class TimeCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         Set<World> worlds = new HashSet<>();
         for (Player player : players) {
             worlds.add(player.getWorld());

@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
@@ -29,7 +28,7 @@ public class GravelCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         List<Location> locations = new ArrayList<>();
         for (Player player : players) {
             locations.addAll(BlockUtil.getNearbyBlocks(player.getLocation(), 6, false, BlockUtil.STONES));

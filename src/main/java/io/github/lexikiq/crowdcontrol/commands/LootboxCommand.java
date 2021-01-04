@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
@@ -74,9 +73,9 @@ public class LootboxCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         for (Player player : players) {
-            Inventory lootbox = Bukkit.createInventory(null, 27, event.getUser().getName()+" has gifted you...");
+            Inventory lootbox = Bukkit.createInventory(null, 27, authorName+" has gifted you...");
             List<Material> items = new ArrayList<>(BlockUtil.MATERIAL_SET);
             Collections.shuffle(items, rand);
             Material item = null;
@@ -111,7 +110,7 @@ public class LootboxCommand extends ChatCommand {
                 }
             }
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setLore(List.of("Donated by "+event.getUser().getName()));
+            itemMeta.setLore(List.of("Donated by "+ authorName));
             if (rand.nextDouble() >= 0.9D) {
                 itemMeta.setUnbreakable(true);
             }

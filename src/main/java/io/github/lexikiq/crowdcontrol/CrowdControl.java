@@ -1,11 +1,17 @@
 package io.github.lexikiq.crowdcontrol;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.philippheuer.events4j.simple.domain.EventSubscriber;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.pubsub.domain.ChannelBitsData;
+import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
+import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
+import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
+import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.google.common.collect.ImmutableList;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
@@ -24,8 +30,8 @@ public final class CrowdControl extends JavaPlugin {
     // actual stuff
     public static final String PREFIX = "!";
     private final Map<String, ChatCommand> commands = new HashMap<>();
-    private final Map<Integer, ChatCommand> bitCommands = new HashMap<>();
-    private final Map<Integer, ChatCommand> pointCommands = new HashMap<>();
+    private final Map<Integer, CommandWrapper> bitCommands = new HashMap<>();
+    private final Map<Integer, CommandWrapper> pointCommands = new HashMap<>();
 
     private TwitchClient twitchClient;
     private final FileConfiguration config = getConfig();
@@ -64,7 +70,7 @@ public final class CrowdControl extends JavaPlugin {
             OAuth2Credential credential = new OAuth2Credential("twitch", Objects.requireNonNull(config.getString("irc")));
             twitchClientBuilder = twitchClientBuilder
                     .withChatAccount(credential)
-                    // .withEnablePubSub(true)
+                    .withEnablePubSub(true)
             ;
         }
         twitchClient = twitchClientBuilder.build();
@@ -78,12 +84,126 @@ public final class CrowdControl extends JavaPlugin {
         twitchClient.close();
     }
 
+    protected void executeCommand(Event event, ChatCommand command, String[] args, CommandType commandType) {
+        List<Player> players = getPlayers();
+        if (players.isEmpty()) {
+            return;
+        }
+
+        String username = null;
+        switch (commandType) {
+            case CHAT:
+                username = ((ChannelMessageEvent) event).getUser().getName();
+                break;
+            case BITS:
+                username = ((ChannelBitsEvent) event).getData().getUserName();
+                break;
+            case POINTS:
+                username = ((ChannelPointsRedemptionEvent) event).getRedemption().getUser().getLogin();
+        }
+        assert username != null;
+
+        // cooldowns
+        ClassCooldowns cooldownType = command.getClassCooldown();
+        if (commandType.usesCooldown()) {
+            // per-cmd cooldown
+            if (!command.canUse()) {
+                if (hasChatToken && config.getBoolean("command_replies")) {
+                    sendMessage((ChannelMessageEvent) event, String.format(
+                            "%s: %s is on cooldown for %s",
+                            username,
+                            command.getCommand(),
+                            formatTime(command.refreshesAt())
+                    ));
+                }
+                return;
+            }
+
+            // global cooldowns
+            String cooldownTypeName;
+            if (cooldownType != null) {
+                cooldownTypeName = WordUtils.capitalizeFully(cooldownType.name().replace('_', ' '));
+                LocalDateTime refreshesAt = cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds());
+                if (LocalDateTime.now().isBefore(refreshesAt)) {
+                    if (hasChatToken && config.getBoolean("command_replies")) {
+                        sendMessage((ChannelMessageEvent) event, String.format(
+                                "%s: %s commands are on cooldown for %s",
+                                username,
+                                cooldownTypeName,
+                                formatTime(refreshesAt)
+                        ));
+                    }
+                    return;
+                }
+            }
+        }
+
+        // actually execute the command!
+        boolean executed = command.execute(username, players, args);
+        // exit if execution failed
+        if (!executed) {
+            return;
+        }
+
+        // set cooldown & display output
+        String commandText = PREFIX+command.getCommand().toLowerCase(Locale.ENGLISH) + " " + String.join(" ", args);
+        getServer().broadcastMessage(String.format(
+                "%s%s%s used command %s%s",
+                USER_COLOR,
+                username,
+                ChatColor.RESET,
+                CMD_COLOR,
+                commandText
+        ));
+
+        // exit if cmd type doesn't do cooldowns
+        if (!commandType.usesCooldown()) return;
+
+        //// cooldown stuff ////
+        command.setCooldown();
+
+        // display when command is usable
+        if (command.getCooldownSeconds() > 0) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    getServer().broadcastMessage(String.format(
+                            "%s%s%s%s%s has refreshed.",
+                            CMD_COLOR,
+                            ChatColor.ITALIC,
+                            PREFIX + command.getCommand().toLowerCase(Locale.ENGLISH),
+                            ChatColor.RESET,
+                            ChatColor.ITALIC
+                    ));
+                }
+            }.runTaskLaterAsynchronously(this, 20L*command.getCooldownSeconds());
+        }
+
+        // display when command group is usable
+        if (cooldownType != null) {
+            cooldowns.put(cooldownType, LocalDateTime.now());
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    getServer().broadcastMessage(String.format(
+                            "%s%s%s%s%s commands have refreshed.",
+                            CMD_COLOR,
+                            ChatColor.ITALIC,
+                            WordUtils.capitalizeFully(cooldownType.name().replace('_',' ')),
+                            ChatColor.RESET,
+                            ChatColor.ITALIC
+                    ));
+                }
+            }.runTaskLaterAsynchronously(this, 20L*cooldownType.getSeconds());
+        }
+    }
+
     @EventSubscriber
     public void handleMessage(ChannelMessageEvent event) {
         // get command/message
         String message = event.getMessage();
         if (!message.startsWith(PREFIX)) {return;}
-        String text = message.substring(PREFIX.length()).toLowerCase(java.util.Locale.ENGLISH);
+        String text = message.substring(PREFIX.length()).toLowerCase(Locale.ENGLISH);
         String[] split = text.split(" ");
         String command = split[0];
         String[] args = Arrays.copyOfRange(split, 1, split.length);
@@ -93,69 +213,40 @@ public final class CrowdControl extends JavaPlugin {
             return;
         }
 
-        List<Player> players = getPlayers();
-        if (players.isEmpty()) {
-            return;
-        }
+        executeCommand(event, commands.get(command), args, CommandType.CHAT);
+    }
 
-        ChatCommand chatCommand = commands.get(command);
-        if (!chatCommand.canUse()) {
-            if (hasChatToken && config.getBoolean("command_replies")) {
-                sendMessage(event, String.format(
-                        "%s: !%s is on cooldown for %s",
-                        event.getUser().getName(),
-                        command,
-                        formatTime(chatCommand.refreshesAt())
-                ));
+    @EventSubscriber
+    public void handleBits(ChannelBitsEvent event) {
+        ChannelBitsData bitsData = event.getData();
+        CommandWrapper commandWrapper = getFlooredMapObject(bitCommands, bitsData.getBitsUsed());
+        if (commandWrapper == null) return;
+        ChatCommand command = commandWrapper.getCommand();
+        String[] args = commandWrapper.getArgs();
+        executeCommand(event, command, args, CommandType.BITS);
+    }
+
+    @EventSubscriber
+    public void handlePoints(RewardRedeemedEvent event) {
+        ChannelPointsRedemption redemption = event.getRedemption();
+        CommandWrapper commandWrapper = getFlooredMapObject(pointCommands, (int) redemption.getReward().getCost());
+        if (commandWrapper == null) return;
+        ChatCommand command = commandWrapper.getCommand();
+        String[] args = commandWrapper.getArgs();
+        executeCommand(event, command, args, CommandType.POINTS);
+    }
+
+    public static CommandWrapper getFlooredMapObject(Map<Integer, CommandWrapper> map, int value) {
+        int max = 0;
+        CommandWrapper object = null;
+        for (Map.Entry<Integer, CommandWrapper> entry : map.entrySet()) {
+            int key = entry.getKey();
+            if (key > max && value >= key) {
+                max = key;
+                object = entry.getValue();
             }
-            return;
         }
-
-        // global cooldowns
-        ClassCooldowns cooldownType = chatCommand.getClassCooldown();
-        String cooldownTypeName;
-        if (cooldownType != null) {
-            cooldownTypeName = WordUtils.capitalizeFully(cooldownType.name().replace('_',' '));
-            LocalDateTime refreshesAt = cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds());
-            if (LocalDateTime.now().isBefore(refreshesAt)) {
-                if (hasChatToken && config.getBoolean("command_replies")) {
-                    sendMessage(event, event.getUser().getName() + ": " + cooldownTypeName + " commands are on cooldown for " + formatTime(refreshesAt));
-                }
-                return;
-            }
-        }
-
-        // actually execute the command!
-        boolean executed = chatCommand.execute(event, players, args);
-        // exit if execution failed
-        if (!executed) {
-            return;
-        }
-
-        // set cooldown & display output
-        chatCommand.setCooldown();
-        getServer().broadcastMessage(USER_COLOR + event.getUser().getName() + ChatColor.RESET + " used command " + CMD_COLOR + event.getMessage());
-
-        // display when command is usable
-        if (chatCommand.getCooldownSeconds() > 0) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    getServer().broadcastMessage(CMD_COLOR + ChatColor.ITALIC.toString() + PREFIX + chatCommand.getCommand().toLowerCase(java.util.Locale.ENGLISH) + ChatColor.RESET + ChatColor.ITALIC + " has refreshed.");
-                }
-            }.runTaskLaterAsynchronously(this, 20L*chatCommand.getCooldownSeconds());
-        }
-
-        // display when command group is usable
-        if (cooldownType != null) {
-            cooldowns.put(cooldownType, LocalDateTime.now());
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    getServer().broadcastMessage(CMD_COLOR + ChatColor.ITALIC.toString() + WordUtils.capitalizeFully(cooldownType.name().replace('_',' ')) + ChatColor.RESET + ChatColor.ITALIC + " commands have refreshed.");
-                }
-            }.runTaskLaterAsynchronously(this, 20L*cooldownType.getSeconds());
-        }
+        return object;
     }
 
     public List<Player> getPlayers() {
@@ -163,7 +254,7 @@ public final class CrowdControl extends JavaPlugin {
     }
 
     public void registerCommand(String name, ChatCommand command) throws AlreadyRegisteredException {
-//        name = name.toLowerCase(java.util.Locale.ENGLISH);
+        name = name.toLowerCase(Locale.ENGLISH);
         if (commands.containsKey(name)) {
             throw new AlreadyRegisteredException(name);
         }

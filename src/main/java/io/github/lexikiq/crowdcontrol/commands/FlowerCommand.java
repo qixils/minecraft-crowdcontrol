@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.CrowdControl;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
@@ -36,7 +35,7 @@ public class FlowerCommand extends ChatCommand {
     }
 
     @Override
-    public boolean execute(ChannelMessageEvent event, List<Player> players, String... args) {
+    public boolean execute(String authorName, List<Player> players, String... args) {
         for (Player player : players) {
             List<Location> locations = RandomUtil.randomNearbyBlocks(player.getLocation(), RADIUS, false, BlockUtil.AIR_ARRAY);
             if (locations.isEmpty()) {continue;} // avoid scheduling a task if unnecessary
@@ -46,7 +45,7 @@ public class FlowerCommand extends ChatCommand {
                     int placed = 0;
                     int toPlace = MIN_RAND+rand.nextInt(MAX_RAND-MIN_RAND+1);
                     for (Location location : locations) {
-                        if (location.clone().subtract(0, 1, 0).getBlock().getType() == Material.GRASS_BLOCK) {
+                        if (location.clone().subtract(0, 1, 0).getBlock().getType().isSolid()) {
                             ++placed;
                             location.getBlock().setType((Material) RandomUtil.randomElementFrom(FLOWERS));
                             if (placed == toPlace) {

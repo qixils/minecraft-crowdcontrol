@@ -1,6 +1,5 @@
 package io.github.lexikiq.crowdcontrol;
 
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +25,7 @@ public abstract class ChatCommand {
 
     public abstract @NotNull String getCommand();
 
-    public abstract boolean execute(ChannelMessageEvent event, List<Player> players, String... args);
+    public abstract boolean execute(String authorName, List<Player> players, String... args);
 
     protected final CrowdControl plugin;
     public ChatCommand(CrowdControl plugin) {
