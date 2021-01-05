@@ -11,7 +11,6 @@ import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.google.common.collect.ImmutableList;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
@@ -108,7 +107,7 @@ public final class CrowdControl extends JavaPlugin {
         if (commandType.usesCooldown()) {
             // per-cmd cooldown
             if (!command.canUse()) {
-                if (hasChatToken && config.getBoolean("command_replies")) {
+                if (hasChatToken && config.getBoolean("command_replies") && commandType == CommandType.CHAT) {
                     sendMessage((ChannelMessageEvent) event, String.format(
                             "%s: %s is on cooldown for %s",
                             username,
@@ -125,7 +124,7 @@ public final class CrowdControl extends JavaPlugin {
                 cooldownTypeName = WordUtils.capitalizeFully(cooldownType.name().replace('_', ' '));
                 LocalDateTime refreshesAt = cooldowns.get(cooldownType).plusSeconds(cooldownType.getSeconds());
                 if (LocalDateTime.now().isBefore(refreshesAt)) {
-                    if (hasChatToken && config.getBoolean("command_replies")) {
+                    if (hasChatToken && config.getBoolean("command_replies") && commandType == CommandType.CHAT) {
                         sendMessage((ChannelMessageEvent) event, String.format(
                                 "%s: %s commands are on cooldown for %s",
                                 username,
@@ -227,7 +226,7 @@ public final class CrowdControl extends JavaPlugin {
     }
 
     @EventSubscriber
-    public void handlePoints(RewardRedeemedEvent event) {
+    public void handlePoints(ChannelPointsRedemptionEvent event) {
         ChannelPointsRedemption redemption = event.getRedemption();
         CommandWrapper commandWrapper = getFlooredMapObject(pointCommands, (int) redemption.getReward().getCost());
         if (commandWrapper == null) return;

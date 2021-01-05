@@ -6,6 +6,7 @@ import io.github.lexikiq.crowdcontrol.CrowdControl;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -38,10 +39,14 @@ public class WeatherCommand extends ChatCommand {
         for (Player player : players) {
             World world = player.getWorld();
             if (weatherType == WeatherType.CLEAR) {
-                world.setWeatherDuration(0);
                 world.setClearWeatherDuration(DURATION);
             } else {
-                world.setClearWeatherDuration(0);
+                new BukkitRunnable(){
+                    @Override
+                    public void run() {
+                        world.setStorm(true);
+                    }
+                }.runTask(plugin);
                 // needs to be BukkitRunnable and seems to not matter
                 // player.getServer().dispatchCommand(player.getServer().getConsoleSender(), "weather rain");
             }

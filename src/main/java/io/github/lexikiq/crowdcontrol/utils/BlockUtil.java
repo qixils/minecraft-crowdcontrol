@@ -2,6 +2,7 @@ package io.github.lexikiq.crowdcontrol.utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -86,6 +87,17 @@ public class BlockUtil {
     };
     public static final Set<Material> TORCH_SET = ImmutableSet.copyOf(TORCH_ARRAY);
     public static final Set<Material> MATERIAL_SET = ImmutableSet.copyOf(Material.values());
+    public static final Material[] AIR_PLACE;
+    public static final Set<Material> AIR_PLACE_SET;
+
+    static {
+        Material[] misc = new Material[]{
+                Material.GRASS,
+                Material.FERN
+        };
+        AIR_PLACE = (Material[]) ArrayUtils.addAll(BlockUtil.AIR_ARRAY, misc);
+        AIR_PLACE_SET = ImmutableSet.copyOf(AIR_PLACE);
+    }
 
     // these should honestly probably return a list (set?) of blocks but i'm too lazy to fix all the instances
     public static List<Location> getNearbyBlocks(Location origin, int minRadius, int maxRadius, boolean spawningSpace, Material... materials) {

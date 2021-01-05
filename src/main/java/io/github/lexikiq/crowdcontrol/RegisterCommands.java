@@ -122,7 +122,7 @@ public class RegisterCommands {
                 new LootboxCommand(plugin),
                 new TeleportCommand(plugin),
                 new ToastCommand(plugin),
-                new SuffocateCommand(plugin),
+                new FreezeCommand(plugin),
                 new FlowerCommand(plugin),
                 new ParticleCommand(plugin),
                 new MoveCommand(plugin, 0, 1, 0, "up"),
