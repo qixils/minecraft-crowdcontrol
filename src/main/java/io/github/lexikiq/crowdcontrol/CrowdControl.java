@@ -111,7 +111,7 @@ public final class CrowdControl extends JavaPlugin {
                     sendMessage((ChannelMessageEvent) event, String.format(
                             "%s: %s is on cooldown for %s",
                             username,
-                            command.getCommand(),
+                            command.getCommand().toLowerCase(Locale.ENGLISH),
                             formatTime(command.refreshesAt())
                     ));
                 }
