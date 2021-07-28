@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
-import dev.qixils.crowdcontrol.plugin.utils.WeightedEnum;
+import dev.qixils.crowdcontrol.plugin.utils.Weighted;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -21,7 +21,7 @@ public class VeinCommand extends ChatCommand {
         super(plugin);
     }
 
-    public enum Ores implements WeightedEnum {
+    public enum Ores implements Weighted {
         DIAMOND(Material.DIAMOND_ORE, 3),
         IRON(Material.IRON_ORE, 3),
         COAL(Material.COAL_ORE, 3),

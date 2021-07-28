@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
-import dev.qixils.crowdcontrol.plugin.utils.WeightedEnum;
+import dev.qixils.crowdcontrol.plugin.utils.Weighted;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -26,7 +26,7 @@ public class LootboxCommand extends ChatCommand {
         super(plugin);
     }
 
-    public enum EnchantmentWeights implements WeightedEnum {
+    public enum EnchantmentWeights implements Weighted {
         ONE(1, 40),
         TWO(2, 15),
         THREE(3, 3),
@@ -44,7 +44,7 @@ public class LootboxCommand extends ChatCommand {
         public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(EnchantmentWeights::getWeight).sum();
     }
 
-    public enum AttributeWeights implements WeightedEnum {
+    public enum AttributeWeights implements Weighted {
         NONE(0, 167),
         ONE(1, 20),
         TWO(2, 10),

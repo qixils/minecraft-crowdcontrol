@@ -53,7 +53,7 @@ public class RandomUtil {
         return randomNearbyBlock(origin, 0, maxRadius, spawningSpace, materials);
     }
 
-    public static Object weightedRandom(WeightedEnum[] weightedEnum, int totalWeights) {
+    public static Object weightedRandom(Weighted[] weightedEnum, int totalWeights) {
         // Weighted random code based off of https://stackoverflow.com/a/6737362
         int idx = 0;
         for (double r = Math.random() * totalWeights; idx < weightedEnum.length - 1; ++idx) {
