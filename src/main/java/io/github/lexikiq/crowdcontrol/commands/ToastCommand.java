@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class ToastCommand extends ChatCommand {
-    public ToastCommand(CrowdControl plugin) {
+    public ToastCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

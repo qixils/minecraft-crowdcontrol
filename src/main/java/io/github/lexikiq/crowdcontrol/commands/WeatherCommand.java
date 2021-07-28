@@ -2,7 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -14,7 +14,7 @@ import java.util.List;
 public class WeatherCommand extends ChatCommand {
     protected final WeatherType weatherType;
     protected static final int DURATION = 20*60*60;
-    public WeatherCommand(CrowdControl plugin, WeatherType weatherType) {
+    public WeatherCommand(CrowdControlPlugin plugin, WeatherType weatherType) {
         super(plugin);
         this.weatherType = weatherType;
     }

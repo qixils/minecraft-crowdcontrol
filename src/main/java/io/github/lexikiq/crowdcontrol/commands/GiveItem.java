@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class GiveItem extends ChatCommand {
-    public GiveItem(CrowdControl plugin) {
+    public GiveItem(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import io.github.lexikiq.crowdcontrol.utils.WeightedEnum;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import static io.github.lexikiq.crowdcontrol.utils.BlockUtil.STONES;
 import static io.github.lexikiq.crowdcontrol.utils.BlockUtil.STONES_SET;
 
 public class VeinCommand extends ChatCommand {
-    public VeinCommand(CrowdControl plugin) {
+    public VeinCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

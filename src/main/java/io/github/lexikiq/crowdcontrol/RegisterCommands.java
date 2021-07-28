@@ -108,7 +108,7 @@ public class RegisterCommands {
             Material.GRAVEL
     );
 
-    public static void register(CrowdControl plugin) {
+    public static void register(CrowdControlPlugin plugin) {
         // register normal commands
         Set<ChatCommand> commands = new HashSet<>(Set.of(
                 new VeinCommand(plugin),

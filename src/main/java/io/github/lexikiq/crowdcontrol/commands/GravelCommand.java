@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GravelCommand extends ChatCommand {
-    public GravelCommand(CrowdControl plugin) {
+    public GravelCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

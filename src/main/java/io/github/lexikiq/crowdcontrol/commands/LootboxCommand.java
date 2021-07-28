@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import io.github.lexikiq.crowdcontrol.utils.WeightedEnum;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class LootboxCommand extends ChatCommand {
-    public LootboxCommand(CrowdControl plugin) {
+    public LootboxCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

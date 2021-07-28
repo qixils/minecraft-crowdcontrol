@@ -2,7 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -16,7 +16,7 @@ public class PotionCommand extends ChatCommand {
     private final int duration;
     private static final int MAX_DURATION = 20*15;
 
-    public PotionCommand(CrowdControl plugin, PotionEffectType potionEffectType) {
+    public PotionCommand(CrowdControlPlugin plugin, PotionEffectType potionEffectType) {
         super(plugin);
         this.potionEffectType = potionEffectType;
         boolean isMinimal = potionEffectType.isInstant();

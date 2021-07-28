@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.ParticleUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class TeleportCommand extends ChatCommand {
-    public TeleportCommand(CrowdControl plugin) {
+    public TeleportCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

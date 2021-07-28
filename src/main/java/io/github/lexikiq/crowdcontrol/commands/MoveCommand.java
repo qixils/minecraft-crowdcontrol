@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -12,13 +12,13 @@ import java.util.List;
 public class MoveCommand extends ChatCommand {
     protected final String name;
     protected final Vector vector;
-    public MoveCommand(CrowdControl plugin, Vector displacement, String name) {
+    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String name) {
         super(plugin);
         vector = displacement;
         this.name = name;
     }
 
-    public MoveCommand(CrowdControl plugin, int x, int y, int z, String name) {
+    public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String name) {
         super(plugin);
         vector = new Vector(x, y, z);
         this.name = name;

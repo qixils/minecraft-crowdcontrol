@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ChargedCreeperCommand extends SummonEntityCommand {
-    public ChargedCreeperCommand(CrowdControl plugin) {
+    public ChargedCreeperCommand(CrowdControlPlugin plugin) {
         super(plugin, EntityType.CREEPER);
     }
 

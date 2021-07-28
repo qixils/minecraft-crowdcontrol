@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -16,7 +16,7 @@ import static io.github.lexikiq.crowdcontrol.utils.BlockUtil.STONES_SET;
 
 public class DigCommand extends ChatCommand {
     private final static double RADIUS = .5D;
-    public DigCommand(CrowdControl plugin) {
+    public DigCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

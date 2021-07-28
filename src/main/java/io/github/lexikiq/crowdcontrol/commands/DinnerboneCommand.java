@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class DinnerboneCommand extends ChatCommand {
     private static final String NAME = "Dinnerbone";
     private static final int RADIUS = 15;
 
-    public DinnerboneCommand(CrowdControl plugin) {
+    public DinnerboneCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

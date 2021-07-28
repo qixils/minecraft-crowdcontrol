@@ -27,8 +27,8 @@ public abstract class ChatCommand {
 
     public abstract boolean execute(String authorName, List<Player> players, String... args);
 
-    protected final CrowdControl plugin;
-    public ChatCommand(CrowdControl plugin) {
+    protected final CrowdControlPlugin plugin;
+    public ChatCommand(CrowdControlPlugin plugin) {
         this.plugin = plugin;
     }
 

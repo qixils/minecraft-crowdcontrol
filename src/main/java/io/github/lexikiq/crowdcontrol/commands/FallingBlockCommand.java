@@ -2,7 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class FallingBlockCommand extends ChatCommand {
     protected final Material blockMaterial;
-    public FallingBlockCommand(CrowdControl plugin, Material blockMaterial) {
+    public FallingBlockCommand(CrowdControlPlugin plugin, Material blockMaterial) {
         super(plugin);
         this.blockMaterial = blockMaterial;
     }

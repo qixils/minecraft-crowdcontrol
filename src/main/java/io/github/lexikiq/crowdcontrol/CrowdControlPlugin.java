@@ -25,7 +25,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.*;
 
-public final class CrowdControl extends JavaPlugin {
+public final class CrowdControlPlugin extends JavaPlugin {
     // actual stuff
     public static final String PREFIX = "!";
     private final Map<String, ChatCommand> commands = new HashMap<>();
@@ -39,7 +39,7 @@ public final class CrowdControl extends JavaPlugin {
     private final Map<ClassCooldowns, LocalDateTime> cooldowns = new HashMap<>();
     private final boolean hasChatToken;
 
-    public CrowdControl() {
+    public CrowdControlPlugin() {
         // default config
         config.addDefault("channel", "lexikiq");
         String ircDefault = "YOUR_IRC_TOKEN";

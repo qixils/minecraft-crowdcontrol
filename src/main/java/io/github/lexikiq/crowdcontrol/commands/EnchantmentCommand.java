@@ -2,7 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class EnchantmentCommand extends ChatCommand {
     protected final Enchantment enchantment;
-    public EnchantmentCommand(CrowdControl plugin, Enchantment enchantment) {
+    public EnchantmentCommand(CrowdControlPlugin plugin, Enchantment enchantment) {
         super(plugin);
         this.enchantment = enchantment;
     }

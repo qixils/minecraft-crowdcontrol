@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ import java.util.List;
 public class DifficultyCommand extends ChatCommand {
     private final Difficulty difficulty;
 
-    public DifficultyCommand(CrowdControl plugin, Difficulty difficulty) {
+    public DifficultyCommand(CrowdControlPlugin plugin, Difficulty difficulty) {
         super(plugin);
         this.difficulty = difficulty;
     }

@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +16,7 @@ public class FreezeCommand extends ChatCommand {
     protected static final Material SET_MATERIAL = Material.GLASS;
     protected static final double RADIUS = 1.5;
 
-    public FreezeCommand(CrowdControl plugin) {
+    public FreezeCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

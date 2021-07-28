@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class SwapCommand extends ChatCommand {
-    public SwapCommand(CrowdControl plugin) {
+    public SwapCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

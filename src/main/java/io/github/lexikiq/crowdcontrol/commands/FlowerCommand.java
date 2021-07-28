@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
@@ -21,7 +21,7 @@ public class FlowerCommand extends ChatCommand {
     protected static final int MIN_RAND = 14;  // inclusive
     protected static final int MAX_RAND = 28;  // inclusive
 
-    public FlowerCommand(CrowdControl plugin) {
+    public FlowerCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

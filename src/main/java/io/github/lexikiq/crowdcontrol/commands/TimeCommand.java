@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class TimeCommand extends ChatCommand {
     protected static final int ADD_TICKS = 400; // a minute in-game i think??
-    public TimeCommand(CrowdControl plugin) {
+    public TimeCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

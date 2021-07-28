@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.ParticleUtil;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ParticleCommand extends ChatCommand {
-    public ParticleCommand(CrowdControl plugin) {
+    public ParticleCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

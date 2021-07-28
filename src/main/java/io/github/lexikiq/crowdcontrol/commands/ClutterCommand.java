@@ -1,7 +1,7 @@
 package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ClutterCommand extends ChatCommand {
-    public ClutterCommand(CrowdControl plugin) {
+    public ClutterCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 

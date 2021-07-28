@@ -2,7 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +31,7 @@ public class TorchCommand extends ChatCommand {
             BlockFace.NORTH
     };
 
-    public TorchCommand(CrowdControl plugin, boolean placeTorches) {
+    public TorchCommand(CrowdControlPlugin plugin, boolean placeTorches) {
         super(plugin);
         this.placeTorches = placeTorches;
         this.name = placeTorches ? "lit" : "dim";

@@ -2,7 +2,7 @@ package io.github.lexikiq.crowdcontrol.commands;
 
 import io.github.lexikiq.crowdcontrol.ChatCommand;
 import io.github.lexikiq.crowdcontrol.ClassCooldowns;
-import io.github.lexikiq.crowdcontrol.CrowdControl;
+import io.github.lexikiq.crowdcontrol.CrowdControlPlugin;
 import io.github.lexikiq.crowdcontrol.utils.BlockUtil;
 import io.github.lexikiq.crowdcontrol.utils.RandomUtil;
 import org.bukkit.Location;
@@ -18,7 +18,7 @@ public class SummonEntityCommand extends ChatCommand {
     protected final EntityType entityType;
     protected static final int SPAWN_RADIUS = 7;
 
-    public SummonEntityCommand(CrowdControl plugin, EntityType entityType) {
+    public SummonEntityCommand(CrowdControlPlugin plugin, EntityType entityType) {
         super(plugin);
         this.entityType = entityType;
     }
