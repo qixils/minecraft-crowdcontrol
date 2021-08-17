@@ -11,11 +11,11 @@ import java.util.Random;
 public class RandomUtil {
     private static final Random rand = new Random();
 
-    public static Object randomElementFrom(Collection<?> from) {
+    public static <T> T randomElementFrom(Collection<T> from) {
         // google told me converting to array was bad so i did this idk
         int index = rand.nextInt(from.size());
         int iteration = 0;
-        for (Object object : from) {
+        for (T object : from) {
             if (iteration == index) {
                 return object;
             }
@@ -24,8 +24,7 @@ public class RandomUtil {
         return null;
     }
 
-    public static Object randomElementFrom(List<?> from) {
-        // todo: can i make the return a wildcard
+    public static <T> T randomElementFrom(List<T> from) {
         return from.get(rand.nextInt(from.size()));
     }
 
@@ -53,13 +52,13 @@ public class RandomUtil {
         return randomNearbyBlock(origin, 0, maxRadius, spawningSpace, materials);
     }
 
-    public static Object weightedRandom(Weighted[] weightedEnum, int totalWeights) {
+    public static <T extends Weighted> T weightedRandom(T[] weightedArray, int totalWeights) {
         // Weighted random code based off of https://stackoverflow.com/a/6737362
         int idx = 0;
-        for (double r = Math.random() * totalWeights; idx < weightedEnum.length - 1; ++idx) {
-            r -= weightedEnum[idx].getWeight();
+        for (double r = Math.random() * totalWeights; idx < weightedArray.length - 1; ++idx) {
+            r -= weightedArray[idx].getWeight();
             if (r <= 0.0) break;
         }
-        return weightedEnum[idx];
+        return weightedArray[idx];
     }
 }

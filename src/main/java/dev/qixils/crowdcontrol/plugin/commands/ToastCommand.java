@@ -2,41 +2,29 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.List;
 
+@Getter
 public class ToastCommand extends ChatCommand {
+    private final String effectName = "toast";
+    private final String displayName = "Render Toasts";
     public ToastCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 
     @Override
-    public int getCooldownSeconds() {
-        return 0;
-    }
-
-    @Override
-    public @NotNull String getCommand() {
-        return "toast";
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
-        for (Player player : players) {
+    public Response.Result execute(Request request) {
+        for (Player player : CrowdControlPlugin.getPlayers()) {
             Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    player.undiscoverRecipes(recipes);
-                    player.discoverRecipes(recipes);
-                }
-            }.runTask(plugin);
+            player.undiscoverRecipes(recipes);
+            player.discoverRecipes(recipes);
         }
-        return true;
+        return Response.Result.SUCCESS;
     }
 }

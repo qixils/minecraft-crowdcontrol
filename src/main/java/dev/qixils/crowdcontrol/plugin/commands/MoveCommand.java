@@ -2,48 +2,33 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Locale;
 
+@Getter
 public class MoveCommand extends ChatCommand {
-    protected final String name;
     protected final Vector vector;
-    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String name) {
+    protected final String effectName;
+    protected final String displayName;
+    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String effectName) {
         super(plugin);
         vector = displacement;
-        this.name = name;
+        this.effectName = effectName;
+        this.displayName = "Move " + effectName.toUpperCase(Locale.ENGLISH);
     }
 
-    public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String name) {
-        super(plugin);
-        vector = new Vector(x, y, z);
-        this.name = name;
-    }
-
-    @Override
-    public int getCooldownSeconds() {
-        return 60;
+    public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String effectName) {
+        this(plugin, new Vector(x, y, z), effectName);
     }
 
     @Override
-    public @NotNull String getCommand() {
-        return name;
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : players) {
-                    player.teleport(player.getLocation().add(vector));
-                }
-            }
-        }.runTask(plugin);
-        return true;
+    public Response.Result execute(Request request) {
+        Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.teleport(player.getLocation().add(vector))));
+        return Response.Result.SUCCESS;
     }
 }

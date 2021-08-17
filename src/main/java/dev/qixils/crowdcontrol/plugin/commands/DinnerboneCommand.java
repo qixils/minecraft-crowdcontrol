@@ -2,14 +2,15 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -21,28 +22,18 @@ public class DinnerboneCommand extends ChatCommand {
         super(plugin);
     }
 
-    @Override
-    public int getCooldownSeconds() {
-        return 0;
-    }
+    @Getter
+    private final String effectName = "dinnerbone";
 
     @Override
-    public @NotNull String getCommand() {
-        return "dinnerbone";
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
+    public Response.Result execute(Request request) {
         Set<LivingEntity> entities = new HashSet<>();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : players) {
-                    entities.addAll(player.getLocation().getNearbyLivingEntities(RADIUS, x -> x.getType() != EntityType.PLAYER && (x.getCustomName() == null || x.getCustomName().isEmpty() || x.getCustomName().equals(NAME))));
-                }
-                entities.forEach(x -> x.setCustomName(Objects.equals(x.getCustomName(), NAME) ? null : NAME));
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (Player player : CrowdControlPlugin.getPlayers()) {
+                entities.addAll(player.getLocation().getNearbyLivingEntities(RADIUS, x -> x.getType() != EntityType.PLAYER && (x.getCustomName() == null || x.getCustomName().isEmpty() || x.getCustomName().equals(NAME))));
             }
-        }.runTask(plugin);
-        return true;
+            entities.forEach(x -> x.setCustomName(Objects.equals(x.getCustomName(), NAME) ? null : NAME));
+        });
+        return Response.Result.SUCCESS;
     }
 }

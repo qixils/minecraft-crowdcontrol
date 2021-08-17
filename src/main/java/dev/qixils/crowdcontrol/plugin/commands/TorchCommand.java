@@ -1,26 +1,28 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
-import dev.qixils.crowdcontrol.plugin.ClassCooldowns;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
+import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class TorchCommand extends ChatCommand {
     protected final boolean placeTorches;
-    protected final String name;
+    protected final String effectName;
+    protected final String displayName;
     protected static final BlockFace[] BLOCK_FACES = new BlockFace[]{
             BlockFace.DOWN,
             BlockFace.EAST,
@@ -32,46 +34,28 @@ public class TorchCommand extends ChatCommand {
     public TorchCommand(CrowdControlPlugin plugin, boolean placeTorches) {
         super(plugin);
         this.placeTorches = placeTorches;
-        this.name = placeTorches ? "lit" : "dim";
+        this.effectName = placeTorches ? "Lit" : "Dim";
+        this.displayName = effectName;
     }
 
     @Override
-    public int getCooldownSeconds() {
-        return 0;
-    }
-
-    @Override
-    public ClassCooldowns getClassCooldown() {
-        return ClassCooldowns.TORCH;
-    }
-
-    @Override
-    public @NotNull String getCommand() {
-        return name;
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
+    public Response.Result execute(Request request) {
         Material[] materials = placeTorches ? BlockUtil.AIR_ARRAY : BlockUtil.TORCH_ARRAY;
         List<Location> nearbyBlocks = new ArrayList<>();
-        for (Player player : players) {
-            nearbyBlocks.addAll(RandomUtil.randomNearbyBlocks(player.getLocation(), 5, false, materials));
-        }
-        if (nearbyBlocks.isEmpty()) {return false;}
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                for (Location location : nearbyBlocks) {
-                    Block block = location.getBlock();
-                    if (placeTorches) {
-                        placeTorch(location);
-                    } else {
-                        block.setType(Material.AIR, false);
-                    }
-                }
+        CrowdControlPlugin.getPlayers().forEach(player -> nearbyBlocks.addAll(RandomUtil.randomNearbyBlocks(player.getLocation(), 5, false, materials)));
+        if (nearbyBlocks.isEmpty())
+            return new Response.Result(Response.ResultType.FAILURE, "No available blocks to place/remove");
+
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (Location location : nearbyBlocks) {
+                Block block = location.getBlock();
+                if (placeTorches)
+                    placeTorch(location);
+                else
+                    block.setType(Material.AIR, false);
             }
-        }.runTask(plugin);
-        return true;
+        });
+        return Response.Result.SUCCESS;
     }
 
     protected void placeTorch(Location location) {

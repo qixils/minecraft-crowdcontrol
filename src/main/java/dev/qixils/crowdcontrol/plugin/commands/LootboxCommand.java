@@ -4,8 +4,12 @@ import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
+import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.plugin.utils.Weighted;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -16,15 +20,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+@Getter
 public class LootboxCommand extends ChatCommand {
     public LootboxCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
+
+    private final String effectName = "lootbox";
+    private final String displayName = "Open Lootbox";
 
     public enum EnchantmentWeights implements Weighted {
         ONE(1, 40),
@@ -63,19 +74,9 @@ public class LootboxCommand extends ChatCommand {
     }
 
     @Override
-    public int getCooldownSeconds() {
-        return 30;
-    }
-
-    @Override
-    public @NotNull String getCommand() {
-        return "lootbox";
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
-        for (Player player : players) {
-            Inventory lootbox = Bukkit.createInventory(null, 27, authorName+" has gifted you...");
+    public Response.Result execute(Request request) {
+        for (Player player : CrowdControlPlugin.getPlayers()) {
+            Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder(request.getViewer(), CrowdControlPlugin.USER_COLOR).next(" has gifted you...").build());
             List<Material> items = new ArrayList<>(BlockUtil.MATERIAL_SET);
             Collections.shuffle(items, rand);
             Material item = null;
@@ -88,7 +89,7 @@ public class LootboxCommand extends ChatCommand {
             assert item != null;
             ItemStack itemStack = new ItemStack(item, 1+rand.nextInt(item.getMaxStackSize()));
             // big dumb enchantment logic to generate sane items lmfao
-            int enchantments = ((EnchantmentWeights) RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS)).getLevel();
+            int enchantments = RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel();
             if (enchantments > 0) {
                 List<Enchantment> enchantmentList = new ArrayList<>();
                 for (Enchantment enchantment : EnchantmentWrapper.values()) {
@@ -110,12 +111,12 @@ public class LootboxCommand extends ChatCommand {
                 }
             }
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setLore(List.of("Donated by "+ authorName));
+            itemMeta.lore(Collections.singletonList(new TextBuilder("Donated by ").next(request.getViewer(), CrowdControlPlugin.USER_COLOR, TextDecoration.ITALIC).build()));
             if (rand.nextDouble() >= 0.9D) {
                 itemMeta.setUnbreakable(true);
             }
 
-            int attributes = ((AttributeWeights) RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS)).getLevel();
+            int attributes = RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel();
             if (attributes > 0) {
                 List<Attribute> attributeList = Arrays.asList(Attribute.values());
                 Collections.shuffle(attributeList, rand);
@@ -129,13 +130,8 @@ public class LootboxCommand extends ChatCommand {
 
             itemStack.setItemMeta(itemMeta);
             lootbox.setItem(13, itemStack);
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    player.openInventory(lootbox);
-                }
-            }.runTask(plugin);
+            Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(lootbox));
         }
-        return true;
+        return Response.Result.SUCCESS;
     }
 }

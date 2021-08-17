@@ -4,11 +4,12 @@ import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,20 +24,15 @@ public class FlowerCommand extends ChatCommand {
         super(plugin);
     }
 
-    @Override
-    public int getCooldownSeconds() {
-        return 0;
-    }
+    @Getter
+    private final String effectName = "flowers";
+    @Getter
+    private final String displayName = "Place Flowers";
 
     @Override
-    public @NotNull String getCommand() {
-        return "flowers";
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
+    public Response.Result execute(Request request) {
         Set<Location> placeLocations = new HashSet<>();
-        for (Player player : players) {
+        for (Player player : CrowdControlPlugin.getPlayers()) {
             List<Location> locations = RandomUtil.randomNearbyBlocks(player.getLocation(), RADIUS, false, BlockUtil.AIR_PLACE);
             int placed = 0;
             int toPlace = MIN_RAND+rand.nextInt(MAX_RAND-MIN_RAND+1);
@@ -50,15 +46,15 @@ public class FlowerCommand extends ChatCommand {
                 }
             }
         }
-        if (placeLocations.isEmpty()) {return false;}
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                for (Location location : placeLocations) {
-                    location.getBlock().setType((Material) RandomUtil.randomElementFrom(BlockUtil.FLOWERS));
-                }
-            }
-        }.runTask(plugin);
-        return true;
+
+        if (placeLocations.isEmpty())
+            return Response.Result.RETRY;
+
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (Location location : placeLocations)
+                location.getBlock().setType(RandomUtil.randomElementFrom(BlockUtil.FLOWERS));
+        });
+
+        return Response.Result.SUCCESS;
     }
 }

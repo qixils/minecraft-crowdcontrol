@@ -3,14 +3,17 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@Getter
 public class SoundCommand extends ChatCommand {
     public static final List<Sound> SOUNDS = List.of(
             Sound.ENTITY_CREEPER_PRIMED,
@@ -26,23 +29,16 @@ public class SoundCommand extends ChatCommand {
         super(plugin);
     }
 
-    @Override
-    public @NotNull String getCommand() {
-        return "sound";
-    }
+    private final String effectName = "sound-effect";
+    private final String displayName = "Spooky Sound Effect";
 
     @Override
-    public int getCooldownSeconds() {
-        return 60;
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
-        Sound sound = (Sound) RandomUtil.randomElementFrom(SOUNDS);
-        for (Player player : players) {
+    public Response.Result execute(Request request) {
+        Sound sound = RandomUtil.randomElementFrom(SOUNDS);
+        for (Player player : CrowdControlPlugin.getPlayers()) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
-            player.getWorld().playSound(playAt, sound, SoundCategory.HOSTILE, 1.0f, 1.0f);
+            player.getWorld().playSound(playAt, sound, SoundCategory.MASTER, 2.0f, 1.0f);
         }
-        return true;
+        return Response.Result.SUCCESS;
     }
 }

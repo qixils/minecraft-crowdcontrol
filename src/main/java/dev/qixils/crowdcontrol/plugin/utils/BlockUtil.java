@@ -60,7 +60,7 @@ public class BlockUtil {
             Material.WHITE_TERRACOTTA,
             Material.YELLOW_TERRACOTTA,
             Material.GRASS,
-            Material.GRASS_PATH,
+            Material.DIRT_PATH,
             Material.TALL_GRASS,
             Material.POPPY,
             Material.DANDELION,

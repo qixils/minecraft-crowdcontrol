@@ -2,21 +2,25 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.Weighted;
-import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Getter
 public class VeinCommand extends ChatCommand {
+    private final String effectName = "vein";
+    private final String displayName = "Spawn Ore Vein";
     public VeinCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
@@ -49,21 +53,11 @@ public class VeinCommand extends ChatCommand {
     public static final int MAX_RADIUS = 20;
 
     @Override
-    public @NotNull String getCommand() {
-        return "vein";
-    }
+    public Response.Result execute(Request request) {
+        Material ore = (RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS)).getBlock();
 
-    @Override
-    public int getCooldownSeconds() {
-        return 20;
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
-        Material ore = ((Ores) RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS)).getBlock();
-
-        boolean didSomething = false;
-        for (Player player : players) {
+        Response.Result result = new Response.Result(Response.ResultType.FAILURE, "Could not find any blocks to replace");
+        for (Player player : CrowdControlPlugin.getPlayers()) {
             List<Location> setBlocks = new ArrayList<>();
             Location oreLocation = RandomUtil.randomNearbyBlock(player.getLocation(), MIN_RADIUS, MAX_RADIUS, false, BlockUtil.STONES);
             if (oreLocation == null) {
@@ -82,7 +76,7 @@ public class VeinCommand extends ChatCommand {
             }
             // if we found viable blocks (idk how we wouldn't have atleast one but justincase??)
             if (!setBlocks.isEmpty()) {
-                didSomething = true;
+                result = Response.Result.SUCCESS;
                 List<Location> trueSetBlocks = new ArrayList<>();
                 int maxBlocks = 1+rand.nextInt(setBlocks.size());
                 int blocksSet = 0;
@@ -95,17 +89,9 @@ public class VeinCommand extends ChatCommand {
                     }
                 }
 
-                // probably needs to be run synchronously
-                new BukkitRunnable(){
-                    @Override
-                    public void run() {
-                        for (Location blockPos : trueSetBlocks) {
-                            blockPos.getBlock().setType(ore);
-                        }
-                    }
-                }.runTask(plugin);
+                Bukkit.getScheduler().runTask(plugin, () -> trueSetBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore)));
             }
         }
-        return didSomething;
+        return result;
     }
 }

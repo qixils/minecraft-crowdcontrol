@@ -1,9 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ClassCooldowns;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -11,27 +11,15 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
+@Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
     public ChargedCreeperCommand(CrowdControlPlugin plugin) {
         super(plugin, EntityType.CREEPER);
     }
 
-    @Override
-    public @NotNull String getCommand() {
-        return "charged";
-    }
-
-    @Override
-    public int getCooldownSeconds() {
-        return 60*30;
-    }
-
-    @Override
-    public ClassCooldowns getClassCooldown() {
-        return super.getClassCooldown();
-    }
+    private final String effectName = "entity-charged-creeper";
+    private final String displayName = "Summon Charged Creeper";
 
     @Override
     protected Entity spawnEntity(Player player, Location location) {

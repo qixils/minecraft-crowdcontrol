@@ -1,56 +1,39 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
-import dev.qixils.crowdcontrol.plugin.ClassCooldowns;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
+@Getter
 public class WeatherCommand extends ChatCommand {
+    protected final String effectName;
+    protected final String displayName;
     protected final WeatherType weatherType;
     protected static final int DURATION = 20*60*60;
     public WeatherCommand(CrowdControlPlugin plugin, WeatherType weatherType) {
         super(plugin);
         this.weatherType = weatherType;
+        this.effectName = weatherType.name();
+        this.displayName = "Set Weather to " + TextUtil.titleCase(weatherType);
     }
 
     @Override
-    public int getCooldownSeconds() {
-        return 0;
-    }
-
-    @Override
-    public ClassCooldowns getClassCooldown() {
-        return ClassCooldowns.WEATHER;
-    }
-
-    @Override
-    public @NotNull String getCommand() {
-        return weatherType.name();
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
-        for (Player player : players) {
-            World world = player.getWorld();
+    public Response.Result execute(Request request) {
+        for (World world : Bukkit.getWorlds()) {
             if (weatherType == WeatherType.CLEAR) {
                 world.setClearWeatherDuration(DURATION);
             } else {
-                new BukkitRunnable(){
-                    @Override
-                    public void run() {
-                        world.setStorm(true);
-                    }
-                }.runTask(plugin);
+                world.setStorm(true);
                 // needs to be BukkitRunnable and seems to not matter
                 // player.getServer().dispatchCommand(player.getServer().getConsoleSender(), "weather rain");
             }
         }
-        return true;
+        return Response.Result.SUCCESS;
     }
 }

@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin;
 
 import com.google.common.collect.ImmutableSet;
 import dev.qixils.crowdcontrol.plugin.commands.*;
-import dev.qixils.crowdcontrol.plugin.crowdcontrol.commands.*;
 import org.bukkit.Difficulty;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -10,7 +9,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class RegisterCommands {
@@ -109,14 +109,23 @@ public class RegisterCommands {
             Material.GRAVEL
     );
 
+    public static final Set<Material> GIVE_TAKE_ITEMS = ImmutableSet.of(
+            Material.WOODEN_PICKAXE,
+            Material.STONE_PICKAXE,
+            Material.GOLDEN_PICKAXE,
+            Material.IRON_PICKAXE,
+            Material.DIAMOND_PICKAXE,
+            Material.NETHERITE_PICKAXE,
+            Material.GOLDEN_APPLE,
+            Material.ENCHANTED_GOLDEN_APPLE
+    );
+
     public static void register(CrowdControlPlugin plugin) {
         // register normal commands
-        Set<ChatCommand> commands = new HashSet<>(Set.of(
+        List<ChatCommand> commands = Arrays.asList(
                 new VeinCommand(plugin),
                 new SoundCommand(plugin),
                 new ChargedCreeperCommand(plugin),
-                new GiveItem(plugin),
-                new TakeItem(plugin),
                 new SwapCommand(plugin),
                 new DinnerboneCommand(plugin),
                 new ClutterCommand(plugin),
@@ -125,7 +134,6 @@ public class RegisterCommands {
                 new ToastCommand(plugin),
                 new FreezeCommand(plugin),
                 new FlowerCommand(plugin),
-                new ParticleCommand(plugin),
                 new MoveCommand(plugin, 0, 1, 0, "up"),
                 new MoveCommand(plugin, 0, -1, 0, "down"),
                 new MoveCommand(plugin, 1, 0, 0, "x+"),
@@ -138,12 +146,9 @@ public class RegisterCommands {
                 new DigCommand(plugin),
                 new TimeCommand(plugin),
                 new NameCommand(plugin)
-        ));
+        );
 
-        // register entity commands
-        for (EntityType entity : SAFE_ENTITIES) {
-            commands.add(new SummonEntityCommand(plugin, entity));
-        }
+        SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));
 
         // register difficulty commands
         for (Difficulty difficulty : Difficulty.values()) {
@@ -156,21 +161,23 @@ public class RegisterCommands {
         }
 
         // block sets
-        for (Material material : SET_BLOCKS) {
-            commands.add(new BlockCommand(plugin, material));
-        }
-        for (Material material : SET_FALLING_BLOCKS) {
-            commands.add(new FallingBlockCommand(plugin, material));
-        }
+        SET_BLOCKS.forEach(block -> commands.add(new BlockCommand(plugin, block)));
+        SET_FALLING_BLOCKS.forEach(block -> commands.add(new FallingBlockCommand(plugin, block)));
 
-        // wwwwwwww
+        // weather commands
         for (WeatherType weatherType : WeatherType.values()) {
             commands.add(new WeatherCommand(plugin, weatherType));
         }
 
+        // enchantments
         for (Enchantment enchantment : Enchantment.values()) {
             commands.add(new EnchantmentCommand(plugin, enchantment));
         }
+
+        GIVE_TAKE_ITEMS.forEach(item -> {
+            commands.add(new GiveItemCommand(plugin, item));
+            commands.add(new TakeItemCommand(plugin, item));
+        });
 
         // generate template commands.txt
 //        FileWriter fileWriter = null;
@@ -183,20 +190,16 @@ public class RegisterCommands {
 
         // actually register the commands
         for (ChatCommand cmd : commands) {
-            String name = cmd.getCommand().toLowerCase(java.util.Locale.ENGLISH);
-            try {
-                plugin.registerCommand(name, cmd);
-//                if (fileWriter != null) {
-//                    try {
-//                        fileWriter.write("!" + name + "\n");
-//                    } catch (IOException e) {
-//                        plugin.getLogger().warning("Failed to save command "+name+".");
-//                        e.printStackTrace();
-//                    }
+            String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
+            plugin.registerCommand(name, cmd);
+//            if (fileWriter != null) {
+//                try {
+//                    fileWriter.write(name + "\n");
+//                } catch (IOException e) {
+//                    plugin.getLogger().warning("Failed to save command "+name+".");
+//                    e.printStackTrace();
 //                }
-            } catch (AlreadyRegisteredException e) {
-                plugin.getLogger().warning("Tried to register Twitch command '"+name+"' but it was already registered.");
-            }
+//            }
         }
 
         // groan

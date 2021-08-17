@@ -1,19 +1,21 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ChatCommand;
-import dev.qixils.crowdcontrol.plugin.ClassCooldowns;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import org.bukkit.entity.Player;
+import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
+@Getter
 public class PotionCommand extends ChatCommand {
     private final PotionEffectType potionEffectType;
     private final int duration;
+    private final String effectName;
+    private final String displayName;
+
     private static final int MAX_DURATION = 20*15;
 
     public PotionCommand(CrowdControlPlugin plugin, PotionEffectType potionEffectType) {
@@ -21,34 +23,14 @@ public class PotionCommand extends ChatCommand {
         this.potionEffectType = potionEffectType;
         boolean isMinimal = potionEffectType.isInstant();
         duration = isMinimal ? 1 : MAX_DURATION;
+        this.effectName = "potion-" + potionEffectType.getName();
+        this.displayName = "Apply " + potionEffectType.getName() + " Potion Effect"; // TODO: proper potion name
     }
 
     @Override
-    public int getCooldownSeconds() {
-        return (int) (60*7.5);
-    }
-
-    @Override
-    public ClassCooldowns getClassCooldown() {
-        return ClassCooldowns.POTION;
-    }
-
-    @Override
-    public @NotNull String getCommand() {
-        return potionEffectType.getName();
-    }
-
-    @Override
-    public boolean execute(String authorName, List<Player> players, String... args) {
+    public Response.Result execute(Request request) {
         PotionEffect potionEffect = potionEffectType.createEffect(duration, rand.nextInt(2));
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                for (Player player : players) {
-                    player.addPotionEffect(potionEffect);
-                }
-            }
-        }.runTask(plugin);
-        return true;
+        Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.addPotionEffect(potionEffect))); // TODO: can this be async?
+        return Response.Result.SUCCESS;
     }
 }
