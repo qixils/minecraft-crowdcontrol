@@ -13,15 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class FreezeCommand extends ChatCommand {
-    public FreezeCommand(CrowdControlPlugin plugin) {
+public class CameraLockCommand extends ChatCommand {
+    public CameraLockCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
 
     @Getter
-    private final String effectName = "freeze";
+    private final String effectName = "camera-lock";
     @Getter
-    private final String displayName = "Freeze";
+    private final String displayName = "Camera Lock";
 
     @Override
     public Response.Result execute(Request request) {
@@ -37,10 +37,8 @@ public class FreezeCommand extends ChatCommand {
                 if (!location.getWorld().equals(playerLoc.getWorld()))
                     return;
 
-                if (location.getX() != playerLoc.getX() || location.getY() != playerLoc.getY() || location.getZ() != playerLoc.getZ()) {
-                    playerLoc.set(location.getX(), location.getY(), location.getZ());
-                    player.teleport(playerLoc);
-                }
+                if (location.getPitch() != playerLoc.getPitch() || location.getYaw() != playerLoc.getYaw())
+                    player.teleport(new Location(location.getWorld(), playerLoc.getX(), playerLoc.getY(), playerLoc.getZ(), location.getYaw(), location.getPitch()));
             });
         }, 1, 1);
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task::cancel, 20*7);
