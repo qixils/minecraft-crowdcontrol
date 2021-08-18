@@ -133,6 +133,7 @@ public class RegisterCommands {
                 new TeleportCommand(plugin),
                 new ToastCommand(plugin),
                 new FreezeCommand(plugin),
+                new CameraLockCommand(plugin),
                 new FlowerCommand(plugin),
                 new MoveCommand(plugin, 0, 1, 0, "up"),
                 new MoveCommand(plugin, 0, -1, 0, "down"),
@@ -145,7 +146,9 @@ public class RegisterCommands {
                 new GravelCommand(plugin),
                 new DigCommand(plugin),
                 new TimeCommand(plugin),
-                new NameCommand(plugin)
+                new NameCommand(plugin),
+                new ItemDamageCommand(plugin, true),
+                new ItemDamageCommand(plugin, false)
         );
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));
