@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 @Getter
-public class SoundCommand extends ChatCommand {
+public class SoundCommand extends Command {
     public static final List<Sound> SOUNDS = List.of(
             Sound.ENTITY_CREEPER_PRIMED,
             Sound.ENTITY_ENDERMAN_STARE,

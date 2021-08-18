@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 
 import java.util.Random;
 
-public abstract class ChatCommand {
+public abstract class Command {
     public static final Random rand = new Random();
 
     public abstract Response.Result execute(Request request);
@@ -36,7 +36,7 @@ public abstract class ChatCommand {
     }
 
     protected final CrowdControlPlugin plugin;
-    public ChatCommand(CrowdControlPlugin plugin) {
+    public Command(CrowdControlPlugin plugin) {
         this.plugin = plugin;
     }
 

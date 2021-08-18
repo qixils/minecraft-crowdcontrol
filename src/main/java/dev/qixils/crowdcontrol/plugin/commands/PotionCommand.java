@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -10,7 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 @Getter
-public class PotionCommand extends ChatCommand {
+public class PotionCommand extends Command {
     private final PotionEffectType potionEffectType;
     private final int duration;
     private final String effectName;

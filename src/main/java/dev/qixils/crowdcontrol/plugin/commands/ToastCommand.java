@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 
 @Getter
-public class ToastCommand extends ChatCommand {
+public class ToastCommand extends Command {
     private final String effectName = "toast";
     private final String displayName = "Render Toasts";
     public ToastCommand(CrowdControlPlugin plugin) {

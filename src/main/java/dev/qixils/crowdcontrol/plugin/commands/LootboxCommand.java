@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public class LootboxCommand extends ChatCommand {
+public class LootboxCommand extends Command {
     public LootboxCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }

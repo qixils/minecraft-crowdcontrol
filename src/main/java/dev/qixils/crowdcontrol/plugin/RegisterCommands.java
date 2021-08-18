@@ -122,7 +122,7 @@ public class RegisterCommands {
 
     public static void register(CrowdControlPlugin plugin) {
         // register normal commands
-        List<ChatCommand> commands = Arrays.asList(
+        List<Command> commands = Arrays.asList(
                 new VeinCommand(plugin),
                 new SoundCommand(plugin),
                 new ChargedCreeperCommand(plugin),
@@ -189,7 +189,7 @@ public class RegisterCommands {
 //        }
 
         // actually register the commands
-        for (ChatCommand cmd : commands) {
+        for (Command cmd : commands) {
             String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
             plugin.registerCommand(name, cmd);
 //            if (fileWriter != null) {

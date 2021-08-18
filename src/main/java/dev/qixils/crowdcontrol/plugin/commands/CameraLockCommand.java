@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CameraLockCommand extends ChatCommand {
+public class CameraLockCommand extends Command {
     public CameraLockCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }

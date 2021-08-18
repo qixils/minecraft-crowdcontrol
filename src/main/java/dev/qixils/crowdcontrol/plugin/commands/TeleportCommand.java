@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.ParticleUtil;
@@ -16,7 +16,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 
 @Getter
-public class TeleportCommand extends ChatCommand {
+public class TeleportCommand extends Command {
     private final String effectName = "chorus-fruit";
     private final String displayName = "Chorus Fruit";
 

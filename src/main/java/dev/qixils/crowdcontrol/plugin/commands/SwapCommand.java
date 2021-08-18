@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-public class SwapCommand extends ChatCommand {
+public class SwapCommand extends Command {
     private final String effectName = "swap";
     private final String displayName = "Swap Locations";
 

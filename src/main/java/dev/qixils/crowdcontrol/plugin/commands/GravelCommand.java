@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class GravelCommand extends ChatCommand {
+public class GravelCommand extends Command {
     public GravelCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }

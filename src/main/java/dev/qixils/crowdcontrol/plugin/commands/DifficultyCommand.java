@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -10,7 +10,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.World;
 
 @Getter
-public class DifficultyCommand extends ChatCommand {
+public class DifficultyCommand extends Command {
     private final Difficulty difficulty;
     private final String effectName;
     private final String displayName;

@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
@@ -13,7 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 @Getter
-public class BlockCommand extends ChatCommand {
+public class BlockCommand extends Command {
     protected final Material material;
     private final String effectName;
     private final String displayName;

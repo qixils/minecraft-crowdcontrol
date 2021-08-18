@@ -34,7 +34,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
         return new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
     }
 
-    public void registerCommand(String name, ChatCommand command) {
+    public void registerCommand(String name, Command command) {
         name = name.toLowerCase(Locale.ENGLISH);
         crowdControl.registerHandler(name, command::executeAndNotify);
         getLogger().fine("Registered CC command '"+name+"'");

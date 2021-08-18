@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
@@ -15,7 +15,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 @Getter
-public class SummonEntityCommand extends ChatCommand {
+public class SummonEntityCommand extends Command {
     protected final EntityType entityType;
     protected static final int SPAWN_RADIUS = 7;
     private final String effectName;

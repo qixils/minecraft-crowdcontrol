@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-public class DigCommand extends ChatCommand {
+public class DigCommand extends Command {
     private final static double RADIUS = .5D;
     public DigCommand(CrowdControlPlugin plugin) {
         super(plugin);

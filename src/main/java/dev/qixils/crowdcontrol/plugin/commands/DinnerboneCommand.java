@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class DinnerboneCommand extends ChatCommand {
+public class DinnerboneCommand extends Command {
     private static final String NAME = "Dinnerbone";
     private static final int RADIUS = 15;
 

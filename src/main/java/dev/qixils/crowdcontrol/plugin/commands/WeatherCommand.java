@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -11,7 +11,7 @@ import org.bukkit.WeatherType;
 import org.bukkit.World;
 
 @Getter
-public class WeatherCommand extends ChatCommand {
+public class WeatherCommand extends Command {
     protected final String effectName;
     protected final String displayName;
     protected final WeatherType weatherType;

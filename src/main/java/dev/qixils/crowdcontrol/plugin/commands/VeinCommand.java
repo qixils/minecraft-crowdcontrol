@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Getter
-public class VeinCommand extends ChatCommand {
+public class VeinCommand extends Command {
     private final String effectName = "vein";
     private final String displayName = "Spawn Ore Vein";
     public VeinCommand(CrowdControlPlugin plugin) {

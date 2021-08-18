@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.ChatCommand;
+import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -12,7 +12,7 @@ import org.bukkit.inventory.PlayerInventory;
 import java.util.Set;
 
 @Getter
-public class ClutterCommand extends ChatCommand {
+public class ClutterCommand extends Command {
     public ClutterCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
