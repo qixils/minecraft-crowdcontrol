@@ -16,17 +16,17 @@ public final class CrowdControlPlugin extends JavaPlugin {
     public static final TextColor USER_COLOR = TextColor.color(0x9f44db);
     public static final TextColor CMD_COLOR = TextColor.color(0xb15be3);
 
-    public CrowdControlPlugin() {
-        RegisterCommands.register(this);
-    }
-
     @Override
     public void onEnable() {
         crowdControl = new CrowdControl(58431);
+        List<Command> commands = RegisterCommands.register(this);
+        if (true)
+            RegisterCommands.writeCommands(this, commands);
     }
 
     @Override
     public void onDisable() {
+        if (crowdControl == null) return;
         crowdControl.shutdown();
     }
 

@@ -9,8 +9,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class RegisterCommands {
@@ -120,9 +124,9 @@ public class RegisterCommands {
             Material.ENCHANTED_GOLDEN_APPLE
     );
 
-    public static void register(CrowdControlPlugin plugin) {
+    public static List<Command> register(CrowdControlPlugin plugin) {
         // register normal commands
-        List<Command> commands = Arrays.asList(
+        List<Command> commands = new ArrayList<>(Arrays.asList(
                 new VeinCommand(plugin),
                 new SoundCommand(plugin),
                 new ChargedCreeperCommand(plugin),
@@ -149,7 +153,7 @@ public class RegisterCommands {
                 new NameCommand(plugin),
                 new ItemDamageCommand(plugin, true),
                 new ItemDamageCommand(plugin, false)
-        );
+        ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));
 
@@ -182,37 +186,24 @@ public class RegisterCommands {
             commands.add(new TakeItemCommand(plugin, item));
         });
 
-        // generate template commands.txt
-//        FileWriter fileWriter = null;
-//        try {
-//            fileWriter = new FileWriter("crowdcontrol_commands.txt");
-//        } catch (IOException e) {
-//            plugin.getLogger().warning("Failed to write commands to file.");
-//            e.printStackTrace();
-//        }
-
         // actually register the commands
         for (Command cmd : commands) {
             String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
             plugin.registerCommand(name, cmd);
-//            if (fileWriter != null) {
-//                try {
-//                    fileWriter.write(name + "\n");
-//                } catch (IOException e) {
-//                    plugin.getLogger().warning("Failed to save command "+name+".");
-//                    e.printStackTrace();
-//                }
-//            }
         }
 
-        // groan
-//        if (fileWriter != null) {
-//            try {
-//                fileWriter.close();
-//            } catch (IOException e) {
-//                plugin.getLogger().warning("Failed to close file???");
-//                e.printStackTrace();
-//            }
-//        }
+        return commands;
+    }
+
+    public static void writeCommands(CrowdControlPlugin plugin, List<Command> commands) {
+        try {
+            FileWriter fileWriter = new FileWriter("crowdcontrol_commands.txt");
+            for (Command command : commands)
+                fileWriter.write("        new Effect(\"" + command.getDisplayName() + "\", \"" + command.getEffectName().toLowerCase(Locale.ENGLISH) + "\"),\n");
+            fileWriter.close();
+        } catch (IOException e) {
+            plugin.getLogger().warning("Failed to write commands to file.");
+            e.printStackTrace();
+        }
     }
 }

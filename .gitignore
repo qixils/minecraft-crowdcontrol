@@ -7,6 +7,7 @@
 
 # IntelliJ
 out/
+.attach_pid*
 
 # Compiled class file
 *.class

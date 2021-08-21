@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -23,8 +24,8 @@ public class PotionCommand extends Command {
         this.potionEffectType = potionEffectType;
         boolean isMinimal = potionEffectType.isInstant();
         duration = isMinimal ? 1 : MAX_DURATION;
-        this.effectName = "potion-" + potionEffectType.getName();
-        this.displayName = "Apply " + potionEffectType.getName() + " Potion Effect"; // TODO: proper potion name
+        this.effectName = "potion-" + nameOf(potionEffectType);
+        this.displayName = "Apply " + TextUtil.titleCase(nameOf(potionEffectType)) + " Potion Effect";
     }
 
     @Override
@@ -32,5 +33,21 @@ public class PotionCommand extends Command {
         PotionEffect potionEffect = potionEffectType.createEffect(duration, rand.nextInt(2));
         Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.addPotionEffect(potionEffect))); // TODO: can this be async?
         return Response.Result.SUCCESS;
+    }
+
+    private static String nameOf(PotionEffectType type) {
+        return switch (type.getName()) {
+            case "SLOW" -> "SLOWNESS";
+            case "FAST_DIGGING" -> "HASTE";
+            case "SLOW_DIGGING" -> "MINING_FATIGUE";
+            case "INCREASE_DAMAGE" -> "STRENGTH";
+            case "HEAL" -> "HEALING";
+            case "HARM" -> "HARMING";
+            case "JUMP" -> "JUMP_BOOST";
+            case "CONFUSION" -> "NAUSEA";
+            case "DAMAGE_RESISTANCE" -> "RESISTANCE";
+            case "UNLUCK" -> "BAD_LUCK";
+            default -> type.getName();
+        };
     }
 }
