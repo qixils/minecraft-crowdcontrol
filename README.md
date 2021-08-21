@@ -1,5 +1,5 @@
 # Minecraft Crowd Control
-Minecraft Crowd Control is a plugin for [Paper](https://papermc.io/) 1.16.4 that allows your Twitch community to interact with your game.
+Minecraft Crowd Control is a plugin for [Paper](https://papermc.io/) 1.17.1 that allows your Twitch community to interact with your game.
 
 This plugin is currently aimed towards streamers without features like channel points or bits, as commands are simply used by typing in chat and work off a cooldown system.
 Most commands have some sort of cooldown to prevent them from being used every second, though generally these are in the range of half a minute to 15 minutes.
