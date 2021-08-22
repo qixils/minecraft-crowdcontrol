@@ -185,7 +185,7 @@ public class Minecraft : SimpleTCPPack
         new Effect("Set Weather to Downfall", "downfall"),
         new Effect("Set Weather to Clear", "clear"),
         // apply enchants
-        // TODO: remove enchantments command
+        new Effect("Remove Enchants", "remove-enchants"), // removes all enchants from the held item
         new Effect("Apply Fire Protection IV", "enchant-fire_protection"),
         new Effect("Apply Sharpness V", "enchant-sharpness"),
         new Effect("Apply Flame", "enchant-flame"),

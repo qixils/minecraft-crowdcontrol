@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class SummonEntityCommand extends Command {
@@ -29,7 +30,7 @@ public class SummonEntityCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location loc = getSpawnLocation(player.getLocation());
             if (loc != null)

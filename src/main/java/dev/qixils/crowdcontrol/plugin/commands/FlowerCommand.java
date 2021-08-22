@@ -10,6 +10,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,7 @@ public class FlowerCommand extends Command {
     private final String displayName = "Place Flowers";
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Set<Location> placeLocations = new HashSet<>();
         for (Player player : CrowdControlPlugin.getPlayers()) {
             List<Location> locations = RandomUtil.randomNearbyBlocks(player.getLocation(), RADIUS, false, BlockUtil.AIR_PLACE);

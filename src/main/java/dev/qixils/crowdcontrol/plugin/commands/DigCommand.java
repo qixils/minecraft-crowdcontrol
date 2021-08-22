@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class DigCommand extends Command {
     private final String displayName = "Dig Hole";
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Set<Block> blocks = new HashSet<>();
         int depth = -(2 + rand.nextInt(4));
         for (Player player : CrowdControlPlugin.getPlayers()) {

@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public class LootboxCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder().next(request.getViewer(), CrowdControlPlugin.USER_COLOR).next(" has gifted you...").build());
             List<Material> items = new ArrayList<>(BlockUtil.MATERIAL_SET);

@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class NameCommand extends Command {
@@ -18,7 +19,7 @@ public class NameCommand extends Command {
     private final String displayName = "Name Item";
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         String text = request.getViewer();
         CrowdControlPlugin.getPlayers().forEach(player -> {
             ItemStack item = player.getInventory().getItemInMainHand();

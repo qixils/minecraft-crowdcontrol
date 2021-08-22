@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class TorchCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Material[] materials = placeTorches ? BlockUtil.AIR_ARRAY : BlockUtil.TORCH_ARRAY;
         List<Location> nearbyBlocks = new ArrayList<>();
         CrowdControlPlugin.getPlayers().forEach(player -> nearbyBlocks.addAll(RandomUtil.randomNearbyBlocks(player.getLocation(), 5, false, materials)));

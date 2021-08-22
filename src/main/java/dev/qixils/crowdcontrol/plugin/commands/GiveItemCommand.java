@@ -13,6 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class GiveItemCommand extends Command {
@@ -27,7 +28,7 @@ public class GiveItemCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         ItemStack itemStack = new ItemStack(item);
         itemStack.setAmount(itemStack.getMaxStackSize());
         for (Player player : CrowdControlPlugin.getPlayers()) {

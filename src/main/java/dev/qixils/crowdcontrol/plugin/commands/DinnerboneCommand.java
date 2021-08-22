@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -26,7 +27,7 @@ public class DinnerboneCommand extends Command {
     private final String effectName = "dinnerbone";
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Set<LivingEntity> entities = new HashSet<>();
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Player player : CrowdControlPlugin.getPlayers()) {

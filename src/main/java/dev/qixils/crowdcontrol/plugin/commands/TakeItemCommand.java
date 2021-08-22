@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class TakeItemCommand extends Command {
@@ -24,7 +25,7 @@ public class TakeItemCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             for (ItemStack itemStack : player.getInventory()) {
                 if (itemStack == null) {

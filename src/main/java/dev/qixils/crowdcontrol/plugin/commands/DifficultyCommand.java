@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class DifficultyCommand extends Command {
@@ -23,7 +24,7 @@ public class DifficultyCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         for (World world : plugin.getServer().getWorlds()) {
             world.setDifficulty(difficulty);
         }

@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class BlockCommand extends Command {
@@ -26,7 +27,7 @@ public class BlockCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Response.Result result = Response.Result.RETRY;
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Block block = player.getLocation().getBlock();

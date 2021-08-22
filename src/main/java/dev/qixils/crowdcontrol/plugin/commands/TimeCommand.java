@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class TimeCommand extends Command {
@@ -17,7 +18,7 @@ public class TimeCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Bukkit.getWorlds().forEach(world -> world.setFullTime(world.getFullTime() + ADD_TICKS));
         return Response.Result.SUCCESS;
     }

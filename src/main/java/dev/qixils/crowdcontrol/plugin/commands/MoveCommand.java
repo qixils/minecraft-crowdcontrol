@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class MoveCommand extends Command {
@@ -25,7 +26,7 @@ public class MoveCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.teleport(player.getLocation().add(vector))));
         return Response.Result.SUCCESS;
     }

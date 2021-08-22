@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class ClutterCommand extends Command {
     private final String displayName = "Clutter Inventories";
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         // swaps two random items in player's inventory
         for (Player player : CrowdControlPlugin.getPlayers()) {
             PlayerInventory inventory = player.getInventory();

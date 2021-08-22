@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class SwapCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         List<Player> players = CrowdControlPlugin.getPlayers();
         if (players.size() < 2)
             return new Response.Result(Response.ResultType.UNAVAILABLE, "Not enough players online");

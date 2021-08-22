@@ -4,25 +4,19 @@ import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
 public abstract class Command {
     public static final Random rand = new Random();
 
-    public abstract Response.Result execute(Request request);
+    @NotNull
+    public abstract Response.Result execute(@NotNull Request request);
+    @NotNull
     public abstract String getEffectName();
 
-    public final Response.Result executeAndNotify(Request request) {
-        Response.Result result = execute(request);
-        if (result.getType() == Response.ResultType.SUCCESS)
-            Bukkit.getServer().sendMessage(new TextBuilder()
-                .next(request.getViewer(), CrowdControlPlugin.USER_COLOR)
-                .next(" used command ")
-                .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
-        return result;
-    }
-
+    @NotNull
     public String getDisplayName() {
         StringBuilder sb = new StringBuilder();
         char[] chars = getClass().getSimpleName().replace("Command", "").toCharArray();
@@ -33,6 +27,17 @@ public abstract class Command {
             sb.append(chr);
         }
         return sb.toString();
+    }
+
+    @NotNull
+    public final Response.Result executeAndNotify(@NotNull Request request) {
+        Response.Result result = execute(request);
+        if (result.getType() == Response.ResultType.SUCCESS)
+            Bukkit.getServer().sendMessage(new TextBuilder()
+                .next(request.getViewer(), CrowdControlPlugin.USER_COLOR)
+                .next(" used command ")
+                .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
+        return result;
     }
 
     protected final CrowdControlPlugin plugin;

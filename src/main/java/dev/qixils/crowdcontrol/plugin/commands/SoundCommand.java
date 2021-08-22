@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class SoundCommand extends Command {
     private final String displayName = "Spooky Sound Effect";
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         Sound sound = RandomUtil.randomElementFrom(SOUNDS);
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());

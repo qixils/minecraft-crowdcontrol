@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;
 
@@ -30,7 +31,7 @@ public class ItemDamageCommand extends Command {
 	}
 
 	@Override
-	public Response.Result execute(Request request) {
+	public Response.@NotNull Result execute(@NotNull Request request) {
 		Response.Result result = Response.Result.RETRY;
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			PlayerInventory inv = player.getInventory();

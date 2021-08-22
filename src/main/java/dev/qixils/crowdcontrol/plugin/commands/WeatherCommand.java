@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class WeatherCommand extends Command {
@@ -24,7 +25,7 @@ public class WeatherCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         for (World world : Bukkit.getWorlds()) {
             if (weatherType == WeatherType.CLEAR) {
                 world.setClearWeatherDuration(DURATION);

@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class GravelCommand extends Command {
     private final String displayName = "Replace Area With Gravel";
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         List<Location> locations = new ArrayList<>();
         for (Player player : CrowdControlPlugin.getPlayers())
             locations.addAll(BlockUtil.getNearbyBlocks(player.getLocation(), 6, false, BlockUtil.STONES));

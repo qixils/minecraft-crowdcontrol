@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class FallingBlockCommand extends Command {
@@ -29,7 +30,7 @@ public class FallingBlockCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location destination = player.getEyeLocation();
             destination.setY(Math.min(destination.getY()+Y, player.getWorld().getMaxHeight()-1));

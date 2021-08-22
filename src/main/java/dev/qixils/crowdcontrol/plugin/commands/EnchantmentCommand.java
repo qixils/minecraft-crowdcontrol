@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class EnchantmentCommand extends Command {
@@ -24,7 +25,7 @@ public class EnchantmentCommand extends Command {
     }
 
     @Override
-    public Response.Result execute(Request request) {
+    public Response.@NotNull Result execute(@NotNull Request request) {
         int level = enchantment.getMaxLevel();
         Response.Result result = Response.Result.RETRY;
         for (Player player : CrowdControlPlugin.getPlayers()) {
