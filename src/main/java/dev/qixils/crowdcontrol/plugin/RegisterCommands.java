@@ -152,7 +152,10 @@ public class RegisterCommands {
                 new TimeCommand(plugin),
                 new NameCommand(plugin),
                 new ItemDamageCommand(plugin, true),
-                new ItemDamageCommand(plugin, false)
+                new ItemDamageCommand(plugin, false),
+                new RemoveEnchantsCommand(plugin),
+                new HatCommand(plugin),
+                new RespawnCommand(plugin)
         ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));

@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public final class CrowdControlPlugin extends JavaPlugin {
     // actual stuff
@@ -19,7 +20,6 @@ public final class CrowdControlPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         crowdControl = new CrowdControl(58431);
-        crowdControl.registerCheck(() -> !Bukkit.getServer().getOnlinePlayers().isEmpty());
         List<Command> commands = RegisterCommands.register(this);
         if (false)
             RegisterCommands.writeCommands(this, commands);
@@ -32,7 +32,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     }
 
     public static List<Player> getPlayers() {
-        return new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
+        return Bukkit.getServer().getOnlinePlayers().stream().filter(player -> !player.isDead()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void registerCommand(String name, Command command) {

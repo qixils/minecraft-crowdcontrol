@@ -4,8 +4,11 @@ import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Random;
 
 public abstract class Command {
@@ -29,6 +32,12 @@ public abstract class Command {
     }
 
     public final Response.@NotNull Result executeAndNotify(@NotNull Request request) {
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        if (players.isEmpty())
+            return new Response.Result(Response.ResultType.UNAVAILABLE, "No players online");
+        if (players.stream().allMatch(Entity::isDead))
+            return new Response.Result(Response.ResultType.RETRY, "All players are dead");
+
         Response.Result result = execute(request);
         if (result.getType() == Response.ResultType.SUCCESS)
             Bukkit.getServer().sendMessage(new TextBuilder()
