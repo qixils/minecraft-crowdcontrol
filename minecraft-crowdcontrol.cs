@@ -36,11 +36,11 @@ public class Minecraft : SimpleTCPPack
         new Effect("Name Item", "name-item"), // names a held item after the viewer
         new Effect("Repair Item", "repair-item"), // sets the durability of an item to 100%
         new Effect("Damage Item", "damage-item"), // sets the durability of an item to 50%
+        new Effect("Put Item on Head", "hat"), // swaps the held item and the player's head item
         // TODO: give/take XP
         // TODO: give/take health (+ kill players)
         // TODO: give/take food
         // TODO: increase/decrease max health
-        // TODO: put held item on the player's head
         // TODO: disable jumping for ~10 seconds
         // TODO: drop selected item
         // TODO: delete selected item

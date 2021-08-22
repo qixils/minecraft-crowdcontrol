@@ -11,8 +11,7 @@ import java.util.Random;
 public abstract class Command {
     public static final Random rand = new Random();
 
-    @NotNull
-    public abstract Response.Result execute(@NotNull Request request);
+    public abstract Response.@NotNull Result execute(@NotNull Request request);
     @NotNull
     public abstract String getEffectName();
 
@@ -29,8 +28,7 @@ public abstract class Command {
         return sb.toString();
     }
 
-    @NotNull
-    public final Response.Result executeAndNotify(@NotNull Request request) {
+    public final Response.@NotNull Result executeAndNotify(@NotNull Request request) {
         Response.Result result = execute(request);
         if (result.getType() == Response.ResultType.SUCCESS)
             Bukkit.getServer().sendMessage(new TextBuilder()

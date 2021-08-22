@@ -131,7 +131,7 @@ public class LootboxCommand extends Command {
 
             itemStack.setItemMeta(itemMeta);
             lootbox.setItem(13, itemStack);
-            Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(lootbox));
+            Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(lootbox)); // TODO: sfx
         }
         return Response.Result.SUCCESS;
     }
