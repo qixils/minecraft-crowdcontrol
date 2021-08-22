@@ -19,6 +19,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         crowdControl = new CrowdControl(58431);
+        crowdControl.registerCheck(() -> !Bukkit.getServer().getOnlinePlayers().isEmpty());
         List<Command> commands = RegisterCommands.register(this);
         if (true)
             RegisterCommands.writeCommands(this, commands);

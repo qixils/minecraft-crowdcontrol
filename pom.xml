@@ -64,10 +64,6 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>jcenter</id>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -91,7 +87,7 @@
         <dependency>
             <groupId>dev.qixils</groupId>
             <artifactId>java-crowd-control</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 </project>
