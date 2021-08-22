@@ -38,13 +38,13 @@ public class Minecraft : SimpleTCPPack
         new Effect("Damage Item", "damage-item"), // sets the durability of an item to 50%
         new Effect("Put Item on Head", "hat"), // swaps the held item and the player's head item
         new Effect("Respawn Players", "respawn"),
+        new Effect("Drop Held Item", "drop-item"),
+        new Effect("Delete Held Item", "delete-item"),
         // TODO: give/take XP
         // TODO: give/take health (+ kill players)
         // TODO: give/take food
         // TODO: increase/decrease max health
         // TODO: disable jumping for ~10 seconds
-        // TODO: drop selected item
-        // TODO: delete selected item
         // TODO: MLG command (teleport players ~20-30 blocks above the highest block and put a water bucket in their hand/hotbar)
         // teleports players by a few blocks in the specified direction
         new Effect("Move Up", "up"),

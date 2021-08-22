@@ -155,7 +155,9 @@ public class RegisterCommands {
                 new ItemDamageCommand(plugin, false),
                 new RemoveEnchantsCommand(plugin),
                 new HatCommand(plugin),
-                new RespawnCommand(plugin)
+                new RespawnCommand(plugin),
+                new DropItemCommand(plugin),
+                new DeleteItemCommand(plugin)
         ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));
