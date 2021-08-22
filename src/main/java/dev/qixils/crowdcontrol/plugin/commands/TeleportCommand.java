@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 @Getter
 public class TeleportCommand extends Command {
     private final String effectName = "chorus-fruit";
-    private final String displayName = "Chorus Fruit";
+    private final String displayName = "Eat Chorus Fruit";
 
     public TeleportCommand(CrowdControlPlugin plugin) {
         super(plugin);

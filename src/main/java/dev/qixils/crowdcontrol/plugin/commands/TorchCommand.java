@@ -35,7 +35,7 @@ public class TorchCommand extends Command {
         super(plugin);
         this.placeTorches = placeTorches;
         this.effectName = placeTorches ? "Lit" : "Dim";
-        this.displayName = effectName;
+        this.displayName = (placeTorches ? "Place" : "Break") + " Torches";
     }
 
     @Override

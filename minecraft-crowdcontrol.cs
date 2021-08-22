@@ -19,30 +19,40 @@ public class Minecraft : SimpleTCPPack
         // miscellaneous
         new Effect("Spawn Ore Vein", "vein"),
         new Effect("Spooky Sound Effect", "sound-effect"),
-        new Effect("Swap Locations", "swap"),
-        new Effect("Dinnerbone", "dinnerbone"),
-        new Effect("Clutter Inventories", "clutter"),
-        new Effect("Open Lootbox", "lootbox"),
-        new Effect("Chorus Fruit", "chorus-fruit"),
-        new Effect("Render Toasts", "toast"),
-        new Effect("Freeze", "freeze"),
-        new Effect("Camera Lock", "camera-lock"),
-        new Effect("Place Flowers", "flowers"),
-        new Effect("Move UP", "up"),
-        new Effect("Move DOWN", "down"),
+        new Effect("Swap Locations", "swap"), // swaps the locations of every online player
+        new Effect("Dinnerbone", "dinnerbone"), // flips nearby mobs upside-down
+        new Effect("Clutter Inventories", "clutter"), // shuffles around a couple items in everyone's inventory
+        new Effect("Open Lootbox", "lootbox"), // gives a completely random item with varying enchants and modifiers
+        new Effect("Eat Chorus Fruit", "chorus-fruit"), // teleports the player to a random nearby block as if they ate a Chorus Fruit
+        new Effect("Render Toasts", "toast"), // displays a bunch of "Recipe Unlocked" notifications in the top right
+        new Effect("Freeze", "freeze"), // locks everyone in place for 7 seconds (camera rotation allowed)
+        new Effect("Camera Lock", "camera-lock"), // locks everyone's camera in place for 7 seconds (movement allowed)
+        new Effect("Place Flowers", "flowers"), // places a bunch of flowers nearby as if a Bonemeal item was used
+        new Effect("Place Torches", "lit"), // places torches on every valid nearby block
+        new Effect("Remove Torches", "dim"), // removes nearby torches
+        new Effect("Replace Area With Gravel", "gravel-hell"), // replaces nearby stone blocks with gravel
+        new Effect("Dig Hole", "dig"), // creates a small hole underneath every player
+        new Effect("Zip Time", "zip"), // adds a minute to the in-game day/night cycle
+        new Effect("Name Item", "name-item"), // names a held item after the viewer
+        new Effect("Repair Item", "repair-item"), // sets the durability of an item to 100%
+        new Effect("Damage Item", "damage-item"), // sets the durability of an item to 50%
+        // TODO: give/take XP
+        // TODO: give/take health (+ kill players)
+        // TODO: give/take food
+        // TODO: increase/decrease max health
+        // TODO: put held item on the player's head
+        // TODO: disable jumping for ~10 seconds
+        // TODO: drop selected item
+        // TODO: delete selected item
+        // TODO: respawn players (send to bed/world spawn, but keep inventory)
+        // teleports players by a few blocks in the specified direction
+        new Effect("Move Up", "up"),
+        new Effect("Move Down", "down"),
         new Effect("Move X+", "x+"),
         new Effect("Move X-", "x-"),
         new Effect("Move Z+", "z+"),
         new Effect("Move Z-", "z-"),
-        new Effect("Lit", "lit"),
-        new Effect("Dim", "dim"),
-        new Effect("Replace Area With Gravel", "gravel-hell"),
-        new Effect("Dig Hole", "dig"),
-        new Effect("Zip Time", "zip"),
-        new Effect("Name Item", "name-item"),
-        new Effect("Repair Item", "repair-item"),
-        new Effect("Damage Item", "damage-item"),
-        // summon mobs
+        // summons a mob around each player
         new Effect("Summon Charged Creeper", "entity-charged-creeper"),
         new Effect("Summon Creeper", "entity-creeper"),
         new Effect("Summon Skeleton", "entity-skeleton"),
@@ -121,12 +131,12 @@ public class Minecraft : SimpleTCPPack
         new Effect("Summon Ravager", "entity-ravager"),
         new Effect("Summon Rabbit", "entity-rabbit"),
         new Effect("Summon Armor Stand", "entity-armor_stand"),
-        // set difficulty
+        // sets the server difficulty (affects how much damage mobs deal)
         new Effect("Set Difficulty: Peaceful", "difficulty-peaceful"),
         new Effect("Set Difficulty: Easy", "difficulty-easy"),
         new Effect("Set Difficulty: Normal", "difficulty-normal"),
         new Effect("Set Difficulty: Hard", "difficulty-hard"),
-        // potion effects
+        // applies potion effects to every player
         new Effect("Apply Speed Potion Effect", "potion-speed"),
         new Effect("Apply Slowness Potion Effect", "potion-slowness"),
         new Effect("Apply Haste Potion Effect", "potion-haste"),
@@ -159,21 +169,22 @@ public class Minecraft : SimpleTCPPack
         new Effect("Apply Dolphins Grace Potion Effect", "potion-dolphins_grace"),
         new Effect("Apply Bad Omen Potion Effect", "potion-bad_omen"),
         new Effect("Apply Hero Of The Village Potion Effect", "potion-hero_of_the_village"),
-        // place blocks at feet
+        // places a block at everyone's feet
         new Effect("Place TNT Block", "block-tnt"),
         new Effect("Place Fire Block", "block-fire"),
         new Effect("Place Cobweb Block", "block-cobweb"),
         new Effect("Place Redstone Torch Block", "block-redstone_torch"),
         new Effect("Place Wither Rose Block", "block-wither_rose"),
-        // place blocks above head
+        // places a block several blocks above everyone's head
         new Effect("Falling Anvil Block", "falling-block-anvil"),
         new Effect("Falling Sand Block", "falling-block-sand"),
         new Effect("Falling Red Sand Block", "falling-block-red_sand"),
         new Effect("Falling Gravel Block", "falling-block-gravel"),
-        // set weather
+        // sets the server weather
         new Effect("Set Weather to Downfall", "downfall"),
         new Effect("Set Weather to Clear", "clear"),
         // apply enchants
+        // TODO: remove enchantments command
         new Effect("Apply Fire Protection IV", "enchant-fire_protection"),
         new Effect("Apply Sharpness V", "enchant-sharpness"),
         new Effect("Apply Flame", "enchant-flame"),
@@ -212,7 +223,7 @@ public class Minecraft : SimpleTCPPack
         new Effect("Apply Feather Falling IV", "enchant-feather_falling"),
         new Effect("Apply Power V", "enchant-power"),
         new Effect("Apply Infinity", "enchant-infinity"),
-        // give/take items
+        // gives/takes 1 item
         new Effect("Give Wooden Pickaxe", "give-wooden_pickaxe"),
         new Effect("Take Wooden Pickaxe", "take-wooden_pickaxe"),
         new Effect("Give Stone Pickaxe", "give-stone_pickaxe"),

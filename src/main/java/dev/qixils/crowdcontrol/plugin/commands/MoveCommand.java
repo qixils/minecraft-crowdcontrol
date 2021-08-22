@@ -8,8 +8,6 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.util.Vector;
 
-import java.util.Locale;
-
 @Getter
 public class MoveCommand extends Command {
     protected final Vector vector;
@@ -19,7 +17,7 @@ public class MoveCommand extends Command {
         super(plugin);
         vector = displacement;
         this.effectName = effectName;
-        this.displayName = "Move " + effectName.toUpperCase(Locale.ENGLISH);
+        this.displayName = "Move " + effectName;
     }
 
     public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String effectName) {
