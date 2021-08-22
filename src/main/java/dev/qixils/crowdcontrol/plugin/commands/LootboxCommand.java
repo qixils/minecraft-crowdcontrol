@@ -21,12 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 public class LootboxCommand extends Command {
@@ -76,7 +71,7 @@ public class LootboxCommand extends Command {
     @Override
     public Response.Result execute(Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
-            Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder(request.getViewer(), CrowdControlPlugin.USER_COLOR).next(" has gifted you...").build());
+            Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder().next(request.getViewer(), CrowdControlPlugin.USER_COLOR).next(" has gifted you...").build());
             List<Material> items = new ArrayList<>(BlockUtil.MATERIAL_SET);
             Collections.shuffle(items, rand);
             Material item = null;
