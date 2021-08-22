@@ -45,6 +45,7 @@ public class Minecraft : SimpleTCPPack
         // TODO: drop selected item
         // TODO: delete selected item
         // TODO: respawn players (send to bed/world spawn, but keep inventory)
+        // TODO: MLG command (teleport players ~20-30 blocks above the highest block and put a water bucket in their hand/hotbar)
         // teleports players by a few blocks in the specified direction
         new Effect("Move Up", "up"),
         new Effect("Move Down", "down"),
