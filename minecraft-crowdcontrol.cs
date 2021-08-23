@@ -49,7 +49,9 @@ public class Minecraft : SimpleTCPPack
         new Effect("Feed Players (1 Bar)", "feed-1"),
         new Effect("Starve Players", "starve"),
         new Effect("Remove One Hunger Bar", "starve-1"),
-        // TODO: give/take XP
+        new Effect("Give One XP Level", "xp+1"),
+        new Effect("Take One XP Level", "xp-1"),
+        new Effect("Reset Experience Progress", "reset-exp-progress"),
         // TODO: increase/decrease max health
         // TODO: disable jumping for ~10 seconds
         // teleports players by a few blocks in the specified direction
