@@ -2,11 +2,13 @@ package dev.qixils.crowdcontrol.plugin;
 
 import com.google.common.collect.ImmutableSet;
 import dev.qixils.crowdcontrol.plugin.commands.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.FileWriter;
@@ -172,7 +174,8 @@ public class RegisterCommands {
                 new ExperienceCommand(plugin, "xp+1", "Give One XP Level", 1),
                 new ExperienceCommand(plugin, "xp-1", "Take One XP Level", 1),
                 new MaxHealthCommand(plugin, -1),
-                new MaxHealthCommand(plugin, 1)
+                new MaxHealthCommand(plugin, 1),
+                new DisableJumpingCommand(plugin)
         ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));
@@ -210,6 +213,8 @@ public class RegisterCommands {
         for (Command cmd : commands) {
             String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
             plugin.registerCommand(name, cmd);
+            if (cmd instanceof Listener listener)
+                Bukkit.getPluginManager().registerEvents(listener, plugin);
         }
 
         return commands;

@@ -54,7 +54,7 @@ public class Minecraft : SimpleTCPPack
         new Effect("Reset Experience Progress", "reset-exp-progress"),
         new Effect("+1 Max Health", "max-health+1"),
         new Effect("-1 Max Health", "max-health-1"),
-        // TODO: disable jumping for ~10 seconds
+        new Effect("Disable Jumping", "disable-jumping"),
         // teleports players by a few blocks in the specified direction
         new Effect("Move Up", "up"),
         new Effect("Move Down", "down"),
