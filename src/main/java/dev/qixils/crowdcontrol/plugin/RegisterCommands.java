@@ -163,7 +163,11 @@ public class RegisterCommands {
                 new DamageCommand(plugin, "damage-1", "Damage Players (1 Heart)", 2f),
                 new DamageCommand(plugin, "heal-1", "Heal Players (1 Heart)", -2f),
                 new DamageCommand(plugin, "full-heal", "Heal Players", -Integer.MAX_VALUE),
-                new HalfHealthCommand(plugin)
+                new HalfHealthCommand(plugin),
+                new FeedCommand(plugin, "feed", "Feed Players", 40),
+                new FeedCommand(plugin, "feed-1", "Feed Players (1 Bar)", 2),
+                new FeedCommand(plugin, "starve", "Starve Players", -Integer.MAX_VALUE),
+                new FeedCommand(plugin, "starve-1", "Remove One Hunger Bar", -2)
         ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));

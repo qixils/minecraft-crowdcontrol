@@ -45,8 +45,11 @@ public class Minecraft : SimpleTCPPack
         new Effect("Damage Players (1 Heart)", "damage-1"),
         new Effect("Heal Players (1 Heart)", "heal-1"),
         new Effect("Heal Players", "full-heal"),
+        new Effect("Feed Players", "feed"),
+        new Effect("Feed Players (1 Bar)", "feed-1"),
+        new Effect("Starve Players", "starve"),
+        new Effect("Remove One Hunger Bar", "starve-1"),
         // TODO: give/take XP
-        // TODO: give/take food
         // TODO: increase/decrease max health
         // TODO: disable jumping for ~10 seconds
         // teleports players by a few blocks in the specified direction
