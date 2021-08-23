@@ -41,8 +41,11 @@ public class Minecraft : SimpleTCPPack
         new Effect("Drop Held Item", "drop-item"),
         new Effect("Delete Held Item", "delete-item"),
         new Effect("Water Bucket Clutch", "bucket-clutch"), // teleports players 30 blocks up and gives them a water bucket
+        new Effect("Kill Players", "kill"),
+        new Effect("Damage Players (1 Heart)", "damage-1"),
+        new Effect("Heal Players (1 Heart)", "heal-1"),
+        new Effect("Heal Players", "full-heal"),
         // TODO: give/take XP
-        // TODO: give/take health (+ kill players)
         // TODO: give/take food
         // TODO: increase/decrease max health
         // TODO: disable jumping for ~10 seconds

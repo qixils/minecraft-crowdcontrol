@@ -158,7 +158,12 @@ public class RegisterCommands {
                 new RespawnCommand(plugin),
                 new DropItemCommand(plugin),
                 new DeleteItemCommand(plugin),
-                new BucketClutchCommand(plugin)
+                new BucketClutchCommand(plugin),
+                new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
+                new DamageCommand(plugin, "damage-1", "Damage Players (1 Heart)", 2f),
+                new DamageCommand(plugin, "heal-1", "Heal Players (1 Heart)", -2f),
+                new DamageCommand(plugin, "full-heal", "Heal Players", -Integer.MAX_VALUE),
+                new HalfHealthCommand(plugin)
         ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));

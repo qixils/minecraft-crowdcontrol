@@ -25,9 +25,9 @@ public class ItemDamageCommand extends Command {
 		super(plugin);
 		handleItem = repair
 				? (damage, type) -> 0
-				: (damage, type) -> Math.max(damage, type.getMaxDurability()/2);
-		effectName = (repair ? "repair" : "damage") + "-item";
+				: (damage, type) -> (type.getMaxDurability() + damage)/2;
 		displayName = (repair ? "Repair" : "Damage") + " Item";
+		effectName = displayName.replace(' ', '-');
 	}
 
 	@Override
