@@ -157,7 +157,8 @@ public class RegisterCommands {
                 new HatCommand(plugin),
                 new RespawnCommand(plugin),
                 new DropItemCommand(plugin),
-                new DeleteItemCommand(plugin)
+                new DeleteItemCommand(plugin),
+                new BucketClutchCommand(plugin)
         ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));

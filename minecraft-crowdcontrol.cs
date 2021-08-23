@@ -40,12 +40,12 @@ public class Minecraft : SimpleTCPPack
         new Effect("Respawn Players", "respawn"),
         new Effect("Drop Held Item", "drop-item"),
         new Effect("Delete Held Item", "delete-item"),
+        new Effect("Water Bucket Clutch", "bucket-clutch"), // teleports players 30 blocks up and gives them a water bucket
         // TODO: give/take XP
         // TODO: give/take health (+ kill players)
         // TODO: give/take food
         // TODO: increase/decrease max health
         // TODO: disable jumping for ~10 seconds
-        // TODO: MLG command (teleport players ~20-30 blocks above the highest block and put a water bucket in their hand/hotbar)
         // teleports players by a few blocks in the specified direction
         new Effect("Move Up", "up"),
         new Effect("Move Down", "down"),
