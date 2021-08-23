@@ -170,7 +170,9 @@ public class RegisterCommands {
                 new FeedCommand(plugin, "starve-1", "Remove One Hunger Bar", -2),
                 new ResetExpProgressCommand(plugin),
                 new ExperienceCommand(plugin, "xp+1", "Give One XP Level", 1),
-                new ExperienceCommand(plugin, "xp-1", "Take One XP Level", 1)
+                new ExperienceCommand(plugin, "xp-1", "Take One XP Level", 1),
+                new MaxHealthCommand(plugin, -1),
+                new MaxHealthCommand(plugin, 1)
         ));
 
         SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));
