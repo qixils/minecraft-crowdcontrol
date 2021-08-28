@@ -28,9 +28,9 @@ public class FeedCommand extends Command {
 			int newFood = Math.max(0, Math.min(20, currFood + amount));
 			player.setFoodLevel(newFood);
 			if (amount > 0 && currFood + amount > 20)
-				player.setAbsorptionAmount(player.getAbsorptionAmount() + currFood + amount - 20);
+				player.setSaturation(player.getSaturation() + currFood + amount - 20);
 			else if (newFood == 0)
-				player.setAbsorptionAmount(0);
+				player.setSaturation(0);
 		}));
 		return Response.Result.SUCCESS;
 	}
