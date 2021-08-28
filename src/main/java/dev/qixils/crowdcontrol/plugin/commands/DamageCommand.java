@@ -27,9 +27,10 @@ public class DamageCommand extends Command {
 			if (amount < 0)
 				player.setHealth(Math.max(0, Math.min(player.getMaxHealth(), player.getHealth() - amount)));
 			else {
-				player.damage(amount);
 				if (amount >= Short.MAX_VALUE)
 					player.setHealth(0);
+				else
+					player.damage(amount);
 			}
 		}));
 		return Response.Result.SUCCESS;
