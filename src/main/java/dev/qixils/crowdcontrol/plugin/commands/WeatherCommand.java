@@ -26,15 +26,13 @@ public class WeatherCommand extends Command {
 
     @Override
     public Response.@NotNull Result execute(@NotNull Request request) {
-        for (World world : Bukkit.getWorlds()) {
-            if (weatherType == WeatherType.CLEAR) {
-                world.setClearWeatherDuration(DURATION);
-            } else {
-                world.setStorm(true);
-                // needs to be BukkitRunnable and seems to not matter
-                // player.getServer().dispatchCommand(player.getServer().getConsoleSender(), "weather rain");
-            }
-        }
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (World world : Bukkit.getWorlds())
+                if (weatherType == WeatherType.CLEAR)
+                    world.setClearWeatherDuration(DURATION);
+                else
+                    world.setStorm(true);
+        });
         return Response.Result.SUCCESS;
     }
 }
