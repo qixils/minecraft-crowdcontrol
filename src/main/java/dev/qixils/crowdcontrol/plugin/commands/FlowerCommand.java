@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class FlowerCommand extends Command {
@@ -34,10 +33,15 @@ public class FlowerCommand extends Command {
     public Response.@NotNull Result execute(@NotNull Request request) {
         Set<Location> placeLocations = new HashSet<>();
         for (Player player : CrowdControlPlugin.getPlayers()) {
-            List<Location> locations = RandomUtil.randomNearbyBlocks(player.getLocation(), RADIUS, false, BlockUtil.AIR_PLACE);
+            BlockUtil.BlockFinder finder = BlockUtil.BlockFinder.builder()
+                    .origin(player.getLocation())
+                    .maxRadius(RADIUS)
+                    .locationValidator(BlockUtil.FLOWERS::matches)
+                    .build();
+            Location location = finder.next();
             int placed = 0;
             int toPlace = MIN_RAND+rand.nextInt(MAX_RAND-MIN_RAND+1);
-            for (Location location : locations) {
+            while (location != null) {
                 if (location.clone().subtract(0, 1, 0).getBlock().getType().isSolid()) {
                     ++placed;
                     placeLocations.add(location);
@@ -45,6 +49,7 @@ public class FlowerCommand extends Command {
                         break;
                     }
                 }
+                location = finder.next();
             }
         }
 
@@ -53,7 +58,7 @@ public class FlowerCommand extends Command {
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Location location : placeLocations)
-                location.getBlock().setType(RandomUtil.randomElementFrom(BlockUtil.FLOWERS));
+                location.getBlock().setType(RandomUtil.randomElementFrom(BlockUtil.FLOWERS.getMaterials()));
         });
 
         return Response.Result.SUCCESS;

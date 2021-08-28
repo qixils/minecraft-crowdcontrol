@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.ParticleUtil;
-import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -27,17 +26,19 @@ public class TeleportCommand extends Command {
 
     @Override
     public Response.@NotNull Result execute(@NotNull Request request) {
+        Response.Result result = new Response.Result(Response.ResultType.FAILURE, "No teleportation destinations were available");
         for (Player player : CrowdControlPlugin.getPlayers()) {
-            Location destination = RandomUtil.randomNearbyBlock(player.getLocation(), 3, 15, true, BlockUtil.AIR_ARRAY);
+            Location destination = BlockUtil.blockFinderBuilder().origin(player.getLocation()).minRadius(3).maxRadius(15).locationValidator(BlockUtil.SPAWNING_SPACE).build().next();
             if (destination == null) {
                 continue;
             }
+            result = Response.Result.SUCCESS;
             Bukkit.getScheduler().runTask(plugin, () -> {
                 player.teleport(destination);
                 ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);
                 player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.AMBIENT, 1.0f, 1.0f);
             });
         }
-        return Response.Result.SUCCESS;
+        return result;
     }
 }

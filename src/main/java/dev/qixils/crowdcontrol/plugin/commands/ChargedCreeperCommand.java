@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
-import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -31,6 +30,11 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 
     @Override
     protected Location getSpawnLocation(Location location) {
-        return RandomUtil.randomNearbyBlock(location, 5, SPAWN_RADIUS, true, BlockUtil.AIR_ARRAY);
+        return BlockUtil.blockFinderBuilder()
+                .origin(location)
+                .locationValidator(BlockUtil.SPAWNING_SPACE)
+                .minRadius(5)
+                .maxRadius(SPAWN_RADIUS)
+                .build().next();
     }
 }

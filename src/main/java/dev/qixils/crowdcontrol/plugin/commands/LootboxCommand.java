@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.plugin.utils.Weighted;
@@ -78,7 +77,7 @@ public class LootboxCommand extends Command {
     public Response.@NotNull Result execute(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder().next(request.getViewer(), CrowdControlPlugin.USER_COLOR).next(" has gifted you...").build());
-            List<Material> items = new ArrayList<>(BlockUtil.MATERIAL_SET);
+            List<Material> items = new ArrayList<>(Arrays.asList(Material.values()));
             Collections.shuffle(items, rand);
             Material item = null;
             for (Material i : items) {

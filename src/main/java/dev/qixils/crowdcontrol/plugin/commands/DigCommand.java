@@ -34,9 +34,8 @@ public class DigCommand extends Command {
                 for (int y = depth; y < 0; ++y) {
                     for (double z = -RADIUS; z <= RADIUS; ++z) {
                         Block block = player.getLocation().add(x, y, z).getBlock();
-                        if (BlockUtil.STONES_SET.contains(block.getType())) {
+                        if (BlockUtil.EARTHLY.matches(block))
                             blocks.add(block);
-                        }
                     }
                 }
             }

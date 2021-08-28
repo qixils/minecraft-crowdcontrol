@@ -12,8 +12,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 public class GravelCommand extends Command {
@@ -26,12 +26,17 @@ public class GravelCommand extends Command {
 
     @Override
     public Response.@NotNull Result execute(@NotNull Request request) {
-        List<Location> locations = new ArrayList<>();
+        Set<Location> locations = new HashSet<>();
         for (Player player : CrowdControlPlugin.getPlayers())
-            locations.addAll(BlockUtil.getNearbyBlocks(player.getLocation(), 6, false, BlockUtil.STONES));
+            locations.addAll(BlockUtil.BlockFinder.builder()
+                    .origin(player.getLocation())
+                    .locationValidator(BlockUtil.STONES_TAG::matches)
+                    .shuffleLocations(false)
+                    .maxRadius(6)
+                    .build().getAll());
 
         if (locations.isEmpty())
-            return new Response.Result(Response.ResultType.FAILURE, "No replacable blocks nearby");
+            return new Response.Result(Response.ResultType.FAILURE, "No replaceable blocks nearby");
 
         Bukkit.getScheduler().runTask(plugin, () -> locations.forEach(location -> location.getBlock().setType(Material.GRAVEL)));
         return Response.Result.SUCCESS;

@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
-import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
+import dev.qixils.crowdcontrol.plugin.utils.MaterialTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -41,9 +41,14 @@ public class TorchCommand extends Command {
 
     @Override
     public Response.@NotNull Result execute(@NotNull Request request) {
-        Material[] materials = placeTorches ? BlockUtil.AIR_ARRAY : BlockUtil.TORCH_ARRAY;
+        MaterialTag materialTag = placeTorches ? BlockUtil.AIR : BlockUtil.TORCHES;
         List<Location> nearbyBlocks = new ArrayList<>();
-        CrowdControlPlugin.getPlayers().forEach(player -> nearbyBlocks.addAll(RandomUtil.randomNearbyBlocks(player.getLocation(), 5, false, materials)));
+        CrowdControlPlugin.getPlayers().forEach(player -> nearbyBlocks.addAll(BlockUtil.blockFinderBuilder()
+                .origin(player.getLocation())
+                .maxRadius(5)
+                .locationValidator(materialTag::matches)
+                .shuffleLocations(false)
+                .build().getAll()));
         if (nearbyBlocks.isEmpty())
             return new Response.Result(Response.ResultType.FAILURE, "No available blocks to place/remove");
 

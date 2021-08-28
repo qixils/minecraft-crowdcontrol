@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -31,7 +30,7 @@ public class BlockCommand extends Command {
         Response.Result result = Response.Result.RETRY;
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Block block = player.getLocation().getBlock();
-            if (BlockUtil.AIR_BLOCKS.contains(block.getType())) {
+            if (block.getType().isEmpty()) {
                 result = Response.Result.SUCCESS;
                 Bukkit.getScheduler().runTask(plugin, () -> block.setType(material));
             }

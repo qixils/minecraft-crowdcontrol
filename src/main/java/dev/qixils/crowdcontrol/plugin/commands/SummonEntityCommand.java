@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
-import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -44,6 +43,11 @@ public class SummonEntityCommand extends Command {
     }
 
     protected Location getSpawnLocation(Location location) {
-        return RandomUtil.randomNearbyBlock(location, 3, SPAWN_RADIUS, true, BlockUtil.AIR_ARRAY);
+        return BlockUtil.blockFinderBuilder()
+                .origin(location)
+                .locationValidator(BlockUtil.SPAWNING_SPACE)
+                .minRadius(3)
+                .maxRadius(SPAWN_RADIUS)
+                .build().next();
     }
 }

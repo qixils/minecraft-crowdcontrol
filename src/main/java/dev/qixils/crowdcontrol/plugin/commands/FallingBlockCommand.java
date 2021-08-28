@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -35,7 +34,7 @@ public class FallingBlockCommand extends Command {
             Location destination = player.getEyeLocation();
             destination.setY(Math.min(destination.getY()+Y, player.getWorld().getMaxHeight()-1));
             Block block = destination.getBlock();
-            if (BlockUtil.AIR_BLOCKS.contains(block.getType()))
+            if (block.getType().isEmpty())
                 Bukkit.getScheduler().runTask(plugin, () -> block.setType(blockMaterial, true));
         }
         return Response.Result.SUCCESS;

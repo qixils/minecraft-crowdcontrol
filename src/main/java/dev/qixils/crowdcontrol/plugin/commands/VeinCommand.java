@@ -60,7 +60,12 @@ public class VeinCommand extends Command {
         Response.Result result = new Response.Result(Response.ResultType.FAILURE, "Could not find any blocks to replace");
         for (Player player : CrowdControlPlugin.getPlayers()) {
             List<Location> setBlocks = new ArrayList<>();
-            Location oreLocation = RandomUtil.randomNearbyBlock(player.getLocation(), MIN_RADIUS, MAX_RADIUS, false, BlockUtil.STONES);
+            Location oreLocation = BlockUtil.BlockFinder.builder()
+                    .origin(player.getLocation())
+                    .maxRadius(MAX_RADIUS)
+                    .minRadius(MIN_RADIUS)
+                    .locationValidator(BlockUtil.STONES_TAG::matches)
+                    .build().next();
             if (oreLocation == null) {
                 continue;
             }
@@ -69,13 +74,13 @@ public class VeinCommand extends Command {
                 for (int y = 0; y <= 1; ++y) {
                     for (int z = 0; z <= 1; ++z) {
                         Location loc = oreLocation.clone().add(x, y, z);
-                        if (BlockUtil.STONES_SET.contains(loc.getBlock().getType())) {
+                        if (BlockUtil.STONES_TAG.matches(loc)) {
                             setBlocks.add(loc);
                         }
                     }
                 }
             }
-            // if we found viable blocks (idk how we wouldn't have atleast one but justincase??)
+            // if we found viable blocks (idk how we wouldn't have at least one but just in case??)
             if (!setBlocks.isEmpty()) {
                 result = Response.Result.SUCCESS;
                 List<Location> trueSetBlocks = new ArrayList<>();
