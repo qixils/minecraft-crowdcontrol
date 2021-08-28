@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
-import dev.qixils.crowdcontrol.plugin.utils.MaterialTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -18,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Getter
 public class TorchCommand extends Command {
@@ -41,12 +41,12 @@ public class TorchCommand extends Command {
 
     @Override
     public Response.@NotNull Result execute(@NotNull Request request) {
-        MaterialTag materialTag = placeTorches ? BlockUtil.AIR : BlockUtil.TORCHES;
+        Predicate<Location> predicate = placeTorches ? loc -> loc.getBlock().isReplaceable() : BlockUtil.TORCHES::matches;
         List<Location> nearbyBlocks = new ArrayList<>();
         CrowdControlPlugin.getPlayers().forEach(player -> nearbyBlocks.addAll(BlockUtil.blockFinderBuilder()
                 .origin(player.getLocation())
                 .maxRadius(5)
-                .locationValidator(materialTag::matches)
+                .locationValidator(predicate)
                 .shuffleLocations(false)
                 .build().getAll()));
         if (nearbyBlocks.isEmpty())
