@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -28,10 +29,15 @@ public class WeatherCommand extends Command {
     public Response.@NotNull Result execute(@NotNull Request request) {
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (World world : Bukkit.getWorlds())
-                if (weatherType == WeatherType.CLEAR)
+                if (weatherType == WeatherType.CLEAR) {
+                    world.setWeatherDuration(0);
+                    world.setStorm(false);
                     world.setClearWeatherDuration(DURATION);
-                else
+                } else {
                     world.setStorm(true);
+                    if (RandomUtil.RNG.nextBoolean())
+                        world.setThundering(true);
+                }
         });
         return Response.Result.SUCCESS;
     }
