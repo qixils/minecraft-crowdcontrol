@@ -36,7 +36,7 @@ public class FlowerCommand extends Command {
             BlockUtil.BlockFinder finder = BlockUtil.BlockFinder.builder()
                     .origin(player.getLocation())
                     .maxRadius(RADIUS)
-                    .locationValidator(BlockUtil.FLOWERS::matches)
+                    .locationValidator(location -> location.getBlock().isReplaceable())
                     .build();
             Location location = finder.next();
             int placed = 0;
