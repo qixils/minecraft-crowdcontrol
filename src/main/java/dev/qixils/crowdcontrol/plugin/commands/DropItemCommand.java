@@ -23,7 +23,10 @@ public class DropItemCommand extends Command {
 		Response.Result result = new Response.Result(Response.ResultType.FAILURE, "No players were holding items");
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			if (!player.getInventory().getItemInMainHand().getType().isEmpty()) {
-				Bukkit.getScheduler().runTask(plugin, () -> player.dropItem(true));
+				Bukkit.getScheduler().runTask(plugin, () -> {
+					player.dropItem(true);
+					player.updateInventory();
+				});
 				result = Response.Result.SUCCESS;
 			}
 		}
