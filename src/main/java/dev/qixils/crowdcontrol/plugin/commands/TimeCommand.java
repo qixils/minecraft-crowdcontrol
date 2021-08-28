@@ -19,7 +19,7 @@ public class TimeCommand extends Command {
 
     @Override
     public Response.@NotNull Result execute(@NotNull Request request) {
-        Bukkit.getWorlds().forEach(world -> world.setFullTime(world.getFullTime() + ADD_TICKS));
+        Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getWorlds().forEach(world -> world.setFullTime(world.getFullTime() + ADD_TICKS)));
         return Response.Result.SUCCESS;
     }
 }
