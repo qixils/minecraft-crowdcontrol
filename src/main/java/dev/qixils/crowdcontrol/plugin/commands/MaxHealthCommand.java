@@ -26,10 +26,10 @@ public class MaxHealthCommand extends Command {
 		if (amount == 0)
 			amountText = "0";
 		else if (amount < 0)
-			amountText = String.valueOf(amount);
+			amountText = "sub" + amount;
 		else
-			amountText = "+" + amount;
-		this.effectName = "max-health" + amountText;
+			amountText = "plus" + amount;
+		this.effectName = "max_health_" + amountText;
 		this.displayName = amountText + " Max Health";
 		this.amount = amount;
 	}

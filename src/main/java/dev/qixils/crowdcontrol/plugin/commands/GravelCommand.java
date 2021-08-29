@@ -21,7 +21,7 @@ public class GravelCommand extends Command {
         super(plugin);
     }
 
-    private final String effectName = "gravel-hell";
+    private final String effectName = "gravel_hell";
     private final String displayName = "Replace Area With Gravel";
 
     @Override

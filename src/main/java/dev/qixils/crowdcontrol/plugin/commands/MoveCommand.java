@@ -14,15 +14,23 @@ public class MoveCommand extends Command {
     protected final Vector vector;
     protected final String effectName;
     protected final String displayName;
-    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String effectName) {
+    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String effectName, String displayName) {
         super(plugin);
         vector = displacement;
         this.effectName = effectName;
-        this.displayName = "Move " + effectName;
+        this.displayName = "Move " + displayName;
+    }
+
+    public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String effectName, String displayName) {
+        this(plugin, new Vector(x, y, z), effectName, displayName);
+    }
+
+    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String effectName) {
+        this(plugin, displacement, effectName, effectName);
     }
 
     public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String effectName) {
-        this(plugin, new Vector(x, y, z), effectName);
+        this(plugin, x, y, z, effectName, effectName);
     }
 
     @Override

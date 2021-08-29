@@ -17,7 +17,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
         super(plugin, EntityType.CREEPER);
     }
 
-    private final String effectName = "entity-charged-creeper";
+    private final String effectName = "entity_charged_creeper";
     private final String displayName = "Summon Charged Creeper";
 
     @Override

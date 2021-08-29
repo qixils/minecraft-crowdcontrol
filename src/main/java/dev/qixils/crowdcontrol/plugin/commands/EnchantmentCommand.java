@@ -20,7 +20,7 @@ public class EnchantmentCommand extends Command {
         super(plugin);
         this.enchantment = enchantment;
         final String translate = TextUtil.translate(enchantment);
-        this.effectName = "enchant-" + translate.replace(' ', '_');
+        this.effectName = "enchant_" + translate.replace(' ', '_');
         this.displayName = "Apply " + TextUtil.asPlain(enchantment.displayName(enchantment.getMaxLevel()));
     }
 

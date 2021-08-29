@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class ResetExpProgressCommand extends Command {
-	private final String effectName = "reset-exp-progress";
+	private final String effectName = "reset_exp_progress";
 	private final String displayName = "Reset Experience Progress";
 
 	public ResetExpProgressCommand(CrowdControlPlugin plugin) {

@@ -15,7 +15,7 @@ public class DropItemCommand extends Command {
 		super(plugin);
 	}
 
-	private final String effectName = "drop-item";
+	private final String effectName = "drop_item";
 	private final String displayName = "Drop Held Item";
 
 	@Override

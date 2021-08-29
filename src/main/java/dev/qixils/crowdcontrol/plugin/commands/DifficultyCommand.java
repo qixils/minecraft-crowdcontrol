@@ -19,7 +19,7 @@ public class DifficultyCommand extends Command {
     public DifficultyCommand(CrowdControlPlugin plugin, Difficulty difficulty) {
         super(plugin);
         this.difficulty = difficulty;
-        this.effectName = "difficulty-" + difficulty.name();
+        this.effectName = "difficulty_" + difficulty.name();
         this.displayName = "Set Difficulty: " + TextUtil.translate(difficulty);
     }
 

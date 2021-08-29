@@ -25,7 +25,7 @@ public class PotionCommand extends Command {
         this.potionEffectType = potionEffectType;
         boolean isMinimal = potionEffectType.isInstant();
         duration = isMinimal ? 1 : MAX_DURATION;
-        this.effectName = "potion-" + nameOf(potionEffectType);
+        this.effectName = "potion_" + nameOf(potionEffectType);
         this.displayName = "Apply " + TextUtil.titleCase(nameOf(potionEffectType)) + " Potion Effect";
     }
 

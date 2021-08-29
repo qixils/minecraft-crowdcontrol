@@ -21,7 +21,7 @@ public class BucketClutchCommand extends Command {
 		super(plugin);
 	}
 
-	private final String effectName = "bucket-clutch";
+	private final String effectName = "bucket_clutch";
 	private final String displayName = "Water Bucket Clutch";
 
 	@Override

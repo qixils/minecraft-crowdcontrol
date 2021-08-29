@@ -15,7 +15,7 @@ public class DeleteItemCommand extends Command {
 		super(plugin);
 	}
 
-	private final String effectName = "delete-item";
+	private final String effectName = "delete_item";
 	private final String displayName = "Delete Held Item";
 
 	@Override

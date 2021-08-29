@@ -24,7 +24,7 @@ public class FallingBlockCommand extends Command {
     public FallingBlockCommand(CrowdControlPlugin plugin, Material blockMaterial) {
         super(plugin);
         this.blockMaterial = blockMaterial;
-        this.effectName = "falling-block-" + blockMaterial.name();
+        this.effectName = "falling_block_" + blockMaterial.name();
         this.displayName = "Falling " + TextUtil.translate(blockMaterial) + " Block";
     }
 

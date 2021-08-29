@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class DisableJumpingCommand extends Command implements Listener {
-	private final String effectName = "disable-jumping";
+	private final String effectName = "disable_jumping";
 	private final String displayName = "Disable Jumping";
 	private int jumpsBlockedAt = 0;
 	private static final int JUMP_BLOCK_DURATION = 200;

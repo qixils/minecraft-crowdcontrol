@@ -18,7 +18,7 @@ public class RemoveEnchantsCommand extends Command {
 		super(plugin);
 	}
 
-	private final String effectName = "remove-enchants";
+	private final String effectName = "remove_enchants";
 	private final String displayName = "Remove Enchants";
 
 	@Override

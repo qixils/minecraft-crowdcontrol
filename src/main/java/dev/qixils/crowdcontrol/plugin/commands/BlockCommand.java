@@ -21,7 +21,7 @@ public class BlockCommand extends Command {
     public BlockCommand(CrowdControlPlugin plugin, Material block) {
         super(plugin);
         this.material = block;
-        this.effectName = "block-" + block.name();
+        this.effectName = "block_" + block.name();
         this.displayName = "Place " + TextUtil.translate(block) + " Block";
     }
 

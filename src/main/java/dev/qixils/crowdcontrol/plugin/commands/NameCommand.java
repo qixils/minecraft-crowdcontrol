@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ public class NameCommand extends Command {
         super(plugin);
     }
 
-    private final String effectName = "name-item";
+    private final String effectName = "name_item";
     private final String displayName = "Name Item";
 
     @Override
@@ -24,7 +25,7 @@ public class NameCommand extends Command {
         CrowdControlPlugin.getPlayers().forEach(player -> {
             ItemStack item = player.getInventory().getItemInMainHand();
             ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName(text);
+            meta.displayName(Component.text(text));
             item.setItemMeta(meta);
         });
         return Response.Result.SUCCESS;

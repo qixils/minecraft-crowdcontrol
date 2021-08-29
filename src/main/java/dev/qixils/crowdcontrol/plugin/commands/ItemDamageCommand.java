@@ -27,7 +27,7 @@ public class ItemDamageCommand extends Command {
 				? (damage, type) -> 0
 				: (damage, type) -> (type.getMaxDurability() + damage)/2;
 		displayName = (repair ? "Repair" : "Damage") + " Item";
-		effectName = displayName.replace(' ', '-');
+		effectName = displayName.replace(' ', '_');
 	}
 
 	@Override

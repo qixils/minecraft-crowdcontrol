@@ -20,7 +20,7 @@ public class TakeItemCommand extends Command {
     public TakeItemCommand(CrowdControlPlugin plugin, Material item) {
         super(plugin);
         this.item = item;
-        this.effectName = "take-" + item.name();
+        this.effectName = "take_" + item.name();
         this.displayName = "Take " + TextUtil.translate(item);
     }
 

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class TeleportCommand extends Command {
-    private final String effectName = "chorus-fruit";
+    private final String effectName = "chorus_fruit";
     private final String displayName = "Eat Chorus Fruit";
 
     public TeleportCommand(CrowdControlPlugin plugin) {

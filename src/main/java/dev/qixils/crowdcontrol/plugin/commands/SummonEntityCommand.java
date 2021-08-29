@@ -24,7 +24,7 @@ public class SummonEntityCommand extends Command {
     public SummonEntityCommand(CrowdControlPlugin plugin, EntityType entityType) {
         super(plugin);
         this.entityType = entityType;
-        this.effectName = "entity-" + entityType.name();
+        this.effectName = "entity_" + entityType.name();
         this.displayName = "Summon " + TextUtil.translate(entityType);
     }
 

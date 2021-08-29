@@ -23,7 +23,7 @@ public class GiveItemCommand extends Command {
     public GiveItemCommand(CrowdControlPlugin plugin, Material item) {
         super(plugin);
         this.item = item;
-        this.effectName = "give-" + item.name();
+        this.effectName = "give_" + item.name();
         this.displayName = "Give " + TextUtil.translate(item);
     }
 
