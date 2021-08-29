@@ -30,7 +30,7 @@ public class SoundCommand extends Command {
         super(plugin);
     }
 
-    private final String effectName = "sound-effect";
+    private final String effectName = "sfx";
     private final String displayName = "Spooky Sound Effect";
 
     @Override

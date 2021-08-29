@@ -18,7 +18,7 @@ public class Minecraft : SimpleTCPPack
     {
         // miscellaneous
         new Effect("Spawn Ore Vein", "vein"),
-        new Effect("Spooky Sound Effect", "sound-effect"),
+        new Effect("Spooky Sound Effect", "sfx"),
         new Effect("Swap Locations", "swap"), // swaps the locations of every online player
         new Effect("Dinnerbone", "dinnerbone"), // flips nearby mobs upside-down
         new Effect("Clutter Inventories", "clutter"), // shuffles around a couple items in everyone's inventory
