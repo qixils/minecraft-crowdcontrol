@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -21,8 +22,12 @@ public class RespawnCommand extends Command {
 
 	@Override
 	public Response.@NotNull Result execute(@NotNull Request request) {
-		// TODO: this is kinda janky especially for the nether/end, could PR a respawn method upstream
-		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.teleport(Optional.ofNullable(player.getBedSpawnLocation()).orElse(player.getWorld().getSpawnLocation()))));
+		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player ->
+				player.teleport(
+						Optional.ofNullable(player.getBedSpawnLocation())
+								.orElse(Objects.requireNonNull(Bukkit.getWorld("world"), "Couldn't find default world").getSpawnLocation())
+				)
+		));
 		return Response.Result.SUCCESS;
 	}
 }
