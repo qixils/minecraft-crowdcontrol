@@ -12,7 +12,7 @@ public class Minecraft : SimpleTCPPack
 
     public Minecraft(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
 
-    public override Game Game => new Game(53, "Minecraft", "minecraft", "PC", ConnectorType.SimpleTCPConnector);
+    public override Game Game => new Game(108, "Minecraft (Server)", "minecraftserver", "PC", ConnectorType.SimpleTCPConnector);
 
     public override List<Effect> Effects => new List<Effect>
     {
