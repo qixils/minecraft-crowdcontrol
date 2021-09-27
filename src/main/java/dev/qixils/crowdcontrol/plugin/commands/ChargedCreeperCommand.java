@@ -6,10 +6,10 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
@@ -21,10 +21,10 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
     private final String displayName = "Summon Charged Creeper";
 
     @Override
-    protected Entity spawnEntity(Player player, Location location) {
-        Creeper creeper = (Creeper) super.spawnEntity(player, location);
+    protected Entity spawnEntity(String viewer, AnimalTamer player, Location location) {
+        Creeper creeper = (Creeper) super.spawnEntity(viewer, player, location);
         creeper.setPowered(true);
-        player.getWorld().playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
+        location.getWorld().playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
         return creeper;
     }
 

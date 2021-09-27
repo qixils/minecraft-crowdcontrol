@@ -9,9 +9,11 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
@@ -33,21 +35,26 @@ public class SummonEntityCommand extends Command {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location loc = getSpawnLocation(player.getLocation());
             if (loc != null)
-                Bukkit.getScheduler().runTask(plugin, () -> spawnEntity(player, loc));
+                Bukkit.getScheduler().runTask(plugin, () -> spawnEntity(request.getViewer(), player, loc));
         }
         return Response.Result.SUCCESS;
     }
 
-    protected Entity spawnEntity(Player player, Location location) {
-        return player.getWorld().spawnEntity(location, entityType);
+    protected Entity spawnEntity(String viewer, AnimalTamer player, Location location) {
+        Entity entity = location.getWorld().spawnEntity(location, entityType);
+        entity.setCustomName(viewer);
+        entity.setCustomNameVisible(true);
+        if (entity instanceof Tameable tameable)
+            tameable.setOwner(player);
+        return entity;
     }
 
     protected Location getSpawnLocation(Location location) {
         return BlockUtil.blockFinderBuilder()
                 .origin(location)
                 .locationValidator(BlockUtil.SPAWNING_SPACE)
-                .minRadius(3)
                 .maxRadius(SPAWN_RADIUS)
+                .shuffleLocations(false)
                 .build().next();
     }
 }

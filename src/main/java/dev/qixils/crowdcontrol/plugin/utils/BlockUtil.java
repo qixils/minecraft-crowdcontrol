@@ -87,7 +87,7 @@ public class BlockUtil {
     public static class BlockFinder {
         private static final Predicate<Location> TRUE = $ -> true; // reduce object creation ?? idk
 
-        private final World origin; // realistically only needs to be a World but this makes the builder cleaner
+        private final World origin;
         private final List<Vector> locations;
         @Builder.Default
         private final Predicate<Location> locationValidator = TRUE;
