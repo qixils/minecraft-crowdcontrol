@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class BlockUtil {
-    public static final MaterialTag AIR = new MaterialTag(Material.AIR, Material.CAVE_AIR, Material.VOID_AIR);
     public static final MaterialTag FLOWERS = new MaterialTag(
             Material.POPPY,
             Material.DANDELION,
