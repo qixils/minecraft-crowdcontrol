@@ -43,7 +43,7 @@ public class SwapCommand extends Command {
         for (int i = 0; i < players.size(); ++i)
             destinations.put(players.get(i), offset.get(i).getLocation());
         // teleport
-        Bukkit.getScheduler().runTask(plugin, () -> destinations.forEach(Entity::teleport));
+        Bukkit.getScheduler().runTask(plugin, () -> destinations.forEach(Entity::teleportAsync));
         return Response.Result.SUCCESS;
     }
 }
