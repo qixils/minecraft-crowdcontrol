@@ -6,10 +6,11 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Getter
 public class RespawnCommand extends Command {
@@ -22,12 +23,25 @@ public class RespawnCommand extends Command {
 
 	@Override
 	public Response.@NotNull Result execute(@NotNull Request request) {
-		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player ->
-				player.teleport(
-						Optional.ofNullable(player.getBedSpawnLocation())
-								.orElse(Objects.requireNonNull(Bukkit.getWorld("world"), "Couldn't find default world").getSpawnLocation())
-				)
-		));
+		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers()
+				.forEach(player -> player.teleport(Objects.requireNonNullElseGet(player.getBedSpawnLocation(), () -> getDefaultWorld().getSpawnLocation()))));
 		return Response.Result.SUCCESS;
+	}
+
+	@NotNull
+	private World getDefaultWorld() {
+		World world = Bukkit.getWorld("world");
+		if (world == null) {
+			for (World iworld : Bukkit.getWorlds()) {
+				if (iworld.getEnvironment() == Environment.NORMAL) {
+					world = iworld;
+					break;
+				}
+			}
+		}
+		if (world == null) {
+			throw new IllegalStateException("Couldn't find an overworld world");
+		}
+		return world;
 	}
 }
