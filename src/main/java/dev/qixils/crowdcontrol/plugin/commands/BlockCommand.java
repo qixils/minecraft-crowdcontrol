@@ -30,7 +30,7 @@ public class BlockCommand extends Command {
         Response.Result result = Response.Result.RETRY;
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Block block = player.getLocation().getBlock();
-            if (block.getType().isEmpty()) {
+            if (block.isReplaceable()) {
                 result = Response.Result.SUCCESS;
                 Bukkit.getScheduler().runTask(plugin, () -> block.setType(material));
             }
