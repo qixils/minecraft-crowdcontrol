@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -13,7 +13,7 @@ import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class WeatherCommand extends Command {
+public class WeatherCommand extends ImmediateCommand {
     protected final String effectName;
     protected final String displayName;
     protected final WeatherType weatherType;
@@ -26,19 +26,29 @@ public class WeatherCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            for (World world : Bukkit.getWorlds())
-                if (weatherType == WeatherType.CLEAR) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+        Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("This weather is already applied");
+        for (World world : Bukkit.getWorlds()) {
+            if (world.getEnvironment() != World.Environment.NORMAL) continue;
+
+            if (weatherType == WeatherType.DOWNFALL) {
+                if (world.getClearWeatherDuration() > 0) {
+                    result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        world.setStorm(true);
+                        if (RandomUtil.RNG.nextBoolean())
+                            world.setThundering(true);
+                    });
+                }
+            } else if (world.getClearWeatherDuration() <= 0) {
+                result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+                Bukkit.getScheduler().runTask(plugin, () -> {
                     world.setWeatherDuration(0);
                     world.setStorm(false);
                     world.setClearWeatherDuration(DURATION);
-                } else {
-                    world.setStorm(true);
-                    if (RandomUtil.RNG.nextBoolean())
-                        world.setThundering(true);
-                }
-        });
-        return Response.Result.SUCCESS;
+                });
+            }
+        }
+        return result;
     }
 }

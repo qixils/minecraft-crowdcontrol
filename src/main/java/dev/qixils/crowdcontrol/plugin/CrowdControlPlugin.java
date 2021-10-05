@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
             throw new IllegalStateException("Config file is misconfigured, please ensure you have entered a valid IP address and port.");
         }
         crowdControl = new CrowdControl(ip, port);
+        crowdControl.registerCheck(() -> !getPlayers().isEmpty());
         List<Command> commands = RegisterCommands.register(this);
         if (false)
             RegisterCommands.writeCommands(this, commands);
@@ -50,9 +53,14 @@ public final class CrowdControlPlugin extends JavaPlugin {
         return Bukkit.getServer().getOnlinePlayers().stream().filter(player -> !player.isDead()).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public void registerCommand(String name, Command command) {
+    public void registerCommand(@NotNull String name, @NotNull Command command) {
         name = name.toLowerCase(Locale.ENGLISH);
         crowdControl.registerHandler(name, command::executeAndNotify);
         getLogger().fine("Registered CC command '"+name+"'");
+    }
+
+    @Nullable
+    public CrowdControl getCrowdControl() {
+        return crowdControl;
     }
 }

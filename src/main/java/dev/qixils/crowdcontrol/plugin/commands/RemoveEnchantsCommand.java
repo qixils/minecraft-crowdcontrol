@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 @Getter
-public class RemoveEnchantsCommand extends Command {
+public class RemoveEnchantsCommand extends ImmediateCommand {
 	public RemoveEnchantsCommand(CrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -22,13 +22,13 @@ public class RemoveEnchantsCommand extends Command {
 	private final String displayName = "Remove Enchants";
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
-		Response.Result result = Response.Result.RETRY;
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+		Response.Builder result = Response.builder().type(Response.ResultType.RETRY);
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			Set<Enchantment> enchants = item.getEnchantments().keySet();
 			if (!enchants.isEmpty()) {
-				result = Response.Result.SUCCESS;
+				result.type(Response.ResultType.SUCCESS);
 				enchants.forEach(item::removeEnchantment);
 			}
 		}

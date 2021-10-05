@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-public class DigCommand extends Command {
+public class DigCommand extends ImmediateCommand {
     private final static double RADIUS = .5D;
     public DigCommand(CrowdControlPlugin plugin) {
         super(plugin);
@@ -26,7 +26,7 @@ public class DigCommand extends Command {
     private final String displayName = "Dig Hole";
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Set<Block> blocks = new HashSet<>();
         int depth = -(2 + rand.nextInt(4));
         for (Player player : CrowdControlPlugin.getPlayers()) {
@@ -42,13 +42,13 @@ public class DigCommand extends Command {
         }
 
         if (blocks.isEmpty())
-            return Response.Result.RETRY;
+            return Response.builder().type(Response.ResultType.RETRY);
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Block block : blocks)
                 block.setType(Material.AIR);
         });
 
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

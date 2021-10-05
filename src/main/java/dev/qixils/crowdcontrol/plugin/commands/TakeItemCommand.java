@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class TakeItemCommand extends Command {
+public class TakeItemCommand extends ImmediateCommand {
     private final Material item;
     private final String effectName;
     private final String displayName;
@@ -25,7 +25,7 @@ public class TakeItemCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             for (ItemStack itemStack : player.getInventory()) {
                 if (itemStack == null) {
@@ -37,6 +37,6 @@ public class TakeItemCommand extends Command {
                 }
             }
         }
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

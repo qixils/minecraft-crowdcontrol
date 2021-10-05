@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class EnchantmentCommand extends Command {
+public class EnchantmentCommand extends ImmediateCommand {
     protected final Enchantment enchantment;
     private final String effectName;
     private final String displayName;
@@ -25,16 +25,16 @@ public class EnchantmentCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         int level = enchantment.getMaxLevel();
-        Response.Result result = Response.Result.RETRY;
+        Response.Builder result = Response.builder().type(Response.ResultType.RETRY);
         for (Player player : CrowdControlPlugin.getPlayers()) {
             ItemStack item = player.getInventory().getItemInMainHand();
             if (item.getType().isEmpty())
                 continue;
             if (item.getEnchantmentLevel(enchantment) != level) {
                 item.addUnsafeEnchantment(enchantment, level);
-                result = Response.Result.SUCCESS;
+                result.type(Response.ResultType.SUCCESS);
             }
         }
         return result;

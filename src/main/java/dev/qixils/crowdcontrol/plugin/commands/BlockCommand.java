@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class BlockCommand extends Command {
+public class BlockCommand extends ImmediateCommand {
     protected final Material material;
     private final String effectName;
     private final String displayName;
@@ -26,12 +26,12 @@ public class BlockCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
-        Response.Result result = Response.Result.RETRY;
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+        Response.Builder result = new Response.Builder().type(Response.ResultType.FAILURE).message("No available locations to set blocks");
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Block block = player.getLocation().getBlock();
             if (block.isReplaceable()) {
-                result = Response.Result.SUCCESS;
+                result.type(Response.ResultType.SUCCESS).message("SUCCESS");
                 Bukkit.getScheduler().runTask(plugin, () -> block.setType(material));
             }
         }

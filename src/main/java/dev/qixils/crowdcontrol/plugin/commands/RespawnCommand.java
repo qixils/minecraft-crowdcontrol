@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 @Getter
-public class RespawnCommand extends Command {
+public class RespawnCommand extends ImmediateCommand {
 	public RespawnCommand(CrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -22,10 +22,10 @@ public class RespawnCommand extends Command {
 	private final String displayName = "Respawn Players";
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
 		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers()
 				.forEach(player -> player.teleport(Objects.requireNonNullElseGet(player.getBedSpawnLocation(), () -> getDefaultWorld().getSpawnLocation()))));
-		return Response.Result.SUCCESS;
+		return Response.builder().type(Response.ResultType.SUCCESS);
 	}
 
 	@NotNull

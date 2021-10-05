@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.Weighted;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Getter
-public class VeinCommand extends Command {
+public class VeinCommand extends ImmediateCommand {
     private final String effectName = "vein";
     private final String displayName = "Spawn Ore Vein";
     public VeinCommand(CrowdControlPlugin plugin) {
@@ -54,10 +54,10 @@ public class VeinCommand extends Command {
     public static final int MAX_RADIUS = 20;
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Material ore = (RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS)).getBlock();
 
-        Response.Result result = new Response.Result(Response.ResultType.FAILURE, "Could not find any blocks to replace");
+        Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
         for (Player player : CrowdControlPlugin.getPlayers()) {
             List<Location> setBlocks = new ArrayList<>();
             Location oreLocation = BlockUtil.BlockFinder.builder()
@@ -82,7 +82,7 @@ public class VeinCommand extends Command {
             }
             // if we found viable blocks (idk how we wouldn't have at least one but just in case??)
             if (!setBlocks.isEmpty()) {
-                result = Response.Result.SUCCESS;
+                result.type(Response.ResultType.SUCCESS).message("SUCCESS");
                 List<Location> trueSetBlocks = new ArrayList<>();
                 int maxBlocks = 1+rand.nextInt(setBlocks.size());
                 int blocksSet = 0;

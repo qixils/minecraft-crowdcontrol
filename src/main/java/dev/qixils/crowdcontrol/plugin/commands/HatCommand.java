@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class HatCommand extends Command {
+public class HatCommand extends ImmediateCommand {
 	public HatCommand(CrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -20,7 +20,7 @@ public class HatCommand extends Command {
 	private final String displayName = "Put Item on Head";
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
 		CrowdControlPlugin.getPlayers().forEach(player -> {
 			PlayerInventory inv = player.getInventory();
 			ItemStack hand = inv.getItemInMainHand();
@@ -28,6 +28,6 @@ public class HatCommand extends Command {
 			inv.setItemInMainHand(head);
 			inv.setItem(EquipmentSlot.HEAD, hand);
 		});
-		return Response.Result.SUCCESS;
+		return Response.builder().type(Response.ResultType.SUCCESS);
 	}
 }

@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -11,7 +11,7 @@ import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class DifficultyCommand extends Command {
+public class DifficultyCommand extends ImmediateCommand {
     private final Difficulty difficulty;
     private final String effectName;
     private final String displayName;
@@ -24,10 +24,10 @@ public class DifficultyCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         for (World world : plugin.getServer().getWorlds()) {
             world.setDifficulty(difficulty);
         }
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

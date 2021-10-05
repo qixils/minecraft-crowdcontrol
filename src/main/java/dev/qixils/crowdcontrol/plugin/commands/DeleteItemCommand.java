@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class DeleteItemCommand extends Command {
+public class DeleteItemCommand extends ImmediateCommand {
 	public DeleteItemCommand(CrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -19,13 +19,13 @@ public class DeleteItemCommand extends Command {
 	private final String displayName = "Delete Held Item";
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
-		Response.Result result = new Response.Result(Response.ResultType.FAILURE, "No players were holding items");
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+		Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("No players were holding items");
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
 			if (!inv.getItemInMainHand().getType().isEmpty()) {
 				inv.setItemInMainHand(null);
-				result = Response.Result.SUCCESS;
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 		}
 		return result;

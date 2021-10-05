@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 @Getter
-public class ToastCommand extends Command {
+public class ToastCommand extends ImmediateCommand {
     private final String effectName = "toast";
     private final String displayName = "Render Toasts";
     public ToastCommand(CrowdControlPlugin plugin) {
@@ -21,7 +21,7 @@ public class ToastCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Player player : CrowdControlPlugin.getPlayers()) {
                 Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
@@ -29,6 +29,6 @@ public class ToastCommand extends Command {
                 player.discoverRecipes(recipes);
             }
         });
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

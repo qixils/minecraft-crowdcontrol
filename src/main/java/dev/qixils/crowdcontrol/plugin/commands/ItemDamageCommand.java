@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.BiFunction;
 
 @Getter
-public class ItemDamageCommand extends Command {
+public class ItemDamageCommand extends ImmediateCommand {
 	private final BiFunction<Integer, Material, Integer> handleItem;
 	private final String effectName;
 	private final String displayName;
@@ -31,14 +31,14 @@ public class ItemDamageCommand extends Command {
 	}
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
-		Response.Result result = Response.Result.RETRY;
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+		Response.Builder result = Response.builder().type(Response.ResultType.RETRY);
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
 			ItemStack item = inv.getItemInMainHand();
 			ItemMeta meta = item.getItemMeta();
 			if (meta instanceof Damageable damageable) {
-				result = Response.Result.SUCCESS;
+				result.type(Response.ResultType.SUCCESS);
 				damageable.setDamage(handleItem.apply(damageable.getDamage(), item.getType()));
 			}
 			item.setItemMeta(meta);

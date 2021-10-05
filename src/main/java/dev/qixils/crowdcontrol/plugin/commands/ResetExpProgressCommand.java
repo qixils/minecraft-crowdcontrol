@@ -1,15 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class ResetExpProgressCommand extends Command {
+public class ResetExpProgressCommand extends ImmediateCommand {
 	private final String effectName = "reset_exp_progress";
 	private final String displayName = "Reset Experience Progress";
 
@@ -18,8 +19,14 @@ public class ResetExpProgressCommand extends Command {
 	}
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
-		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.setExp(0)));
-		return Response.Result.SUCCESS;
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+		Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("No players have XP");
+		for (Player player : CrowdControlPlugin.getPlayers()) {
+			if (player.getExp() > 0) {
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+				Bukkit.getScheduler().runTask(plugin, () -> player.setExp(0));
+			}
+		}
+		return result;
 	}
 }

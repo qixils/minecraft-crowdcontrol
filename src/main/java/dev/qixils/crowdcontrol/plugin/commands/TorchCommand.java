@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @Getter
-public class TorchCommand extends Command {
+public class TorchCommand extends ImmediateCommand {
     protected final boolean placeTorches;
     protected final String effectName;
     protected final String displayName;
@@ -40,7 +40,7 @@ public class TorchCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Predicate<Location> predicate = placeTorches ? loc -> loc.getBlock().isReplaceable() : BlockUtil.TORCHES::matches;
         List<Location> nearbyBlocks = new ArrayList<>();
         CrowdControlPlugin.getPlayers().forEach(player -> nearbyBlocks.addAll(BlockUtil.blockFinderBuilder()
@@ -50,7 +50,7 @@ public class TorchCommand extends Command {
                 .shuffleLocations(false)
                 .build().getAll()));
         if (nearbyBlocks.isEmpty())
-            return new Response.Result(Response.ResultType.FAILURE, "No available blocks to place/remove");
+            return Response.builder().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Location location : nearbyBlocks) {
@@ -61,7 +61,7 @@ public class TorchCommand extends Command {
                     block.setType(Material.AIR, false);
             }
         });
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 
     protected void placeTorch(Location location) {

@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class FreezeCommand extends Command {
+public class FreezeCommand extends ImmediateCommand {
     public FreezeCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
@@ -25,7 +25,7 @@ public class FreezeCommand extends Command {
     private final String displayName = "Freeze";
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Map<UUID, Location> locations = new HashMap<>();
         CrowdControlPlugin.getPlayers().forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -45,6 +45,6 @@ public class FreezeCommand extends Command {
             });
         }, 1, 1);
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task::cancel, 20*7);
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

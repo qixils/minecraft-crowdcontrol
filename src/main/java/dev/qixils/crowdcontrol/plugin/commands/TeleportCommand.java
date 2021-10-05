@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.ParticleUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class TeleportCommand extends Command {
+public class TeleportCommand extends ImmediateCommand {
     private final String effectName = "chorus_fruit";
     private final String displayName = "Eat Chorus Fruit";
 
@@ -25,14 +25,14 @@ public class TeleportCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
-        Response.Result result = new Response.Result(Response.ResultType.FAILURE, "No teleportation destinations were available");
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+        Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("No teleportation destinations were available");
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location destination = BlockUtil.blockFinderBuilder().origin(player.getLocation()).minRadius(3).maxRadius(15).locationValidator(BlockUtil.SPAWNING_SPACE).build().next();
             if (destination == null) {
                 continue;
             }
-            result = Response.Result.SUCCESS;
+            result.type(Response.ResultType.SUCCESS).message("SUCCESS");
             Bukkit.getScheduler().runTask(plugin, () -> {
                 player.teleport(destination);
                 ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);

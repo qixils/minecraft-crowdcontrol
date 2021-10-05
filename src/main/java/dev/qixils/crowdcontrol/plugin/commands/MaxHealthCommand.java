@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 @Getter
-public class MaxHealthCommand extends Command {
+public class MaxHealthCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 	private final int amount;
@@ -35,8 +35,8 @@ public class MaxHealthCommand extends Command {
 	}
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
-		Response.Result result = new Response.Result(Response.ResultType.FAILURE, "All players are at minimum health");
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+		Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("All players are at minimum health");
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth == null) {
@@ -54,7 +54,7 @@ public class MaxHealthCommand extends Command {
 			double current = modifier == null ? 0 : modifier.getAmount();
 			double newVal = Math.max(-10, current + amount);
 			if (current != newVal)
-				result = Response.Result.SUCCESS;
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			maxHealth.addModifier(new AttributeModifier(modifierUUID, "max-health-cc", newVal, AttributeModifier.Operation.ADD_NUMBER));
 		}
 		return result;

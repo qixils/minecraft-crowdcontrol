@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class FallingBlockCommand extends Command {
+public class FallingBlockCommand extends ImmediateCommand {
     private static final int Y = 5;
 
     protected final Material blockMaterial;
@@ -29,7 +29,7 @@ public class FallingBlockCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location destination = player.getEyeLocation();
             destination.setY(Math.min(destination.getY()+Y, player.getWorld().getMaxHeight()-1));
@@ -37,6 +37,6 @@ public class FallingBlockCommand extends Command {
             if (block.getType().isEmpty())
                 Bukkit.getScheduler().runTask(plugin, () -> block.setType(blockMaterial, true));
         }
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-public class SwapCommand extends Command {
+public class SwapCommand extends ImmediateCommand {
     private final String effectName = "swap";
     private final String displayName = "Swap Locations";
 
@@ -27,10 +27,10 @@ public class SwapCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         List<Player> players = CrowdControlPlugin.getPlayers();
         if (players.size() < 2)
-            return new Response.Result(Response.ResultType.UNAVAILABLE, "Not enough players online");
+            return Response.builder().type(Response.ResultType.UNAVAILABLE).message("Not enough players online");
 
         // get shuffled list of players
         Collections.shuffle(players, rand);
@@ -44,6 +44,6 @@ public class SwapCommand extends Command {
             destinations.put(players.get(i), offset.get(i).getLocation());
         // teleport
         Bukkit.getScheduler().runTask(plugin, () -> destinations.forEach(Entity::teleportAsync));
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

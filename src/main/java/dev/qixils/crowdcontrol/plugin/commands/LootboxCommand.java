@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.plugin.utils.Weighted;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public class LootboxCommand extends Command {
+public class LootboxCommand extends ImmediateCommand {
     public LootboxCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
@@ -74,7 +74,7 @@ public class LootboxCommand extends Command {
     }
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder().next(request.getViewer(), CrowdControlPlugin.USER_COLOR).next(" has gifted you...").build());
             List<Material> items = new ArrayList<>(Arrays.asList(Material.values()));
@@ -132,6 +132,6 @@ public class LootboxCommand extends Command {
             lootbox.setItem(13, itemStack);
             Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(lootbox)); // TODO: sfx
         }
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

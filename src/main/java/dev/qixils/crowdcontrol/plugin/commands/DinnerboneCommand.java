@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class DinnerboneCommand extends Command {
+public class DinnerboneCommand extends ImmediateCommand {
     private static final String NAME = "Dinnerbone";
     private static final int RADIUS = 15;
 
@@ -27,7 +27,7 @@ public class DinnerboneCommand extends Command {
     private final String effectName = "dinnerbone";
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Set<LivingEntity> entities = new HashSet<>();
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Player player : CrowdControlPlugin.getPlayers()) {
@@ -35,6 +35,6 @@ public class DinnerboneCommand extends Command {
             }
             entities.forEach(x -> x.setCustomName(Objects.equals(x.getCustomName(), NAME) ? null : NAME));
         });
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

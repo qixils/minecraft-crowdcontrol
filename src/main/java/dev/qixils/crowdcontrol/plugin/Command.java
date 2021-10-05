@@ -1,20 +1,20 @@
 package dev.qixils.crowdcontrol.plugin;
 
+import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class Command {
     public static final Random rand = new Random();
 
-    public abstract Response.@NotNull Result execute(@NotNull Request request);
+    public abstract @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull Request request);
     @NotNull
     public abstract String getEffectName();
 
@@ -31,25 +31,24 @@ public abstract class Command {
         return sb.toString();
     }
 
-    public final Response.@NotNull Result executeAndNotify(@NotNull Request request) {
-        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-        if (players.isEmpty())
-            return new Response.Result(Response.ResultType.UNAVAILABLE, "No players online");
-        if (players.stream().allMatch(Entity::isDead))
-            return new Response.Result(Response.ResultType.RETRY, "All players are dead");
+    public final void executeAndNotify(@NotNull Request request) {
+        execute(request).thenAccept(builder -> {
+            Response response = builder.id(request.getId()).build();
 
-        Response.Result result = execute(request);
-        if (result.getType() == Response.ResultType.SUCCESS)
-            Bukkit.getServer().sendMessage(new TextBuilder()
-                .next(request.getViewer(), CrowdControlPlugin.USER_COLOR)
-                .next(" used command ")
-                .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
-        return result;
+            CrowdControl cc = plugin.getCrowdControl();
+            if (cc != null) cc.dispatchResponse(response);
+
+            if (response.getResultType() == Response.ResultType.SUCCESS)
+                Bukkit.getServer().sendMessage(new TextBuilder()
+                        .next(request.getViewer(), CrowdControlPlugin.USER_COLOR)
+                        .next(" used command ")
+                        .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
+        });
     }
 
     protected final CrowdControlPlugin plugin;
-    public Command(CrowdControlPlugin plugin) {
-        this.plugin = plugin;
+    public Command(@NotNull CrowdControlPlugin plugin) {
+        this.plugin = Objects.requireNonNull(plugin, "plugin");
     }
 
 }

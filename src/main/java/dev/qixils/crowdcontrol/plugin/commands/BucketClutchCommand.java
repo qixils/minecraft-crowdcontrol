@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class BucketClutchCommand extends Command {
+public class BucketClutchCommand extends ImmediateCommand {
 	private static final int OFFSET = 30;
 	public BucketClutchCommand(CrowdControlPlugin plugin) {
 		super(plugin);
@@ -25,8 +25,8 @@ public class BucketClutchCommand extends Command {
 	private final String displayName = "Water Bucket Clutch";
 
 	@Override
-	public Response.@NotNull Result execute(@NotNull Request request) {
-		Response.Result result = new Response.Result(Response.ResultType.FAILURE, "No players are on the surface");
+	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+		Response.Builder result = new Response.Builder().type(Response.ResultType.FAILURE).message("No players are on the surface");
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			Location curr = player.getLocation();
 			boolean obstruction = false;
@@ -38,7 +38,7 @@ public class BucketClutchCommand extends Command {
 				break;
 			}
 			if (!obstruction) {
-				result = Response.Result.SUCCESS;
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				Bukkit.getScheduler().runTask(plugin, () -> player.teleportAsync(curr.clone().add(0, OFFSET, 0)).thenRun(() -> {
 					PlayerInventory inv = player.getInventory();
 					ItemStack hand = inv.getItemInMainHand();

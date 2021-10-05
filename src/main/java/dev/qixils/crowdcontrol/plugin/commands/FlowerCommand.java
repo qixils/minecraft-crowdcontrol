@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FlowerCommand extends Command {
+public class FlowerCommand extends ImmediateCommand {
     protected static final int RADIUS = 10;
     protected static final int MIN_RAND = 14;  // inclusive
     protected static final int MAX_RAND = 28;  // inclusive
@@ -30,7 +30,7 @@ public class FlowerCommand extends Command {
     private final String displayName = "Place Flowers";
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Set<Location> placeLocations = new HashSet<>();
         for (Player player : CrowdControlPlugin.getPlayers()) {
             BlockUtil.BlockFinder finder = BlockUtil.BlockFinder.builder()
@@ -54,13 +54,13 @@ public class FlowerCommand extends Command {
         }
 
         if (placeLocations.isEmpty())
-            return Response.Result.RETRY;
+            return Response.builder().type(Response.ResultType.RETRY);
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Location location : placeLocations)
                 location.getBlock().setType(RandomUtil.randomElementFrom(BlockUtil.FLOWERS.getMaterials()));
         });
 
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

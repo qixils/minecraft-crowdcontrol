@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Getter
-public class SoundCommand extends Command {
+public class SoundCommand extends ImmediateCommand {
     public static final List<Sound> SOUNDS = List.of(
             Sound.ENTITY_CREEPER_PRIMED,
             Sound.ENTITY_ENDERMAN_STARE,
@@ -34,12 +34,12 @@ public class SoundCommand extends Command {
     private final String displayName = "Spooky Sound Effect";
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Sound sound = RandomUtil.randomElementFrom(SOUNDS);
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
             player.getWorld().playSound(playAt, sound, SoundCategory.MASTER, 2.0f, 1.0f);
         }
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }

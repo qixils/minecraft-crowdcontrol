@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-public class GravelCommand extends Command {
+public class GravelCommand extends ImmediateCommand {
     public GravelCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
@@ -25,7 +25,7 @@ public class GravelCommand extends Command {
     private final String displayName = "Replace Area With Gravel";
 
     @Override
-    public Response.@NotNull Result execute(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Set<Location> locations = new HashSet<>();
         for (Player player : CrowdControlPlugin.getPlayers())
             locations.addAll(BlockUtil.BlockFinder.builder()
@@ -36,9 +36,9 @@ public class GravelCommand extends Command {
                     .build().getAll());
 
         if (locations.isEmpty())
-            return new Response.Result(Response.ResultType.FAILURE, "No replaceable blocks nearby");
+            return Response.builder().type(Response.ResultType.FAILURE).message("No replaceable blocks nearby");
 
         Bukkit.getScheduler().runTask(plugin, () -> locations.forEach(location -> location.getBlock().setType(Material.GRAVEL)));
-        return Response.Result.SUCCESS;
+        return Response.builder().type(Response.ResultType.SUCCESS);
     }
 }
