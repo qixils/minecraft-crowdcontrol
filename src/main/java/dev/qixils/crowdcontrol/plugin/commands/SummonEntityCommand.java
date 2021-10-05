@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
     protected final EntityType entityType;
-    protected static final int SPAWN_RADIUS = 7;
     private final String effectName;
     private final String displayName;
 

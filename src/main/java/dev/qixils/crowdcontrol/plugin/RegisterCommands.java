@@ -29,6 +29,7 @@ import dev.qixils.crowdcontrol.plugin.commands.MaxHealthCommand;
 import dev.qixils.crowdcontrol.plugin.commands.MoveCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEnchantsCommand;
+import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.commands.ResetExpProgressCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RespawnCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SoundCommand;
@@ -219,7 +220,10 @@ public class RegisterCommands {
                 new DisableJumpingCommand(plugin)
         ));
 
-        SAFE_ENTITIES.forEach(entity -> commands.add(new SummonEntityCommand(plugin, entity)));
+        SAFE_ENTITIES.forEach(entity -> {
+            commands.add(new SummonEntityCommand(plugin, entity));
+            commands.add(new RemoveEntityCommand(plugin, entity));
+        });
 
         // register difficulty commands
         for (Difficulty difficulty : Difficulty.values()) {
