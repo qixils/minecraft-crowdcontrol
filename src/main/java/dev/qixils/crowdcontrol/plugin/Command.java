@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 public abstract class Command {
     public static final Random rand = new Random();
 
-    public abstract @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull Request request);
+    public abstract @NotNull CompletableFuture<Response.Builder> execute(@NotNull Request request);
     @NotNull
     public abstract String getEffectName();
 
@@ -33,6 +33,8 @@ public abstract class Command {
 
     public final void executeAndNotify(@NotNull Request request) {
         execute(request).thenAccept(builder -> {
+            if (builder == null) return;
+
             Response response = builder.id(request.getId()).build();
 
             CrowdControl cc = plugin.getCrowdControl();
@@ -44,6 +46,17 @@ public abstract class Command {
                         .next(" used command ")
                         .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
         });
+    }
+
+    public final void announce(final Request viewer) {
+        announce(viewer.getViewer());
+    }
+
+    public final void announce(final String viewer) {
+        Bukkit.getServer().sendMessage(new TextBuilder()
+                .next(viewer, CrowdControlPlugin.USER_COLOR)
+                .next(" used command ")
+                .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
     }
 
     protected final CrowdControlPlugin plugin;
