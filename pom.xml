@@ -85,7 +85,7 @@
             <version>31.0.1-jre</version>
         </dependency>
         <dependency>
-            <groupId>dev.qixils</groupId>
+            <groupId>dev.qixils.crowdcontrol</groupId>
             <artifactId>java-crowd-control</artifactId>
             <version>2.1.0</version>
         </dependency>
