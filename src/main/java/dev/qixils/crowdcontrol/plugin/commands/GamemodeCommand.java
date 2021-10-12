@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -32,15 +34,19 @@ public class GamemodeCommand extends VoidCommand {
     @Override
     public void voidExecute(@NotNull Request request) {
         // use fake request (w/ fake ID) to only allow 1 of any gamemode command to run at a time
-        Request fakeRequest = new Request(request.getId(), "gamemode", new Object[0], request.getViewer(), request.getCost(), request.getType());
-        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC cannot be null"),
+        Request fakeRequest = new Request(request.getId(), "gamemode", request.getParameters(), request.getViewer(), request.getCost(), request.getType());
+        List<Player> players = new ArrayList<>();
+        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
                 fakeRequest, DURATION,
-                $ -> setGameMode(gamemode),
-                $ -> setGameMode(GameMode.SURVIVAL)).queue();
+                $ -> players.addAll(setGameMode(CrowdControlPlugin.getPlayers(), gamemode)),
+                $ -> setGameMode(players, GameMode.SURVIVAL)).queue();
     }
 
-    private void setGameMode(GameMode gamemode) {
-        for (Player player : CrowdControlPlugin.getPlayers())
-            Bukkit.getScheduler().runTask(plugin, () -> player.setGameMode(gamemode));
+    private List<Player> setGameMode(List<Player> players, GameMode gamemode) {
+        for (Player player : players) {
+            if (player.isValid())
+                Bukkit.getScheduler().runTask(plugin, () -> player.setGameMode(gamemode));
+        }
+        return players;
     }
 }

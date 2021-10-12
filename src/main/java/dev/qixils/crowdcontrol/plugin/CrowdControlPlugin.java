@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin;
 import dev.qixils.crowdcontrol.CrowdControl;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,7 +51,9 @@ public final class CrowdControlPlugin extends JavaPlugin {
     }
 
     public static List<Player> getPlayers() {
-        return Bukkit.getServer().getOnlinePlayers().stream().filter(player -> !player.isDead()).collect(Collectors.toCollection(ArrayList::new));
+        return Bukkit.getServer().getOnlinePlayers().stream()
+                .filter(player -> !player.isDead() && player.getGameMode() != GameMode.SPECTATOR)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void registerCommand(@NotNull String name, @NotNull Command command) {
