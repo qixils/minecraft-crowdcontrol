@@ -1,6 +1,6 @@
 name: CrowdControl
 version: ${project.version}
-main: io.github.lexikiq.crowdcontrol.CrowdControl
+main: dev.qixils.crowdcontrol.plugin.CrowdControlPlugin
 api-version: 1.17
 prefix: MCCC
 authors: [ lexikiq ]
