@@ -19,17 +19,7 @@ public abstract class Command {
     public abstract String getEffectName();
 
     @NotNull
-    public String getDisplayName() {
-        StringBuilder sb = new StringBuilder();
-        char[] chars = getClass().getSimpleName().replace("Command", "").toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            char chr = chars[i];
-            if (i > 0 && Character.isUpperCase(chr))
-                sb.append(' ');
-            sb.append(chr);
-        }
-        return sb.toString();
-    }
+    public abstract String getDisplayName();
 
     public final void executeAndNotify(@NotNull Request request) {
         execute(request).thenAccept(builder -> {
