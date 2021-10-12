@@ -20,6 +20,7 @@ import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FeedCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FlowerCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FreezeCommand;
+import dev.qixils.crowdcontrol.plugin.commands.GamemodeCommand;
 import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.GravelCommand;
 import dev.qixils.crowdcontrol.plugin.commands.HalfHealthCommand;
@@ -45,6 +46,7 @@ import dev.qixils.crowdcontrol.plugin.commands.VeinCommand;
 import dev.qixils.crowdcontrol.plugin.commands.WeatherCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.enchantments.Enchantment;
@@ -222,10 +224,10 @@ public class RegisterCommands {
                 new EntityChaosCommand(plugin)
         ));
 
-        SAFE_ENTITIES.forEach(entity -> {
+        for (EntityType entity : SAFE_ENTITIES) {
             commands.add(new SummonEntityCommand(plugin, entity));
             commands.add(new RemoveEntityCommand(plugin, entity));
-        });
+        }
 
         // register difficulty commands
         for (Difficulty difficulty : Difficulty.values()) {
@@ -238,8 +240,13 @@ public class RegisterCommands {
         }
 
         // block sets
-        SET_BLOCKS.forEach(block -> commands.add(new BlockCommand(plugin, block)));
-        SET_FALLING_BLOCKS.forEach(block -> commands.add(new FallingBlockCommand(plugin, block)));
+        for (Material SET_BLOCK : SET_BLOCKS) {
+            commands.add(new BlockCommand(plugin, SET_BLOCK));
+        }
+
+        for (Material block : SET_FALLING_BLOCKS) {
+            commands.add(new FallingBlockCommand(plugin, block));
+        }
 
         // weather commands
         for (WeatherType weatherType : WeatherType.values()) {
@@ -251,10 +258,17 @@ public class RegisterCommands {
             commands.add(new EnchantmentCommand(plugin, enchantment));
         }
 
-        GIVE_TAKE_ITEMS.forEach(item -> {
+        // give/take items
+        for (Material item : GIVE_TAKE_ITEMS) {
             commands.add(new GiveItemCommand(plugin, item));
             commands.add(new TakeItemCommand(plugin, item));
-        });
+        }
+
+        // gamemode commands
+        for (GameMode gamemode : GameMode.values()) {
+            if (gamemode == GameMode.SURVIVAL) continue;
+            commands.add(new GamemodeCommand(plugin, gamemode));
+        }
 
         // actually register the commands
         for (Command cmd : commands) {

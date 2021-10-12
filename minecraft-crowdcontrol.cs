@@ -55,6 +55,10 @@ public class Minecraft : SimpleTCPPack
         new Effect("+1 Max Health", "max_health_plus1"),
         new Effect("-1 Max Health", "max_health_sub1"),
         new Effect("Disable Jumping", "disable_jumping"),
+        new Effect("Teleport All Entities To Players", "entity_chaos"),
+        new Effect("Adventure Mode (30s)", "adventure_mode"),
+        new Effect("Creative Mode (30s)", "creative_mode"),
+        new Effect("Spectator Mode (30s)", "spectator_mode"),
         // teleports players by a few blocks in the specified direction
         new Effect("Move Up", "up"),
         new Effect("Move Down", "down"),
