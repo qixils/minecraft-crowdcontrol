@@ -14,6 +14,7 @@ import dev.qixils.crowdcontrol.plugin.commands.DinnerboneCommand;
 import dev.qixils.crowdcontrol.plugin.commands.DisableJumpingCommand;
 import dev.qixils.crowdcontrol.plugin.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.EnchantmentCommand;
+import dev.qixils.crowdcontrol.plugin.commands.EntityChaosCommand;
 import dev.qixils.crowdcontrol.plugin.commands.ExperienceCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FeedCommand;
@@ -217,7 +218,8 @@ public class RegisterCommands {
                 new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
                 new MaxHealthCommand(plugin, -1),
                 new MaxHealthCommand(plugin, 1),
-                new DisableJumpingCommand(plugin)
+                new DisableJumpingCommand(plugin),
+                new EntityChaosCommand(plugin)
         ));
 
         SAFE_ENTITIES.forEach(entity -> {
