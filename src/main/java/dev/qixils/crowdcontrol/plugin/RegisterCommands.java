@@ -267,7 +267,8 @@ public class RegisterCommands {
         // gamemode commands
         for (GameMode gamemode : GameMode.values()) {
             if (gamemode == GameMode.SURVIVAL) continue;
-            commands.add(new GamemodeCommand(plugin, gamemode));
+            commands.add(new GamemodeCommand(plugin, gamemode,
+                    gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
         }
 
         // actually register the commands

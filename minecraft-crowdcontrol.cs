@@ -59,9 +59,9 @@ namespace CrowdControl.Games.Packs
             new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous"),
             // set gamemode for 30 seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
-            new Effect("Adventure Mode (30s)", "adventure_mode", "change_gamemode"),
-            new Effect("Creative Mode (30s)", "creative_mode", "change_gamemode"),
-            new Effect("Spectator Mode (30s)", "spectator_mode", "change_gamemode"),
+            new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode"),
+            new Effect("Creative Mode (15s)", "creative_mode", "change_gamemode"),
+            new Effect("Spectator Mode (8s)", "spectator_mode", "change_gamemode"),
             // teleports players by a few blocks in the specified direction
             new Effect("Teleport Players", "teleportation", ItemKind.Folder),
             new Effect("Move Up", "up", "teleportation"),

@@ -20,13 +20,14 @@ import java.util.Objects;
 
 @Getter
 public class GamemodeCommand extends VoidCommand {
-    private static final Duration DURATION = Duration.ofSeconds(30);
+    private final Duration duration;
     private final GameMode gamemode;
     private final String displayName;
     private final String effectName;
 
-    public GamemodeCommand(CrowdControlPlugin plugin, GameMode gamemode) {
+    public GamemodeCommand(CrowdControlPlugin plugin, GameMode gamemode, long seconds) {
         super(plugin);
+        this.duration = Duration.ofSeconds(seconds);
         this.gamemode = gamemode;
         this.displayName = TextUtil.titleCase(gamemode) + " Mode";
         this.effectName = gamemode.name().toLowerCase(Locale.ENGLISH) + "_mode";
@@ -38,7 +39,7 @@ public class GamemodeCommand extends VoidCommand {
         Request fakeRequest = new Request(request.getId(), "gamemode", request.getParameters(), request.getViewer(), request.getCost(), request.getType());
         List<Player> players = new ArrayList<>();
         new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
-                fakeRequest, DURATION,
+                fakeRequest, duration,
                 $ -> players.addAll(setGameMode(request, CrowdControlPlugin.getPlayers(), gamemode)),
                 $ -> setGameMode(null, players, GameMode.SURVIVAL)).queue();
     }
