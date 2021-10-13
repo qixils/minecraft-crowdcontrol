@@ -25,6 +25,8 @@ public class DinnerboneCommand extends ImmediateCommand {
 
     @Getter
     private final String effectName = "dinnerbone";
+    @Getter
+    private final String displayName = "Dinnerbone";
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
