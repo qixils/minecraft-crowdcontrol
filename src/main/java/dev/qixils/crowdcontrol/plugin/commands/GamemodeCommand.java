@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -39,12 +40,15 @@ public class GamemodeCommand extends VoidCommand {
         new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
                 fakeRequest, DURATION,
                 $ -> players.addAll(setGameMode(request, CrowdControlPlugin.getPlayers(), gamemode)),
-                $ -> setGameMode(request, players, GameMode.SURVIVAL)).queue();
+                $ -> setGameMode(null, players, GameMode.SURVIVAL)).queue();
     }
 
-    private List<Player> setGameMode(Request request, List<Player> players, GameMode gamemode) {
+    private List<Player> setGameMode(@Nullable Request request,
+                                     @NotNull List<@NotNull Player> players,
+                                     @NotNull GameMode gamemode) {
         if (players.isEmpty()) return players;
-        announce(request);
+        if (request != null)
+            announce(request);
         for (Player player : players) {
             if (player.isValid())
                 Bukkit.getScheduler().runTask(plugin, () -> player.setGameMode(gamemode));
