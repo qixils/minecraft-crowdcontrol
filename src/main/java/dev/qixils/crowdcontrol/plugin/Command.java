@@ -31,10 +31,7 @@ public abstract class Command {
             if (cc != null) cc.dispatchResponse(response);
 
             if (response.getResultType() == Response.ResultType.SUCCESS)
-                Bukkit.getServer().sendMessage(new TextBuilder()
-                        .next(request.getViewer(), CrowdControlPlugin.USER_COLOR)
-                        .next(" used command ")
-                        .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
+                announce(request);
         });
     }
 

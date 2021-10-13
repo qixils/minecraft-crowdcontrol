@@ -1,10 +1,10 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -13,22 +13,27 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.Objects;
 
 @Getter
-public class DisableJumpingCommand extends ImmediateCommand implements Listener {
+public class DisableJumpingCommand extends VoidCommand implements Listener {
 	private final String effectName = "disable_jumping";
 	private final String displayName = "Disable Jumping";
 	private int jumpsBlockedAt = 0;
-	private static final int JUMP_BLOCK_DURATION = 200;
+	private static final Duration DURATION = Duration.ofSeconds(10);
+	private static final int JUMP_BLOCK_DURATION = (int) (DURATION.toSeconds() * 20);
 
 	public DisableJumpingCommand(CrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		jumpsBlockedAt = Bukkit.getCurrentTick();
-		return Response.builder().type(Response.ResultType.SUCCESS).timeRemaining(Duration.ofMillis(JUMP_BLOCK_DURATION * 500));
+	public void voidExecute(@NotNull Request request) {
+		new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
+				request, DURATION, $ -> {
+			this.jumpsBlockedAt = Bukkit.getCurrentTick();
+			announce(request);
+		}, $ -> {}).queue();
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)

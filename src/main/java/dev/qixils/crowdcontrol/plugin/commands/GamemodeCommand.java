@@ -38,11 +38,13 @@ public class GamemodeCommand extends VoidCommand {
         List<Player> players = new ArrayList<>();
         new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
                 fakeRequest, DURATION,
-                $ -> players.addAll(setGameMode(CrowdControlPlugin.getPlayers(), gamemode)),
-                $ -> setGameMode(players, GameMode.SURVIVAL)).queue();
+                $ -> players.addAll(setGameMode(request, CrowdControlPlugin.getPlayers(), gamemode)),
+                $ -> setGameMode(request, players, GameMode.SURVIVAL)).queue();
     }
 
-    private List<Player> setGameMode(List<Player> players, GameMode gamemode) {
+    private List<Player> setGameMode(Request request, List<Player> players, GameMode gamemode) {
+        if (players.isEmpty()) return players;
+        announce(request);
         for (Player player : players) {
             if (player.isValid())
                 Bukkit.getScheduler().runTask(plugin, () -> player.setGameMode(gamemode));
