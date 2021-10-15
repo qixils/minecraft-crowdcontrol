@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.CrowdControl;
+import me.lucko.commodore.CommodoreProvider;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -13,12 +14,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public final class CrowdControlPlugin extends JavaPlugin {
     // actual stuff
-    private CrowdControl crowdControl = null;
-    private final FileConfiguration config = getConfig();
+    CrowdControl crowdControl = null;
+    List<Command> commands;
+    final FileConfiguration config = getConfig();
     public static final TextColor USER_COLOR = TextColor.color(0x9f44db);
     public static final TextColor CMD_COLOR = TextColor.color(0xb15be3);
 
@@ -30,8 +33,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
         saveConfig();
     }
 
-    @Override
-    public void onEnable() {
+    void initCrowdControl() {
         String ip = config.getString("ip");
         int port = config.getInt("port");
         if (ip == null || port == 0) {
@@ -39,15 +41,29 @@ public final class CrowdControlPlugin extends JavaPlugin {
         }
         crowdControl = new CrowdControl(ip, port);
         crowdControl.registerCheck(() -> !getPlayers().isEmpty());
-        List<Command> commands = RegisterCommands.register(this);
-        if (false)
-            RegisterCommands.writeCommands(this, commands);
+        if (commands == null)
+            commands = RegisterCommands.register(this);
+        else
+            RegisterCommands.register(this, commands);
+    }
+
+    @Override
+    public void onEnable() {
+        initCrowdControl();
+
+        BukkitCrowdControlCommand.register(
+                this,
+                CommodoreProvider.getCommodore(this),
+                Objects.requireNonNull(getCommand("crowdcontrol"), "plugin.yml is misconfigured; cannot find crowdcontrol command")
+        );
     }
 
     @Override
     public void onDisable() {
         if (crowdControl == null) return;
         crowdControl.shutdown();
+        crowdControl = null;
+        commands = null;
     }
 
     public static List<Player> getPlayers() {

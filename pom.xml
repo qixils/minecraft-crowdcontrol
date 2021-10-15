@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.qixils.crowdcontrol</groupId>
+    <groupId>dev.qixils.crowdcontrol.plugin</groupId>
     <artifactId>Minecraft-CrowdControl</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -41,15 +41,10 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>me.lucko:commodore</include>
-                                </includes>
-                            </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>me.lucko.commodore</pattern>
-                                    <shadedPattern>dev.qixils.crowdcontrol.commodore</shadedPattern>
+                                    <shadedPattern>dev.qixils.crowdcontrol.plugin.commodore</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -57,6 +52,17 @@
                 </executions>
             </plugin>
         </plugins>
+        <!-- allow plugin.yml to use variables from this file -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                    <!--<include>config.yml</include>-->
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <repositories>
@@ -96,6 +102,7 @@
             <groupId>dev.qixils.crowdcontrol</groupId>
             <artifactId>java-crowd-control</artifactId>
             <version>2.1.1</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>

@@ -174,7 +174,7 @@ public class RegisterCommands {
             Material.ENCHANTED_GOLDEN_APPLE
     );
 
-    public static List<Command> register(CrowdControlPlugin plugin) {
+    public static List<Command> getCommands(CrowdControlPlugin plugin) {
         // register normal commands
         List<Command> commands = new ArrayList<>(Arrays.asList(
                 new VeinCommand(plugin),
@@ -226,7 +226,7 @@ public class RegisterCommands {
                 new EntityChaosCommand(plugin),
                 new CameraLockToSkyCommand(plugin),
                 new CameraLockToGroundCommand(plugin)
-                ));
+        ));
 
         for (EntityType entity : SAFE_ENTITIES) {
             commands.add(new SummonEntityCommand(plugin, entity));
@@ -275,12 +275,22 @@ public class RegisterCommands {
                     gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
         }
 
-        // actually register the commands
+        return commands;
+    }
+
+    public static List<Command> register(CrowdControlPlugin plugin) {
+        List<Command> commands = register(plugin, getCommands(plugin));
+        for (Command command : commands) {
+            if (command instanceof Listener listener)
+                Bukkit.getPluginManager().registerEvents(listener, plugin);
+        }
+        return commands;
+    }
+
+    public static List<Command> register(CrowdControlPlugin plugin, List<Command> commands) {
         for (Command cmd : commands) {
             String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
             plugin.registerCommand(name, cmd);
-            if (cmd instanceof Listener listener)
-                Bukkit.getPluginManager().registerEvents(listener, plugin);
         }
 
         return commands;
@@ -293,7 +303,8 @@ public class RegisterCommands {
                 fileWriter.write("        new Effect(\"" + command.getDisplayName() + "\", \"" + command.getEffectName().toLowerCase(Locale.ENGLISH) + "\"),\n");
             fileWriter.close();
         } catch (IOException e) {
-            plugin.getLogger().warning("Failed to write commands to file.");
+            if (plugin != null)
+                plugin.getLogger().warning("Failed to write commands to file.");
             e.printStackTrace();
         }
     }

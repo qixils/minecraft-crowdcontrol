@@ -126,7 +126,7 @@ public class TextBuilder implements ComponentLike {
 	 * @param contents component to append after the prefix, or null for nothing
 	 */
 	private TextBuilder(@NotNull String prefix, @Nullable ComponentLike contents) {
-		color(NamedTextColor.DARK_AQUA).next("&8&l[").next(prefix, NamedTextColor.YELLOW).next("&8&l]").next(" ").next(contents);
+		color(NamedTextColor.DARK_AQUA).next("&8&l[").next(prefix, NamedTextColor.YELLOW).next("&8&l]").next(Component.space()).next(contents);
 	}
 
 	/**
