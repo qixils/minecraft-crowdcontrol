@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.VoidCommand;
+import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 @Getter
-public class GamemodeCommand extends VoidCommand {
+public class GamemodeCommand extends TimedCommand {
     private final Duration duration;
     private final GameMode gamemode;
     private final String displayName;
@@ -29,7 +29,7 @@ public class GamemodeCommand extends VoidCommand {
         super(plugin);
         this.duration = Duration.ofSeconds(seconds);
         this.gamemode = gamemode;
-        this.displayName = TextUtil.titleCase(gamemode) + " Mode (" + seconds + "s)";
+        this.displayName = TextUtil.titleCase(gamemode) + " Mode";
         this.effectName = gamemode.name().toLowerCase(Locale.ENGLISH) + "_mode";
     }
 

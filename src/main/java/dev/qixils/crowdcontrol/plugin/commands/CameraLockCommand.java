@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.VoidCommand;
+import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class CameraLockCommand extends VoidCommand {
+public final class CameraLockCommand extends TimedCommand {
     public CameraLockCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
@@ -26,7 +26,12 @@ public final class CameraLockCommand extends VoidCommand {
     @Getter
     private final String effectName = "camera_lock";
     @Getter
-    private final String displayName = "Camera Lock (" + DURATION.getSeconds() + "s)";
+    private final String displayName = "Camera Lock";
+
+    @Override
+    public @NotNull Duration getDuration() {
+        return DURATION;
+    }
 
     @Override
     public void voidExecute(@NotNull Request request) {

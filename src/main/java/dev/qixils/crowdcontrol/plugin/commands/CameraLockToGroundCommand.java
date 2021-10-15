@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.VoidCommand;
+import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class CameraLockToGroundCommand extends VoidCommand {
+public final class CameraLockToGroundCommand extends TimedCommand {
     public CameraLockToGroundCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
@@ -23,7 +23,12 @@ public final class CameraLockToGroundCommand extends VoidCommand {
     @Getter
     private final String effectName = "camera_lock_to_ground";
     @Getter
-    private final String displayName = "Camera Lock To Ground (" + DURATION.toSeconds() + "s)";
+    private final String displayName = "Camera Lock To Ground";
+
+    @Override
+    public @NotNull Duration getDuration() {
+        return DURATION;
+    }
 
     @Override
     public void voidExecute(@NotNull Request request) {

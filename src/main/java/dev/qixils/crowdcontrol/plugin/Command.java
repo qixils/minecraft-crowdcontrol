@@ -43,7 +43,11 @@ public abstract class Command {
         Bukkit.getServer().sendMessage(new TextBuilder()
                 .next(viewer, CrowdControlPlugin.USER_COLOR)
                 .next(" used command ")
-                .next(getDisplayName(), CrowdControlPlugin.CMD_COLOR));
+                .next(getProcessedDisplayName(), CrowdControlPlugin.CMD_COLOR));
+    }
+
+    protected @NotNull String getProcessedDisplayName() {
+        return getDisplayName();
     }
 
     protected final CrowdControlPlugin plugin;
