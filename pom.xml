@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.qixils.crowdcontrol</groupId>
-    <artifactId>minecraft-crowdcontrol</artifactId>
+    <artifactId>Minecraft-CrowdControl</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 

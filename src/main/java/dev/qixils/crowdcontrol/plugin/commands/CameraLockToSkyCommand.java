@@ -11,40 +11,28 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-public final class FreezeCommand extends VoidCommand {
-    public FreezeCommand(CrowdControlPlugin plugin) {
+public final class CameraLockToSkyCommand extends VoidCommand {
+    public CameraLockToSkyCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
-    private static final Duration DURATION = Duration.ofSeconds(7);
+    private static final Duration DURATION = Duration.ofSeconds(20);
 
     @Getter
-    private final String effectName = "freeze";
+    private final String effectName = "camera_lock_to_sky";
     @Getter
-    private final String displayName = "Freeze (" + DURATION.getSeconds() + "s)";
+    private final String displayName = "Camera Lock To Sky (" + DURATION.toSeconds() + "s)";
 
     @Override
     public void voidExecute(@NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
         new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request, DURATION, $ -> {
-            Map<UUID, Location> locations = new HashMap<>();
-            CrowdControlPlugin.getPlayers().forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
             task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {
-                if (!locations.containsKey(player.getUniqueId()))
-                    return;
-
-                Location location = locations.get(player.getUniqueId());
                 Location playerLoc = player.getLocation();
-                if (!location.getWorld().equals(playerLoc.getWorld()))
-                    return;
-
-                if (location.getX() != playerLoc.getX() || location.getY() != playerLoc.getY() || location.getZ() != playerLoc.getZ()) {
-                    playerLoc.set(location.getX(), location.getY(), location.getZ());
+                if (playerLoc.getPitch() > -89.99) {
+                    playerLoc.setPitch(-90);
                     player.teleport(playerLoc);
                 }
             }), 1, 1));

@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableSet;
 import dev.qixils.crowdcontrol.plugin.commands.BlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.BucketClutchCommand;
 import dev.qixils.crowdcontrol.plugin.commands.CameraLockCommand;
+import dev.qixils.crowdcontrol.plugin.commands.CameraLockToGroundCommand;
+import dev.qixils.crowdcontrol.plugin.commands.CameraLockToSkyCommand;
 import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
 import dev.qixils.crowdcontrol.plugin.commands.ClutterCommand;
 import dev.qixils.crowdcontrol.plugin.commands.DamageCommand;
@@ -221,8 +223,10 @@ public class RegisterCommands {
                 new MaxHealthCommand(plugin, -1),
                 new MaxHealthCommand(plugin, 1),
                 new DisableJumpingCommand(plugin),
-                new EntityChaosCommand(plugin)
-        ));
+                new EntityChaosCommand(plugin),
+                new CameraLockToSkyCommand(plugin),
+                new CameraLockToGroundCommand(plugin)
+                ));
 
         for (EntityType entity : SAFE_ENTITIES) {
             commands.add(new SummonEntityCommand(plugin, entity));

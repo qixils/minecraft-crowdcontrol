@@ -34,5 +34,4 @@ jobs:
         with:
           name: crowdcontrol-plugin
           path: |
-            target/minecraft-crowdcontrol-*.jar
-            !target/minecraft-crowdcontrol-*-shaded.jar
+            target/Minecraft-CrowdControl-*.jar

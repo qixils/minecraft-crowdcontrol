@@ -26,7 +26,7 @@ public final class CameraLockCommand extends VoidCommand {
     @Getter
     private final String effectName = "camera_lock";
     @Getter
-    private final String displayName = "Camera Lock";
+    private final String displayName = "Camera Lock (" + DURATION.getSeconds() + "s)";
 
     @Override
     public void voidExecute(@NotNull Request request) {

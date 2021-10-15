@@ -17,11 +17,12 @@ import java.util.Objects;
 
 @Getter
 public class DisableJumpingCommand extends VoidCommand implements Listener {
-	private final String effectName = "disable_jumping";
-	private final String displayName = "Disable Jumping";
-	private int jumpsBlockedAt = 0;
 	private static final Duration DURATION = Duration.ofSeconds(10);
 	private static final int JUMP_BLOCK_DURATION = (int) (DURATION.toSeconds() * 20);
+
+	private final String effectName = "disable_jumping";
+	private final String displayName = "Disable Jumping (" + DURATION.toSeconds() + "s)";
+	private int jumpsBlockedAt = 0;
 
 	public DisableJumpingCommand(CrowdControlPlugin plugin) {
 		super(plugin);

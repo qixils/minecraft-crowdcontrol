@@ -29,7 +29,7 @@ public class GamemodeCommand extends VoidCommand {
         super(plugin);
         this.duration = Duration.ofSeconds(seconds);
         this.gamemode = gamemode;
-        this.displayName = TextUtil.titleCase(gamemode) + " Mode";
+        this.displayName = TextUtil.titleCase(gamemode) + " Mode (" + seconds + "s)";
         this.effectName = gamemode.name().toLowerCase(Locale.ENGLISH) + "_mode";
     }
 

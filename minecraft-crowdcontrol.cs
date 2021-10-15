@@ -28,6 +28,8 @@ namespace CrowdControl.Games.Packs
             new Effect("Render Toasts", "toast", "miscellaneous"), // displays a bunch of "Recipe Unlocked" notifications in the top right
             new Effect("Freeze (7s)", "freeze", "miscellaneous"), // locks everyone in place for 7 seconds (camera rotation allowed)
             new Effect("Camera Lock (7s)", "camera_lock", "miscellaneous"), // locks everyone's camera in place for 7 seconds (movement allowed)
+            new Effect("Camera Lock To Sky (20s)", "camera_lock_to_sky", "miscellaneous"), // locks everyone's cameras to face the sky
+            new Effect("Camera Lock To Ground (20s)", "camera_lock_to_ground", "miscellaneous"), // locks everyone's cameras to face the ground
             new Effect("Place Flowers", "flowers", "miscellaneous"), // places a bunch of flowers nearby as if a Bonemeal item was used
             new Effect("Place Torches", "lit", "miscellaneous"), // places torches on every valid nearby block
             new Effect("Remove Torches", "dim", "miscellaneous"), // removes nearby torches
