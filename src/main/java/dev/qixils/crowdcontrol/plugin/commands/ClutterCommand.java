@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -27,7 +28,10 @@ public class ClutterCommand extends ImmediateCommand {
         for (Player player : CrowdControlPlugin.getPlayers()) {
             PlayerInventory inventory = player.getInventory();
             int maxSlots = inventory.getSize();
-            Set<Integer> slots = Set.of(inventory.getHeldItemSlot(), rand.nextInt(maxSlots), rand.nextInt(maxSlots));
+            Set<Integer> slots = new HashSet<>();
+            slots.add(inventory.getHeldItemSlot());
+            while (slots.size() < 3)
+                slots.add(rand.nextInt(maxSlots));
             for (int slot : slots) {
                 ItemStack hand = inventory.getItem(slot);
                 // lazy workaround to get a unique slot lmfao
