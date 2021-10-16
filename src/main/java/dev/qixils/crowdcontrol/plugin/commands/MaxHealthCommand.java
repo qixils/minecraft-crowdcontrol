@@ -18,7 +18,8 @@ public class MaxHealthCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 	private final int amount;
-	private static final UUID modifierUUID = new UUID(-899185282624176127L, -7747914881652381318L);
+	private static final UUID MODIFIER_UUID = new UUID(-899185282624176127L, -7747914881652381318L);
+	private static final String MODIFIER_NAME = "max-health-cc";
 
 	public MaxHealthCommand(CrowdControlPlugin plugin, int amount) {
 		super(plugin);
@@ -45,17 +46,17 @@ public class MaxHealthCommand extends ImmediateCommand {
 			}
 			AttributeModifier modifier = null;
 			for (AttributeModifier attributeModifier : maxHealth.getModifiers()) {
-				if (attributeModifier.getUniqueId() == modifierUUID) {
-					modifier = attributeModifier;
+				if (attributeModifier.getUniqueId() == MODIFIER_UUID || attributeModifier.getName().equals(MODIFIER_NAME)) {
+					if (modifier == null)
+						modifier = attributeModifier;
 					maxHealth.removeModifier(modifier);
-					break;
 				}
 			}
 			double current = modifier == null ? 0 : modifier.getAmount();
 			double newVal = Math.max(-10, current + amount);
 			if (current != newVal)
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			maxHealth.addModifier(new AttributeModifier(modifierUUID, "max-health-cc", newVal, AttributeModifier.Operation.ADD_NUMBER));
+			maxHealth.addModifier(new AttributeModifier(MODIFIER_UUID, MODIFIER_NAME, newVal, AttributeModifier.Operation.ADD_NUMBER));
 		}
 		return result;
 	}
