@@ -36,7 +36,7 @@ public final class CameraLockCommand extends TimedCommand {
     @Override
     public void voidExecute(@NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
-        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request, DURATION, $ -> {
+        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request.getId(), "camera_lock", DURATION, $ -> {
             Map<UUID, Location> locations = new HashMap<>();
             CrowdControlPlugin.getPlayers().forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
             task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {

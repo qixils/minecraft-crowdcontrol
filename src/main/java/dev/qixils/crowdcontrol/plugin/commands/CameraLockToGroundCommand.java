@@ -33,7 +33,7 @@ public final class CameraLockToGroundCommand extends TimedCommand {
     @Override
     public void voidExecute(@NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
-        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request, DURATION, $ -> {
+        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request.getId(), "camera_lock", DURATION, $ -> {
             task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {
                 Location playerLoc = player.getLocation();
                 if (playerLoc.getPitch() < 89.99) {

@@ -36,10 +36,9 @@ public class GamemodeCommand extends TimedCommand {
     @Override
     public void voidExecute(@NotNull Request request) {
         // use fake request (w/ fake ID) to only allow 1 of any gamemode command to run at a time
-        Request fakeRequest = new Request(request.getId(), "gamemode", request.getParameters(), request.getViewer(), request.getCost(), request.getType());
         List<Player> players = new ArrayList<>();
         new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
-                fakeRequest, duration,
+                request.getId(), "gamemode", duration,
                 $ -> players.addAll(setGameMode(request, CrowdControlPlugin.getPlayers(), gamemode)),
                 $ -> setGameMode(null, players, GameMode.SURVIVAL)).queue();
     }
