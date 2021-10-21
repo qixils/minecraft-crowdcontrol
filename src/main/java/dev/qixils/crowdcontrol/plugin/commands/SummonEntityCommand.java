@@ -7,8 +7,11 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +31,12 @@ public class SummonEntityCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+        if (entityType.getEntityClass() != null && Monster.class.isAssignableFrom(entityType.getEntityClass())) {
+            for (World world : Bukkit.getWorlds()) {
+                if (world.getDifficulty() == Difficulty.PEACEFUL)
+                    return Response.builder().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+            }
+        }
         Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> spawnEntity(request.getViewer(), player)));
         return Response.builder().type(Response.ResultType.SUCCESS);
     }
