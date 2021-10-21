@@ -13,7 +13,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {
@@ -26,13 +29,17 @@ public class EntityChaosCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        List<Player> players = CrowdControlPlugin.getPlayers();
         Bukkit.getScheduler().runTask(plugin, () -> {
+            List<Entity> entities = new ArrayList<>();
             for (World world : Bukkit.getWorlds()) {
                 for (Entity entity : world.getEntities()) {
                     if (entity.getType() == EntityType.PLAYER) continue;
-                    entity.teleport(RandomUtil.randomElementFrom(players));
+                    entities.add(entity);
                 }
+            }
+            List<Player> players = CrowdControlPlugin.getPlayers();
+            for (int i = 0; i < entities.size(); i++) {
+                entities.get(i).teleport(players.get(i % players.size()));
             }
         });
         return Response.builder().type(Response.ResultType.SUCCESS);
