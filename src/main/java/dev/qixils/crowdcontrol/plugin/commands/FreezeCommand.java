@@ -1,9 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,6 +37,13 @@ public final class FreezeCommand extends TimedCommand {
 
     @Override
     public void voidExecute(@NotNull Request request) {
+        if (TimedEffect.isActive("gamemode")) {
+            CrowdControl cc = plugin.getCrowdControl();
+            if (cc != null)
+                cc.dispatchResponse(new Response.Builder(request).type(Response.ResultType.FAILURE).message("Cannot freeze players while a gamemode command is active").build());
+            return;
+        }
+
         AtomicReference<BukkitTask> task = new AtomicReference<>();
         new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request, DURATION, $ -> {
             Map<UUID, Location> locations = new HashMap<>();
