@@ -145,7 +145,9 @@ public class RegisterCommands {
             EntityType.ARMOR_STAND,
             EntityType.AXOLOTL,
             EntityType.GLOW_SQUID,
-            EntityType.GOAT
+            EntityType.GOAT,
+            EntityType.WITHER,
+            EntityType.ENDER_DRAGON
     );
 
     public static final Set<Material> SET_BLOCKS = ImmutableSet.of(
