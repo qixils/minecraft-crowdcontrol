@@ -24,14 +24,19 @@ public class MaxHealthCommand extends ImmediateCommand {
 	public MaxHealthCommand(CrowdControlPlugin plugin, int amount) {
 		super(plugin);
 		String amountText;
-		if (amount == 0)
+		String displayText;
+		if (amount == 0) {
 			amountText = "0";
-		else if (amount < 0)
+			displayText = "0";
+		} else if (amount < 0) {
 			amountText = "sub" + amount;
-		else
+			displayText = "-" + amount;
+		} else {
 			amountText = "plus" + amount;
+			displayText = "+" + amount;
+		}
 		this.effectName = "max_health_" + amountText;
-		this.displayName = amountText + " Max Health";
+		this.displayName = displayText + " Max Health";
 		this.amount = amount;
 	}
 
