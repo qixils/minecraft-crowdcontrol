@@ -58,7 +58,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Take One XP Level", "xp_sub1", "miscellaneous"),
             new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous"),
             new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous"), // teleports players 30 blocks up and gives them a water bucket
-            new Effect("Zip Time", "zip", "miscellaneous"), // adds a minute to the in-game day/night cycle
+            new Effect("Zip Time", "zip", "miscellaneous"), // adds 10 minutes to the in-game day/night cycle
             // set gamemode for 30 seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
             new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode"),
@@ -66,12 +66,12 @@ namespace CrowdControl.Games.Packs
             new Effect("Spectator Mode (8s)", "spectator_mode", "change_gamemode"),
             // teleports players by a few blocks in the specified direction
             new Effect("Teleport Players", "teleportation", ItemKind.Folder),
-            new Effect("Move Up", "up", "teleportation"),
-            new Effect("Move Down", "down", "teleportation"),
-            new Effect("Move X+", "xplus", "teleportation"),
-            new Effect("Move X-", "xminus", "teleportation"),
-            new Effect("Move Z+", "zplus", "teleportation"),
-            new Effect("Move Z-", "zminus", "teleportation"),
+            new Effect("Fling Up", "up", "teleportation"),
+            new Effect("Fling Down", "down", "teleportation"),
+            new Effect("Fling East", "xplus", "teleportation"),
+            new Effect("Fling West", "xminus", "teleportation"),
+            new Effect("Fling South", "zplus", "teleportation"),
+            new Effect("Fling North", "zminus", "teleportation"),
             // summons a mob around each player
             new Effect("Summon Entity", "summon_entity", ItemKind.Folder),
             new Effect("Summon Armor Stand", "entity_armor_stand", "summon_entity"),
