@@ -183,7 +183,8 @@ public class RegisterCommands {
                 new DisableJumpingCommand(plugin),
                 new EntityChaosCommand(plugin),
                 new CameraLockToSkyCommand(plugin),
-                new CameraLockToGroundCommand(plugin)
+                new CameraLockToGroundCommand(plugin),
+                new FlightCommand(plugin)
         ));
 
         for (EntityType entity : SAFE_ENTITIES) {
