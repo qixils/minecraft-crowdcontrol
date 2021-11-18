@@ -63,7 +63,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
             crowdControl = CrowdControl.server().port(port).password(password).build();
         } else if (ip != null && !ip.isBlank()) {
             getLogger().info("Running Crowd Control in client mode");
-            crowdControl = CrowdControl.client().ip(ip).build();
+            crowdControl = CrowdControl.client().port(port).ip(ip).build();
         } else {
             throw new IllegalStateException("Config file is improperly configured; please ensure you have entered a valid IP address or password.");
         }
