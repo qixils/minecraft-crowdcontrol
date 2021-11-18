@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +34,7 @@ public abstract class Command {
         CrowdControlPlugin.getPlayers(request).thenAccept(players -> {
             if (players.isEmpty()) return; // ensure targets are online
 
-            execute(players, request).thenAccept(builder -> {
+            execute(new ArrayList<>(players), request).thenAccept(builder -> {
                 if (builder == null) return;
 
                 Response response = builder.build();
