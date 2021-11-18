@@ -21,7 +21,7 @@ public class ClutterCommand extends ImmediateCommand {
     }
 
     private final String effectName = "clutter";
-    private final String displayName = "Clutter Inventories";
+    private final String displayName = "Clutter Inventory";
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {

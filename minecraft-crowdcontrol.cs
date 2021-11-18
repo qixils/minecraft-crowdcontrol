@@ -23,7 +23,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Camera Lock (7s)", "camera_lock", "miscellaneous"), // locks everyone's camera in place for 7 seconds (movement allowed)
             new Effect("Camera Lock To Ground (20s)", "camera_lock_to_ground", "miscellaneous"), // locks everyone's cameras to face the ground
             new Effect("Camera Lock To Sky (20s)", "camera_lock_to_sky", "miscellaneous"), // locks everyone's cameras to face the sky
-            new Effect("Clutter Inventories", "clutter", "miscellaneous"), // shuffles around a couple items in everyone's inventory
+            new Effect("Clutter Inventory", "clutter", "miscellaneous"), // shuffles around a couple items in everyone's inventory
             new Effect("Damage Item", "damage_item", "miscellaneous"), // sets the durability of an item to 50%
             new Effect("Damage Players (1 Heart)", "damage_1", "miscellaneous"),
             new Effect("Delete Held Item", "delete_item", "miscellaneous"),
