@@ -43,32 +43,29 @@ public final class CrowdControlPlugin extends JavaPlugin {
     final FileConfiguration config = getConfig();
     public static final TextColor USER_COLOR = TextColor.color(0x9f44db);
     public static final TextColor CMD_COLOR = TextColor.color(0xb15be3);
+    private static final int port = 58431;
 
     @Override
     public void onLoad() {
+        saveDefaultConfig();
         config.addDefault("ip", "127.0.0.1");
-        config.addDefault("port", 58431);
-        config.options().copyDefaults(true);
-        saveConfig();
     }
 
     void initCrowdControl() {
         String password = config.getString("password");
         String ip = config.getString("ip");
-        int port = config.getInt("port");
-        if ((password == null && ip == null) || port == 0) {
-            throw new IllegalStateException("Config file is improperly configured; please ensure you have entered a valid IP address and port.");
-        }
 
-        if (password != null) {
+        if (password != null && !password.isBlank()) {
             getLogger().info("Running Crowd Control in server mode");
-            if (ip != null) {
-                getLogger().warning("The configured IP address " + ip + " will not be used due to running in server mode");
+            if (ip != null && !ip.isBlank()) {
+                getLogger().info("The configured IP address " + ip + " will not be used due to running in server mode");
             }
             crowdControl = CrowdControl.server().port(port).password(password).build();
-        } else {
+        } else if (ip != null && !ip.isBlank()) {
             getLogger().info("Running Crowd Control in client mode");
             crowdControl = CrowdControl.client().ip(ip).build();
+        } else {
+            throw new IllegalStateException("Config file is improperly configured; please ensure you have entered a valid IP address or password.");
         }
 
         if (commands == null)

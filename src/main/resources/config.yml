@@ -1,0 +1,11 @@
+# Password that Crowd Control clients must enter to connect to this Crowd Control server.
+# A blank password will cause this plugin to operate in client mode, in which only one
+#  streamer may connect to the CC server and all purchased effects will apply to everyone
+#  on the Minecraft server.
+password: ""
+
+# IP address to connect to when running in client mode.
+# This should usually be a local IP address (i.e. "127.0.0.1") unless this server is being
+#  run on a different machine than the streamer's PC.
+# This value is not applicable when running in server mode and thus will be ignored.
+ip: 127.0.0.1
