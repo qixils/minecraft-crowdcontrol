@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -26,10 +27,10 @@ public class DigCommand extends ImmediateCommand {
     private final String displayName = "Dig Hole";
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Set<Block> blocks = new HashSet<>();
         int depth = -(2 + rand.nextInt(4));
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             for (double x = -RADIUS; x <= RADIUS; ++x) {
                 for (int y = depth; y < 0; ++y) {
                     for (double z = -RADIUS; z <= RADIUS; ++z) {

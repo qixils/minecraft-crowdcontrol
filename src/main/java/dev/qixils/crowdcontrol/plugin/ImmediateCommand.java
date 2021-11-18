@@ -2,8 +2,10 @@ package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -15,9 +17,9 @@ public abstract class ImmediateCommand extends Command {
     }
 
     @Override
-    public final @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull Request request) {
-        return CompletableFuture.completedFuture(executeImmediately(request));
+    protected final @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        return CompletableFuture.completedFuture(executeImmediately(players, request));
     }
 
-    public abstract Response.@NotNull Builder executeImmediately(@NotNull Request request);
+    protected abstract Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request);
 }

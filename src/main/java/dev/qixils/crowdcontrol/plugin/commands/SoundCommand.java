@@ -34,9 +34,9 @@ public class SoundCommand extends ImmediateCommand {
     private final String displayName = "Spooky Sound Effect";
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Sound sound = RandomUtil.randomElementFrom(SOUNDS);
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
             player.getWorld().playSound(playAt, sound, SoundCategory.MASTER, 2.0f, 1.0f);
         }

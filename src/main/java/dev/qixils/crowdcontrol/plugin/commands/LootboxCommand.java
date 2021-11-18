@@ -74,8 +74,8 @@ public class LootboxCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        for (Player player : players) {
             Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder().next(request.getViewer(), CrowdControlPlugin.USER_COLOR).next(" has gifted you...").build());
             List<Material> items = new ArrayList<>(Arrays.asList(Material.values()));
             Collections.shuffle(items, rand);

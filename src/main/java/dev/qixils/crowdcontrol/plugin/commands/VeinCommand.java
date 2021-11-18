@@ -54,11 +54,11 @@ public class VeinCommand extends ImmediateCommand {
     public static final int MAX_RADIUS = 20;
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Material ore = (RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS)).getBlock();
 
         Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             List<Location> setBlocks = new ArrayList<>();
             Location oreLocation = BlockUtil.BlockFinder.builder()
                     .origin(player.getLocation())

@@ -6,7 +6,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Getter
 public class ExperienceCommand extends ImmediateCommand {
@@ -22,8 +25,8 @@ public class ExperienceCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.setLevel(player.getLevel() + amount)));
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> player.setLevel(player.getLevel() + amount)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

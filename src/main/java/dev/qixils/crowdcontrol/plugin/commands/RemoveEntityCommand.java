@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -29,13 +30,13 @@ public final class RemoveEntityCommand extends Command {
     }
 
     @Override
-    public @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull Request request) {
+    protected @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         CompletableFuture<Response.Builder> future = new CompletableFuture<>();
         Bukkit.getScheduler().runTask(plugin, () -> {
             Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
                     .message("No " + TextUtil.translate(entityType) + "s found nearby to remove");
 
-            for (Player player : CrowdControlPlugin.getPlayers()) {
+            for (Player player : players) {
                 for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), SEARCH_RADIUS)) {
                     result.type(Response.ResultType.SUCCESS).message("SUCCESS");
                     entity.remove();

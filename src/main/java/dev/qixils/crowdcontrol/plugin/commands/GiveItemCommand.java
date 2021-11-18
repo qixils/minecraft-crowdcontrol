@@ -15,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class GiveItemCommand extends ImmediateCommand {
     private final Material item;
@@ -28,10 +30,10 @@ public class GiveItemCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         ItemStack itemStack = new ItemStack(item);
         itemStack.setAmount(itemStack.getMaxStackSize());
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             Location location = player.getLocation();
             Bukkit.getScheduler().runTask(plugin, () -> {
                 Item item = (Item) player.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);

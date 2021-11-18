@@ -9,11 +9,13 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,7 +37,7 @@ public final class FreezeCommand extends TimedCommand {
     }
 
     @Override
-    public void voidExecute(@NotNull Request request) {
+    public void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         if (TimedEffect.isActive("gamemode")) {
             CrowdControl cc = plugin.getCrowdControl();
             if (cc != null)
@@ -46,8 +48,8 @@ public final class FreezeCommand extends TimedCommand {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
         new TimedEffect(request, DURATION, $ -> {
             Map<UUID, Location> locations = new HashMap<>();
-            CrowdControlPlugin.getPlayers().forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
-            task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {
+            players.forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
+            task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
                 if (!locations.containsKey(player.getUniqueId()))
                     return;
 

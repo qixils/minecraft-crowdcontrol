@@ -14,6 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class BucketClutchCommand extends ImmediateCommand {
 	private static final int OFFSET = 30;
@@ -25,9 +27,9 @@ public class BucketClutchCommand extends ImmediateCommand {
 	private final String displayName = "Water Bucket Clutch";
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+	protected Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players are on the surface");
-		for (Player player : CrowdControlPlugin.getPlayers()) {
+		for (Player player : players) {
 			Location curr = player.getLocation();
 			boolean obstruction = false;
 			for (int y = 1; y <= OFFSET; y++) {

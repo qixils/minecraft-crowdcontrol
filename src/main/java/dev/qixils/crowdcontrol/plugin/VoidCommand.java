@@ -2,8 +2,10 @@ package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -15,10 +17,10 @@ public abstract class VoidCommand extends Command {
     }
 
     @Override
-    public final @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull Request request) {
-        voidExecute(request);
+    protected final @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        voidExecute(players, request);
         return CompletableFuture.completedFuture(null);
     }
 
-    public abstract void voidExecute(@NotNull Request request);
+    protected abstract void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request);
 }

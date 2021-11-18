@@ -7,12 +7,14 @@ import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.List;
 
 @Getter
 public class DisableJumpingCommand extends TimedCommand implements Listener {
@@ -33,7 +35,7 @@ public class DisableJumpingCommand extends TimedCommand implements Listener {
 	}
 
 	@Override
-	public void voidExecute(@NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		new TimedEffect(request, DURATION, $ -> {
 			this.jumpsBlockedAt = Bukkit.getCurrentTick();
 			announce(request);

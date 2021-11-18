@@ -13,6 +13,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class FallingBlockCommand extends ImmediateCommand {
     private static final int Y = 5;
@@ -29,8 +31,8 @@ public class FallingBlockCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        for (Player player : players) {
             Location destination = player.getEyeLocation();
             destination.setY(Math.min(destination.getY()+Y, player.getWorld().getMaxHeight()-1));
             Block block = destination.getBlock();

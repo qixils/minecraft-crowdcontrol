@@ -7,9 +7,12 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Getter
 public class PotionCommand extends ImmediateCommand {
@@ -30,9 +33,9 @@ public class PotionCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         PotionEffect potionEffect = potionEffectType.createEffect(duration, rand.nextInt(2));
-        Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.addPotionEffect(potionEffect))); // TODO: can this be async?
+        Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> player.addPotionEffect(potionEffect))); // TODO: can this be async?
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 

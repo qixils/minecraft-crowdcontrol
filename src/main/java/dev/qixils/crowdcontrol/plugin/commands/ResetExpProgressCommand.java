@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class ResetExpProgressCommand extends ImmediateCommand {
 	private final String effectName = "reset_exp_progress";
@@ -19,9 +21,9 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players have XP");
-		for (Player player : CrowdControlPlugin.getPlayers()) {
+		for (Player player : players) {
 			if (player.getExp() > 0) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				Bukkit.getScheduler().runTask(plugin, () -> player.setExp(0));

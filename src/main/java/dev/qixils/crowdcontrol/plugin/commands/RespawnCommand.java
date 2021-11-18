@@ -8,8 +8,10 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -22,8 +24,8 @@ public class RespawnCommand extends ImmediateCommand {
 	private final String displayName = "Respawn Players";
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers()
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Bukkit.getScheduler().runTask(plugin, () -> players
 				.forEach(player -> player.teleport(Objects.requireNonNullElseGet(player.getBedSpawnLocation(), () -> getDefaultWorld().getSpawnLocation()))));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}

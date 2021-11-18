@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 public class ToastCommand extends ImmediateCommand {
@@ -21,9 +22,9 @@ public class ToastCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Bukkit.getScheduler().runTask(plugin, () -> {
-            for (Player player : CrowdControlPlugin.getPlayers()) {
+            for (Player player : players) {
                 Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
                 player.undiscoverRecipes(recipes);
                 player.discoverRecipes(recipes);

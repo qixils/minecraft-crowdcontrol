@@ -15,6 +15,8 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class TeleportCommand extends ImmediateCommand {
     private final String effectName = "chorus_fruit";
@@ -25,9 +27,9 @@ public class TeleportCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No teleportation destinations were available");
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             Location destination = BlockUtil.blockFinderBuilder().origin(player.getLocation()).minRadius(3).maxRadius(15).locationValidator(BlockUtil.SPAWNING_SPACE).build().next();
             if (destination == null) {
                 continue;
