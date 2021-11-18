@@ -43,6 +43,6 @@ public class GiveItemCommand extends ImmediateCommand {
                 item.setPickupDelay(0);
             });
         }
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

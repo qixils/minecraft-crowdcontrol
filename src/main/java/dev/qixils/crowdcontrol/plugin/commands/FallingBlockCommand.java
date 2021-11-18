@@ -37,6 +37,6 @@ public class FallingBlockCommand extends ImmediateCommand {
             if (block.getType().isEmpty())
                 Bukkit.getScheduler().runTask(plugin, () -> block.setType(blockMaterial, true));
         }
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

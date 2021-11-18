@@ -34,11 +34,11 @@ public class SummonEntityCommand extends ImmediateCommand {
         if (entityType.getEntityClass() != null && Monster.class.isAssignableFrom(entityType.getEntityClass())) {
             for (World world : Bukkit.getWorlds()) {
                 if (world.getDifficulty() == Difficulty.PEACEFUL)
-                    return Response.builder().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+                    return request.buildResponse().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
             }
         }
         Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> spawnEntity(request.getViewer(), player)));
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 
     protected Entity spawnEntity(String viewer, Player player) {

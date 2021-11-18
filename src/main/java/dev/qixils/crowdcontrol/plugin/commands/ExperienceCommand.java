@@ -24,6 +24,6 @@ public class ExperienceCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
 		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.setLevel(player.getLevel() + amount)));
-		return Response.builder().type(Response.ResultType.SUCCESS);
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

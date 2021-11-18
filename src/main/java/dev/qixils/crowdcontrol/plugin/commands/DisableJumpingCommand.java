@@ -13,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.Objects;
 
 @Getter
 public class DisableJumpingCommand extends TimedCommand implements Listener {
@@ -35,8 +34,7 @@ public class DisableJumpingCommand extends TimedCommand implements Listener {
 
 	@Override
 	public void voidExecute(@NotNull Request request) {
-		new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
-				request, DURATION, $ -> {
+		new TimedEffect(request, DURATION, $ -> {
 			this.jumpsBlockedAt = Bukkit.getCurrentTick();
 			announce(request);
 		}, $ -> {}).queue();

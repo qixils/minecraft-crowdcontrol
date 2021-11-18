@@ -50,7 +50,7 @@ public class TorchCommand extends ImmediateCommand {
                 .shuffleLocations(false)
                 .build().getAll()));
         if (nearbyBlocks.isEmpty())
-            return Response.builder().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
+            return request.buildResponse().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Location location : nearbyBlocks) {
@@ -61,7 +61,7 @@ public class TorchCommand extends ImmediateCommand {
                     block.setType(Material.AIR, false);
             }
         });
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 
     protected void placeTorch(Location location) {

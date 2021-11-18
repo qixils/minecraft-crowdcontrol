@@ -23,7 +23,7 @@ public class RemoveEnchantsCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Response.Builder result = Response.builder().type(Response.ResultType.RETRY);
+		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY);
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			Set<Enchantment> enchants = item.getEnchantments().keySet();

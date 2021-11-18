@@ -36,9 +36,9 @@ public class GravelCommand extends ImmediateCommand {
                     .build().getAll());
 
         if (locations.isEmpty())
-            return Response.builder().type(Response.ResultType.FAILURE).message("No replaceable blocks nearby");
+            return request.buildResponse().type(Response.ResultType.FAILURE).message("No replaceable blocks nearby");
 
         Bukkit.getScheduler().runTask(plugin, () -> locations.forEach(location -> location.getBlock().setType(Material.GRAVEL)));
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

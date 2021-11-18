@@ -1,51 +1,7 @@
 package dev.qixils.crowdcontrol.plugin;
 
 import com.google.common.collect.ImmutableSet;
-import dev.qixils.crowdcontrol.plugin.commands.BlockCommand;
-import dev.qixils.crowdcontrol.plugin.commands.BucketClutchCommand;
-import dev.qixils.crowdcontrol.plugin.commands.CameraLockCommand;
-import dev.qixils.crowdcontrol.plugin.commands.CameraLockToGroundCommand;
-import dev.qixils.crowdcontrol.plugin.commands.CameraLockToSkyCommand;
-import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
-import dev.qixils.crowdcontrol.plugin.commands.ClutterCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DamageCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DeleteItemCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DifficultyCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DigCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DinnerboneCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DisableJumpingCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DropItemCommand;
-import dev.qixils.crowdcontrol.plugin.commands.EnchantmentCommand;
-import dev.qixils.crowdcontrol.plugin.commands.EntityChaosCommand;
-import dev.qixils.crowdcontrol.plugin.commands.ExperienceCommand;
-import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
-import dev.qixils.crowdcontrol.plugin.commands.FeedCommand;
-import dev.qixils.crowdcontrol.plugin.commands.FlowerCommand;
-import dev.qixils.crowdcontrol.plugin.commands.FreezeCommand;
-import dev.qixils.crowdcontrol.plugin.commands.GamemodeCommand;
-import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
-import dev.qixils.crowdcontrol.plugin.commands.GravelCommand;
-import dev.qixils.crowdcontrol.plugin.commands.HalfHealthCommand;
-import dev.qixils.crowdcontrol.plugin.commands.HatCommand;
-import dev.qixils.crowdcontrol.plugin.commands.ItemDamageCommand;
-import dev.qixils.crowdcontrol.plugin.commands.LootboxCommand;
-import dev.qixils.crowdcontrol.plugin.commands.MaxHealthCommand;
-import dev.qixils.crowdcontrol.plugin.commands.MoveCommand;
-import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
-import dev.qixils.crowdcontrol.plugin.commands.RemoveEnchantsCommand;
-import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
-import dev.qixils.crowdcontrol.plugin.commands.ResetExpProgressCommand;
-import dev.qixils.crowdcontrol.plugin.commands.RespawnCommand;
-import dev.qixils.crowdcontrol.plugin.commands.SoundCommand;
-import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
-import dev.qixils.crowdcontrol.plugin.commands.SwapCommand;
-import dev.qixils.crowdcontrol.plugin.commands.TakeItemCommand;
-import dev.qixils.crowdcontrol.plugin.commands.TeleportCommand;
-import dev.qixils.crowdcontrol.plugin.commands.TimeCommand;
-import dev.qixils.crowdcontrol.plugin.commands.ToastCommand;
-import dev.qixils.crowdcontrol.plugin.commands.TorchCommand;
-import dev.qixils.crowdcontrol.plugin.commands.VeinCommand;
-import dev.qixils.crowdcontrol.plugin.commands.WeatherCommand;
+import dev.qixils.crowdcontrol.plugin.commands.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -193,10 +149,10 @@ public class RegisterCommands {
                 new FlowerCommand(plugin),
                 new MoveCommand(plugin, 0, 2, 0, "Up"),
                 new MoveCommand(plugin, 0, -2, 0, "Down"),
-                new MoveCommand(plugin, 2, 0, 0, "xplus", "X+"),
-                new MoveCommand(plugin, -2, 0, 0, "xminus", "X-"),
-                new MoveCommand(plugin, 0, 0, 2, "zplus", "Z+"),
-                new MoveCommand(plugin, 0, 0, -2, "zminus", "Z-"),
+                new MoveCommand(plugin, 2, 0, 0, "xplus", "East"),
+                new MoveCommand(plugin, -2, 0, 0, "xminus", "West"),
+                new MoveCommand(plugin, 0, 0, 2, "zplus", "South"),
+                new MoveCommand(plugin, 0, 0, -2, "zminus", "North"),
                 new TorchCommand(plugin, true),
                 new TorchCommand(plugin, false),
                 new GravelCommand(plugin),

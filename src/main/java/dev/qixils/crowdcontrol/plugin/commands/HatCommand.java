@@ -28,6 +28,6 @@ public class HatCommand extends ImmediateCommand {
 			inv.setItemInMainHand(head);
 			inv.setItem(EquipmentSlot.HEAD, hand);
 		});
-		return Response.builder().type(Response.ResultType.SUCCESS);
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

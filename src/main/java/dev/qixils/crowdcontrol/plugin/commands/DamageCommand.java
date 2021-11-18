@@ -44,8 +44,8 @@ public class DamageCommand extends ImmediateCommand {
 		}
 
 		if (success)
-			return Response.builder().type(Response.ResultType.SUCCESS);
+			return request.buildResponse().type(Response.ResultType.SUCCESS);
 		else
-			return Response.builder().type(Response.ResultType.FAILURE).message("Players would have been killed by this command");
+			return request.buildResponse().type(Response.ResultType.FAILURE).message("Players would have been killed by this command");
 	}
 }

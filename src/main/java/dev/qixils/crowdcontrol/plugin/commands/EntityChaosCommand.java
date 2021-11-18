@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -14,9 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {
@@ -42,6 +39,6 @@ public class EntityChaosCommand extends ImmediateCommand {
                 entities.get(i).teleport(players.get(i % players.size()));
             }
         });
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

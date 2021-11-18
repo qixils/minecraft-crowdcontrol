@@ -37,6 +37,6 @@ public class TakeItemCommand extends ImmediateCommand {
                 }
             }
         }
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

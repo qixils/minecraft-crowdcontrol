@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -40,12 +39,12 @@ public final class FreezeCommand extends TimedCommand {
         if (TimedEffect.isActive("gamemode")) {
             CrowdControl cc = plugin.getCrowdControl();
             if (cc != null)
-                cc.dispatchResponse(new Response.Builder(request).type(Response.ResultType.FAILURE).message("Cannot freeze players while a gamemode command is active").build());
+                request.buildResponse().type(Response.ResultType.FAILURE).message("Cannot freeze players while a gamemode command is active").build().send();
             return;
         }
 
         AtomicReference<BukkitTask> task = new AtomicReference<>();
-        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request, DURATION, $ -> {
+        new TimedEffect(request, DURATION, $ -> {
             Map<UUID, Location> locations = new HashMap<>();
             CrowdControlPlugin.getPlayers().forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
             task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {

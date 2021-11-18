@@ -29,6 +29,6 @@ public class ToastCommand extends ImmediateCommand {
                 player.discoverRecipes(recipes);
             }
         });
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

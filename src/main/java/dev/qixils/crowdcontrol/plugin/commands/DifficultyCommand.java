@@ -28,6 +28,6 @@ public class DifficultyCommand extends ImmediateCommand {
         for (World world : plugin.getServer().getWorlds()) {
             world.setDifficulty(difficulty);
         }
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

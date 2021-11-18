@@ -34,12 +34,24 @@ public final class CrowdControlPlugin extends JavaPlugin {
     }
 
     void initCrowdControl() {
+        String password = config.getString("password");
         String ip = config.getString("ip");
         int port = config.getInt("port");
-        if (ip == null || port == 0) {
+        if ((password == null && ip == null) || port == 0) {
             throw new IllegalStateException("Config file is misconfigured, please ensure you have entered a valid IP address and port.");
         }
-        crowdControl = new CrowdControl(ip, port);
+
+        if (password != null) {
+            getLogger().info("Running Crowd Control in server mode");
+            if (ip != null) {
+                getLogger().warning("The configured IP address " + ip + " will not be used due to running in server mode");
+            }
+            crowdControl = CrowdControl.server().port(port).password(password).build();
+        } else {
+            getLogger().info("Running Crowd Control in client mode");
+            crowdControl = CrowdControl.client().ip(ip).build();
+        }
+
         crowdControl.registerCheck(() -> !getPlayers().isEmpty());
         if (commands == null)
             commands = RegisterCommands.register(this);
@@ -54,7 +66,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
         BukkitCrowdControlCommand.register(
                 this,
                 CommodoreProvider.getCommodore(this),
-                Objects.requireNonNull(getCommand("crowdcontrol"), "plugin.yml is misconfigured; cannot find crowdcontrol command")
+                Objects.requireNonNull(getCommand("crowdcontrol"), "plugin.yml is improperly configured; cannot find crowdcontrol command")
         );
     }
 

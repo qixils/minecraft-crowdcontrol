@@ -42,7 +42,7 @@ public class MaxHealthCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("All players are at minimum health");
+		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("All players are at minimum health");
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth == null) {

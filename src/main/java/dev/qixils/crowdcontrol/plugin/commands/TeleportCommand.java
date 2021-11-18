@@ -26,7 +26,7 @@ public class TeleportCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("No teleportation destinations were available");
+        Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No teleportation destinations were available");
         for (Player player : CrowdControlPlugin.getPlayers()) {
             Location destination = BlockUtil.blockFinderBuilder().origin(player.getLocation()).minRadius(3).maxRadius(15).locationValidator(BlockUtil.SPAWNING_SPACE).build().next();
             if (destination == null) {

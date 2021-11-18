@@ -33,7 +33,7 @@ public class PotionCommand extends ImmediateCommand {
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         PotionEffect potionEffect = potionEffectType.createEffect(duration, rand.nextInt(2));
         Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.addPotionEffect(potionEffect))); // TODO: can this be async?
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 
     private static String nameOf(PotionEffectType type) {

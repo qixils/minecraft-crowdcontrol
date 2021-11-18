@@ -27,7 +27,7 @@ public class WeatherCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("This weather is already applied");
+        Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("This weather is already applied");
         for (World world : Bukkit.getWorlds()) {
             if (world.getEnvironment() != World.Environment.NORMAL) continue;
 
