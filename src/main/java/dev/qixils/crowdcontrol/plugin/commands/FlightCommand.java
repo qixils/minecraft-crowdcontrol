@@ -29,13 +29,16 @@ public class FlightCommand extends TimedCommand implements Listener {
 	@Override
 	protected void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		new TimedEffect(request, "gamemode", duration,
-				$ -> CrowdControlPlugin.getPlayers(request).thenAccept(curPlayers -> curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
-					player.setAllowFlight(true);
-					player.setFlying(true);
-				}))), $ -> CrowdControlPlugin.getPlayers(request).thenAccept(curPlayers -> curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
+				$ -> CrowdControlPlugin.getPlayers(request).thenAccept(curPlayers -> {
+					announce(request);
+					curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
+						player.setAllowFlight(true);
+						player.setFlying(true);
+					}));
+				}), $ -> CrowdControlPlugin.getPlayers(request).thenAccept(curPlayers -> curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
 					player.setFlying(false);
 					player.setAllowFlight(false);
-		}))));
+		})))).queue();
 	}
 
 	// clear flight on login if they disconnected mid-effect
