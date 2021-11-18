@@ -36,7 +36,7 @@ public class DamageCommand extends ImmediateCommand {
 				Bukkit.getScheduler().runTask(plugin, () -> player.setHealth(0));
 			} else {
 				double oldHealth = player.getHealth();
-				double newHealth = Math.min(1, oldHealth - amount);
+				double newHealth = Math.max(1, oldHealth - amount);
 				double appliedDamage = oldHealth - newHealth;
 				if (appliedDamage > 0) {
 					success = true;
