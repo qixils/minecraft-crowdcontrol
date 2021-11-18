@@ -6,8 +6,11 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Getter
 public class MoveCommand extends ImmediateCommand {
@@ -34,8 +37,8 @@ public class MoveCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.setVelocity(vector)));
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> player.setVelocity(vector)));
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

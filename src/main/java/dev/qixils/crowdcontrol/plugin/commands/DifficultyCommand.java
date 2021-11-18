@@ -8,7 +8,10 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Getter
 public class DifficultyCommand extends ImmediateCommand {
@@ -24,7 +27,7 @@ public class DifficultyCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         for (World world : plugin.getServer().getWorlds()) {
             world.setDifficulty(difficulty);
         }

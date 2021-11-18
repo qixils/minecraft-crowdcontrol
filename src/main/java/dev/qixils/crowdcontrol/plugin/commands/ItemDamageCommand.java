@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.BiFunction;
 
 @Getter
@@ -31,9 +32,9 @@ public class ItemDamageCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY);
-		for (Player player : CrowdControlPlugin.getPlayers()) {
+		for (Player player : players) {
 			PlayerInventory inv = player.getInventory();
 			ItemStack item = inv.getItemInMainHand();
 			ItemMeta meta = item.getItemMeta();

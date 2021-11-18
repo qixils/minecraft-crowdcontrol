@@ -16,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
     protected final EntityType entityType;
@@ -30,14 +32,14 @@ public class SummonEntityCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         if (entityType.getEntityClass() != null && Monster.class.isAssignableFrom(entityType.getEntityClass())) {
             for (World world : Bukkit.getWorlds()) {
                 if (world.getDifficulty() == Difficulty.PEACEFUL)
                     return request.buildResponse().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
             }
         }
-        Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> spawnEntity(request.getViewer(), player)));
+        Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 

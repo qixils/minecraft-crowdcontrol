@@ -6,7 +6,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Getter
 public class HalfHealthCommand extends ImmediateCommand {
@@ -17,8 +20,8 @@ public class HalfHealthCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.setHealth(player.getHealth()/2)));
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> player.setHealth(player.getHealth()/2)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,10 +41,10 @@ public class TorchCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Predicate<Location> predicate = placeTorches ? loc -> loc.getBlock().isReplaceable() : BlockUtil.TORCHES::matches;
         List<Location> nearbyBlocks = new ArrayList<>();
-        CrowdControlPlugin.getPlayers().forEach(player -> nearbyBlocks.addAll(BlockUtil.blockFinderBuilder()
+        players.forEach(player -> nearbyBlocks.addAll(BlockUtil.blockFinderBuilder()
                 .origin(player.getLocation())
                 .maxRadius(5)
                 .locationValidator(predicate)

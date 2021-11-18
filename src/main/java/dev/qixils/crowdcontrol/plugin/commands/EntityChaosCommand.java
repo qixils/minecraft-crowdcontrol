@@ -25,7 +25,7 @@ public class EntityChaosCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Bukkit.getScheduler().runTask(plugin, () -> {
             List<Entity> entities = new ArrayList<>();
             for (World world : Bukkit.getWorlds()) {
@@ -34,7 +34,6 @@ public class EntityChaosCommand extends ImmediateCommand {
                     entities.add(entity);
                 }
             }
-            List<Player> players = CrowdControlPlugin.getPlayers();
             for (int i = 0; i < entities.size(); i++) {
                 entities.get(i).teleport(players.get(i % players.size()));
             }

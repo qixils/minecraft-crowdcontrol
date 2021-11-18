@@ -3,10 +3,13 @@ package dev.qixils.crowdcontrol.plugin;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.audience.Audience;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +19,7 @@ public abstract class Command {
 
     @NotNull
     @CheckReturnValue
-    public abstract CompletableFuture<Response.Builder> execute(@NotNull Request request);
+    protected abstract CompletableFuture<Response.Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request);
 
     @NotNull
     @CheckReturnValue
@@ -27,28 +30,35 @@ public abstract class Command {
     public abstract String getDisplayName();
 
     public final void executeAndNotify(@NotNull Request request) {
-        execute(request).thenAccept(builder -> {
-            if (builder == null) return;
+        CrowdControlPlugin.getPlayers(request).thenAccept(players -> {
+            if (players.isEmpty()) return; // ensure targets are online
 
-            Response response = builder.build();
-            response.send();
+            execute(players, request).thenAccept(builder -> {
+                if (builder == null) return;
 
-            if (response.getResultType() == Response.ResultType.SUCCESS)
-                announce(request);
+                Response response = builder.build();
+                response.send();
+
+                if (response.getResultType() == Response.ResultType.SUCCESS)
+                    announce(players, request);
+            });
         });
     }
 
-    public final void announce(final Request viewer) {
-        // TODO only announce to targets
-        announce(viewer.getViewer());
+    public final void announce(final Request request) {
+        CrowdControlPlugin.getPlayers(request).thenAccept(players -> announce(players, request));
     }
 
-    @Deprecated
-    public final void announce(final String viewer) {
-        Bukkit.getServer().sendMessage(new TextBuilder()
-                .next(viewer, CrowdControlPlugin.USER_COLOR)
+    protected final void announce(final Collection<? extends Audience> audiences, final Request request) {
+        announce(Audience.audience(audiences), request);
+    }
+
+    protected final void announce(final Audience audience, final Request request) {
+        audience.sendMessage(new TextBuilder()
+                .next(request.getViewer(), CrowdControlPlugin.USER_COLOR)
                 .next(" used command ")
-                .next(getProcessedDisplayName(), CrowdControlPlugin.CMD_COLOR));
+                .next(getProcessedDisplayName(), CrowdControlPlugin.CMD_COLOR)
+        );
     }
 
     @NotNull

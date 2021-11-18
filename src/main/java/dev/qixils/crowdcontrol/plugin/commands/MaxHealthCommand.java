@@ -11,6 +11,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -41,9 +42,9 @@ public class MaxHealthCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("All players are at minimum health");
-		for (Player player : CrowdControlPlugin.getPlayers()) {
+		for (Player player : players) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth == null) {
 				plugin.getLogger().fine("Player missing GENERIC_MAX_HEALTH attribute?");

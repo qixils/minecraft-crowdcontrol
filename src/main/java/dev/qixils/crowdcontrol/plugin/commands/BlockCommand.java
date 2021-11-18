@@ -12,6 +12,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class BlockCommand extends ImmediateCommand {
     protected final Material material;
@@ -26,9 +28,9 @@ public class BlockCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No available locations to set blocks");
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             Block block = player.getLocation().getBlock();
             if (block.isReplaceable()) {
                 result.type(Response.ResultType.SUCCESS).message("SUCCESS");

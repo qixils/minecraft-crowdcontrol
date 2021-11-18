@@ -6,7 +6,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Getter
 public class FeedCommand extends ImmediateCommand {
@@ -22,8 +25,8 @@ public class FeedCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> {
 			int currFood = player.getFoodLevel();
 			int newFood = Math.max(0, Math.min(20, currFood + amount));
 			player.setFoodLevel(newFood);

@@ -11,6 +11,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -23,9 +24,9 @@ public class ClutterCommand extends ImmediateCommand {
     private final String displayName = "Clutter Inventories";
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         // swaps two random items in player's inventory
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             PlayerInventory inventory = player.getInventory();
             int maxSlots = inventory.getSize();
             Set<Integer> slots = new HashSet<>();

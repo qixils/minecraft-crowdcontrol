@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class DeleteItemCommand extends ImmediateCommand {
 	public DeleteItemCommand(CrowdControlPlugin plugin) {
@@ -19,9 +21,9 @@ public class DeleteItemCommand extends ImmediateCommand {
 	private final String displayName = "Delete Held Item";
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players were holding items");
-		for (Player player : CrowdControlPlugin.getPlayers()) {
+		for (Player player : players) {
 			PlayerInventory inv = player.getInventory();
 			if (!inv.getItemInMainHand().getType().isEmpty()) {
 				inv.setItemInMainHand(null);

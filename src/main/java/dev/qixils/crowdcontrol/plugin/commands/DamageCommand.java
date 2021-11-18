@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class DamageCommand extends ImmediateCommand {
 	private final String effectName;
@@ -23,9 +25,9 @@ public class DamageCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		boolean success = false;
-		for (Player player : CrowdControlPlugin.getPlayers()) {
+		for (Player player : players) {
 			if (amount < 0) {
 				success = true;
 				Bukkit.getScheduler().runTask(plugin, () -> player.setHealth(Math.max(0, Math.min(player.getMaxHealth(), player.getHealth() - amount))));

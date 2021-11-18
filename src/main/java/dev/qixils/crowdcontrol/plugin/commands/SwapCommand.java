@@ -27,8 +27,7 @@ public class SwapCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        List<Player> players = CrowdControlPlugin.getPlayers();
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         if (players.size() < 2)
             return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("Not enough players online");
 

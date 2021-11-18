@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class FlowerCommand extends ImmediateCommand {
@@ -30,9 +31,9 @@ public class FlowerCommand extends ImmediateCommand {
     private final String displayName = "Place Flowers";
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Set<Location> placeLocations = new HashSet<>();
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+        for (Player player : players) {
             BlockUtil.BlockFinder finder = BlockUtil.BlockFinder.builder()
                     .origin(player.getLocation())
                     .maxRadius(RADIUS)

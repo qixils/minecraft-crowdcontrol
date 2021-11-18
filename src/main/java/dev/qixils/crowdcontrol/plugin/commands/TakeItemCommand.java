@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 public class TakeItemCommand extends ImmediateCommand {
     private final Material item;
@@ -25,8 +27,8 @@ public class TakeItemCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        for (Player player : CrowdControlPlugin.getPlayers()) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        for (Player player : players) {
             for (ItemStack itemStack : player.getInventory()) {
                 if (itemStack == null) {
                     continue;

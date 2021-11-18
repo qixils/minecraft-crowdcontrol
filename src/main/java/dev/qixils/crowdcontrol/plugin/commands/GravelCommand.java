@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -25,9 +26,9 @@ public class GravelCommand extends ImmediateCommand {
     private final String displayName = "Replace Area With Gravel";
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Set<Location> locations = new HashSet<>();
-        for (Player player : CrowdControlPlugin.getPlayers())
+        for (Player player : players)
             locations.addAll(BlockUtil.BlockFinder.builder()
                     .origin(player.getLocation())
                     .locationValidator(BlockUtil.STONES_TAG::matches)

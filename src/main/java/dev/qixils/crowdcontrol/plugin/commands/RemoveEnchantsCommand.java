@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -22,9 +23,9 @@ public class RemoveEnchantsCommand extends ImmediateCommand {
 	private final String displayName = "Remove Enchants";
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY);
-		for (Player player : CrowdControlPlugin.getPlayers()) {
+		for (Player player : players) {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			Set<Enchantment> enchants = item.getEnchantments().keySet();
 			if (!enchants.isEmpty()) {

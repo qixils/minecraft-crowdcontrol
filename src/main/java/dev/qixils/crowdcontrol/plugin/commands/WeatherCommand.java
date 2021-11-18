@@ -10,7 +10,10 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 @Getter
 public class WeatherCommand extends ImmediateCommand {
@@ -26,7 +29,7 @@ public class WeatherCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("This weather is already applied");
         for (World world : Bukkit.getWorlds()) {
             if (world.getEnvironment() != World.Environment.NORMAL) continue;
