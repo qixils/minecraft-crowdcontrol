@@ -33,13 +33,14 @@ public class ItemDamageCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY);
+		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Player(s) not holding a damaged item");
 		for (Player player : players) {
 			PlayerInventory inv = player.getInventory();
 			ItemStack item = inv.getItemInMainHand();
 			ItemMeta meta = item.getItemMeta();
-			if (meta instanceof Damageable damageable) {
-				result.type(Response.ResultType.SUCCESS);
+			// only allowing items with damage because apparently "instanceof Damageable" isn't good enough
+			if (meta instanceof Damageable damageable && damageable.hasDamage()) {
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				damageable.setDamage(handleItem.apply(damageable.getDamage(), item.getType()));
 			}
 			item.setItemMeta(meta);
