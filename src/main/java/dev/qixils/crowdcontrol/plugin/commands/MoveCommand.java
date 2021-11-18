@@ -35,7 +35,7 @@ public class MoveCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-        Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.teleport(player.getLocation().add(vector))));
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.setVelocity(vector)));
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

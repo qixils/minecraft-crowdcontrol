@@ -19,6 +19,6 @@ public class HalfHealthCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
 		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> player.setHealth(player.getHealth()/2)));
-		return Response.builder().type(Response.ResultType.SUCCESS);
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

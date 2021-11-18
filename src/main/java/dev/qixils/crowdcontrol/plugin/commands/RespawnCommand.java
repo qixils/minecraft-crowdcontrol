@@ -25,7 +25,7 @@ public class RespawnCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
 		Bukkit.getScheduler().runTask(plugin, () -> CrowdControlPlugin.getPlayers()
 				.forEach(player -> player.teleport(Objects.requireNonNullElseGet(player.getBedSpawnLocation(), () -> getDefaultWorld().getSpawnLocation()))));
-		return Response.builder().type(Response.ResultType.SUCCESS);
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 
 	@NotNull

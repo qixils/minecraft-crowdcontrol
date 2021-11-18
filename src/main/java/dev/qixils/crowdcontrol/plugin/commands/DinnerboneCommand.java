@@ -37,6 +37,6 @@ public class DinnerboneCommand extends ImmediateCommand {
             }
             entities.forEach(x -> x.setCustomName(Objects.equals(x.getCustomName(), NAME) ? null : NAME));
         });
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

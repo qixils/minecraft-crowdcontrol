@@ -45,6 +45,6 @@ public class ClutterCommand extends ImmediateCommand {
             }
             player.updateInventory();
         }
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

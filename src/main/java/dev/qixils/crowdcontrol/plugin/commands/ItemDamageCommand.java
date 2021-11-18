@@ -32,7 +32,7 @@ public class ItemDamageCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Response.Builder result = Response.builder().type(Response.ResultType.RETRY);
+		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY);
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
 			ItemStack item = inv.getItemInMainHand();

@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 @Getter
 public class GamemodeCommand extends TimedCommand {
@@ -37,8 +36,7 @@ public class GamemodeCommand extends TimedCommand {
     public void voidExecute(@NotNull Request request) {
         // use fake request (w/ fake ID) to only allow 1 of any gamemode command to run at a time
         List<Player> players = new ArrayList<>();
-        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl(), "CC not initialized"),
-                request.getId(), "gamemode", duration,
+        new TimedEffect(request, "gamemode", duration,
                 $ -> players.addAll(setGameMode(request, CrowdControlPlugin.getPlayers(), gamemode)),
                 $ -> setGameMode(null, players, GameMode.SURVIVAL)).queue();
     }

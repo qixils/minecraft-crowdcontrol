@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,7 +35,7 @@ public final class CameraLockCommand extends TimedCommand {
     @Override
     public void voidExecute(@NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
-        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request.getId(), "camera_lock", DURATION, $ -> {
+        new TimedEffect(request, "camera_lock", DURATION, $ -> {
             Map<UUID, Location> locations = new HashMap<>();
             CrowdControlPlugin.getPlayers().forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
             task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {

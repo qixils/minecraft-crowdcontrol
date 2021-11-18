@@ -20,7 +20,7 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Response.Builder result = Response.builder().type(Response.ResultType.FAILURE).message("No players have XP");
+		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players have XP");
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			if (player.getExp() > 0) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");

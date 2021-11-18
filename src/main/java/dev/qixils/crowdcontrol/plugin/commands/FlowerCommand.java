@@ -54,13 +54,13 @@ public class FlowerCommand extends ImmediateCommand {
         }
 
         if (placeLocations.isEmpty())
-            return Response.builder().type(Response.ResultType.RETRY);
+            return request.buildResponse().type(Response.ResultType.RETRY);
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Location location : placeLocations)
                 location.getBlock().setType(RandomUtil.randomElementFrom(BlockUtil.FLOWERS.getMaterials()));
         });
 
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

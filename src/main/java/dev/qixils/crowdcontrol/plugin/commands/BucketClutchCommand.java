@@ -26,7 +26,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
-		Response.Builder result = new Response.Builder().type(Response.ResultType.FAILURE).message("No players are on the surface");
+		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players are on the surface");
 		for (Player player : CrowdControlPlugin.getPlayers()) {
 			Location curr = player.getLocation();
 			boolean obstruction = false;

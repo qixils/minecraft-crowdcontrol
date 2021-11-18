@@ -32,7 +32,7 @@ public final class RemoveEntityCommand extends Command {
     public @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull Request request) {
         CompletableFuture<Response.Builder> future = new CompletableFuture<>();
         Bukkit.getScheduler().runTask(plugin, () -> {
-            Response.Builder result = Response.builder().type(Response.ResultType.FAILURE)
+            Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
                     .message("No " + TextUtil.translate(entityType) + "s found nearby to remove");
 
             for (Player player : CrowdControlPlugin.getPlayers()) {

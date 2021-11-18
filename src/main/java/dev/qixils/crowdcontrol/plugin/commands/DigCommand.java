@@ -42,13 +42,13 @@ public class DigCommand extends ImmediateCommand {
         }
 
         if (blocks.isEmpty())
-            return Response.builder().type(Response.ResultType.RETRY);
+            return request.buildResponse().type(Response.ResultType.RETRY);
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Block block : blocks)
                 block.setType(Material.AIR);
         });
 
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

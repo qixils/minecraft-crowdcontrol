@@ -11,7 +11,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class CameraLockToSkyCommand extends TimedCommand {
@@ -33,7 +32,7 @@ public final class CameraLockToSkyCommand extends TimedCommand {
     @Override
     public void voidExecute(@NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
-        new TimedEffect(Objects.requireNonNull(plugin.getCrowdControl()), request.getId(), "camera_lock", DURATION, $ -> {
+        new TimedEffect(request, "camera_lock", DURATION, $ -> {
             task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> CrowdControlPlugin.getPlayers().forEach(player -> {
                 Location playerLoc = player.getLocation();
                 if (playerLoc.getPitch() > -89.99) {

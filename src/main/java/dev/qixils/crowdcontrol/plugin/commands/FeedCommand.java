@@ -32,6 +32,6 @@ public class FeedCommand extends ImmediateCommand {
 			else if (newFood == 0)
 				player.setSaturation(0);
 		}));
-		return Response.builder().type(Response.ResultType.SUCCESS);
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

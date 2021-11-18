@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class TimeCommand extends ImmediateCommand {
     private final String effectName = "zip";
     private final String displayName = "Zip Time";
-    protected static final int ADD_TICKS = 400; // a minute in-game i think??
+    protected static final int ADD_TICKS = 4000; // 10 minutes in-game, I think
     public TimeCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
@@ -20,6 +20,6 @@ public class TimeCommand extends ImmediateCommand {
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull Request request) {
         Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getWorlds().forEach(world -> world.setFullTime(world.getFullTime() + ADD_TICKS)));
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

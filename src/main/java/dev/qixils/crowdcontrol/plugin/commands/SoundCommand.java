@@ -40,6 +40,6 @@ public class SoundCommand extends ImmediateCommand {
             Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
             player.getWorld().playSound(playAt, sound, SoundCategory.MASTER, 2.0f, 1.0f);
         }
-        return Response.builder().type(Response.ResultType.SUCCESS);
+        return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }
