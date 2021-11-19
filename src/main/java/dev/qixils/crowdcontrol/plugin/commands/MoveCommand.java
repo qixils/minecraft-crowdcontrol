@@ -25,7 +25,7 @@ public class MoveCommand extends ImmediateCommand {
         this.displayName = "Fling " + displayName;
     }
 
-    public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String effectName, String displayName) {
+    public MoveCommand(CrowdControlPlugin plugin, double x, double y, double z, String effectName, String displayName) {
         this(plugin, new Vector(x, y, z), effectName, displayName);
     }
 
@@ -33,7 +33,7 @@ public class MoveCommand extends ImmediateCommand {
         this(plugin, displacement, effectName, effectName);
     }
 
-    public MoveCommand(CrowdControlPlugin plugin, int x, int y, int z, String effectName) {
+    public MoveCommand(CrowdControlPlugin plugin, double x, double y, double z, String effectName) {
         this(plugin, x, y, z, effectName, effectName);
     }
 
