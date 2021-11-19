@@ -39,7 +39,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Heal Players", "full_heal", "miscellaneous"),
             new Effect("Heal Players (1 Heart)", "heal_1", "miscellaneous"),
             new Effect("Kill Players", "kill", "miscellaneous"),
-            new Effect("Name Item", "name_item", "miscellaneous"), // names a held item after the viewer
             new Effect("Open Lootbox", "lootbox", "miscellaneous"), // gives a completely random item with varying enchants and modifiers
             new Effect("Place Flowers", "flowers", "miscellaneous"), // places a bunch of flowers nearby as if a Bonemeal item was used
             new Effect("Place Torches", "lit", "miscellaneous"), // places torches on every valid nearby block
