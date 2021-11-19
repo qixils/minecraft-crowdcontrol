@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin;
 
+import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -31,21 +32,24 @@ public abstract class Command {
     public abstract String getDisplayName();
 
     public final void executeAndNotify(@NotNull Request request) {
-        CrowdControlPlugin.getPlayers(request).thenAccept(players -> {
-            if (players.isEmpty()) return; // ensure targets are online
+        List<Player> players = CrowdControlPlugin.getPlayers(request).join();
 
-            execute(new ArrayList<>(players), request).thenAccept(builder -> {
-                if (builder == null) return;
+        // ensure targets are online / available
+        if (players.isEmpty())
+            throw new NoApplicableTarget();
 
-                Response response = builder.build();
-                response.send();
+        execute(new ArrayList<>(players), request).thenAccept(builder -> {
+            if (builder == null) return;
 
-                if (response.getResultType() == Response.ResultType.SUCCESS)
-                    announce(players, request);
-            });
+            Response response = builder.build();
+            response.send();
+
+            if (response.getResultType() == Response.ResultType.SUCCESS)
+                announce(players, request);
         });
     }
 
+    @Deprecated
     public final void announce(final Request request) {
         CrowdControlPlugin.getPlayers(request).thenAccept(players -> announce(players, request));
     }

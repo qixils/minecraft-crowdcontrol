@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -28,17 +29,25 @@ public class FlightCommand extends TimedCommand implements Listener {
 
 	@Override
 	protected void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		new TimedEffect(request, "gamemode", duration,
-				$ -> CrowdControlPlugin.getPlayers(request).thenAccept(curPlayers -> {
-					announce(request);
-					curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
-						player.setAllowFlight(true);
-						player.setFlying(true);
-					}));
-				}), $ -> CrowdControlPlugin.getPlayers(request).thenAccept(curPlayers -> curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
+		PlayerListWrapper startWrapper = new PlayerListWrapper(request, curPlayers -> {
+			announce(curPlayers, request);
+			curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
+				player.setAllowFlight(true);
+				player.setFlying(true);
+			}));
+		});
+
+		PlayerListWrapper endWrapper = new PlayerListWrapper(request,
+				curPlayers -> curPlayers.forEach(player -> Bukkit.getScheduler().runTask(plugin, () -> {
 					player.setFlying(false);
 					player.setAllowFlight(false);
-		})))).queue();
+				}))
+		);
+
+		new TimedEffect(request, "gamemode", duration,
+				$ -> CrowdControlPlugin.getPlayers(request).whenComplete(startWrapper),
+				$ -> CrowdControlPlugin.getPlayers(request).whenComplete(endWrapper)
+		).queue();
 	}
 
 	// clear flight on login if they disconnected mid-effect

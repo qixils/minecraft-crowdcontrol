@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import me.lucko.commodore.CommodoreProvider;
@@ -16,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.CheckReturnValue;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -93,13 +96,16 @@ public final class CrowdControlPlugin extends JavaPlugin {
         commands = null;
     }
 
-    private static List<Player> getPlayers() {
+    @CheckReturnValue
+    @NotNull
+    private static List<@NotNull Player> getPlayers() {
         return Bukkit.getServer().getOnlinePlayers().stream()
                 .filter(player -> !player.isDead() && player.getGameMode() != GameMode.SPECTATOR)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
-
-    public static CompletableFuture<List<Player>> getPlayers(final @NotNull Request request) {
+    @CheckReturnValue
+    @NotNull
+    public static CompletableFuture<@NotNull List<@NotNull Player>> getPlayers(final @NotNull Request request) {
         if (request.isGlobal()) {
             return CompletableFuture.completedFuture(getPlayers());
         } else {
@@ -121,7 +127,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
                 }
 
                 if (players.isEmpty())
-                    playersFuture.complete(getPlayers());
+                    playersFuture.completeExceptionally(new NoApplicableTarget());
                 else
                     playersFuture.complete(players);
             });
@@ -135,6 +141,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     private static final Gson GSON = new Gson();
 
     @NotNull
+    @CheckReturnValue
     public static CompletableFuture<@Nullable Player> playerFromTarget(@NotNull Target target) {
         if (TWITCH_TO_USER_MAP.containsKey(target.getId())) {
             Player player = Bukkit.getPlayer(TWITCH_TO_USER_MAP.get(target.getId()));
@@ -157,7 +164,11 @@ public final class CrowdControlPlugin extends JavaPlugin {
                     input.close();
                     if (uuid != null) {
                         TWITCH_TO_USER_MAP.put(target.getId(), uuid);
-                        future.complete(Bukkit.getPlayer(uuid));
+                        Player player = Bukkit.getPlayer(uuid);
+                        if (player == null || player.isDead() || !player.isValid() || (player.getGameMode() == GameMode.SPECTATOR && !TimedEffect.isActive("gamemode", target)))
+                            future.complete(null);
+                        else
+                            future.complete(player);
                     } else
                         future.complete(null);
                 } catch (IOException | JsonParseException ioExc) {
