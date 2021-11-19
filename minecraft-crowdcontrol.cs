@@ -14,6 +14,10 @@ namespace CrowdControl.Games.Packs
 
         public override Game Game => new Game(108, "Minecraft (Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPConnector);
 
+        public override ISimpleTCPPack.AuthenticationType AuthenticationMode => ISimpleTCPPack.AuthenticationType.SimpleTCPSendKey;
+
+        public override ISimpleTCPPack.DigestAlgorithm AuthenticationHashMode => ISimpleTCPPack.DigestAlgorithm.SHA_512;
+
         public override List<Effect> Effects => new List<Effect>
         {
             // miscellaneous
