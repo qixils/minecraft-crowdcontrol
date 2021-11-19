@@ -42,6 +42,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Give One XP Level", "xp_plus1", "miscellaneous"),
             new Effect("Heal Players", "full_heal", "miscellaneous"),
             new Effect("Heal Players (1 Heart)", "heal_1", "miscellaneous"),
+            new Effect("Halve Health", "half_health", "miscellaneous"), // sets player's health to 50% of what they currently have
             new Effect("Kill Players", "kill", "miscellaneous"),
             new Effect("Open Lootbox", "lootbox", "miscellaneous"), // gives a completely random item with varying enchants and modifiers
             new Effect("Place Flowers", "flowers", "miscellaneous"), // places a bunch of flowers nearby as if a Bonemeal item was used

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 public class HalfHealthCommand extends ImmediateCommand {
-	private final String effectName = "half-health";
+	private final String effectName = "half_health";
 	private final String displayName = "Half Health";
 	public HalfHealthCommand(CrowdControlPlugin plugin) {
 		super(plugin);
