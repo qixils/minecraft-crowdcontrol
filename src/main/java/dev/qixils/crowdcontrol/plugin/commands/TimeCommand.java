@@ -15,7 +15,7 @@ import java.util.List;
 public class TimeCommand extends ImmediateCommand {
     private final String effectName = "zip";
     private final String displayName = "Zip Time";
-    protected static final int ADD_TICKS = 4000; // 10 minutes in-game, I think
+    protected static final int ADD_TICKS = 6000; // roughly 15 minutes in-game
     public TimeCommand(CrowdControlPlugin plugin) {
         super(plugin);
     }
