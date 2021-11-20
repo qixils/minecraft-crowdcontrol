@@ -29,8 +29,12 @@ public class DamageCommand extends ImmediateCommand {
 		boolean success = false;
 		for (Player player : players) {
 			if (amount < 0) {
-				success = true;
-				Bukkit.getScheduler().runTask(plugin, () -> player.setHealth(Math.max(0, Math.min(player.getMaxHealth(), player.getHealth() - amount))));
+				double oldHealth = player.getHealth();
+				double newHealth = Math.max(0, Math.min(player.getMaxHealth(), oldHealth - amount));
+				if (newHealth != oldHealth) {
+					success = true;
+					Bukkit.getScheduler().runTask(plugin, () -> player.setHealth(newHealth));
+				}
 			} else if (amount >= Short.MAX_VALUE) {
 				success = true;
 				Bukkit.getScheduler().runTask(plugin, () -> player.setHealth(0));
