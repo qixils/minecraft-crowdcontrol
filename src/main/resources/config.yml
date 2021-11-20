@@ -23,3 +23,6 @@ global: false
 # Example:
 #hosts: ["Owner1", "Owner2"]
 hosts: []
+
+# Determines whether to alert streamers in chat when an effect has been activated.
+announce: true

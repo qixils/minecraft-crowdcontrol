@@ -82,14 +82,17 @@ public abstract class Command {
 
     @Deprecated
     protected final void announce(final Request request) {
+        if (!plugin.announceEffects()) return;
         CrowdControlPlugin.getPlayers(request).thenAccept(players -> announce(players, request));
     }
 
     protected final void announce(final Collection<? extends Audience> audiences, final Request request) {
+        if (!plugin.announceEffects()) return;
         announce(Audience.audience(audiences), request);
     }
 
     protected final void announce(final Audience audience, final Request request) {
+        if (!plugin.announceEffects()) return;
         audience.sendMessage(new TextBuilder()
                 .next(request.getViewer(), CrowdControlPlugin.USER_COLOR)
                 .next(" used command ")
