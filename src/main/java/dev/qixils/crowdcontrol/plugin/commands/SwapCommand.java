@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,6 +29,9 @@ public class SwapCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        if (!isGlobalCommandUsable(players, request))
+            return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+
         if (players.size() < 2)
             return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("Not enough players online");
 

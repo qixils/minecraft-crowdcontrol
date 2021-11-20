@@ -3,10 +3,12 @@ package dev.qixils.crowdcontrol.plugin;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Request.Target;
 import dev.qixils.crowdcontrol.socket.Response;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.CheckReturnValue;
 import java.util.ArrayList;
@@ -49,8 +51,37 @@ public abstract class Command {
         });
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    protected final boolean isGlobalCommandUsable(@Nullable List<Player> players, @NotNull Request request) {
+        if (CrowdControlPlugin.isGlobal(request))
+            return true;
+
+        List<String> hosts = plugin.getHosts();
+        if (hosts.isEmpty())
+            return false;
+
+        for (Target target : request.getTargets()) {
+            if (hosts.contains(target.getId()))
+                return true;
+            if (hosts.contains(target.getName()))
+                return true;
+        }
+
+        if (players == null)
+            players = CrowdControlPlugin.getPlayers(request).join();
+
+        for (Player player : players) {
+            if (hosts.contains(player.getUniqueId().toString()))
+                return true;
+            if (hosts.contains(player.getName()))
+                return true;
+        }
+
+        return false;
+    }
+
     @Deprecated
-    public final void announce(final Request request) {
+    protected final void announce(final Request request) {
         CrowdControlPlugin.getPlayers(request).thenAccept(players -> announce(players, request));
     }
 
