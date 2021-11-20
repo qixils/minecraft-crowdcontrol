@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -47,24 +48,24 @@ public final class CrowdControlPlugin extends JavaPlugin {
     public static final TextColor USER_COLOR = TextColor.color(0x9f44db);
     public static final TextColor CMD_COLOR = TextColor.color(0xb15be3);
     private static final int port = 58431;
+    static boolean global = false; // I don't like making this static, but it's an easy fix
+    private List<String> hosts = Collections.emptyList();
 
     @Override
     public void onLoad() {
         saveDefaultConfig();
-        config.addDefault("ip", "127.0.0.1");
     }
 
     void initCrowdControl() {
-        String password = config.getString("password");
-        String ip = config.getString("ip");
+        String password = config.getString("password", "");
+        String ip = config.getString("ip", "127.0.0.1");
+        global = config.getBoolean("global", false);
+        hosts = config.getStringList("hosts");
 
-        if (password != null && !password.isBlank()) {
+        if (!password.isBlank()) {
             getLogger().info("Running Crowd Control in server mode");
-            if (ip != null && !ip.isBlank()) {
-                getLogger().info("The configured IP address " + ip + " will not be used due to running in server mode");
-            }
             crowdControl = CrowdControl.server().port(port).password(password).build();
-        } else if (ip != null && !ip.isBlank()) {
+        } else if (!ip.isBlank()) {
             getLogger().info("Running Crowd Control in client mode");
             crowdControl = CrowdControl.client().port(port).ip(ip).build();
         } else {
@@ -96,6 +97,15 @@ public final class CrowdControlPlugin extends JavaPlugin {
         commands = null;
     }
 
+    public List<String> getHosts() {
+        return hosts;
+    }
+
+    @CheckReturnValue
+    public static boolean isGlobal(@NotNull Request request) {
+        return global || request.isGlobal();
+    }
+
     @CheckReturnValue
     @NotNull
     private static List<@NotNull Player> getPlayers() {
@@ -103,10 +113,11 @@ public final class CrowdControlPlugin extends JavaPlugin {
                 .filter(player -> !player.isDead() && player.getGameMode() != GameMode.SPECTATOR)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
+
     @CheckReturnValue
     @NotNull
     public static CompletableFuture<@NotNull List<@NotNull Player>> getPlayers(final @NotNull Request request) {
-        if (request.isGlobal()) {
+        if (isGlobal(request)) {
             return CompletableFuture.completedFuture(getPlayers());
         } else {
             Target[] targets = request.getTargets();
