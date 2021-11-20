@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
+import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -83,7 +84,8 @@ public abstract class Command {
     @Deprecated
     protected final void announce(final Request request) {
         if (!plugin.announceEffects()) return;
-        CrowdControlPlugin.getPlayers(request).thenAccept(players -> announce(players, request));
+        PlayerListWrapper wrapper = new PlayerListWrapper(request, players -> announce(players, request));
+        CrowdControlPlugin.getPlayers(request).whenComplete(wrapper);
     }
 
     protected final void announce(final Collection<? extends Audience> audiences, final Request request) {
