@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -14,16 +15,19 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Getter
 public class DisableJumpingCommand extends TimedCommand implements Listener {
 	private static final Duration DURATION = Duration.ofSeconds(10);
 	private static final int JUMP_BLOCK_DURATION = (int) (DURATION.toSeconds() * 20);
 
+	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>();
 	private final String effectName = "disable_jumping";
 	private final String displayName = "Disable Jumping";
-	private int jumpsBlockedAt = 0;
 
 	public DisableJumpingCommand(CrowdControlPlugin plugin) {
 		super(plugin);
@@ -35,16 +39,27 @@ public class DisableJumpingCommand extends TimedCommand implements Listener {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		new TimedEffect(request, DURATION, $ -> {
-			this.jumpsBlockedAt = Bukkit.getCurrentTick();
-			announce(request);
-		}, $ -> {}).queue();
+	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
+		PlayerListWrapper wrapper = new PlayerListWrapper(request, players -> {
+			int tick = Bukkit.getCurrentTick();
+			for (Player player : players)
+				jumpsBlockedAt.put(player.getUniqueId(), tick);
+			announce(players, request);
+		});
+		new TimedEffect(request, DURATION,
+				$ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+				$ -> {}
+		).queue();
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onJumpEvent(PlayerJumpEvent event) {
-		if ((jumpsBlockedAt + JUMP_BLOCK_DURATION) >= Bukkit.getCurrentTick())
+		UUID uuid = event.getPlayer().getUniqueId();
+		if (!jumpsBlockedAt.containsKey(uuid)) return;
+		int blockedAt = jumpsBlockedAt.get(uuid);
+		if ((blockedAt + JUMP_BLOCK_DURATION) >= Bukkit.getCurrentTick())
 			event.setCancelled(true);
+		else
+			jumpsBlockedAt.remove(uuid, blockedAt);
 	}
 }
