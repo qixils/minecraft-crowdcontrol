@@ -29,7 +29,9 @@ public class BlockUtil {
             Material.LILY_OF_THE_VALLEY,
             Material.WITHER_ROSE
     );
+
     public static final MaterialTag STONES_TAG = new MaterialTag(
+            Material.DEEPSLATE,
             Material.ANDESITE,
             Material.DIORITE,
             Material.STONE,
@@ -60,11 +62,13 @@ public class BlockUtil {
             Material.WHITE_TERRACOTTA,
             Material.YELLOW_TERRACOTTA
     );
+
     public static final MaterialTag EARTHLY = FLOWERS.and(STONES_TAG).and(
             Material.GRASS,
             Material.DIRT_PATH,
             Material.TALL_GRASS
     );
+
     public static final MaterialTag TORCHES = new MaterialTag(
             Material.TORCH,
             Material.REDSTONE_TORCH,
@@ -113,7 +117,7 @@ public class BlockUtil {
         }
 
         public static class BlockFinderBuilder {
-            private Vector originPos;
+            private Vector originPos = null;
             private Integer maxRadius = null;
             private int minRadius = 0;
             private boolean shuffleLocations = true;
@@ -148,24 +152,28 @@ public class BlockUtil {
             }
 
             public BlockFinder build() {
-                if (this.locations == null)
-                    this.locations = new ArrayList<>();
+                if (maxRadius == null)
+                    throw new IllegalStateException("maxRadius is not set");
+                if (origin == null)
+                    throw new IllegalStateException("origin is not set");
 
-                if (maxRadius != null && origin != null) {
-                    int origX = originPos.getBlockX();
-                    int origY = originPos.getBlockY();
-                    int origZ = originPos.getBlockZ();
-                    for (int x = -maxRadius; x <= maxRadius; x++) {
-                        if (Math.abs(x) < minRadius)
+                if (this.locations == null)
+                    // pre-define capacity
+                    this.locations = new ArrayList<>((int) (Math.pow(maxRadius, 3) - Math.pow(minRadius, 3)));
+
+                int origX = originPos.getBlockX();
+                int origY = originPos.getBlockY();
+                int origZ = originPos.getBlockZ();
+                for (int x = -maxRadius; x <= maxRadius; x++) {
+                    if (Math.abs(x) < minRadius)
+                        continue;
+                    for (int y = -maxRadius; y <= maxRadius; y++) {
+                        if (Math.abs(y) < minRadius)
                             continue;
-                        for (int y = -maxRadius; y <= maxRadius; y++) {
-                            if (Math.abs(y) < minRadius)
+                        for (int z = -maxRadius; z <= maxRadius; z++) {
+                            if (Math.abs(z) < minRadius)
                                 continue;
-                            for (int z = -maxRadius; z <= maxRadius; z++) {
-                                if (Math.abs(z) < minRadius)
-                                    continue;
-                                locations.add(new Vector(origX + x, origY + y, origZ + z));
-                            }
+                            locations.add(new Vector(origX + x, origY + y, origZ + z));
                         }
                     }
                 }
