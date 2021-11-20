@@ -1,11 +1,10 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -37,16 +36,10 @@ public final class FreezeCommand extends TimedCommand {
     }
 
     @Override
-    public void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        if (TimedEffect.isActive("gamemode")) {
-            CrowdControl cc = plugin.getCrowdControl();
-            if (cc != null)
-                request.buildResponse().type(Response.ResultType.FAILURE).message("Cannot freeze players while a gamemode command is active").build().send();
-            return;
-        }
-
+    public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
-        new TimedEffect(request, DURATION, $ -> {
+
+        PlayerListWrapper wrapper = new PlayerListWrapper(request, players -> {
             Map<UUID, Location> locations = new HashMap<>();
             players.forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
             task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
@@ -63,7 +56,12 @@ public final class FreezeCommand extends TimedCommand {
                     player.teleport(playerLoc);
                 }
             }), 1, 1));
-            announce(request);
-        }, $ -> task.get().cancel()).queue();
+            announce(players, request);
+        });
+
+        new TimedEffect(request, "gamemode", DURATION,
+                $ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+                $ -> task.get().cancel()
+        ).queue();
     }
 }

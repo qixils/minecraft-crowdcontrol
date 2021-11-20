@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -33,11 +34,15 @@ public class GamemodeCommand extends TimedCommand {
     }
 
     @Override
-    public void voidExecute(@NotNull List<@NotNull Player> originalPlayers, @NotNull Request request) {
-        // use fake request (w/ fake ID) to only allow 1 of any gamemode command to run at a time
+    public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
         List<Player> players = new ArrayList<>();
+
+        PlayerListWrapper wrapper = new PlayerListWrapper(request,
+                curPlayers -> players.addAll(setGameMode(request, curPlayers, gamemode))
+        );
+
         new TimedEffect(request, "gamemode", duration,
-                $ -> players.addAll(setGameMode(request, originalPlayers, gamemode)),
+                $ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
                 $ -> setGameMode(null, players, GameMode.SURVIVAL)).queue();
     }
 
@@ -46,7 +51,7 @@ public class GamemodeCommand extends TimedCommand {
                                      @NotNull GameMode gamemode) {
         if (players.isEmpty()) return players;
         if (request != null)
-            announce(request);
+            announce(players, request);
         for (Player player : players) {
             if (player.isValid())
                 Bukkit.getScheduler().runTask(plugin, () -> player.setGameMode(gamemode));
