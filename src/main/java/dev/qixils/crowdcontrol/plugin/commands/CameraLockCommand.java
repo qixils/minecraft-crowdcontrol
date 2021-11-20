@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -35,9 +36,9 @@ public final class CameraLockCommand extends TimedCommand {
     }
 
     @Override
-    protected void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+    protected void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
-        new TimedEffect(request, "camera_lock", DURATION, $ -> {
+        PlayerListWrapper wrapper = new PlayerListWrapper(request, players -> {
             Map<UUID, Location> locations = new HashMap<>();
             for (Player player : players)
                 locations.put(player.getUniqueId(), player.getLocation());
@@ -53,7 +54,12 @@ public final class CameraLockCommand extends TimedCommand {
                 if (location.getPitch() != playerLoc.getPitch() || location.getYaw() != playerLoc.getYaw())
                     player.teleport(new Location(location.getWorld(), playerLoc.getX(), playerLoc.getY(), playerLoc.getZ(), location.getYaw(), location.getPitch()));
             }), 1, 1));
-            announce(request);
-        }, $ -> task.get().cancel()).queue();
+            announce(players, request);
+        });
+
+        new TimedEffect(request, "camera_lock", DURATION,
+                $ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+                $ -> task.get().cancel()
+        ).queue();
     }
 }
