@@ -50,6 +50,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     private static final int port = 58431;
     static boolean global = false; // I don't like making this static, but it's an easy fix
     private List<String> hosts = Collections.emptyList();
+    private boolean announce = true;
 
     @Override
     public void onLoad() {
@@ -61,6 +62,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
         String ip = config.getString("ip", "127.0.0.1");
         global = config.getBoolean("global", false);
         hosts = config.getStringList("hosts");
+        announce = config.getBoolean("announce", true);
 
         if (!password.isBlank()) {
             getLogger().info("Running Crowd Control in server mode");
@@ -99,6 +101,10 @@ public final class CrowdControlPlugin extends JavaPlugin {
 
     public List<String> getHosts() {
         return hosts;
+    }
+
+    public boolean announceEffects() {
+        return announce;
     }
 
     @CheckReturnValue
