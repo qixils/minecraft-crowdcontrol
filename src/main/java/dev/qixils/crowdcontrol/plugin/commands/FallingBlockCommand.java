@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,13 +33,18 @@ public class FallingBlockCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Could not find a valid location to place block");
         for (Player player : players) {
             Location destination = player.getEyeLocation();
             destination.setY(Math.min(destination.getY()+Y, player.getWorld().getMaxHeight()-1));
+
             Block block = destination.getBlock();
-            if (block.getType().isEmpty())
+            Material type = block.getType();
+            if (type.isEmpty() && type != blockMaterial) {
+                resp.type(ResultType.SUCCESS).message("SUCCESS");
                 Bukkit.getScheduler().runTask(plugin, () -> block.setType(blockMaterial, true));
+            }
         }
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
+        return resp;
     }
 }
