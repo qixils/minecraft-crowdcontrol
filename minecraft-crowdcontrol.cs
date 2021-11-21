@@ -1,22 +1,25 @@
 using System;
 using System.Collections.Generic;
+using ConnectorLib;
 using CrowdControl.Common;
+using CrowdControl.Games.Packs;
+using ConnectorType = CrowdControl.Common.ConnectorType;
 
 namespace CrowdControl.Games.Packs
 {
-    public class Minecraft : SimpleTCPPack
+    public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
     {
         public override string Host => "127.0.0.1";
 
         public override ushort Port => 58431;
 
-        public Minecraft(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
-
-        public override Game Game => new Game(108, "Minecraft (Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPConnector);
-
         public override ISimpleTCPPack.AuthenticationType AuthenticationMode => ISimpleTCPPack.AuthenticationType.SimpleTCPSendKey;
 
         public override ISimpleTCPPack.DigestAlgorithm AuthenticationHashMode => ISimpleTCPPack.DigestAlgorithm.SHA_512;
+
+        public MinecraftServer(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
+
+        public override Game Game => new Game(108, "Minecraft (Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
 
         public override List<Effect> Effects => new List<Effect>
         {
