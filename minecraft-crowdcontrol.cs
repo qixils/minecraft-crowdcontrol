@@ -66,6 +66,11 @@ namespace CrowdControl.Games.Packs
             new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous"),
             new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous"), // teleports players 30 blocks up and gives them a water bucket
             new Effect("Zip Time", "zip", "miscellaneous"), // adds 10 minutes to the in-game day/night cycle
+            // inventory commands
+            new Effect("Inventory", "inventory", ItemKind.Folder),
+            new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory"),
+            new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory"),
+            new Effect("Clear Inventory", "clear_inventory", "inventory"),
             // set gamemode for 30 seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
             new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode"),

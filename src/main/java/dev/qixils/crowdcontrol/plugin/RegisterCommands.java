@@ -184,9 +184,17 @@ public class RegisterCommands {
                 new EntityChaosCommand(plugin),
                 new CameraLockToSkyCommand(plugin),
                 new CameraLockToGroundCommand(plugin),
-                new FlightCommand(plugin)
+                new FlightCommand(plugin),
+                new KeepInventoryCommand(plugin, true),
+                new KeepInventoryCommand(plugin, false),
+                new ClearInventoryCommand(plugin)
         ));
 
+        // register action bar updater
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, KeepInventoryCommand.Manager::renderActionBars, 10, 2);
+        Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
+
+        // entity commands
         for (EntityType entity : SAFE_ENTITIES) {
             commands.add(new SummonEntityCommand(plugin, entity));
             commands.add(new RemoveEntityCommand(plugin, entity));
