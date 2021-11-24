@@ -8,7 +8,6 @@ public class RandomUtil {
     public static final Random RNG = new Random();
 
     public static <T> T randomElementFrom(Collection<T> from) {
-        // google told me converting to array was bad so i did this idk
         if (from.isEmpty())
             throw new IllegalArgumentException("Collection may not be empty");
         int index = RNG.nextInt(from.size());
@@ -24,8 +23,14 @@ public class RandomUtil {
 
     public static <T> T randomElementFrom(List<T> from) {
         if (from.isEmpty())
-            throw new IllegalArgumentException("Collection may not be empty");
+            throw new IllegalArgumentException("List may not be empty");
         return from.get(RNG.nextInt(from.size()));
+    }
+
+    public static <T> T randomElementFrom(T[] from) {
+        if (from.length == 0)
+            throw new IllegalArgumentException("Array may not be empty");
+        return from[RNG.nextInt(from.length)];
     }
 
     public static <T extends Weighted> T weightedRandom(T[] weightedArray, int totalWeights) {

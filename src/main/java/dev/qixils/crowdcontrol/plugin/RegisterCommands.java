@@ -187,7 +187,8 @@ public class RegisterCommands {
                 new FlightCommand(plugin),
                 new KeepInventoryCommand(plugin, true),
                 new KeepInventoryCommand(plugin, false),
-                new ClearInventoryCommand(plugin)
+                new ClearInventoryCommand(plugin),
+                new PlantTreeCommand(plugin)
         ));
 
         // register action bar updater

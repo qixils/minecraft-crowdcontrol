@@ -50,6 +50,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Open Lootbox", "lootbox", "miscellaneous"), // gives a completely random item with varying enchants and modifiers
             new Effect("Place Flowers", "flowers", "miscellaneous"), // places a bunch of flowers nearby as if a Bonemeal item was used
             new Effect("Place Torches", "lit", "miscellaneous"), // places torches on every valid nearby block
+            new Effect("Place Tree", "plant_tree", "miscellaneous"), // places a tree on the player
             new Effect("Put Item on Head", "hat", "miscellaneous"), // swaps the held item and the player's head item
             new Effect("Remove One Hunger Bar", "starve_1", "miscellaneous"),
             new Effect("Remove Torches", "dim", "miscellaneous"), // removes nearby torches
@@ -68,9 +69,9 @@ namespace CrowdControl.Games.Packs
             new Effect("Zip Time", "zip", "miscellaneous"), // adds 10 minutes to the in-game day/night cycle
             // inventory commands
             new Effect("Inventory", "inventory", ItemKind.Folder),
-            new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory"),
-            new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory"),
             new Effect("Clear Inventory", "clear_inventory", "inventory"),
+            new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory"),
+            new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory"),
             // set gamemode for 30 seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
             new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode"),
