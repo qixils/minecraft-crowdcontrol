@@ -101,7 +101,7 @@
         <dependency>
             <groupId>dev.qixils.crowdcontrol</groupId>
             <artifactId>java-crowd-control</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>
