@@ -37,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -153,7 +154,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     }
 
     private static final Logger TARGET_LOGGER = Logger.getLogger("MC-CC-TargetMapper");
-    private static final Map<String, UUID> TWITCH_TO_USER_MAP = new HashMap<>();
+    private static final Map<Integer, UUID> TWITCH_TO_USER_MAP = new HashMap<>();
     private static final Executor TARGET_EXECUTOR = Executors.newCachedThreadPool();
     private static final Gson GSON = new Gson();
 
@@ -161,6 +162,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     @CheckReturnValue
     public static CompletableFuture<@Nullable Player> playerFromTarget(@NotNull Target target) {
         if (TWITCH_TO_USER_MAP.containsKey(target.getId())) {
+            TARGET_LOGGER.finer("Using cached UUID for " + target.getId());
             Player player = Bukkit.getPlayer(TWITCH_TO_USER_MAP.get(target.getId()));
             if (player == null) {
                 final String warning = "Streamer %s (%s) is accepting effects but is offline".formatted(target.getName(), target.getId());
@@ -186,14 +188,21 @@ public final class CrowdControlPlugin extends JavaPlugin {
                             future.complete(null);
                         else
                             future.complete(player);
-                    } else
+                    } else {
+                        TARGET_LOGGER.fine("Couldn't read results from API (no parsable response)");
                         future.complete(null);
-                } catch (IOException | JsonParseException ioExc) {
+                    }
+                } catch (IOException ioExc) {
+                    TARGET_LOGGER.log(Level.FINE, "Couldn't fetch results from API", ioExc);
+                    future.complete(null);
+                } catch (JsonParseException jsonExc) {
+                    TARGET_LOGGER.log(Level.WARNING, "Couldn't read results from API", jsonExc);
                     future.complete(null);
                 }
             });
             return future;
         } catch (MalformedURLException exc) {
+            TARGET_LOGGER.log(Level.SEVERE, "Failed to parse URL", exc);
             return CompletableFuture.completedFuture(null);
         }
     }
