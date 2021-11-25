@@ -22,7 +22,7 @@ public class DropItemCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players were holding items");
+		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("No players were holding items");
 		for (Player player : players) {
 			if (!player.getInventory().getItemInMainHand().getType().isEmpty()) {
 				Bukkit.getScheduler().runTask(plugin, () -> {
