@@ -43,7 +43,7 @@ public class DigCommand extends ImmediateCommand {
         }
 
         if (blocks.isEmpty())
-            return request.buildResponse().type(Response.ResultType.RETRY);
+            return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any earthly blocks");
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Block block : blocks)
