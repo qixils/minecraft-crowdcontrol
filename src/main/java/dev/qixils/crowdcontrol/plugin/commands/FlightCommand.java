@@ -52,7 +52,7 @@ public class FlightCommand extends TimedCommand implements Listener {
 
 	// clear flight on login if they disconnected mid-effect
 	@EventHandler
-	public void onLogin(PlayerJoinEvent event) {
+	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		GameMode gamemode = player.getGameMode();
 		if ((gamemode == GameMode.SURVIVAL || gamemode == GameMode.ADVENTURE) && (player.getAllowFlight() || player.isFlying())) {
