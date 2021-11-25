@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
+import dev.qixils.crowdcontrol.plugin.commands.GamemodeCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import me.lucko.commodore.CommodoreProvider;
@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public final class CrowdControlPlugin extends JavaPlugin {
+    private static CrowdControlPlugin instance;
     // actual stuff
     CrowdControl crowdControl = null;
     List<Command> commands;
@@ -64,15 +65,6 @@ public final class CrowdControlPlugin extends JavaPlugin {
     void initCrowdControl() {
         String password = config.getString("password", "");
         String ip = config.getString("ip", "127.0.0.1");
-        global = config.getBoolean("global", false);
-        announce = config.getBoolean("announce", true);
-        hosts = config.getStringList("hosts");
-        if (!hosts.isEmpty()) {
-            Set<String> loweredHosts = new HashSet<>(hosts.size());
-            for (String host : hosts)
-                loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
-            hosts = loweredHosts;
-        }
 
         if (!password.isBlank()) {
             getLogger().info("Running Crowd Control in server mode");
@@ -92,6 +84,18 @@ public final class CrowdControlPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
+
+        global = config.getBoolean("global", false);
+        announce = config.getBoolean("announce", true);
+        hosts = config.getStringList("hosts");
+        if (!hosts.isEmpty()) {
+            Set<String> loweredHosts = new HashSet<>(hosts.size());
+            for (String host : hosts)
+                loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
+            hosts = loweredHosts;
+        }
+
         initCrowdControl();
 
         BukkitCrowdControlCommand.register(
@@ -126,7 +130,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     @NotNull
     private static List<@NotNull Player> getPlayers() {
         return Bukkit.getServer().getOnlinePlayers().stream()
-                .filter(player -> !player.isDead() && player.getGameMode() != GameMode.SPECTATOR)
+                .filter(player -> !player.isDead() && (player.getGameMode() != GameMode.SPECTATOR || GamemodeCommand.isEffectActive(instance, player)))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -193,7 +197,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
                     if (uuid != null) {
                         TWITCH_TO_USER_MAP.put(target.getId(), uuid);
                         Player player = Bukkit.getPlayer(uuid);
-                        if (player == null || player.isDead() || !player.isValid() || (player.getGameMode() == GameMode.SPECTATOR && !TimedEffect.isActive("gamemode", target)))
+                        if (player == null || player.isDead() || !player.isValid() || (player.getGameMode() == GameMode.SPECTATOR && !GamemodeCommand.isEffectActive(instance, player)))
                             future.complete(null);
                         else
                             future.complete(player);
