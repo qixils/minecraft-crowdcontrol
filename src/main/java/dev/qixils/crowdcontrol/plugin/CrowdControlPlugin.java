@@ -25,12 +25,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -50,7 +53,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
     public static final TextColor CMD_COLOR = TextColor.color(0xb15be3);
     private static final int port = 58431;
     static boolean global = false; // I don't like making this static, but it's an easy fix
-    private List<String> hosts = Collections.emptyList();
+    private Collection<String> hosts = Collections.emptyList();
     private boolean announce = true;
 
     @Override
@@ -62,8 +65,14 @@ public final class CrowdControlPlugin extends JavaPlugin {
         String password = config.getString("password", "");
         String ip = config.getString("ip", "127.0.0.1");
         global = config.getBoolean("global", false);
-        hosts = config.getStringList("hosts");
         announce = config.getBoolean("announce", true);
+        hosts = config.getStringList("hosts");
+        if (!hosts.isEmpty()) {
+            Set<String> loweredHosts = new HashSet<>(hosts.size());
+            for (String host : hosts)
+                loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
+            hosts = loweredHosts;
+        }
 
         if (!password.isBlank()) {
             getLogger().info("Running Crowd Control in server mode");
@@ -100,7 +109,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
         commands = null;
     }
 
-    public List<String> getHosts() {
+    public Collection<String> getHosts() {
         return hosts;
     }
 

@@ -15,6 +15,7 @@ import javax.annotation.CheckReturnValue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -57,14 +58,14 @@ public abstract class Command {
         if (CrowdControlPlugin.isGlobal(request))
             return true;
 
-        List<String> hosts = plugin.getHosts();
+        Collection<String> hosts = plugin.getHosts();
         if (hosts.isEmpty())
             return false;
 
         for (Target target : request.getTargets()) {
-            if (hosts.contains(target.getId()))
+            if (hosts.contains(String.valueOf(target.getId())))
                 return true;
-            if (hosts.contains(target.getName()))
+            if (hosts.contains(target.getName().toLowerCase(Locale.ENGLISH)))
                 return true;
         }
 
@@ -72,9 +73,10 @@ public abstract class Command {
             players = CrowdControlPlugin.getPlayers(request).join();
 
         for (Player player : players) {
-            if (hosts.contains(player.getUniqueId().toString()))
+            String uuidStr = player.getUniqueId().toString().toLowerCase(Locale.ENGLISH);
+            if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
                 return true;
-            if (hosts.contains(player.getName()))
+            if (hosts.contains(player.getName().toLowerCase(Locale.ENGLISH)))
                 return true;
         }
 
