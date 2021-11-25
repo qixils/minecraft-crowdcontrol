@@ -33,7 +33,7 @@ public class SwapCommand extends ImmediateCommand {
             return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
 
         if (players.size() < 2)
-            return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("Not enough players online");
+            return request.buildResponse().type(ResultType.FAILURE).message("Not enough players online");
 
         // get shuffled list of players
         Collections.shuffle(players, rand);
