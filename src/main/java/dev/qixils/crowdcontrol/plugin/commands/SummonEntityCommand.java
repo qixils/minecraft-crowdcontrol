@@ -1,7 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.utils.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.utils.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -14,12 +16,27 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
+import org.bukkit.loot.LootTables;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
+    private static final Set<LootTables> CHEST_LOOT_TABLES;
+    static {
+        EnumSet<LootTables> lootTables = EnumSet.noneOf(LootTables.class);
+        for (LootTables lootTable : LootTables.values()) {
+            String key = lootTable.getKey().getKey();
+            if (key.startsWith("chests/"))
+                lootTables.add(lootTable);
+        }
+        CHEST_LOOT_TABLES = Collections.unmodifiableSet(lootTables);
+    }
+
     protected final EntityType entityType;
     private final String effectName;
     private final String displayName;
@@ -49,6 +66,8 @@ public class SummonEntityCommand extends ImmediateCommand {
         entity.setCustomNameVisible(true);
         if (entity instanceof Tameable tameable)
             tameable.setOwner(player);
+        if (entity instanceof LootableInventory lootable)
+            lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
         return entity;
     }
 }
