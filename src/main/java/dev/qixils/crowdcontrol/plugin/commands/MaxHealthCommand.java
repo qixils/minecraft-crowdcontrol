@@ -30,8 +30,8 @@ public class MaxHealthCommand extends ImmediateCommand {
 			amountText = "0";
 			displayText = "0";
 		} else if (amount < 0) {
-			amountText = "sub" + amount;
-			displayText = "-" + amount;
+			amountText = "sub" + (amount * -1);
+			displayText = String.valueOf(amount);
 		} else {
 			amountText = "plus" + amount;
 			displayText = "+" + amount;
@@ -47,7 +47,7 @@ public class MaxHealthCommand extends ImmediateCommand {
 		for (Player player : players) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth == null) {
-				plugin.getLogger().fine("Player missing GENERIC_MAX_HEALTH attribute?");
+				plugin.getLogger().warning("Player missing GENERIC_MAX_HEALTH attribute");
 				continue;
 			}
 			AttributeModifier modifier = null;
