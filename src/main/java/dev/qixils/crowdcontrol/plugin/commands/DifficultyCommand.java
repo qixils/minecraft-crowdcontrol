@@ -32,9 +32,17 @@ public class DifficultyCommand extends ImmediateCommand {
         if (!isGlobalCommandUsable(players, request))
             return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
 
+        boolean success = false;
         for (World world : plugin.getServer().getWorlds()) {
-            world.setDifficulty(difficulty);
+            if (world.getDifficulty() != difficulty) {
+                success = true;
+                world.setDifficulty(difficulty);
+            }
         }
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
+
+        if (success)
+            return request.buildResponse().type(ResultType.SUCCESS);
+        else
+            return request.buildResponse().type(ResultType.FAILURE).message("World is already on that difficulty");
     }
 }
