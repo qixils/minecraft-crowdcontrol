@@ -129,7 +129,9 @@ public class RegisterCommands {
             Material.DIAMOND_PICKAXE,
             Material.NETHERITE_PICKAXE,
             Material.GOLDEN_APPLE,
-            Material.ENCHANTED_GOLDEN_APPLE
+            Material.ENCHANTED_GOLDEN_APPLE,
+            Material.ENDER_EYE,
+            Material.END_PORTAL_FRAME
     );
 
     public static List<Command> getCommands(CrowdControlPlugin plugin) {
