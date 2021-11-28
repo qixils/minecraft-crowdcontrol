@@ -60,7 +60,7 @@ public final class FreezeCommand extends TimedCommand {
         });
 
         new TimedEffect(request, "gamemode", DURATION,
-                $ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+                $ -> plugin.getPlayers(request).whenComplete(wrapper),
                 $ -> task.get().cancel()
         ).queue();
     }

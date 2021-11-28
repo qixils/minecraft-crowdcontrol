@@ -16,66 +16,10 @@ import java.util.Locale;
 
 public class BukkitCrowdControlCommand implements CommandExecutor {
     private static final String PREFIX = "CrowdControl";
+    private final CrowdControlPlugin plugin;
 
-    @RequiredArgsConstructor
-    private enum Subcommand {
-        CONNECT("Connect to the Crowd Control server") {
-            @Override
-            public void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-                if (args.length != 0) {
-                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cExpected 0 arguments, received " + args.length));
-                } else if (plugin.crowdControl != null) {
-                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cServer is already connected or attempting to establish a connection"));
-                } else {
-                    plugin.initCrowdControl();
-                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "Server connections have been re-enabled and will be attempted in the background"));
-                }
-            }
-        },
-        DISCONNECT("Disconnect from the Crowd Control server") {
-            @Override
-            public void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-                if (args.length != 0) {
-                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cExpected 0 arguments, received " + args.length));
-                } else if (plugin.crowdControl == null) {
-                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cServer is already disconnected"));
-                } else {
-                    plugin.crowdControl.shutdown();
-                    plugin.crowdControl = null;
-                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "Disconnected from the Crowd Control server"));
-                }
-            }
-        },
-        RECONNECT("Reconnects to the Crowd Control server") {
-            @Override
-            public void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-                if (args.length != 0) {
-                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cExpected 0 arguments, received " + args.length));
-                    return;
-                }
-
-                if (plugin.crowdControl != null)
-                    plugin.crowdControl.shutdown();
-                plugin.initCrowdControl();
-
-                sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "Server connection has been reset"));
-            }
-        };
-
-        private final @NotNull String description;
-        private String name;
-
-        public @NotNull String getName() {
-            if (name == null)
-                name = name().toLowerCase(Locale.ENGLISH);
-            return name;
-        }
-
-        public @NotNull String getDescription() {
-            return description;
-        }
-
-        public abstract void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args);
+    public BukkitCrowdControlCommand(@NotNull CrowdControlPlugin plugin) {
+        this.plugin = plugin;
     }
 
     public static void register(@NotNull CrowdControlPlugin plugin, @NotNull Commodore commodore, @NotNull PluginCommand command) {
@@ -86,12 +30,6 @@ public class BukkitCrowdControlCommand implements CommandExecutor {
             node.then(LiteralArgumentBuilder.literal(subcommand.getName()));
 
         commodore.register(command, node);
-    }
-
-    private final CrowdControlPlugin plugin;
-
-    public BukkitCrowdControlCommand(@NotNull CrowdControlPlugin plugin) {
-        this.plugin = plugin;
     }
 
     @Override
@@ -122,5 +60,66 @@ public class BukkitCrowdControlCommand implements CommandExecutor {
             sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cUnknown subcommand &6" + subcommandName));
         }
         return true;
+    }
+
+    @RequiredArgsConstructor
+    private enum Subcommand {
+        CONNECT("Connect to the Crowd Control server") {
+            @Override
+            public void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+                if (args.length != 0) {
+                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cExpected 0 arguments, received " + args.length));
+                } else if (plugin.crowdControl != null) {
+                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cServer is already connected or attempting to establish a connection"));
+                } else {
+                    plugin.initCrowdControl();
+                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "Server connections have been re-enabled and will be attempted in the background"));
+                }
+            }
+        },
+        DISCONNECT("Disconnect from the Crowd Control server") {
+            @Override
+            public void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+                if (args.length != 0) {
+                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cExpected 0 arguments, received " + args.length));
+                } else if (plugin.crowdControl == null) {
+                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cServer is already disconnected"));
+                } else {
+                    plugin.crowdControl.shutdown("Disconnection issued by server administrator");
+                    plugin.crowdControl = null;
+                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "Disconnected from the Crowd Control server"));
+                }
+            }
+        },
+        RECONNECT("Reconnects to the Crowd Control server") {
+            @Override
+            public void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+                if (args.length != 0) {
+                    sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "&cExpected 0 arguments, received " + args.length));
+                    return;
+                }
+
+                if (plugin.crowdControl != null)
+                    plugin.crowdControl.shutdown("Reconnection issued by server administrator");
+                plugin.initCrowdControl();
+
+                sender.sendMessage(TextBuilder.fromPrefix(PREFIX, "Server connection has been reset"));
+            }
+        };
+
+        private final @NotNull String description;
+        private String name;
+
+        public @NotNull String getName() {
+            if (name == null)
+                name = name().toLowerCase(Locale.ENGLISH);
+            return name;
+        }
+
+        public @NotNull String getDescription() {
+            return description;
+        }
+
+        public abstract void execute(@NotNull CrowdControlPlugin plugin, @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args);
     }
 }

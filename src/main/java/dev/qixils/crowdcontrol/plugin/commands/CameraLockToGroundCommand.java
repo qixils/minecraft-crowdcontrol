@@ -48,7 +48,7 @@ public final class CameraLockToGroundCommand extends TimedCommand {
         });
 
         new TimedEffect(request, "camera_lock", DURATION,
-                $ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+                $ -> plugin.getPlayers(request).whenComplete(wrapper),
                 $ -> task.get().cancel()
         ).queue();
     }
