@@ -67,7 +67,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
 		);
 
 		new TimedEffect(request, "gamemode", duration,
-				$ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+				$ -> plugin.getPlayers(request).whenComplete(wrapper),
 				$ -> setGameMode(null, players, GameMode.SURVIVAL)).queue();
 	}
 

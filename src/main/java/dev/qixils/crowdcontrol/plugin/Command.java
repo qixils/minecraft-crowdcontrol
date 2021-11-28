@@ -22,6 +22,11 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class Command {
     public static final Random rand = new Random();
+    protected final CrowdControlPlugin plugin;
+
+    public Command(@NotNull CrowdControlPlugin plugin) {
+        this.plugin = Objects.requireNonNull(plugin, "plugin");
+    }
 
     @NotNull
     @CheckReturnValue
@@ -36,7 +41,7 @@ public abstract class Command {
     public abstract String getDisplayName();
 
     public final void executeAndNotify(@NotNull Request request) {
-        List<Player> players = CrowdControlPlugin.getPlayers(request).join();
+        List<Player> players = plugin.getPlayers(request).join();
 
         // ensure targets are online / available
         if (players.isEmpty())
@@ -55,7 +60,7 @@ public abstract class Command {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     protected final boolean isGlobalCommandUsable(@Nullable List<Player> players, @NotNull Request request) {
-        if (CrowdControlPlugin.isGlobal(request))
+        if (plugin.isGlobal(request))
             return true;
 
         Collection<String> hosts = plugin.getHosts();
@@ -70,7 +75,7 @@ public abstract class Command {
         }
 
         if (players == null)
-            players = CrowdControlPlugin.getPlayers(request).join();
+            players = plugin.getPlayers(request).join();
 
         for (Player player : players) {
             String uuidStr = player.getUniqueId().toString().toLowerCase(Locale.ENGLISH);
@@ -87,7 +92,7 @@ public abstract class Command {
     protected final void announce(final Request request) {
         if (!plugin.announceEffects()) return;
         PlayerListWrapper wrapper = new PlayerListWrapper(request, players -> announce(players, request));
-        CrowdControlPlugin.getPlayers(request).whenComplete(wrapper);
+        plugin.getPlayers(request).whenComplete(wrapper);
     }
 
     protected final void announce(final Collection<? extends Audience> audiences, final Request request) {
@@ -108,13 +113,6 @@ public abstract class Command {
     @CheckReturnValue
     protected String getProcessedDisplayName() {
         return getDisplayName();
-    }
-
-    protected final CrowdControlPlugin plugin;
-
-    @CheckReturnValue
-    public Command(@NotNull CrowdControlPlugin plugin) {
-        this.plugin = Objects.requireNonNull(plugin, "plugin");
     }
 
 }

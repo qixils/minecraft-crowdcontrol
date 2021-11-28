@@ -8,13 +8,13 @@ import java.time.Duration;
  * A command which has a timed duration
  */
 public abstract class TimedCommand extends VoidCommand {
+    private String processedDisplayName;
+
     public TimedCommand(@NotNull CrowdControlPlugin plugin) {
         super(plugin);
     }
 
     public abstract @NotNull Duration getDuration();
-
-    private String processedDisplayName;
 
     @Override
     protected @NotNull String getProcessedDisplayName() {

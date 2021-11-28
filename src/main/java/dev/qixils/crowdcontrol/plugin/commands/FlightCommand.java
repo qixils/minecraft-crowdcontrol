@@ -45,8 +45,8 @@ public class FlightCommand extends TimedCommand implements Listener {
 		);
 
 		new TimedEffect(request, "gamemode", duration,
-				$ -> CrowdControlPlugin.getPlayers(request).whenComplete(startWrapper),
-				$ -> CrowdControlPlugin.getPlayers(request).whenComplete(endWrapper)
+				$ -> plugin.getPlayers(request).whenComplete(startWrapper),
+				$ -> plugin.getPlayers(request).whenComplete(endWrapper)
 		).queue();
 	}
 

@@ -58,7 +58,7 @@ public final class CameraLockCommand extends TimedCommand {
         });
 
         new TimedEffect(request, "camera_lock", DURATION,
-                $ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+                $ -> plugin.getPlayers(request).whenComplete(wrapper),
                 $ -> task.get().cancel()
         ).queue();
     }

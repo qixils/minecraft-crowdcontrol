@@ -47,7 +47,7 @@ public class DisableJumpingCommand extends TimedCommand implements Listener {
 			announce(players, request);
 		});
 		new TimedEffect(request, DURATION,
-				$ -> CrowdControlPlugin.getPlayers(request).whenComplete(wrapper),
+				$ -> plugin.getPlayers(request).whenComplete(wrapper),
 				$ -> {}
 		).queue();
 	}
