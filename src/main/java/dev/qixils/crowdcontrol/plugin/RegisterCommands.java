@@ -194,7 +194,6 @@ public class RegisterCommands {
         ));
 
         // register action bar updater
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, KeepInventoryCommand.Manager::renderActionBars, 10, 2);
         Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
 
         // entity commands
