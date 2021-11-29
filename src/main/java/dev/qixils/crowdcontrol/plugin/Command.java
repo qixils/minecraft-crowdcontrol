@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
-import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -41,7 +40,7 @@ public abstract class Command {
     public abstract String getDisplayName();
 
     public final void executeAndNotify(@NotNull Request request) {
-        List<Player> players = plugin.getPlayers(request).join();
+        List<Player> players = plugin.getPlayers(request);
 
         // ensure targets are online / available
         if (players.isEmpty())
@@ -75,7 +74,7 @@ public abstract class Command {
         }
 
         if (players == null)
-            players = plugin.getPlayers(request).join();
+            players = plugin.getPlayers(request);
 
         for (Player player : players) {
             String uuidStr = player.getUniqueId().toString().toLowerCase(Locale.ENGLISH);
@@ -91,8 +90,7 @@ public abstract class Command {
     @Deprecated
     protected final void announce(final Request request) {
         if (!plugin.announceEffects()) return;
-        PlayerListWrapper wrapper = new PlayerListWrapper(request, players -> announce(players, request));
-        plugin.getPlayers(request).whenComplete(wrapper);
+        announce(plugin.getPlayers(request), request);
     }
 
     protected final void announce(final Collection<? extends Audience> audiences, final Request request) {

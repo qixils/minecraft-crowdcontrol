@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
-import dev.qixils.crowdcontrol.plugin.utils.PlayerListWrapper;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -17,15 +16,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class CameraLockToSkyCommand extends TimedCommand {
-    public CameraLockToSkyCommand(CrowdControlPlugin plugin) {
-        super(plugin);
-    }
     private static final Duration DURATION = Duration.ofSeconds(20);
-
     @Getter
     private final String effectName = "camera_lock_to_sky";
     @Getter
     private final String displayName = "Camera Lock To Sky";
+
+    public CameraLockToSkyCommand(CrowdControlPlugin plugin) {
+        super(plugin);
+    }
 
     @Override
     public @NotNull Duration getDuration() {
@@ -36,19 +35,18 @@ public final class CameraLockToSkyCommand extends TimedCommand {
     public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
         AtomicReference<BukkitTask> task = new AtomicReference<>();
 
-        PlayerListWrapper wrapper = new PlayerListWrapper(request, players -> {
-            task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
-                Location playerLoc = player.getLocation();
-                if (playerLoc.getPitch() > -89.99) {
-                    playerLoc.setPitch(-90);
-                    player.teleport(playerLoc);
-                }
-            }), 1, 1));
-            announce(players, request);
-        });
-
         new TimedEffect(request, "camera_lock", DURATION,
-                $ -> plugin.getPlayers(request).whenComplete(wrapper),
+                $ -> {
+                    List<Player> players = plugin.getPlayers(request);
+                    task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
+                        Location playerLoc = player.getLocation();
+                        if (playerLoc.getPitch() > -89.99) {
+                            playerLoc.setPitch(-90);
+                            player.teleport(playerLoc);
+                        }
+                    }), 1, 1));
+                    announce(players, request);
+                },
                 $ -> task.get().cancel()
         ).queue();
     }

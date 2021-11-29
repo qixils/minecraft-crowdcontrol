@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.socket.Request;
+import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public final class CrowdControlPlugin extends JavaPlugin {
     public static final TextColor USER_COLOR = TextColor.color(0x9f44db);
@@ -77,11 +77,18 @@ public final class CrowdControlPlugin extends JavaPlugin {
         initCrowdControl();
 
         Bukkit.getPluginManager().registerEvents(mapper, this);
+        Commodore commodore = CommodoreProvider.getCommodore(this);
 
         BukkitCrowdControlCommand.register(
                 this,
-                CommodoreProvider.getCommodore(this),
+                commodore,
                 Objects.requireNonNull(getCommand("crowdcontrol"), "plugin.yml is improperly configured; cannot find crowdcontrol command")
+        );
+
+        BukkitAccountCommand.register(
+                mapper,
+                commodore,
+                Objects.requireNonNull(getCommand("account"), "plugin.yml is improperly configured; cannot find account command")
         );
     }
 
@@ -108,7 +115,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
 
     @CheckReturnValue
     @NotNull
-    public CompletableFuture<@NotNull List<@NotNull Player>> getPlayers(final @NotNull Request request) {
+    public List<@NotNull Player> getPlayers(final @NotNull Request request) {
         return mapper.getPlayers(request);
     }
 

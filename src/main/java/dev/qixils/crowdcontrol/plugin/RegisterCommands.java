@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin;
 
 import com.google.common.collect.ImmutableSet;
 import dev.qixils.crowdcontrol.plugin.commands.*;
+import dev.qixils.crowdcontrol.plugin.commands.executeorperish.DoOrDieCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -190,7 +191,8 @@ public class RegisterCommands {
                 new KeepInventoryCommand(plugin, true),
                 new KeepInventoryCommand(plugin, false),
                 new ClearInventoryCommand(plugin),
-                new PlantTreeCommand(plugin)
+                new PlantTreeCommand(plugin),
+                new DoOrDieCommand(plugin)
         ));
 
         // register action bar updater

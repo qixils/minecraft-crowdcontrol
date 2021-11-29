@@ -9,3 +9,6 @@ website: https://github.com/qixils/minecraft-crowdcontrol
 commands:
   crowdcontrol:
     description: Manages the connection to the Crowd Control server
+  account:
+    description: Connect to your Twitch account to receive effects
+    usage: "/account <link | unlink> <twitch username>"
