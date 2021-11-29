@@ -32,55 +32,55 @@ namespace CrowdControl.Games.Packs
             new Effect("Camera Lock To Sky (20s)", "camera_lock_to_sky", "miscellaneous"), // locks everyone's cameras to face the sky
             new Effect("Clutter Inventory", "clutter", "miscellaneous"), // shuffles around a couple items in everyone's inventory
             new Effect("Damage Item", "damage_item", "miscellaneous"), // sets the durability of an item to 50%
-            new Effect("Damage Players (1 Heart)", "damage_1", "miscellaneous"),
+            new Effect("Damage Player (1 Heart)", "damage_1", "miscellaneous"),
             new Effect("Delete Held Item", "delete_item", "miscellaneous"),
-            new Effect("Dig Hole", "dig", "miscellaneous"), // creates a small hole underneath every player
-            new Effect("Dinnerbone", "dinnerbone", "miscellaneous"), // flips nearby mobs upside-down
+            new Effect("Dig Hole", "dig", "miscellaneous") {Description = "Digs a small hole underneath the streamer"},
+            new Effect("Dinnerbone", "dinnerbone", "miscellaneous") {Description = "Flips nearby mobs upside-down"},
             new Effect("Disable Jumping (10s)", "disable_jumping", "miscellaneous"),
-            new Effect("Do-or-Die", "do_or_die", "miscellaneous"), // gives the streamer a task to complete within 30 seconds, else they die
+            new Effect("Do-or-Die", "do_or_die", "miscellaneous") {Description = "Gives the streamer a task to complete within 30 seconds or else they die"},
             new Effect("Drop Held Item", "drop_item", "miscellaneous"),
-            new Effect("Eat Chorus Fruit", "chorus_fruit", "miscellaneous"), // teleports the player to a random nearby block as if they ate a Chorus Fruit
-            new Effect("Feed Players", "feed", "miscellaneous"),
-            new Effect("Feed Players (1 Bar)", "feed_1", "miscellaneous"),
+            new Effect("Eat Chorus Fruit", "chorus_fruit", "miscellaneous") {Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit"},
+            new Effect("Feed Player", "feed", "miscellaneous"),
+            new Effect("Feed Player (1 Bar)", "feed_1", "miscellaneous"),
             new Effect("Freeze (7s)", "freeze", "miscellaneous"), // locks everyone in place for 7 seconds (camera rotation allowed)
             new Effect("Give One XP Level", "xp_plus1", "miscellaneous"),
-            new Effect("Heal Players", "full_heal", "miscellaneous"),
-            new Effect("Heal Players (1 Heart)", "heal_1", "miscellaneous"),
+            new Effect("Heal Player", "full_heal", "miscellaneous"),
+            new Effect("Heal Player (1 Heart)", "heal_1", "miscellaneous"),
             new Effect("Halve Health", "half_health", "miscellaneous"), // sets player's health to 50% of what they currently have
-            new Effect("Kill Players", "kill", "miscellaneous"),
-            new Effect("Open Lootbox", "lootbox", "miscellaneous"), // gives a completely random item with varying enchants and modifiers
-            new Effect("Place Flowers", "flowers", "miscellaneous"), // places a bunch of flowers nearby as if a Bonemeal item was used
+            new Effect("Kill Player", "kill", "miscellaneous"),
+            new Effect("Open Lootbox", "lootbox", "miscellaneous") {Description = "Gifts a completely random item with varying enchants and modifiers"},
+            new Effect("Place Flowers", "flowers", "miscellaneous"), // places a bunch of flowers nearby as if a bone meal item was used
             new Effect("Place Torches", "lit", "miscellaneous"), // places torches on every valid nearby block
             new Effect("Plant Tree", "plant_tree", "miscellaneous"), // places a tree on the player
-            new Effect("Put Item on Head", "hat", "miscellaneous"), // swaps the held item and the player's head item
+            new Effect("Put Held Item on Head", "hat", "miscellaneous"), // swaps the held item and the player's head item
             new Effect("Remove One Hunger Bar", "starve_1", "miscellaneous"),
             new Effect("Remove Torches", "dim", "miscellaneous"), // removes nearby torches
-            new Effect("Render Toasts", "toast", "miscellaneous"), // displays a bunch of "Recipe Unlocked" notifications in the top right
-            new Effect("Repair Item", "repair_item", "miscellaneous"), // sets the durability of an item to 100%
-            new Effect("Replace Area With Gravel", "gravel_hell", "miscellaneous"), // replaces nearby stone blocks with gravel
-            new Effect("Reset Experience Progress", "reset_exp_progress", "miscellaneous"), // resets the progress to the next level up
-            new Effect("Respawn Players", "respawn", "miscellaneous"),
-            new Effect("Spawn Ore Vein", "vein", "miscellaneous"),
-            new Effect("Spooky Sound Effect", "sfx", "miscellaneous"),
-            new Effect("Starve Players", "starve", "miscellaneous"), // makes everyone hungry
-            new Effect("Swap Locations", "swap", "miscellaneous"), // swaps the locations of every online player
+            new Effect("Render Toasts", "toast", "miscellaneous") {Description = "Plays an obnoxious animation and an obnoxious sound"},
+            new Effect("Repair Item", "repair_item", "miscellaneous"), // sets the durability of a damaged item to 100%
+            new Effect("Replace Area With Gravel", "gravel_hell", "miscellaneous") {Description = "Replaces nearby stone-like blocks with gravel"},
+            new Effect("Reset Experience Progress", "reset_exp_progress", "miscellaneous") {Description = "Clears the streamer's progress towards their next XP level"},
+            new Effect("Respawn Player", "respawn", "miscellaneous") {Description = "Sends the streamer to their spawn point"},
+            new Effect("Spawn Ore Veins", "vein", "miscellaneous") {Description = "Places random ore veins (ore lava) near the streamer"},
+            new Effect("Spooky Sound Effect", "sfx", "miscellaneous") {Description = "Plays a random spooky sound effect"},
+            new Effect("Starve Player", "starve", "miscellaneous"), // makes everyone hungry
+            new Effect("Swap Locations", "swap", "miscellaneous") {Description = "Swaps the locations of all players participating in a multiplayer Crowd Control session"},
             new Effect("Take One XP Level", "xp_sub1", "miscellaneous"),
             new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous"),
-            new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous"), // teleports players 30 blocks up and gives them a water bucket
-            new Effect("Zip Time", "zip", "miscellaneous"), // adds 10 minutes to the in-game day/night cycle
+            new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous") {Description = "Teleports players 30 blocks up and gives them a water bucket"},
+            new Effect("Zip Time", "zip", "miscellaneous") {Description = "Adds several minutes to the in-game time"},
             // inventory commands
             new Effect("Inventory", "inventory", ItemKind.Folder),
             new Effect("Clear Inventory", "clear_inventory", "inventory"),
-            new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory"),
-            new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory"),
+            new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory") {Description = "Disallows the streamer from keeping their inventory upon death"},
+            new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory") {Description = "Allows the streamer to keep their inventory upon death"},
             // set gamemode for 30 seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
-            new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode"),
-            new Effect("Creative Mode (15s)", "creative_mode", "change_gamemode"),
-            new Effect("Spectator Mode (8s)", "spectator_mode", "change_gamemode"),
-            new Effect("Allow Flight (15s)", "flight", "change_gamemode"),
+            new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode") {Description = "Temporarily sets the streamer to Adventure mode, rendering them unable to place or break blocks"},
+            new Effect("Creative Mode (15s)", "creative_mode", "change_gamemode") {Description = "Temporarily sets the streamer to Creative mode, allowing them to fly and spawn in items"},
+            new Effect("Spectator Mode (8s)", "spectator_mode", "change_gamemode") {Description = "Temporarily sets the streamer to Spectator mode, turning them into a ghost that can fly through blocks"},
+            new Effect("Allow Flight (15s)", "flight", "change_gamemode") {Description = "Temporarily allows the streamer to fly"},
             // teleports players by a few blocks in the specified direction
-            new Effect("Teleport Players", "teleportation", ItemKind.Folder),
+            new Effect("Fling Players", "teleportation", ItemKind.Folder),
             new Effect("Fling Up", "up", "teleportation"),
             new Effect("Fling Down", "down", "teleportation"),
             new Effect("Fling East", "xplus", "teleportation"),

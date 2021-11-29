@@ -35,9 +35,15 @@ public final class PlayerMapper implements Listener {
 
     @CheckReturnValue
     @NotNull
+    List<@NotNull Player> getAllPlayers() {
+        return filter(new ArrayList<>(Bukkit.getOnlinePlayers()));
+    }
+
+    @CheckReturnValue
+    @NotNull
     List<@NotNull Player> getPlayers(final @NotNull Request request) {
         if (plugin.isGlobal(request))
-            return filter(new ArrayList<>(Bukkit.getOnlinePlayers()));
+            return getAllPlayers();
 
         List<Player> players = new ArrayList<>(request.getTargets().length);
         for (Target target : request.getTargets()) {

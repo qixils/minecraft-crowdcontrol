@@ -29,11 +29,8 @@ public class SwapCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        if (!isGlobalCommandUsable(players, request))
-            return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
-
         if (players.size() < 2)
-            return request.buildResponse().type(ResultType.FAILURE).message("Not enough players online");
+            return request.buildResponse().type(ResultType.FAILURE).message("Not enough participating players online");
 
         // get shuffled list of players
         Collections.shuffle(players, rand);

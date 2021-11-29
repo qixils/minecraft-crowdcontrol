@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -25,8 +26,12 @@ public class EntityChaosCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> targetPlayers, @NotNull Request request) {
+        if (!isGlobalCommandUsable(targetPlayers, request))
+            return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+
         Bukkit.getScheduler().runTask(plugin, () -> {
+            List<Player> players = plugin.getAllPlayers();
             List<Entity> entities = new ArrayList<>();
             for (World world : Bukkit.getWorlds()) {
                 for (Entity entity : world.getEntities()) {

@@ -115,6 +115,12 @@ public final class CrowdControlPlugin extends JavaPlugin {
 
     @CheckReturnValue
     @NotNull
+    public List<@NotNull Player> getAllPlayers() {
+        return mapper.getAllPlayers();
+    }
+
+    @CheckReturnValue
+    @NotNull
     public List<@NotNull Player> getPlayers(final @NotNull Request request) {
         return mapper.getPlayers(request);
     }
