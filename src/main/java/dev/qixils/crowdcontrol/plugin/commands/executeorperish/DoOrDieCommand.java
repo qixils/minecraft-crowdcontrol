@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Getter
 public class DoOrDieCommand extends VoidCommand {
     private static final Duration DURATION = Duration.ofSeconds(31);
-    private static final Duration COOLDOWN = DURATION.multipliedBy(2);
+    private static final Duration COOLDOWN = DURATION.multipliedBy(3);
     private static final int TICKS = (int) (DURATION.getSeconds() * 20);
     private static final TextColor START_COLOR = TextColor.color(0xE4F73D);
     private static final TextColor END_COLOR = TextColor.color(0xF42929);
@@ -51,7 +51,7 @@ public class DoOrDieCommand extends VoidCommand {
 
     @Override
     protected void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-        new TimedEffect(request, DURATION, effect -> {
+        new TimedEffect(request, COOLDOWN, effect -> {
             List<Player> players = plugin.getPlayers(request);
             List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
             Collections.shuffle(conditions, rand);
