@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class CameraLockToGroundCommand extends TimedCommand {
-    private static final Duration DURATION = Duration.ofSeconds(20);
+    private static final Duration DURATION = Duration.ofSeconds(7);
     @Getter
     private final String effectName = "camera_lock_to_ground";
     @Getter
