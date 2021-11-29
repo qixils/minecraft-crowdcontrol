@@ -14,8 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.persistence.PersistentDataAdapterContext;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +25,6 @@ import java.util.Locale;
 
 @Getter
 public class GamemodeCommand extends TimedCommand implements Listener {
-    private static final PersistentDataType<Byte, Boolean> BOOLEAN = new BooleanDataType();
-
     private final Duration duration;
     private final GameMode gamemode;
     private final String displayName;
@@ -49,7 +45,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
     }
 
     private static boolean isEffectActive(NamespacedKey key, Entity player) {
-        return player.getPersistentDataContainer().getOrDefault(key, BOOLEAN, false);
+        return player.getPersistentDataContainer().getOrDefault(key, CrowdControlPlugin.BOOLEAN, false);
     }
 
     public static boolean isEffectActive(Plugin plugin, Entity player) {
@@ -79,7 +75,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
             if (player.isValid())
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     player.setGameMode(gamemode);
-                    player.getPersistentDataContainer().set(gamemodeKey, BOOLEAN, request != null);
+                    player.getPersistentDataContainer().set(gamemodeKey, CrowdControlPlugin.BOOLEAN, request != null);
                 });
         }
         return players;
@@ -89,33 +85,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (!isEffectActive(gamemodeKey, player)) return;
-        player.getPersistentDataContainer().set(gamemodeKey, BOOLEAN, false);
+        player.getPersistentDataContainer().set(gamemodeKey, CrowdControlPlugin.BOOLEAN, false);
         player.setGameMode(GameMode.SURVIVAL);
-    }
-
-    // boilerplate stuff for the data container storage
-    private static final class BooleanDataType implements PersistentDataType<Byte, Boolean> {
-        private static final byte TRUE = 1;
-        private static final byte FALSE = 0;
-
-        @NotNull
-        public Class<Byte> getPrimitiveType() {
-            return Byte.class;
-        }
-
-        @NotNull
-        public Class<Boolean> getComplexType() {
-            return Boolean.class;
-        }
-
-        @NotNull
-        public Byte toPrimitive(@NotNull Boolean complex, @NotNull PersistentDataAdapterContext context) {
-            return complex ? TRUE : FALSE;
-        }
-
-        @NotNull
-        public Boolean fromPrimitive(@NotNull Byte primitive, @NotNull PersistentDataAdapterContext context) {
-            return primitive != FALSE;
-        }
     }
 }

@@ -32,7 +32,6 @@ public class GiveItemCommand extends ImmediateCommand {
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         ItemStack itemStack = new ItemStack(item);
-        itemStack.setAmount(itemStack.getMaxStackSize());
         for (Player player : players) {
             Location location = player.getLocation();
             Bukkit.getScheduler().runTask(plugin, () -> {

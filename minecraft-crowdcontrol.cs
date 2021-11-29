@@ -303,6 +303,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Redstone Torch", "block_redstone_torch", "place_block"),
             new Effect("TNT", "block_tnt", "place_block"),
             new Effect("Wither Rose", "block_wither_rose", "place_block"),
+            new Effect("Lightning Rod", "block_lightning_rod", "place_block"),
             // places a block several blocks above everyone's head
             new Effect("Place Falling Block", "place_falling_block", ItemKind.Folder),
             new Effect("Anvil", "falling_block_anvil", "place_falling_block"),

@@ -27,7 +27,10 @@ public class HalfHealthCommand extends ImmediateCommand {
 			double health = player.getHealth();
 			if (health > 0.5) {
 				resp.type(ResultType.SUCCESS).message("SUCCESS");
-				Bukkit.getScheduler().runTask(plugin, () -> player.damage(health / 2));
+				Bukkit.getScheduler().runTask(plugin, () -> {
+					player.damage(.1);
+					player.setHealth(health / 2);
+				});
 			}
 		}
 		return resp;

@@ -112,7 +112,8 @@ public class RegisterCommands {
             Material.FIRE,
             Material.COBWEB,
             Material.REDSTONE_TORCH,
-            Material.WITHER_ROSE
+            Material.WITHER_ROSE,
+            Material.LIGHTNING_ROD
     );
 
     public static final Set<Material> SET_FALLING_BLOCKS = ImmutableSet.of(

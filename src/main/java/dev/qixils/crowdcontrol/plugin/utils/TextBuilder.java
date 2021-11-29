@@ -187,10 +187,12 @@ public class TextBuilder implements ComponentLike {
 
 	/**
 	 * Converts the input text to a colored and formatted component and appends it to the internal builder
+	 *
 	 * @param formattedText text formatted with ampersands or section symbols
 	 * @return this builder
 	 */
-	@NotNull @Contract("_ -> this")
+	@NotNull
+	@Contract("_ -> this")
 	public TextBuilder next(@Nullable String formattedText) {
 		if (formattedText != null)
 			builder.append(SERIALIZER.deserialize(formattedText));
@@ -198,11 +200,28 @@ public class TextBuilder implements ComponentLike {
 	}
 
 	/**
-	 * Creates a component with its text and color set and appends it to the internal builder
+	 * Creates a component with its text set and appends it to the internal builder
+	 *
 	 * @param rawText raw text, color codes are ignored
 	 * @return this builder
 	 */
-	@NotNull @Contract("_, _ -> this")
+	@NotNull
+	@Contract("_ -> this")
+	public TextBuilder rawNext(@Nullable String rawText) {
+		if (rawText != null)
+			builder.append(Component.text(rawText));
+		return this;
+	}
+
+	/**
+	 * Creates a component with its text and color set and appends it to the internal builder
+	 *
+	 * @param rawText raw text, color codes are ignored
+	 * @param color   text color
+	 * @return this builder
+	 */
+	@NotNull
+	@Contract("_, _ -> this")
 	public TextBuilder next(@Nullable String rawText, @Nullable TextColor color) {
 		if (rawText != null)
 			builder.append(Component.text(rawText, color));
@@ -697,7 +716,7 @@ public class TextBuilder implements ComponentLike {
 	 */
 	@NotNull
 	public String toString() {
-		return Bukkit.getUnsafe().legacyComponentSerializer().serialize(build());
+		return Bukkit.getUnsafe().plainComponentSerializer().serialize(build());
 	}
 
 }

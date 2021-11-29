@@ -37,10 +37,16 @@ public class DinnerboneCommand extends Command {
         CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Player player : players) {
-                entities.addAll(player.getLocation().getNearbyLivingEntities(RADIUS, x -> x.getType() != EntityType.PLAYER && (x.getCustomName() == null || x.getCustomName().isEmpty() || x.getCustomName().equals(NAME))));
+                entities.addAll(player.getLocation().getNearbyLivingEntities(RADIUS,
+                        x -> x.getType() != EntityType.PLAYER && (x.getCustomName() == null || x.getCustomName().isEmpty() || x.getCustomName().equals(NAME) || SummonEntityCommand.isMobViewerSpawned(plugin, x))
+                ));
             }
             successFuture.complete(!entities.isEmpty());
-            entities.forEach(x -> x.setCustomName(Objects.equals(x.getCustomName(), NAME) ? null : NAME));
+            entities.forEach(x -> {
+                // TODO: save/restore old name
+                x.setCustomNameVisible(false);
+                x.setCustomName(Objects.equals(x.getCustomName(), NAME) ? null : NAME);
+            });
         });
         return successFuture.thenApply(success -> success
                 ? request.buildResponse().type(ResultType.SUCCESS)

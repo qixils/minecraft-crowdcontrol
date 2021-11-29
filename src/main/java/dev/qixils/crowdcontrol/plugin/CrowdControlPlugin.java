@@ -1,13 +1,22 @@
 package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.plugin.utils.TextBuilder;
 import dev.qixils.crowdcontrol.socket.Request;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,9 +30,31 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-public final class CrowdControlPlugin extends JavaPlugin {
+public final class CrowdControlPlugin extends JavaPlugin implements Listener {
+    public static final PersistentDataType<Byte, Boolean> BOOLEAN = new BooleanDataType();
     public static final TextColor USER_COLOR = TextColor.color(0x9f44db);
     public static final TextColor CMD_COLOR = TextColor.color(0xb15be3);
+    private static final Component JOIN_MESSAGE_1 = new TextBuilder()
+            .rawNext("This server is running ")
+            .next("Crowd Control", TextColor.color(0xFAE100)) // picked a color from the CC logo/icon
+            .rawNext(", developed by ")
+            .next("qi", TextColor.color(0xFFC7B5))
+            .next("xi", TextColor.color(0xFFDECA))
+            .next("ls", TextColor.color(0xFFCEEA))
+            .next(".dev", TextColor.color(0xFFB7E5))
+            .rawNext(" in coordination with the ")
+            .next("crowdcontrol.live", TextColor.color(0xFAE100))
+            .rawNext(" team.")
+            .build();
+    private static final Component JOIN_MESSAGE_2 = new TextBuilder()
+            .rawNext("Please link your Twitch account using ")
+            .next("/account link <username>", NamedTextColor.GOLD)
+            .rawNext(". You can ")
+            .next("click here", TextDecoration.BOLD)
+            .rawNext(" to do so.")
+            .suggest("/account link ")
+            .hover(Component.text("Click here to link your Twitch account").asHoverEvent())
+            .build();
     private static final int port = 58431;
     final FileConfiguration config = getConfig();
     private final PlayerMapper mapper = new PlayerMapper(this);
@@ -76,6 +107,7 @@ public final class CrowdControlPlugin extends JavaPlugin {
 
         initCrowdControl();
 
+        Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(mapper, this);
         Commodore commodore = CommodoreProvider.getCommodore(this);
 
@@ -138,5 +170,38 @@ public final class CrowdControlPlugin extends JavaPlugin {
 
     public boolean isServer() {
         return isServer;
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        event.getPlayer().sendMessage(JOIN_MESSAGE_1);
+        if (!global && !mapper.twitchToUserMap.containsValue(event.getPlayer().getUniqueId()))
+            event.getPlayer().sendMessage(JOIN_MESSAGE_2);
+    }
+
+    // boilerplate stuff for the data container storage
+    private static final class BooleanDataType implements PersistentDataType<Byte, Boolean> {
+        private static final byte TRUE = 1;
+        private static final byte FALSE = 0;
+
+        @NotNull
+        public Class<Byte> getPrimitiveType() {
+            return Byte.class;
+        }
+
+        @NotNull
+        public Class<Boolean> getComplexType() {
+            return Boolean.class;
+        }
+
+        @NotNull
+        public Byte toPrimitive(@NotNull Boolean complex, @NotNull PersistentDataAdapterContext context) {
+            return complex ? TRUE : FALSE;
+        }
+
+        @NotNull
+        public Boolean fromPrimitive(@NotNull Byte primitive, @NotNull PersistentDataAdapterContext context) {
+            return primitive != FALSE;
+        }
     }
 }

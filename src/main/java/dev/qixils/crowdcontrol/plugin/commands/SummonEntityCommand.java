@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.loot.LootTables;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -40,12 +42,14 @@ public class SummonEntityCommand extends ImmediateCommand {
     protected final EntityType entityType;
     private final String effectName;
     private final String displayName;
+    private final NamespacedKey mobKey;
 
     public SummonEntityCommand(CrowdControlPlugin plugin, EntityType entityType) {
         super(plugin);
         this.entityType = entityType;
         this.effectName = "entity_" + entityType.name();
         this.displayName = "Summon " + TextUtil.translate(entityType);
+        this.mobKey = getMobKey(plugin);
     }
 
     @Override
@@ -60,6 +64,15 @@ public class SummonEntityCommand extends ImmediateCommand {
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 
+    @NotNull
+    protected static NamespacedKey getMobKey(Plugin plugin) {
+        return new NamespacedKey(plugin, "isViewerSpawned");
+    }
+
+    public static boolean isMobViewerSpawned(Plugin plugin, Entity entity) {
+        return entity.getPersistentDataContainer().getOrDefault(getMobKey(plugin), CrowdControlPlugin.BOOLEAN, false);
+    }
+
     protected Entity spawnEntity(String viewer, Player player) {
         Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
         entity.setCustomName(viewer);
@@ -68,6 +81,7 @@ public class SummonEntityCommand extends ImmediateCommand {
             tameable.setOwner(player);
         if (entity instanceof LootableInventory lootable)
             lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
+        entity.getPersistentDataContainer().set(mobKey, CrowdControlPlugin.BOOLEAN, true);
         return entity;
     }
 }
