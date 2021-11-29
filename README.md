@@ -24,9 +24,11 @@ If you are hosting a server for streamers to join, you may use the following ste
 8. Ensure the ports 25565 and 58431 so that users may connect to the Minecraft server and its Crowd Control server.
 9. Pre-generating chunks using a plugin like [Chunkmaster](https://www.spigotmc.org/resources/chunkmaster.71351/) is recommended for optimal performance.
 
-Users may now connect using the steps below ("Streamer Setup (External Server)"). Make sure to provide your public IP address and the password used in the config file.
+Users may now connect using the ["Streamer Setup (External Server)" steps below](https://github.com/qixils/minecraft-crowdcontrol#streamer-setup-external-server). Make sure to provide your public IP address and the password used in the config file to your streamers.
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command.
+
+You may also be interested in setting up [GeyserMC](https://geysermc.org/) to allow Bedrock users to play.
 
 ## Streamer Setup (External Server)
 
@@ -34,9 +36,9 @@ The following steps are for streamers who are connecting to another individual's
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
 2. In the **Game Selection** tab, select **Minecraft (Server) (PC)**.
-3. Click **Start**. A pop-up menu will appear, prompting you for information that you should have received from your server administrator.
+3. Click **Start**. A pop-up menu will appear prompting you for information that you should have received from your server administrator.
     - In the host field, you should enter an IP address or a website URL. This will usually be the same as the IP address that you connect to in Minecraft.
-    - In the password field, you must enter a password provided to you by the server administrator.
+    - In the password field, you must enter a secret passphrase provided to you by the server administrator.
 4. Upon joining the Minecraft server, run the command `/account link <your twitch username>` to ensure you receive effects that viewers purchase for you.
 
 ## Streamer Setup (Local Server)
@@ -47,5 +49,5 @@ The following steps are for streamers who are playing alone.
 2. In the Game Selection tab, select **Minecraft (Server) (PC)**.
 3. Click **One Click Server Setup** to automatically setup a server. This may take several minutes to complete.
 4. Once done, click **Launch Server** to start the Minecraft server. If you were not already prompted to do so during setup, you may need to set a temporary password to be able to connect to the server. This can be done by typing `password <insert password here>` in the pop-up server console window.
-5. Once the server has started, click **Start** in the Crowd Control app to connect to the server, and join the Minecraft server.
+5. Once the Minecraft server has started, click **Start** in the Crowd Control app to connect to the server. You may also join the Minecraft server in your game.
 6. Upon joining the Minecraft server, run the command `/account link <your twitch username>` to ensure you receive effects that viewers purchase for you.
