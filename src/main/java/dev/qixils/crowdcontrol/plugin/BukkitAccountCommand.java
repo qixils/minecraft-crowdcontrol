@@ -52,15 +52,15 @@ public class BukkitAccountCommand implements CommandExecutor {
         if (subcommand.equals("unlink")) {
             mapper.twitchToUserMap.remove(username, uuid);
 
-            sender.sendMessage(new TextBuilder()
+            sender.sendMessage(TextBuilder.fromPrefix(CrowdControlPlugin.PREFIX)
                     .next(username, NamedTextColor.AQUA)
-                    .next(" has been removed from your linked Twitch accounts", NamedTextColor.WHITE));
+                    .rawNext(" has been removed from your linked Twitch accounts"));
         } else if (subcommand.equals("link")) {
             mapper.twitchToUserMap.put(username, uuid);
 
-            sender.sendMessage(new TextBuilder()
+            sender.sendMessage(TextBuilder.fromPrefix(CrowdControlPlugin.PREFIX)
                     .next(username, NamedTextColor.AQUA)
-                    .next(" has been added to your linked Twitch accounts", NamedTextColor.WHITE));
+                    .rawNext(" has been added to your linked Twitch accounts"));
         } else {
             return false;
         }

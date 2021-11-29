@@ -14,13 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Locale;
 
-public class BukkitCrowdControlCommand implements CommandExecutor {
-    private static final String PREFIX = "CrowdControl";
-    private final CrowdControlPlugin plugin;
+import static dev.qixils.crowdcontrol.plugin.CrowdControlPlugin.PREFIX;
 
-    public BukkitCrowdControlCommand(@NotNull CrowdControlPlugin plugin) {
-        this.plugin = plugin;
-    }
+@RequiredArgsConstructor
+public class BukkitCrowdControlCommand implements CommandExecutor {
+    private final CrowdControlPlugin plugin;
 
     public static void register(@NotNull CrowdControlPlugin plugin, @NotNull Commodore commodore, @NotNull PluginCommand command) {
         command.setExecutor(new BukkitCrowdControlCommand(plugin));
