@@ -33,11 +33,15 @@ public class EnchantmentCommand extends ImmediateCommand {
         for (Player player : players) {
             ItemStack item = player.getInventory().getItemInMainHand();
             if (item.getType().isEmpty())
+                item = player.getInventory().getItemInOffHand();
+            if (item.getType().isEmpty())
                 continue;
-            if (item.getEnchantmentLevel(enchantment) != level) {
-                item.addUnsafeEnchantment(enchantment, level);
-                result.type(Response.ResultType.SUCCESS);
-            }
+            if (item.getEnchantmentLevel(enchantment) == level)
+                continue;
+            if (!enchantment.getItemTarget().includes(item))
+                continue;
+            item.addUnsafeEnchantment(enchantment, level);
+            result.type(Response.ResultType.SUCCESS);
         }
         return result;
     }

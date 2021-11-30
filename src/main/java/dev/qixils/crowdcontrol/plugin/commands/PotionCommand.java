@@ -21,7 +21,8 @@ public class PotionCommand extends ImmediateCommand {
     private final String effectName;
     private final String displayName;
 
-    private static final int MAX_DURATION = 20*15;
+    private static final int SECONDS = 15;
+    private static final int MAX_DURATION = 20 * SECONDS;
 
     public PotionCommand(CrowdControlPlugin plugin, PotionEffectType potionEffectType) {
         super(plugin);
@@ -29,13 +30,13 @@ public class PotionCommand extends ImmediateCommand {
         boolean isMinimal = potionEffectType.isInstant();
         duration = isMinimal ? 1 : MAX_DURATION;
         this.effectName = "potion_" + nameOf(potionEffectType);
-        this.displayName = "Apply " + TextUtil.titleCase(nameOf(potionEffectType)) + " Potion Effect";
+        this.displayName = "Apply " + TextUtil.titleCase(nameOf(potionEffectType)) + " Potion Effect (" + SECONDS + "s)";
     }
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         PotionEffect potionEffect = potionEffectType.createEffect(duration, rand.nextInt(2));
-        Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> player.addPotionEffect(potionEffect))); // TODO: can this be async?
+        Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> player.addPotionEffect(potionEffect)));
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 

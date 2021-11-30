@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -29,14 +28,12 @@ public class DigCommand extends ImmediateCommand {
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Set<Block> blocks = new HashSet<>();
-        int depth = -(2 + rand.nextInt(4));
+        int depth = -(3 + rand.nextInt(5));
         for (Player player : players) {
             for (double x = -RADIUS; x <= RADIUS; ++x) {
                 for (int y = depth; y < 0; ++y) {
                     for (double z = -RADIUS; z <= RADIUS; ++z) {
-                        Block block = player.getLocation().add(x, y, z).getBlock();
-                        if (BlockUtil.EARTHLY.matches(block))
-                            blocks.add(block);
+                        blocks.add(player.getLocation().add(x, y, z).getBlock());
                     }
                 }
             }

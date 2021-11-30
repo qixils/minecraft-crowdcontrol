@@ -27,7 +27,9 @@ public class BukkitPasswordCommand implements CommandExecutor {
     private static final Component SUCCESS = TextBuilder.fromPrefix(CrowdControlPlugin.PREFIX)
             .rawNext("The password has been updated. Please use ")
             .next("/crowdcontrol reconnect", NamedTextColor.YELLOW)
-            .rawNext(" to apply this change.")
+            .rawNext(" or click here to apply this change.")
+            .suggest("/crowdcontrol reconnect")
+            .hover(new TextBuilder().rawNext("Click here to run ").next("/crowdcontrol reconnect", NamedTextColor.YELLOW))
             .build();
     private final CrowdControlPlugin plugin;
 
