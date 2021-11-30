@@ -291,6 +291,7 @@ namespace CrowdControl.Games.Packs
             //new Effect("Wither", "potion_wither", "apply_potion_effect"),
             // places a block at everyone's feet
             new Effect("Place Block", "place_block", ItemKind.Folder),
+            new Effect("Bedrock", "block_bedrock", "place_block") {Price = 500, Description = "Places bedrock at the streamer's feet"},
             new Effect("Cobweb", "block_cobweb", "place_block") {Price = 25, Description = "Places a cobweb block on the streamer"},
             new Effect("Fire", "block_fire", "place_block") {Price = 200, Description = "Places a fire block on the streamer"},
             new Effect("Redstone Torch", "block_redstone_torch", "place_block") {Price = 25, Description = "Places a redstone torch on the streamer"},
@@ -350,6 +351,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Apply Unbreaking III", "enchant_unbreaking", "enchantments") {Price = 50, Description = "Lessens the speed at which items break"},
             // gives 1 item
             new Effect("Give an Item", "give_item", ItemKind.Folder),
+            new Effect("Elytra", "give_elytra", "give_item") {Price = 500},
             new Effect("Wooden Pickaxe", "give_wooden_pickaxe", "give_item") {Price = 25},
             new Effect("Stone Pickaxe", "give_stone_pickaxe", "give_item") {Price = 50},
             new Effect("Golden Pickaxe", "give_golden_pickaxe", "give_item") {Price = 25},
@@ -362,6 +364,7 @@ namespace CrowdControl.Games.Packs
             new Effect("End Portal Frame", "give_end_portal_frame", "give_item") {Price = 300},
             // takes 1 item
             new Effect("Take an Item", "take_item", ItemKind.Folder),
+            new Effect("Elytra", "take_elytra", "take_item") {Price = 1000},
             new Effect("Wooden Pickaxe", "take_wooden_pickaxe", "take_item") {Price = 50},
             new Effect("Stone Pickaxe", "take_stone_pickaxe", "take_item") {Price = 75},
             new Effect("Golden Pickaxe", "take_golden_pickaxe", "take_item") {Price = 50},

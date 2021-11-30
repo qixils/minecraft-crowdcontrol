@@ -113,7 +113,8 @@ public class RegisterCommands {
             Material.COBWEB,
             Material.REDSTONE_TORCH,
             Material.WITHER_ROSE,
-            Material.LIGHTNING_ROD
+            Material.LIGHTNING_ROD,
+            Material.BEDROCK
     );
 
     public static final Set<Material> SET_FALLING_BLOCKS = ImmutableSet.of(
@@ -133,7 +134,8 @@ public class RegisterCommands {
             Material.GOLDEN_APPLE,
             Material.ENCHANTED_GOLDEN_APPLE,
             Material.ENDER_EYE,
-            Material.END_PORTAL_FRAME
+            Material.END_PORTAL_FRAME,
+            Material.ELYTRA
     );
 
     public static List<Command> getCommands(CrowdControlPlugin plugin) {

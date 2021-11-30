@@ -43,6 +43,9 @@ public class GiveItemCommand extends ImmediateCommand {
                 item.setCanPlayerPickup(true);
                 item.setPickupDelay(0);
             });
+            // workaround to limit the circulation of end portal frames in the economy
+            if (item == Material.END_PORTAL_FRAME)
+                break;
         }
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }

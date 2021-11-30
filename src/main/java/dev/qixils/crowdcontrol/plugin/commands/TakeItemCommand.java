@@ -29,15 +29,19 @@ public class TakeItemCommand extends ImmediateCommand {
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         for (Player player : players) {
+            boolean taken = false;
             for (ItemStack itemStack : player.getInventory()) {
                 if (itemStack == null) {
                     continue;
                 }
                 if (itemStack.getType() == item) {
-                    itemStack.setAmount(itemStack.getAmount()-1);
+                    itemStack.setAmount(itemStack.getAmount() - 1);
+                    taken = true;
                     break;
                 }
             }
+            if (taken && item == Material.END_PORTAL_FRAME)
+                break;
         }
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
