@@ -205,7 +205,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Husk", "remove_entity_husk", "remove_entity") {Price = 200},
             new Effect("Illusioner", "remove_entity_illusioner", "remove_entity") {Price = 300},
             new Effect("Iron Golem", "remove_entity_iron_golem", "remove_entity") {Price = 300},
-//            new Effect("Lightning Bolt", "remove_entity_lightning", "remove_entity"),
+            //new Effect("Lightning Bolt", "remove_entity_lightning", "remove_entity"),
             new Effect("Llama", "remove_entity_llama", "remove_entity") {Price = 200},
             new Effect("Magma Cube", "remove_entity_magma_cube", "remove_entity") {Price = 300},
             new Effect("Minecart", "remove_entity_minecart", "remove_entity") {Price = 25},
