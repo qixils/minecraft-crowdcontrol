@@ -1,7 +1,9 @@
 # Minecraft Crowd Control
-Minecraft Crowd Control is a plugin for [Paper](https://papermc.io/) 1.17.1 that allows your Twitch community to interact with your game.
+Minecraft Crowd Control is a plugin for [Paper](https://papermc.io/) 1.18 that allows your Twitch
+community to interact with your game.
 
-This version of the plugin is to be used with [crowdcontrol.live](https://crowdcontrol.live) which allows viewers to control your game via bits or channel points.
+This version of the plugin is to be used with [crowdcontrol.live](https://crowdcontrol.live) which
+allows viewers to control your game via bits or channel points.
 
 Commands are fully compatible with multiplayer servers. Everyone online will be affected to some extent.
 
@@ -10,8 +12,10 @@ Commands are fully compatible with multiplayer servers. Everyone online will be 
 If you are hosting a server for streamers to join, you may use the following steps to setup a Minecraft server running with Crowd Control.
 
 1. Download and install [Java 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).
-2. Download the latest version of [Paper](https://papermc.io/downloads) 1.17.1. Spigot is not supported.
-3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the "root folder."
+2. Download the latest version of [Paper](https://papermc.io/downloads) 1.18. Spigot is not
+   supported.
+3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the "
+   root folder."
 4. Create a new folder named `plugins` inside the root folder.
 5. Download the [latest plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/latest) and place it into the `plugins` folder.
 6. Run the Minecraft server. You will have to run it twice, as the first will prompt you to accept Minecraft's End User License Agreement by editing `eula.txt`. To run the server:
