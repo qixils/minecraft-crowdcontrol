@@ -63,24 +63,6 @@ public class BlockUtil {
             Material.YELLOW_TERRACOTTA
     );
 
-    public static final MaterialTag EARTHLY = FLOWERS.and(STONES_TAG).and(
-            Material.GRASS,
-            Material.DIRT_PATH,
-            Material.TALL_GRASS,
-            Material.OAK_LOG,
-            Material.BIRCH_LOG,
-            Material.ACACIA_LOG,
-            Material.JUNGLE_LOG,
-            Material.DARK_OAK_LOG,
-            Material.SPRUCE_LOG,
-            Material.OAK_LEAVES,
-            Material.BIRCH_LEAVES,
-            Material.ACACIA_LEAVES,
-            Material.JUNGLE_LEAVES,
-            Material.DARK_OAK_LEAVES,
-            Material.SPRUCE_LEAVES
-    );
-
     public static final MaterialTag TORCHES = new MaterialTag(
             Material.TORCH,
             Material.REDSTONE_TORCH,
