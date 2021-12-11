@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin;
 
-import com.google.common.collect.ImmutableSet;
 import dev.qixils.crowdcontrol.plugin.commands.*;
 import dev.qixils.crowdcontrol.plugin.commands.executeorperish.DoOrDieCommand;
 import org.bukkit.Bukkit;
@@ -22,7 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public class RegisterCommands {
-    public static final Set<EntityType> SAFE_ENTITIES = ImmutableSet.of(
+    public static final Set<EntityType> SAFE_ENTITIES = Set.of(
             EntityType.CREEPER,
             EntityType.SKELETON,
             EntityType.ZOMBIE,
@@ -107,7 +106,7 @@ public class RegisterCommands {
             EntityType.ENDER_DRAGON
     );
 
-    public static final Set<Material> SET_BLOCKS = ImmutableSet.of(
+    public static final Set<Material> SET_BLOCKS = Set.of(
             Material.TNT,
             Material.FIRE,
             Material.COBWEB,
@@ -117,14 +116,14 @@ public class RegisterCommands {
             Material.BEDROCK
     );
 
-    public static final Set<Material> SET_FALLING_BLOCKS = ImmutableSet.of(
+    public static final Set<Material> SET_FALLING_BLOCKS = Set.of(
             Material.ANVIL,
             Material.SAND,
             Material.RED_SAND,
             Material.GRAVEL
     );
 
-    public static final Set<Material> GIVE_TAKE_ITEMS = ImmutableSet.of(
+    public static final Set<Material> GIVE_TAKE_ITEMS = Set.of(
             Material.WOODEN_PICKAXE,
             Material.STONE_PICKAXE,
             Material.GOLDEN_PICKAXE,
