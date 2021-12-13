@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
-public interface Command<P extends Audience> {
+public interface Command<P> {
 	@NotNull
 	@CheckReturnValue
 	Plugin<P, ? super P> getPlugin();
@@ -35,7 +35,8 @@ public interface Command<P extends Audience> {
 	String getDisplayName();
 
 	default void executeAndNotify(@NotNull Request request) {
-		List<P> players = getPlugin().getPlayers(request);
+		Plugin<P, ? super P> plugin = getPlugin();
+		List<P> players = plugin.getPlayers(request);
 
 		// ensure targets are online / available
 		if (players.isEmpty())
@@ -48,7 +49,7 @@ public interface Command<P extends Audience> {
 			response.send();
 
 			if (response.getResultType() == Response.ResultType.SUCCESS)
-				announce(players, request);
+				announce(players.stream().map(plugin::asAudience).collect(Audience.toAudience()), request);
 		});
 	}
 
@@ -85,9 +86,9 @@ public interface Command<P extends Audience> {
 
 	@Deprecated
 	default void announce(final Request request) {
-		Plugin<?, ?> plugin = getPlugin();
+		Plugin<P, ? super P> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
-		announce(plugin.getPlayers(request), request);
+		announce(plugin.getPlayers(request).stream().map(plugin::asAudience).collect(Audience.toAudience()), request);
 	}
 
 	default void announce(final Collection<? extends Audience> audiences, final Request request) {

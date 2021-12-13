@@ -32,7 +32,7 @@ import java.util.UUID;
  * @param <P> class used to represent online players
  * @param <S> class used to represent command senders in Cloud Command Framework
  */
-public interface Plugin<P extends S, S extends Audience> {
+public interface Plugin<P extends S, S> {
 	/**
 	 * Text color to use for usernames.
 	 */
@@ -149,14 +149,15 @@ public interface Plugin<P extends S, S extends Audience> {
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
+					Audience audience = asAudience(sender);
 					UUID uuid = getUUID(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerMapper().linkPlayer(uuid, username))
-						sender.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
+						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.next(username, NamedTextColor.AQUA)
 								.rawNext(" has been added to your linked Twitch accounts"));
 					else
-						sender.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
+						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.color(NamedTextColor.RED)
 								.next("You have already linked the Twitch account ")
 								.next(username, NamedTextColor.AQUA));
@@ -168,14 +169,15 @@ public interface Plugin<P extends S, S extends Audience> {
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
+					Audience audience = asAudience(sender);
 					UUID uuid = getUUID(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerMapper().unlinkPlayer(uuid, username))
-						sender.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
+						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.next(username, NamedTextColor.AQUA)
 								.rawNext(" has been removed from your linked Twitch accounts"));
 					else
-						sender.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
+						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.color(NamedTextColor.RED)
 								.next("You do not have a Twitch account linked named ")
 								.next(username, NamedTextColor.AQUA));
@@ -196,7 +198,7 @@ public interface Plugin<P extends S, S extends Audience> {
 		manager.command(ccCmd.literal("connect")
 				.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
 				.handler(commandContext -> {
-					S sender = commandContext.getSender();
+					Audience sender = asAudience(commandContext.getSender());
 					if (getCrowdControl() != null)
 						sender.sendMessage(serviceNotDisconnected);
 					else {
@@ -212,7 +214,7 @@ public interface Plugin<P extends S, S extends Audience> {
 		manager.command(ccCmd.literal("disconnect")
 				.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
 				.handler(commandContext -> {
-					S sender = commandContext.getSender();
+					Audience sender = asAudience(commandContext.getSender());
 					if (getCrowdControl() == null)
 						sender.sendMessage(serviceNotRunning);
 					else {
@@ -227,20 +229,20 @@ public interface Plugin<P extends S, S extends Audience> {
 		manager.command(ccCmd.literal("reconnect")
 				.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
 				.handler(commandContext -> {
-					S sender = commandContext.getSender();
+					Audience audience = asAudience(commandContext.getSender());
 					CrowdControl cc = getCrowdControl();
 					if (cc != null)
 						cc.shutdown("Reconnect issued by server administrator");
 					initCrowdControl();
 
-					sender.sendMessage(serviceReset);
+					audience.sendMessage(serviceReset);
 				}));
 		// status command
 		final Component notRunning = TextBuilder.fromPrefix(PREFIX, "The service is not currently running").build();
 		final Component isRunning = TextBuilder.fromPrefix(PREFIX, "The service is currently running").build();
 		manager.command(ccCmd.literal("status")
 				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-				.handler(commandContext -> commandContext.getSender().sendMessage(
+				.handler(commandContext -> asAudience(commandContext.getSender()).sendMessage(
 						getCrowdControl() == null ? notRunning : isRunning)));
 
 		//// Password Command ////
@@ -259,7 +261,7 @@ public interface Plugin<P extends S, S extends Audience> {
 				.permission(this::isAdmin)
 				.argument(StringArgument.<S>newBuilder("password").greedy().asRequired())
 				.handler(commandContext -> {
-					S sender = commandContext.getSender();
+					Audience sender = asAudience(commandContext.getSender());
 					if (!isServer()) {
 						sender.sendMessage(passwordFailureMessage);
 						return;
@@ -270,7 +272,29 @@ public interface Plugin<P extends S, S extends Audience> {
 				})
 		);
 
-		new MinecraftExceptionHandler<S>().withDefaultHandlers().apply(manager, source -> source);
+		new MinecraftExceptionHandler<S>().withDefaultHandlers().apply(manager, this::asAudience);
+	}
+
+	/**
+	 * Converts the command sender object to an adventure {@link Audience}.
+	 *
+	 * @param source command sender
+	 * @return adventure audience
+	 */
+	default Audience asAudience(@NotNull S source) {
+		if (source instanceof Audience)
+			return (Audience) source;
+		throw new UnsupportedOperationException("#asAudience is unsupported");
+	}
+
+	/**
+	 * Converts the command senders to an adventure {@link Audience}.
+	 *
+	 * @param source command sender
+	 * @return adventure audience
+	 */
+	default Audience asAudience(@NotNull Collection<S> source) {
+		return source.stream().map(this::asAudience).collect(Audience.toAudience());
 	}
 
 	/**
@@ -359,7 +383,8 @@ public interface Plugin<P extends S, S extends Audience> {
 	 */
 	@CheckReturnValue
 	default @NotNull String getUsername(@NotNull P player) {
-		return player.get(Identity.NAME).orElseThrow(() -> new IllegalStateException("Player object does not support Identity.NAME"));
+		return asAudience(player).get(Identity.NAME).orElseThrow(() ->
+				new UnsupportedOperationException("Player object does not support Identity.NAME"));
 	}
 
 	/**
@@ -370,7 +395,7 @@ public interface Plugin<P extends S, S extends Audience> {
 	 */
 	@CheckReturnValue
 	default @NotNull Optional<UUID> getUUID(@NotNull S entity) {
-		return entity.get(Identity.UUID);
+		return asAudience(entity).get(Identity.UUID);
 	}
 
 	/**
@@ -466,18 +491,19 @@ public interface Plugin<P extends S, S extends Audience> {
 	boolean isAdmin(@NotNull S commandSource);
 
 	default void onPlayerJoin(P player) {
-		player.sendMessage(JOIN_MESSAGE_1);
+		Audience audience = asAudience(player);
+		audience.sendMessage(JOIN_MESSAGE_1);
 		//noinspection OptionalGetWithoutIsPresent
 		if (!isGlobal() && isServer() && getPlayerMapper().getLinkedAccounts(getUUID(player).get()).size() == 0)
-			player.sendMessage(JOIN_MESSAGE_2);
+			audience.sendMessage(JOIN_MESSAGE_2);
 		if (getCrowdControl() == null) {
 			if (isAdmin(player)) {
 				if (isServer() && getPassword() == null)
-					player.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
+					audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
 				else
-					player.sendMessage(NO_CC_UNKNOWN_ERROR);
+					audience.sendMessage(NO_CC_UNKNOWN_ERROR);
 			} else
-				player.sendMessage(NO_CC_USER_ERROR);
+				audience.sendMessage(NO_CC_USER_ERROR);
 		}
 	}
 }

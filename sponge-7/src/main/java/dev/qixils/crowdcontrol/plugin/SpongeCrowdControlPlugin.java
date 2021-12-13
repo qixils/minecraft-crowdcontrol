@@ -10,6 +10,8 @@ import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -68,6 +70,8 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 	@Inject
 	@DefaultConfig() // TODO: set this up
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
+	@Inject
+	private SpongeAudiences audiences;
 	// "actual" variables
 	private CrowdControl crowdControl;
 	private SpongeCommandManager<CommandSource> commandManager;
@@ -77,6 +81,13 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 	private Collection<String> hosts = Collections.emptySet();
 	private boolean isServer = true;
 	private String manualPassword;
+
+	@Override
+	public Audience asAudience(@NotNull CommandSource source) {
+		if (source instanceof Player)
+			return audiences.player((Player) source);
+		return audiences.receiver(source);
+	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
