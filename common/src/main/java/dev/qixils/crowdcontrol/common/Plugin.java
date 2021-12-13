@@ -54,6 +54,11 @@ public interface Plugin<P extends S, S extends Audience> {
 	String ADMIN_PERMISSION = "crowdcontrol.admin";
 
 	/**
+	 * Port that the {@link CrowdControl} service connects to or listen on.
+	 */
+	int PORT = 58431;
+
+	/**
 	 * The first message to send to a player when they join the server.
 	 */
 	Component JOIN_MESSAGE_1 = new TextBuilder(TextColor.color(0xFCE9D4))
@@ -144,7 +149,8 @@ public interface Plugin<P extends S, S extends Audience> {
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
-					UUID uuid = getUUID(sender);
+					UUID uuid = getUUID(sender).orElseThrow(() ->
+							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerMapper().linkPlayer(uuid, username))
 						sender.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.next(username, NamedTextColor.AQUA)
@@ -162,7 +168,8 @@ public interface Plugin<P extends S, S extends Audience> {
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
-					UUID uuid = getUUID(sender);
+					UUID uuid = getUUID(sender).orElseThrow(() ->
+							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerMapper().unlinkPlayer(uuid, username))
 						sender.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.next(username, NamedTextColor.AQUA)
@@ -460,7 +467,8 @@ public interface Plugin<P extends S, S extends Audience> {
 
 	default void onPlayerJoin(P player) {
 		player.sendMessage(JOIN_MESSAGE_1);
-		if (!isGlobal() && isServer() && getPlayerMapper().getLinkedAccounts(getUUID(player)).size() == 0)
+		//noinspection OptionalGetWithoutIsPresent
+		if (!isGlobal() && isServer() && getPlayerMapper().getLinkedAccounts(getUUID(player).get()).size() == 0)
 			player.sendMessage(JOIN_MESSAGE_2);
 		if (getCrowdControl() == null) {
 			if (isAdmin(player)) {

@@ -33,7 +33,6 @@ import java.util.function.Function;
 
 public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
     public static final PersistentDataType<Byte, Boolean> BOOLEAN = new BooleanDataType();
-    private static final int PORT = 58431;
     FileConfiguration config = getConfig();
     @Getter
     private final BukkitPlayerMapper playerMapper = new BukkitPlayerMapper(this);
@@ -75,7 +74,7 @@ public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listen
                 getLogger().info("Running Crowd Control in server mode");
                 crowdControl = CrowdControl.server().port(PORT).password(password).build();
             } else {
-                getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or enable a temporary password using the /password command.");
+                getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
                 return;
             }
         } else {
@@ -170,6 +169,8 @@ public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listen
 
     @Override
     public void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException {
+        if (!isServer())
+            throw new IllegalStateException("Not running in server mode");
         manualPassword = password;
     }
 

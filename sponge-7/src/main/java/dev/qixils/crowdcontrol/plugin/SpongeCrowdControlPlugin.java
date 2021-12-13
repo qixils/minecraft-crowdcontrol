@@ -6,14 +6,16 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
@@ -28,6 +30,7 @@ import org.spongepowered.api.scheduler.AsynchronousExecutor;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -72,17 +75,27 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 	@Accessors(fluent = true)
 	private boolean announceEffects;
 	private Collection<String> hosts = Collections.emptySet();
-	private boolean isServer;
+	private boolean isServer = true;
 	private String manualPassword;
 
 	@SuppressWarnings("UnstableApiUsage")
-	@SneakyThrows
 	@Override
 	public void initCrowdControl() {
-		ConfigurationNode config = configLoader.load();
+		ConfigurationNode config;
+		try {
+			config = configLoader.load();
+		} catch (IOException e) {
+			throw new RuntimeException("Could not load plugin config", e);
+		}
+
+		try {
+			hosts = Collections.unmodifiableCollection(config.getNode("hosts").getList(TypeToken.of(String.class)));
+		} catch (ObjectMappingException e) {
+			throw new RuntimeException("Could not parse 'hosts' config variable", e);
+		}
+
 		global = config.getNode("global").getBoolean(false);
 		announceEffects = config.getNode("announce").getBoolean(true);
-		hosts = Collections.unmodifiableCollection(config.getNode("hosts").getList(TypeToken.of(String.class)));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
@@ -91,20 +104,26 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 		}
 		isServer = !config.getNode("legacy").getBoolean(false);
 		if (isServer) {
+			getLogger().info("Running Crowd Control in server mode");
 			String password;
 			if (manualPassword != null)
 				password = manualPassword;
 			else {
 				password = config.getNode("password").getString();
-				if (password == null) {
-
+				if (password == null || password.isEmpty()) {
+					logger.error("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command."); // TODO: update config file path
 					return;
 				}
 			}
+			crowdControl = CrowdControl.server().port(PORT).password(password).build();
 		} else {
-			String ip = config.getNode("ip").getString("localhost");
-			if (ip.isEmpty())
-				throw new IllegalStateException("IP address is blank. Please fix this in the plugin's config file.");
+			getLogger().info("Running Crowd Control in legacy client mode");
+			String ip = config.getNode("ip").getString();
+			if (ip == null || ip.isEmpty()) {
+				logger.error("No IP address has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml"); // TODO config path
+				return;
+			}
+			crowdControl = CrowdControl.client().port(PORT).ip(ip).build();
 		}
 		// TODO
 	}
@@ -129,5 +148,27 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 	@Override
 	public boolean isAdmin(@NotNull CommandSource commandSource) {
 		return commandSource.hasPermission(ADMIN_PERMISSION); // TODO: operator check
+	}
+
+	@Override
+	public @Nullable String getPassword() {
+		if (!isServer()) return null;
+		if (crowdControl != null)
+			return crowdControl.getPassword();
+		if (manualPassword != null)
+			return manualPassword;
+		try {
+			return configLoader.load().getNode("password").getString();
+		} catch (IOException e) {
+			logger.warn("Could not load config", e);
+			return null;
+		}
+	}
+
+	@Override
+	public void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException {
+		if (!isServer())
+			throw new IllegalStateException("Not running in server mode");
+		manualPassword = ExceptionUtil.validateNotNull(password);
 	}
 }
