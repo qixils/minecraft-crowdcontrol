@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -22,7 +22,8 @@ public class WeatherCommand extends ImmediateCommand {
     protected final String displayName;
     protected final WeatherType weatherType;
     protected static final int DURATION = 20*60*60;
-    public WeatherCommand(CrowdControlPlugin plugin, WeatherType weatherType) {
+
+    public WeatherCommand(BukkitCrowdControlPlugin plugin, WeatherType weatherType) {
         super(plugin);
         this.weatherType = weatherType;
         this.effectName = weatherType.name();

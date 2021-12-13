@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -19,11 +18,11 @@ public class TakeItemCommand extends ImmediateCommand {
     private final String effectName;
     private final String displayName;
 
-    public TakeItemCommand(CrowdControlPlugin plugin, Material item) {
+    public TakeItemCommand(BukkitCrowdControlPlugin plugin, Material item) {
         super(plugin);
         this.item = item;
         this.effectName = "take_" + item.name();
-        this.displayName = "Take " + TextUtil.translate(item);
+        this.displayName = "Take " + plugin.getTextUtil().translate(item);
     }
 
     @Override

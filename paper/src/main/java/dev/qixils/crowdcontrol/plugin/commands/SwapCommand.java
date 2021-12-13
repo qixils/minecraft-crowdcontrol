@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -23,7 +23,7 @@ public class SwapCommand extends ImmediateCommand {
     private final String effectName = "swap";
     private final String displayName = "Swap Locations";
 
-    public SwapCommand(CrowdControlPlugin plugin) {
+    public SwapCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

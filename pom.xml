@@ -12,6 +12,7 @@
     <modules>
         <module>common</module>
         <module>paper</module>
+        <module>sponge-7</module>
     </modules>
 
     <name>Minecraft Crowd Control: Parent</name>
@@ -19,7 +20,7 @@
     <url>https://github.com/qixils/minecraft-crowdcontrol</url>
 
     <properties>
-        <java.version>16</java.version>
+        <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.release>${java.version}</maven.compiler.release>

@@ -1,8 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.Command;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -22,11 +21,11 @@ public final class RemoveEntityCommand extends Command {
     private final String effectName;
     private final String displayName;
 
-    public RemoveEntityCommand(CrowdControlPlugin plugin, EntityType entityType) {
+    public RemoveEntityCommand(BukkitCrowdControlPlugin plugin, EntityType entityType) {
         super(plugin);
         this.entityType = entityType;
         this.effectName = "remove_entity_" + entityType.name();
-        this.displayName = "Remove " + TextUtil.translate(entityType);
+        this.displayName = "Remove " + plugin.getTextUtil().translate(entityType);
     }
 
     @Override
@@ -34,7 +33,7 @@ public final class RemoveEntityCommand extends Command {
         CompletableFuture<Response.Builder> future = new CompletableFuture<>();
         Bukkit.getScheduler().runTask(plugin, () -> {
             Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
-                    .message("No " + TextUtil.translate(entityType) + "s found nearby to remove");
+                    .message("No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
 
             for (Player player : players) {
                 for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), SEARCH_RADIUS)) {

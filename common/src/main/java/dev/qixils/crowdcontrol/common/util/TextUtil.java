@@ -23,6 +23,12 @@ public class TextUtil {
 		return serializer.serialize(component.asComponent());
 	}
 
+	/**
+	 * Gets the English (en_US) translation for an object.
+	 *
+	 * @param translatable object to translate
+	 * @return translated string
+	 */
 	public String translate(Translatable translatable) {
 		return asPlain(Component.translatable(translatable));
 	}

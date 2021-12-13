@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class DisableJumpingCommand extends TimedCommand implements Listener {
     private final String effectName = "disable_jumping";
     private final String displayName = "Disable Jumping";
 
-    public DisableJumpingCommand(CrowdControlPlugin plugin) {
+    public DisableJumpingCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class TimedCommand extends VoidCommand implements dev.qixils.crowdcontrol.common.TimedCommand<Player> {
     private String processedDisplayName;
 
-    public TimedCommand(@NotNull CrowdControlPlugin plugin) {
+    public TimedCommand(@NotNull BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

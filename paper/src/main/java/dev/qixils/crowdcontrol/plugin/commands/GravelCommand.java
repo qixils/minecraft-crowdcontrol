@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Getter
 public class GravelCommand extends ImmediateCommand {
-    public GravelCommand(CrowdControlPlugin plugin) {
+    public GravelCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

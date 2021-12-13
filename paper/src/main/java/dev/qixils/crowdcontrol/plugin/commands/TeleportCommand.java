@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.ParticleUtil;
@@ -22,7 +22,7 @@ public class TeleportCommand extends ImmediateCommand {
     private final String effectName = "chorus_fruit";
     private final String displayName = "Eat Chorus Fruit";
 
-    public TeleportCommand(CrowdControlPlugin plugin) {
+    public TeleportCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

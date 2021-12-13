@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
 import dev.qixils.crowdcontrol.socket.Request;
-import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
@@ -11,9 +10,10 @@ import java.util.UUID;
 
 /**
  * Maps a {@link Request} to the players that should receive it.
+ *
  * @param <P> class used to represent online players
  */
-public interface PlayerMapper<P extends Audience> {
+public interface PlayerMapper<P> {
 	/**
 	 * Fetches all online players that should be affected by the provided {@link Request}.
 	 *

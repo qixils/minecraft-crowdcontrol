@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.Weighted;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -31,7 +31,7 @@ import java.util.Set;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-    public LootboxCommand(CrowdControlPlugin plugin) {
+    public LootboxCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

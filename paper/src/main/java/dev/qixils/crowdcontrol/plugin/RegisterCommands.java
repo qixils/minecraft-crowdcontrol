@@ -29,7 +29,7 @@ public class RegisterCommands {
     public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommonTags.SET_BLOCKS);
     public static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommonTags.SET_BLOCKS);
 
-    public static List<Command> getCommands(CrowdControlPlugin plugin) {
+    public static List<Command> getCommands(BukkitCrowdControlPlugin plugin) {
         // register normal commands
         List<Command> commands = new ArrayList<>(Arrays.asList(
                 new VeinCommand(plugin),
@@ -143,7 +143,7 @@ public class RegisterCommands {
         return commands;
     }
 
-    public static List<Command> register(CrowdControlPlugin plugin) {
+    public static List<Command> register(BukkitCrowdControlPlugin plugin) {
         List<Command> commands = register(plugin, getCommands(plugin));
         for (Command command : commands) {
             if (command instanceof Listener listener)
@@ -152,7 +152,7 @@ public class RegisterCommands {
         return commands;
     }
 
-    public static List<Command> register(CrowdControlPlugin plugin, List<Command> commands) {
+    public static List<Command> register(BukkitCrowdControlPlugin plugin, List<Command> commands) {
         for (Command cmd : commands) {
             String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
             plugin.registerCommand(name, cmd);
@@ -161,7 +161,7 @@ public class RegisterCommands {
         return commands;
     }
 
-    public static void writeCommands(CrowdControlPlugin plugin, List<Command> commands) {
+    public static void writeCommands(BukkitCrowdControlPlugin plugin, List<Command> commands) {
         try {
             FileWriter fileWriter = new FileWriter("crowdcontrol_commands.txt");
             for (Command command : commands)

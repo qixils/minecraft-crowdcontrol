@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -18,7 +18,8 @@ import java.util.Set;
 @Getter
 public class DigCommand extends ImmediateCommand {
     private final static double RADIUS = .5D;
-    public DigCommand(CrowdControlPlugin plugin) {
+
+    public DigCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

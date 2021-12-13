@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.Command;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
@@ -22,7 +22,7 @@ public class PlantTreeCommand extends Command {
 	private final String effectName = "plant_tree";
 	private final String displayName = "Plant Tree";
 
-	public PlantTreeCommand(CrowdControlPlugin plugin) {
+	public PlantTreeCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 

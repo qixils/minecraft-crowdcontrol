@@ -1,6 +1,6 @@
 name: CrowdControl
 version: ${project.version}
-main: dev.qixils.crowdcontrol.plugin.CrowdControlPlugin
+main: dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin
 api-version: 1.17
 prefix: Crowd Control
 authors: [ qixils ]

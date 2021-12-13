@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
-    public ChargedCreeperCommand(CrowdControlPlugin plugin) {
+    public ChargedCreeperCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin, EntityType.CREEPER);
     }
 

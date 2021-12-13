@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class DoOrDieCommand extends VoidCommand {
     private final String effectName = "do_or_die";
     private final String displayName = "Do-or-Die";
 
-    public DoOrDieCommand(@NotNull CrowdControlPlugin plugin) {
+    public DoOrDieCommand(@NotNull BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

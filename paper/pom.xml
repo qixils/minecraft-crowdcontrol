@@ -14,6 +14,14 @@
     <description>Paper implementation for the Minecraft Crowd Control plugin</description>
     <url>https://github.com/qixils/minecraft-crowdcontrol</url>
 
+    <properties>
+        <java.version>16</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <repositories>
         <repository>
             <id>papermc-repo</id>
@@ -27,15 +35,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>dev.qixils.crowdcontrol.plugin</groupId>
-            <artifactId>minecraft-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.17.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.qixils.crowdcontrol.plugin</groupId>
+            <artifactId>minecraft-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>cloud.commandframework</groupId>

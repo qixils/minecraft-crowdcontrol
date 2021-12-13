@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class FlightCommand extends TimedCommand implements Listener {
     private final String displayName = "Enable Flight";
     private final Duration duration = Duration.ofSeconds(15);
 
-    public FlightCommand(@NotNull CrowdControlPlugin plugin) {
+    public FlightCommand(@NotNull BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

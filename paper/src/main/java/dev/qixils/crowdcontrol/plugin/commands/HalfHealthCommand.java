@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -16,7 +16,8 @@ import java.util.List;
 public class HalfHealthCommand extends ImmediateCommand {
 	private final String effectName = "half_health";
 	private final String displayName = "Half Health";
-	public HalfHealthCommand(CrowdControlPlugin plugin) {
+
+	public HalfHealthCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 

@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -16,7 +16,7 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 	private final String effectName = "reset_exp_progress";
 	private final String displayName = "Reset Experience Progress";
 
-	public ResetExpProgressCommand(CrowdControlPlugin plugin) {
+	public ResetExpProgressCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 

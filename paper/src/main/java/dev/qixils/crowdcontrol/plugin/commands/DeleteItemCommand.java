@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 public class DeleteItemCommand extends ImmediateCommand {
-	public DeleteItemCommand(CrowdControlPlugin plugin) {
+	public DeleteItemCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 

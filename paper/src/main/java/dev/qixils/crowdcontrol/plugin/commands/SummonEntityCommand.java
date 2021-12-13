@@ -2,8 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -44,11 +43,11 @@ public class SummonEntityCommand extends ImmediateCommand {
     private final String displayName;
     private final NamespacedKey mobKey;
 
-    public SummonEntityCommand(CrowdControlPlugin plugin, EntityType entityType) {
+    public SummonEntityCommand(BukkitCrowdControlPlugin plugin, EntityType entityType) {
         super(plugin);
         this.entityType = entityType;
         this.effectName = "entity_" + entityType.name();
-        this.displayName = "Summon " + TextUtil.translate(entityType);
+        this.displayName = "Summon " + plugin.getTextUtil().translate(entityType);
         this.mobKey = getMobKey(plugin);
     }
 
@@ -70,7 +69,7 @@ public class SummonEntityCommand extends ImmediateCommand {
     }
 
     public static boolean isMobViewerSpawned(Plugin plugin, Entity entity) {
-        return entity.getPersistentDataContainer().getOrDefault(getMobKey(plugin), CrowdControlPlugin.BOOLEAN, false);
+        return entity.getPersistentDataContainer().getOrDefault(getMobKey(plugin), BukkitCrowdControlPlugin.BOOLEAN, false);
     }
 
     protected Entity spawnEntity(String viewer, Player player) {
@@ -81,7 +80,7 @@ public class SummonEntityCommand extends ImmediateCommand {
             tameable.setOwner(player);
         if (entity instanceof LootableInventory lootable)
             lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
-        entity.getPersistentDataContainer().set(mobKey, CrowdControlPlugin.BOOLEAN, true);
+        entity.getPersistentDataContainer().set(mobKey, BukkitCrowdControlPlugin.BOOLEAN, true);
         return entity;
     }
 }

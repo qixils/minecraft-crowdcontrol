@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -20,7 +20,7 @@ public class FlowerCommand extends ImmediateCommand {
     protected static final int MIN_RAND = 14;  // inclusive
     protected static final int MAX_RAND = 28;  // inclusive
 
-    public FlowerCommand(CrowdControlPlugin plugin) {
+    public FlowerCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

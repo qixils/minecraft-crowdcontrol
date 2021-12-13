@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -22,11 +22,11 @@ public class ItemDamageCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public ItemDamageCommand(CrowdControlPlugin plugin, boolean repair) {
+	public ItemDamageCommand(BukkitCrowdControlPlugin plugin, boolean repair) {
 		super(plugin);
 		handleItem = repair
 				? (damage, type) -> 0
-				: (damage, type) -> (type.getMaxDurability() + damage)/2;
+				: (damage, type) -> (type.getMaxDurability() + damage) / 2;
 		displayName = (repair ? "Repair" : "Damage") + " Item";
 		effectName = displayName.replace(' ', '_');
 	}

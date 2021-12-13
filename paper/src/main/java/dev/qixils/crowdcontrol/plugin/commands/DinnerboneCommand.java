@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.Command;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -22,7 +22,7 @@ public class DinnerboneCommand extends Command {
     private static final String NAME = "Dinnerbone";
     private static final int RADIUS = 15;
 
-    public DinnerboneCommand(CrowdControlPlugin plugin) {
+    public DinnerboneCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

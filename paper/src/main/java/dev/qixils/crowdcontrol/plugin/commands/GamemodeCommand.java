@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
     private final String effectName;
     private final NamespacedKey gamemodeKey;
 
-    public GamemodeCommand(CrowdControlPlugin plugin, GameMode gamemode, long seconds) {
+    public GamemodeCommand(BukkitCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
         super(plugin);
         this.gamemodeKey = getGamemodeKey(plugin);
         this.duration = Duration.ofSeconds(seconds);
@@ -45,7 +45,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
     }
 
     private static boolean isEffectActive(NamespacedKey key, Entity player) {
-        return player.getPersistentDataContainer().getOrDefault(key, CrowdControlPlugin.BOOLEAN, false);
+        return player.getPersistentDataContainer().getOrDefault(key, BukkitCrowdControlPlugin.BOOLEAN, false);
     }
 
     public static boolean isEffectActive(Plugin plugin, Entity player) {
@@ -75,7 +75,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
             if (player.isValid())
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     player.setGameMode(gamemode);
-                    player.getPersistentDataContainer().set(gamemodeKey, CrowdControlPlugin.BOOLEAN, request != null);
+                    player.getPersistentDataContainer().set(gamemodeKey, BukkitCrowdControlPlugin.BOOLEAN, request != null);
                 });
         }
         return players;
@@ -85,7 +85,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (!isEffectActive(gamemodeKey, player)) return;
-        player.getPersistentDataContainer().set(gamemodeKey, CrowdControlPlugin.BOOLEAN, false);
+        player.getPersistentDataContainer().set(gamemodeKey, BukkitCrowdControlPlugin.BOOLEAN, false);
         player.setGameMode(GameMode.SURVIVAL);
     }
 }

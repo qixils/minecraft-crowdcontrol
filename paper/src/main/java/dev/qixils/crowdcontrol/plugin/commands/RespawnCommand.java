@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -16,7 +16,7 @@ import java.util.Objects;
 
 @Getter
 public class RespawnCommand extends ImmediateCommand {
-	public RespawnCommand(CrowdControlPlugin plugin) {
+	public RespawnCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 

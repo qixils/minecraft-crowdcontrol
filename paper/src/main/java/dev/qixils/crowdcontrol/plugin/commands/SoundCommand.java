@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -26,7 +26,7 @@ public class SoundCommand extends ImmediateCommand {
             Sound.AMBIENT_CAVE
     );
 
-    public SoundCommand(CrowdControlPlugin plugin) {
+    public SoundCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

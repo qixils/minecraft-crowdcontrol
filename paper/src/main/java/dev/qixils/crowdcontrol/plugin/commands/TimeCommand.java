@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -17,7 +17,8 @@ public class TimeCommand extends ImmediateCommand {
     private final String effectName = "zip";
     private final String displayName = "Zip Time";
     protected static final int ADD_TICKS = 6000; // roughly 15 minutes in-game
-    public TimeCommand(CrowdControlPlugin plugin) {
+
+    public TimeCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

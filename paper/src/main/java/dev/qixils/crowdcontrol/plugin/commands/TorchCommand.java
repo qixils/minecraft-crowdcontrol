@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -33,7 +33,7 @@ public class TorchCommand extends ImmediateCommand {
             BlockFace.NORTH
     };
 
-    public TorchCommand(CrowdControlPlugin plugin, boolean placeTorches) {
+    public TorchCommand(BukkitCrowdControlPlugin plugin, boolean placeTorches) {
         super(plugin);
         this.placeTorches = placeTorches;
         this.effectName = placeTorches ? "Lit" : "Dim";

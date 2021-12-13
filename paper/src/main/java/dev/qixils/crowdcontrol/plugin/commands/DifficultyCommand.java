@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -20,11 +19,11 @@ public class DifficultyCommand extends ImmediateCommand {
     private final String effectName;
     private final String displayName;
 
-    public DifficultyCommand(CrowdControlPlugin plugin, Difficulty difficulty) {
+    public DifficultyCommand(BukkitCrowdControlPlugin plugin, Difficulty difficulty) {
         super(plugin);
         this.difficulty = difficulty;
         this.effectName = "difficulty_" + difficulty.name();
-        this.displayName = "Set Difficulty: " + TextUtil.translate(difficulty);
+        this.displayName = "Set Difficulty: " + plugin.getTextUtil().translate(difficulty);
     }
 
     @Override

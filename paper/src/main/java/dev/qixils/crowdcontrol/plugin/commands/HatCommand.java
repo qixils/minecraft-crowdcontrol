@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Getter
 public class HatCommand extends ImmediateCommand {
-	public HatCommand(CrowdControlPlugin plugin) {
+	public HatCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 

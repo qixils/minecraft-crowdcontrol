@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -21,7 +21,7 @@ public class EntityChaosCommand extends ImmediateCommand {
     private final String displayName = "Entity Chaos";
     private final String effectName = "entity_chaos";
 
-    public EntityChaosCommand(CrowdControlPlugin plugin) {
+    public EntityChaosCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

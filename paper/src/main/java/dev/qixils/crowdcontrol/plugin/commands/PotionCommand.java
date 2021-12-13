@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -24,7 +24,7 @@ public class PotionCommand extends ImmediateCommand {
     private static final int SECONDS = 15;
     private static final int MAX_DURATION = 20 * SECONDS;
 
-    public PotionCommand(CrowdControlPlugin plugin, PotionEffectType potionEffectType) {
+    public PotionCommand(BukkitCrowdControlPlugin plugin, PotionEffectType potionEffectType) {
         super(plugin);
         this.potionEffectType = potionEffectType;
         boolean isMinimal = potionEffectType.isInstant();

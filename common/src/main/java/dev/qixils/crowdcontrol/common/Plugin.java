@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -361,8 +362,8 @@ public interface Plugin<P extends S, S extends Audience> {
 	 * @return the UUID of the entity
 	 */
 	@CheckReturnValue
-	default @NotNull UUID getUUID(@NotNull S entity) {
-		return entity.get(Identity.UUID).orElseThrow(() -> new IllegalStateException("Player object does not support Identity.UUID"));
+	default @NotNull Optional<UUID> getUUID(@NotNull S entity) {
+		return entity.get(Identity.UUID);
 	}
 
 	/**

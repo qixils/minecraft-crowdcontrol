@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.utils.BlockUtil.BlockFinder;
@@ -25,7 +25,8 @@ import java.util.List;
 public class VeinCommand extends ImmediateCommand {
     private final String effectName = "vein";
     private final String displayName = "Spawn Ore Vein";
-    public VeinCommand(CrowdControlPlugin plugin) {
+
+    public VeinCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

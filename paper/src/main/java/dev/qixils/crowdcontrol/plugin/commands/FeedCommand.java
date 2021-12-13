@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -18,7 +18,7 @@ public class FeedCommand extends ImmediateCommand {
 	private final String displayName;
 	private final int amount;
 
-	public FeedCommand(CrowdControlPlugin plugin, String effectName, String displayName, int amount) {
+	public FeedCommand(BukkitCrowdControlPlugin plugin, String effectName, String displayName, int amount) {
 		super(plugin);
 		this.effectName = effectName;
 		this.displayName = displayName;

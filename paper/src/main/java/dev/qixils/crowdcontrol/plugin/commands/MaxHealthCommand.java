@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -22,7 +22,7 @@ public class MaxHealthCommand extends ImmediateCommand {
 	private static final UUID MODIFIER_UUID = new UUID(-899185282624176127L, -7747914881652381318L);
 	private static final String MODIFIER_NAME = "max-health-cc";
 
-	public MaxHealthCommand(CrowdControlPlugin plugin, int amount) {
+	public MaxHealthCommand(BukkitCrowdControlPlugin plugin, int amount) {
 		super(plugin);
 		String amountText;
 		String displayText;

@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -24,11 +23,11 @@ public class FallingBlockCommand extends ImmediateCommand {
     private final String effectName;
     private final String displayName;
 
-    public FallingBlockCommand(CrowdControlPlugin plugin, Material blockMaterial) {
+    public FallingBlockCommand(BukkitCrowdControlPlugin plugin, Material blockMaterial) {
         super(plugin);
         this.blockMaterial = blockMaterial;
         this.effectName = "falling_block_" + blockMaterial.name();
-        this.displayName = "Falling " + TextUtil.translate(blockMaterial) + " Block";
+        this.displayName = "Falling " + plugin.getTextUtil().translate(blockMaterial) + " Block";
     }
 
     @Override

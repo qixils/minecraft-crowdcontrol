@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -20,11 +19,11 @@ public class BlockCommand extends ImmediateCommand {
     private final String effectName;
     private final String displayName;
 
-    public BlockCommand(CrowdControlPlugin plugin, Material block) {
+    public BlockCommand(BukkitCrowdControlPlugin plugin, Material block) {
         super(plugin);
         this.material = block;
         this.effectName = "block_" + block.name();
-        this.displayName = "Place " + TextUtil.translate(block) + " Block";
+        this.displayName = "Place " + plugin.getTextUtil().translate(block) + " Block";
     }
 
     @Override

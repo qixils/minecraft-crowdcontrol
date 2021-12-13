@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public final class FreezeCommand extends TimedCommand {
     @Getter
     private final String displayName = "Freeze";
 
-    public FreezeCommand(CrowdControlPlugin plugin) {
+    public FreezeCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

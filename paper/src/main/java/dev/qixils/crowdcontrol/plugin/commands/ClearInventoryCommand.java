@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -18,7 +18,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 	private final String effectName = "clear_inventory";
 	private final String displayName = "Clear Inventory";
 
-	public ClearInventoryCommand(CrowdControlPlugin plugin) {
+	public ClearInventoryCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 

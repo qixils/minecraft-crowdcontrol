@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -18,12 +17,13 @@ public class EnchantmentCommand extends ImmediateCommand {
     protected final Enchantment enchantment;
     private final String effectName;
     private final String displayName;
-    public EnchantmentCommand(CrowdControlPlugin plugin, Enchantment enchantment) {
+
+    public EnchantmentCommand(BukkitCrowdControlPlugin plugin, Enchantment enchantment) {
         super(plugin);
         this.enchantment = enchantment;
-        final String translate = TextUtil.translate(enchantment);
+        final String translate = plugin.getTextUtil().translate(enchantment);
         this.effectName = "enchant_" + translate.replace(' ', '_');
-        this.displayName = "Apply " + TextUtil.asPlain(enchantment.displayName(enchantment.getMaxLevel()));
+        this.displayName = "Apply " + plugin.getTextUtil().asPlain(enchantment.displayName(enchantment.getMaxLevel()));
     }
 
     @Override

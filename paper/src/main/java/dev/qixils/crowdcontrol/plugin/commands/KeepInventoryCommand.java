@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -59,7 +59,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public KeepInventoryCommand(CrowdControlPlugin plugin, boolean enable) {
+	public KeepInventoryCommand(BukkitCrowdControlPlugin plugin, boolean enable) {
 		super(plugin);
 		this.enable = enable;
 		this.effectName = "keep_inventory_" + (enable ? "on" : "off");

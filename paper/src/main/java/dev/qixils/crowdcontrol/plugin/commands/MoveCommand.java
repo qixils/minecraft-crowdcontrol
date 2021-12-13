@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.CrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -18,22 +18,23 @@ public class MoveCommand extends ImmediateCommand {
     protected final Vector vector;
     protected final String effectName;
     protected final String displayName;
-    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String effectName, String displayName) {
+
+    public MoveCommand(BukkitCrowdControlPlugin plugin, Vector displacement, String effectName, String displayName) {
         super(plugin);
         vector = displacement;
         this.effectName = effectName;
         this.displayName = "Fling " + displayName;
     }
 
-    public MoveCommand(CrowdControlPlugin plugin, double x, double y, double z, String effectName, String displayName) {
+    public MoveCommand(BukkitCrowdControlPlugin plugin, double x, double y, double z, String effectName, String displayName) {
         this(plugin, new Vector(x, y, z), effectName, displayName);
     }
 
-    public MoveCommand(CrowdControlPlugin plugin, Vector displacement, String effectName) {
+    public MoveCommand(BukkitCrowdControlPlugin plugin, Vector displacement, String effectName) {
         this(plugin, displacement, effectName, effectName);
     }
 
-    public MoveCommand(CrowdControlPlugin plugin, double x, double y, double z, String effectName) {
+    public MoveCommand(BukkitCrowdControlPlugin plugin, double x, double y, double z, String effectName) {
         this(plugin, x, y, z, effectName, effectName);
     }
 

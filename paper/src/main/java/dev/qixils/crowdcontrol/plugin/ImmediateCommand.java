@@ -11,7 +11,7 @@ import java.util.List;
  * A command whose result is available immediately
  */
 public abstract class ImmediateCommand extends Command implements dev.qixils.crowdcontrol.common.ImmediateCommand<Player> {
-    public ImmediateCommand(CrowdControlPlugin plugin) {
+    public ImmediateCommand(BukkitCrowdControlPlugin plugin) {
         super(plugin);
     }
 

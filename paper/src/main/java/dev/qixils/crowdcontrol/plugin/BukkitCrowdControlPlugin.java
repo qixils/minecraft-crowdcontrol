@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
-public final class CrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
+public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
     public static final PersistentDataType<Byte, Boolean> BOOLEAN = new BooleanDataType();
     private static final int PORT = 58431;
     FileConfiguration config = getConfig();
@@ -113,7 +113,6 @@ public final class CrowdControlPlugin extends JavaPlugin implements Listener, Pl
         initCrowdControl();
 
         Bukkit.getPluginManager().registerEvents(this, this);
-        Bukkit.getPluginManager().registerEvents(playerMapper, this);
 
         commandManager = new PaperCommandManager<>(this,
                 CommandExecutionCoordinator.simpleCoordinator(),
