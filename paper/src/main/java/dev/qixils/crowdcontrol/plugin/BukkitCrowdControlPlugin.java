@@ -134,11 +134,6 @@ public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listen
     }
 
     @CheckReturnValue
-    public boolean isGlobal(@NotNull Request request) {
-        return global || request.isGlobal();
-    }
-
-    @CheckReturnValue
     @NotNull
     public List<@NotNull Player> getAllPlayers() {
         return playerMapper.getAllPlayers();

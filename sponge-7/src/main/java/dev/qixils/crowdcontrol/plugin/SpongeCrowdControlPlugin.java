@@ -139,6 +139,11 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 		// TODO
 	}
 
+	@Override
+	public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
+		this.crowdControl = crowdControl;
+	}
+
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
 		initCrowdControl();

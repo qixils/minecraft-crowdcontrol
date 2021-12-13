@@ -361,7 +361,9 @@ public interface Plugin<P extends S, S> {
 	 * @return true if the request should apply to all online players
 	 */
 	@CheckReturnValue
-	boolean isGlobal(@NotNull Request request);
+	default boolean isGlobal(@NotNull Request request) {
+		return isGlobal() || request.isGlobal();
+	}
 
 	/**
 	 * Returns a collection of strings representing the names of hosts.
