@@ -6,7 +6,7 @@
 
     <groupId>dev.qixils.crowdcontrol.plugin</groupId>
     <artifactId>Minecraft-CrowdControl</artifactId>
-    <version>3.1.0</version>
+    <version>3.1.1</version>
     <packaging>jar</packaging>
 
     <name>CrowdControl-Plugin</name>
@@ -19,7 +19,7 @@
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <url>https://github.com/lexikiq/minecraft-crowdcontrol</url>
+    <url>https://github.com/qixils/minecraft-crowdcontrol</url>
 
     <pluginRepositories>
         <pluginRepository>

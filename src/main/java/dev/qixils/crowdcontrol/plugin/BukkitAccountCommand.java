@@ -13,6 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -36,13 +37,18 @@ public class BukkitAccountCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        final UUID uuid;
         Optional<UUID> optionalUUID = sender.get(Identity.UUID);
         if (optionalUUID.isEmpty()) {
-            sender.sendMessage(Component.text("This command can only be run by players").color(NamedTextColor.RED));
-            return true;
+            if (sender instanceof Entity entity)
+                uuid = entity.getUniqueId();
+            else {
+                sender.sendMessage(Component.text("This command can only be run by players").color(NamedTextColor.RED));
+                return true;
+            }
+        } else {
+            uuid = optionalUUID.get();
         }
-
-        UUID uuid = optionalUUID.get();
 
         if (args.length != 2)
             return false;
