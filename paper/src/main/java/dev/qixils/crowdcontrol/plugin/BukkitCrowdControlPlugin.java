@@ -20,6 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
@@ -119,6 +120,11 @@ public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listen
                 Function.identity()
         );
         registerChatCommands();
+    }
+
+    @Override
+    public @NotNull Logger getSLF4JLogger() {
+        return super.getSLF4JLogger();
     }
 
     @Override

@@ -19,6 +19,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
@@ -447,6 +448,17 @@ public interface Plugin<P extends S, S> {
 	void updateCrowdControl(@Nullable CrowdControl crowdControl);
 
 	/**
+	 * Restarts the {@link CrowdControl} instance.
+	 */
+	default void restartCrowdControl() {
+		CrowdControl cc = getCrowdControl();
+		if (cc != null)
+			cc.shutdown("Service is restarting");
+		updateCrowdControl(null);
+		initCrowdControl();
+	}
+
+	/**
 	 * Determines if the {@link CrowdControl} instance is running in server mode.
 	 *
 	 * @return true if the {@link CrowdControl} instance is running in server mode
@@ -476,6 +488,8 @@ public interface Plugin<P extends S, S> {
 
 	/**
 	 * Sets the password required for clients to connect to the server.
+	 * <p>
+	 * {@link #restartCrowdControl()} must be called for this to take effect.
 	 *
 	 * @param password unencrypted password
 	 * @throws IllegalArgumentException if the password is null
@@ -492,6 +506,12 @@ public interface Plugin<P extends S, S> {
 	 */
 	boolean isAdmin(@NotNull S commandSource);
 
+	/**
+	 * Renders messages to a player. This should be called by an event handler that listens for
+	 * players joining the server.
+	 *
+	 * @param player player to send messages to
+	 */
 	default void onPlayerJoin(P player) {
 		Audience audience = asAudience(player);
 		audience.sendMessage(JOIN_MESSAGE_1);
@@ -508,4 +528,11 @@ public interface Plugin<P extends S, S> {
 				audience.sendMessage(NO_CC_USER_ERROR);
 		}
 	}
+
+	/**
+	 * Gets the plugin's SLF4J logger.
+	 * @return slf4j logger
+	 */
+	@NotNull
+	Logger getSLF4JLogger();
 }

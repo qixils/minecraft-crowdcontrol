@@ -5,11 +5,10 @@ import cloud.commandframework.sponge7.SpongeCommandManager;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -33,7 +32,6 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -49,11 +47,10 @@ import java.util.function.Function;
 		authors = {"qixils"}
 )
 @Getter
-public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.Plugin<Player, CommandSource> {
+public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSource> {
 	private final TextUtil textUtil = new Sponge7TextUtil();
 	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
-	private final Class<Player> playerClass = Player.class;
-	private final Class<CommandSource> commandSenderClass = CommandSource.class;
+	private SpongeCommandManager<CommandSource> commandManager;
 	// injected variables
 	@Inject
 	private Logger logger;
@@ -72,21 +69,36 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	@Inject
 	private SpongeAudiences audiences;
-	// "actual" variables
-	private CrowdControl crowdControl;
-	private SpongeCommandManager<CommandSource> commandManager;
-	private boolean global;
-	@Accessors(fluent = true)
-	private boolean announceEffects;
-	private Collection<String> hosts = Collections.emptySet();
-	private boolean isServer = true;
-	private String manualPassword;
+
+	public SpongeCrowdControlPlugin() {
+		super(Player.class, CommandSource.class);
+	}
 
 	@Override
 	public Audience asAudience(@NotNull CommandSource source) {
 		if (source instanceof Player)
 			return audiences.player((Player) source);
 		return audiences.receiver(source);
+	}
+
+	@Override
+	public boolean isAdmin(@NotNull CommandSource commandSource) {
+		return commandSource.hasPermission(ADMIN_PERMISSION); // TODO: operator check
+	}
+
+	@Override
+	public @Nullable String getPassword() {
+		if (!isServer()) return null;
+		if (crowdControl != null)
+			return crowdControl.getPassword();
+		if (manualPassword != null)
+			return manualPassword;
+		try {
+			return configLoader.load().getNode("password").getString();
+		} catch (IOException e) {
+			logger.warn("Could not load config", e);
+			return null;
+		}
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -106,7 +118,7 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 		}
 
 		global = config.getNode("global").getBoolean(false);
-		announceEffects = config.getNode("announce").getBoolean(true);
+		announce = config.getNode("announce").getBoolean(true);
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
@@ -139,11 +151,6 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 		// TODO
 	}
 
-	@Override
-	public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
-		this.crowdControl = crowdControl;
-	}
-
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
 		initCrowdControl();
@@ -162,29 +169,7 @@ public class SpongeCrowdControlPlugin implements dev.qixils.crowdcontrol.common.
 	}
 
 	@Override
-	public boolean isAdmin(@NotNull CommandSource commandSource) {
-		return commandSource.hasPermission(ADMIN_PERMISSION); // TODO: operator check
-	}
-
-	@Override
-	public @Nullable String getPassword() {
-		if (!isServer()) return null;
-		if (crowdControl != null)
-			return crowdControl.getPassword();
-		if (manualPassword != null)
-			return manualPassword;
-		try {
-			return configLoader.load().getNode("password").getString();
-		} catch (IOException e) {
-			logger.warn("Could not load config", e);
-			return null;
-		}
-	}
-
-	@Override
-	public void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException {
-		if (!isServer())
-			throw new IllegalStateException("Not running in server mode");
-		manualPassword = ExceptionUtil.validateNotNull(password);
+	public @NotNull Logger getSLF4JLogger() {
+		return logger;
 	}
 }
