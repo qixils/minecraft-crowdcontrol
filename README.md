@@ -34,8 +34,8 @@ Minecraft server running with Crowd Control.
 7. A password must be set to run the server in Server Mode, allowing multiple streamers to connect.
    - The `config.yml` file can be found inside the `<root>/plugins/CrowdControl` folder.
    - Enter a password into the `password` field
-8. Ensure the ports 25565 and 58431 so that users may connect to the Minecraft server and its Crowd
-   Control server.
+8. Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and
+   its Crowd Control server.
 9. Pre-generating chunks using a plugin
    like [Chunkmaster](https://www.spigotmc.org/resources/chunkmaster.71351/) is recommended for
    optimal performance.
