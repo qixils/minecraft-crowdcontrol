@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class RegisterCommands {
+    @SuppressWarnings("deprecation") // Bukkit is dumb
     public static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
             new MappedKeyedTag<>(CommonTags.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
     public static final MaterialTag SET_BLOCKS = new MaterialTag(CommonTags.SET_BLOCKS);
@@ -89,7 +90,7 @@ public class RegisterCommands {
                 new DoOrDieCommand(plugin)
         ));
 
-        // register action bar updater
+        // register keep inventory event handler
         Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
 
         // entity commands

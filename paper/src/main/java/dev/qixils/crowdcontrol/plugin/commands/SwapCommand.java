@@ -33,7 +33,7 @@ public class SwapCommand extends ImmediateCommand {
             return request.buildResponse().type(ResultType.FAILURE).message("Not enough participating players online");
 
         // get shuffled list of players
-        Collections.shuffle(players, rand);
+        Collections.shuffle(players, random);
         // create a list offset by one
         List<Player> offset = new ArrayList<>(players.size());
         offset.addAll(players.subList(1, players.size()));

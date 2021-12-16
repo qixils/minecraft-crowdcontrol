@@ -273,7 +273,9 @@ public interface Plugin<P extends S, S> {
 				})
 		);
 
-		new MinecraftExceptionHandler<S>().withDefaultHandlers().apply(manager, this::asAudience);
+		new MinecraftExceptionHandler<S>().withDefaultHandlers()
+				.withDecorator(component -> TextBuilder.fromPrefix(PREFIX, component).color(NamedTextColor.RED).build())
+				.apply(manager, this::asAudience);
 	}
 
 	/**

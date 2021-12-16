@@ -10,20 +10,20 @@ import java.util.Collections;
 import java.util.Locale;
 
 public abstract class AbstractPlugin<P extends S, S> implements Plugin<P, S> {
-	private final @Getter
-	Class<P> playerClass;
-	private final @Getter
-	Class<S> commandSenderClass;
+	@Getter
+	private final Class<P> playerClass;
+	@Getter
+	private final Class<S> commandSenderClass;
 	protected String manualPassword = null;
-	protected @Getter
-	CrowdControl crowdControl = null;
-	protected @Getter
-	boolean isServer = true;
-	protected @Getter
-	boolean global = false;
+	@Getter
+	protected CrowdControl crowdControl = null;
+	@Getter
+	protected boolean isServer = true;
+	@Getter
+	protected boolean global = false;
 	protected boolean announce = true;
-	protected @Getter
-	Collection<String> hosts = Collections.emptyList();
+	@Getter
+	protected Collection<String> hosts = Collections.emptyList();
 
 	public AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;

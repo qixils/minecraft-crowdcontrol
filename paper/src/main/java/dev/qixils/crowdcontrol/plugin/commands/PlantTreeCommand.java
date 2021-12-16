@@ -27,7 +27,7 @@ public class PlantTreeCommand extends Command {
 	}
 
 	@Override
-	protected @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Streamer is not in a suitable place for tree planting");
 		TreeType treeType = RandomUtil.randomElementFrom(TreeType.values());
 
@@ -37,7 +37,7 @@ public class PlantTreeCommand extends Command {
 			futures.add(future);
 
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				if (player.getWorld().generateTree(player.getLocation(), rand, treeType))
+				if (player.getWorld().generateTree(player.getLocation(), random, treeType))
 					resp.type(ResultType.SUCCESS).message("SUCCESS");
 				future.complete(null);
 			});

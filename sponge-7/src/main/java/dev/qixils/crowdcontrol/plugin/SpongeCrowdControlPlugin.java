@@ -9,16 +9,20 @@ import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.asset.AssetId;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
@@ -32,15 +36,17 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 
 @Plugin(
-		id = "minecraft-crowd-control",
-		name = "Minecraft Crowd Control",
+		id = "crowd-control",
+		name = "Crowd Control",
 		version = "${project.version}",
 		description = "Allows viewers to interact with your Minecraft world",
 		url = "https://github.com/qixils/minecraft-crowdcontrol",
@@ -51,6 +57,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	private final TextUtil textUtil = new Sponge7TextUtil();
 	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
 	private SpongeCommandManager<CommandSource> commandManager;
+	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
+	private List<Command> commands;
 	// injected variables
 	@Inject
 	private Logger logger;
@@ -65,8 +73,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Inject
 	private Game game;
 	@Inject
-	@DefaultConfig() // TODO: set this up
-	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
+	@AssetId("default.conf")
+	private Asset defaultConfig;
+	@Inject
+	@DefaultConfig(sharedRoot = true)
+	private Path configPath;
 	@Inject
 	private SpongeAudiences audiences;
 
@@ -148,11 +159,20 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			}
 			crowdControl = CrowdControl.client().port(PORT).ip(ip).build();
 		}
-		// TODO
+
+		if (commands == null)
+			commands = RegisterCommands.register(this);
+		else
+			RegisterCommands.register(this, commands);
 	}
 
+	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
+		defaultConfig.copyToFile(configPath, false, true);
+		configLoader = HoconConfigurationLoader.builder()
+				.setPath(configPath)
+				.build();
 		initCrowdControl();
 		commandManager = new SpongeCommandManager<>(
 				pluginContainer,
@@ -165,7 +185,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	@Listener
 	public void onServerStop(GameStoppingServerEvent event) {
-
+		if (crowdControl != null) {
+			crowdControl.shutdown("Minecraft server is shutting down");
+			crowdControl = null;
+		}
+		commands = null;
 	}
 
 	@Override

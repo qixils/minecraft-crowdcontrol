@@ -37,6 +37,7 @@ public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listen
     FileConfiguration config = getConfig();
     @Getter
     private final BukkitPlayerMapper playerMapper = new BukkitPlayerMapper(this);
+    @SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
     @Getter
     private final TextUtil textUtil = new TextUtil(Bukkit.getUnsafe().componentFlattener());
     @Getter
@@ -129,9 +130,10 @@ public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listen
 
     @Override
     public void onDisable() {
-        if (crowdControl == null) return;
-        crowdControl.shutdown("Plugin is unloading (server may be shutting down)");
-        crowdControl = null;
+        if (crowdControl != null) {
+            crowdControl.shutdown("Plugin is unloading (server may be shutting down)");
+            crowdControl = null;
+        }
         commands = null;
     }
 

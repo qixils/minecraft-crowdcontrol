@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.common.util;
 
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -11,7 +10,7 @@ import java.util.Map;
 import java.util.Spliterator;
 import java.util.function.Function;
 
-public class MappedKeyedTag<T extends Keyed> implements Iterable<T> {
+public class MappedKeyedTag<T> implements Iterable<T> {
 	private final Map<Key, T> keyMap = new HashMap<>();
 	private final Function<Key, T> mapper;
 	private final KeyedTag tag;

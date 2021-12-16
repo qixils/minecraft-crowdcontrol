@@ -32,13 +32,13 @@ public class ClutterCommand extends ImmediateCommand {
             Set<Integer> slots = new HashSet<>();
             slots.add(inventory.getHeldItemSlot());
             while (slots.size() < 3)
-                slots.add(rand.nextInt(maxSlots));
+                slots.add(random.nextInt(maxSlots));
             for (int slot : slots) {
                 ItemStack hand = inventory.getItem(slot);
                 // lazy workaround to get a unique slot lmfao
                 int destSlot = slot;
                 while (destSlot == slot) {
-                    destSlot = rand.nextInt(maxSlots);
+                    destSlot = random.nextInt(maxSlots);
                 }
                 ItemStack swap = inventory.getItem(destSlot);
                 inventory.setItem(slot, swap);

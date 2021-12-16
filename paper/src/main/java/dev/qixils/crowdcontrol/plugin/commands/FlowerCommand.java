@@ -40,7 +40,7 @@ public class FlowerCommand extends ImmediateCommand {
                     .build();
             Location location = finder.next();
             int placed = 0;
-            int toPlace = MIN_RAND+rand.nextInt(MAX_RAND-MIN_RAND+1);
+            int toPlace = MIN_RAND + random.nextInt(MAX_RAND - MIN_RAND + 1);
             while (location != null) {
                 if (location.clone().subtract(0, 1, 0).getBlock().getType().isSolid()) {
                     ++placed;

@@ -125,8 +125,8 @@ public class VeinCommand extends ImmediateCommand {
     @Contract(value = "null -> fail", mutates = "param1")
     private static void randomlyShrinkOreVein(List<Location> blockLocations) {
         if (blockLocations.isEmpty()) return;
-        Collections.shuffle(blockLocations, rand);
-        int maxBlocks = 1 + rand.nextInt(blockLocations.size());
+        Collections.shuffle(blockLocations, random);
+        int maxBlocks = 1 + random.nextInt(blockLocations.size());
         while (blockLocations.size() > maxBlocks)
             blockLocations.remove(0);
     }

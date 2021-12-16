@@ -29,7 +29,7 @@ public class DigCommand extends ImmediateCommand {
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
         Set<Block> blocks = new HashSet<>();
-        int depth = -(3 + rand.nextInt(5));
+        int depth = -(3 + random.nextInt(5));
         for (Player player : players) {
             for (double x = -RADIUS; x <= RADIUS; ++x) {
                 for (int y = depth; y < 0; ++y) {

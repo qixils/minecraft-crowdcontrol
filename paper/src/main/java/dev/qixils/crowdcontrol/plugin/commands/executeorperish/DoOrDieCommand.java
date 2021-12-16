@@ -54,7 +54,7 @@ public class DoOrDieCommand extends VoidCommand {
         new TimedEffect(request, COOLDOWN, effect -> {
             List<Player> players = plugin.getPlayers(request);
             List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
-            Collections.shuffle(conditions, rand);
+            Collections.shuffle(conditions, random);
             SuccessCondition condition = null;
             while (condition == null && !conditions.isEmpty()) {
                 SuccessCondition next = conditions.remove(0);
