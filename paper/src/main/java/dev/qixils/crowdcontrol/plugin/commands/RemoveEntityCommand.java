@@ -14,36 +14,37 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.REMOVE_ENTITY_RADIUS;
+
 @Getter
 public final class RemoveEntityCommand extends Command {
-    private static final int SEARCH_RADIUS = 35;
-    private final EntityType entityType;
-    private final String effectName;
-    private final String displayName;
+	private final EntityType entityType;
+	private final String effectName;
+	private final String displayName;
 
-    public RemoveEntityCommand(BukkitCrowdControlPlugin plugin, EntityType entityType) {
-        super(plugin);
-        this.entityType = entityType;
-        this.effectName = "remove_entity_" + entityType.name();
-        this.displayName = "Remove " + plugin.getTextUtil().translate(entityType);
-    }
+	public RemoveEntityCommand(BukkitCrowdControlPlugin plugin, EntityType entityType) {
+		super(plugin);
+		this.entityType = entityType;
+		this.effectName = "remove_entity_" + entityType.name();
+		this.displayName = "Remove " + plugin.getTextUtil().translate(entityType);
+	}
 
-    @Override
-    protected @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        CompletableFuture<Response.Builder> future = new CompletableFuture<>();
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
-                    .message("No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
+	@Override
+	public @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
+					.message("No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
 
-            for (Player player : players) {
-                for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), SEARCH_RADIUS)) {
-                    result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-                    entity.remove();
-                    break;
-                }
-            }
-            future.complete(result);
-        });
+			for (Player player : players) {
+				for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
+					result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+					entity.remove();
+					break;
+				}
+			}
+			future.complete(result);
+		});
         return future;
     }
 }

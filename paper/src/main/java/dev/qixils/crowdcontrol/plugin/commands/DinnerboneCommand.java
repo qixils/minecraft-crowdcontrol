@@ -18,38 +18,41 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_NAME;
+import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_RADIUS;
+
 public class DinnerboneCommand extends Command {
-    private static final String NAME = "Dinnerbone";
-    private static final int RADIUS = 15;
+	@Getter
+	private final String effectName = "dinnerbone";
+	@Getter
+	private final String displayName = "Dinnerbone";
 
-    public DinnerboneCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public DinnerboneCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Getter
-    private final String effectName = "dinnerbone";
-    @Getter
-    private final String displayName = "Dinnerbone";
-
-    @Override
-    protected @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Set<LivingEntity> entities = new HashSet<>();
-        CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            for (Player player : players) {
-                entities.addAll(player.getLocation().getNearbyLivingEntities(RADIUS,
-                        x -> x.getType() != EntityType.PLAYER && (x.getCustomName() == null || x.getCustomName().isEmpty() || x.getCustomName().equals(NAME) || SummonEntityCommand.isMobViewerSpawned(plugin, x))
-                ));
-            }
-            successFuture.complete(!entities.isEmpty());
-            entities.forEach(x -> {
-                // TODO: save/restore old name
-                x.setCustomNameVisible(false);
-                x.setCustomName(Objects.equals(x.getCustomName(), NAME) ? null : NAME);
-            });
-        });
-        return successFuture.thenApply(success -> success
-                ? request.buildResponse().type(ResultType.SUCCESS)
-                : request.buildResponse().type(ResultType.RETRY).message("No nearby entities"));
-    }
+	@Override
+	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Set<LivingEntity> entities = new HashSet<>();
+		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			for (Player player : players) {
+				entities.addAll(player.getLocation().getNearbyLivingEntities(DINNERBONE_RADIUS,
+						x -> x.getType() != EntityType.PLAYER
+								&& (x.getCustomName() == null
+								|| x.getCustomName().isEmpty()
+								|| x.getCustomName().equals(DINNERBONE_NAME)
+								|| SummonEntityCommand.isMobViewerSpawned(plugin, x))));
+			}
+			successFuture.complete(!entities.isEmpty());
+			entities.forEach(x -> {
+				// TODO: save/restore old name
+				x.setCustomNameVisible(false);
+				x.setCustomName(Objects.equals(x.getCustomName(), DINNERBONE_NAME) ? null : DINNERBONE_NAME);
+			});
+		});
+		return successFuture.thenApply(success -> success
+				? request.buildResponse().type(ResultType.SUCCESS)
+				: request.buildResponse().type(ResultType.RETRY).message("No nearby entities"));
+	}
 }

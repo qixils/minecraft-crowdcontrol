@@ -11,18 +11,18 @@ import org.bukkit.entity.Player;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
-    public ChargedCreeperCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin, EntityType.CREEPER);
-    }
+	private final String effectName = "entity_charged_creeper";
+	private final String displayName = "Summon Charged Creeper";
 
-    private final String effectName = "entity_charged_creeper";
-    private final String displayName = "Summon Charged Creeper";
+	public ChargedCreeperCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin, EntityType.CREEPER);
+	}
 
-    @Override
-    protected Entity spawnEntity(String viewer, Player player) {
-        Creeper creeper = (Creeper) super.spawnEntity(viewer, player);
-        creeper.setPowered(true);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
-        return creeper;
-    }
+	@Override
+	protected Entity spawnEntity(String viewer, Player player) {
+		Creeper creeper = (Creeper) super.spawnEntity(viewer, player);
+		creeper.setPowered(true);
+		creeper.getWorld().playSound(creeper.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
+		return creeper;
+	}
 }

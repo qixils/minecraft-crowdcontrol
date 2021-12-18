@@ -19,6 +19,7 @@ public class Sponge7TextUtil extends TextUtil {
 	@Override
 	@Deprecated
 	public String translate(Translatable translatable) {
+		// TODO: this is possible to support
 		throw new UnsupportedOperationException("Translation services are unavailable in Sponge API v7");
 	}
 }

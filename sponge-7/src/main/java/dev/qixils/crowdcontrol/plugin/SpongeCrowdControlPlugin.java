@@ -6,7 +6,6 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -39,7 +38,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
@@ -47,18 +45,18 @@ import java.util.function.Function;
 @Plugin(
 		id = "crowd-control",
 		name = "Crowd Control",
-		version = "${project.version}",
+		version = "3.2.0-SNAPSHOT",
 		description = "Allows viewers to interact with your Minecraft world",
 		url = "https://github.com/qixils/minecraft-crowdcontrol",
 		authors = {"qixils"}
 )
 @Getter
 public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSource> {
-	private final TextUtil textUtil = new Sponge7TextUtil();
+	private final CommandRegister register = new CommandRegister(this);
+	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
 	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
-	private List<Command> commands;
 	// injected variables
 	@Inject
 	private Logger logger;
@@ -160,10 +158,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			crowdControl = CrowdControl.client().port(PORT).ip(ip).build();
 		}
 
-		if (commands == null)
-			commands = RegisterCommands.register(this);
-		else
-			RegisterCommands.register(this, commands);
+		register.register();
 	}
 
 	@SneakyThrows(IOException.class)
@@ -189,7 +184,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			crowdControl.shutdown("Minecraft server is shutting down");
 			crowdControl = null;
 		}
-		commands = null;
 	}
 
 	@Override

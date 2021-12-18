@@ -1,5 +1,14 @@
 package dev.qixils.crowdcontrol.plugin;
 
+import dev.qixils.crowdcontrol.common.util.CommonTags;
+import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
+import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
+import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
+import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
+import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.item.ItemType;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,19 +16,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class RegisterCommands {
-//	public static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
-//			new MappedKeyedTag<>(CommonTags.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
-//	public static final MaterialTag SET_BLOCKS = new MaterialTag(CommonTags.SET_BLOCKS);
-//	public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommonTags.SET_BLOCKS);
-//	public static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommonTags.SET_BLOCKS);
+public class CommandRegister {
+	private final SpongeCrowdControlPlugin plugin;
+	private final MappedKeyedTag<EntityType> SAFE_ENTITIES;
+	private final MappedKeyedTag<ItemType> SET_BLOCKS;
+	private final MappedKeyedTag<ItemType> SET_FALLING_BLOCKS;
+	private final MappedKeyedTag<ItemType> GIVE_TAKE_ITEMS;
+	private List<Command> registeredCommands;
 
-	public static List<Command> getCommands(SpongeCrowdControlPlugin plugin) {
+	public CommandRegister(SpongeCrowdControlPlugin plugin) {
+		this.plugin = plugin;
+		SAFE_ENTITIES = new TypedTag<>(CommonTags.SAFE_ENTITIES, plugin, EntityType.class);
+		SET_BLOCKS = new TypedTag<>(CommonTags.SET_BLOCKS, plugin, ItemType.class);
+		SET_FALLING_BLOCKS = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin, ItemType.class);
+		GIVE_TAKE_ITEMS = new TypedTag<>(CommonTags.GIVE_TAKE_ITEMS, plugin, ItemType.class);
+	}
+
+	public List<Command> getCommands() {
+		if (registeredCommands != null)
+			return registeredCommands;
+
 		// register normal commands
 		List<Command> commands = new ArrayList<>(Arrays.asList(
 //				new VeinCommand(plugin),
 //				new SoundCommand(plugin),
-//				new ChargedCreeperCommand(plugin),
+				new ChargedCreeperCommand(plugin)
 //				new SwapCommand(plugin),
 //				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin),
@@ -78,10 +99,10 @@ public class RegisterCommands {
 //		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
 
 		// entity commands
-//		for (EntityType entity : SAFE_ENTITIES) {
-//			commands.add(new SummonEntityCommand(plugin, entity));
-//			commands.add(new RemoveEntityCommand(plugin, entity));
-//		}
+		for (EntityType entity : SAFE_ENTITIES) {
+			commands.add(new SummonEntityCommand(plugin, entity));
+			commands.add(new RemoveEntityCommand(plugin, entity));
+		}
 
 		// register difficulty commands
 //		for (Difficulty difficulty : Difficulty.values()) {
@@ -125,28 +146,22 @@ public class RegisterCommands {
 //					gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
 //		}
 
-		return commands;
+		registeredCommands = commands;
+		return registeredCommands;
 	}
 
-	public static List<Command> register(SpongeCrowdControlPlugin plugin) {
-		List<Command> commands = register(plugin, getCommands(plugin));
-		for (Command command : commands) {
-			if (command.isEventListener())
+	public void register() {
+		boolean firstRegistry = registeredCommands == null;
+		for (Command command : getCommands()) {
+			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
+			plugin.registerCommand(name, command);
+
+			if (firstRegistry && command.isEventListener())
 				plugin.getGame().getEventManager().registerListeners(plugin, command);
 		}
-		return commands;
 	}
 
-	public static List<Command> register(SpongeCrowdControlPlugin plugin, List<Command> commands) {
-		for (Command cmd : commands) {
-			String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
-			plugin.registerCommand(name, cmd);
-		}
-
-		return commands;
-	}
-
-	public static void writeCommands(SpongeCrowdControlPlugin plugin, List<Command> commands) {
+	public void writeCommands(List<Command> commands) {
 		try {
 			FileWriter fileWriter = new FileWriter("crowdcontrol_commands.txt");
 			for (Command command : commands)

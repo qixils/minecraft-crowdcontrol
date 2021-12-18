@@ -2,10 +2,14 @@ package dev.qixils.crowdcontrol.common.util;
 
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
 import java.util.function.Function;
@@ -16,12 +20,12 @@ public class MappedKeyedTag<T> implements Iterable<T> {
 	private final KeyedTag tag;
 	private Collection<T> calculatedValues = null;
 
-	public MappedKeyedTag(KeyedTag tag, Function<Key, T> mapper) {
+	public MappedKeyedTag(@NotNull KeyedTag tag, @NotNull Function<@NotNull Key, @Nullable T> mapper) {
 		this.tag = tag;
 		this.mapper = mapper;
 	}
 
-	private T map(Key key) {
+	private T map(@NotNull Key key) {
 		return keyMap.computeIfAbsent(key, mapper);
 	}
 
@@ -52,9 +56,18 @@ public class MappedKeyedTag<T> implements Iterable<T> {
 	 * Gets a random value from this tag.
 	 *
 	 * @return random value
+	 * @throws IllegalStateException if all associated keys map to a null value
 	 */
-	public T getRandom() {
-		return map(RandomUtil.randomElementFrom(tag.getKeys()));
+	@NotNull
+	public T getRandom() throws IllegalStateException {
+		List<Key> keys = new ArrayList<>(tag.getKeys());
+		Collections.shuffle(keys, RandomUtil.RNG);
+		for (Key key : keys) {
+			T item = map(key);
+			if (item != null)
+				return item;
+		}
+		throw new IllegalStateException("Could not find a valid mapped value");
 	}
 
 	/**

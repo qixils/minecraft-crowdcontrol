@@ -23,14 +23,14 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>templating-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
-                        <id>filter-src</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>filter-sources</goal>
+                            <goal>shade</goal>
                         </goals>
                     </execution>
                 </executions>
