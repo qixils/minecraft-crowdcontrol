@@ -55,7 +55,7 @@ public class KeyedTag implements Iterable<Key> {
 	}
 
 	public Set<Key> getKeys() {
-		return Set.copyOf(keyedSet);
+		return Collections.unmodifiableSet(new HashSet<>(keyedSet));
 	}
 
 	@NotNull

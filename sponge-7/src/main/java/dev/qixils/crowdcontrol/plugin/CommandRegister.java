@@ -18,23 +18,32 @@ import java.util.Locale;
 
 public class CommandRegister {
 	private final SpongeCrowdControlPlugin plugin;
-	private final MappedKeyedTag<EntityType> SAFE_ENTITIES;
-	private final MappedKeyedTag<ItemType> SET_BLOCKS;
-	private final MappedKeyedTag<ItemType> SET_FALLING_BLOCKS;
-	private final MappedKeyedTag<ItemType> GIVE_TAKE_ITEMS;
+	private boolean tagsRegistered = false;
+	private MappedKeyedTag<EntityType> safeEntities;
+	private MappedKeyedTag<ItemType> setBlocks;
+	private MappedKeyedTag<ItemType> setFallingBlocks;
+	private MappedKeyedTag<ItemType> giveTakeItems;
 	private List<Command> registeredCommands;
 
 	public CommandRegister(SpongeCrowdControlPlugin plugin) {
 		this.plugin = plugin;
-		SAFE_ENTITIES = new TypedTag<>(CommonTags.SAFE_ENTITIES, plugin, EntityType.class);
-		SET_BLOCKS = new TypedTag<>(CommonTags.SET_BLOCKS, plugin, ItemType.class);
-		SET_FALLING_BLOCKS = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin, ItemType.class);
-		GIVE_TAKE_ITEMS = new TypedTag<>(CommonTags.GIVE_TAKE_ITEMS, plugin, ItemType.class);
+	}
+
+	private void registerTags() {
+		if (!tagsRegistered) {
+			tagsRegistered = true;
+			safeEntities = new TypedTag<>(CommonTags.SAFE_ENTITIES, plugin, EntityType.class);
+			setBlocks = new TypedTag<>(CommonTags.SET_BLOCKS, plugin, ItemType.class);
+			setFallingBlocks = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin, ItemType.class);
+			giveTakeItems = new TypedTag<>(CommonTags.GIVE_TAKE_ITEMS, plugin, ItemType.class);
+		}
 	}
 
 	public List<Command> getCommands() {
 		if (registeredCommands != null)
 			return registeredCommands;
+
+		registerTags();
 
 		// register normal commands
 		List<Command> commands = new ArrayList<>(Arrays.asList(
@@ -99,7 +108,7 @@ public class CommandRegister {
 //		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
 
 		// entity commands
-		for (EntityType entity : SAFE_ENTITIES) {
+		for (EntityType entity : safeEntities) {
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}

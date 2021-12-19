@@ -28,6 +28,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.AsynchronousExecutor;
@@ -176,6 +177,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 				Function.identity(),
 				Function.identity()
 		);
+		registerChatCommands();
 	}
 
 	@Listener
@@ -184,6 +186,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			crowdControl.shutdown("Minecraft server is shutting down");
 			crowdControl = null;
 		}
+	}
+
+	@Listener
+	public void onConnection(ClientConnectionEvent.Join event) {
+		onPlayerJoin(event.getTargetEntity());
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class RemoveEntityCommand extends Command {
 	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + entityType.getId(); // TODO: ensure this is right!
+		this.effectName = "remove_entity_" + entityType.getId().replaceFirst("minecraft:", "");
 		this.displayName = "Remove " + entityType.getTranslation().get();
 	}
 

@@ -35,7 +35,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "entity_" + entityType.getId(); // TODO: ensure this is right!
+		this.effectName = "entity_" + entityType.getId().replaceFirst("minecraft:", "");
 		this.displayName = "Summon " + entityType.getTranslation().get();
 	}
 

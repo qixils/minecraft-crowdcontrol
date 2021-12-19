@@ -166,7 +166,7 @@ public interface Plugin<P extends S, S> {
 		// unlink command
 		manager.command(account.literal("unlink")
 				.meta(CommandMeta.DESCRIPTION, "Unlink a Twitch account from your Minecraft account")
-				.argument(usernameArg, usernameDesc)
+				.argument(usernameArg.copy(), usernameDesc)
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
