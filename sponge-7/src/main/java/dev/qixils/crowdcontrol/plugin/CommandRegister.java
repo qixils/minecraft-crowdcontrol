@@ -32,10 +32,10 @@ public class CommandRegister {
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new TypedTag<>(CommonTags.SAFE_ENTITIES, plugin, EntityType.class);
-			setBlocks = new TypedTag<>(CommonTags.SET_BLOCKS, plugin, ItemType.class);
-			setFallingBlocks = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin, ItemType.class);
-			giveTakeItems = new TypedTag<>(CommonTags.GIVE_TAKE_ITEMS, plugin, ItemType.class);
+			safeEntities = new TypedTag<>(CommonTags.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class);
+			setBlocks = new TypedTag<>(CommonTags.SET_BLOCKS, plugin.getRegistry(), ItemType.class);
+			setFallingBlocks = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin.getRegistry(), ItemType.class);
+			giveTakeItems = new TypedTag<>(CommonTags.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
 		}
 	}
 

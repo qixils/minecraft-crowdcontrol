@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetId;
 import org.spongepowered.api.command.CommandSource;
@@ -32,6 +33,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.AsynchronousExecutor;
+import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 
@@ -58,6 +60,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
+	private Scheduler scheduler;
 	// injected variables
 	@Inject
 	private Logger logger;
@@ -79,6 +82,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	private Path configPath;
 	@Inject
 	private SpongeAudiences audiences;
+	@Inject
+	private GameRegistry registry;
 
 	public SpongeCrowdControlPlugin() {
 		super(Player.class, CommandSource.class);
@@ -165,6 +170,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
+		scheduler = game.getScheduler();
 		defaultConfig.copyToFile(configPath, false, true);
 		configLoader = HoconConfigurationLoader.builder()
 				.setPath(configPath)
