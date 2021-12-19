@@ -28,7 +28,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + entityType.getId().replaceFirst("minecraft:", "");
+		this.effectName = "remove_entity_" + plugin.getTextUtil().valueOf(entityType);
 		this.displayName = "Remove " + entityType.getTranslation().get();
 	}
 

@@ -3,11 +3,13 @@ package dev.qixils.crowdcontrol.plugin;
 import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
+import dev.qixils.crowdcontrol.plugin.commands.DifficultyCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -114,9 +116,9 @@ public class CommandRegister {
 		}
 
 		// register difficulty commands
-//		for (Difficulty difficulty : Difficulty.values()) {
-//			commands.add(new DifficultyCommand(plugin, difficulty));
-//		}
+		for (Difficulty difficulty : plugin.getRegistry().getAllOf(Difficulty.class)) {
+			commands.add(new DifficultyCommand(plugin, difficulty));
+		}
 
 		// potions
 //		for (PotionEffectType potionEffectType : PotionEffectType.values()) {

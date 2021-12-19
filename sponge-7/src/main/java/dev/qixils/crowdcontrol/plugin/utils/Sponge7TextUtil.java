@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.utils;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.translation.Translatable;
+import org.spongepowered.api.CatalogType;
 
 public class Sponge7TextUtil extends TextUtil {
 	public Sponge7TextUtil() {
@@ -21,5 +22,9 @@ public class Sponge7TextUtil extends TextUtil {
 	public String translate(Translatable translatable) {
 		// TODO: this is possible to support
 		throw new UnsupportedOperationException("Translation services are unavailable in Sponge API v7");
+	}
+
+	public String valueOf(CatalogType type) {
+		return type.getId().replaceFirst("minecraft:", "");
 	}
 }
