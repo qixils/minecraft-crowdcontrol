@@ -32,7 +32,6 @@ public class SpongePlayerMapper extends AbstractPlayerMapper<Player> {
 
 	@Override
 	public @NotNull List<@NotNull Player> getAllPlayers() {
-		plugin.getSLF4JLogger().info("Getting all players");
 		return filter(new ArrayList<>(plugin.getGame().getServer().getOnlinePlayers()));
 	}
 
@@ -47,8 +46,6 @@ public class SpongePlayerMapper extends AbstractPlayerMapper<Player> {
 			for (UUID uuid : twitchToUserMap.get(target.getName()))
 				players.add(server.getPlayer(uuid).orElse(null));
 		}
-
-		plugin.getSLF4JLogger().info("Got " + players.size() + " players");
 
 		return filter(players);
 	}
