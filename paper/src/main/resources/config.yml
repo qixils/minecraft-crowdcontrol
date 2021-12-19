@@ -4,8 +4,6 @@ password: ""
 
 # Makes it so that all purchased effects apply to everyone on the server,
 #  even when running in server-mode with individually connected clients.
-# Enabling this is usually not recommended,
-#  unless running in client-mode is not viable for your setup.
 global: false
 
 # The hosts or owners of a server, through which viewers are able to purchase specific universal
