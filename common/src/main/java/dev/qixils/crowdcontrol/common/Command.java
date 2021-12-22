@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public interface Command<P> {
 	@NotNull
@@ -36,7 +37,7 @@ public interface Command<P> {
 
 	default void executeAndNotify(@NotNull Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
-		plugin.getSLF4JLogger().info("Executing " + getDisplayName());
+		plugin.getSLF4JLogger().info("Executing " + getDisplayName()); // TODO make debug
 		List<P> players = plugin.getPlayers(request);
 
 		// ensure targets are online / available
@@ -96,6 +97,12 @@ public interface Command<P> {
 		Plugin<?, ?> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
 		announce(Audience.audience(audiences), request);
+	}
+
+	default void playerAnnounce(final Collection<P> players, final Request request) {
+		Plugin<P, ? super P> plugin = getPlugin();
+		if (!plugin.announceEffects()) return;
+		announce(players.stream().map(plugin::asAudience).collect(Collectors.toList()), request);
 	}
 
 	default void announce(final Audience audience, final Request request) {

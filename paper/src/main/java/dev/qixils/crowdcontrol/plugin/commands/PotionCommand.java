@@ -35,7 +35,8 @@ public class PotionCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        PotionEffect potionEffect = potionEffectType.createEffect(duration, random.nextInt(2));
+        // TODO match sponge 7 impl
+        PotionEffect potionEffect = potionEffectType.createEffect(duration, random.nextInt(3));
         Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> player.addPotionEffect(potionEffect)));
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
