@@ -13,7 +13,6 @@ import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.living.player.Player;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class PotionCommand extends ImmediateCommand {
 	private static final int SECONDS = 15;
 	private static final int TICKS = 20 * SECONDS;
 	private final PotionEffectType potionEffectType;
-	private final Duration duration;
+	private final int duration;
 	private final String effectName;
 	private final String displayName;
 
@@ -30,7 +29,7 @@ public class PotionCommand extends ImmediateCommand {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
 		boolean isMinimal = potionEffectType.isInstant();
-		duration = isMinimal ? Duration.ZERO : Duration.ofSeconds(SECONDS);
+		duration = isMinimal ? 1 : TICKS;
 		this.effectName = "potion_" + potionEffectType.getTranslation().get();
 		this.displayName = "Apply " + TextUtil.titleCase(potionEffectType.getTranslation().get()) + " Potion Effect (" + SECONDS + "s)";
 	}
@@ -40,7 +39,7 @@ public class PotionCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		PotionEffect.Builder builder = PotionEffect.builder()
 				.potionType(potionEffectType)
-				.duration(potionEffectType.isInstant() ? 1 : TICKS);
+				.duration(duration);
 
 		for (Player player : players) {
 			PotionEffect effect = builder.build();
