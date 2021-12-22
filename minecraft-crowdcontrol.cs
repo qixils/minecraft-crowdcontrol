@@ -9,8 +9,8 @@ namespace CrowdControl.Games.Packs
 {
     public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
     {
+        // note: these two fields are sorta for decor as they're overridden with some secret stuff by the CC team
         public override string Host => "127.0.0.1";
-
         public override ushort Port => 58431;
 
         public override ISimpleTCPPack.AuthenticationType AuthenticationMode => ISimpleTCPPack.AuthenticationType.SimpleTCPSendKey;
