@@ -76,7 +76,6 @@ public final class CrowdControlPlugin extends JavaPlugin implements Listener {
             .next("WARNING: ", NamedTextColor.RED)
             .rawNext("The Crowd Control plugin has failed to load. Please review the console logs and resolve the error.")
             .build();
-    private static final int port = 58431;
     FileConfiguration config = getConfig();
     private final PlayerMapper mapper = new PlayerMapper(this);
     // actual stuff
@@ -98,6 +97,7 @@ public final class CrowdControlPlugin extends JavaPlugin implements Listener {
         config = getConfig();
         String password = Objects.requireNonNullElseGet(manualPassword, () -> config.getString("password", ""));
         String ip = config.getString("ip", "127.0.0.1");
+        int port = config.getInt("port", 58431);
 
         if (!config.getBoolean("legacy", false)) {
             isServer = true;
