@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +31,8 @@ public class BucketClutchCommand extends ImmediateCommand {
 	protected Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players are on the surface");
 		for (Player player : players) {
+			if (player.getWorld().getEnvironment().equals(Environment.NETHER))
+				continue;
 			Location curr = player.getLocation();
 			boolean obstruction = false;
 			for (int y = 1; y <= OFFSET; y++) {
