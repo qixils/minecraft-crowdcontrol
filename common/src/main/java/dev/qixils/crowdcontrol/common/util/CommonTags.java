@@ -179,6 +179,16 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "elytra")
 	);
 
+	public static final KeyedTag REPLACEABLE_BLOCKS = new KeyedTag(
+			Key.key(MINECRAFT_NAMESPACE, "air"),
+			Key.key(MINECRAFT_NAMESPACE, "cave_air"),
+			Key.key(MINECRAFT_NAMESPACE, "void_air"),
+			Key.key(MINECRAFT_NAMESPACE, "grass"),
+			Key.key(MINECRAFT_NAMESPACE, "tall_grass"),
+			Key.key(MINECRAFT_NAMESPACE, "water"),
+			Key.key(MINECRAFT_NAMESPACE, "lava")
+	);
+
 	private CommonTags() {
 		throw new IllegalStateException("Utility class");
 	}

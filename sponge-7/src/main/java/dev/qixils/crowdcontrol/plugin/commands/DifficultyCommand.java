@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
@@ -24,7 +25,7 @@ public class DifficultyCommand extends ImmediateCommand {
 	public DifficultyCommand(SpongeCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
-		this.effectName = "difficulty_" + plugin.getTextUtil().valueOf(difficulty);
+		this.effectName = "difficulty_" + Sponge7TextUtil.valueOf(difficulty);
 		this.displayName = difficulty.getTranslation().get() + " Mode";
 	}
 

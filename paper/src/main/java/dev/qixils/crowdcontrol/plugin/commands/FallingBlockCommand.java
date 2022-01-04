@@ -15,10 +15,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.FALLING_BLOCK_FALL_DISTANCE;
+
 @Getter
 public class FallingBlockCommand extends ImmediateCommand {
-    private static final int Y = 5;
-
     protected final Material blockMaterial;
     private final String effectName;
     private final String displayName;
@@ -27,7 +27,7 @@ public class FallingBlockCommand extends ImmediateCommand {
         super(plugin);
         this.blockMaterial = blockMaterial;
         this.effectName = "falling_block_" + blockMaterial.name();
-        this.displayName = "Falling " + plugin.getTextUtil().translate(blockMaterial) + " Block";
+        this.displayName = "Place Falling " + plugin.getTextUtil().translate(blockMaterial) + " Block";
     }
 
     @Override
@@ -35,7 +35,10 @@ public class FallingBlockCommand extends ImmediateCommand {
         Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Could not find a valid location to place block");
         for (Player player : players) {
             Location destination = player.getEyeLocation();
-            destination.setY(Math.min(destination.getY()+Y, player.getWorld().getMaxHeight()-1));
+            destination.setY(Math.min(
+                    destination.getY() + FALLING_BLOCK_FALL_DISTANCE,
+                    player.getWorld().getMaxHeight() - 1)
+            );
 
             Block block = destination.getBlock();
             Material type = block.getType();

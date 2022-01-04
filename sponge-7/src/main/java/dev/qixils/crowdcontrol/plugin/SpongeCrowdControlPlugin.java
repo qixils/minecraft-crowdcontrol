@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -19,6 +20,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.asset.Asset;
@@ -202,5 +204,9 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Override
 	public @NotNull Logger getSLF4JLogger() {
 		return logger;
+	}
+
+	public static Key key(final CatalogType catalogType) {
+		return Key.key(catalogType.getId());
 	}
 }

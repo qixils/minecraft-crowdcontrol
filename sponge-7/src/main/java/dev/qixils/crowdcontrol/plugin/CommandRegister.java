@@ -2,12 +2,15 @@ package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
+import dev.qixils.crowdcontrol.plugin.commands.BlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
 import dev.qixils.crowdcontrol.plugin.commands.DifficultyCommand;
+import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
@@ -24,8 +27,8 @@ public class CommandRegister {
 	private final SpongeCrowdControlPlugin plugin;
 	private boolean tagsRegistered = false;
 	private MappedKeyedTag<EntityType> safeEntities;
-	private MappedKeyedTag<ItemType> setBlocks;
-	private MappedKeyedTag<ItemType> setFallingBlocks;
+	private MappedKeyedTag<BlockType> setBlocks;
+	private MappedKeyedTag<BlockType> setFallingBlocks;
 	private MappedKeyedTag<ItemType> giveTakeItems;
 	private List<Command> registeredCommands;
 
@@ -37,8 +40,8 @@ public class CommandRegister {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
 			safeEntities = new TypedTag<>(CommonTags.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class);
-			setBlocks = new TypedTag<>(CommonTags.SET_BLOCKS, plugin.getRegistry(), ItemType.class);
-			setFallingBlocks = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin.getRegistry(), ItemType.class);
+			setBlocks = new TypedTag<>(CommonTags.SET_BLOCKS, plugin.getRegistry(), BlockType.class);
+			setFallingBlocks = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin.getRegistry(), BlockType.class);
 			giveTakeItems = new TypedTag<>(CommonTags.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
 		}
 	}
@@ -128,13 +131,13 @@ public class CommandRegister {
 		}
 
 		// block sets
-//		for (Material SET_BLOCK : SET_BLOCKS) {
-//			commands.add(new BlockCommand(plugin, SET_BLOCK));
-//		}
-//
-//		for (Material block : SET_FALLING_BLOCKS) {
-//			commands.add(new FallingBlockCommand(plugin, block));
-//		}
+		for (BlockType block : setBlocks) {
+			commands.add(new BlockCommand(plugin, block));
+		}
+
+		for (BlockType block : setFallingBlocks) {
+			commands.add(new FallingBlockCommand(plugin, block));
+		}
 
 		// weather commands
 //		for (WeatherType weatherType : WeatherType.values()) {

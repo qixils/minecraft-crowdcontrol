@@ -24,7 +24,7 @@ public class Sponge7TextUtil extends TextUtil {
 		throw new UnsupportedOperationException("Translation services are unavailable in Sponge API v7");
 	}
 
-	public String valueOf(CatalogType type) {
+	public static String valueOf(CatalogType type) {
 		return type.getId().replaceFirst("minecraft:", "");
 	}
 }

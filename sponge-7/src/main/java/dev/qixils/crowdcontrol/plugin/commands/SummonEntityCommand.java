@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -35,7 +36,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "entity_" + plugin.getTextUtil().valueOf(entityType);
+		this.effectName = "entity_" + Sponge7TextUtil.valueOf(entityType);
 		this.displayName = "Summon " + entityType.getTranslation().get();
 	}
 
