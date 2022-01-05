@@ -313,8 +313,9 @@ namespace CrowdControl.Games.Packs
             new Effect("Sand", "falling_block_sand", "place_falling_block") {Price = 25, Description = "Drops a sand block on the streamer"},
             // sets the server weather
             new Effect("Set Weather", "weather", ItemKind.Folder),
-            new Effect("Clear Weather", "clear", "weather") {Price = 25, Description = "Makes the weather sunny"},
-            new Effect("Rainy Weather", "downfall", "weather") {Price = 50, Description = "Makes the weather rainy with a 50% chance to start a thunderstorm"},
+            new Effect("Clear Weather", "clear", "weather") {Price = 25, Description = "Makes the weather sunny to allow rays of fire to shine down on hostile mobs"},
+            new Effect("Rainy Weather", "downfall", "weather") {Price = 50, Description = "Makes the weather rainy which prevents hostile mobs from burning in the daylight"},
+            new Effect("Stormy Weather", "thunder_storm", "weather") {Price = 75, Description = "Starts a thunderstorm with sporadic lightning strikes. Combine with placing a lightning rod to perform some electrocution!"},
             // apply enchants
             new Effect("Enchantments", "enchantments", ItemKind.Folder),
             new Effect("Remove Enchants", "remove_enchants", "enchantments") {Price = 200, Description = "Removes all enchants from the held item"},

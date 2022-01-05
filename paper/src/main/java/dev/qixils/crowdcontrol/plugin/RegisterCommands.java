@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.WeatherType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
@@ -87,7 +86,10 @@ public class RegisterCommands {
                 new KeepInventoryCommand(plugin, false),
                 new ClearInventoryCommand(plugin),
                 new PlantTreeCommand(plugin),
-                new DoOrDieCommand(plugin)
+                new DoOrDieCommand(plugin),
+                new ClearWeatherCommand(plugin),
+                new RainyWeatherCommand(plugin),
+                new ThunderingWeatherCommand(plugin)
         ));
 
         // register keep inventory event handler
@@ -116,11 +118,6 @@ public class RegisterCommands {
 
         for (Material block : SET_FALLING_BLOCKS) {
             commands.add(new FallingBlockCommand(plugin, block));
-        }
-
-        // weather commands
-        for (WeatherType weatherType : WeatherType.values()) {
-            commands.add(new WeatherCommand(plugin, weatherType));
         }
 
         // enchantments

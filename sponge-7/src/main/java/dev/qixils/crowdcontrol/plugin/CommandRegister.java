@@ -9,12 +9,14 @@ import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
+import dev.qixils.crowdcontrol.plugin.commands.WeatherCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.weather.Weather;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -140,9 +142,9 @@ public class CommandRegister {
 		}
 
 		// weather commands
-//		for (WeatherType weatherType : WeatherType.values()) {
-//			commands.add(new WeatherCommand(plugin, weatherType));
-//		}
+		for (Weather weather : plugin.getRegistry().getAllOf(Weather.class)) {
+			commands.add(new WeatherCommand(plugin, weather));
+		}
 
 		// enchantments
 //		for (Enchantment enchantment : Enchantment.values()) {
