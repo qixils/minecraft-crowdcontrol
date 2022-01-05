@@ -47,12 +47,14 @@ public class SummonEntityCommand extends ImmediateCommand {
 		if (Monster.class.isAssignableFrom(entityClass)) {
 			for (World world : plugin.getGame().getServer().getWorlds()) {
 				if (world.getDifficulty().equals(Difficulties.PEACEFUL)) {
-					return request.buildResponse().type(ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+					return request.buildResponse()
+							.type(ResultType.FAILURE)
+							.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
 				}
 			}
 		}
 
-		plugin.getSyncExecutor().execute(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
+		sync(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 

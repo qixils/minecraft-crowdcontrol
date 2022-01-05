@@ -20,4 +20,12 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 	protected Command(@NotNull SpongeCrowdControlPlugin plugin) {
 		this(plugin, false);
 	}
+
+	protected void sync(Runnable runnable) {
+		plugin.getSyncExecutor().execute(runnable);
+	}
+
+	protected void async(Runnable runnable) {
+		plugin.getAsyncExecutor().execute(runnable);
+	}
 }

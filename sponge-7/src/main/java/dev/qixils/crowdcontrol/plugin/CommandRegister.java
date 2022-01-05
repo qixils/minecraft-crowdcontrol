@@ -6,9 +6,11 @@ import dev.qixils.crowdcontrol.plugin.commands.BlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
 import dev.qixils.crowdcontrol.plugin.commands.DifficultyCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
+import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
+import dev.qixils.crowdcontrol.plugin.commands.TakeItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.WeatherCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
 import org.spongepowered.api.block.BlockType;
@@ -152,10 +154,10 @@ public class CommandRegister {
 //		}
 
 		// give/take items
-//		for (Material item : GIVE_TAKE_ITEMS) {
-//			commands.add(new GiveItemCommand(plugin, item));
-//			commands.add(new TakeItemCommand(plugin, item));
-//		}
+		for (ItemType item : giveTakeItems) {
+			commands.add(new GiveItemCommand(plugin, item));
+			commands.add(new TakeItemCommand(plugin, item));
+		}
 
 		// gamemode commands
 //		for (GameMode gamemode : GameMode.values()) {
@@ -164,8 +166,7 @@ public class CommandRegister {
 //					gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
 //		}
 
-		registeredCommands = commands;
-		return registeredCommands;
+		return registeredCommands = commands;
 	}
 
 	public void register() {
