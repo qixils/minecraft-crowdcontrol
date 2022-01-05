@@ -39,8 +39,8 @@ public class EnchantmentCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
-				.type(ResultType.FAILURE)
-				.message("");
+				.type(ResultType.RETRY)
+				.message("No items could be enchanted");
 		for (Player player : players) {
 			Optional<ItemStack> optionalStack = player.getItemInHand(HandTypes.MAIN_HAND);
 			if (!optionalStack.isPresent())
@@ -49,33 +49,39 @@ public class EnchantmentCommand extends ImmediateCommand {
 				continue;
 
 			ItemStack item = optionalStack.get();
-
-			// Here is where I'd check if the item stack supports this enchantment
-			// but this is not available in API 7 apparently
-
 			if (!item.getOrCreate(EnchantmentData.class).isPresent())
 				continue;
 
 			Optional<EnchantmentData> optionalEnchantmentData = item.getOrCreate(EnchantmentData.class);
 			if (!optionalEnchantmentData.isPresent())
 				continue;
-			response.type(ResultType.SUCCESS).message("SUCCESS");
+
 			Enchantment toAdd = Enchantment.of(enchantmentType, maxLevel);
 			EnchantmentData enchantmentData = optionalEnchantmentData.get();
 			ListValue<Enchantment> enchantments = enchantmentData.enchantments();
 			Iterator<Enchantment> iterator = enchantments.iterator();
+			boolean canAdd = enchantmentType.canBeAppliedToStack(item);
+
 			while (iterator.hasNext()) {
 				Enchantment enchantment = iterator.next();
 				if (!enchantment.getType().equals(enchantmentType))
 					continue;
-				if (enchantment.getLevel() == maxLevel)
-					toAdd = Enchantment.of(enchantmentType, maxLevel + 1);
+				int curLevel = enchantment.getLevel();
+				if (curLevel >= maxLevel)
+					toAdd = Enchantment.of(enchantmentType, curLevel + 1);
 				iterator.remove();
+				canAdd = true;
+				break;
 			}
+
+			if (!canAdd)
+				continue;
+
 			enchantments.add(toAdd);
 			// I think these are necessary
 			enchantmentData.set(enchantments);
 			item.offer(enchantmentData);
+			response.type(ResultType.SUCCESS).message("SUCCESS");
 		}
 		return response;
 	}

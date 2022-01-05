@@ -27,17 +27,20 @@ public class EnchantmentCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        int level = enchantment.getMaxLevel();
-        Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY);
+        Response.Builder result = request.buildResponse()
+                .type(Response.ResultType.RETRY)
+                .message("No items could be enchanted");
         for (Player player : players) {
+            int level = enchantment.getMaxLevel();
             ItemStack item = player.getInventory().getItemInMainHand();
             if (item.getType().isEmpty())
                 item = player.getInventory().getItemInOffHand();
             if (item.getType().isEmpty())
                 continue;
-            if (item.getEnchantmentLevel(enchantment) == level) // TODO: increase level by 1 instead
-                continue;
-            if (!enchantment.getItemTarget().includes(item))
+            int curLevel = item.getEnchantmentLevel(enchantment);
+            if (curLevel >= level)
+                level = curLevel + 1;
+            else if (curLevel == 0 && !enchantment.getItemTarget().includes(item))
                 continue;
             item.addUnsafeEnchantment(enchantment, level);
             result.type(Response.ResultType.SUCCESS);
