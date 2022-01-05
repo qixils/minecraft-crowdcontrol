@@ -26,7 +26,7 @@ public class RegisterCommands {
     public static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
             new MappedKeyedTag<>(CommonTags.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
     public static final MaterialTag SET_BLOCKS = new MaterialTag(CommonTags.SET_BLOCKS);
-    public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommonTags.SET_BLOCKS);
+    public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommonTags.SET_FALLING_BLOCKS);
     public static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommonTags.SET_BLOCKS);
 
     public static List<Command> getCommands(BukkitCrowdControlPlugin plugin) {
