@@ -21,8 +21,7 @@ public class EnchantmentCommand extends ImmediateCommand {
     public EnchantmentCommand(BukkitCrowdControlPlugin plugin, Enchantment enchantment) {
         super(plugin);
         this.enchantment = enchantment;
-        final String translate = plugin.getTextUtil().translate(enchantment);
-        this.effectName = "enchant_" + translate.replace(' ', '_');
+        this.effectName = "enchant_" + plugin.getTextUtil().translate(enchantment).replace(' ', '_');
         this.displayName = "Apply " + plugin.getTextUtil().asPlain(enchantment.displayName(enchantment.getMaxLevel()));
     }
 
@@ -36,7 +35,7 @@ public class EnchantmentCommand extends ImmediateCommand {
                 item = player.getInventory().getItemInOffHand();
             if (item.getType().isEmpty())
                 continue;
-            if (item.getEnchantmentLevel(enchantment) == level)
+            if (item.getEnchantmentLevel(enchantment) == level) // TODO: increase level by 1 instead
                 continue;
             if (!enchantment.getItemTarget().includes(item))
                 continue;

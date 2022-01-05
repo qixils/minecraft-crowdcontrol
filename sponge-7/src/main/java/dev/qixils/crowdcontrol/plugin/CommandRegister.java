@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.commands.BlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
 import dev.qixils.crowdcontrol.plugin.commands.DifficultyCommand;
+import dev.qixils.crowdcontrol.plugin.commands.EnchantmentCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
@@ -17,6 +18,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
@@ -149,9 +151,9 @@ public class CommandRegister {
 		}
 
 		// enchantments
-//		for (Enchantment enchantment : Enchantment.values()) {
-//			commands.add(new EnchantmentCommand(plugin, enchantment));
-//		}
+		for (EnchantmentType enchantment : plugin.getRegistry().getAllOf(EnchantmentType.class)) {
+			commands.add(new EnchantmentCommand(plugin, enchantment));
+		}
 
 		// give/take items
 		for (ItemType item : giveTakeItems) {
