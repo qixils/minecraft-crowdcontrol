@@ -35,3 +35,7 @@ obtain the user's unique ID. A workaround was added to fix this issue.
 - Added the "Give Elytra" and "Take Elytra" commands.
 - Added default prices and descriptions to every effect.
 - Allowed the "Dig Command" to dig larger holes and break any block.
+- Prevent the enchantment commands from adding illegal enchantments to items.
+- Only allow one End Portal Frame to be distributed or taken at a time via the
+  "Give End Portal Frame" command.
+- The duration of potion effect commands are now displayed in chat.
