@@ -32,7 +32,8 @@ public class FallingBlockCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Could not find a valid location to place block");
+        // TODO: update impl (GH#47)
+        Response.Builder resp = request.buildResponse().type(ResultType.RETRY).message("Could not find a valid location to place block");
         for (Player player : players) {
             Location destination = player.getEyeLocation();
             destination.setY(Math.min(

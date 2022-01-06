@@ -36,7 +36,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
-				.type(ResultType.FAILURE)
+				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");
 		for (Player player : players) {
 			CarriedInventory<? extends Carrier> inventory = player.getInventory();

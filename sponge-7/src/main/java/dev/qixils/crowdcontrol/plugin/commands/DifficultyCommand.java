@@ -32,6 +32,9 @@ public class DifficultyCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (!isGlobalCommandUsable(players, request))
+			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+
 		Builder response = request.buildResponse().type(ResultType.FAILURE)
 				.message("Server difficulty is already on " + displayName);
 

@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,6 +28,9 @@ public class TakeItemCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+        Response.Builder response = request.buildResponse()
+                .type(ResultType.RETRY)
+                .message("Item could not be found in target inventories");
         for (Player player : players) {
             boolean taken = false;
             for (ItemStack itemStack : player.getInventory()) {
@@ -35,6 +39,7 @@ public class TakeItemCommand extends ImmediateCommand {
                 }
                 if (itemStack.getType() == item) {
                     itemStack.setAmount(itemStack.getAmount() - 1);
+                    response.type(ResultType.SUCCESS).message("SUCCESS");
                     taken = true;
                     break;
                 }
@@ -42,6 +47,6 @@ public class TakeItemCommand extends ImmediateCommand {
             if (taken && item == Material.END_PORTAL_FRAME)
                 break;
         }
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
+        return response;
     }
 }
