@@ -4,6 +4,8 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
@@ -32,24 +34,37 @@ public class FlightCommand extends TimedCommand {
 				.request(request)
 				.effectGroup("gamemode")
 				.duration(duration)
-				.legacyStartCallback($ -> {
+				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
-					playerAnnounce(players, request);
-					sync(() -> {
-						for (Player player : players) {
+					Response.Builder response = request.buildResponse()
+							.type(ResultType.RETRY)
+							.message("Target is already flying or able to fly");
+					for (Player player : players) {
+						GameMode gameMode = player.gameMode().get();
+						if (gameMode.equals(GameModes.CREATIVE))
+							continue;
+						if (gameMode.equals(GameModes.SPECTATOR))
+							continue;
+						if (player.get(Keys.CAN_FLY).orElse(false))
+							continue;
+						if (player.get(Keys.IS_FLYING).orElse(false))
+							continue;
+						response.type(ResultType.SUCCESS).message("SUCCESS");
+						sync(() -> {
 							player.offer(Keys.CAN_FLY, true);
 							player.offer(Keys.IS_FLYING, true);
-						}
-					});
+						});
+					}
+					if (response.type() == ResultType.SUCCESS)
+						playerAnnounce(players, request);
+					return response;
 				})
 				.completionCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
-					sync(() -> {
-						for (Player player : players) {
-							player.offer(Keys.CAN_FLY, false);
-							player.offer(Keys.IS_FLYING, false);
-						}
-					});
+					sync(() -> players.forEach(player -> {
+						player.offer(Keys.CAN_FLY, false);
+						player.offer(Keys.IS_FLYING, false);
+					}));
 				})
 				.build().queue();
 	}
@@ -64,17 +79,15 @@ public class FlightCommand extends TimedCommand {
 		Player player = event.getTargetEntity();
 		GameMode gameMode = player.gameMode().get();
 		// this is a work of art
-		if (
-				(
-						gameMode.equals(GameModes.SURVIVAL)
-								|| gameMode.equals(GameModes.ADVENTURE)
-				) && (
-						player.get(Keys.CAN_FLY).orElse(false)
-								|| player.get(Keys.IS_FLYING).orElse(false)
-				)
-		) {
-			player.offer(Keys.IS_FLYING, false);
-			player.offer(Keys.CAN_FLY, false);
-		}
+		if (gameMode.equals(GameModes.CREATIVE))
+			return;
+		if (gameMode.equals(GameModes.SPECTATOR))
+			return;
+		if (!player.get(Keys.CAN_FLY).orElse(false))
+			return;
+		if (!player.get(Keys.IS_FLYING).orElse(false))
+			return;
+		player.offer(Keys.IS_FLYING, false);
+		player.offer(Keys.CAN_FLY, false);
 	}
 }

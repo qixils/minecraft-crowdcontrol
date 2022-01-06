@@ -57,7 +57,7 @@ public class TakeItemCommand extends ImmediateCommand {
 				break;
 			}
 
-			if (ResultType.SUCCESS.equals(response.type()) && item.equals(ItemTypes.END_PORTAL_FRAME))
+			if (ResultType.SUCCESS == response.type() && item.equals(ItemTypes.END_PORTAL_FRAME))
 				break;
 		}
 		return response;
