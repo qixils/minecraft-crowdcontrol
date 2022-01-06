@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
 import dev.qixils.crowdcontrol.plugin.commands.DifficultyCommand;
 import dev.qixils.crowdcontrol.plugin.commands.EnchantmentCommand;
 import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
+import dev.qixils.crowdcontrol.plugin.commands.FlightCommand;
 import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
@@ -62,7 +63,7 @@ public class CommandRegister {
 		List<Command> commands = new ArrayList<>(Arrays.asList(
 //				new VeinCommand(plugin),
 //				new SoundCommand(plugin),
-				new ChargedCreeperCommand(plugin)
+				new ChargedCreeperCommand(plugin),
 //				new SwapCommand(plugin),
 //				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin),
@@ -109,7 +110,7 @@ public class CommandRegister {
 //				new EntityChaosCommand(plugin),
 //				new CameraLockToSkyCommand(plugin),
 //				new CameraLockToGroundCommand(plugin),
-//				new FlightCommand(plugin),
+				new FlightCommand(plugin)
 //				new KeepInventoryCommand(plugin, true),
 //				new KeepInventoryCommand(plugin, false),
 //				new ClearInventoryCommand(plugin),
