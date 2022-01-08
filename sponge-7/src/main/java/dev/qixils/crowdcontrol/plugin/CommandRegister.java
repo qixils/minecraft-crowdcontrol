@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
+import dev.qixils.crowdcontrol.plugin.commands.SwapCommand;
 import dev.qixils.crowdcontrol.plugin.commands.TakeItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.WeatherCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
@@ -64,7 +65,7 @@ public class CommandRegister {
 //				new VeinCommand(plugin),
 //				new SoundCommand(plugin),
 				new ChargedCreeperCommand(plugin),
-//				new SwapCommand(plugin),
+				new SwapCommand(plugin),
 //				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin),
 //				new LootboxCommand(plugin),
