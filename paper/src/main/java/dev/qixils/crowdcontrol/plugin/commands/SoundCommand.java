@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
@@ -29,7 +30,7 @@ public class SoundCommand extends ImmediateCommand {
 		for (Player player : players) {
 			Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
 			player.playSound(
-					CommonTags.spookySoundOf(sound),
+					CommandConstants.spookySoundOf(sound),
 					playAt.getX(),
 					playAt.getY(),
 					playAt.getZ()

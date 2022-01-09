@@ -1,37 +1,39 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.List;
 
 @Getter
 public class TimeCommand extends ImmediateCommand {
-    private final String effectName = "zip";
-    private final String displayName = "Zip Time";
+	private final String effectName = "zip";
+	private final String displayName = "Zip Time";
 
-    public TimeCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public TimeCommand(SpongeCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
+	@NotNull
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players,
-														@NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (!isGlobalCommandUsable(players, request))
 			return request.buildResponse()
 					.type(ResultType.UNAVAILABLE)
 					.message("Global command cannot be used on this streamer");
 
-		Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getWorlds().forEach(world ->
-				world.setFullTime(world.getFullTime() + CommandConstants.ZIP_TIME_TICKS)));
+		sync(() -> plugin.getGame().getServer().getWorlds().forEach(world -> {
+			WorldProperties properties = world.getProperties();
+			properties.setWorldTime(properties.getWorldTime() + CommandConstants.ZIP_TIME_TICKS);
+		}));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }
