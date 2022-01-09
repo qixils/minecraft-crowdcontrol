@@ -26,19 +26,18 @@ public class EntityChaosCommand extends ImmediateCommand {
     }
 
     @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> targetPlayers, @NotNull Request request) {
-        if (!isGlobalCommandUsable(targetPlayers, request))
-            return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (!isGlobalCommandUsable(players, request))
+			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            List<Player> players = plugin.getAllPlayers();
-            List<Entity> entities = new ArrayList<>();
-            for (World world : Bukkit.getWorlds()) {
-                for (Entity entity : world.getEntities()) {
-                    if (entity.getType() == EntityType.PLAYER) continue;
-                    entities.add(entity);
-                }
-            }
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			List<Entity> entities = new ArrayList<>(200);
+			for (World world : Bukkit.getWorlds()) {
+				for (Entity entity : world.getEntities()) {
+					if (entity.getType() == EntityType.PLAYER) continue;
+					entities.add(entity);
+				}
+			}
             for (int i = 0; i < entities.size(); i++) {
                 entities.get(i).teleport(players.get(i % players.size()));
             }
