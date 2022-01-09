@@ -75,7 +75,7 @@ public class CommandRegister {
 				new TimeCommand(plugin),
 //				new ItemDamageCommand(plugin, true),
 //				new ItemDamageCommand(plugin, false),
-//				new RemoveEnchantsCommand(plugin),
+				new RemoveEnchantsCommand(plugin),
 //				new HatCommand(plugin),
 //				new RespawnCommand(plugin),
 //				new DropItemCommand(plugin),
