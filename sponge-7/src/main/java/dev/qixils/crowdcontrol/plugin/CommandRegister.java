@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.plugin.commands.FlightCommand;
 import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
 import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
+import dev.qixils.crowdcontrol.plugin.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
 import dev.qixils.crowdcontrol.plugin.commands.SwapCommand;
 import dev.qixils.crowdcontrol.plugin.commands.TakeItemCommand;
@@ -63,7 +64,7 @@ public class CommandRegister {
 		// register normal commands
 		List<Command> commands = new ArrayList<>(Arrays.asList(
 //				new VeinCommand(plugin),
-//				new SoundCommand(plugin),
+				new SoundCommand(plugin),
 				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
 //				new DinnerboneCommand(plugin),

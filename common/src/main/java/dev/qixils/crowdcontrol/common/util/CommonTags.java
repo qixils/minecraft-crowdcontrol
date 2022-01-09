@@ -1,6 +1,8 @@
 package dev.qixils.crowdcontrol.common.util;
 
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.Sound.Source;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
@@ -188,6 +190,25 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "water"),
 			Key.key(MINECRAFT_NAMESPACE, "lava")
 	);
+
+	public static final KeyedTag SPOOKY_SOUNDS = new KeyedTag(
+			Key.key(MINECRAFT_NAMESPACE, "entity.creeper.primed"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.stare"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.scream"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.ender_dragon.growl"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.ghast.hurt"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.generic.explode"),
+			Key.key(MINECRAFT_NAMESPACE, "ambient.cave")
+	);
+
+	public static Sound spookySoundOf(Key key) {
+		return Sound.sound(
+				key,
+				Source.MASTER,
+				1.75f,
+				1f
+		);
+	}
 
 	private CommonTags() {
 		throw new IllegalStateException("Utility class");

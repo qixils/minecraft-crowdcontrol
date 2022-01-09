@@ -1,14 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,30 +16,25 @@ import java.util.List;
 
 @Getter
 public class SoundCommand extends ImmediateCommand {
-    public static final List<Sound> SOUNDS = List.of(
-            Sound.ENTITY_CREEPER_PRIMED,
-            Sound.ENTITY_ENDERMAN_STARE,
-            Sound.ENTITY_ENDERMAN_SCREAM,
-            Sound.ENTITY_ENDER_DRAGON_GROWL,
-            Sound.ENTITY_GHAST_HURT,
-            Sound.ENTITY_GENERIC_EXPLODE,
-            Sound.AMBIENT_CAVE
-    );
+	private final String effectName = "sfx";
+	private final String displayName = "Spooky Sound Effect";
 
-    public SoundCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public SoundCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    private final String effectName = "sfx";
-    private final String displayName = "Spooky Sound Effect";
-
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Sound sound = RandomUtil.randomElementFrom(SOUNDS);
-        for (Player player : players) {
-            Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
-            player.getWorld().playSound(playAt, sound, SoundCategory.MASTER, 2.0f, 1.0f);
-        }
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
-    }
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Key sound = RandomUtil.randomElementFrom(CommonTags.SPOOKY_SOUNDS.getKeys());
+		for (Player player : players) {
+			Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
+			player.playSound(
+					CommonTags.spookySoundOf(sound),
+					playAt.getX(),
+					playAt.getY(),
+					playAt.getZ()
+			);
+		}
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
 }

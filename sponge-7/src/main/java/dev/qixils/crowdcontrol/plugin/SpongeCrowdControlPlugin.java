@@ -91,7 +91,15 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		super(Player.class, CommandSource.class);
 	}
 
+	public @NotNull SpongeAudiences adventure() {
+		//noinspection ConstantConditions
+		if (audiences == null)
+			throw new IllegalStateException("Tried to access adventure before plugin loaded");
+		return audiences;
+	}
+
 	@Override
+	@NotNull
 	public Audience asAudience(@NotNull CommandSource source) {
 		if (source instanceof Player)
 			return audiences.player((Player) source);
