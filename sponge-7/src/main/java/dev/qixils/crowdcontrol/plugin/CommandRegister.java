@@ -76,7 +76,7 @@ public class CommandRegister {
 //				new ItemDamageCommand(plugin, true),
 //				new ItemDamageCommand(plugin, false),
 				new RemoveEnchantsCommand(plugin),
-//				new HatCommand(plugin),
+				new HatCommand(plugin),
 //				new RespawnCommand(plugin),
 //				new DropItemCommand(plugin),
 //				new DeleteItemCommand(plugin),

@@ -28,6 +28,9 @@ public class DeleteItemCommand extends ImmediateCommand {
 			if (!inv.getItemInMainHand().getType().isEmpty()) {
 				inv.setItemInMainHand(null);
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+			} else if (!inv.getItemInOffHand().getType().isEmpty()) {
+				inv.setItemInOffHand(null);
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 		}
 		return result;
