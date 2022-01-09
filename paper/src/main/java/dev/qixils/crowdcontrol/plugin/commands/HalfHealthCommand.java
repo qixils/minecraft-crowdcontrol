@@ -23,7 +23,10 @@ public class HalfHealthCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Health is already minimum");
+		Response.Builder resp = request.buildResponse()
+				.type(ResultType.FAILURE)
+				.message("Health is already minimum");
+
 		for (Player player : players) {
 			double health = player.getHealth();
 			if (health > 0.5) {
@@ -34,6 +37,7 @@ public class HalfHealthCommand extends ImmediateCommand {
 				});
 			}
 		}
+
 		return resp;
 	}
 }
