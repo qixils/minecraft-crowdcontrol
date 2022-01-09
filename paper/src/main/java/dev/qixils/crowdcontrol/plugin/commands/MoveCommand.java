@@ -40,6 +40,7 @@ public class MoveCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		// TODO test if this works with Disable Jumping
         Response.Builder resp = request.buildResponse().type(ResultType.RETRY).message("All players were grounded");
         boolean isDownwards = vector.getY() < 0.0;
         for (Player player : players) {

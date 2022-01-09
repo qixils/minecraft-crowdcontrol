@@ -95,7 +95,7 @@ public class CommandRegister {
 //				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
 //				new MaxHealthCommand(plugin, -1),
 //				new MaxHealthCommand(plugin, 1),
-//				new DisableJumpingCommand(plugin),
+				new DisableJumpingCommand(plugin),
 				new EntityChaosCommand(plugin),
 //				new CameraLockToSkyCommand(plugin),
 //				new CameraLockToGroundCommand(plugin),

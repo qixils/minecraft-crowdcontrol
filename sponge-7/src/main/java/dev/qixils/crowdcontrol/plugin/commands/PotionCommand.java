@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Collections;
@@ -37,6 +39,13 @@ public class PotionCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (potionEffectType.equals(PotionEffectTypes.JUMP_BOOST)
+				&& TimedEffect.isActive("disable_jumping", request.getTargets())) {
+			return request.buildResponse()
+					.type(ResultType.RETRY)
+					.message("Cannot apply jump boost while Disable Jump is active");
+		}
+
 		PotionEffect.Builder builder = PotionEffect.builder()
 				.potionType(potionEffectType)
 				.duration(duration);

@@ -18,14 +18,14 @@ import java.util.List;
 
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {
-    private final String displayName = "Entity Chaos";
-    private final String effectName = "entity_chaos";
+	private final String displayName = "Entity Chaos";
+	private final String effectName = "entity_chaos";
 
-    public EntityChaosCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public EntityChaosCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
+	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (!isGlobalCommandUsable(players, request))
 			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
@@ -38,10 +38,10 @@ public class EntityChaosCommand extends ImmediateCommand {
 					entities.add(entity);
 				}
 			}
-            for (int i = 0; i < entities.size(); i++) {
-                entities.get(i).teleport(players.get(i % players.size()));
-            }
-        });
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
-    }
+			for (int i = 0; i < entities.size(); i++) {
+				entities.get(i).teleport(players.get(i % players.size()));
+			}
+		});
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
 }

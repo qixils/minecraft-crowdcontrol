@@ -1,10 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -51,6 +53,13 @@ public class PotionCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (potionEffectType == PotionEffectType.JUMP
+				&& TimedEffect.isActive("disable_jumping", request.getTargets())) {
+			return request.buildResponse()
+					.type(ResultType.RETRY)
+					.message("Cannot apply jump boost while Disable Jump is active");
+		}
+
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			for (Player player : players) {
 				boolean overridden = false;
