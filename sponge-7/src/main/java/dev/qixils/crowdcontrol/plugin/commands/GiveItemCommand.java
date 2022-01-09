@@ -41,7 +41,7 @@ public class GiveItemCommand extends ImmediateCommand {
 				Item entity = (Item) player.getLocation().createEntity(EntityTypes.ITEM);
 				entity.transform(Keys.REPRESENTED_ITEM, $ -> ItemStack.of(item).createSnapshot());
 				// seems like Sponge 7 doesn't support any of the other keys used in the Paper impl
-				// so this is a note to add them back in the Sponge 8 impl
+				// so this is a note to add them back in the Sponge 8 impl [API8]
 
 				// give entity a cause & spawn it
 				try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {

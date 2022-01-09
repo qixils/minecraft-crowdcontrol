@@ -78,7 +78,7 @@ public class CommandRegister {
 				new RemoveEnchantsCommand(plugin),
 				new HatCommand(plugin),
 //				new RespawnCommand(plugin),
-//				new DropItemCommand(plugin),
+				new DropItemCommand(plugin),
 //				new DeleteItemCommand(plugin),
 //				new BucketClutchCommand(plugin),
 //				new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
