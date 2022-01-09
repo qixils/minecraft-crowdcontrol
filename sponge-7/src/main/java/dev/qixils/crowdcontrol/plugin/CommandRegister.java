@@ -2,20 +2,7 @@ package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
-import dev.qixils.crowdcontrol.plugin.commands.BlockCommand;
-import dev.qixils.crowdcontrol.plugin.commands.ChargedCreeperCommand;
-import dev.qixils.crowdcontrol.plugin.commands.DifficultyCommand;
-import dev.qixils.crowdcontrol.plugin.commands.EnchantmentCommand;
-import dev.qixils.crowdcontrol.plugin.commands.FallingBlockCommand;
-import dev.qixils.crowdcontrol.plugin.commands.FlightCommand;
-import dev.qixils.crowdcontrol.plugin.commands.GiveItemCommand;
-import dev.qixils.crowdcontrol.plugin.commands.PotionCommand;
-import dev.qixils.crowdcontrol.plugin.commands.RemoveEntityCommand;
-import dev.qixils.crowdcontrol.plugin.commands.SoundCommand;
-import dev.qixils.crowdcontrol.plugin.commands.SummonEntityCommand;
-import dev.qixils.crowdcontrol.plugin.commands.SwapCommand;
-import dev.qixils.crowdcontrol.plugin.commands.TakeItemCommand;
-import dev.qixils.crowdcontrol.plugin.commands.WeatherCommand;
+import dev.qixils.crowdcontrol.plugin.commands.*;
 import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.effect.potion.PotionEffectType;
@@ -75,12 +62,12 @@ public class CommandRegister {
 //				new FreezeCommand(plugin),
 //				new CameraLockCommand(plugin),
 //				new FlowerCommand(plugin),
-//				new MoveCommand(plugin, 0, 1, 0, "Up"),
-//				new MoveCommand(plugin, 0, -2, 0, "Down"),
-//				new MoveCommand(plugin, 2, 0.2, 0, "xplus", "East"),
-//				new MoveCommand(plugin, -2, 0.2, 0, "xminus", "West"),
-//				new MoveCommand(plugin, 0, 0.2, 2, "zplus", "South"),
-//				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
+				new MoveCommand(plugin, 0, 1, 0, "Up"),
+				new MoveCommand(plugin, 0, -2, 0, "Down"),
+				new MoveCommand(plugin, 2, 0.2, 0, "xplus", "East"),
+				new MoveCommand(plugin, -2, 0.2, 0, "xminus", "West"),
+				new MoveCommand(plugin, 0, 0.2, 2, "zplus", "South"),
+				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
 //				new TorchCommand(plugin, true),
 //				new TorchCommand(plugin, false),
 //				new GravelCommand(plugin),
