@@ -58,7 +58,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Render Toasts", "toast", "miscellaneous") {Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound"},
             new Effect("Repair Held Item", "repair_item", "miscellaneous") {Price = 100, Description = "Fully repairs a damaged item"},
             new Effect("Replace Area With Gravel", "gravel_hell", "miscellaneous") {Price = 300, Description = "Replaces nearby stone-like blocks with gravel"},
-            new Effect("Reset Experience Progress", "reset_exp_progress", "miscellaneous") {Price = 300, Description = "Clears the streamer's progress towards their next XP level"},
+            new Effect("Reset Experience", "reset_exp_progress", "miscellaneous") {Price = 1000, Description = "Clears all of the streamer's XP"},
             new Effect("Respawn Player", "respawn", "miscellaneous") {Price = 500, Description = "Sends the streamer to their spawn point"},
             new Effect("Spawn Ore Veins", "vein", "miscellaneous") {Price = 100, Description = "Places random ore veins (ore lava) near the streamer"},
             new Effect("Spooky Sound Effect", "sfx", "miscellaneous") {Price = 50, Description = "Plays a random spooky sound effect"},

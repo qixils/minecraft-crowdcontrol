@@ -13,6 +13,9 @@ A list of all changes made to the software in reverse chronological order.
 - Fixed the Take Item commands erroneously returning `SUCCESS` responses when it changed nothing.
 - Created a new Thunderstorm command to start a thunderstorm.
 - Downfall command no longer has a 50% chance of starting a thunderstorm.
+- Reset Experience Progress has been renamed to Reset Experience and now sets the target's XP levels
+  to zero instead of clearing their progress since the last level-up. This matches the current price
+  and description of the perk in Crowd Control.
 
 ## 3.1.3
 

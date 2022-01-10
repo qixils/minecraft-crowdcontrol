@@ -1,22 +1,22 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.List;
 
 @Getter
 public class ResetExpProgressCommand extends ImmediateCommand {
 	private final String effectName = "reset_exp_progress";
-	private final String displayName = "Reset Experience Progress";
+	private final String displayName = "Reset Experience";
 
-	public ResetExpProgressCommand(BukkitCrowdControlPlugin plugin) {
+	public ResetExpProgressCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
@@ -24,9 +24,9 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players have XP");
 		for (Player player : players) {
-			if (player.getTotalExperience() > 0) {
+			if (player.get(Keys.TOTAL_EXPERIENCE).orElse(0) > 0) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				Bukkit.getScheduler().runTask(plugin, () -> player.setTotalExperience(0));
+				sync(() -> player.offer(Keys.TOTAL_EXPERIENCE, 0));
 			}
 		}
 		return result;
