@@ -1,16 +1,20 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.utils.BlockFinder;
+import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.CauseStackManager.StackFrame;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,26 +26,29 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.FLOWER_RADIUS;
 
 @Getter
 public class FlowerCommand extends ImmediateCommand {
+	private final TypedTag<BlockType> flowers;
 	private final String effectName = "flowers";
 	private final String displayName = "Place Flowers";
 
-	public FlowerCommand(BukkitCrowdControlPlugin plugin) {
+	public FlowerCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
+		flowers = new TypedTag<>(CommonTags.FLOWERS, plugin, BlockType.class);
 	}
 
+	@NotNull
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Set<Location> placeLocations = new HashSet<>(FLOWER_MAX * players.size());
+	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Set<Location<World>> placeLocations = new HashSet<>(FLOWER_MAX * players.size());
 		for (Player player : players) {
-			BlockUtil.BlockFinder finder = BlockUtil.BlockFinder.builder()
+			BlockFinder finder = BlockFinder.builder()
 					.origin(player.getLocation())
 					.maxRadius(FLOWER_RADIUS)
 					.locationValidator(location ->
 							!placeLocations.contains(location)
-									&& location.getBlock().isReplaceable()
-									&& location.clone().subtract(0, 1, 0).getBlock().getType().isSolid())
+									&& BlockFinder.isReplaceable(location.getBlock())
+									&& BlockFinder.isSolid(location.sub(0, 1, 0).getBlock()))
 					.build();
-			Location location = finder.next();
+			Location<World> location = finder.next();
 			int placed = 0;
 			int toPlace = RandomUtil.nextInclusiveInt(FLOWER_MIN, FLOWER_MAX);
 			while (location != null) {
@@ -57,9 +64,11 @@ public class FlowerCommand extends ImmediateCommand {
 					.type(Response.ResultType.RETRY)
 					.message("Could not find a suitable location to place flowers");
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			for (Location location : placeLocations) {
-				location.getBlock().setType(BlockUtil.FLOWERS.getRandom());
+		sync(() -> {
+			try (StackFrame ignored = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
+				for (Location<World> location : placeLocations) {
+					location.setBlockType(flowers.getRandom());
+				}
 			}
 		});
 

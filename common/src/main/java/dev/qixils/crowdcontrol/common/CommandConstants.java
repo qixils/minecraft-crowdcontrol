@@ -15,6 +15,9 @@ public class CommandConstants {
 	public static final long ZIP_TIME_TICKS = 10000; // roughly a day
 	public static final Duration DISABLE_JUMPING_DURATION = Duration.ofSeconds(10);
 	public static final long DISABLE_JUMPING_TICKS = DISABLE_JUMPING_DURATION.getSeconds() * 20;
+	public static final int FLOWER_RADIUS = 10;
+	public static final int FLOWER_MIN = 14;
+	public static final int FLOWER_MAX = 28;
 
 	public static Sound spookySoundOf(Key key) {
 		return Sound.sound(

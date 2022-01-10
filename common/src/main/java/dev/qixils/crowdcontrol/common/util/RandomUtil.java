@@ -33,15 +33,19 @@ public class RandomUtil {
         return from[RNG.nextInt(from.length)];
     }
 
-    public static <T extends Weighted> T weightedRandom(T[] weightedArray, int totalWeights) {
-        // Weighted random code based off of https://stackoverflow.com/a/6737362
-        int idx = 0;
-        for (double r = Math.random() * totalWeights; idx < weightedArray.length - 1; ++idx) {
-            r -= weightedArray[idx].getWeight();
-            if (r <= 0.0) break;
-        }
-        return weightedArray[idx];
-    }
+	public static <T extends Weighted> T weightedRandom(T[] weightedArray, int totalWeights) {
+		// Weighted random code based off of https://stackoverflow.com/a/6737362
+		int idx = 0;
+		for (double r = Math.random() * totalWeights; idx < weightedArray.length - 1; ++idx) {
+			r -= weightedArray[idx].getWeight();
+			if (r <= 0.0) break;
+		}
+		return weightedArray[idx];
+	}
+
+	public static int nextInclusiveInt(int from, int to) {
+		return from + RNG.nextInt(to - from + 1);
+	}
 
 
 }

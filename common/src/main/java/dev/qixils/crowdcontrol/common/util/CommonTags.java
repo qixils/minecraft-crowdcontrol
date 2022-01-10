@@ -18,7 +18,10 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "oxeye_daisy"),
 			Key.key(MINECRAFT_NAMESPACE, "cornflower"),
 			Key.key(MINECRAFT_NAMESPACE, "lily_of_the_valley"),
-			Key.key(MINECRAFT_NAMESPACE, "wither_rose")
+			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
+			// legacy pre-1.12
+			Key.key(MINECRAFT_NAMESPACE, "red_flower"),
+			Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
 	);
 
 	public static final KeyedTag STONES = new KeyedTag(
