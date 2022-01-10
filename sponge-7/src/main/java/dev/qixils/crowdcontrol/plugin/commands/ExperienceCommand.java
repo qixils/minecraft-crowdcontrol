@@ -1,16 +1,17 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class ExperienceCommand extends ImmediateCommand {
@@ -18,7 +19,7 @@ public class ExperienceCommand extends ImmediateCommand {
 	private final String displayName;
 	private final int amount;
 
-	public ExperienceCommand(BukkitCrowdControlPlugin plugin, String effectName, String displayName, int amount) {
+	public ExperienceCommand(SpongeCrowdControlPlugin plugin, String effectName, String displayName, int amount) {
 		super(plugin);
 		this.effectName = effectName;
 		this.displayName = displayName;
@@ -26,17 +27,21 @@ public class ExperienceCommand extends ImmediateCommand {
 		this.amount = amount;
 	}
 
+	@NotNull
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse()
 				.type(ResultType.FAILURE)
 				.message("Player does not have enough XP levels");
 		for (Player player : players) {
-			int curLevel = player.getLevel();
+			Optional<Integer> optionalLevel = player.get(Keys.EXPERIENCE_LEVEL);
+			if (!optionalLevel.isPresent())
+				continue;
+			int curLevel = optionalLevel.get();
 			int newLevel = curLevel + amount;
 			if (newLevel >= 0) {
 				resp.type(ResultType.SUCCESS).message("SUCCESS");
-				Bukkit.getScheduler().runTask(plugin, () -> player.setLevel(newLevel));
+				sync(() -> player.offer(Keys.EXPERIENCE_LEVEL, newLevel));
 			}
 		}
 		return resp;
