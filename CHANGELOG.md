@@ -16,6 +16,9 @@ A list of all changes made to the software in reverse chronological order.
 - Reset Experience Progress has been renamed to Reset Experience and now sets the target's XP levels
   to zero instead of clearing their progress since the last level-up. This matches the current price
   and description of the perk in Crowd Control.
+- Damage Item and Repair Item will now only be marked as successful if the item's damage was
+  actually altered.
+- Damage Item now has a minimum value of 1% durability (or 15 usages).
 
 ## 3.1.3
 

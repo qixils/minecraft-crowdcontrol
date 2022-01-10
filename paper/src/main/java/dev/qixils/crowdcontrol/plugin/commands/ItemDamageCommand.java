@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -40,8 +41,14 @@ public class ItemDamageCommand extends ImmediateCommand {
 			ItemMeta meta = item.getItemMeta();
 			// only allowing items with damage because apparently "instanceof Damageable" isn't good enough
 			if (meta instanceof Damageable damageable && damageable.hasDamage()) {
-				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				damageable.setDamage(handleItem.apply(damageable.getDamage(), item.getType()));
+				Material type = item.getType();
+				int curDamage = damageable.getDamage();
+				int newDamage = handleItem.apply(damageable.getDamage(), type);
+				// todo: test
+				if (CommandConstants.canApplyDamage(curDamage, newDamage, type.getMaxDurability())) {
+					result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+					damageable.setDamage(newDamage);
+				}
 			}
 			item.setItemMeta(meta);
 		}

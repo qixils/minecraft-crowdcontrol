@@ -6,6 +6,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
@@ -40,6 +41,7 @@ public class CommandConstants {
 			1f,
 			1f
 	);
+	private static final int MIN_ITEM_DAMAGE = 15;
 
 	public static Sound spookySoundOf(Key key) {
 		return Sound.sound(
@@ -48,6 +50,18 @@ public class CommandConstants {
 				1.75f,
 				1f
 		);
+	}
+
+	public static boolean canApplyDurability(int oldDurability, int newDurability, int maxDurability) {
+		LoggerFactory.getLogger(CommandConstants.class).warn(oldDurability + " " + newDurability + " " + maxDurability);
+		if (oldDurability == newDurability)
+			return false;
+		int min = Math.min(maxDurability, Math.max(MIN_ITEM_DAMAGE, maxDurability / 100));
+		return newDurability >= min;
+	}
+
+	public static boolean canApplyDamage(int oldDamage, int newDamage, int maxDurability) {
+		return canApplyDurability(maxDurability - oldDamage, maxDurability - newDamage, maxDurability);
 	}
 
 	private CommandConstants() {
