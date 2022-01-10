@@ -1,15 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 	private final String effectName = "clear_inventory";
 	private final String displayName = "Clear Inventory";
 
-	public ClearInventoryCommand(BukkitCrowdControlPlugin plugin) {
+	public ClearInventoryCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
@@ -30,10 +29,10 @@ public class ClearInventoryCommand extends ImmediateCommand {
 				.message("All inventories are already empty or protected");
 		for (Player player : players) {
 			if (KeepInventoryCommand.isKeepingInventory(player)) continue;
-			PlayerInventory inv = player.getInventory();
-			if (inv.isEmpty()) continue;
+			CarriedInventory<?> inv = player.getInventory();
+			if (inv.size() == 0) continue;
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
-			Bukkit.getScheduler().runTask(plugin, (@NotNull Runnable) inv::clear);
+			sync(inv::clear);
 		}
 		return resp;
 	}

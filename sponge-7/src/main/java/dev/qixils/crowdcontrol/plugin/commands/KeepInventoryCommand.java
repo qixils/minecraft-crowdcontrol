@@ -1,30 +1,26 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.KEEP_INVENTORY_ALERT;
 import static dev.qixils.crowdcontrol.common.CommandConstants.KEEP_INVENTORY_MESSAGE;
-import static dev.qixils.crowdcontrol.common.CommandConstants.LOSE_INVENTORY_ALERT;
 import static dev.qixils.crowdcontrol.common.CommandConstants.LOSE_INVENTORY_MESSAGE;
 
 @Getter
@@ -34,7 +30,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public KeepInventoryCommand(BukkitCrowdControlPlugin plugin, boolean enable) {
+	public KeepInventoryCommand(SpongeCrowdControlPlugin plugin, boolean enable) {
 		super(plugin);
 		this.enable = enable;
 		this.effectName = "keep_inventory_" + (enable ? "on" : "off");
@@ -49,14 +45,14 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		return isKeepingInventory(player.getUniqueId());
 	}
 
-	private void alert(Collection<? extends Audience> players) {
-		Audience audience = Audience.audience(players);
+	private void alert(List<Player> players) {
+		Audience audience = players.stream().map(plugin::asAudience).collect(Audience.toAudience());
 		audience.sendActionBar(enable ? KEEP_INVENTORY_MESSAGE : LOSE_INVENTORY_MESSAGE);
-		audience.playSound(enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT);
+		// API8: alert sound (beacon sounds do not exist in 1.12.2)
 	}
 
-	@Override
 	@NotNull
+	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse();
 
@@ -79,14 +75,11 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		}
 	}
 
-	public static final class Manager implements Listener {
-		@EventHandler
-		public void onDeath(PlayerDeathEvent event) {
-			if (!keepingInventory.contains(event.getEntity().getUniqueId())) return;
+	public static final class Manager {
+		@Listener
+		public void onDeath(DestructEntityEvent.Death event) {
+			if (!keepingInventory.contains(event.getTargetEntity().getUniqueId())) return;
 			event.setKeepInventory(true);
-			event.getDrops().clear();
-			event.setKeepLevel(true);
-			event.setDroppedExp(0);
 		}
 	}
 }

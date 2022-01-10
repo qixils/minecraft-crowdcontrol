@@ -99,16 +99,16 @@ public class CommandRegister {
 				new EntityChaosCommand(plugin),
 //				new CameraLockToSkyCommand(plugin),
 //				new CameraLockToGroundCommand(plugin),
-				new FlightCommand(plugin)
-//				new KeepInventoryCommand(plugin, true),
-//				new KeepInventoryCommand(plugin, false),
-//				new ClearInventoryCommand(plugin),
+				new FlightCommand(plugin),
+				new KeepInventoryCommand(plugin, true),
+				new KeepInventoryCommand(plugin, false),
+				new ClearInventoryCommand(plugin)
 //				new PlantTreeCommand(plugin),
 //				new DoOrDieCommand(plugin)
 		));
 
 		// register keep inventory event handler
-//		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
+		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
 
 		// entity commands
 		for (EntityType entity : safeEntities) {

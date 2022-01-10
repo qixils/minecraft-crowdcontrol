@@ -1,8 +1,11 @@
 package dev.qixils.crowdcontrol.common;
 
+import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.time.Duration;
 
@@ -19,6 +22,24 @@ public class CommandConstants {
 	public static final int FLOWER_MIN = 14;
 	public static final int FLOWER_MAX = 28;
 	public static final double DIG_RADIUS = .5d;
+	public static final Component KEEP_INVENTORY_MESSAGE = Component.text(
+			"Your inventory will be kept on death",
+			NamedTextColor.GREEN
+	);
+	public static final Component LOSE_INVENTORY_MESSAGE = new TextBuilder(NamedTextColor.RED)
+			.next("Your inventory will &lnot&r be kept on death").build();
+	public static final Sound KEEP_INVENTORY_ALERT = Sound.sound(
+			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.activate"),
+			Source.MASTER,
+			1f,
+			1f
+	);
+	public static final Sound LOSE_INVENTORY_ALERT = Sound.sound(
+			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.deactivate"),
+			Source.MASTER,
+			1f,
+			1f
+	);
 
 	public static Sound spookySoundOf(Key key) {
 		return Sound.sound(
