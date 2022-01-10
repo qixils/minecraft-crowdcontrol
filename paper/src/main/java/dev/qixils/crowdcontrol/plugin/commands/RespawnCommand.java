@@ -16,12 +16,12 @@ import java.util.Objects;
 
 @Getter
 public class RespawnCommand extends ImmediateCommand {
+	private final String effectName = "respawn";
+	private final String displayName = "Respawn Players";
+
 	public RespawnCommand(BukkitCrowdControlPlugin plugin) {
 		super(plugin);
 	}
-
-	private final String effectName = "respawn";
-	private final String displayName = "Respawn Players";
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {

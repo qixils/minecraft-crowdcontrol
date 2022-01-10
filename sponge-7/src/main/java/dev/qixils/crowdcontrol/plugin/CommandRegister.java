@@ -77,7 +77,7 @@ public class CommandRegister {
 //				new ItemDamageCommand(plugin, false),
 				new RemoveEnchantsCommand(plugin),
 				new HatCommand(plugin),
-//				new RespawnCommand(plugin),
+				new RespawnCommand(plugin),
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
 //				new BucketClutchCommand(plugin),
@@ -103,7 +103,7 @@ public class CommandRegister {
 				new KeepInventoryCommand(plugin, true),
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin)
-//				new PlantTreeCommand(plugin),
+//				new PlantTreeCommand(plugin), -- no generateTree method seems to exist in API 7; will need to use the legacy code (in git commit history somewhere)
 //				new DoOrDieCommand(plugin)
 		));
 
