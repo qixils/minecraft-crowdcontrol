@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+// TODO: abstract class & builder into impl-neutral class
 @AllArgsConstructor
 public class BlockFinder {
 	public static Predicate<Location<World>> SPAWNING_SPACE = location ->

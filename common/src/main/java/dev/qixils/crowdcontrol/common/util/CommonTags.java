@@ -34,6 +34,7 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "gravel"),
 			Key.key(MINECRAFT_NAMESPACE, "netherrack"),
 			Key.key(MINECRAFT_NAMESPACE, "grass_block"),
+			Key.key(MINECRAFT_NAMESPACE, "grass"), // legacy (1.12.2)
 			Key.key(MINECRAFT_NAMESPACE, "sand"),
 			Key.key(MINECRAFT_NAMESPACE, "red_sand"),
 			Key.key(MINECRAFT_NAMESPACE, "sandstone"),

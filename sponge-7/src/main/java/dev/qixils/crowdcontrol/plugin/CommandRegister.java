@@ -70,7 +70,7 @@ public class CommandRegister {
 				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
 //				new TorchCommand(plugin, true),
 //				new TorchCommand(plugin, false),
-//				new GravelCommand(plugin),
+				new GravelCommand(plugin),
 //				new DigCommand(plugin),
 				new TimeCommand(plugin),
 //				new ItemDamageCommand(plugin, true),
