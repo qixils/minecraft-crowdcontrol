@@ -9,7 +9,6 @@ import dev.qixils.crowdcontrol.plugin.utils.BlockUtil.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -96,9 +95,9 @@ public class VeinCommand extends ImmediateCommand {
                 randomlyShrinkOreVein(setDeepslateBlocks);
 
                 if (!setBlocks.isEmpty())
-                    Bukkit.getScheduler().runTask(plugin, () -> setBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getBlock())));
+                    sync(() -> setBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getBlock())));
                 if (!setDeepslateBlocks.isEmpty())
-                    Bukkit.getScheduler().runTask(plugin, () -> setDeepslateBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getDeepslateBlock())));
+                    sync(() -> setDeepslateBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getDeepslateBlock())));
             }
         }
         return result;

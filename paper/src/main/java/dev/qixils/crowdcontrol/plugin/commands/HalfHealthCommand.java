@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +30,7 @@ public class HalfHealthCommand extends ImmediateCommand {
 			double health = player.getHealth();
 			if (health > 0.5) {
 				resp.type(ResultType.SUCCESS).message("SUCCESS");
-				Bukkit.getScheduler().runTask(plugin, () -> {
+				sync(() -> {
 					player.damage(.1);
 					player.setHealth(health / 2);
 				});

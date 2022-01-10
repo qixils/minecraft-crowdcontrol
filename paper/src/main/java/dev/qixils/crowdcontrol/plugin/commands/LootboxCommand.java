@@ -95,7 +95,7 @@ public class LootboxCommand extends ImmediateCommand {
 
             itemStack.setItemMeta(itemMeta);
             lootbox.setItem(13, itemStack);
-            Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(lootbox)); // TODO: sfx
+            sync(() -> player.openInventory(lootbox)); // TODO: sfx
         }
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }

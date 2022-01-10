@@ -30,7 +30,7 @@ public class EntityChaosCommand extends ImmediateCommand {
 		if (!isGlobalCommandUsable(players, request))
 			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
+		sync(() -> {
 			List<Entity> entities = new ArrayList<>(200);
 			for (World world : Bukkit.getWorlds()) {
 				for (Entity entity : world.getEntities()) {

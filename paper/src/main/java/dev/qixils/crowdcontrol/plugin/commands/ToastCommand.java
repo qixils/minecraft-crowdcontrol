@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
-import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,7 @@ public class ToastCommand extends ImmediateCommand {
 
     @Override
     public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        sync(() -> {
             for (Player player : players) {
                 player.playSound(Sound.sound(org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, Source.MASTER, 1, 1), player);
                 Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();

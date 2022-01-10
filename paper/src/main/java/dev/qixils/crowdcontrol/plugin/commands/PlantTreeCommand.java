@@ -8,7 +8,6 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.TreeType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +35,7 @@ public class PlantTreeCommand extends Command {
 			CompletableFuture<Void> future = new CompletableFuture<>();
 			futures.add(future);
 
-			Bukkit.getScheduler().runTask(plugin, () -> {
+			sync(() -> {
 				if (player.getWorld().generateTree(player.getLocation(), random, treeType))
 					resp.type(ResultType.SUCCESS).message("SUCCESS");
 				future.complete(null);

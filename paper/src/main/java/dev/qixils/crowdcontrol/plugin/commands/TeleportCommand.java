@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.plugin.utils.ParticleUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -40,7 +39,7 @@ public class TeleportCommand extends ImmediateCommand {
 				continue;
 			}
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			Bukkit.getScheduler().runTask(plugin, () -> {
+			sync(() -> {
 				player.teleport(destination);
 				ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);
 				player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.AMBIENT, 1.0f, 1.0f);

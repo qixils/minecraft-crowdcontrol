@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +32,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			PlayerInventory inv = player.getInventory();
 			if (inv.isEmpty()) continue;
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
-			Bukkit.getScheduler().runTask(plugin, (@NotNull Runnable) inv::clear);
+			sync((@NotNull Runnable) inv::clear);
 		}
 		return resp;
 	}

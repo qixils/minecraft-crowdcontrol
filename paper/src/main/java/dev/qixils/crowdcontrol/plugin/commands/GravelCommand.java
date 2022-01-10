@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -41,7 +40,7 @@ public class GravelCommand extends ImmediateCommand {
 					.type(Response.ResultType.FAILURE)
 					.message("No replaceable blocks nearby");
 
-		Bukkit.getScheduler().runTask(plugin, () -> locations.forEach(location -> location.getBlock().setType(Material.GRAVEL)));
+		sync(() -> locations.forEach(location -> location.getBlock().setType(Material.GRAVEL)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

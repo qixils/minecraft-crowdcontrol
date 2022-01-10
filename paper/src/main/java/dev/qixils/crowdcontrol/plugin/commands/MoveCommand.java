@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +48,7 @@ public class MoveCommand extends ImmediateCommand {
             if (isDownwards && player.isOnGround())
                 continue;
             resp.type(ResultType.SUCCESS).message("SUCCESS");
-            Bukkit.getScheduler().runTask(plugin, () -> player.setVelocity(vector));
+            sync(() -> player.setVelocity(vector));
         }
         return resp;
     }

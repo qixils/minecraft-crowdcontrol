@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -73,7 +72,7 @@ public class GamemodeCommand extends TimedCommand implements Listener {
             announce(players, request);
         for (Player player : players) {
             if (player.isValid())
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                sync(() -> {
                     player.setGameMode(gamemode);
                     player.getPersistentDataContainer().set(gamemodeKey, BukkitCrowdControlPlugin.BOOLEAN, request != null);
                 });

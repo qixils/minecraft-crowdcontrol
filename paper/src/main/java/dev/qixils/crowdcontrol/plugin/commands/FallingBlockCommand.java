@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -45,7 +44,7 @@ public class FallingBlockCommand extends ImmediateCommand {
             Material type = block.getType();
             if (type.isEmpty() && type != blockMaterial) {
                 resp.type(ResultType.SUCCESS).message("SUCCESS");
-                Bukkit.getScheduler().runTask(plugin, () -> block.setType(blockMaterial, true));
+                sync(() -> block.setType(blockMaterial, true));
             }
         }
         return resp;

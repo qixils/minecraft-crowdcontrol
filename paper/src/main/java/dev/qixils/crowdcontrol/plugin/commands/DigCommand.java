@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -44,7 +43,7 @@ public class DigCommand extends ImmediateCommand {
 		if (blocks.isEmpty())
 			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any earthly blocks");
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
+		sync(() -> {
 			for (Location location : blocks)
 				location.getBlock().setType(Material.AIR);
 		});

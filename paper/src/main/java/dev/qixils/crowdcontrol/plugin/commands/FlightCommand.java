@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -50,7 +49,7 @@ public class FlightCommand extends TimedCommand implements Listener {
                         if (player.isFlying())
                             continue;
                         response.type(ResultType.SUCCESS).message("SUCCESS");
-                        Bukkit.getScheduler().runTask(plugin, () -> {
+                        sync(() -> {
                             player.setAllowFlight(true);
                             player.setFlying(true);
                         });
@@ -61,7 +60,7 @@ public class FlightCommand extends TimedCommand implements Listener {
                 })
                 .completionCallback($ -> {
                     List<Player> players = plugin.getPlayers(request);
-                    Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> {
+                    sync(() -> players.forEach(player -> {
                         player.setFlying(false);
                         player.setAllowFlight(false);
                     }));

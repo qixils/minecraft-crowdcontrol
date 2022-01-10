@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,18 +32,18 @@ public class DamageCommand extends ImmediateCommand {
 				double newHealth = Math.max(0, Math.min(player.getMaxHealth(), oldHealth - amount));
 				if (newHealth != oldHealth) {
 					success = true;
-					Bukkit.getScheduler().runTask(plugin, () -> player.setHealth(newHealth));
+					sync(() -> player.setHealth(newHealth));
 				}
 			} else if (amount >= Short.MAX_VALUE) {
 				success = true;
-				Bukkit.getScheduler().runTask(plugin, () -> player.setHealth(0));
+				sync(() -> player.setHealth(0));
 			} else {
 				double oldHealth = player.getHealth();
 				double newHealth = Math.max(1, oldHealth - amount);
 				double appliedDamage = oldHealth - newHealth;
 				if (appliedDamage > 0) {
 					success = true;
-					Bukkit.getScheduler().runTask(plugin, () -> player.damage(appliedDamage));
+					sync(() -> player.damage(appliedDamage));
 				}
 			}
 		}

@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -35,7 +34,7 @@ public class DinnerboneCommand extends Command {
 	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Set<LivingEntity> entities = new HashSet<>();
 		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
-		Bukkit.getScheduler().runTask(plugin, () -> {
+		sync(() -> {
 			for (Player player : players) {
 				entities.addAll(player.getLocation().getNearbyLivingEntities(DINNERBONE_RADIUS,
 						x -> x.getType() != EntityType.PLAYER

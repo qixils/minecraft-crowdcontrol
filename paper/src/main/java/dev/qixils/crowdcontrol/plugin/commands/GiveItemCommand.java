@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -34,7 +33,7 @@ public class GiveItemCommand extends ImmediateCommand {
         ItemStack itemStack = new ItemStack(item);
         for (Player player : players) {
             Location location = player.getLocation();
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            sync(() -> {
                 Item item = (Item) player.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);
                 item.setItemStack(itemStack);
                 item.setOwner(player.getUniqueId());

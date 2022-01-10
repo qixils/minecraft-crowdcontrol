@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -53,7 +52,7 @@ public class TorchCommand extends ImmediateCommand {
         if (nearbyBlocks.isEmpty())
             return request.buildResponse().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        sync(() -> {
             for (Location location : nearbyBlocks) {
                 Block block = location.getBlock();
                 if (placeTorches)

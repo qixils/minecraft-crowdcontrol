@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -42,7 +41,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 			}
 			if (!obstruction) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				Bukkit.getScheduler().runTask(plugin, () -> player.teleportAsync(curr.clone().add(0, OFFSET, 0)).thenRun(() -> {
+				sync(() -> player.teleportAsync(curr.clone().add(0, OFFSET, 0)).thenRun(() -> {
 					PlayerInventory inv = player.getInventory();
 					ItemStack hand = inv.getItemInMainHand();
 					ItemStack offhand = inv.getItemInOffHand();

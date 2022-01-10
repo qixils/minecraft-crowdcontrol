@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +35,7 @@ public class ExperienceCommand extends ImmediateCommand {
 			int newLevel = curLevel + amount;
 			if (newLevel >= 0) {
 				resp.type(ResultType.SUCCESS).message("SUCCESS");
-				Bukkit.getScheduler().runTask(plugin, () -> player.setLevel(newLevel));
+				sync(() -> player.setLevel(newLevel));
 			}
 		}
 		return resp;

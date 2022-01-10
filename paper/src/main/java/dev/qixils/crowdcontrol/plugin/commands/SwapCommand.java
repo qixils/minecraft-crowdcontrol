@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -43,7 +42,7 @@ public class SwapCommand extends ImmediateCommand {
         for (int i = 0; i < players.size(); ++i)
             destinations.put(players.get(i), offset.get(i).getLocation());
         // teleport
-        Bukkit.getScheduler().runTask(plugin, () -> destinations.forEach(Entity::teleportAsync));
+        sync(() -> destinations.forEach(Entity::teleportAsync));
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 }

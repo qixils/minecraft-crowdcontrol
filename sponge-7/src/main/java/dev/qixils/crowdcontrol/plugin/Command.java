@@ -1,12 +1,15 @@
 package dev.qixils.crowdcontrol.plugin;
 
+import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Objects;
+import java.util.Random;
 
 public abstract class Command implements dev.qixils.crowdcontrol.common.Command<Player> {
+	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final SpongeCrowdControlPlugin plugin;
 	@Getter

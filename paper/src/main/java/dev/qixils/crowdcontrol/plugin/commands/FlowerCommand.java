@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.plugin.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +56,7 @@ public class FlowerCommand extends ImmediateCommand {
 					.type(Response.ResultType.RETRY)
 					.message("Could not find a suitable location to place flowers");
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
+		sync(() -> {
 			for (Location location : placeLocations) {
 				location.getBlock().setType(BlockUtil.FLOWERS.getRandom());
 			}

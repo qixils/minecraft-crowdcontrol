@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.Command;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -32,7 +31,7 @@ public final class RemoveEntityCommand extends Command {
 	@Override
 	public @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
-		Bukkit.getScheduler().runTask(plugin, () -> {
+		sync(() -> {
 			Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
 					.message("No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
 

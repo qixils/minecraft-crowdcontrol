@@ -30,7 +30,7 @@ public class TimeCommand extends ImmediateCommand {
 					.type(ResultType.UNAVAILABLE)
 					.message("Global command cannot be used on this streamer");
 
-		Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getWorlds().forEach(world ->
+		sync(() -> Bukkit.getWorlds().forEach(world ->
 				world.setFullTime(world.getFullTime() + CommandConstants.ZIP_TIME_TICKS)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}

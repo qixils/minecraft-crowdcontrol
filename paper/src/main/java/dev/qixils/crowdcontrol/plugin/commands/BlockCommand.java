@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -33,7 +32,7 @@ public class BlockCommand extends ImmediateCommand {
             Block block = player.getLocation().getBlock();
             if (block.isReplaceable()) {
                 result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-                Bukkit.getScheduler().runTask(plugin, () -> block.setType(material));
+                sync(() -> block.setType(material));
             }
         }
         return result;

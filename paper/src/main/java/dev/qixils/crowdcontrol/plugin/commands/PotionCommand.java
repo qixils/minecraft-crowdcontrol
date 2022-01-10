@@ -8,7 +8,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -60,7 +59,7 @@ public class PotionCommand extends ImmediateCommand {
 					.message("Cannot apply jump boost while Disable Jump is active");
 		}
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
+		sync(() -> {
 			for (Player player : players) {
 				boolean overridden = false;
 				for (PotionEffect existingEffect : new ArrayList<>(player.getActivePotionEffects())) {

@@ -38,7 +38,7 @@ public abstract class AbstractWeatherCommand extends ImmediateCommand {
 			if (isWeatherActive(world))
 				continue;
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			Bukkit.getScheduler().runTask(plugin, () -> applyWeather(world));
+			sync(() -> applyWeather(world));
 		}
 		return result;
 	}

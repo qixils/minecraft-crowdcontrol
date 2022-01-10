@@ -59,7 +59,7 @@ public class SummonEntityCommand extends ImmediateCommand {
                     return request.buildResponse().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
             }
         }
-        Bukkit.getScheduler().runTask(plugin, () -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
+        sync(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
         return request.buildResponse().type(Response.ResultType.SUCCESS);
     }
 

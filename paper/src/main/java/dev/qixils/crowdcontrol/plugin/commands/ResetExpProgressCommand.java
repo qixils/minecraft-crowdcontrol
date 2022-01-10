@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +25,7 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 		for (Player player : players) {
 			if (player.getTotalExperience() > 0) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				Bukkit.getScheduler().runTask(plugin, () -> player.setTotalExperience(0));
+				sync(() -> player.setTotalExperience(0));
 			}
 		}
 		return result;
