@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.sponge7.SpongeCommandManager;
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
@@ -27,6 +28,9 @@ import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetId;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleType;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -38,6 +42,8 @@ import org.spongepowered.api.scheduler.AsynchronousExecutor;
 import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -89,6 +95,23 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	public SpongeCrowdControlPlugin() {
 		super(Player.class, CommandSource.class);
+	}
+
+	public static void spawnPlayerParticles(Entity entity, ParticleEffect particle) {
+		World world = entity.getWorld();
+		Location<World> location = entity.getLocation();
+		Vector3d position = new Vector3d(location.getX(), Math.ceil(location.getY()), location.getZ());
+		world.spawnParticles(particle, position, 75);
+	}
+
+	public static void spawnPlayerParticles(Entity entity, ParticleType particle, int count) {
+		spawnPlayerParticles(
+				entity,
+				ParticleEffect.builder()
+						.type(particle)
+						.quantity(count)
+						.build()
+		);
 	}
 
 	public @NotNull SpongeAudiences adventure() {

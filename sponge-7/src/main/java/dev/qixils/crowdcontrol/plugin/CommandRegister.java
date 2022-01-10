@@ -57,7 +57,7 @@ public class CommandRegister {
 //				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin),
 //				new LootboxCommand(plugin),
-//				new TeleportCommand(plugin),
+				new TeleportCommand(plugin),
 //				new ToastCommand(plugin),
 //				new FreezeCommand(plugin),
 //				new CameraLockCommand(plugin),

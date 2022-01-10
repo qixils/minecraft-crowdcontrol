@@ -19,28 +19,33 @@ import java.util.List;
 
 @Getter
 public class TeleportCommand extends ImmediateCommand {
-    private final String effectName = "chorus_fruit";
-    private final String displayName = "Eat Chorus Fruit";
+	private final String effectName = "chorus_fruit";
+	private final String displayName = "Eat Chorus Fruit";
 
-    public TeleportCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public TeleportCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No teleportation destinations were available");
-        for (Player player : players) {
-            Location destination = BlockUtil.blockFinderBuilder().origin(player.getLocation()).minRadius(3).maxRadius(15).locationValidator(BlockUtil.SPAWNING_SPACE).build().next();
-            if (destination == null) {
-                continue;
-            }
-            result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                player.teleport(destination);
-                ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);
-                player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.AMBIENT, 1.0f, 1.0f);
-            });
-        }
-        return result;
-    }
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No teleportation destinations were available");
+		for (Player player : players) {
+			Location destination = BlockUtil.blockFinderBuilder()
+					.origin(player.getLocation())
+					.minRadius(3)
+					.maxRadius(15)
+					.locationValidator(BlockUtil.SPAWNING_SPACE)
+					.build().next();
+			if (destination == null) {
+				continue;
+			}
+			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+			Bukkit.getScheduler().runTask(plugin, () -> {
+				player.teleport(destination);
+				ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);
+				player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.AMBIENT, 1.0f, 1.0f);
+			});
+		}
+		return result;
+	}
 }
