@@ -71,7 +71,7 @@ public class CommandRegister {
 //				new TorchCommand(plugin, true),
 //				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
-//				new DigCommand(plugin),
+				new DigCommand(plugin),
 				new TimeCommand(plugin),
 //				new ItemDamageCommand(plugin, true),
 //				new ItemDamageCommand(plugin, false),

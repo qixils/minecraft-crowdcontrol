@@ -18,6 +18,7 @@ public class CommandConstants {
 	public static final int FLOWER_RADIUS = 10;
 	public static final int FLOWER_MIN = 14;
 	public static final int FLOWER_MAX = 28;
+	public static final double DIG_RADIUS = .5d;
 
 	public static Sound spookySoundOf(Key key) {
 		return Sound.sound(

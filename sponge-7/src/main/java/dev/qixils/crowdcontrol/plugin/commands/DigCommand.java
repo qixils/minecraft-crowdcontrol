@@ -1,15 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
+import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,31 +23,32 @@ public class DigCommand extends ImmediateCommand {
 	private final String effectName = "dig";
 	private final String displayName = "Dig Hole";
 
-	public DigCommand(BukkitCrowdControlPlugin plugin) {
+	public DigCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
+	@NotNull
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Set<Location> blocks = new HashSet<>();
-		int depth = -(3 + random.nextInt(5));
+	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Set<Location<World>> locations = new HashSet<>();
+		int depth = -(3 + RandomUtil.RNG.nextInt(5));
 		for (Player player : players) {
-			Location playerLocation = player.getLocation();
+			Location<World> playerLocation = player.getLocation();
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 				for (int y = depth; y < 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
-						blocks.add(playerLocation.clone().add(x, y, z));
+						locations.add(playerLocation.add(x, y, z));
 					}
 				}
 			}
 		}
 
-		if (blocks.isEmpty())
+		if (locations.isEmpty())
 			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any earthly blocks");
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			for (Location location : blocks)
-				location.getBlock().setType(Material.AIR);
+		sync(() -> {
+			for (Location<World> location : locations)
+				location.setBlockType(BlockTypes.AIR);
 		});
 
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
