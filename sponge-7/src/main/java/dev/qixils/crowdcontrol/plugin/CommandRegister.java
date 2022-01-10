@@ -60,7 +60,7 @@ public class CommandRegister {
 				new TeleportCommand(plugin),
 //				new ToastCommand(plugin),
 				new FreezeCommand(plugin),
-//				new CameraLockCommand(plugin),
+				new CameraLockCommand(plugin),
 				new FlowerCommand(plugin),
 				new MoveCommand(plugin, 0, 1, 0, "Up"),
 				new MoveCommand(plugin, 0, -2, 0, "Down"),

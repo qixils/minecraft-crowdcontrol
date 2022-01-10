@@ -38,7 +38,7 @@ public final class FreezeCommand extends TimedCommand {
 				.duration(duration)
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
-					Map<UUID, Location> locations = new HashMap<>();
+					Map<UUID, Location> locations = new HashMap<>(players.size());
 					players.forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
 					task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
 						if (!locations.containsKey(player.getUniqueId()))
@@ -50,7 +50,9 @@ public final class FreezeCommand extends TimedCommand {
 							return;
 
 						if (location.getX() != playerLoc.getX() || location.getY() != playerLoc.getY() || location.getZ() != playerLoc.getZ()) {
-							player.teleport(location);
+							// preserve rotation
+							playerLoc.set(location.getX(), location.getY(), location.getZ());
+							player.teleport(playerLoc);
 						}
 					}), 1, 1));
 					announce(players, request);

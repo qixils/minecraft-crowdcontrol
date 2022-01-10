@@ -38,7 +38,7 @@ public final class FreezeCommand extends TimedCommand {
 				.duration(duration)
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
-					Map<UUID, Location<World>> locations = new HashMap<>();
+					Map<UUID, Location<World>> locations = new HashMap<>(players.size());
 					players.forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
 					task.set(Task.builder()
 							.delayTicks(1)
@@ -51,10 +51,9 @@ public final class FreezeCommand extends TimedCommand {
 								Location<World> playerLoc = player.getLocation();
 								if (!location.getExtent().equals(playerLoc.getExtent()))
 									return;
-
-								if (location.getX() != playerLoc.getX() || location.getY() != playerLoc.getY() || location.getZ() != playerLoc.getZ()) {
-									player.setLocation(location);
-								}
+								if (location.equals(playerLoc))
+									return;
+								player.setLocation(location);
 							}))
 							.submit(plugin));
 					playerAnnounce(players, request);
