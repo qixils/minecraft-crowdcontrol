@@ -1,15 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -24,13 +24,13 @@ public final class FreezeCommand extends TimedCommand {
 	private final String effectName = "freeze";
 	private final String displayName = "Freeze";
 
-	public FreezeCommand(BukkitCrowdControlPlugin plugin) {
+	public FreezeCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		AtomicReference<BukkitTask> task = new AtomicReference<>();
+		AtomicReference<Task> task = new AtomicReference<>();
 
 		new TimedEffect.Builder()
 				.request(request)
@@ -38,22 +38,26 @@ public final class FreezeCommand extends TimedCommand {
 				.duration(duration)
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
-					Map<UUID, Location> locations = new HashMap<>();
+					Map<UUID, Location<World>> locations = new HashMap<>();
 					players.forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
-					task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
-						if (!locations.containsKey(player.getUniqueId()))
-							return;
+					task.set(Task.builder()
+							.delayTicks(1)
+							.intervalTicks(1)
+							.execute(() -> players.forEach(player -> {
+								if (!locations.containsKey(player.getUniqueId()))
+									return;
 
-						Location location = locations.get(player.getUniqueId());
-						Location playerLoc = player.getLocation();
-						if (!location.getWorld().equals(playerLoc.getWorld()))
-							return;
+								Location<World> location = locations.get(player.getUniqueId());
+								Location<World> playerLoc = player.getLocation();
+								if (!location.getExtent().equals(playerLoc.getExtent()))
+									return;
 
-						if (location.getX() != playerLoc.getX() || location.getY() != playerLoc.getY() || location.getZ() != playerLoc.getZ()) {
-							player.teleport(location);
-						}
-					}), 1, 1));
-					announce(players, request);
+								if (location.getX() != playerLoc.getX() || location.getY() != playerLoc.getY() || location.getZ() != playerLoc.getZ()) {
+									player.setLocation(location);
+								}
+							}))
+							.submit(plugin));
+					playerAnnounce(players, request);
 					return null;
 				})
 				.completionCallback($ -> task.get().cancel())
