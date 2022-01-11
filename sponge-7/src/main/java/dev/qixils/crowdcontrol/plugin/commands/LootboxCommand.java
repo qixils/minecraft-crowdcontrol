@@ -37,7 +37,7 @@ public class LootboxCommand extends ImmediateCommand {
 			.from(InventoryArchetypes.MENU_GRID)
 			.title(Text.of("Lootbox"))
 			.property(InventoryCapacity.of(27))
-			.build("crowdcontrol:lootbox", "Lootbox");
+			.build("crowd-control:lootbox", "Lootbox");
 	private final List<ItemType> allItems;
 	private final String effectName = "lootbox";
 	private final String displayName = "Open Lootbox";

@@ -1,0 +1,83 @@
+package dev.qixils.crowdcontrol.plugin.data.entity;
+
+import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.manipulator.mutable.common.AbstractSingleData;
+import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.text.Text;
+
+import java.util.Optional;
+
+import static dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME;
+
+public class OriginalDisplayNameData extends AbstractSingleData
+		<Text, OriginalDisplayNameData, ImmutableOriginalDisplayNameData> {
+
+	static final int CONTENT_VERSION = 1;
+
+	public OriginalDisplayNameData(Text value) {
+		super(
+				ORIGINAL_DISPLAY_NAME,
+				ExceptionUtil.validateNotNullElse(value, Text.EMPTY),
+				Text.EMPTY
+		);
+	}
+
+	public OriginalDisplayNameData() {
+		this(Text.EMPTY);
+	}
+
+	public Value<Text> originalDisplayName() {
+		return getValueGetter();
+	}
+
+	@Override
+	public @NotNull DataContainer toContainer() {
+		return super.toContainer().set(ORIGINAL_DISPLAY_NAME, getValue());
+	}
+
+	@Override
+	public @NotNull Optional<OriginalDisplayNameData> fill(@NotNull DataHolder dataHolder, @NotNull MergeFunction overlap) {
+		OriginalDisplayNameData merged = overlap.merge(this, dataHolder.get(OriginalDisplayNameData.class).orElse(null));
+		setValue(merged.originalDisplayName().get());
+
+		return Optional.of(this);
+	}
+
+	@Override
+	public @NotNull Optional<OriginalDisplayNameData> from(DataContainer container) {
+		if (container.contains(ORIGINAL_DISPLAY_NAME)) {
+			//noinspection OptionalGetWithoutIsPresent -- check is implied by the if statement
+			return Optional.of(setValue(container.getObject(ORIGINAL_DISPLAY_NAME.getQuery(), Text.class).get()));
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public @NotNull OriginalDisplayNameData copy() {
+		return new OriginalDisplayNameData(value);
+	}
+
+	@Override
+	protected @NotNull Value<Text> getValueGetter() {
+		return Sponge.getRegistry().getValueFactory().createValue(
+				ORIGINAL_DISPLAY_NAME,
+				this.value,
+				this.defaultValue
+		);
+	}
+
+	@Override
+	public @NotNull ImmutableOriginalDisplayNameData asImmutable() {
+		return new ImmutableOriginalDisplayNameData(value);
+	}
+
+	@Override
+	public int getContentVersion() {
+		return CONTENT_VERSION;
+	}
+}

@@ -9,9 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
-import org.spongepowered.api.data.manipulator.mutable.entity.CustomNameVisibleData;
-import org.spongepowered.api.data.manipulator.mutable.entity.TameableData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.monster.Monster;
@@ -31,7 +29,6 @@ public class SummonEntityCommand extends ImmediateCommand {
 	protected final EntityType entityType;
 	private final String effectName;
 	private final String displayName;
-	// TODO: mob key
 
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
@@ -61,11 +58,11 @@ public class SummonEntityCommand extends ImmediateCommand {
 	@Blocking
 	protected Entity spawnEntity(String viewer, Player player) {
 		Entity entity = player.getLocation().createEntity(entityType);
-		entity.get(DisplayNameData.class).ifPresent(data -> data.displayName().set(Text.of(viewer)));
-		entity.get(CustomNameVisibleData.class).ifPresent(data -> data.customNameVisible().set(true));
-		entity.get(TameableData.class).ifPresent(data -> data.owner().set(Optional.of(player.getUniqueId())));
+		entity.offer(Keys.DISPLAY_NAME, Text.of(viewer));
+		entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
+		entity.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
+		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
 		// loot table data not supported in v7
-		// TODO mob key
 
 		try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
 			frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);

@@ -54,7 +54,7 @@ public class CommandRegister {
 				new SoundCommand(plugin),
 				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
-//				new DinnerboneCommand(plugin),
+				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin), // TODO broken on Sponge 7.4.7; re-add if fixed
 				new LootboxCommand(plugin),
 				new TeleportCommand(plugin),

@@ -16,7 +16,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.util.AABB;
-import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
@@ -100,7 +99,6 @@ public class DisableJumpingCommand extends TimedCommand {
 		Optional<AABB> optAABB = entity.getBoundingBox();
 		if (optAABB.isPresent()) {
 			World world = entity.getWorld();
-			Location<World> location = event.getFromTransform().getLocation();
 			AABB bbox = optAABB.get();
 
 			// TODO cache results per Vector3i?

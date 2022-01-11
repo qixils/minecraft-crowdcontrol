@@ -1,19 +1,22 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.Command;
+import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.data.entity.OriginalDisplayNameData;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,28 +28,31 @@ public class DinnerboneCommand extends Command {
 	private final String effectName = "dinnerbone";
 	private final String displayName = "Flip Mobs Upside-Down";
 
-	public DinnerboneCommand(BukkitCrowdControlPlugin plugin) {
+	public DinnerboneCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	@Override
 	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Set<LivingEntity> entities = new HashSet<>();
 		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
 		sync(() -> {
+			Set<Entity> entities = new HashSet<>();
 			for (Player player : players) {
-				entities.addAll(player.getLocation().getNearbyLivingEntities(DINNERBONE_RADIUS,
-						x -> x.getType() != EntityType.PLAYER
-								&& (x.getCustomName() == null
-								|| x.getCustomName().isEmpty()
-								|| x.getCustomName().equals(DINNERBONE_NAME)
-								|| SummonEntityCommand.isMobViewerSpawned(plugin, x))));
+				List<Entity> toAdd = new ArrayList<>(player.getWorld().getNearbyEntities(player.getPosition(), DINNERBONE_RADIUS));
+				toAdd.removeIf(entity -> entity.getType().equals(EntityTypes.PLAYER));
+				entities.addAll(toAdd);
 			}
 			successFuture.complete(!entities.isEmpty());
-			entities.forEach(x -> {
-				// TODO: save/restore old name
-				x.setCustomNameVisible(false);
-				x.setCustomName(Objects.equals(x.getCustomName(), DINNERBONE_NAME) ? null : DINNERBONE_NAME);
+			entities.forEach(entity -> {
+				Text oldName = entity.get(OriginalDisplayNameData.class).map(data -> data.originalDisplayName().get()).orElse(Text.EMPTY);
+				Text currentName = entity.getOrElse(Keys.DISPLAY_NAME, Text.EMPTY);
+				if (currentName.equals(Text.of(DINNERBONE_NAME))) {
+					entity.offer(Keys.DISPLAY_NAME, oldName);
+					entity.remove(OriginalDisplayNameData.class);
+				} else {
+					entity.offer(new OriginalDisplayNameData(currentName));
+					entity.offer(Keys.DISPLAY_NAME, Text.of(DINNERBONE_NAME));
+				}
 			});
 		});
 		return successFuture.thenApply(success -> success
