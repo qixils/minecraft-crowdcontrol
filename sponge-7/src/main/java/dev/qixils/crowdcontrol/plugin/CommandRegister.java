@@ -55,7 +55,7 @@ public class CommandRegister {
 				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
 //				new DinnerboneCommand(plugin),
-//				new ClutterCommand(plugin),
+//				new ClutterCommand(plugin), // TODO broken on Sponge 7.4.7; re-add if fixed
 //				new LootboxCommand(plugin),
 				new TeleportCommand(plugin),
 //				new ToastCommand(plugin), -- Recipes do not exist in 1.12 / API7 [to add in API8]
