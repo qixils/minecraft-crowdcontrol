@@ -104,8 +104,8 @@ public class CommandRegister {
 				new FlightCommand(plugin),
 				new KeepInventoryCommand(plugin, true),
 				new KeepInventoryCommand(plugin, false),
-				new ClearInventoryCommand(plugin)
-//				new PlantTreeCommand(plugin), -- no generateTree method seems to exist in API 7; will need to use the legacy code (in git commit history somewhere)
+				new ClearInventoryCommand(plugin),
+				new PlantTreeCommand(plugin)
 //				new DoOrDieCommand(plugin)
 		));
 

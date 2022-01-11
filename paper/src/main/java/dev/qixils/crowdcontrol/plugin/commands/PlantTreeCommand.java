@@ -27,7 +27,9 @@ public class PlantTreeCommand extends Command {
 
 	@Override
 	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Streamer is not in a suitable place for tree planting");
+		Response.Builder resp = request.buildResponse()
+				.type(ResultType.RETRY)
+				.message("Streamer is not in a suitable place for tree planting");
 		TreeType treeType = RandomUtil.randomElementFrom(TreeType.values());
 
 		List<CompletableFuture<Void>> futures = new ArrayList<>(players.size());
