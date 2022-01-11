@@ -26,8 +26,11 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetId;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.entity.Entity;
@@ -50,6 +53,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -239,5 +243,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	public static Key key(final CatalogType catalogType) {
 		return Key.key(catalogType.getId());
+	}
+
+	public static boolean isMatter(BlockState block, Matter matter) {
+		Optional<MatterProperty> matterProp = block.getProperty(MatterProperty.class);
+		return matterProp.isPresent() && matter.equals(matterProp.get().getValue());
+	}
+
+	public static boolean isLiquid(BlockState block) {
+		return isMatter(block, Matter.LIQUID);
 	}
 }

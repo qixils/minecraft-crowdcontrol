@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.Entity;
@@ -54,6 +55,34 @@ public class DropItemCommand extends ImmediateCommand {
 		return new Vector3d(x, y, z);
 	}
 
+	public static boolean dropItem(Game game, Player player) {
+		for (HandType hand : game.getRegistry().getAllOf(HandType.class)) {
+			Optional<ItemStack> optionalItem = player.getItemInHand(hand);
+			if (!optionalItem.isPresent())
+				continue;
+			ItemStack itemStack = optionalItem.get();
+			if (itemStack.isEmpty())
+				continue;
+			// API8: drop item naturally if available
+			Vector3d rotation = asItemVector(player.getHeadRotation());
+			Entity item = player.getLocation() // API8: use eye location (if available)
+					.add(0, 1.4, 0)
+					.createEntity(EntityTypes.ITEM);
+			item.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+			item.setVelocity(rotation);
+			item.offer(Keys.PICKUP_DELAY, 40);
+
+			// spawn the entity
+			try (StackFrame frame = game.getCauseStackManager().pushCauseFrame()) {
+				frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
+				player.getWorld().spawnEntity(item);
+				player.setItemInHand(hand, null);
+			}
+			return true;
+		}
+		return false;
+	}
+
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
@@ -62,30 +91,8 @@ public class DropItemCommand extends ImmediateCommand {
 				.message("No players were holding items");
 
 		for (Player player : players) {
-			for (HandType hand : plugin.getRegistry().getAllOf(HandType.class)) {
-				Optional<ItemStack> optionalItem = player.getItemInHand(hand);
-				if (!optionalItem.isPresent())
-					continue;
+			if (dropItem(plugin.getGame(), player))
 				response.type(ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> {
-					// API8: drop item naturally if available
-					Vector3d rotation = asItemVector(player.getHeadRotation());
-					Entity item = player.getLocation() // API8: use eye location (if available)
-							.add(0, 1.4, 0)
-							.createEntity(EntityTypes.ITEM);
-					item.offer(Keys.REPRESENTED_ITEM, optionalItem.get().createSnapshot());
-					item.setVelocity(rotation);
-					item.offer(Keys.PICKUP_DELAY, 40);
-
-					// spawn the entity
-					try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
-						frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
-						player.getWorld().spawnEntity(item);
-						player.setItemInHand(hand, null);
-					}
-				});
-				break;
-			}
 		}
 
 		return response;

@@ -10,9 +10,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.property.block.MatterProperty;
-import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -29,6 +26,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin.isLiquid;
+
 @Getter
 public class DisableJumpingCommand extends TimedCommand {
 	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>(1);
@@ -37,11 +36,6 @@ public class DisableJumpingCommand extends TimedCommand {
 
 	public DisableJumpingCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
-	}
-
-	private static boolean isLiquid(BlockState block) {
-		Optional<MatterProperty> matterProp = block.getProperty(MatterProperty.class);
-		return matterProp.isPresent() && Matter.LIQUID.equals(matterProp.get().getValue());
 	}
 
 	@Override
