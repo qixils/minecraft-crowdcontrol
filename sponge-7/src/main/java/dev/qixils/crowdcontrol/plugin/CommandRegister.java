@@ -7,6 +7,8 @@ import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -107,9 +109,6 @@ public class CommandRegister {
 //				new DoOrDieCommand(plugin)
 		));
 
-		// register keep inventory event handler
-		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
-
 		// entity commands
 		for (EntityType entity : safeEntities) {
 			commands.add(new SummonEntityCommand(plugin, entity));
@@ -152,11 +151,16 @@ public class CommandRegister {
 		}
 
 		// gamemode commands
-//		for (GameMode gamemode : GameMode.values()) {
-//			if (gamemode == GameMode.SURVIVAL) continue;
-//			commands.add(new GamemodeCommand(plugin, gamemode,
-//					gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
-//		}
+		for (GameMode gamemode : plugin.getRegistry().getAllOf(GameMode.class)) {
+			if (gamemode.equals(GameModes.SURVIVAL))
+				continue;
+			commands.add(new GameModeCommand(plugin, gamemode,
+					gamemode.equals(GameModes.SPECTATOR) ? 8L : 15L)); // duration (in seconds)
+		}
+
+		// register keep inventory event handler
+		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
+		plugin.getGame().getEventManager().registerListeners(plugin, new GameModeCommand.Manager());
 
 		return registeredCommands = commands;
 	}

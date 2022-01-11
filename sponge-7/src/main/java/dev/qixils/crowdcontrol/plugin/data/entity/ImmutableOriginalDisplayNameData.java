@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.data.entity;
 
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableSingleData;
@@ -38,18 +37,18 @@ public class ImmutableOriginalDisplayNameData extends AbstractImmutableSingleDat
 	}
 
 	@Override
-	public @NotNull DataContainer toContainer() {
+	public DataContainer toContainer() {
 		return super.toContainer().set(ORIGINAL_DISPLAY_NAME, getValue());
 	}
 
 	@Override
-	protected @NotNull ImmutableValue<Text> getValueGetter() {
+	protected ImmutableValue<Text> getValueGetter() {
 		return immutableValue;
 	}
 
 	@Override
-	public @NotNull OriginalDisplayNameData asMutable() {
-		return new OriginalDisplayNameData(value);
+	public OriginalDisplayNameData asMutable() {
+		return new OriginalDisplayNameData(getValue());
 	}
 
 	@Override

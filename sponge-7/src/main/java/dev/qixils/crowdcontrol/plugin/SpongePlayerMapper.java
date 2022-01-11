@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.common.AbstractPlayerMapper;
+import dev.qixils.crowdcontrol.plugin.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class SpongePlayerMapper extends AbstractPlayerMapper<Player> {
 				|| !player.isOnline()
 				|| !player.isLoaded()
 				|| player.health().get() <= 0.0
-				|| player.gameMode().get().equals(GameModes.SPECTATOR) // TODO: account for gamemode command
+				|| (player.gameMode().get().equals(GameModes.SPECTATOR) && !player.get(GameModeEffectData.class).isPresent())
 		);
 		return players;
 	}

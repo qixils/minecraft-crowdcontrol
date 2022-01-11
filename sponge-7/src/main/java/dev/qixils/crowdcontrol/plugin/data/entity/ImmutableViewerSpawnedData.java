@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.data.entity;
 
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableBooleanData;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
@@ -23,13 +22,13 @@ public class ImmutableViewerSpawnedData extends AbstractImmutableBooleanData
 	}
 
 	@Override
-	public @NotNull DataContainer toContainer() {
+	public DataContainer toContainer() {
 		return super.toContainer().set(VIEWER_SPAWNED, getValue());
 	}
 
 	@Override
-	public @NotNull ViewerSpawnedData asMutable() {
-		return new ViewerSpawnedData(value);
+	public ViewerSpawnedData asMutable() {
+		return new ViewerSpawnedData(getValue());
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.data.entity;
 
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -36,12 +35,12 @@ public class OriginalDisplayNameData extends AbstractSingleData
 	}
 
 	@Override
-	public @NotNull DataContainer toContainer() {
+	public DataContainer toContainer() {
 		return super.toContainer().set(ORIGINAL_DISPLAY_NAME, getValue());
 	}
 
 	@Override
-	public @NotNull Optional<OriginalDisplayNameData> fill(@NotNull DataHolder dataHolder, @NotNull MergeFunction overlap) {
+	public Optional<OriginalDisplayNameData> fill(DataHolder dataHolder, MergeFunction overlap) {
 		OriginalDisplayNameData merged = overlap.merge(this, dataHolder.get(OriginalDisplayNameData.class).orElse(null));
 		setValue(merged.originalDisplayName().get());
 
@@ -49,7 +48,7 @@ public class OriginalDisplayNameData extends AbstractSingleData
 	}
 
 	@Override
-	public @NotNull Optional<OriginalDisplayNameData> from(DataContainer container) {
+	public Optional<OriginalDisplayNameData> from(DataContainer container) {
 		if (container.contains(ORIGINAL_DISPLAY_NAME)) {
 			//noinspection OptionalGetWithoutIsPresent -- check is implied by the if statement
 			return Optional.of(setValue(container.getObject(ORIGINAL_DISPLAY_NAME.getQuery(), Text.class).get()));
@@ -58,12 +57,12 @@ public class OriginalDisplayNameData extends AbstractSingleData
 	}
 
 	@Override
-	public @NotNull OriginalDisplayNameData copy() {
-		return new OriginalDisplayNameData(value);
+	public OriginalDisplayNameData copy() {
+		return new OriginalDisplayNameData(getValue());
 	}
 
 	@Override
-	protected @NotNull Value<Text> getValueGetter() {
+	protected Value<Text> getValueGetter() {
 		return Sponge.getRegistry().getValueFactory().createValue(
 				ORIGINAL_DISPLAY_NAME,
 				this.value,
@@ -72,8 +71,8 @@ public class OriginalDisplayNameData extends AbstractSingleData
 	}
 
 	@Override
-	public @NotNull ImmutableOriginalDisplayNameData asImmutable() {
-		return new ImmutableOriginalDisplayNameData(value);
+	public ImmutableOriginalDisplayNameData asImmutable() {
+		return new ImmutableOriginalDisplayNameData(getValue());
 	}
 
 	@Override

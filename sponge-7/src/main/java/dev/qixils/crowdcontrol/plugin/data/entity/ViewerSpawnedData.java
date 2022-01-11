@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.data.entity;
 
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractBooleanData;
@@ -29,20 +28,19 @@ public class ViewerSpawnedData extends AbstractBooleanData
 	}
 
 	@Override
-	public @NotNull DataContainer toContainer() {
+	public DataContainer toContainer() {
 		return super.toContainer().set(VIEWER_SPAWNED, getValue());
 	}
 
 	@Override
-	public @NotNull Optional<ViewerSpawnedData> fill(@NotNull DataHolder dataHolder, @NotNull MergeFunction overlap) {
+	public Optional<ViewerSpawnedData> fill(DataHolder dataHolder, MergeFunction overlap) {
 		ViewerSpawnedData merged = overlap.merge(this, dataHolder.get(ViewerSpawnedData.class).orElse(null));
 		setValue(merged.viewerSpawned().get());
-
 		return Optional.of(this);
 	}
 
 	@Override
-	public @NotNull Optional<ViewerSpawnedData> from(DataContainer container) {
+	public Optional<ViewerSpawnedData> from(DataContainer container) {
 		if (container.contains(VIEWER_SPAWNED)) {
 			//noinspection OptionalGetWithoutIsPresent -- check is implied by the if statement
 			return Optional.of(setValue(container.getBoolean(VIEWER_SPAWNED.getQuery()).get()));
@@ -51,13 +49,13 @@ public class ViewerSpawnedData extends AbstractBooleanData
 	}
 
 	@Override
-	public @NotNull ViewerSpawnedData copy() {
-		return new ViewerSpawnedData(value);
+	public ViewerSpawnedData copy() {
+		return new ViewerSpawnedData(getValue());
 	}
 
 	@Override
-	public @NotNull ImmutableViewerSpawnedData asImmutable() {
-		return new ImmutableViewerSpawnedData(value);
+	public ImmutableViewerSpawnedData asImmutable() {
+		return new ImmutableViewerSpawnedData(getValue());
 	}
 
 	@Override

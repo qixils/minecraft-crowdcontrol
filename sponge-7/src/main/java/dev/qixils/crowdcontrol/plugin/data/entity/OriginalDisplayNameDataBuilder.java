@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.data.entity;
 
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
@@ -20,17 +19,17 @@ public class OriginalDisplayNameDataBuilder extends AbstractDataBuilder<Original
 	}
 
 	@Override
-	public @NotNull OriginalDisplayNameData create() {
+	public OriginalDisplayNameData create() {
 		return new OriginalDisplayNameData();
 	}
 
 	@Override
-	public @NotNull Optional<OriginalDisplayNameData> createFrom(@NotNull DataHolder dataHolder) {
+	public Optional<OriginalDisplayNameData> createFrom(DataHolder dataHolder) {
 		return create().fill(dataHolder);
 	}
 
 	@Override
-	protected @NotNull Optional<OriginalDisplayNameData> buildContent(@NotNull DataView container) throws InvalidDataException {
+	protected Optional<OriginalDisplayNameData> buildContent(DataView container) throws InvalidDataException {
 		if (container.contains(ORIGINAL_DISPLAY_NAME)) {
 			//noinspection OptionalGetWithoutIsPresent -- check is implied by the if statement
 			return Optional.of(new OriginalDisplayNameData(container.getObject(ORIGINAL_DISPLAY_NAME.getQuery(), Text.class).get()));

@@ -7,6 +7,9 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
+import dev.qixils.crowdcontrol.plugin.data.entity.GameModeEffectData;
+import dev.qixils.crowdcontrol.plugin.data.entity.GameModeEffectDataBuilder;
+import dev.qixils.crowdcontrol.plugin.data.entity.ImmutableGameModeEffectData;
 import dev.qixils.crowdcontrol.plugin.data.entity.ImmutableOriginalDisplayNameData;
 import dev.qixils.crowdcontrol.plugin.data.entity.ImmutableViewerSpawnedData;
 import dev.qixils.crowdcontrol.plugin.data.entity.OriginalDisplayNameData;
@@ -45,6 +48,7 @@ import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameRegistryEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -83,6 +87,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	// keys (though they don't really work)
 	public static Key<Value<Text>> ORIGINAL_DISPLAY_NAME = DummyObjectProvider.createExtendedFor(Key.class, "ORIGINAL_DISPLAY_NAME");
 	public static Key<Value<Boolean>> VIEWER_SPAWNED = DummyObjectProvider.createExtendedFor(Key.class, "VIEWER_SPAWNED");
+	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
 	// "real" variables
 	private final CommandRegister register = new CommandRegister(this);
 	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
@@ -117,6 +122,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	// registries
 	private DataRegistration<OriginalDisplayNameData, ImmutableOriginalDisplayNameData> ORIGINAL_DISPLAY_NAME_DATA_REGISTRATION;
 	private DataRegistration<ViewerSpawnedData, ImmutableViewerSpawnedData> VIEWER_SPAWNED_DATA_REGISTRATION;
+	private DataRegistration<GameModeEffectData, ImmutableGameModeEffectData> GAME_MODE_EFFECT_DATA_REGISTRATION;
 
 	public SpongeCrowdControlPlugin() {
 		super(Player.class, CommandSource.class);
@@ -137,6 +143,19 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 						.quantity(count)
 						.build()
 		);
+	}
+
+	public static net.kyori.adventure.key.Key key(final CatalogType catalogType) {
+		return net.kyori.adventure.key.Key.key(catalogType.getId());
+	}
+
+	public static boolean isMatter(BlockState block, Matter matter) {
+		Optional<MatterProperty> matterProp = block.getProperty(MatterProperty.class);
+		return matterProp.isPresent() && matter.equals(matterProp.get().getValue());
+	}
+
+	public static boolean isLiquid(BlockState block) {
+		return isMatter(block, Matter.LIQUID);
 	}
 
 	public @NotNull SpongeAudiences adventure() {
@@ -174,30 +193,65 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		}
 	}
 
-	public static net.kyori.adventure.key.Key key(final CatalogType catalogType) {
-		return net.kyori.adventure.key.Key.key(catalogType.getId());
-	}
-
 	@SuppressWarnings("UnstableApiUsage")
 	@Listener
 	public void onKeyRegistration(GameRegistryEvent.Register<Key<?>> event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
 				.type(new TypeToken<Value<Text>>() {
 				})
-				.id("crowd-control:original_display_name")
+				.id("original_display_name")
 				.name("Original Display Name")
 				.query(DataQuery.of("OriginalDisplayName"))
 				.build();
 		VIEWER_SPAWNED = Key.builder()
 				.type(new TypeToken<Value<Boolean>>() {
 				})
-				.id("crowd-control:viewer_spawned")
+				.id("viewer_spawned")
 				.name("Viewer Spawned")
 				.query(DataQuery.of("ViewerSpawned"))
+				.build();
+		GAME_MODE_EFFECT = Key.builder()
+				.type(new TypeToken<Value<GameMode>>() {
+				})
+				.id("game_mode_effect")
+				.name("Game Mode Effect State")
+				.query(DataQuery.of("GameModeEffect"))
 				.build();
 
 		event.register(ORIGINAL_DISPLAY_NAME);
 		event.register(VIEWER_SPAWNED);
+		event.register(GAME_MODE_EFFECT);
+	}
+
+	@Listener
+	public void onDataRegistration(GameRegistryEvent.Register<DataRegistration<?, ?>> event) {
+		ORIGINAL_DISPLAY_NAME_DATA_REGISTRATION = DataRegistration.builder()
+				.dataClass(OriginalDisplayNameData.class)
+				.immutableClass(ImmutableOriginalDisplayNameData.class)
+				.dataImplementation(OriginalDisplayNameData.class)
+				.immutableImplementation(ImmutableOriginalDisplayNameData.class)
+				.builder(new OriginalDisplayNameDataBuilder())
+				.id("original_display_name")
+				.name("Original Display Name")
+				.build();
+		VIEWER_SPAWNED_DATA_REGISTRATION = DataRegistration.builder()
+				.dataClass(ViewerSpawnedData.class)
+				.immutableClass(ImmutableViewerSpawnedData.class)
+				.dataImplementation(ViewerSpawnedData.class)
+				.immutableImplementation(ImmutableViewerSpawnedData.class)
+				.builder(new ViewerSpawnedDataBuilder())
+				.id("viewer_spawned")
+				.name("Viewer Spawned")
+				.build();
+		GAME_MODE_EFFECT_DATA_REGISTRATION = DataRegistration.builder()
+				.dataClass(GameModeEffectData.class)
+				.immutableClass(ImmutableGameModeEffectData.class)
+				.dataImplementation(GameModeEffectData.class)
+				.immutableImplementation(ImmutableGameModeEffectData.class)
+				.builder(new GameModeEffectDataBuilder())
+				.id("game_mode_effect")
+				.name("Game Mode Effect State")
+				.build();
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -287,36 +341,5 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Override
 	public @NotNull Logger getSLF4JLogger() {
 		return logger;
-	}
-
-	@Listener
-	public void onDataRegistration(GameRegistryEvent.Register<DataRegistration<?, ?>> event) {
-		ORIGINAL_DISPLAY_NAME_DATA_REGISTRATION = DataRegistration.builder()
-				.dataClass(OriginalDisplayNameData.class)
-				.immutableClass(ImmutableOriginalDisplayNameData.class)
-				.dataImplementation(OriginalDisplayNameData.class)
-				.immutableImplementation(ImmutableOriginalDisplayNameData.class)
-				.builder(new OriginalDisplayNameDataBuilder())
-				.id("original_display_name")
-				.name("Original Display Name")
-				.build();
-		VIEWER_SPAWNED_DATA_REGISTRATION = DataRegistration.builder()
-				.dataClass(ViewerSpawnedData.class)
-				.immutableClass(ImmutableViewerSpawnedData.class)
-				.dataImplementation(ViewerSpawnedData.class)
-				.immutableImplementation(ImmutableViewerSpawnedData.class)
-				.builder(new ViewerSpawnedDataBuilder())
-				.id("viewer_spawned")
-				.name("Viewer Spawned")
-				.build();
-	}
-
-	public static boolean isMatter(BlockState block, Matter matter) {
-		Optional<MatterProperty> matterProp = block.getProperty(MatterProperty.class);
-		return matterProp.isPresent() && matter.equals(matterProp.get().getValue());
-	}
-
-	public static boolean isLiquid(BlockState block) {
-		return isMatter(block, Matter.LIQUID);
 	}
 }
