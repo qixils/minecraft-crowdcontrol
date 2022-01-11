@@ -19,6 +19,7 @@ A list of all changes made to the software in reverse chronological order.
 - Damage Item and Repair Item will now only be marked as successful if the item's damage was
   actually altered.
 - Damage Item now has a minimum value of 1% durability (or 15 usages).
+- Enchantments on items in the Lootbox can now rarely be higher than the usual maximum.
 
 ## 3.1.3
 

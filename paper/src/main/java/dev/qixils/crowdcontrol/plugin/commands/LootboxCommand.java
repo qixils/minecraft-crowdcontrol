@@ -1,15 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.CommandConstants.AttributeWeights;
+import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
-import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.plugin.BukkitCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.Sound.Source;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -31,109 +32,85 @@ import java.util.Set;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-    public LootboxCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	private final String effectName = "lootbox";
+	private final String displayName = "Open Lootbox";
 
-    private final String effectName = "lootbox";
-    private final String displayName = "Open Lootbox";
+	public LootboxCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        for (Player player : players) {
-            Inventory lootbox = Bukkit.createInventory(null, 27, new TextBuilder().next(request.getViewer(), Plugin.USER_COLOR).next(" has gifted you...").build());
-            List<Material> items = new ArrayList<>(Arrays.asList(Material.values()));
-            Collections.shuffle(items, random);
-            Material item = null;
-            for (Material i : items) {
-                if (i.isItem()) {
-                    item = i;
-                    break;
-                }
-            }
-            assert item != null;
-            ItemStack itemStack = new ItemStack(item, 1 + random.nextInt(item.getMaxStackSize()));
-            // big dumb enchantment logic to generate sane items lmfao
-            int enchantments = RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel();
-            if (enchantments > 0) {
-                List<Enchantment> enchantmentList = new ArrayList<>();
-                for (Enchantment enchantment : EnchantmentWrapper.values()) {
-                    if(enchantment.canEnchantItem(itemStack)) enchantmentList.add(enchantment);
-                }
-                if (!enchantmentList.isEmpty()) {
-                    Collections.shuffle(enchantmentList, random);
-                    Set<Enchantment> addedEnchantments = new HashSet<>();
-                    int count = 0;
-                    for (int i = 0; i < enchantmentList.size() && count < enchantments; ++i) {
-                        Enchantment enchantment = enchantmentList.get(i);
-                        if (addedEnchantments.stream().noneMatch(x -> x.conflictsWith(enchantment))) {
-                            ++count;
-                            addedEnchantments.add(enchantment);
-                            int level = enchantment.getStartLevel() + random.nextInt(enchantment.getMaxLevel() - enchantment.getStartLevel() + 1);
-                            itemStack.addEnchantment(enchantment, level);
-                        }
-                    }
-                }
-            }
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.lore(Collections.singletonList(new TextBuilder("Donated by ").next(request.getViewer(), Plugin.USER_COLOR, TextDecoration.ITALIC).build()));
-            if (random.nextDouble() >= 0.9D) {
-                itemMeta.setUnbreakable(true);
-            }
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		for (Player player : players) {
+			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(request));
+			List<Material> items = new ArrayList<>(Arrays.asList(Material.values()));
+			Collections.shuffle(items, random);
+			Material item = null;
+			for (Material i : items) {
+				if (i.isItem()) {
+					item = i;
+					break;
+				}
+			}
+			assert item != null;
 
-            int attributes = RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel();
-            if (attributes > 0) {
-                List<Attribute> attributeList = Arrays.asList(Attribute.values());
-                Collections.shuffle(attributeList, random);
-                for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
-                    Attribute attribute = attributeList.get(i);
-                    String name = "lootbox_" + attribute.getKey().getKey();
-                    AttributeModifier attributeModifier = new AttributeModifier(name, (random.nextDouble() * 2) - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-                    itemMeta.addAttributeModifier(attribute, attributeModifier);
-                }
-            }
+			ItemStack itemStack = new ItemStack(item, 1 + random.nextInt(item.getMaxStackSize()));
+			ItemMeta itemMeta = itemStack.getItemMeta();
+			itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(request)));
+			if (random.nextDouble() >= 0.9D) {
+				itemMeta.setUnbreakable(true);
+			}
 
-            itemStack.setItemMeta(itemMeta);
-            lootbox.setItem(13, itemStack);
-            sync(() -> player.openInventory(lootbox)); // TODO: sfx
-        }
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
-    }
+			// big dumb enchantment logic to generate sane items lmfao
+			int enchantments = RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel();
+			if (enchantments > 0) {
+				List<Enchantment> enchantmentList = new ArrayList<>();
+				for (Enchantment enchantment : EnchantmentWrapper.values()) {
+					if (enchantment.canEnchantItem(itemStack)) enchantmentList.add(enchantment);
+				}
+				if (!enchantmentList.isEmpty()) {
+					Collections.shuffle(enchantmentList, random);
+					Set<Enchantment> addedEnchantments = new HashSet<>();
+					int count = 0;
+					for (int i = 0; i < enchantmentList.size() && count < enchantments; ++i) {
+						Enchantment enchantment = enchantmentList.get(i);
+						if (addedEnchantments.stream().noneMatch(x -> x.conflictsWith(enchantment))) {
+							++count;
+							addedEnchantments.add(enchantment);
+							int level = enchantment.getStartLevel() + random.nextInt(enchantment.getMaxLevel() - enchantment.getStartLevel() + 1);
+							if (random.nextBoolean()) // bonus OP enchant chance
+								level += random.nextInt(4);
+							itemStack.addEnchantment(enchantment, level);
+						}
+					}
+				}
+			}
 
-    public enum AttributeWeights implements Weighted {
-        NONE(0, 167),
-        ONE(1, 20),
-        TWO(2, 10),
-        THREE(3, 2),
-        FOUR(4, 1);
+			int attributes = RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel();
+			if (attributes > 0) {
+				List<Attribute> attributeList = Arrays.asList(Attribute.values());
+				Collections.shuffle(attributeList, random);
+				for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
+					Attribute attribute = attributeList.get(i);
+					String name = "lootbox_" + attribute.getKey().getKey();
+					AttributeModifier attributeModifier = new AttributeModifier(name, (random.nextDouble() * 2) - 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+					itemMeta.addAttributeModifier(attribute, attributeModifier);
+				}
+			}
 
-        public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(AttributeWeights::getWeight).sum();
-        private final @Getter
-        int level;
-        private final @Getter
-        int weight;
-
-        AttributeWeights(int level, int weight) {
-            this.level = level;
-            this.weight = weight;
-        }
-    }
-
-    @Getter
-    public enum EnchantmentWeights implements Weighted {
-        ONE(1, 40),
-        TWO(2, 15),
-        THREE(3, 3),
-        FOUR(4, 2),
-        FIVE(5, 1);
-
-        public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(EnchantmentWeights::getWeight).sum();
-        private final int level;
-        private final int weight;
-
-        EnchantmentWeights(int level, int weight) {
-            this.level = level;
-            this.weight = weight;
-        }
-    }
+			itemStack.setItemMeta(itemMeta);
+			lootbox.setItem(13, itemStack);
+			player.playSound(
+					Sound.sound(
+							org.bukkit.Sound.BLOCK_NOTE_BLOCK_CHIME,
+							Source.PLAYER,
+							1f,
+							1.2f
+					),
+					Sound.Emitter.self()
+			);
+			sync(() -> player.openInventory(lootbox));
+		}
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
 }

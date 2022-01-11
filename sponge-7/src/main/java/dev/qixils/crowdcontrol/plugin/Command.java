@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import lombok.Getter;
+import net.kyori.adventure.text.serializer.spongeapi.SpongeComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -12,12 +13,14 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final SpongeCrowdControlPlugin plugin;
+	protected final SpongeComponentSerializer spongeSerializer;
 	@Getter
 	private final boolean isEventListener;
 
 	protected Command(@NotNull SpongeCrowdControlPlugin plugin, boolean isEventListener) {
 		this.plugin = Objects.requireNonNull(plugin, "plugin");
 		this.isEventListener = isEventListener;
+		this.spongeSerializer = Objects.requireNonNull(plugin.getSpongeSerializer());
 	}
 
 	protected Command(@NotNull SpongeCrowdControlPlugin plugin) {

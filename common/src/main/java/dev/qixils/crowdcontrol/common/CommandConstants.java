@@ -1,14 +1,19 @@
 package dev.qixils.crowdcontrol.common;
 
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
+import dev.qixils.crowdcontrol.common.util.Weighted;
+import dev.qixils.crowdcontrol.socket.Request;
+import lombok.Getter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Arrays;
 
 public class CommandConstants {
 	public static final int REMOVE_ENTITY_RADIUS = 35;
@@ -66,6 +71,55 @@ public class CommandConstants {
 
 	public static boolean canApplyDamage(int oldDamage, int newDamage, int maxDurability) {
 		return canApplyDurability(maxDurability - oldDamage, maxDurability - newDamage, maxDurability);
+	}
+
+	public static Component buildLootboxTitle(Request request) {
+		return new TextBuilder()
+				.next(request.getViewer(), Plugin.USER_COLOR)
+				.rawNext(" has gifted you...")
+				.build();
+	}
+
+	public static Component buildLootboxLore(Request request) {
+		return new TextBuilder("Donated by ")
+				.next(request.getViewer(), Plugin.USER_COLOR, TextDecoration.ITALIC)
+				.build();
+	}
+
+	@Getter
+	public enum AttributeWeights implements Weighted {
+		NONE(0, 167),
+		ONE(1, 20),
+		TWO(2, 10),
+		THREE(3, 2),
+		FOUR(4, 1);
+
+		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(AttributeWeights::getWeight).sum();
+		private final int level;
+		private final int weight;
+
+		AttributeWeights(int level, int weight) {
+			this.level = level;
+			this.weight = weight;
+		}
+	}
+
+	@Getter
+	public enum EnchantmentWeights implements Weighted {
+		ONE(1, 40),
+		TWO(2, 15),
+		THREE(3, 3),
+		FOUR(4, 2),
+		FIVE(5, 1);
+
+		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(EnchantmentWeights::getWeight).sum();
+		private final int level;
+		private final int weight;
+
+		EnchantmentWeights(int level, int weight) {
+			this.level = level;
+			this.weight = weight;
+		}
 	}
 
 	private CommandConstants() {

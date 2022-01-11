@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
+import net.kyori.adventure.text.serializer.spongeapi.SpongeComponentSerializer;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -73,6 +74,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
+	private SpongeComponentSerializer spongeSerializer;
 	// injected variables
 	@Inject
 	private Logger logger;
@@ -207,6 +209,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
+		spongeSerializer = SpongeComponentSerializer.get();
 		scheduler = game.getScheduler();
 		defaultConfig.copyToFile(configPath, false, true);
 		configLoader = HoconConfigurationLoader.builder()
