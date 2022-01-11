@@ -42,6 +42,7 @@ public class CommandConstants {
 			1f
 	);
 	private static final int MIN_ITEM_DAMAGE = 15;
+	public static final int MIN_MAX_HEALTH = 10;
 
 	public static Sound spookySoundOf(Key key) {
 		return Sound.sound(
