@@ -50,7 +50,7 @@ public class CommandRegister {
 
 		// register normal commands
 		List<Command> commands = new ArrayList<>(Arrays.asList(
-//				new VeinCommand(plugin),
+				new VeinCommand(plugin),
 				new SoundCommand(plugin),
 				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
