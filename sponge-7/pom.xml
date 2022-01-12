@@ -15,6 +15,7 @@
     <url>https://github.com/qixils/minecraft-crowdcontrol</url>
 
     <build>
+        <finalName>CrowdControl-Sponge7-v${project.version}</finalName>
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
