@@ -9,7 +9,9 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
@@ -51,6 +53,26 @@ public class CommandConstants {
 	public static final int CLUTTER_ITEMS = 3;
 	public static final int VEIN_RADIUS = 12;
 	public static final int VEIN_COUNT = 2;
+	// do-or-die
+	public static final Duration DO_OR_DIE_DURATION = Duration.ofSeconds(31);
+	public static final Duration DO_OR_DIE_COOLDOWN = DO_OR_DIE_DURATION.multipliedBy(3);
+	private static final TextColor DO_OR_DIE_START_COLOR = TextColor.color(0xE4F73D);
+	private static final TextColor DO_OR_DIE_END_COLOR = TextColor.color(0xF42929);
+	public static final Title.Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
+	public static final Title DO_OR_DIE_SUCCESS = Title.title(
+			Component.empty(),
+			Component.text("Task Completed!").color(NamedTextColor.GREEN),
+			DO_OR_DIE_TIMES
+	);
+	public static final Title DO_OR_DIE_FAILURE = Title.title(
+			Component.empty(),
+			Component.text("Task Failed").color(NamedTextColor.RED),
+			DO_OR_DIE_TIMES
+	);
+
+	public static TextColor doOrDieColor(int secondsLeft) {
+		return TextColor.lerp((float) secondsLeft / DO_OR_DIE_DURATION.getSeconds(), DO_OR_DIE_END_COLOR, DO_OR_DIE_START_COLOR);
+	}
 
 	public static Sound spookySoundOf(Key key) {
 		return Sound.sound(

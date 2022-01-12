@@ -27,6 +27,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adventure.version>4.9.3</adventure.version>
         <cloud.version>1.6.1</cloud.version>
+        <crowdcontrol.version>3.3.3</crowdcontrol.version>
     </properties>
 
     <pluginRepositories>
@@ -58,7 +59,7 @@
         <dependency>
             <groupId>dev.qixils.crowdcontrol</groupId>
             <artifactId>crowd-control-receiver</artifactId>
-            <version>3.3.2</version>
+            <version>${crowdcontrol.version}</version>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>

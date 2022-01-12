@@ -32,7 +32,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		this.enchantmentType = enchantmentType;
 		this.maxLevel = enchantmentType.getMaximumLevel();
 		this.effectName = "enchant_" + Sponge7TextUtil.valueOf(enchantmentType);
-		this.displayName = "Apply " + enchantmentType.getTranslation().get(); // TODO: enchant level
+		this.displayName = "Apply " + enchantmentType.getTranslation().get();
 	}
 
 	@NotNull

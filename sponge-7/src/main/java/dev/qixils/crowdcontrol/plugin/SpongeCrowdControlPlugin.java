@@ -175,7 +175,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	@Override
 	public boolean isAdmin(@NotNull CommandSource commandSource) {
-		return commandSource.hasPermission(ADMIN_PERMISSION); // TODO: operator check
+		return commandSource.hasPermission(ADMIN_PERMISSION);
 	}
 
 	@Override
@@ -287,7 +287,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			else {
 				password = config.getNode("password").getString();
 				if (password == null || password.isEmpty()) {
-					logger.error("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command."); // TODO: update config file path
+					logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowd-control.conf or set a temporary password using the /password command.");
 					return;
 				}
 			}
@@ -296,7 +296,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			getLogger().info("Running Crowd Control in legacy client mode");
 			String ip = config.getNode("ip").getString();
 			if (ip == null || ip.isEmpty()) {
-				logger.error("No IP address has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml"); // TODO config path
+				logger.error("No IP address has been set in the plugin's config file. Please set one by editing config/crowd-control.conf");
 				return;
 			}
 			crowdControl = CrowdControl.client().port(PORT).ip(ip).build();

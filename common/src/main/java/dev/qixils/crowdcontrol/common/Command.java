@@ -37,7 +37,7 @@ public interface Command<P> {
 
 	default void executeAndNotify(@NotNull Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
-		plugin.getSLF4JLogger().info("Executing " + getDisplayName()); // TODO make debug
+		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
 		List<P> players = plugin.getPlayers(request);
 
 		// ensure targets are online / available

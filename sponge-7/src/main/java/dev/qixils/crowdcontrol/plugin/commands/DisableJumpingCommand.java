@@ -20,12 +20,12 @@ import org.spongepowered.api.world.World;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin.isLiquid;
 
 @Getter
 public class DisableJumpingCommand extends TimedCommand {
@@ -101,28 +101,35 @@ public class DisableJumpingCommand extends TimedCommand {
 			World world = entity.getWorld();
 			AABB bbox = optAABB.get();
 
-			// TODO cache results per Vector3i?
+			Set<Vector3i> checked = new HashSet<>(7);
 			Vector3d min = bbox.getMin();
-			if (isLiquid(world.getBlock(min.toInt())))
+			if (isLiquid(checked, world, min.toInt()))
 				return;
 			Vector3d max = bbox.getMax();
-			if (isLiquid(world.getBlock(max.toInt())))
+			if (isLiquid(checked, world, max.toInt()))
 				return;
-			if (isLiquid(world.getBlock(new Vector3i(min.getX(), min.getY(), max.getZ()))))
+			if (isLiquid(checked, world, new Vector3i(min.getX(), min.getY(), max.getZ())))
 				return;
-			if (isLiquid(world.getBlock(new Vector3i(min.getX(), max.getY(), max.getZ()))))
+			if (isLiquid(checked, world, new Vector3i(min.getX(), max.getY(), max.getZ())))
 				return;
-			if (isLiquid(world.getBlock(new Vector3i(max.getX(), min.getY(), max.getZ()))))
+			if (isLiquid(checked, world, new Vector3i(max.getX(), min.getY(), max.getZ())))
 				return;
-			if (isLiquid(world.getBlock(new Vector3i(max.getX(), min.getY(), min.getZ()))))
+			if (isLiquid(checked, world, new Vector3i(max.getX(), min.getY(), min.getZ())))
 				return;
-			if (isLiquid(world.getBlock(new Vector3i(max.getX(), max.getY(), min.getZ()))))
+			if (isLiquid(checked, world, new Vector3i(max.getX(), max.getY(), min.getZ())))
 				return;
-			if (isLiquid(world.getBlock(new Vector3i(min.getX(), max.getY(), min.getZ()))))
+			if (isLiquid(checked, world, new Vector3i(min.getX(), max.getY(), min.getZ())))
 				return;
 		}
 
 		// now that we know this is a jump, we can cancel it lmao
 		event.setCancelled(true);
+	}
+
+	private static boolean isLiquid(Set<Vector3i> checked, World world, Vector3i pos) {
+		if (checked.contains(pos))
+			return false;
+		checked.add(pos);
+		return SpongeCrowdControlPlugin.isLiquid(world.getBlock(pos));
 	}
 }

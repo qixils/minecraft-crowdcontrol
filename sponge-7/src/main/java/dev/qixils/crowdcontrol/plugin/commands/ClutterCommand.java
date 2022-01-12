@@ -82,17 +82,24 @@ public class ClutterCommand extends ImmediateCommand {
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 
-	private Slot unwrap(@Nullable Slot slot, SlotPos pos) {
+	private static Slot unwrap(@Nullable Slot slot, SlotPos pos) {
 		if (slot == null)
 			throw new IndexOutOfBoundsException("Slot " + pos.getX() + "," + pos.getY() + " is out of bounds");
 		return slot;
 	}
 
-	private Slot unwrap(GridInventory inventory, SlotPos pos) {
-		return unwrap(inventory.getSlot(pos).orElse(null), pos);
+	private static Slot unwrap(GridInventory inventory, SlotPos pos) {
+		try {
+			return unwrap(inventory.getSlot(pos).orElse(null), pos);
+		} catch (IndexOutOfBoundsException e) {
+			// workaround for Sponge#3584
+			int offset = 9 * (pos.getY() - 1);
+			SlotPos hackPos = SlotPos.of(pos.getX() + offset, 1);
+			return unwrap(inventory.getSlot(hackPos).orElse(null), pos);
+		}
 	}
 
-	private void swap(MainPlayerInventory inv, SlotPos slotPos1, SlotPos slotPos2) {
+	private static void swap(MainPlayerInventory inv, SlotPos slotPos1, SlotPos slotPos2) {
 		Slot slot1 = unwrap(inv, slotPos1);
 		Slot slot2 = unwrap(inv, slotPos2);
 

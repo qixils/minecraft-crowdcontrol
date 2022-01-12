@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin;
 import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.commands.*;
+import dev.qixils.crowdcontrol.plugin.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.utils.TypedTag;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.effect.potion.PotionEffectType;
@@ -57,7 +58,7 @@ public class CommandRegister {
 				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
 				new DinnerboneCommand(plugin),
-//				new ClutterCommand(plugin), // TODO broken on Sponge 7.4.7; re-add if fixed
+				new ClutterCommand(plugin),
 				new LootboxCommand(plugin),
 				new TeleportCommand(plugin),
 //				new ToastCommand(plugin), -- Recipes do not exist in 1.12 / API7 [to add in API8]
@@ -105,8 +106,8 @@ public class CommandRegister {
 				new KeepInventoryCommand(plugin, true),
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin),
-				new PlantTreeCommand(plugin)
-//				new DoOrDieCommand(plugin)
+				new PlantTreeCommand(plugin),
+				new DoOrDieCommand(plugin)
 		));
 
 		// entity commands

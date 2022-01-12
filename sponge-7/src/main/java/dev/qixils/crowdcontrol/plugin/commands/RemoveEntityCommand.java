@@ -24,7 +24,6 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	protected final EntityType entityType;
 	private final String effectName;
 	private final String displayName;
-	// TODO: mob key
 
 	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);

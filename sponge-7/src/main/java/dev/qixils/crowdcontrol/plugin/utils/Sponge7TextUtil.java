@@ -4,6 +4,8 @@ import dev.qixils.crowdcontrol.common.util.TextUtil;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.translation.Translatable;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.text.translation.Translation;
 
 public class Sponge7TextUtil extends TextUtil {
 	public Sponge7TextUtil() {
@@ -20,8 +22,8 @@ public class Sponge7TextUtil extends TextUtil {
 	@Override
 	@Deprecated
 	public String translate(Translatable translatable) {
-		// TODO: this is possible to support
-		throw new UnsupportedOperationException("Translation services are unavailable in Sponge API v7");
+		String key = translatable.translationKey();
+		return Sponge.getRegistry().getTranslationById(key).map(Translation::get).orElse(key);
 	}
 
 	public static String valueOf(CatalogType type) {
