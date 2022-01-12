@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.commands;
 
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -16,11 +15,13 @@ import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.property.SlotPos;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.CLUTTER_ITEMS;
 
@@ -33,53 +34,22 @@ public class ClutterCommand extends ImmediateCommand {
 		super(plugin);
 	}
 
-	private static SlotPos uniqueSlot(GridInventory inventory, SlotPos exclude) {
-		return uniqueSlot(inventory, pos -> pos.equals(exclude));
-	}
-
-	private static SlotPos uniqueSlot(GridInventory inventory, Predicate<SlotPos> extraCheck) {
-		SlotPos newSlot;
-		do {
-			newSlot = randomSlot(inventory);
-		} while (extraCheck.test(newSlot));
-		return newSlot;
-	}
-
-	private static SlotPos randomSlot(GridInventory inventory) {
-		return SlotPos.of(
-				RandomUtil.RNG.nextInt(inventory.getColumns()),
-				RandomUtil.RNG.nextInt(inventory.getRows())
-		);
-	}
-
-	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		// swaps random items in player's inventory
-		for (Player player : players) {
-			if (!(player.getInventory() instanceof PlayerInventory)) {
-				plugin.getLogger().warn("Player " + player.getName() + "'s inventory "
-						+ player.getInventory().getClass().getSimpleName()
-						+ " is not an instance of PlayerInventory");
-				continue;
-			}
-			MainPlayerInventory inventory = ((PlayerInventory) player.getInventory()).getMain();
-			Set<SlotPos> swappedSlots = new HashSet<>(CLUTTER_ITEMS * 3);
-
-			SlotPos heldItemSlot = SlotPos.of(inventory.getHotbar().getSelectedSlotIndex(), 0);
-			SlotPos swapItemWith = uniqueSlot(inventory, heldItemSlot);
-			swappedSlots.add(heldItemSlot);
-			swappedSlots.add(swapItemWith);
-			swap(inventory, heldItemSlot, swapItemWith);
-
-			while (swappedSlots.size() < CLUTTER_ITEMS) {
-				SlotPos newSlot1 = uniqueSlot(inventory, swappedSlots::contains);
-				swappedSlots.add(newSlot1);
-				SlotPos newSlot2 = uniqueSlot(inventory, swappedSlots::contains);
-				swappedSlots.add(newSlot2);
-				swap(inventory, newSlot1, newSlot2);
+	private static SlotPos uniqueSlot(GridInventory inventory, Collection<SlotPos> usedSlots) {
+		int rows = inventory.getRows();
+		int columns = inventory.getColumns();
+		List<SlotPos> allSlots = new ArrayList<>(rows * columns);
+		for (int x = 0; x < columns; x++) {
+			for (int y = 0; y < rows; y++) {
+				allSlots.add(SlotPos.of(x, y));
 			}
 		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		Collections.shuffle(allSlots, random);
+
+		for (SlotPos slot : allSlots) {
+			if (!usedSlots.contains(slot))
+				return slot;
+		}
+		throw new IllegalArgumentException("All slots have been used");
 	}
 
 	private static Slot unwrap(@Nullable Slot slot, SlotPos pos) {
@@ -108,5 +78,35 @@ public class ClutterCommand extends ImmediateCommand {
 
 		slot1item.ifPresent(slot2::offer);
 		slot2item.ifPresent(slot1::offer);
+	}
+
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		// swaps random items in player's inventory
+		for (Player player : players) {
+			if (!(player.getInventory() instanceof PlayerInventory)) {
+				plugin.getLogger().warn("Player " + player.getName() + "'s inventory "
+						+ player.getInventory().getClass().getSimpleName()
+						+ " is not an instance of PlayerInventory");
+				continue;
+			}
+			MainPlayerInventory inventory = ((PlayerInventory) player.getInventory()).getMain();
+			Set<SlotPos> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
+
+			SlotPos heldItemSlot = SlotPos.of(inventory.getHotbar().getSelectedSlotIndex(), 0);
+			swappedSlots.add(heldItemSlot);
+			SlotPos swapItemWith = uniqueSlot(inventory, swappedSlots);
+			swappedSlots.add(swapItemWith);
+			swap(inventory, heldItemSlot, swapItemWith);
+
+			while (swappedSlots.size() < CLUTTER_ITEMS) {
+				SlotPos newSlot1 = uniqueSlot(inventory, swappedSlots);
+				swappedSlots.add(newSlot1);
+				SlotPos newSlot2 = uniqueSlot(inventory, swappedSlots);
+				swappedSlots.add(newSlot2);
+				swap(inventory, newSlot1, newSlot2);
+			}
+		}
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

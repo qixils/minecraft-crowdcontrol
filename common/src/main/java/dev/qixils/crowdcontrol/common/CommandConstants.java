@@ -50,7 +50,7 @@ public class CommandConstants {
 	);
 	private static final int MIN_ITEM_DAMAGE = 15;
 	public static final int MIN_MAX_HEALTH = 10;
-	public static final int CLUTTER_ITEMS = 3;
+	public static final int CLUTTER_ITEMS = 6;
 	public static final int VEIN_RADIUS = 12;
 	public static final int VEIN_COUNT = 2;
 	// do-or-die
