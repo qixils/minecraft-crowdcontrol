@@ -44,6 +44,6 @@ public final class RemoveEntityCommand extends Command {
 			}
 			future.complete(result);
 		});
-        return future;
-    }
+		return future;
+	}
 }

@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public interface SuccessCondition {
-    Component getComponent();
+	Component getComponent();
 
-    boolean hasSucceeded(Player player);
+	boolean hasSucceeded(Player player);
 }

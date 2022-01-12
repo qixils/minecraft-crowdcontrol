@@ -16,23 +16,23 @@ import java.util.List;
 
 @Getter
 public class ToastCommand extends ImmediateCommand {
-    private final String effectName = "toast";
-    private final String displayName = "Render Toasts";
+	private final String effectName = "toast";
+	private final String displayName = "Obnoxious Pop-Ups";
 
-    public ToastCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public ToastCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        sync(() -> {
-            for (Player player : players) {
-                player.playSound(Sound.sound(org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, Source.MASTER, 1, 1), player);
-                Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
-                player.undiscoverRecipes(recipes);
-                player.discoverRecipes(recipes);
-            }
-        });
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
-    }
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		sync(() -> {
+			for (Player player : players) {
+				player.playSound(Sound.sound(org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, Source.MASTER, 1, 1), player);
+				Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
+				player.undiscoverRecipes(recipes);
+				player.discoverRecipes(recipes);
+			}
+		});
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
 }

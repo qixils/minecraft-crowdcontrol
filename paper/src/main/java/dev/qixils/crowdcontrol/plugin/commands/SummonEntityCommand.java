@@ -27,60 +27,61 @@ import java.util.Set;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
-    private static final Set<LootTables> CHEST_LOOT_TABLES;
-    static {
-        EnumSet<LootTables> lootTables = EnumSet.noneOf(LootTables.class);
-        for (LootTables lootTable : LootTables.values()) {
-            String key = lootTable.getKey().getKey();
-            if (key.startsWith("chests/"))
-                lootTables.add(lootTable);
-        }
-        CHEST_LOOT_TABLES = Collections.unmodifiableSet(lootTables);
-    }
+	private static final Set<LootTables> CHEST_LOOT_TABLES;
 
-    protected final EntityType entityType;
-    private final String effectName;
-    private final String displayName;
-    private final NamespacedKey mobKey;
+	static {
+		EnumSet<LootTables> lootTables = EnumSet.noneOf(LootTables.class);
+		for (LootTables lootTable : LootTables.values()) {
+			String key = lootTable.getKey().getKey();
+			if (key.startsWith("chests/"))
+				lootTables.add(lootTable);
+		}
+		CHEST_LOOT_TABLES = Collections.unmodifiableSet(lootTables);
+	}
 
-    public SummonEntityCommand(BukkitCrowdControlPlugin plugin, EntityType entityType) {
-        super(plugin);
-        this.entityType = entityType;
-        this.effectName = "entity_" + entityType.name();
-        this.displayName = "Summon " + plugin.getTextUtil().translate(entityType);
-        this.mobKey = getMobKey(plugin);
-    }
+	protected final EntityType entityType;
+	private final String effectName;
+	private final String displayName;
+	private final NamespacedKey mobKey;
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        if (entityType.getEntityClass() != null && Monster.class.isAssignableFrom(entityType.getEntityClass())) {
-            for (World world : Bukkit.getWorlds()) {
-                if (world.getDifficulty() == Difficulty.PEACEFUL)
-                    return request.buildResponse().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
-            }
-        }
-        sync(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
-    }
+	public SummonEntityCommand(BukkitCrowdControlPlugin plugin, EntityType entityType) {
+		super(plugin);
+		this.entityType = entityType;
+		this.effectName = "entity_" + entityType.name();
+		this.displayName = "Summon " + plugin.getTextUtil().translate(entityType);
+		this.mobKey = getMobKey(plugin);
+	}
 
-    @NotNull
-    protected static NamespacedKey getMobKey(Plugin plugin) {
-        return new NamespacedKey(plugin, "isViewerSpawned");
-    }
+	@NotNull
+	protected static NamespacedKey getMobKey(Plugin plugin) {
+		return new NamespacedKey(plugin, "isViewerSpawned");
+	}
 
-    public static boolean isMobViewerSpawned(Plugin plugin, Entity entity) {
-        return entity.getPersistentDataContainer().getOrDefault(getMobKey(plugin), BukkitCrowdControlPlugin.BOOLEAN, false);
-    }
+	public static boolean isMobViewerSpawned(Plugin plugin, Entity entity) {
+		return entity.getPersistentDataContainer().getOrDefault(getMobKey(plugin), BukkitCrowdControlPlugin.BOOLEAN, false);
+	}
 
-    protected Entity spawnEntity(String viewer, Player player) {
-        Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
-        entity.setCustomName(viewer);
-        entity.setCustomNameVisible(true);
-        if (entity instanceof Tameable tameable)
-            tameable.setOwner(player);
-        if (entity instanceof LootableInventory lootable)
-            lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
-        entity.getPersistentDataContainer().set(mobKey, BukkitCrowdControlPlugin.BOOLEAN, true);
-        return entity;
-    }
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (entityType.getEntityClass() != null && Monster.class.isAssignableFrom(entityType.getEntityClass())) {
+			for (World world : Bukkit.getWorlds()) {
+				if (world.getDifficulty() == Difficulty.PEACEFUL)
+					return request.buildResponse().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+			}
+		}
+		sync(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
+
+	protected Entity spawnEntity(String viewer, Player player) {
+		Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
+		entity.setCustomName(viewer);
+		entity.setCustomNameVisible(true);
+		if (entity instanceof Tameable tameable)
+			tameable.setOwner(player);
+		if (entity instanceof LootableInventory lootable)
+			lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
+		entity.getPersistentDataContainer().set(mobKey, BukkitCrowdControlPlugin.BOOLEAN, true);
+		return entity;
+	}
 }

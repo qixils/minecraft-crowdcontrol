@@ -23,21 +23,21 @@ import java.util.UUID;
 
 @Getter
 public class DisableJumpingCommand extends TimedCommand implements Listener {
-    private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>();
-    private final String effectName = "disable_jumping";
-    private final String displayName = "Disable Jumping";
+	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>();
+	private final String effectName = "disable_jumping";
+	private final String displayName = "Disable Jumping";
 
-    public DisableJumpingCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public DisableJumpingCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
-    public @NotNull Duration getDuration() {
+	@Override
+	public @NotNull Duration getDuration() {
 		return CommandConstants.DISABLE_JUMPING_DURATION;
-    }
+	}
 
-    @Override
-    public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
+	@Override
+	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
 		new TimedEffect.Builder().request(request)
 				.duration(CommandConstants.DISABLE_JUMPING_DURATION)
 				.startCallback($ -> {
@@ -56,8 +56,8 @@ public class DisableJumpingCommand extends TimedCommand implements Listener {
 				}).build().queue();
 	}
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onJumpEvent(PlayerJumpEvent event) {
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	public void onJumpEvent(PlayerJumpEvent event) {
 		UUID uuid = event.getPlayer().getUniqueId();
 		if (!jumpsBlockedAt.containsKey(uuid)) return;
 		int blockedAt = jumpsBlockedAt.get(uuid);

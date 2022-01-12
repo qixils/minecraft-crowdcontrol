@@ -18,36 +18,36 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public final class BukkitPlayerMapper extends AbstractPlayerMapper<Player> {
-    private final BukkitCrowdControlPlugin plugin;
+	private final BukkitCrowdControlPlugin plugin;
 
-    @Contract(value = "_ -> param1", mutates = "param1")
-    private @NotNull List<@NotNull Player> filter(@NotNull List<Player> players) {
-        players.removeIf(player -> player == null
-                || !player.isValid()
-                || player.isDead()
-                || (player.getGameMode() == GameMode.SPECTATOR && !GamemodeCommand.isEffectActive(plugin, player))
-        );
-        return players;
-    }
+	@Contract(value = "_ -> param1", mutates = "param1")
+	private @NotNull List<@NotNull Player> filter(@NotNull List<Player> players) {
+		players.removeIf(player -> player == null
+				|| !player.isValid()
+				|| player.isDead()
+				|| (player.getGameMode() == GameMode.SPECTATOR && !GamemodeCommand.isEffectActive(plugin, player))
+		);
+		return players;
+	}
 
-    @CheckReturnValue
-    @NotNull
-    public List<@NotNull Player> getAllPlayers() {
-        return filter(new ArrayList<>(Bukkit.getOnlinePlayers()));
-    }
+	@CheckReturnValue
+	@NotNull
+	public List<@NotNull Player> getAllPlayers() {
+		return filter(new ArrayList<>(Bukkit.getOnlinePlayers()));
+	}
 
-    @CheckReturnValue
-    @NotNull
-    public List<@NotNull Player> getPlayers(final @NotNull Request request) {
-        if (plugin.isGlobal(request))
-            return getAllPlayers();
+	@CheckReturnValue
+	@NotNull
+	public List<@NotNull Player> getPlayers(final @NotNull Request request) {
+		if (plugin.isGlobal(request))
+			return getAllPlayers();
 
-        List<Player> players = new ArrayList<>(request.getTargets().length);
-        for (Target target : request.getTargets()) {
-            for (UUID uuid : twitchToUserMap.get(target.getName()))
-                players.add(Bukkit.getPlayer(uuid));
-        }
+		List<Player> players = new ArrayList<>(request.getTargets().length);
+		for (Target target : request.getTargets()) {
+			for (UUID uuid : twitchToUserMap.get(target.getName()))
+				players.add(Bukkit.getPlayer(uuid));
+		}
 
-        return filter(players);
-    }
+		return filter(players);
+	}
 }

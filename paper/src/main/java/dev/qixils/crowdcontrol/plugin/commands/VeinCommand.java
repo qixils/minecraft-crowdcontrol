@@ -25,22 +25,49 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.VEIN_RADIUS;
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
-    private final String effectName = "vein";
-    private final String displayName = "Spawn Ore Vein";
+	private final String effectName = "vein";
+	private final String displayName = "Spawn Ore Vein";
 
-    public VeinCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public VeinCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
-        for (Player player : players) {
-            BlockFinder finder = BlockFinder.builder()
+	// Gets a 2x2 chunk of blocks
+	@Contract(value = "null, _, _ -> fail; _, null, _ -> fail; _, _, null -> fail", mutates = "param1, param2")
+	private static void addOreVein(List<Location> deepslateBlocks, List<Location> stoneBlocks, Location base) {
+		for (int x = 0; x <= 1; ++x) {
+			for (int y = 0; y <= 1; ++y) {
+				for (int z = 0; z <= 1; ++z) {
+					Location loc = base.clone().add(x, y, z);
+					Material matType = loc.getBlock().getType();
+					if (matType == Material.DEEPSLATE) {
+						deepslateBlocks.add(loc);
+					} else if (BlockUtil.STONES_TAG.contains(matType)) {
+						stoneBlocks.add(loc);
+					}
+				}
+			}
+		}
+	}
+
+	@Contract(value = "null -> fail", mutates = "param1")
+	private static void randomlyShrinkOreVein(List<Location> blockLocations) {
+		if (blockLocations.isEmpty()) return;
+		Collections.shuffle(blockLocations, random);
+		int maxBlocks = 1 + random.nextInt(blockLocations.size());
+		while (blockLocations.size() > maxBlocks)
+			blockLocations.remove(0);
+	}
+
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
+		for (Player player : players) {
+			BlockFinder finder = BlockFinder.builder()
 					.origin(player.getLocation())
 					.maxRadius(VEIN_RADIUS)
-                    .locationValidator(BlockUtil.STONES_TAG::contains)
-                    .build();
+					.locationValidator(BlockUtil.STONES_TAG::contains)
+					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {
 				Ores ore = RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS);
@@ -54,13 +81,13 @@ public class VeinCommand extends ImmediateCommand {
 				// get 2x2 chunk of blocks
 				addOreVein(setDeepslateBlocks, setBlocks, oreLocation);
 
-                // if we didn't find viable blocks, exit
-                if (setBlocks.isEmpty() && setDeepslateBlocks.isEmpty())
-                    continue;
+				// if we didn't find viable blocks, exit
+				if (setBlocks.isEmpty() && setDeepslateBlocks.isEmpty())
+					continue;
 
-                result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-                randomlyShrinkOreVein(setBlocks);
-                randomlyShrinkOreVein(setDeepslateBlocks);
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+				randomlyShrinkOreVein(setBlocks);
+				randomlyShrinkOreVein(setDeepslateBlocks);
 
 				if (!setBlocks.isEmpty())
 					sync(() -> setBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getBlock())));
@@ -86,6 +113,7 @@ public class VeinCommand extends ImmediateCommand {
 		SILVERFISH(Material.INFESTED_STONE, Material.INFESTED_DEEPSLATE, 2),
 		LAVA(Material.LAVA, 8);
 
+		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(Ores::getWeight).sum();
 		private final Material block;
 		private final Material deepslateBlock;
 		private final int weight;
@@ -99,34 +127,5 @@ public class VeinCommand extends ImmediateCommand {
 		Ores(Material block, int weight) {
 			this(block, block, weight);
 		}
-
-		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(Ores::getWeight).sum();
 	}
-
-	// Gets a 2x2 chunk of blocks
-	@Contract(value = "null, _, _ -> fail; _, null, _ -> fail; _, _, null -> fail", mutates = "param1, param2")
-	private static void addOreVein(List<Location> deepslateBlocks, List<Location> stoneBlocks, Location base) {
-		for (int x = 0; x <= 1; ++x) {
-			for (int y = 0; y <= 1; ++y) {
-				for (int z = 0; z <= 1; ++z) {
-					Location loc = base.clone().add(x, y, z);
-					Material matType = loc.getBlock().getType();
-					if (matType == Material.DEEPSLATE) {
-                        deepslateBlocks.add(loc);
-                    } else if (BlockUtil.STONES_TAG.contains(matType)) {
-                        stoneBlocks.add(loc);
-                    }
-                }
-            }
-        }
-    }
-
-    @Contract(value = "null -> fail", mutates = "param1")
-    private static void randomlyShrinkOreVein(List<Location> blockLocations) {
-        if (blockLocations.isEmpty()) return;
-        Collections.shuffle(blockLocations, random);
-        int maxBlocks = 1 + random.nextInt(blockLocations.size());
-        while (blockLocations.size() > maxBlocks)
-            blockLocations.remove(0);
-    }
 }

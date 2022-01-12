@@ -19,30 +19,30 @@ import java.util.Map;
 
 @Getter
 public class SwapCommand extends ImmediateCommand {
-    private final String effectName = "swap";
-    private final String displayName = "Swap Locations";
+	private final String effectName = "swap";
+	private final String displayName = "Swap Locations";
 
-    public SwapCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public SwapCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        if (players.size() < 2)
-            return request.buildResponse().type(ResultType.FAILURE).message("Not enough participating players online");
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (players.size() < 2)
+			return request.buildResponse().type(ResultType.FAILURE).message("Not enough participating players online");
 
-        // get shuffled list of players
-        Collections.shuffle(players, random);
-        // create a list offset by one
-        List<Player> offset = new ArrayList<>(players.size());
-        offset.addAll(players.subList(1, players.size()));
-        offset.add(players.get(0));
-        // get teleport destinations
-        Map<Player, Location> destinations = new HashMap<>(players.size());
-        for (int i = 0; i < players.size(); ++i)
-            destinations.put(players.get(i), offset.get(i).getLocation());
-        // teleport
-        sync(() -> destinations.forEach(Entity::teleportAsync));
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
-    }
+		// get shuffled list of players
+		Collections.shuffle(players, random);
+		// create a list offset by one
+		List<Player> offset = new ArrayList<>(players.size());
+		offset.addAll(players.subList(1, players.size()));
+		offset.add(players.get(0));
+		// get teleport destinations
+		Map<Player, Location> destinations = new HashMap<>(players.size());
+		for (int i = 0; i < players.size(); ++i)
+			destinations.put(players.get(i), offset.get(i).getLocation());
+		// teleport
+		sync(() -> destinations.forEach(Entity::teleportAsync));
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
 }

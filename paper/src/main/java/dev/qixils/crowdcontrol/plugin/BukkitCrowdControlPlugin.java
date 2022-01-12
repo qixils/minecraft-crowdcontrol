@@ -33,183 +33,183 @@ import java.util.Set;
 import java.util.function.Function;
 
 public final class BukkitCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
-    public static final PersistentDataType<Byte, Boolean> BOOLEAN = new BooleanDataType();
-    FileConfiguration config = getConfig();
-    @Getter
-    private final BukkitPlayerMapper playerMapper = new BukkitPlayerMapper(this);
-    @SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
-    @Getter
-    private final TextUtil textUtil = new TextUtil(Bukkit.getUnsafe().componentFlattener());
-    @Getter
-    private PaperCommandManager<CommandSender> commandManager;
-    @Getter
-    private final Class<Player> playerClass = Player.class;
-    @Getter
-    private final Class<CommandSender> commandSenderClass = CommandSender.class;
-    // actual stuff
-    String manualPassword = null; // set via /password
-    @Getter
-    CrowdControl crowdControl = null;
-    List<Command> commands;
-    @Getter
-    private boolean isServer = true;
-    @Getter
-    private boolean global = false;
-    @Getter
-    private Collection<String> hosts = Collections.emptyList();
-    private boolean announce = true;
+	public static final PersistentDataType<Byte, Boolean> BOOLEAN = new BooleanDataType();
+	@Getter
+	private final BukkitPlayerMapper playerMapper = new BukkitPlayerMapper(this);
+	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
+	@Getter
+	private final TextUtil textUtil = new TextUtil(Bukkit.getUnsafe().componentFlattener());
+	@Getter
+	private final Class<Player> playerClass = Player.class;
+	@Getter
+	private final Class<CommandSender> commandSenderClass = CommandSender.class;
+	FileConfiguration config = getConfig();
+	// actual stuff
+	String manualPassword = null; // set via /password
+	@Getter
+	CrowdControl crowdControl = null;
+	List<Command> commands;
+	@Getter
+	private PaperCommandManager<CommandSender> commandManager;
+	@Getter
+	private boolean isServer = true;
+	@Getter
+	private boolean global = false;
+	@Getter
+	private Collection<String> hosts = Collections.emptyList();
+	private boolean announce = true;
 
-    @Override
-    public void onLoad() {
-        saveDefaultConfig();
-    }
+	@Override
+	public void onLoad() {
+		saveDefaultConfig();
+	}
 
-    public void initCrowdControl() {
-        reloadConfig();
-        config = getConfig();
-        String password = Objects.requireNonNullElseGet(manualPassword, () -> config.getString("password", ""));
-        String ip = config.getString("ip", "127.0.0.1");
+	public void initCrowdControl() {
+		reloadConfig();
+		config = getConfig();
+		String password = Objects.requireNonNullElseGet(manualPassword, () -> config.getString("password", ""));
+		String ip = config.getString("ip", "127.0.0.1");
 
-        if (!config.getBoolean("legacy", false)) {
-            isServer = true;
-            if (!password.isBlank()) {
-                getLogger().info("Running Crowd Control in server mode");
-                crowdControl = CrowdControl.server().port(PORT).password(password).build();
-            } else {
-                getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
-                return;
-            }
-        } else {
-            isServer = false;
-            if (ip.isBlank())
-                throw new IllegalStateException("IP address is blank. Please fix this in the config.yml file");
-            getLogger().info("Running Crowd Control in client mode");
-            crowdControl = CrowdControl.client().port(PORT).ip(ip).build();
-        }
+		if (!config.getBoolean("legacy", false)) {
+			isServer = true;
+			if (!password.isBlank()) {
+				getLogger().info("Running Crowd Control in server mode");
+				crowdControl = CrowdControl.server().port(PORT).password(password).build();
+			} else {
+				getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
+				return;
+			}
+		} else {
+			isServer = false;
+			if (ip.isBlank())
+				throw new IllegalStateException("IP address is blank. Please fix this in the config.yml file");
+			getLogger().info("Running Crowd Control in client mode");
+			crowdControl = CrowdControl.client().port(PORT).ip(ip).build();
+		}
 
-        if (commands == null)
-            commands = RegisterCommands.register(this);
-        else
-            RegisterCommands.register(this, commands);
-    }
+		if (commands == null)
+			commands = RegisterCommands.register(this);
+		else
+			RegisterCommands.register(this, commands);
+	}
 
-    @Override
-    public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
-        this.crowdControl = crowdControl;
-    }
+	@Override
+	public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
+		this.crowdControl = crowdControl;
+	}
 
-    @SneakyThrows
-    @Override
-    public void onEnable() {
-        global = config.getBoolean("global", false);
-        announce = config.getBoolean("announce", true);
-        hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
-        if (!hosts.isEmpty()) {
-            Set<String> loweredHosts = new HashSet<>(hosts.size());
-            for (String host : hosts)
-                loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
-            hosts = Collections.unmodifiableSet(loweredHosts);
-        }
+	@SneakyThrows
+	@Override
+	public void onEnable() {
+		global = config.getBoolean("global", false);
+		announce = config.getBoolean("announce", true);
+		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
+		if (!hosts.isEmpty()) {
+			Set<String> loweredHosts = new HashSet<>(hosts.size());
+			for (String host : hosts)
+				loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
+			hosts = Collections.unmodifiableSet(loweredHosts);
+		}
 
-        initCrowdControl();
+		initCrowdControl();
 
-        Bukkit.getPluginManager().registerEvents(this, this);
+		Bukkit.getPluginManager().registerEvents(this, this);
 
-        commandManager = new PaperCommandManager<>(this,
-                CommandExecutionCoordinator.simpleCoordinator(),
-                Function.identity(),
-                Function.identity()
-        );
-        registerChatCommands();
-    }
+		commandManager = new PaperCommandManager<>(this,
+				CommandExecutionCoordinator.simpleCoordinator(),
+				Function.identity(),
+				Function.identity()
+		);
+		registerChatCommands();
+	}
 
-    @Override
-    public @NotNull Logger getSLF4JLogger() {
-        return super.getSLF4JLogger();
-    }
+	@Override
+	public @NotNull Logger getSLF4JLogger() {
+		return super.getSLF4JLogger();
+	}
 
-    @Override
-    public void onDisable() {
-        if (crowdControl != null) {
-            crowdControl.shutdown("Plugin is unloading (server may be shutting down)");
-            crowdControl = null;
-        }
-        commands = null;
-    }
+	@Override
+	public void onDisable() {
+		if (crowdControl != null) {
+			crowdControl.shutdown("Plugin is unloading (server may be shutting down)");
+			crowdControl = null;
+		}
+		commands = null;
+	}
 
-    public boolean announceEffects() {
-        return announce;
-    }
+	public boolean announceEffects() {
+		return announce;
+	}
 
-    @CheckReturnValue
-    @NotNull
-    public List<@NotNull Player> getAllPlayers() {
-        return playerMapper.getAllPlayers();
-    }
+	@CheckReturnValue
+	@NotNull
+	public List<@NotNull Player> getAllPlayers() {
+		return playerMapper.getAllPlayers();
+	}
 
-    @CheckReturnValue
-    @NotNull
-    public List<@NotNull Player> getPlayers(final @NotNull Request request) {
-        return playerMapper.getPlayers(request);
-    }
+	@CheckReturnValue
+	@NotNull
+	public List<@NotNull Player> getPlayers(final @NotNull Request request) {
+		return playerMapper.getPlayers(request);
+	}
 
-    @Override
-    public void registerCommand(@NotNull String name, dev.qixils.crowdcontrol.common.@NotNull Command<Player> command) {
-        name = name.toLowerCase(Locale.ENGLISH);
-        crowdControl.registerHandler(name, command::executeAndNotify);
-        getLogger().fine("Registered CC command '" + name + "'");
-    }
+	@Override
+	public void registerCommand(@NotNull String name, dev.qixils.crowdcontrol.common.@NotNull Command<Player> command) {
+		name = name.toLowerCase(Locale.ENGLISH);
+		crowdControl.registerHandler(name, command::executeAndNotify);
+		getLogger().fine("Registered CC command '" + name + "'");
+	}
 
-    @Override
-    public @Nullable String getPassword() {
-        if (!isServer()) return null;
-        if (crowdControl != null)
-            return crowdControl.getPassword(); // should be non-null because isServer is true
-        if (manualPassword != null)
-            return manualPassword;
-        return config.getString("password");
-    }
+	@Override
+	public @Nullable String getPassword() {
+		if (!isServer()) return null;
+		if (crowdControl != null)
+			return crowdControl.getPassword(); // should be non-null because isServer is true
+		if (manualPassword != null)
+			return manualPassword;
+		return config.getString("password");
+	}
 
-    @Override
-    public void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException {
-        if (!isServer())
-            throw new IllegalStateException("Not running in server mode");
-        manualPassword = password;
-    }
+	@Override
+	public void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException {
+		if (!isServer())
+			throw new IllegalStateException("Not running in server mode");
+		manualPassword = password;
+	}
 
-    @Override
-    public boolean isAdmin(@NotNull CommandSender commandSource) {
-        return commandSource.hasPermission(ADMIN_PERMISSION) || commandSource.isOp();
-    }
+	@Override
+	public boolean isAdmin(@NotNull CommandSender commandSource) {
+		return commandSource.hasPermission(ADMIN_PERMISSION) || commandSource.isOp();
+	}
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        onPlayerJoin(event.getPlayer());
-    }
+	@EventHandler
+	public void onJoin(PlayerJoinEvent event) {
+		onPlayerJoin(event.getPlayer());
+	}
 
-    // boilerplate stuff for the data container storage
-    private static final class BooleanDataType implements PersistentDataType<Byte, Boolean> {
-        private static final byte TRUE = 1;
-        private static final byte FALSE = 0;
+	// boilerplate stuff for the data container storage
+	private static final class BooleanDataType implements PersistentDataType<Byte, Boolean> {
+		private static final byte TRUE = 1;
+		private static final byte FALSE = 0;
 
-        @NotNull
-        public Class<Byte> getPrimitiveType() {
-            return Byte.class;
-        }
+		@NotNull
+		public Class<Byte> getPrimitiveType() {
+			return Byte.class;
+		}
 
-        @NotNull
-        public Class<Boolean> getComplexType() {
-            return Boolean.class;
-        }
+		@NotNull
+		public Class<Boolean> getComplexType() {
+			return Boolean.class;
+		}
 
-        @NotNull
-        public Byte toPrimitive(@NotNull Boolean complex, @NotNull PersistentDataAdapterContext context) {
-            return complex ? TRUE : FALSE;
-        }
+		@NotNull
+		public Byte toPrimitive(@NotNull Boolean complex, @NotNull PersistentDataAdapterContext context) {
+			return complex ? TRUE : FALSE;
+		}
 
-        @NotNull
-        public Boolean fromPrimitive(@NotNull Byte primitive, @NotNull PersistentDataAdapterContext context) {
-            return primitive != FALSE;
-        }
-    }
+		@NotNull
+		public Boolean fromPrimitive(@NotNull Byte primitive, @NotNull PersistentDataAdapterContext context) {
+			return primitive != FALSE;
+		}
+	}
 }

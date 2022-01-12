@@ -5,9 +5,10 @@ package dev.qixils.crowdcontrol.common.util;
  * Higher weights have a higher chance of being selected.
  */
 public interface Weighted {
-    /**
-     * Gets the weight of this element.
-     * @return weight
-     */
-    int getWeight();
+	/**
+	 * Gets the weight of this element.
+	 *
+	 * @return weight
+	 */
+	int getWeight();
 }

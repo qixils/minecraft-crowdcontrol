@@ -14,23 +14,23 @@ import java.util.List;
 
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
-    protected final Enchantment enchantment;
-    private final String effectName;
-    private final String displayName;
+	protected final Enchantment enchantment;
+	private final String effectName;
+	private final String displayName;
 
-    public EnchantmentCommand(BukkitCrowdControlPlugin plugin, Enchantment enchantment) {
-        super(plugin);
-        this.enchantment = enchantment;
-        this.effectName = "enchant_" + plugin.getTextUtil().translate(enchantment).replace(' ', '_');
-        this.displayName = "Apply " + plugin.getTextUtil().asPlain(enchantment.displayName(enchantment.getMaxLevel()));
-    }
+	public EnchantmentCommand(BukkitCrowdControlPlugin plugin, Enchantment enchantment) {
+		super(plugin);
+		this.enchantment = enchantment;
+		this.effectName = "enchant_" + plugin.getTextUtil().translate(enchantment).replace(' ', '_');
+		this.displayName = "Apply " + plugin.getTextUtil().asPlain(enchantment.displayName(enchantment.getMaxLevel()));
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Response.Builder result = request.buildResponse()
-                .type(Response.ResultType.RETRY)
-                .message("No items could be enchanted");
-        for (Player player : players) {
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder result = request.buildResponse()
+				.type(Response.ResultType.RETRY)
+				.message("No items could be enchanted");
+		for (Player player : players) {
 			int level = enchantment.getMaxLevel();
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType().isEmpty()) {
@@ -46,6 +46,6 @@ public class EnchantmentCommand extends ImmediateCommand {
 			item.addUnsafeEnchantment(enchantment, level);
 			result.type(Response.ResultType.SUCCESS);
 		}
-        return result;
-    }
+		return result;
+	}
 }

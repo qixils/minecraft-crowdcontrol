@@ -17,35 +17,35 @@ import java.util.List;
 
 @Getter
 public class GiveItemCommand extends ImmediateCommand {
-    private final Material item;
-    private final String effectName;
-    private final String displayName;
+	private final Material item;
+	private final String effectName;
+	private final String displayName;
 
-    public GiveItemCommand(BukkitCrowdControlPlugin plugin, Material item) {
-        super(plugin);
-        this.item = item;
-        this.effectName = "give_" + item.name();
-        this.displayName = "Give " + plugin.getTextUtil().translate(item);
-    }
+	public GiveItemCommand(BukkitCrowdControlPlugin plugin, Material item) {
+		super(plugin);
+		this.item = item;
+		this.effectName = "give_" + item.name();
+		this.displayName = "Give " + plugin.getTextUtil().translate(item);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        ItemStack itemStack = new ItemStack(item);
-        for (Player player : players) {
-            Location location = player.getLocation();
-            sync(() -> {
-                Item item = (Item) player.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);
-                item.setItemStack(itemStack);
-                item.setOwner(player.getUniqueId());
-                item.setThrower(player.getUniqueId());
-                item.setCanMobPickup(false);
-                item.setCanPlayerPickup(true);
-                item.setPickupDelay(0);
-            });
-            // workaround to limit the circulation of end portal frames in the economy
-            if (item == Material.END_PORTAL_FRAME)
-                break;
-        }
-        return request.buildResponse().type(Response.ResultType.SUCCESS);
-    }
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		ItemStack itemStack = new ItemStack(item);
+		for (Player player : players) {
+			Location location = player.getLocation();
+			sync(() -> {
+				Item item = (Item) player.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);
+				item.setItemStack(itemStack);
+				item.setOwner(player.getUniqueId());
+				item.setThrower(player.getUniqueId());
+				item.setCanMobPickup(false);
+				item.setCanPlayerPickup(true);
+				item.setPickupDelay(0);
+			});
+			// workaround to limit the circulation of end portal frames in the economy
+			if (item == Material.END_PORTAL_FRAME)
+				break;
+		}
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
 }

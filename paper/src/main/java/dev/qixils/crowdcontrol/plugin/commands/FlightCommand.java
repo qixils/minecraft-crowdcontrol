@@ -19,69 +19,69 @@ import java.util.List;
 
 @Getter
 public class FlightCommand extends TimedCommand implements Listener {
-    private final String effectName = "flight";
-    private final String displayName = "Enable Flight";
-    private final Duration duration = Duration.ofSeconds(15);
+	private final String effectName = "flight";
+	private final String displayName = "Enable Flight";
+	private final Duration duration = Duration.ofSeconds(15);
 
-    public FlightCommand(@NotNull BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public FlightCommand(@NotNull BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
-    @Override
+	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-        new TimedEffect.Builder()
-                .request(request)
-                .effectGroup("gamemode")
-                .duration(duration)
-                .startCallback($ -> {
-                    List<Player> players = plugin.getPlayers(request);
-                    Response.Builder response = request.buildResponse()
-                            .type(ResultType.RETRY)
-                            .message("Target is already flying or able to fly");
-                    for (Player player : players) {
-                        GameMode gameMode = player.getGameMode();
-                        if (gameMode == GameMode.CREATIVE)
-                            continue;
-                        if (gameMode == GameMode.SPECTATOR)
-                            continue;
-                        if (player.getAllowFlight())
-                            continue;
-                        if (player.isFlying())
-                            continue;
-                        response.type(ResultType.SUCCESS).message("SUCCESS");
-                        sync(() -> {
-                            player.setAllowFlight(true);
-                            player.setFlying(true);
-                        });
-                    }
-                    if (response.type() == ResultType.SUCCESS)
-                        announce(players, request);
-                    return response;
-                })
-                .completionCallback($ -> {
-                    List<Player> players = plugin.getPlayers(request);
-                    sync(() -> players.forEach(player -> {
-                        player.setFlying(false);
-                        player.setAllowFlight(false);
-                    }));
-                })
-                .build().queue();
-    }
+		new TimedEffect.Builder()
+				.request(request)
+				.effectGroup("gamemode")
+				.duration(duration)
+				.startCallback($ -> {
+					List<Player> players = plugin.getPlayers(request);
+					Response.Builder response = request.buildResponse()
+							.type(ResultType.RETRY)
+							.message("Target is already flying or able to fly");
+					for (Player player : players) {
+						GameMode gameMode = player.getGameMode();
+						if (gameMode == GameMode.CREATIVE)
+							continue;
+						if (gameMode == GameMode.SPECTATOR)
+							continue;
+						if (player.getAllowFlight())
+							continue;
+						if (player.isFlying())
+							continue;
+						response.type(ResultType.SUCCESS).message("SUCCESS");
+						sync(() -> {
+							player.setAllowFlight(true);
+							player.setFlying(true);
+						});
+					}
+					if (response.type() == ResultType.SUCCESS)
+						announce(players, request);
+					return response;
+				})
+				.completionCallback($ -> {
+					List<Player> players = plugin.getPlayers(request);
+					sync(() -> players.forEach(player -> {
+						player.setFlying(false);
+						player.setAllowFlight(false);
+					}));
+				})
+				.build().queue();
+	}
 
-    // clear flight on login if they disconnected mid-effect
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        GameMode gamemode = player.getGameMode();
-        if (gamemode.equals(GameMode.CREATIVE))
-            return;
-        if (gamemode.equals(GameMode.SPECTATOR))
-            return;
-        if (!player.isFlying())
-            return;
-        if (!player.getAllowFlight())
-            return;
-        player.setFlying(false);
-        player.setAllowFlight(false);
-    }
+	// clear flight on login if they disconnected mid-effect
+	@EventHandler
+	public void onJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		GameMode gamemode = player.getGameMode();
+		if (gamemode.equals(GameMode.CREATIVE))
+			return;
+		if (gamemode.equals(GameMode.SPECTATOR))
+			return;
+		if (!player.isFlying())
+			return;
+		if (!player.getAllowFlight())
+			return;
+		player.setFlying(false);
+		player.setAllowFlight(false);
+	}
 }

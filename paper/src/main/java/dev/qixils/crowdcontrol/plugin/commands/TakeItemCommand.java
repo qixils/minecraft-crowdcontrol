@@ -15,38 +15,38 @@ import java.util.List;
 
 @Getter
 public class TakeItemCommand extends ImmediateCommand {
-    private final Material item;
-    private final String effectName;
-    private final String displayName;
+	private final Material item;
+	private final String effectName;
+	private final String displayName;
 
-    public TakeItemCommand(BukkitCrowdControlPlugin plugin, Material item) {
-        super(plugin);
-        this.item = item;
-        this.effectName = "take_" + item.name();
-        this.displayName = "Take " + plugin.getTextUtil().translate(item);
-    }
+	public TakeItemCommand(BukkitCrowdControlPlugin plugin, Material item) {
+		super(plugin);
+		this.item = item;
+		this.effectName = "take_" + item.name();
+		this.displayName = "Take " + plugin.getTextUtil().translate(item);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        Response.Builder response = request.buildResponse()
-                .type(ResultType.RETRY)
-                .message("Item could not be found in target inventories");
-        for (Player player : players) {
-            boolean taken = false;
-            for (ItemStack itemStack : player.getInventory()) {
-                if (itemStack == null) {
-                    continue;
-                }
-                if (itemStack.getType() == item) {
-                    itemStack.setAmount(itemStack.getAmount() - 1);
-                    response.type(ResultType.SUCCESS).message("SUCCESS");
-                    taken = true;
-                    break;
-                }
-            }
-            if (taken && item == Material.END_PORTAL_FRAME)
-                break;
-        }
-        return response;
-    }
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder response = request.buildResponse()
+				.type(ResultType.RETRY)
+				.message("Item could not be found in target inventories");
+		for (Player player : players) {
+			boolean taken = false;
+			for (ItemStack itemStack : player.getInventory()) {
+				if (itemStack == null) {
+					continue;
+				}
+				if (itemStack.getType() == item) {
+					itemStack.setAmount(itemStack.getAmount() - 1);
+					response.type(ResultType.SUCCESS).message("SUCCESS");
+					taken = true;
+					break;
+				}
+			}
+			if (taken && item == Material.END_PORTAL_FRAME)
+				break;
+		}
+		return response;
+	}
 }

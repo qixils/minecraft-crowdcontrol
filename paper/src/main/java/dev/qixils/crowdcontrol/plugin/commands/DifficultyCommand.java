@@ -15,33 +15,33 @@ import java.util.List;
 
 @Getter
 public class DifficultyCommand extends ImmediateCommand {
-    private final Difficulty difficulty;
-    private final String effectName;
-    private final String displayName;
+	private final Difficulty difficulty;
+	private final String effectName;
+	private final String displayName;
 
-    public DifficultyCommand(BukkitCrowdControlPlugin plugin, Difficulty difficulty) {
-        super(plugin);
-        this.difficulty = difficulty;
-        this.effectName = "difficulty_" + difficulty.name();
-        this.displayName = "Set Difficulty: " + plugin.getTextUtil().translate(difficulty);
-    }
+	public DifficultyCommand(BukkitCrowdControlPlugin plugin, Difficulty difficulty) {
+		super(plugin);
+		this.difficulty = difficulty;
+		this.effectName = "difficulty_" + difficulty.name();
+		this.displayName = "Set Difficulty: " + plugin.getTextUtil().translate(difficulty);
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        if (!isGlobalCommandUsable(players, request))
-            return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (!isGlobalCommandUsable(players, request))
+			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
 
-        boolean success = false;
-        for (World world : plugin.getServer().getWorlds()) {
-            if (world.getDifficulty() != difficulty) {
-                success = true;
-                world.setDifficulty(difficulty);
-            }
-        }
+		boolean success = false;
+		for (World world : plugin.getServer().getWorlds()) {
+			if (world.getDifficulty() != difficulty) {
+				success = true;
+				world.setDifficulty(difficulty);
+			}
+		}
 
-        if (success)
-            return request.buildResponse().type(ResultType.SUCCESS);
-        else
-            return request.buildResponse().type(ResultType.FAILURE).message("World is already on that difficulty");
-    }
+		if (success)
+			return request.buildResponse().type(ResultType.SUCCESS);
+		else
+			return request.buildResponse().type(ResultType.FAILURE).message("World is already on that difficulty");
+	}
 }

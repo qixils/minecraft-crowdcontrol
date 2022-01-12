@@ -15,12 +15,12 @@ import java.util.List;
 
 @Getter
 public class TimeCommand extends ImmediateCommand {
-    private final String effectName = "zip";
-    private final String displayName = "Zip Time";
+	private final String effectName = "zip";
+	private final String displayName = "Zip Time";
 
-    public TimeCommand(BukkitCrowdControlPlugin plugin) {
-        super(plugin);
-    }
+	public TimeCommand(BukkitCrowdControlPlugin plugin) {
+		super(plugin);
+	}
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players,

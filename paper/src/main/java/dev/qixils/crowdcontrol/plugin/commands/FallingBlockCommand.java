@@ -18,35 +18,35 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.FALLING_BLOCK_FALL
 
 @Getter
 public class FallingBlockCommand extends ImmediateCommand {
-    protected final Material blockMaterial;
-    private final String effectName;
-    private final String displayName;
+	protected final Material blockMaterial;
+	private final String effectName;
+	private final String displayName;
 
-    public FallingBlockCommand(BukkitCrowdControlPlugin plugin, Material blockMaterial) {
-        super(plugin);
-        this.blockMaterial = blockMaterial;
-        this.effectName = "falling_block_" + blockMaterial.name();
-        this.displayName = "Place Falling " + plugin.getTextUtil().translate(blockMaterial) + " Block";
-    }
+	public FallingBlockCommand(BukkitCrowdControlPlugin plugin, Material blockMaterial) {
+		super(plugin);
+		this.blockMaterial = blockMaterial;
+		this.effectName = "falling_block_" + blockMaterial.name();
+		this.displayName = "Place Falling " + plugin.getTextUtil().translate(blockMaterial) + " Block";
+	}
 
-    @Override
-    public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-        // TODO: update impl (GH#47)
-        Response.Builder resp = request.buildResponse().type(ResultType.RETRY).message("Could not find a valid location to place block");
-        for (Player player : players) {
-            Location destination = player.getEyeLocation();
-            destination.setY(Math.min(
-                    destination.getY() + FALLING_BLOCK_FALL_DISTANCE,
-                    player.getWorld().getMaxHeight() - 1)
-            );
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		// TODO: update impl (GH#47)
+		Response.Builder resp = request.buildResponse().type(ResultType.RETRY).message("Could not find a valid location to place block");
+		for (Player player : players) {
+			Location destination = player.getEyeLocation();
+			destination.setY(Math.min(
+					destination.getY() + FALLING_BLOCK_FALL_DISTANCE,
+					player.getWorld().getMaxHeight() - 1)
+			);
 
-            Block block = destination.getBlock();
-            Material type = block.getType();
-            if (type.isEmpty() && type != blockMaterial) {
-                resp.type(ResultType.SUCCESS).message("SUCCESS");
-                sync(() -> block.setType(blockMaterial, true));
-            }
-        }
-        return resp;
-    }
+			Block block = destination.getBlock();
+			Material type = block.getType();
+			if (type.isEmpty() && type != blockMaterial) {
+				resp.type(ResultType.SUCCESS).message("SUCCESS");
+				sync(() -> block.setType(blockMaterial, true));
+			}
+		}
+		return resp;
+	}
 }
