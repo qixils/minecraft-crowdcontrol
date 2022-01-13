@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
+import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -75,7 +76,7 @@ public class CommandConstants {
 	/**
 	 * The radius for the X and Z axis to break blocks in the Dig Command.
 	 */
-	public static final double DIG_RADIUS = .5d; // TODO: should have depth as a variable too
+	public static final double DIG_RADIUS = .5d;
 	/**
 	 * The message to display to players when Keep Inventory has been enabled for them.
 	 */
@@ -266,6 +267,16 @@ public class CommandConstants {
 		return new TextBuilder("Donated by ")
 				.next(request.getViewer(), Plugin.USER_COLOR, TextDecoration.ITALIC)
 				.build();
+	}
+
+	/**
+	 * Gets the number of blocks that should be dug down from using the Dig Command as a negative
+	 * integer.
+	 *
+	 * @return depth to dig as a random negative integer
+	 */
+	public static int getDigDepth() {
+		return -(3 + RandomUtil.RNG.nextInt(5));
 	}
 
 	/**

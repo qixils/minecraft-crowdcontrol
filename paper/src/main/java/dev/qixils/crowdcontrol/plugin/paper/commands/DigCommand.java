@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.DIG_RADIUS;
+import static dev.qixils.crowdcontrol.common.CommandConstants.getDigDepth;
 
 @Getter
 public class DigCommand extends ImmediateCommand {
@@ -28,7 +29,7 @@ public class DigCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Set<Location> blocks = new HashSet<>();
-		int depth = -(3 + random.nextInt(5));
+		int depth = getDigDepth();
 		for (Player player : players) {
 			Location playerLocation = player.getLocation();
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {

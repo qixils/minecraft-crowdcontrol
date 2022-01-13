@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.DIG_RADIUS;
+import static dev.qixils.crowdcontrol.common.CommandConstants.getDigDepth;
 
 @Getter
 public class DigCommand extends ImmediateCommand {
@@ -31,7 +31,7 @@ public class DigCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Set<Location<World>> locations = new HashSet<>();
-		int depth = -(3 + RandomUtil.RNG.nextInt(5));
+		int depth = getDigDepth();
 		for (Player player : players) {
 			Location<World> playerLocation = player.getLocation();
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
