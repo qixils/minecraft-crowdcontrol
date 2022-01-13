@@ -9,7 +9,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
+/**
+ * Abstraction layer for {@link Plugin} which implements platform-agnostic methods.
+ *
+ * @param <P> class used to represent online players
+ * @param <S> class used to represent command senders in Cloud Command Framework
+ */
 public abstract class AbstractPlugin<P extends S, S> implements Plugin<P, S> {
+
 	@Getter
 	private final Class<P> playerClass;
 	@Getter
@@ -25,7 +32,7 @@ public abstract class AbstractPlugin<P extends S, S> implements Plugin<P, S> {
 	@Getter
 	protected Collection<String> hosts = Collections.emptyList();
 
-	public AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
+	protected AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;
 		this.commandSenderClass = commandSenderClass;
 	}

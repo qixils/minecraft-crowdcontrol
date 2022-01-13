@@ -28,12 +28,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * The generic plugin interface.
+ * The main class used by a Crowd Control implementation which defines numerous methods for
+ * managing Crowd Control server/client connections and handling {@link Command}s.
  *
  * @param <P> class used to represent online players
  * @param <S> class used to represent command senders in Cloud Command Framework
  */
 public interface Plugin<P extends S, S> {
+
 	/**
 	 * Text color to use for usernames.
 	 */
@@ -495,7 +497,7 @@ public interface Plugin<P extends S, S> {
 	 *
 	 * @param password unencrypted password
 	 * @throws IllegalArgumentException if the password is null
-	 * @throws IllegalStateException if the plugin is not running in {@link #isServer() server mode}
+	 * @throws IllegalStateException    if the plugin is not running in {@link #isServer() server mode}
 	 */
 	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
 
@@ -533,6 +535,7 @@ public interface Plugin<P extends S, S> {
 
 	/**
 	 * Gets the plugin's SLF4J logger.
+	 *
 	 * @return slf4j logger
 	 */
 	@NotNull

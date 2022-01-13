@@ -23,6 +23,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * A simpler {@link Component} builder.
+ */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 @NoArgsConstructor
 public class TextBuilder implements ComponentLike {

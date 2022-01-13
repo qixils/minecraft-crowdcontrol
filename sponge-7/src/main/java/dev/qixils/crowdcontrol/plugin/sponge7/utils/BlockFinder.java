@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.utils;
 
 import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.property.BooleanProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
@@ -59,34 +60,30 @@ public final class BlockFinder extends AbstractBlockFinder<Location<World>, Vect
 	}
 
 	public static final class BlockFinderBuilder extends AbstractBlockFinderBuilder<BlockFinderBuilder, BlockFinder, Location<World>, Vector3i, World> {
-		private static final Predicate<Location<World>> TRUE = $ -> true;
 
-		@Override
-		protected Predicate<Location<World>> defaultPredicate() {
-			return TRUE;
-		}
-
-		public BlockFinderBuilder origin(Location<World> origin) {
+		public @NotNull BlockFinderBuilder origin(Location<World> origin) {
+			if (origin == null)
+				return this;
 			return originPos(origin.getPosition().toInt()).originWorld(origin.getExtent());
 		}
 
 		@Override
-		protected int getFloorX(Vector3i pos) {
+		protected int getFloorX(@NotNull Vector3i pos) {
 			return pos.getX();
 		}
 
 		@Override
-		protected int getFloorY(Vector3i pos) {
+		protected int getFloorY(@NotNull Vector3i pos) {
 			return pos.getY();
 		}
 
 		@Override
-		protected int getFloorZ(Vector3i pos) {
+		protected int getFloorZ(@NotNull Vector3i pos) {
 			return pos.getZ();
 		}
 
 		@Override
-		protected Vector3i createVector(int x, int y, int z) {
+		protected @NotNull Vector3i createVector(int x, int y, int z) {
 			return new Vector3i(x, y, z);
 		}
 

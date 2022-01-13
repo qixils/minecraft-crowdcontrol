@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.util.CommonTags;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -37,34 +38,30 @@ public class BlockUtil {
 		}
 
 		public static class BlockFinderBuilder extends AbstractBlockFinderBuilder<BlockFinderBuilder, BlockFinder, Location, Vector, World> {
-			private static final Predicate<Location> TRUE = $ -> true;
 
-			@Override
-			protected Predicate<Location> defaultPredicate() {
-				return TRUE;
-			}
-
-			public BlockFinderBuilder origin(Location origin) {
+			public @NotNull BlockFinderBuilder origin(Location origin) {
+				if (origin == null)
+					return this;
 				return originPos(origin.toVector()).originWorld(origin.getWorld());
 			}
 
 			@Override
-			protected int getFloorX(Vector pos) {
+			protected int getFloorX(@NotNull Vector pos) {
 				return pos.getBlockX();
 			}
 
 			@Override
-			protected int getFloorY(Vector pos) {
+			protected int getFloorY(@NotNull Vector pos) {
 				return pos.getBlockY();
 			}
 
 			@Override
-			protected int getFloorZ(Vector pos) {
+			protected int getFloorZ(@NotNull Vector pos) {
 				return pos.getBlockZ();
 			}
 
 			@Override
-			protected Vector createVector(int x, int y, int z) {
+			protected @NotNull Vector createVector(int x, int y, int z) {
 				return new Vector(x, y, z);
 			}
 

@@ -18,23 +18,76 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * A command which handles incoming effects requested by Crowd Control server.
+ *
+ * @param <P> class used to represent online players
+ */
 public interface Command<P> {
+
+	/**
+	 * Gets the plugin that registered this command.
+	 *
+	 * @return owning plugin
+	 */
 	@NotNull
 	@CheckReturnValue
 	Plugin<P, ? super P> getPlugin();
 
+	/**
+	 * Executes this command. This will apply a certain effect to all the targeted {@code players}.
+	 * The resulting status of executing the command (or null) is returned.
+	 *
+	 * @param players players to apply the effect to
+	 * @param request request that prompted the execution of this command
+	 * @return {@link CompletableFuture} containing either the resulting status of executing the
+	 * command or null
+	 */
 	@NotNull
 	@CheckReturnValue
-	CompletableFuture<Builder> execute(@NotNull List<@NotNull P> players, @NotNull Request request);
+	CompletableFuture<@Nullable Builder> execute(@NotNull List<@NotNull P> players, @NotNull Request request);
 
+	/**
+	 * Gets the internal code name for an effect.
+	 * It should match the name of an effect from the project's .cs file.
+	 *
+	 * @return internal code name
+	 */
 	@NotNull
 	@CheckReturnValue
 	String getEffectName();
 
+	/**
+	 * Gets the effect's raw display name. This is used when sending a chat message to streamers
+	 * informing them of the activation of an effect.
+	 *
+	 * <p>Further processing may take place in the {@link #getProcessedDisplayName()} method.</p>
+	 *
+	 * @return display name
+	 */
 	@NotNull
 	@CheckReturnValue
 	String getDisplayName();
 
+	/**
+	 * Gets the effect's processed display name. This contains the contents of
+	 * {@link #getDisplayName()} and may optionally include additional information such as how long
+	 * the command's effects will last.
+	 *
+	 * @return processed display name
+	 */
+	@NotNull
+	@CheckReturnValue
+	default String getProcessedDisplayName() {
+		return getDisplayName();
+	}
+
+	/**
+	 * {@link #execute Executes} this command and notifies its targets (if
+	 * {@link Plugin#announceEffects() enabled}).
+	 *
+	 * @param request request that prompted the execution of this command
+	 */
 	default void executeAndNotify(@NotNull Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
 		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
@@ -55,6 +108,13 @@ public interface Command<P> {
 		});
 	}
 
+	/**
+	 * Determines if this global command is usable.
+	 *
+	 * @param players players being targeted by this command
+	 * @param request request that prompted the execution of this command
+	 * @return whether this global command is usable
+	 */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	default boolean isGlobalCommandUsable(@Nullable List<P> players, @NotNull Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
@@ -86,6 +146,15 @@ public interface Command<P> {
 		return false;
 	}
 
+	/**
+	 * Announces the {@link #execute(List, Request) execution} of this command.
+	 *
+	 * @param request request that prompted the execution of this command
+	 * @see #playerAnnounce(Collection, Request)
+	 * @see #announce(Collection, Request)
+	 * @see #announce(Audience, Request)
+	 * @deprecated usage of {@link #playerAnnounce(Collection, Request)} is preferred
+	 */
 	@Deprecated
 	default void announce(final Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
@@ -93,18 +162,36 @@ public interface Command<P> {
 		announce(plugin.getPlayers(request).stream().map(plugin::asAudience).collect(Audience.toAudience()), request);
 	}
 
+	/**
+	 * Announces the {@link #execute(List, Request) execution} of this command.
+	 *
+	 * @param audiences collection of audiences to render the effect announcement to
+	 * @param request   request that prompted the execution of this command
+	 */
 	default void announce(final Collection<? extends Audience> audiences, final Request request) {
 		Plugin<?, ?> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
 		announce(Audience.audience(audiences), request);
 	}
 
+	/**
+	 * Announces the {@link #execute(List, Request) execution} of this command.
+	 *
+	 * @param players collection of players to render the effect announcement to
+	 * @param request request that prompted the execution of this command
+	 */
 	default void playerAnnounce(final Collection<P> players, final Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
 		announce(players.stream().map(plugin::asAudience).collect(Collectors.toList()), request);
 	}
 
+	/**
+	 * Announces the {@link #execute(List, Request) execution} of this command.
+	 *
+	 * @param audience audience to render the effect announcement to
+	 * @param request  request that prompted the execution of this command
+	 */
 	default void announce(final Audience audience, final Request request) {
 		Plugin<?, ?> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
@@ -113,11 +200,5 @@ public interface Command<P> {
 				.next(" used command ")
 				.next(getProcessedDisplayName(), Plugin.CMD_COLOR)
 		);
-	}
-
-	@NotNull
-	@CheckReturnValue
-	default String getProcessedDisplayName() {
-		return getDisplayName();
 	}
 }

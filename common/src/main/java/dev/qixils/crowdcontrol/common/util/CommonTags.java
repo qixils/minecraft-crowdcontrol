@@ -4,7 +4,13 @@ import net.kyori.adventure.key.Key;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
+/**
+ * Collection of {@link CommonTags tags} that are used in various commands.
+ */
 public class CommonTags {
+	/**
+	 * Collection of flower blocks.
+	 */
 	public static final KeyedTag FLOWERS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "poppy"),
 			Key.key(MINECRAFT_NAMESPACE, "dandelion"),
@@ -24,6 +30,9 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
 	);
 
+	/**
+	 * Collection of blocks generally found underground in the overworld.
+	 */
 	public static final KeyedTag STONES = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "granite"),
 			Key.key(MINECRAFT_NAMESPACE, "diorite"),
@@ -58,6 +67,9 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "yellow_terracotta")
 	);
 
+	/**
+	 * Collection of torch blocks.
+	 */
 	public static final KeyedTag TORCHES = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "torch"),
 			Key.key(MINECRAFT_NAMESPACE, "redstone_torch"),
@@ -67,6 +79,9 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
 	);
 
+	/**
+	 * Collection of entities that are safe to summon into the world.
+	 */
 	public static final KeyedTag SAFE_ENTITIES = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "armor_stand"),
 			Key.key(MINECRAFT_NAMESPACE, "axolotl"),
@@ -152,6 +167,25 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "zombified_piglin")
 	);
 
+	/**
+	 * Collection of blocks that can be replaced.
+	 */
+	@Deprecated
+	public static final KeyedTag REPLACEABLE_BLOCKS = new KeyedTag(
+			Key.key(MINECRAFT_NAMESPACE, "air"),
+			Key.key(MINECRAFT_NAMESPACE, "cave_air"),
+			Key.key(MINECRAFT_NAMESPACE, "void_air"),
+			Key.key(MINECRAFT_NAMESPACE, "grass"),
+			Key.key(MINECRAFT_NAMESPACE, "tall_grass"),
+			Key.key(MINECRAFT_NAMESPACE, "water"),
+			Key.key(MINECRAFT_NAMESPACE, "lava")
+	);
+
+	// TODO: move the below tags to CommandConstants
+
+	/**
+	 * Collection of blocks to be used in the Place Block command.
+	 */
 	public static final KeyedTag SET_BLOCKS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "tnt"),
 			Key.key(MINECRAFT_NAMESPACE, "fire"),
@@ -162,6 +196,9 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "bedrock")
 	);
 
+	/**
+	 * Collection of blocks to be used in the Place Falling Block command.
+	 */
 	public static final KeyedTag SET_FALLING_BLOCKS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "anvil"),
 			Key.key(MINECRAFT_NAMESPACE, "sand"),
@@ -169,6 +206,9 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "gravel")
 	);
 
+	/**
+	 * Collection of items to be used in the Give Item and Take Item commands.
+	 */
 	public static final KeyedTag GIVE_TAKE_ITEMS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "wooden_pickaxe"),
 			Key.key(MINECRAFT_NAMESPACE, "stone_pickaxe"),
@@ -183,16 +223,9 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "elytra")
 	);
 
-	public static final KeyedTag REPLACEABLE_BLOCKS = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "air"),
-			Key.key(MINECRAFT_NAMESPACE, "cave_air"),
-			Key.key(MINECRAFT_NAMESPACE, "void_air"),
-			Key.key(MINECRAFT_NAMESPACE, "grass"),
-			Key.key(MINECRAFT_NAMESPACE, "tall_grass"),
-			Key.key(MINECRAFT_NAMESPACE, "water"),
-			Key.key(MINECRAFT_NAMESPACE, "lava")
-	);
-
+	/**
+	 * Collection of spooky sounds that can be played by the Spooky Sound command.
+	 */
 	public static final KeyedTag SPOOKY_SOUNDS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "entity.creeper.primed"),
 			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.stare"),

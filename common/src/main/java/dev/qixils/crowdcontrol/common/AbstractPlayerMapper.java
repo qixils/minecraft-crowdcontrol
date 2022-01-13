@@ -8,7 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.UUID;
 
+/**
+ * Abstraction layer for {@link PlayerMapper} which implements platform-agnostic methods.
+ *
+ * @param <P> class used to represent online players
+ */
 public abstract class AbstractPlayerMapper<P> implements PlayerMapper<P> {
+
 	protected final Multimap<String, UUID> twitchToUserMap =
 			Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
 
