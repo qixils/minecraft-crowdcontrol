@@ -1,14 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
@@ -48,9 +49,9 @@ public class BlockCommand extends ImmediateCommand {
 		Builder result = request.buildResponse().type(ResultType.RETRY).message("No available locations to set blocks");
 		for (Player player : players) {
 			Location<World> location = getLocation(player);
-			BlockType currentType = location.getBlockType();
-			if (CommonTags.REPLACEABLE_BLOCKS.contains(SpongeCrowdControlPlugin.key(currentType))
-					&& !currentType.equals(blockType)) {
+			BlockState currentBlock = location.getBlock();
+			BlockType currentType = currentBlock.getType();
+			if (BlockFinder.isReplaceable(currentBlock) && !currentType.equals(blockType)) {
 				result.type(ResultType.SUCCESS).message("SUCCESS");
 				plugin.getSyncExecutor().execute(() -> location.setBlockType(blockType));
 			}

@@ -46,20 +46,6 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "yellow_terracotta")
 	);
 
-	/**
-	 * Collection of blocks that can be replaced.
-	 */
-	@Deprecated
-	public static final KeyedTag REPLACEABLE_BLOCKS = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "air"),
-			Key.key(MINECRAFT_NAMESPACE, "cave_air"),
-			Key.key(MINECRAFT_NAMESPACE, "void_air"),
-			Key.key(MINECRAFT_NAMESPACE, "grass"),
-			Key.key(MINECRAFT_NAMESPACE, "tall_grass"),
-			Key.key(MINECRAFT_NAMESPACE, "water"),
-			Key.key(MINECRAFT_NAMESPACE, "lava")
-	);
-
 	private CommonTags() {
 		throw new IllegalStateException("Utility class");
 	}
