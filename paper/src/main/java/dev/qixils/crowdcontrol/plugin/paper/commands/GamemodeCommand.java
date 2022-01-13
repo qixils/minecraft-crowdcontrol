@@ -44,7 +44,7 @@ public class GamemodeCommand extends TimedCommand {
 	}
 
 	private static boolean isEffectActive(NamespacedKey key, Entity player) {
-		return player.getPersistentDataContainer().getOrDefault(key, PaperCrowdControlPlugin.BOOLEAN, false);
+		return player.getPersistentDataContainer().getOrDefault(key, PaperCrowdControlPlugin.BOOLEAN_TYPE, false);
 	}
 
 	public static boolean isEffectActive(Plugin plugin, Entity player) {
@@ -78,7 +78,7 @@ public class GamemodeCommand extends TimedCommand {
 			return;
 		sync(() -> players.forEach(player -> {
 			player.setGameMode(gamemode);
-			player.getPersistentDataContainer().set(gamemodeKey, PaperCrowdControlPlugin.BOOLEAN, request != null);
+			player.getPersistentDataContainer().set(gamemodeKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, request != null);
 		}));
 	}
 
@@ -93,7 +93,7 @@ public class GamemodeCommand extends TimedCommand {
 		public void onJoin(PlayerJoinEvent event) {
 			Player player = event.getPlayer();
 			if (!isEffectActive(key, player)) return;
-			player.getPersistentDataContainer().set(key, PaperCrowdControlPlugin.BOOLEAN, false);
+			player.getPersistentDataContainer().set(key, PaperCrowdControlPlugin.BOOLEAN_TYPE, false);
 			player.setGameMode(GameMode.SURVIVAL);
 		}
 	}

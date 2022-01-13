@@ -8,6 +8,8 @@ import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -33,7 +35,8 @@ import java.util.Set;
 import java.util.function.Function;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
-	public static final PersistentDataType<Byte, Boolean> BOOLEAN = new BooleanDataType();
+	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
+	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
 	@Getter
 	private final PaperPlayerMapper playerMapper = new PaperPlayerMapper(this);
 	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
@@ -188,6 +191,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	// boilerplate stuff for the data container storage
+
 	private static final class BooleanDataType implements PersistentDataType<Byte, Boolean> {
 		private static final byte TRUE = 1;
 		private static final byte FALSE = 0;
@@ -210,6 +214,30 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		@NotNull
 		public Boolean fromPrimitive(@NotNull Byte primitive, @NotNull PersistentDataAdapterContext context) {
 			return primitive != FALSE;
+		}
+	}
+
+	private static final class ComponentDataType implements PersistentDataType<String, Component> {
+		private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
+
+		@Override
+		public @NotNull Class<String> getPrimitiveType() {
+			return String.class;
+		}
+
+		@Override
+		public @NotNull Class<Component> getComplexType() {
+			return Component.class;
+		}
+
+		@Override
+		public @NotNull String toPrimitive(@NotNull Component complex, @NotNull PersistentDataAdapterContext context) {
+			return serializer.serialize(complex);
+		}
+
+		@Override
+		public @NotNull Component fromPrimitive(@NotNull String primitive, @NotNull PersistentDataAdapterContext context) {
+			return serializer.deserialize(primitive);
 		}
 	}
 }

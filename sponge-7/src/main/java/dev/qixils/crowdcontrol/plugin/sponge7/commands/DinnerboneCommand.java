@@ -46,6 +46,7 @@ public class DinnerboneCommand extends Command {
 			entities.forEach(entity -> {
 				Text oldName = entity.get(OriginalDisplayNameData.class).map(data -> data.originalDisplayName().get()).orElse(Text.EMPTY);
 				Text currentName = entity.getOrElse(Keys.DISPLAY_NAME, Text.EMPTY);
+				// TODO determine if display name visibility needs to be disabled
 				if (currentName.equals(Text.of(DINNERBONE_NAME))) {
 					entity.offer(Keys.DISPLAY_NAME, oldName);
 					entity.remove(OriginalDisplayNameData.class);

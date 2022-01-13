@@ -58,7 +58,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 	}
 
 	public static boolean isMobViewerSpawned(Plugin plugin, Entity entity) {
-		return entity.getPersistentDataContainer().getOrDefault(getMobKey(plugin), PaperCrowdControlPlugin.BOOLEAN, false);
+		return entity.getPersistentDataContainer().getOrDefault(getMobKey(plugin), PaperCrowdControlPlugin.BOOLEAN_TYPE, false);
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 			tameable.setOwner(player);
 		if (entity instanceof LootableInventory lootable)
 			lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
-		entity.getPersistentDataContainer().set(mobKey, PaperCrowdControlPlugin.BOOLEAN, true);
+		entity.getPersistentDataContainer().set(mobKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, true);
 		return entity;
 	}
 }

@@ -33,6 +33,10 @@ public class CommandConstants {
 	 */
 	public static final String DINNERBONE_NAME = "Dinnerbone";
 	/**
+	 * The name to apply to entities to turn them upside-down as a text component.
+	 */
+	public static final Component DINNERBONE_COMPONENT = Component.text(DINNERBONE_NAME);
+	/**
 	 * The radius to search for entities to flip upside-down.
 	 */
 	public static final int DINNERBONE_RADIUS = 15;
