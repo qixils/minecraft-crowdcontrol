@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -39,6 +40,7 @@ public class BlockCommand extends ImmediateCommand {
 		this.displayName = displayName;
 	}
 
+	@Nullable
 	protected Location<World> getLocation(Player player) {
 		return player.getLocation();
 	}
@@ -46,14 +48,20 @@ public class BlockCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Builder result = request.buildResponse().type(ResultType.RETRY).message("No available locations to set blocks");
+		Builder result = request.buildResponse()
+				.type(ResultType.RETRY)
+				.message("No available locations to set blocks");
 		for (Player player : players) {
+			if (!BlockFinder.isReplaceable(player.getLocation().getBlock()))
+				continue;
 			Location<World> location = getLocation(player);
+			if (location == null)
+				continue;
 			BlockState currentBlock = location.getBlock();
 			BlockType currentType = currentBlock.getType();
 			if (BlockFinder.isReplaceable(currentBlock) && !currentType.equals(blockType)) {
 				result.type(ResultType.SUCCESS).message("SUCCESS");
-				plugin.getSyncExecutor().execute(() -> location.setBlockType(blockType));
+				sync(() -> location.setBlockType(blockType));
 			}
 		}
 		return result;

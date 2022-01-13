@@ -45,7 +45,7 @@ public class WeatherCommand extends ImmediateCommand {
 				continue;
 			if (world.getWeather().equals(weather))
 				continue;
-			plugin.getSyncExecutor().execute(() -> world.setWeather(weather, WEATHER_TICKS));
+			sync(() -> world.setWeather(weather, WEATHER_TICKS));
 			builder.type(ResultType.SUCCESS).message("SUCCESS");
 		}
 		return builder;
