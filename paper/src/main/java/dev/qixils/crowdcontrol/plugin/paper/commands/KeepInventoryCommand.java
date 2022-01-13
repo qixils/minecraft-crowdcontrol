@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.KEEP_INVENTORY_ALERT;
 import static dev.qixils.crowdcontrol.common.CommandConstants.KEEP_INVENTORY_MESSAGE;
-import static dev.qixils.crowdcontrol.common.CommandConstants.LOSE_INVENTORY_ALERT;
 import static dev.qixils.crowdcontrol.common.CommandConstants.LOSE_INVENTORY_MESSAGE;
+import static dev.qixils.crowdcontrol.common.util.sound.Sounds.KEEP_INVENTORY_ALERT;
+import static dev.qixils.crowdcontrol.common.util.sound.Sounds.LOSE_INVENTORY_ALERT;
 
 @Getter
 public class KeepInventoryCommand extends ImmediateCommand {

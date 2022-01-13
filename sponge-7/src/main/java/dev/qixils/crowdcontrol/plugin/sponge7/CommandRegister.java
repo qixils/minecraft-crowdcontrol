@@ -61,7 +61,7 @@ public class CommandRegister {
 				new ClutterCommand(plugin),
 				new LootboxCommand(plugin),
 				new TeleportCommand(plugin),
-//				new ToastCommand(plugin), -- Recipes do not exist in 1.12 / API7 [to add in API8]
+//				new ToastCommand(plugin), // TODO recreate the non-recipe functionality
 				new FreezeCommand(plugin),
 				new CameraLockCommand(plugin),
 				new FlowerCommand(plugin),

@@ -4,9 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
 
 /**
  * Utility class for randomness.
@@ -52,7 +56,7 @@ public class RandomUtil {
 	 * @throws IllegalArgumentException if the list is empty
 	 */
 	@UnknownNullability
-	public static <T> T randomElementFrom(List<T> from) throws IllegalArgumentException {
+	public static <T> T randomElementFrom(@NotNull List<T> from) throws IllegalArgumentException {
 		if (from.isEmpty())
 			throw new IllegalArgumentException("List may not be empty");
 		return from.get(RNG.nextInt(from.size()));
@@ -67,10 +71,46 @@ public class RandomUtil {
 	 * @return randomly selected item
 	 * @throws IllegalArgumentException if the array is empty
 	 */
-	public static <T> T randomElementFrom(T[] from) throws IllegalArgumentException {
+	@UnknownNullability
+	public static <T> T randomElementFrom(T @NotNull [] from) throws IllegalArgumentException {
 		if (from.length == 0)
 			throw new IllegalArgumentException("Array may not be empty");
 		return from[RNG.nextInt(from.length)];
+	}
+
+	/**
+	 * Picks a valid random item from the provided collection of items.
+	 *
+	 * <p>If the provided {@code validator} returns {@code false} for a given item, then it will
+	 * not be returned by this function. If no valid item can be found then an
+	 * {@link Optional#empty() empty optional} is returned.</p>
+	 *
+	 * <p>Unlike {@link #randomElementFrom(Collection)}, items contained in the provided collection
+	 * must not be null.</p>
+	 *
+	 * @param from      collection of items
+	 * @param validator predicate that returns {@code true} if an item is valid
+	 * @param <T>       type of item
+	 * @return {@link Optional} containing the randomly selected item, or an
+	 * {@link Optional#empty() empty optional} if no valid item was found
+	 * @throws IllegalArgumentException if the collection is empty
+	 */
+	@NotNull
+	public static <T> Optional<@NotNull T> randomElementFrom(@NotNull Collection<@NotNull T> from,
+															 @NotNull Predicate<@NotNull T> validator) {
+		if (from.isEmpty())
+			throw new IllegalArgumentException("Collection may not be empty");
+		List<T> shuffledItems = new ArrayList<>(from);
+		Collections.shuffle(shuffledItems, RNG);
+		for (T item : from) {
+			//noinspection ConstantConditions
+			if (item == null)
+				throw new IllegalArgumentException("Items in collection must not be null");
+			if (validator.test(item)) {
+				return Optional.of(item);
+			}
+		}
+		return Optional.empty();
 	}
 
 	/**
@@ -83,7 +123,8 @@ public class RandomUtil {
 	 * @throws IllegalArgumentException if the array is empty
 	 * @throws NullPointerException     if an item in the array is null
 	 */
-	public static <T extends Weighted> T weightedRandom(T[] weightedArray, int totalWeights) throws IllegalArgumentException, NullPointerException {
+	@UnknownNullability
+	public static <T extends Weighted> T weightedRandom(T @NotNull [] weightedArray, int totalWeights) throws IllegalArgumentException, NullPointerException {
 		if (weightedArray.length == 0)
 			throw new IllegalArgumentException("Array may not be empty");
 		// Weighted random code based off of https://stackoverflow.com/a/6737362
@@ -104,7 +145,8 @@ public class RandomUtil {
 	 * @throws IllegalArgumentException if the array is empty
 	 * @throws NullPointerException     if an item in the array is null
 	 */
-	public static <T extends Weighted> T weightedRandom(T[] weightedArray) throws IllegalArgumentException, NullPointerException {
+	@UnknownNullability
+	public static <T extends Weighted> T weightedRandom(T @NotNull [] weightedArray) throws IllegalArgumentException, NullPointerException {
 		if (weightedArray.length == 0)
 			throw new IllegalArgumentException("Array may not be empty");
 		int total = 0;

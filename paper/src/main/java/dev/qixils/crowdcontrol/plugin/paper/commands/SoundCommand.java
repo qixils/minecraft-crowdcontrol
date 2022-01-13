@@ -1,13 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -25,11 +23,10 @@ public class SoundCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Key sound = RandomUtil.randomElementFrom(CommandConstants.SPOOKY_SOUNDS.getKeys());
 		for (Player player : players) {
 			Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
 			player.playSound(
-					CommandConstants.spookySoundOf(sound),
+					Sounds.SPOOKY_SOUND.get(),
 					playAt.getX(),
 					playAt.getY(),
 					playAt.getZ()

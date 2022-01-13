@@ -31,6 +31,7 @@ public class ToastCommand extends ImmediateCommand {
 				Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
 				player.undiscoverRecipes(recipes);
 				player.discoverRecipes(recipes);
+				// TODO open an inventory (not sure what to put in it, if anything. poison potatoes?)
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

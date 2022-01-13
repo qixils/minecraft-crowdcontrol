@@ -7,14 +7,11 @@ import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
@@ -93,24 +90,6 @@ public class CommandConstants {
 	public static final Component LOSE_INVENTORY_MESSAGE = new TextBuilder(NamedTextColor.RED)
 			.next("Your inventory will &lnot&r be kept on death").build();
 	/**
-	 * The message to play to players when Keep Inventory has been enabled for them.
-	 */
-	public static final Sound KEEP_INVENTORY_ALERT = Sound.sound(
-			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.activate"),
-			Source.MASTER,
-			1f,
-			1f
-	);
-	/**
-	 * The message to play to players when Keep Inventory has been disabled for them.
-	 */
-	public static final Sound LOSE_INVENTORY_ALERT = Sound.sound(
-			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.deactivate"),
-			Source.MASTER,
-			1f,
-			1f
-	);
-	/**
 	 * The minimum amount of durability allowed to be set by the Damage Item command.
 	 */
 	private static final int MIN_ITEM_DAMAGE = 15;
@@ -172,19 +151,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "ender_eye"),
 			Key.key(MINECRAFT_NAMESPACE, "end_portal_frame"),
 			Key.key(MINECRAFT_NAMESPACE, "elytra")
-	);
-
-	/**
-	 * Collection of spooky sounds that can be played by the Spooky Sound command.
-	 */
-	public static final KeyedTag SPOOKY_SOUNDS = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "entity.creeper.primed"),
-			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.stare"),
-			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.scream"),
-			Key.key(MINECRAFT_NAMESPACE, "entity.ender_dragon.growl"),
-			Key.key(MINECRAFT_NAMESPACE, "entity.ghast.hurt"),
-			Key.key(MINECRAFT_NAMESPACE, "entity.generic.explode"),
-			Key.key(MINECRAFT_NAMESPACE, "ambient.cave")
 	);
 
 	/**
@@ -360,25 +326,6 @@ public class CommandConstants {
 	}
 
 	// misc methods
-
-	// TODO: make this an enum or collection of static fields; there's a lot of different types of sounds used
-	// (probably two enums/collections-- one for basic sounds, and one for variable sounds like this one)
-
-	/**
-	 * Returns the sound corresponding with a spooky sound key.
-	 *
-	 * @param key key for a spooky sound
-	 * @return {@link Sound} object
-	 */
-	@NotNull
-	public static Sound spookySoundOf(@NotNull Key key) {
-		return Sound.sound(
-				key,
-				Source.MASTER,
-				1.75f,
-				1f
-		);
-	}
 
 	/**
 	 * Determines whether a change to an item's durability can be applied by one of the durability
