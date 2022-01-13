@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
@@ -42,7 +42,7 @@ public class TorchCommand extends ImmediateCommand {
 		this.placeTorches = placeTorches;
 		this.effectName = placeTorches ? "Lit" : "Dim";
 		this.displayName = (placeTorches ? "Place" : "Break") + " Torches";
-		this.torches = new TypedTag<>(CommonTags.TORCHES, plugin, BlockType.class);
+		this.torches = new TypedTag<>(CommandConstants.TORCHES, plugin, BlockType.class);
 	}
 
 	@Override

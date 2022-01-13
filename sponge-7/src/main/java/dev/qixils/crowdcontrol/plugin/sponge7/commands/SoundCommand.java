@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
-import dev.qixils.crowdcontrol.common.util.CommonTags;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -29,7 +29,7 @@ public class SoundCommand extends ImmediateCommand {
 	public SoundCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 		spookySounds = new MappedKeyedTag<>(
-				CommonTags.SPOOKY_SOUNDS,
+				CommandConstants.SPOOKY_SOUNDS,
 				key -> plugin.getRegistry().getType(SoundType.class, key.asString()).orElse(null)
 		);
 	}

@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
@@ -24,10 +24,10 @@ import java.util.Locale;
 public class RegisterCommands {
 	@SuppressWarnings("deprecation") // Bukkit is dumb
 	public static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
-			new MappedKeyedTag<>(CommonTags.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
-	public static final MaterialTag SET_BLOCKS = new MaterialTag(CommonTags.SET_BLOCKS);
-	public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommonTags.SET_FALLING_BLOCKS);
-	public static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommonTags.SET_BLOCKS);
+			new MappedKeyedTag<>(CommandConstants.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
+	public static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
+	public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommandConstants.SET_FALLING_BLOCKS);
+	public static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommandConstants.GIVE_TAKE_ITEMS);
 
 	public static List<Command> getCommands(PaperCrowdControlPlugin plugin) {
 		// register normal commands

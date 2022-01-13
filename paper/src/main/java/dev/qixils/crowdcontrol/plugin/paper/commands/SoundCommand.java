@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
@@ -26,7 +25,7 @@ public class SoundCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Key sound = RandomUtil.randomElementFrom(CommonTags.SPOOKY_SOUNDS.getKeys());
+		Key sound = RandomUtil.randomElementFrom(CommandConstants.SPOOKY_SOUNDS.getKeys());
 		for (Player player : players) {
 			Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
 			player.playSound(

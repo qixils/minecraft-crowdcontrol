@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.executeorperish.DoOrDieCommand;
@@ -38,10 +38,10 @@ public class CommandRegister {
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new TypedTag<>(CommonTags.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class);
-			setBlocks = new TypedTag<>(CommonTags.SET_BLOCKS, plugin.getRegistry(), BlockType.class);
-			setFallingBlocks = new TypedTag<>(CommonTags.SET_FALLING_BLOCKS, plugin.getRegistry(), BlockType.class);
-			giveTakeItems = new TypedTag<>(CommonTags.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
+			safeEntities = new TypedTag<>(CommandConstants.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class);
+			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, plugin.getRegistry(), BlockType.class);
+			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, plugin.getRegistry(), BlockType.class);
+			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
 		}
 	}
 

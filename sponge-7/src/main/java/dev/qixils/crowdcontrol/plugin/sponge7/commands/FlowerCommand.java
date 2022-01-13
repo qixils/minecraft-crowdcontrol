@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -33,7 +33,7 @@ public class FlowerCommand extends ImmediateCommand {
 
 	public FlowerCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
-		flowers = new TypedTag<>(CommonTags.FLOWERS, plugin, BlockType.class);
+		flowers = new TypedTag<>(CommandConstants.FLOWERS, plugin, BlockType.class);
 	}
 
 	@NotNull
