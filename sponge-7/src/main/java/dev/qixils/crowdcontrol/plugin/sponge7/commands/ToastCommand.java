@@ -59,7 +59,7 @@ public class ToastCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		sync(() -> {
 			for (Player player : players) {
-				plugin.asAudience(player).playSound(Sounds.ANNOYING);
+				plugin.asAudience(player).playSound(Sounds.ANNOYING.get());
 				// API8: recipes
 
 				// actual pop-up

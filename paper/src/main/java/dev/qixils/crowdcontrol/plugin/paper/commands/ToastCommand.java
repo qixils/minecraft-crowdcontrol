@@ -63,7 +63,7 @@ public class ToastCommand extends ImmediateCommand implements Listener {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		sync(() -> {
 			for (Player player : players) {
-				player.playSound(Sounds.ANNOYING, player);
+				player.playSound(Sounds.ANNOYING.get(), player);
 				Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
 				player.undiscoverRecipes(recipes);
 				player.discoverRecipes(recipes);

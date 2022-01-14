@@ -52,7 +52,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private void alert(Collection<? extends Audience> players) {
 		Audience audience = Audience.audience(players);
 		audience.sendActionBar(enable ? KEEP_INVENTORY_MESSAGE : LOSE_INVENTORY_MESSAGE);
-		audience.playSound(enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT);
+		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get());
 	}
 
 	@Override
