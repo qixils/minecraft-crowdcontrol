@@ -44,7 +44,6 @@ public class ItemDamageCommand extends ImmediateCommand {
 				Material type = item.getType();
 				int curDamage = damageable.getDamage();
 				int newDamage = handleItem.apply(damageable.getDamage(), type);
-				// todo: test
 				if (CommandConstants.canApplyDamage(curDamage, newDamage, type.getMaxDurability())) {
 					result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 					damageable.setDamage(newDamage);

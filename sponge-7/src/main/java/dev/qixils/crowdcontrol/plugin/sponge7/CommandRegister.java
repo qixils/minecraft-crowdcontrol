@@ -61,7 +61,7 @@ public class CommandRegister {
 				new ClutterCommand(plugin),
 				new LootboxCommand(plugin),
 				new TeleportCommand(plugin),
-//				new ToastCommand(plugin), // TODO recreate the non-recipe functionality
+				new ToastCommand(plugin),
 				new FreezeCommand(plugin),
 				new CameraLockCommand(plugin),
 				new FlowerCommand(plugin),

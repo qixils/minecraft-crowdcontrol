@@ -12,7 +12,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -350,7 +349,6 @@ public class CommandConstants {
 	 * @see #canApplyDurability(int, int, int)
 	 */
 	public static boolean canApplyDurability(int oldDurability, int newDurability, int maxDurability) {
-		LoggerFactory.getLogger(CommandConstants.class).warn(oldDurability + " " + newDurability + " " + maxDurability);
 		if (oldDurability == newDurability)
 			return false;
 		int min = Math.min(maxDurability, Math.max(MIN_ITEM_DAMAGE, maxDurability / 100));
