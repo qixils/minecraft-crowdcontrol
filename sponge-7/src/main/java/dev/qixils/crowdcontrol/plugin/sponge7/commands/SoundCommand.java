@@ -9,7 +9,6 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
 
@@ -35,8 +34,7 @@ public class SoundCommand extends ImmediateCommand {
 				playAt = playAt.add(direction.get().getOpposite().asBlockOffset().toDouble());
 			}
 			plugin.asAudience(player).playSound(
-					Sounds.SPOOKY_SOUND.getOrThrow(key ->
-							plugin.getRegistry().getType(SoundType.class, key.asString()).isPresent()),
+					Sounds.SPOOKY.get(),
 					playAt.getX(),
 					playAt.getY(),
 					playAt.getZ()

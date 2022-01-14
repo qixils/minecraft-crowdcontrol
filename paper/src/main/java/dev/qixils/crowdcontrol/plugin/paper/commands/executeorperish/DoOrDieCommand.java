@@ -1,12 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
@@ -77,7 +76,7 @@ public class DoOrDieCommand extends VoidCommand {
 							if (finalCondition.hasSucceeded(player)) {
 								player.showTitle(DO_OR_DIE_SUCCESS);
 								notCompleted.remove(uuid);
-								player.playSound(Sound.sound(org.bukkit.Sound.BLOCK_NOTE_BLOCK_CHIME, Source.MASTER, 1, 1.5f), player);
+								player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), player);
 							} else if (isTimeUp) {
 								player.showTitle(DO_OR_DIE_FAILURE);
 								player.setHealth(0);
@@ -85,7 +84,7 @@ public class DoOrDieCommand extends VoidCommand {
 								Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
 								player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
 								if (isNewValue)
-									player.playSound(Sound.sound(org.bukkit.Sound.BLOCK_NOTE_BLOCK_BASS, Source.MASTER, 1, 1), player);
+									player.playSound(Sounds.DO_OR_DIE_TICK.get(), player);
 							}
 						}
 

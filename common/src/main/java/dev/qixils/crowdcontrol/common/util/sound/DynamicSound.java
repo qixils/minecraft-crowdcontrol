@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common.util.sound;
 
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.jetbrains.annotations.NotNull;
@@ -17,14 +18,16 @@ public interface DynamicSound {
 	 * Gets the current {@link Sound} represented by this object.
 	 * This may not return the same object every time.
 	 * <p>
-	 * This method may return sounds that are not compatible with the current platform. If this
-	 * could be an issue, please use {@link #get(Predicate)} instead.
+	 * The default validator set by the platform will be used to ensure that incompatible sounds
+	 * (i.e. sounds that are not present in an older version) are not returned.
+	 * If no valid sound can be found, an {@link IllegalArgumentException} will be thrown.
 	 *
 	 * @return current {@link Sound}
 	 */
 	@NotNull
 	default Sound get() {
-		return get(null).orElseThrow(() -> new IllegalStateException("No sound could be found"));
+		return get(CommandConstants.SOUND_VALIDATOR)
+				.orElseThrow(() -> new IllegalStateException("No sound could be found"));
 	}
 
 	/**
@@ -62,6 +65,5 @@ public interface DynamicSound {
 		return get(validator).orElseThrow(() ->
 				new IllegalArgumentException("No supported sound could be found for this platform"));
 	}
-
 
 }

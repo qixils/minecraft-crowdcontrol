@@ -16,7 +16,7 @@ public final class Sounds {
 	}
 
 	/**
-	 * The message to play to players when Keep Inventory has been enabled for them.
+	 * The sound to play to players when Keep Inventory has been enabled for them.
 	 */
 	public static final Sound KEEP_INVENTORY_ALERT = Sound.sound(
 			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.activate"),
@@ -26,7 +26,7 @@ public final class Sounds {
 	);
 
 	/**
-	 * The message to play to players when Keep Inventory has been disabled for them.
+	 * The sound to play to players when Keep Inventory has been disabled for them.
 	 */
 	public static final Sound LOSE_INVENTORY_ALERT = Sound.sound(
 			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.deactivate"),
@@ -36,20 +36,85 @@ public final class Sounds {
 	);
 
 	/**
+	 * The sound to play to players upon usage of the Pop-up Command.
+	 */
+	public static final Sound ANNOYING = Sound.sound(
+			Key.key(MINECRAFT_NAMESPACE, "ui.toast.challenge_complete"),
+			Source.MASTER,
+			1,
+			1
+	);
+
+	/**
+	 * The sound to play when a lootbox is opened.
+	 */
+	public static final DynamicSound LOOTBOX_CHIME = new FallbackSound(
+			Source.PLAYER,
+			1f,
+			1.2f,
+			Key.key(MINECRAFT_NAMESPACE, "block.note_block.chime"),
+			Key.key(MINECRAFT_NAMESPACE, "block.note.chime") // 1.12.2
+	);
+
+	/**
+	 * The sound to play upon completion of a Do-or-Die task.
+	 */
+	public static final DynamicSound DO_OR_DIE_SUCCESS_CHIME = new FallbackSound(
+			Source.MASTER,
+			1f,
+			1.5f,
+			Key.key(MINECRAFT_NAMESPACE, "block.note_block.chime"),
+			Key.key(MINECRAFT_NAMESPACE, "block.note.chime") // 1.12.2
+	);
+
+	/**
+	 * The sound to play every time the countdown is updated during a Do-or-Die task.
+	 */
+	public static final DynamicSound DO_OR_DIE_TICK = new FallbackSound(
+			Source.MASTER,
+			1f,
+			1f,
+			Key.key(MINECRAFT_NAMESPACE, "block.note_block.bass"),
+			Key.key(MINECRAFT_NAMESPACE, "block.note.bass") // 1.12.2
+	);
+
+	/**
+	 * The sound to play upon spawning of a charged creeper.
+	 */
+	public static final DynamicSound LIGHTNING_STRIKE = new FallbackSound(
+			Source.HOSTILE,
+			1f,
+			1f,
+			Key.key(MINECRAFT_NAMESPACE, "entity.lightning_bolt.thunder"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.lightning.thunder") // 1.12.2
+	);
+
+	/**
+	 * The sound to play when teleporting a player using the teleport command.
+	 */
+	public static final DynamicSound TELEPORT = new FallbackSound(
+			Source.AMBIENT,
+			1f,
+			1f,
+			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.teleport"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.endermen.teleport") // 1.12.2
+	);
+
+	/**
 	 * Collection of randomly selected spooky sounds that can be played by the Spooky Sound command.
 	 */
-	public static final DynamicSound SPOOKY_SOUND = new RandomSound(
+	public static final DynamicSound SPOOKY = new RandomSound(
 			Source.MASTER,
 			1.75f,
 			1f,
 			Key.key(MINECRAFT_NAMESPACE, "entity.creeper.primed"),
 			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.stare"),
 			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.scream"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.endermen.stare"), // 1.12.2
+			Key.key(MINECRAFT_NAMESPACE, "entity.endermen.scream"), // 1.12.2
 			Key.key(MINECRAFT_NAMESPACE, "entity.ender_dragon.growl"),
 			Key.key(MINECRAFT_NAMESPACE, "entity.ghast.hurt"),
 			Key.key(MINECRAFT_NAMESPACE, "entity.generic.explode"),
 			Key.key(MINECRAFT_NAMESPACE, "ambient.cave")
 	);
-
-	// TODO move more sounds here
 }

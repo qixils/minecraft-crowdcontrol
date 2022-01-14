@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
@@ -10,8 +11,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
-import org.spongepowered.api.effect.sound.SoundCategories;
-import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -55,12 +54,11 @@ public class TeleportCommand extends ImmediateCommand {
 								.offset(new Vector3d(.5d, 1d, .5d))
 								.build()
 				);
-				player.getWorld().playSound(
-						SoundTypes.ENTITY_ENDERMEN_TELEPORT,
-						SoundCategories.AMBIENT,
-						destination.getPosition(),
-						1d,
-						1d
+				plugin.asAudience(player.getWorld()).playSound(
+						Sounds.TELEPORT.get(),
+						destination.getX(),
+						destination.getY(),
+						destination.getZ()
 				);
 			});
 		}

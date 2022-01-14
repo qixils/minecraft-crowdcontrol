@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -11,6 +12,7 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -27,14 +29,17 @@ import org.slf4j.Logger;
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
+	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
 	@Getter
@@ -65,6 +70,22 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public void onLoad() {
 		saveDefaultConfig();
+		// init sound validator
+		CommandConstants.SOUND_VALIDATOR = key -> {
+			String asString = key.asString();
+			Boolean value = VALID_SOUNDS.get(asString);
+			if (value != null)
+				return value;
+
+			try {
+				Sound.valueOf(asString.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+				VALID_SOUNDS.put(asString, true);
+				return true;
+			} catch (IllegalArgumentException e) {
+				VALID_SOUNDS.put(asString, false);
+				return false;
+			}
+		};
 	}
 
 	public void initCrowdControl() {

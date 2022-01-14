@@ -27,6 +27,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Miscellaneous", "miscellaneous", ItemKind.Folder),
             new Effect("-1 Max Health", "max_health_sub1", "miscellaneous") {Price = 100, Description = "Subtracts half a heart from the streamer's max health"},
             new Effect("+1 Max Health", "max_health_plus1", "miscellaneous") {Price = 50, Description = "Adds half a heart to the streamer's max health"},
+            new Effect("Annoying Pop-Ups", "toast", "miscellaneous") {Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound"},
             new Effect("Camera Lock (7s)", "camera_lock", "miscellaneous") {Price = 100, Description = "Temporarily freeze the streamer's camera"},
             new Effect("Camera Lock To Ground (7s)", "camera_lock_to_ground", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the ground"},
             new Effect("Camera Lock To Sky (7s)", "camera_lock_to_sky", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the sky"},
@@ -55,7 +56,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Put Held Item on Head", "hat", "miscellaneous") {Price = 25}, // swaps the held item and the player's head item
             new Effect("Remove One Hunger Bar", "starve_1", "miscellaneous") {Price = 75},
             new Effect("Remove Torches", "dim", "miscellaneous") {Price = 200, Description = "Removes all nearby torches"},
-            new Effect("Render Toasts", "toast", "miscellaneous") {Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound"},
             new Effect("Repair Held Item", "repair_item", "miscellaneous") {Price = 100, Description = "Fully repairs a damaged item"},
             new Effect("Replace Area With Gravel", "gravel_hell", "miscellaneous") {Price = 300, Description = "Replaces nearby stone-like blocks with gravel"},
             new Effect("Reset Experience", "reset_exp_progress", "miscellaneous") {Price = 1000, Description = "Clears all of the streamer's XP"},

@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
@@ -24,6 +25,11 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
  */
 public class CommandConstants {
 
+	/**
+	 * The default validator which ensures that a given sound is available.
+	 * This should be set when the plugin is enabled.
+	 */
+	public static Predicate<Key> SOUND_VALIDATOR = null;
 	/**
 	 * The radius to search for an entity to remove during the execution of the Remove XYZ Entity
 	 * command.

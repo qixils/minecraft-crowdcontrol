@@ -1,9 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import lombok.Getter;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
+import org.bukkit.Location;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -22,7 +22,8 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 	protected Entity spawnEntity(String viewer, Player player) {
 		Creeper creeper = (Creeper) super.spawnEntity(viewer, player);
 		creeper.setPowered(true);
-		creeper.getWorld().playSound(creeper.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.0f, 1.0f);
+		Location pos = creeper.getLocation();
+		creeper.getWorld().playSound(Sounds.LIGHTNING_STRIKE.get(), pos.getX(), pos.getY(), pos.getZ());
 		return creeper;
 	}
 }

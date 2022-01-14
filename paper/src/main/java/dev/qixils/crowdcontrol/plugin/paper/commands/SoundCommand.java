@@ -26,7 +26,7 @@ public class SoundCommand extends ImmediateCommand {
 		for (Player player : players) {
 			Location playAt = player.getLocation().add(player.getFacing().getOppositeFace().getDirection());
 			player.playSound(
-					Sounds.SPOOKY_SOUND.get(),
+					Sounds.SPOOKY.get(),
 					playAt.getX(),
 					playAt.getY(),
 					playAt.getZ()

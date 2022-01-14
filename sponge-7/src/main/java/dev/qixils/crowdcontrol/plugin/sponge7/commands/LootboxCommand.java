@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -10,8 +11,6 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.effect.sound.SoundCategories;
-import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.enchantment.Enchantment;
@@ -100,13 +99,7 @@ public class LootboxCommand extends ImmediateCommand {
 				}
 			}
 			// sound & open
-			player.playSound(
-					SoundTypes.BLOCK_NOTE_CHIME,
-					SoundCategories.PLAYER,
-					player.getPosition(), // API8: should not use pos
-					1d,
-					1.2d
-			);
+			plugin.asAudience(player).playSound(Sounds.LOOTBOX_CHIME.get());
 			sync(() -> player.openInventory(lootbox));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

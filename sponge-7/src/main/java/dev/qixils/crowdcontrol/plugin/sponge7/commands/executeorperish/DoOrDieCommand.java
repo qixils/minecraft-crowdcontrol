@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -10,8 +11,6 @@ import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.effect.sound.SoundCategories;
-import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 
@@ -82,13 +81,7 @@ public class DoOrDieCommand extends VoidCommand {
 									if (finalCondition.hasSucceeded(player)) {
 										plugin.asAudience(player).showTitle(DO_OR_DIE_SUCCESS);
 										notCompleted.remove(uuid);
-										player.playSound(
-												SoundTypes.BLOCK_NOTE_CHIME,
-												SoundCategories.MASTER,
-												player.getPosition(), // API8: use emitter
-												1d,
-												1.5d
-										);
+										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get());
 									} else if (isTimeUp) {
 										plugin.asAudience(player).showTitle(DO_OR_DIE_FAILURE);
 										player.offer(Keys.HEALTH, 0d);
@@ -96,13 +89,7 @@ public class DoOrDieCommand extends VoidCommand {
 										Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
 										plugin.asAudience(player).showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
 										if (isNewValue)
-											player.playSound(
-													SoundTypes.BLOCK_NOTE_BASS,
-													SoundCategories.MASTER,
-													player.getPosition(), // API8: use emitter
-													1,
-													1
-											);
+											plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_TICK.get());
 									}
 								}
 

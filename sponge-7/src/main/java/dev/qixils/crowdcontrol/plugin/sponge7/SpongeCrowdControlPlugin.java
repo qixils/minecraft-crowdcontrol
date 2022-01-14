@@ -7,6 +7,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectDataBuilder;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableGameModeEffectData;
@@ -46,6 +47,7 @@ import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
+import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -73,6 +75,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+
+import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
 @Plugin(
 		id = "crowd-control",
@@ -169,8 +173,13 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@NotNull
 	public Audience asAudience(@NotNull CommandSource source) {
 		if (source instanceof Player)
-			return audiences.player((Player) source);
-		return audiences.receiver(source);
+			return adventure().player((Player) source);
+		return adventure().receiver(source);
+	}
+
+	@NotNull
+	public Audience asAudience(@NotNull World world) {
+		return adventure().world(net.kyori.adventure.key.Key.key(MINECRAFT_NAMESPACE, world.getName()));
 	}
 
 	@Override
@@ -257,6 +266,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void initCrowdControl() {
+		CommandConstants.SOUND_VALIDATOR = key -> registry.getType(SoundType.class, key.asString()).isPresent();
+
 		ConfigurationNode config;
 		try {
 			config = configLoader.load();

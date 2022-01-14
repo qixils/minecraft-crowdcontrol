@@ -4,13 +4,13 @@ import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.CommandConstants.AttributeWeights;
 import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.sound.Sound.Source;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -101,12 +101,7 @@ public class LootboxCommand extends ImmediateCommand {
 			itemStack.setItemMeta(itemMeta);
 			lootbox.setItem(13, itemStack);
 			player.playSound(
-					Sound.sound(
-							org.bukkit.Sound.BLOCK_NOTE_BLOCK_CHIME,
-							Source.PLAYER,
-							1f,
-							1.2f
-					),
+					Sounds.LOOTBOX_CHIME.get(),
 					Sound.Emitter.self()
 			);
 			sync(() -> player.openInventory(lootbox));
