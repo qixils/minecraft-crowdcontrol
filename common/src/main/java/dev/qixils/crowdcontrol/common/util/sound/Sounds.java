@@ -19,6 +19,7 @@ public final class Sounds {
 	 * The sound to play to players when Keep Inventory has been enabled for them.
 	 */
 	public static final Sound KEEP_INVENTORY_ALERT = Sound.sound(
+			// TODO create fallback for 1.12.2
 			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.activate"),
 			Source.MASTER,
 			1f,
@@ -29,6 +30,7 @@ public final class Sounds {
 	 * The sound to play to players when Keep Inventory has been disabled for them.
 	 */
 	public static final Sound LOSE_INVENTORY_ALERT = Sound.sound(
+			// TODO create fallback for 1.12.2
 			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.deactivate"),
 			Source.MASTER,
 			1f,
