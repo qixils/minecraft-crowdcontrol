@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
-import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -68,7 +67,7 @@ public class FlowerCommand extends ImmediateCommand {
 		sync(() -> {
 			try (StackFrame ignored = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
 				for (Location<World> location : placeLocations) {
-					location.setBlockType(flowers.getRandom(), BlockChangeFlags.NONE);
+					location.setBlockType(flowers.getRandom());
 				}
 			}
 		});

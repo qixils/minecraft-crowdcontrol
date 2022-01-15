@@ -18,14 +18,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+
 @Getter
 public final class FreezeCommand extends TimedCommand {
-	private final Duration duration = Duration.ofSeconds(7);
 	private final String effectName = "freeze";
 	private final String displayName = "Freeze";
 
 	public FreezeCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
+	}
+
+	@Override
+	public @NotNull Duration getDuration() {
+		return FREEZE_DURATION;
 	}
 
 	@Override
@@ -35,7 +41,7 @@ public final class FreezeCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration())
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Map<UUID, Location<World>> locations = new HashMap<>(players.size());

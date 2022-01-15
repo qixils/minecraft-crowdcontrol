@@ -10,6 +10,8 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -103,22 +105,22 @@ public class DisableJumpingCommand extends TimedCommand {
 
 			Set<Vector3i> checked = new HashSet<>(7);
 			Vector3d min = bbox.getMin();
-			if (isLiquid(checked, world, min.toInt()))
+			if (canAscendAt(checked, world, min.toInt()))
 				return;
 			Vector3d max = bbox.getMax();
-			if (isLiquid(checked, world, max.toInt()))
+			if (canAscendAt(checked, world, max.toInt()))
 				return;
-			if (isLiquid(checked, world, new Vector3i(min.getX(), min.getY(), max.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(min.getX(), min.getY(), max.getZ())))
 				return;
-			if (isLiquid(checked, world, new Vector3i(min.getX(), max.getY(), max.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(min.getX(), max.getY(), max.getZ())))
 				return;
-			if (isLiquid(checked, world, new Vector3i(max.getX(), min.getY(), max.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(max.getX(), min.getY(), max.getZ())))
 				return;
-			if (isLiquid(checked, world, new Vector3i(max.getX(), min.getY(), min.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(max.getX(), min.getY(), min.getZ())))
 				return;
-			if (isLiquid(checked, world, new Vector3i(max.getX(), max.getY(), min.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(max.getX(), max.getY(), min.getZ())))
 				return;
-			if (isLiquid(checked, world, new Vector3i(min.getX(), max.getY(), min.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(min.getX(), max.getY(), min.getZ())))
 				return;
 		}
 
@@ -126,10 +128,11 @@ public class DisableJumpingCommand extends TimedCommand {
 		event.setCancelled(true);
 	}
 
-	private static boolean isLiquid(Set<Vector3i> checked, World world, Vector3i pos) {
+	private static boolean canAscendAt(Set<Vector3i> checked, World world, Vector3i pos) {
 		if (checked.contains(pos))
 			return false;
 		checked.add(pos);
-		return SpongeCrowdControlPlugin.isLiquid(world.getBlock(pos));
+		BlockState block = world.getBlock(pos);
+		return block.getType().equals(BlockTypes.LADDER) || SpongeCrowdControlPlugin.isLiquid(block);
 	}
 }

@@ -14,14 +14,19 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+
 @Getter
 public class CameraLockToSkyCommand extends TimedCommand {
-	private final Duration duration = Duration.ofSeconds(7);
 	private final String effectName = "camera_lock_to_sky";
 	private final String displayName = "Camera Lock To Sky";
 
 	public CameraLockToSkyCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
+	}
+
+	public @NotNull Duration getDuration() {
+		return FREEZE_DURATION;
 	}
 
 	@Override
@@ -30,7 +35,7 @@ public class CameraLockToSkyCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
-				.duration(duration)
+				.duration(getDuration())
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					task.set(Task.builder()

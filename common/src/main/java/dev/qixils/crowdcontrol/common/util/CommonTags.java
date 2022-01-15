@@ -46,6 +46,13 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "yellow_terracotta")
 	);
 
+	/**
+	 * Collection of blocks generally found underground in the overworld except for gravel.
+	 */
+	public static final KeyedTag STONES_EXCEPT_GRAVEL = STONES.except(
+			Key.key(MINECRAFT_NAMESPACE, "gravel")
+	);
+
 	private CommonTags() {
 		throw new IllegalStateException("Utility class");
 	}

@@ -28,7 +28,7 @@ public class BlockCommand extends ImmediateCommand {
 		this(
 				plugin,
 				blockType,
-				"block_" + Sponge7TextUtil.valueOf(blockType),
+				"block_" + Sponge7TextUtil.csIdOf(blockType),
 				"Place " + blockType.getTranslation().get() + " Block"
 		);
 	}

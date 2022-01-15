@@ -24,7 +24,7 @@ public class StandOnBlockCondition implements SuccessCondition {
 
 		component = Component.text("Stand on ").append(Component.text(displayText)
 				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(displayItem.getId())
+						.replacement(Component.translatable(displayItem.getTranslation().getId())
 								.color(NamedTextColor.GREEN)))
 		);
 	}

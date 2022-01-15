@@ -115,6 +115,10 @@ public class CommandConstants {
 	 * The amount of veins to spawn per usage of the ore vein command.
 	 */
 	public static final int VEIN_COUNT = 2;
+	/**
+	 * How long the freeze commands should last.
+	 */
+	public static final Duration FREEZE_DURATION = Duration.ofSeconds(10);
 
 	// tags
 

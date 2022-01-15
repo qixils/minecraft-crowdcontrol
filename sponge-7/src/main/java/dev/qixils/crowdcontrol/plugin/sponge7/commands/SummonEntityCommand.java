@@ -33,8 +33,8 @@ public class SummonEntityCommand extends ImmediateCommand {
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "entity_" + Sponge7TextUtil.valueOf(entityType);
-		this.displayName = "Summon " + entityType.getTranslation().get();
+		this.effectName = "entity_" + Sponge7TextUtil.csIdOf(entityType);
+		this.displayName = "Summon " + Sponge7TextUtil.getFixedName(entityType);
 	}
 
 	@NotNull

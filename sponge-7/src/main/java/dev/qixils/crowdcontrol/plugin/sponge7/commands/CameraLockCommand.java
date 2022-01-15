@@ -17,14 +17,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+
 @Getter
 public final class CameraLockCommand extends TimedCommand {
-	private final Duration duration = Duration.ofSeconds(7);
 	private final String effectName = "camera_lock";
 	private final String displayName = "Camera Lock";
 
 	public CameraLockCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
+	}
+
+	public @NotNull Duration getDuration() {
+		return FREEZE_DURATION;
 	}
 
 	@Override
@@ -34,7 +39,7 @@ public final class CameraLockCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
-				.duration(duration)
+				.duration(getDuration())
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Map<UUID, Vector3d> rotations = new HashMap<>(players.size());

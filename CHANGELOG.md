@@ -20,6 +20,9 @@ A list of all changes made to the software in reverse chronological order.
   actually altered.
 - Damage Item now has a minimum value of 1% durability (or 15 usages).
 - Enchantments on items in the Lootbox can now rarely be higher than the usual maximum.
+- The Render Toasts command has been renamed to Annoying Pop-Ups and now opens an obnoxious animated
+  inventory.
+- Duration of freeze commands have been increased.
 
 ## 3.1.3
 

@@ -34,7 +34,7 @@ public final class Sounds {
 			1f,
 			1f,
 			Key.key(Key.MINECRAFT_NAMESPACE, "block.beacon.deactivate"),
-			Key.key(Key.MINECRAFT_NAMESPACE, "block.bloth.break")
+			Key.key(Key.MINECRAFT_NAMESPACE, "block.cloth.break")
 	);
 
 	/**

@@ -9,6 +9,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemType;
@@ -20,13 +21,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class CommandRegister {
 	private final SpongeCrowdControlPlugin plugin;
 	private boolean tagsRegistered = false;
-	private MappedKeyedTag<EntityType> safeEntities;
+	private Set<EntityType> safeEntities;
 	private MappedKeyedTag<BlockType> setBlocks;
 	private MappedKeyedTag<BlockType> setFallingBlocks;
 	private MappedKeyedTag<ItemType> giveTakeItems;
@@ -39,7 +42,11 @@ public class CommandRegister {
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new TypedTag<>(CommandConstants.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class);
+			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class).getAll());
+			safeEntities.add(EntityTypes.MUSHROOM_COW);
+			safeEntities.add(EntityTypes.IRON_GOLEM);
+			safeEntities.add(EntityTypes.PRIMED_TNT);
+			safeEntities.add(EntityTypes.PIG_ZOMBIE);
 			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, plugin.getRegistry(), BlockType.class);
 			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, plugin.getRegistry(), BlockType.class);
 			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
@@ -132,8 +139,7 @@ public class CommandRegister {
 			commands.add(new BlockCommand(plugin, block));
 		}
 		// cobweb is named differently in 1.12.2 & I'm not refactoring KeyedTag to support fallbacks
-		commands.add(new BlockCommand(plugin, BlockTypes.WEB, "block_cobweb", "Place Cobweb Block") {
-		});
+		commands.add(new BlockCommand(plugin, BlockTypes.WEB));
 
 		for (BlockType block : setFallingBlocks) {
 			commands.add(new FallingBlockCommand(plugin, block));

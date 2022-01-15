@@ -144,6 +144,8 @@ public final class KeyedTag implements Iterable<Key> {
 	 * @param items new keys to introduce
 	 * @return new {@link KeyedTag}
 	 */
+	@NotNull
+	@Contract(value = "_ -> new", pure = true)
 	public KeyedTag and(Key @NotNull ... items) {
 		return new KeyedTag(keyedSet, Arrays.asList(items));
 	}
@@ -183,7 +185,41 @@ public final class KeyedTag implements Iterable<Key> {
 	 * @param other {@link KeyedTag} to merge with
 	 * @return new {@link KeyedTag}
 	 */
+	@NotNull
+	@Contract(value = "_ -> new", pure = true)
 	public KeyedTag and(@NotNull KeyedTag other) {
 		return new KeyedTag(keyedSet, other.getKeys());
+	}
+
+	/**
+	 * Creates a new {@link KeyedTag} containing the contents of this tag except tags that are equal
+	 * to one of the provided keys.
+	 *
+	 * @param keys array of keys to exclude from the new tag
+	 * @return new {@link KeyedTag}
+	 */
+	@NotNull
+	@Contract(value = "_ -> new", pure = true)
+	public KeyedTag except(Key @NotNull ... keys) {
+		return except(Arrays.asList(keys));
+	}
+
+	/**
+	 * Creates a new {@link KeyedTag} containing the contents of this tag except tags that are equal
+	 * to one of the provided keys.
+	 *
+	 * @param keys collection of keys to exclude from the new tag
+	 * @return new {@link KeyedTag}
+	 */
+	@NotNull
+	@Contract(value = "_ -> new", pure = true)
+	public KeyedTag except(@NotNull Collection<Key> keys) {
+		Set<Key> newSet = new HashSet<>(keyedSet.size());
+		for (Key key : keyedSet) {
+			if (!keys.contains(key)) {
+				newSet.add(key);
+			}
+		}
+		return new KeyedTag(newSet, null);
 	}
 }

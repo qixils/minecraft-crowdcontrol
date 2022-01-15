@@ -19,7 +19,7 @@ namespace CrowdControl.Games.Packs
 
         public MinecraftServer(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
 
-        public override Game Game => new Game(108, "Minecraft (Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
+        public override Game Game => new Game(108, "Minecraft (Paper Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
 
         public override List<Effect> Effects => new List<Effect>
         {
@@ -28,9 +28,9 @@ namespace CrowdControl.Games.Packs
             new Effect("-1 Max Health", "max_health_sub1", "miscellaneous") {Price = 100, Description = "Subtracts half a heart from the streamer's max health"},
             new Effect("+1 Max Health", "max_health_plus1", "miscellaneous") {Price = 50, Description = "Adds half a heart to the streamer's max health"},
             new Effect("Annoying Pop-Ups", "toast", "miscellaneous") {Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound"},
-            new Effect("Camera Lock (7s)", "camera_lock", "miscellaneous") {Price = 100, Description = "Temporarily freeze the streamer's camera"},
-            new Effect("Camera Lock To Ground (7s)", "camera_lock_to_ground", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the ground"},
-            new Effect("Camera Lock To Sky (7s)", "camera_lock_to_sky", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the sky"},
+            new Effect("Camera Lock (10s)", "camera_lock", "miscellaneous") {Price = 100, Description = "Temporarily freeze the streamer's camera"},
+            new Effect("Camera Lock To Ground (10s)", "camera_lock_to_ground", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the ground"},
+            new Effect("Camera Lock To Sky (10s)", "camera_lock_to_sky", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the sky"},
             new Effect("Clutter Inventory", "clutter", "miscellaneous") {Price = 50, Description = "Shuffles around items in the streamer's inventory"},
             new Effect("Damage Held Item", "damage_item", "miscellaneous") {Price = 100, Description = "Halves the durability of the held item"},
             new Effect("Damage Player (1 Heart)", "damage_1", "miscellaneous") {Price = 25},
@@ -43,7 +43,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Feed Player", "feed", "miscellaneous") {Price = 15, Description = "Replenishes the hunger bar"},
             new Effect("Feed Player (1 Bar)", "feed_1", "miscellaneous") {Price = 1, Description = "Replenishes a single bar of hunger"},
             new Effect("Flip Mobs Upside-Down", "dinnerbone", "miscellaneous") {Price = 25, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone"},
-            new Effect("Freeze (7s)", "freeze", "miscellaneous") {Price = 100, Description = "Temporarily prohibits movement"},
+            new Effect("Freeze (10s)", "freeze", "miscellaneous") {Price = 100, Description = "Temporarily prohibits movement"},
             new Effect("Give One XP Level", "xp_plus1", "miscellaneous") {Price = 75, Description = "Adds one level of experience"},
             new Effect("Heal Player", "full_heal", "miscellaneous") {Price = 50},
             new Effect("Heal Player (1 Heart)", "heal_1", "miscellaneous") {Price = 10},

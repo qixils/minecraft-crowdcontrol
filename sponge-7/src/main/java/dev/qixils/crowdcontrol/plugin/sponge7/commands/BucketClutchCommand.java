@@ -67,7 +67,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 								}
 							}
 							if (!slotFound)
-								DropItemCommand.dropItem(plugin.getGame(), player);
+								DropItemCommand.dropItem(plugin, player);
 						}
 					}
 					player.setItemInHand(HandTypes.MAIN_HAND, ItemStack.of(ItemTypes.WATER_BUCKET));

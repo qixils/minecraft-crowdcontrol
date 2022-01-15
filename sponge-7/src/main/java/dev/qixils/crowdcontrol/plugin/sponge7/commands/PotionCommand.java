@@ -60,7 +60,7 @@ public class PotionCommand extends ImmediateCommand {
 				for (int i = 0; i < effects.size(); i++) {
 					PotionEffect existingEffect = effects.get(i);
 					if (existingEffect.getType().equals(potionEffectType)) {
-						plugin.getSLF4JLogger().info("Updating existing effect");
+						plugin.getSLF4JLogger().debug("Updating existing effect");
 						overridden = true;
 						effects.set(i, PotionEffect.builder()
 								.from(existingEffect)
@@ -72,7 +72,7 @@ public class PotionCommand extends ImmediateCommand {
 				}
 
 				if (!overridden) {
-					plugin.getSLF4JLogger().info("Adding new effect");
+					plugin.getSLF4JLogger().debug("Adding new effect");
 					effects.add(effect);
 				}
 

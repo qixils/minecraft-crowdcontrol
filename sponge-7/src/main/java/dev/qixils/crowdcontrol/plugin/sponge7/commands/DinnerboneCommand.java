@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_NAME;
 import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin.VIEWER_SPAWNED;
 
 @Getter
 public class DinnerboneCommand extends Command {
@@ -49,7 +50,8 @@ public class DinnerboneCommand extends Command {
 				if (currentName.equals(Text.of(DINNERBONE_NAME))) {
 					entity.offer(Keys.DISPLAY_NAME, oldName);
 					entity.remove(OriginalDisplayNameData.class);
-					entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
+					if (entity.getOrElse(VIEWER_SPAWNED, false))
+						entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
 				} else {
 					entity.offer(new OriginalDisplayNameData(currentName));
 					entity.offer(Keys.DISPLAY_NAME, Text.of(DINNERBONE_NAME));

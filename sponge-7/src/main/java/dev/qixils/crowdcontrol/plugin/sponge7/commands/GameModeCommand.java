@@ -31,7 +31,7 @@ public class GameModeCommand extends TimedCommand {
 		super(plugin);
 		this.duration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = gamemode.getTranslation().get() + " Mode";
+		this.displayName = gamemode.getTranslation().get();
 		this.effectName = Sponge7TextUtil.valueOf(gamemode) + "_mode";
 	}
 
