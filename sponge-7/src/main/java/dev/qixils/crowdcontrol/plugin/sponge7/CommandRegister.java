@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.TypedTag;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -130,6 +131,9 @@ public class CommandRegister {
 		for (BlockType block : setBlocks) {
 			commands.add(new BlockCommand(plugin, block));
 		}
+		// cobweb is named differently in 1.12.2 & I'm not refactoring KeyedTag to support fallbacks
+		commands.add(new BlockCommand(plugin, BlockTypes.WEB, "block_cobweb", "Place Cobweb Block") {
+		});
 
 		for (BlockType block : setFallingBlocks) {
 			commands.add(new FallingBlockCommand(plugin, block));
