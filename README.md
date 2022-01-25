@@ -15,8 +15,8 @@ If you are hosting a server for streamers to join, you may use the following ste
 Minecraft server running with Crowd Control.
 
 1. Download and install [Java 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).
-2. Download the latest version of [Paper](https://papermc.io/downloads) 1.17.1 or 1.18. Spigot is
-   not supported.
+2. Download the latest version of [Paper](https://papermc.io/downloads) 1.18.1 or 1.17.1. Spigot
+   is not supported.
 3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the
    "root folder."
 4. Create a new folder named `plugins` inside the root folder.
