@@ -233,7 +233,11 @@ public class RegisterCommands {
 
         // enchantments
         for (Enchantment enchantment : Enchantment.values()) {
-            commands.add(new EnchantmentCommand(plugin, enchantment));
+            try {
+                commands.add(new EnchantmentCommand(plugin, enchantment));
+            } catch (AbstractMethodError ignored) {
+                // ignore enchants that do not implement the Adventure/Paper API
+            }
         }
 
         // give/take items
