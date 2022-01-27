@@ -7,4 +7,10 @@ public interface SuccessCondition {
 	Component getComponent();
 
 	boolean hasSucceeded(Player player);
+
+	// TODO: boolean hasSucceeded(Event event);
+
+	default int getRewardLuck() {
+		return 0;
+	}
 }

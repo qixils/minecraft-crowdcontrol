@@ -4,12 +4,15 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.VoidCommand;
+import dev.qixils.crowdcontrol.plugin.paper.commands.GiveItemCommand;
+import dev.qixils.crowdcontrol.plugin.paper.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -74,9 +77,11 @@ public class DoOrDieCommand extends VoidCommand {
 							if (player == null) continue;
 
 							if (finalCondition.hasSucceeded(player)) {
-								player.showTitle(DO_OR_DIE_SUCCESS);
+								ItemStack reward = LootboxCommand.createRandomItem(finalCondition.getRewardLuck());
+								player.showTitle(doOrDieSuccess(reward.getType()));
 								notCompleted.remove(uuid);
 								player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), player);
+								sync(() -> GiveItemCommand.giveItemTo(player, reward));
 							} else if (isTimeUp) {
 								player.showTitle(DO_OR_DIE_FAILURE);
 								player.setHealth(0);

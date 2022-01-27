@@ -12,6 +12,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
+import net.kyori.adventure.translation.Translatable;
+import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -312,21 +315,56 @@ public class CommandConstants {
 	 */
 	public static final Title.Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
 	/**
+	 * Color used for the subtitle of the Do-or-Die success message.
+	 */
+	private static final TextColor SUCCESS_SUBTITLE_COLOR = TextColor.color(0x99ff99);
+	/**
 	 * Message to show to users when they complete a Do-or-Die task.
 	 */
+	@Deprecated
+	@ScheduledForRemoval
 	public static final Title DO_OR_DIE_SUCCESS = Title.title(
-			Component.empty(),
 			Component.text("Task Completed!").color(NamedTextColor.GREEN),
+			Component.empty(),
 			DO_OR_DIE_TIMES
 	);
 	/**
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */
 	public static final Title DO_OR_DIE_FAILURE = Title.title(
-			Component.empty(),
 			Component.text("Task Failed").color(NamedTextColor.RED),
+			Component.empty(),
 			DO_OR_DIE_TIMES
 	);
+
+	/**
+	 * Creates the title to display to a user upon the completion of a Do-or-Die task.
+	 * Includes the name of the random item they won for completing the task.
+	 *
+	 * @param rewardItem item that the user is being rewarded with
+	 * @return title to display
+	 */
+	@NotNull
+	public static Title doOrDieSuccess(Translatable rewardItem) {
+		return doOrDieSuccess(Component.translatable(rewardItem));
+	}
+
+	/**
+	 * Creates the title to display to a user upon the completion of a Do-or-Die task.
+	 * Includes the name of the random item they won for completing the task.
+	 *
+	 * @param rewardItem item that the user is being rewarded with
+	 * @return title to display
+	 */
+	@NotNull
+	public static Title doOrDieSuccess(@NotNull Component rewardItem) {
+		return Title.title(
+				Component.text("Task Completed!").color(NamedTextColor.GREEN),
+				Component.text("You have been rewarded with ", SUCCESS_SUBTITLE_COLOR)
+						.append(rewardItem),
+				DO_OR_DIE_TIMES
+		);
+	}
 
 	/**
 	 * Returns the text color used at the given point during the countdown.

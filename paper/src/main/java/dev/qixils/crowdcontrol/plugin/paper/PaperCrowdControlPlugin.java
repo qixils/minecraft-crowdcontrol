@@ -72,7 +72,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		saveDefaultConfig();
 		// init sound validator
 		CommandConstants.SOUND_VALIDATOR = key -> {
-			String asString = key.asString();
+			String asString = key.value();
 			Boolean value = VALID_SOUNDS.get(asString);
 			if (value != null)
 				return value;

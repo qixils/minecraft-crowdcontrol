@@ -23,6 +23,9 @@ A list of all changes made to the software in reverse chronological order.
 - The Render Toasts command has been renamed to Annoying Pop-Ups and now opens an obnoxious animated
   inventory.
 - Duration of freeze commands have been increased.
+- Do-or-Die now grants the streamer a reward for completing their task which generates a random item
+  similarly to the Open Lootbox command but which a much higher likelihood of receiving a "good"
+  item depending on the difficulty of the completed task.
 
 ## 3.1.3
 

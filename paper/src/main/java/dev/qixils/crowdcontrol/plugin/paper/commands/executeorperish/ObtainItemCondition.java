@@ -8,10 +8,12 @@ import org.bukkit.entity.Player;
 
 @Getter
 public class ObtainItemCondition implements SuccessCondition {
+	private final int rewardLuck;
 	private final Material item;
 	private final Component component;
 
-	public ObtainItemCondition(String displayText, Material item) {
+	public ObtainItemCondition(int rewardLuck, String displayText, Material item) {
+		this.rewardLuck = rewardLuck;
 		this.item = item;
 		component = Component.text("Obtain ").append(Component.text(displayText)
 				.replaceText(builder -> builder.matchLiteral("%s").once()
