@@ -39,7 +39,7 @@ public class TeleportCommand extends ImmediateCommand {
 			}
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			sync(() -> {
-				player.teleport(destination);
+				player.teleport(destination.add(.5, 0, .5));
 				ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);
 				player.getWorld().playSound(Sounds.TELEPORT.get(), player);
 			});
