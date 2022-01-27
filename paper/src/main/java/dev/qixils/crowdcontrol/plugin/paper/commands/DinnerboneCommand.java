@@ -51,11 +51,13 @@ public class DinnerboneCommand extends Command {
 				Component currentName = entity.customName();
 				if (DINNERBONE_COMPONENT.equals(currentName)) {
 					entity.customName(data.get(key, COMPONENT_TYPE));
+					entity.setCustomNameVisible(true);
 					data.remove(key);
 				} else {
 					if (currentName != null)
 						data.set(key, COMPONENT_TYPE, currentName);
 					entity.customName(DINNERBONE_COMPONENT);
+					entity.setCustomNameVisible(false);
 				}
 			}
 		});
