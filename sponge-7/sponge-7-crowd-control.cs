@@ -9,9 +9,8 @@ namespace CrowdControl.Games.Packs
 {
     public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
     {
-        public override string Host => "127.0.0.1";
-
-        public override ushort Port => 58431;
+        // default port: 58731
+        public override ISimpleTCPPack.PromptType PromptType => ISimpleTCPPack.PromptType.Host | ISimpleTCPPack.PromptType.Password;
 
         public override ISimpleTCPPack.AuthenticationType AuthenticationMode => ISimpleTCPPack.AuthenticationType.SimpleTCPSendKey;
 
@@ -19,7 +18,7 @@ namespace CrowdControl.Games.Packs
 
         public MinecraftServer(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
 
-        public override Game Game => new Game(108, "Minecraft (Paper Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
+        public override Game Game => new Game(125, "Minecraft (Sponge 7)", "MinecraftSponge", "PC", ConnectorType.SimpleTCPClientConnector);
 
         public override List<Effect> Effects => new List<Effect>
         {
@@ -90,33 +89,33 @@ namespace CrowdControl.Games.Packs
             // summons a mob around each player
             new Effect("Summon Entity", "summon_entity", ItemKind.Folder),
             new Effect("Armor Stand", "entity_armor_stand", "summon_entity") {Price = 10},
-            new Effect("Axolotl", "entity_axolotl", "summon_entity") {Price = 200},
+//            new Effect("Axolotl", "entity_axolotl", "summon_entity") {Price = 200}, //API9
             new Effect("Bat", "entity_bat", "summon_entity") {Price = 10},
-            new Effect("Bee", "entity_bee", "summon_entity") {Price = 200},
+//            new Effect("Bee", "entity_bee", "summon_entity") {Price = 200}, // API8
             new Effect("Blaze", "entity_blaze", "summon_entity") {Price = 300},
             new Effect("Boat", "entity_boat", "summon_entity") {Price = 50},
-            new Effect("Cat", "entity_cat", "summon_entity") {Price = 200},
+//            new Effect("Cat", "entity_cat", "summon_entity") {Price = 200}, // API8
             new Effect("Cave Spider", "entity_cave_spider", "summon_entity") {Price = 300},
             new Effect("Charged Creeper", "entity_charged_creeper", "summon_entity") {Price = 500},
             new Effect("Chicken", "entity_chicken", "summon_entity") {Price = 100},
-            new Effect("Cod", "entity_cod", "summon_entity") {Price = 100},
+//            new Effect("Cod", "entity_cod", "summon_entity") {Price = 100}, // API8
             new Effect("Cow", "entity_cow", "summon_entity") {Price = 100},
             new Effect("Creeper", "entity_creeper", "summon_entity") {Price = 300},
-            new Effect("Dolphin", "entity_dolphin", "summon_entity") {Price = 200},
+//            new Effect("Dolphin", "entity_dolphin", "summon_entity") {Price = 200}, // API8
             new Effect("Donkey", "entity_donkey", "summon_entity") {Price = 200},
-            new Effect("Drowned", "entity_drowned", "summon_entity") {Price = 300},
+//            new Effect("Drowned", "entity_drowned", "summon_entity") {Price = 300}, // API8
             new Effect("Elder Guardian", "entity_elder_guardian", "summon_entity") {Price = 1000},
             new Effect("Ender Dragon", "entity_ender_dragon", "summon_entity") {Price = 2000},
             new Effect("Enderman", "entity_enderman", "summon_entity") {Price = 300},
             new Effect("Endermite", "entity_endermite", "summon_entity") {Price = 300},
-            new Effect("Evoker", "entity_evoker", "summon_entity") {Price = 750},
-            new Effect("Fox", "entity_fox", "summon_entity") {Price = 200},
+//            new Effect("Evoker", "entity_evoker", "summon_entity") {Price = 750}, // API8
+//            new Effect("Fox", "entity_fox", "summon_entity") {Price = 200}, // API8
             new Effect("Ghast", "entity_ghast", "summon_entity") {Price = 500},
             new Effect("Giant", "entity_giant", "summon_entity") {Price = 100}, // this mob does literally nothing but it is big and obnoxious :-)
-            new Effect("Glow Squid", "entity_glow_squid", "summon_entity") {Price = 150},
-            new Effect("Goat", "entity_goat", "summon_entity") {Price = 250},
+//            new Effect("Glow Squid", "entity_glow_squid", "summon_entity") {Price = 150}, // API9
+//            new Effect("Goat", "entity_goat", "summon_entity") {Price = 250}, // API9
             new Effect("Guardian", "entity_guardian", "summon_entity") {Price = 300},
-            new Effect("Hoglin", "entity_hoglin", "summon_entity") {Price = 1000},
+//            new Effect("Hoglin", "entity_hoglin", "summon_entity") {Price = 1000}, // API8
             new Effect("Horse", "entity_horse", "summon_entity") {Price = 200},
             new Effect("Husk", "entity_husk", "summon_entity") {Price = 300},
             new Effect("Illusioner", "entity_illusioner", "summon_entity") {Price = 500},
@@ -125,26 +124,23 @@ namespace CrowdControl.Games.Packs
             new Effect("Llama", "entity_llama", "summon_entity") {Price = 200},
             new Effect("Magma Cube", "entity_magma_cube", "summon_entity") {Price = 350},
             new Effect("Minecart", "entity_minecart", "summon_entity") {Price = 10},
-            new Effect("Minecart with Chest", "entity_minecart_chest", "summon_entity") {Price = 100},
-            new Effect("Minecart with Furnace", "entity_minecart_furnace", "summon_entity") {Price = 10},
-            new Effect("Minecart with Hopper", "entity_minecart_hopper", "summon_entity") {Price = 50},
-            new Effect("Minecart with TNT", "entity_minecart_tnt", "summon_entity") {Price = 100},
+//            new Effect("Minecart with Chest", "entity_minecart_chest", "summon_entity") {Price = 100}, // API8
             new Effect("Mooshroom", "entity_mushroom_cow", "summon_entity") {Price = 200},
             new Effect("Mule", "entity_mule", "summon_entity") {Price = 200},
             new Effect("Ocelot", "entity_ocelot", "summon_entity") {Price = 100},
-            new Effect("Panda", "entity_panda", "summon_entity") {Price = 200},
+//            new Effect("Panda", "entity_panda", "summon_entity") {Price = 200}, //API8
             new Effect("Parrot", "entity_parrot", "summon_entity") {Price = 200},
-            new Effect("Phantom", "entity_phantom", "summon_entity") {Price = 300},
+//            new Effect("Phantom", "entity_phantom", "summon_entity") {Price = 300}, //API8
             new Effect("Pig", "entity_pig", "summon_entity") {Price = 100},
-            new Effect("Piglin", "entity_piglin", "summon_entity") {Price = 350},
-            new Effect("Piglin Brute", "entity_piglin_brute", "summon_entity") {Price = 1000},
-            new Effect("Pillager", "entity_pillager", "summon_entity") {Price = 500},
+//            new Effect("Piglin", "entity_piglin", "summon_entity") {Price = 350}, //API8
+//            new Effect("Piglin Brute", "entity_piglin_brute", "summon_entity") {Price = 1000}, //API8
+//            new Effect("Pillager", "entity_pillager", "summon_entity") {Price = 500}, //API8
             new Effect("Polar Bear", "entity_polar_bear", "summon_entity") {Price = 200},
             new Effect("Primed TNT", "entity_primed_tnt", "summon_entity") {Price = 1000},
-            new Effect("Pufferfish", "entity_pufferfish", "summon_entity") {Price = 300},
+//            new Effect("Pufferfish", "entity_pufferfish", "summon_entity") {Price = 300}, //API8
             new Effect("Rabbit", "entity_rabbit", "summon_entity") {Price = 100},
-            new Effect("Ravager", "entity_ravager", "summon_entity") {Price = 1000},
-            new Effect("Salmon", "entity_salmon", "summon_entity") {Price = 100},
+//            new Effect("Ravager", "entity_ravager", "summon_entity") {Price = 1000}, //API8
+//            new Effect("Salmon", "entity_salmon", "summon_entity") {Price = 100}, //API8
             new Effect("Sheep", "entity_sheep", "summon_entity") {Price = 100},
             new Effect("Shulker", "entity_shulker", "summon_entity") {Price = 500},
             new Effect("Silverfish", "entity_silverfish", "summon_entity") {Price = 300},
@@ -155,19 +151,19 @@ namespace CrowdControl.Games.Packs
             new Effect("Spider", "entity_spider", "summon_entity") {Price = 300},
             new Effect("Squid", "entity_squid", "summon_entity") {Price = 100},
             new Effect("Stray", "entity_stray", "summon_entity") {Price = 300},
-            new Effect("Strider", "entity_strider", "summon_entity") {Price = 200},
-            new Effect("Trader Llama", "entity_trader_llama", "summon_entity") {Price = 150},
-            new Effect("Tropical Fish", "entity_tropical_fish", "summon_entity") {Price = 100},
-            new Effect("Turtle", "entity_turtle", "summon_entity") {Price = 200},
+//            new Effect("Strider", "entity_strider", "summon_entity") {Price = 200}, //API8
+//            new Effect("Trader Llama", "entity_trader_llama", "summon_entity") {Price = 150}, //API8
+//            new Effect("Tropical Fish", "entity_tropical_fish", "summon_entity") {Price = 100}, //API8
+//            new Effect("Turtle", "entity_turtle", "summon_entity") {Price = 200}, //API8
             new Effect("Vex", "entity_vex", "summon_entity") {Price = 350},
             new Effect("Villager", "entity_villager", "summon_entity") {Price = 200},
-            new Effect("Vindicator", "entity_vindicator", "summon_entity") {Price = 500},
-            new Effect("Wandering Trader", "entity_wandering_trader", "summon_entity") {Price = 200},
+//            new Effect("Vindicator", "entity_vindicator", "summon_entity") {Price = 500}, //API8
+//            new Effect("Wandering Trader", "entity_wandering_trader", "summon_entity") {Price = 200}, //API8
             new Effect("Witch", "entity_witch", "summon_entity") {Price = 300},
             new Effect("Wither", "entity_wither", "summon_entity") {Price = 4000},
             new Effect("Wither Skeleton", "entity_wither_skeleton", "summon_entity") {Price = 500},
             new Effect("Wolf", "entity_wolf", "summon_entity") {Price = 200},
-            new Effect("Zoglin", "entity_zoglin", "summon_entity") {Price = 1000},
+//            new Effect("Zoglin", "entity_zoglin", "summon_entity") {Price = 1000}, //API8
             new Effect("Zombie", "entity_zombie", "summon_entity") {Price = 300},
             new Effect("Zombie Horse", "entity_zombie_horse", "summon_entity") {Price = 200},
             new Effect("Zombie Villager", "entity_zombie_villager", "summon_entity") {Price = 300},
@@ -175,32 +171,32 @@ namespace CrowdControl.Games.Packs
             // remove nearest entity
             new Effect("Remove Entity", "remove_entity", ItemKind.Folder),
             new Effect("Armor Stand", "remove_entity_armor_stand", "remove_entity") {Price = 50},
-            new Effect("Axolotl", "remove_entity_axolotl", "remove_entity") {Price = 300},
+//            new Effect("Axolotl", "remove_entity_axolotl", "remove_entity") {Price = 300}, //API9
             new Effect("Bat", "remove_entity_bat", "remove_entity") {Price = 1},
-            new Effect("Bee", "remove_entity_bee", "remove_entity") {Price = 50},
+//            new Effect("Bee", "remove_entity_bee", "remove_entity") {Price = 50}, //API8
             new Effect("Blaze", "remove_entity_blaze", "remove_entity") {Price = 300},
             new Effect("Boat", "remove_entity_boat", "remove_entity") {Price = 100},
-            new Effect("Cat", "remove_entity_cat", "remove_entity") {Price = 500},
+//            new Effect("Cat", "remove_entity_cat", "remove_entity") {Price = 500}, //API8
             new Effect("Cave Spider", "remove_entity_cave_spider", "remove_entity") {Price = 150},
             new Effect("Chicken", "remove_entity_chicken", "remove_entity") {Price = 150},
-            new Effect("Cod", "remove_entity_cod", "remove_entity") {Price = 150},
+//            new Effect("Cod", "remove_entity_cod", "remove_entity") {Price = 150}, //API8
             new Effect("Cow", "remove_entity_cow", "remove_entity") {Price = 150},
             new Effect("Creeper", "remove_entity_creeper", "remove_entity") {Price = 150},
-            new Effect("Dolphin", "remove_entity_dolphin", "remove_entity") {Price = 250},
+//            new Effect("Dolphin", "remove_entity_dolphin", "remove_entity") {Price = 250}, //API8
             new Effect("Donkey", "remove_entity_donkey", "remove_entity") {Price = 250},
-            new Effect("Drowned", "remove_entity_drowned", "remove_entity") {Price = 150},
+//            new Effect("Drowned", "remove_entity_drowned", "remove_entity") {Price = 150}, //API8
             new Effect("Elder Guardian", "remove_entity_elder_guardian", "remove_entity") {Price = 750},
             new Effect("Ender Dragon", "remove_entity_ender_dragon", "remove_entity") {Price = 1000},
             new Effect("Enderman", "remove_entity_enderman", "remove_entity") {Price = 150},
             new Effect("Endermite", "remove_entity_endermite", "remove_entity") {Price = 150},
-            new Effect("Evoker", "remove_entity_evoker", "remove_entity") {Price = 200},
-            new Effect("Fox", "remove_entity_fox", "remove_entity") {Price = 200},
+//            new Effect("Evoker", "remove_entity_evoker", "remove_entity") {Price = 200}, //API8
+//            new Effect("Fox", "remove_entity_fox", "remove_entity") {Price = 200}, //API8
             new Effect("Ghast", "remove_entity_ghast", "remove_entity") {Price = 200},
             new Effect("Giant", "remove_entity_giant", "remove_entity") {Price = 25},
-            new Effect("Glow Squid", "remove_entity_glow_squid", "remove_entity") {Price = 50},
-            new Effect("Goat", "remove_entity_goat", "remove_entity") {Price = 200},
+//            new Effect("Glow Squid", "remove_entity_glow_squid", "remove_entity") {Price = 50}, //API9
+//            new Effect("Goat", "remove_entity_goat", "remove_entity") {Price = 200}, //API9
             new Effect("Guardian", "remove_entity_guardian", "remove_entity") {Price = 250},
-            new Effect("Hoglin", "remove_entity_hoglin", "remove_entity") {Price = 300},
+//            new Effect("Hoglin", "remove_entity_hoglin", "remove_entity") {Price = 300}, //API8
             new Effect("Horse", "remove_entity_horse", "remove_entity") {Price = 750},
             new Effect("Husk", "remove_entity_husk", "remove_entity") {Price = 200},
             new Effect("Illusioner", "remove_entity_illusioner", "remove_entity") {Price = 300},
@@ -209,26 +205,23 @@ namespace CrowdControl.Games.Packs
             new Effect("Llama", "remove_entity_llama", "remove_entity") {Price = 200},
             new Effect("Magma Cube", "remove_entity_magma_cube", "remove_entity") {Price = 300},
             new Effect("Minecart", "remove_entity_minecart", "remove_entity") {Price = 25},
-            new Effect("Minecart with Chest", "remove_entity_minecart_chest", "remove_entity") {Price = 50},
-            new Effect("Minecart with Furnace", "remove_entity_minecart_furnace", "remove_entity") {Price = 1},
-            new Effect("Minecart with Hopper", "remove_entity_minecart_hopper", "remove_entity") {Price = 30},
-            new Effect("Minecart with TNT", "remove_entity_minecart_tnt", "remove_entity") {Price = 50},
+//            new Effect("Minecart with Chest", "remove_entity_minecart_chest", "remove_entity") {Price = 50}, //API8
             new Effect("Mooshroom", "remove_entity_mushroom_cow", "remove_entity") {Price = 200},
             new Effect("Mule", "remove_entity_mule", "remove_entity") {Price = 200},
             new Effect("Ocelot", "remove_entity_ocelot", "remove_entity") {Price = 50},
-            new Effect("Panda", "remove_entity_panda", "remove_entity") {Price = 200},
+//            new Effect("Panda", "remove_entity_panda", "remove_entity") {Price = 200}, //API8
             new Effect("Parrot", "remove_entity_parrot", "remove_entity") {Price = 250},
-            new Effect("Phantom", "remove_entity_phantom", "remove_entity") {Price = 200},
+//            new Effect("Phantom", "remove_entity_phantom", "remove_entity") {Price = 200}, //API8
             new Effect("Pig", "remove_entity_pig", "remove_entity") {Price = 150},
-            new Effect("Piglin", "remove_entity_piglin", "remove_entity") {Price = 350},
-            new Effect("Piglin Brute", "remove_entity_piglin_brute", "remove_entity") {Price = 150},
-            new Effect("Pillager", "remove_entity_pillager", "remove_entity") {Price = 150},
+//            new Effect("Piglin", "remove_entity_piglin", "remove_entity") {Price = 350}, //API8
+//            new Effect("Piglin Brute", "remove_entity_piglin_brute", "remove_entity") {Price = 150}, //API8
+//            new Effect("Pillager", "remove_entity_pillager", "remove_entity") {Price = 150}, //API8
             new Effect("Polar Bear", "remove_entity_polar_bear", "remove_entity") {Price = 200},
             new Effect("Primed TNT", "remove_entity_primed_tnt", "remove_entity") {Price = 50},
-            new Effect("Pufferfish", "remove_entity_pufferfish", "remove_entity") {Price = 50},
+//            new Effect("Pufferfish", "remove_entity_pufferfish", "remove_entity") {Price = 50}, //API8
             new Effect("Rabbit", "remove_entity_rabbit", "remove_entity") {Price = 50},
-            new Effect("Ravager", "remove_entity_ravager", "remove_entity") {Price = 150},
-            new Effect("Salmon", "remove_entity_salmon", "remove_entity") {Price = 50},
+//            new Effect("Ravager", "remove_entity_ravager", "remove_entity") {Price = 150}, //API8
+//            new Effect("Salmon", "remove_entity_salmon", "remove_entity") {Price = 50}, //API8
             new Effect("Sheep", "remove_entity_sheep", "remove_entity") {Price = 75},
             new Effect("Shulker", "remove_entity_shulker", "remove_entity") {Price = 150},
             new Effect("Silverfish", "remove_entity_silverfish", "remove_entity") {Price = 150},
@@ -239,19 +232,19 @@ namespace CrowdControl.Games.Packs
             new Effect("Spider", "remove_entity_spider", "remove_entity") {Price = 150},
             new Effect("Squid", "remove_entity_squid", "remove_entity") {Price = 25},
             new Effect("Stray", "remove_entity_stray", "remove_entity") {Price = 150},
-            new Effect("Strider", "remove_entity_strider", "remove_entity") {Price = 750},
-            new Effect("Trader Llama", "remove_entity_trader_llama", "remove_entity") {Price = 50},
-            new Effect("Tropical Fish", "remove_entity_tropical_fish", "remove_entity") {Price = 50},
-            new Effect("Turtle", "remove_entity_turtle", "remove_entity") {Price = 100},
+//            new Effect("Strider", "remove_entity_strider", "remove_entity") {Price = 750}, //API8
+//            new Effect("Trader Llama", "remove_entity_trader_llama", "remove_entity") {Price = 50}, //API8
+//            new Effect("Tropical Fish", "remove_entity_tropical_fish", "remove_entity") {Price = 50}, //API8
+//            new Effect("Turtle", "remove_entity_turtle", "remove_entity") {Price = 100}, //API8
             new Effect("Vex", "remove_entity_vex", "remove_entity") {Price = 50},
             new Effect("Villager", "remove_entity_villager", "remove_entity") {Price = 200},
-            new Effect("Vindicator", "remove_entity_vindicator", "remove_entity") {Price = 150},
-            new Effect("Wandering Trader", "remove_entity_wandering_trader", "remove_entity") {Price = 100},
+//            new Effect("Vindicator", "remove_entity_vindicator", "remove_entity") {Price = 150}, //API8
+//            new Effect("Wandering Trader", "remove_entity_wandering_trader", "remove_entity") {Price = 100}, //API8
             new Effect("Witch", "remove_entity_witch", "remove_entity") {Price = 150},
             new Effect("Wither", "remove_entity_wither", "remove_entity") {Price = 1000},
             new Effect("Wither Skeleton", "remove_entity_wither_skeleton", "remove_entity") {Price = 150},
             new Effect("Wolf", "remove_entity_wolf", "remove_entity") {Price = 200},
-            new Effect("Zoglin", "remove_entity_zoglin", "remove_entity") {Price = 150},
+//            new Effect("Zoglin", "remove_entity_zoglin", "remove_entity") {Price = 150}, //API8
             new Effect("Zombie", "remove_entity_zombie", "remove_entity") {Price = 150},
             new Effect("Zombie Horse", "remove_entity_zombie_horse", "remove_entity") {Price = 750},
             new Effect("Zombie Villager", "remove_entity_zombie_villager", "remove_entity") {Price = 150},
@@ -265,37 +258,29 @@ namespace CrowdControl.Games.Packs
             // applies potion effects to every player
             new Effect("Apply Potion (15s)", "apply_potion_effect", ItemKind.Folder),
             new Effect("Absorption", "potion_absorption", "apply_potion_effect") {Price = 50, Description = "Grants extra health that cannot be regenerated"},
-            //new Effect("Bad Luck", "potion_bad_luck", "apply_potion_effect"),
-            new Effect("Bad Omen", "potion_bad_omen", "apply_potion_effect") {Price = 500, Description = "Causes a village raid when a player possessing this effect is inside of a village"},
+//            new Effect("Bad Omen", "potion_bad_omen", "apply_potion_effect") {Price = 500, Description = "Causes a village raid when a player possessing this effect is inside of a village"}, //API8
             new Effect("Blindness", "potion_blindness", "apply_potion_effect") {Price = 75, Description = "Temporarily reduces a player's range of vision and disables their sprinting"},
-            new Effect("Conduit Power", "potion_conduit_power", "apply_potion_effect") {Price = 50, Description = "Grants water breathing, night vision, and haste when underwater"},
-            new Effect("Dolphins Grace", "potion_dolphins_grace", "apply_potion_effect") {Price = 50, Description = "Increases swimming speed"},
+//            new Effect("Conduit Power", "potion_conduit_power", "apply_potion_effect") {Price = 50, Description = "Grants water breathing, night vision, and haste when underwater"}, //API8
+//            new Effect("Dolphins Grace", "potion_dolphins_grace", "apply_potion_effect") {Price = 50, Description = "Increases swimming speed"}, //API8
             new Effect("Fire Resistance", "potion_fire_resistance", "apply_potion_effect") {Price = 50, Description = "Grants invincibility from fire and lava damage"},
             new Effect("Glowing", "potion_glowing", "apply_potion_effect") {Price = 25, Description = "Gives the player a glowing white outline that can be seen through walls"},
-            //new Effect("Harming", "potion_harming", "apply_potion_effect"),
             new Effect("Haste", "potion_haste", "apply_potion_effect") {Price = 50, Description = "Increases mining speed"},
-            //new Effect("Healing", "potion_healing", "apply_potion_effect"),
             new Effect("Health Boost", "potion_health_boost", "apply_potion_effect") {Price = 50, Description = "Increases maximum health"},
-            //new Effect("Hero Of The Village", "potion_hero_of_the_village", "apply_potion_effect"),
-            //new Effect("Hunger", "potion_hunger", "apply_potion_effect"),
             new Effect("Invisibility", "potion_invisibility", "apply_potion_effect") {Price = 25, Description = "Makes the player's skin invisible"},
             new Effect("Jump Boost", "potion_jump_boost", "apply_potion_effect") {Price = 50, Description = "Makes the player jump higher"},
             new Effect("Levitation", "potion_levitation", "apply_potion_effect") {Price = 100, Description = "Gradually lifts the player up into the air"},
-            //new Effect("Luck", "potion_luck", "apply_potion_effect"),
             new Effect("Mining Fatigue", "potion_mining_fatigue", "apply_potion_effect") {Price = 75, Description = "Decreases mining speed"},
             new Effect("Nausea", "potion_nausea", "apply_potion_effect") {Price = 50, Description = "Makes the player's screen shake"},
             new Effect("Night Vision", "potion_night_vision", "apply_potion_effect") {Price = 50, Description = "Allows the player to see inside dark areas"},
             new Effect("Poison", "potion_poison", "apply_potion_effect") {Price = 50, Description = "Gradually damages the player"},
             new Effect("Regeneration", "potion_regeneration", "apply_potion_effect") {Price = 25, Description = "Gradually heals the player"},
             new Effect("Resistance", "potion_resistance", "apply_potion_effect") {Price = 25, Description = "Reduces damage taken"},
-            //new Effect("Saturation", "potion_saturation", "apply_potion_effect"),
-            new Effect("Slow Falling", "potion_slow_falling", "apply_potion_effect") {Price = 25, Description = "Reduces the player's falling speed"},
+//            new Effect("Slow Falling", "potion_slow_falling", "apply_potion_effect") {Price = 25, Description = "Reduces the player's falling speed"}, //API8
             new Effect("Slowness", "potion_slowness", "apply_potion_effect") {Price = 50, Description = "Decreases the player's walking speed"},
             new Effect("Speed", "potion_speed", "apply_potion_effect") {Price = 50, Description = "Increases the player's walking speed"},
             new Effect("Strength", "potion_strength", "apply_potion_effect") {Price = 50, Description = "Increases the player's damage output"},
             new Effect("Water Breathing", "potion_water_breathing", "apply_potion_effect") {Price = 50, Description = "Grants the ability to breathe underwater"},
             new Effect("Weakness", "potion_weakness", "apply_potion_effect") {Price = 50, Description = "Decreases the player's damage output"},
-            //new Effect("Wither", "potion_wither", "apply_potion_effect"),
             // places a block at everyone's feet
             new Effect("Place Block", "place_block", ItemKind.Folder),
             new Effect("Bedrock", "block_bedrock", "place_block") {Price = 500, Description = "Places bedrock at the streamer's feet"},
@@ -303,14 +288,14 @@ namespace CrowdControl.Games.Packs
             new Effect("Fire", "block_fire", "place_block") {Price = 200, Description = "Places a fire block on the streamer"},
             new Effect("Redstone Torch", "block_redstone_torch", "place_block") {Price = 25, Description = "Places a redstone torch on the streamer"},
             new Effect("TNT", "block_tnt", "place_block") {Price = 400, Description = "Places a TNT block on the streamer"},
-            new Effect("Wither Rose", "block_wither_rose", "place_block") {Price = 100, Description = "Places a wither rose on the streamer"},
-            new Effect("Lightning Rod", "block_lightning_rod", "place_block") {Price = 25, Description = "Places a lightning rod on the streamer"},
+//            new Effect("Wither Rose", "block_wither_rose", "place_block") {Price = 100, Description = "Places a wither rose on the streamer"}, //API8
+//            new Effect("Lightning Rod", "block_lightning_rod", "place_block") {Price = 25, Description = "Places a lightning rod on the streamer"}, //API9
             new Effect("Water", "block_water", "place_block") {Price = 50, Description = "Places a flowing water block on the streamer"},
             // places a block several blocks above everyone's head
             new Effect("Place Falling Block", "place_falling_block", ItemKind.Folder),
             new Effect("Anvil", "falling_block_anvil", "place_falling_block") {Price = 75, Description = "Drops an anvil block on the streamer"},
             new Effect("Gravel", "falling_block_gravel", "place_falling_block") {Price = 25, Description = "Drops a gravel block on the streamer"},
-            new Effect("Red Sand", "falling_block_red_sand", "place_falling_block") {Price = 25, Description = "Drops a red sand block on the streamer"},
+//            new Effect("Red Sand", "falling_block_red_sand", "place_falling_block") {Price = 25, Description = "Drops a red sand block on the streamer"}, //API8
             new Effect("Sand", "falling_block_sand", "place_falling_block") {Price = 25, Description = "Drops a sand block on the streamer"},
             // sets the server weather
             new Effect("Set Weather", "weather", ItemKind.Folder),
@@ -323,9 +308,9 @@ namespace CrowdControl.Games.Packs
             new Effect("Apply Aqua Affinity", "enchant_aqua_affinity", "enchantments") {Price = 50, Description = "Increases underwater mining speed"},
             new Effect("Apply Bane of Arthropods V", "enchant_bane_of_arthropods", "enchantments") {Price = 50, Description = "Increases damage dealt to arthropod mobs (spiders, cave spiders, bees, silverfish, and endermites)"},
             new Effect("Apply Blast Protection IV", "enchant_blast_protection", "enchantments") {Price = 50, Description = "Reduces damage taken from explosions"},
-            new Effect("Apply Channeling", "enchant_channeling", "enchantments") {Price = 50, Description = "Makes tridents produce lightning when thrown while raining"},
-            new Effect("Apply Curse of Binding", "enchant_curse_of_binding", "enchantments") {Price = 50, Description = "Armor pieces with this enchantment cannot be taken off until death"},
-            new Effect("Apply Curse of Vanishing", "enchant_curse_of_vanishing", "enchantments") {Price = 50, Description = "Items with this enchantment will disappear upon death"},
+//            new Effect("Apply Channeling", "enchant_channeling", "enchantments") {Price = 50, Description = "Makes tridents produce lightning when thrown while raining"}, //API8
+//            new Effect("Apply Curse of Binding", "enchant_curse_of_binding", "enchantments") {Price = 50, Description = "Armor pieces with this enchantment cannot be taken off until death"}, //API8
+//            new Effect("Apply Curse of Vanishing", "enchant_curse_of_vanishing", "enchantments") {Price = 50, Description = "Items with this enchantment will disappear upon death"}, //API8
             new Effect("Apply Depth Strider III", "enchant_depth_strider", "enchantments") {Price = 50, Description = "Increases swimming speed"},
             new Effect("Apply Efficiency V", "enchant_efficiency", "enchantments") {Price = 50, Description = "Increases mining speed"},
             new Effect("Apply Feather Falling IV", "enchant_feather_falling", "enchantments") {Price = 50, Description = "Reduces damage taken from fall damage"},
@@ -334,27 +319,27 @@ namespace CrowdControl.Games.Packs
             new Effect("Apply Flame", "enchant_flame", "enchantments") {Price = 50, Description = "Bows with this enchantment shoot flaming arrows that set mobs on fire"},
             new Effect("Apply Fortune III", "enchant_fortune", "enchantments") {Price = 50, Description = "Increases the drops of minerals (iron, diamond, etc.)"},
             new Effect("Apply Frost Walker II", "enchant_frost_walker", "enchantments") {Price = 50, Description = "Walking near water with this enchantment will temporarily turn it into ice"},
-            new Effect("Apply Impaling V", "enchant_impaling", "enchantments") {Price = 50, Description = "Increases damage dealt by tridents to aquatic mobs"},
+//            new Effect("Apply Impaling V", "enchant_impaling", "enchantments") {Price = 50, Description = "Increases damage dealt by tridents to aquatic mobs"}, //API8
             new Effect("Apply Infinity", "enchant_infinity", "enchantments") {Price = 50, Description = "Prevents bows from consuming arrows"},
             new Effect("Apply Knockback II", "enchant_knockback", "enchantments") {Price = 50, Description = "Increases the distance that mobs get knocked back when attacked by a melee weapon"},
             new Effect("Apply Looting III", "enchant_looting", "enchantments") {Price = 50, Description = "Increases the number of items dropped by mobs when killed"},
-            new Effect("Apply Loyalty III", "enchant_loyalty", "enchantments") {Price = 50, Description = "Tridents with this enchantment will return to the thrower"},
+//            new Effect("Apply Loyalty III", "enchant_loyalty", "enchantments") {Price = 50, Description = "Tridents with this enchantment will return to the thrower"}, //API8
             new Effect("Apply Luck of the Sea III", "enchant_luck_of_the_sea", "enchantments") {Price = 50, Description = "Increases luck while fishing"},
             new Effect("Apply Lure III", "enchant_lure", "enchantments") {Price = 50, Description = "Decreases the wait time for a bite on your fishing hook"},
             new Effect("Apply Mending", "enchant_mending", "enchantments") {Price = 50, Description = "Items with this enchantment that are held or worn by a player will be repaired as XP is collected"},
-            new Effect("Apply Multishot", "enchant_multishot", "enchantments") {Price = 50, Description = "Makes crossbows fire three arrows"},
-            new Effect("Apply Piercing IV", "enchant_piercing", "enchantments") {Price = 50, Description = "Lets crossbow arrows penetrate four mobs"},
+//            new Effect("Apply Multishot", "enchant_multishot", "enchantments") {Price = 50, Description = "Makes crossbows fire three arrows"}, //API8
+//            new Effect("Apply Piercing IV", "enchant_piercing", "enchantments") {Price = 50, Description = "Lets crossbow arrows penetrate four mobs"}, //API8
             new Effect("Apply Power V", "enchant_power", "enchantments") {Price = 50, Description = "Increases damage dealt by bows"},
             new Effect("Apply Projectile Protection IV", "enchant_projectile_protection", "enchantments") {Price = 50, Description = "Reduces damage taken from arrows"},
             new Effect("Apply Protection IV", "enchant_protection", "enchantments") {Price = 50, Description = "Reduces damage taken from all sources"},
             new Effect("Apply Punch II", "enchant_punch", "enchantments") {Price = 50, Description = "Increases the distance that mobs get knocked back when shot by a bow"},
-            new Effect("Apply Quick Charge III", "enchant_quick_charge", "enchantments") {Price = 50, Description = "Reduces the time required to charge a crossbow"},
+//            new Effect("Apply Quick Charge III", "enchant_quick_charge", "enchantments") {Price = 50, Description = "Reduces the time required to charge a crossbow"}, //API8
             new Effect("Apply Respiration III", "enchant_respiration", "enchantments") {Price = 50, Description = "Extends breathing time underwater"},
-            new Effect("Apply Riptide III", "enchant_riptide", "enchantments") {Price = 50, Description = "When throwing a riptide trident inside rain or a body of water, the thrower will be rocketed in the direction they are facing"},
+//            new Effect("Apply Riptide III", "enchant_riptide", "enchantments") {Price = 50, Description = "When throwing a riptide trident inside rain or a body of water, the thrower will be rocketed in the direction they are facing"}, //API8
             new Effect("Apply Sharpness V", "enchant_sharpness", "enchantments") {Price = 50, Description = "Increases damage dealt by melee damage"},
             new Effect("Apply Silk Touch", "enchant_silk_touch", "enchantments") {Price = 50, Description = "Allows various blocks to drop themselves instead of their usual items"},
             new Effect("Apply Smite V", "enchant_smite", "enchantments") {Price = 50, Description = "Increases damage dealt to undead mobs (zombies, skeletons, etc.)"},
-            new Effect("Apply Soul Speed III", "enchant_soul_speed", "enchantments") {Price = 50, Description = "Increases walking speed on soul sand at the cost of armor durability"},
+//            new Effect("Apply Soul Speed III", "enchant_soul_speed", "enchantments") {Price = 50, Description = "Increases walking speed on soul sand at the cost of armor durability"}, //API8
             new Effect("Apply Sweeping Edge III", "enchant_sweeping_edge", "enchantments") {Price = 50, Description = "Increases the damage done by sweeping attacks"},
             new Effect("Apply Thorns III", "enchant_thorns", "enchantments") {Price = 50, Description = "Deals damage to attackers when hit"},
             new Effect("Apply Unbreaking III", "enchant_unbreaking", "enchantments") {Price = 50, Description = "Lessens the speed at which items break"},
@@ -366,14 +351,14 @@ namespace CrowdControl.Games.Packs
             new Effect("Golden Pickaxe", "give_golden_pickaxe", "give_item") {Price = 25},
             new Effect("Iron Pickaxe", "give_iron_pickaxe", "give_item") {Price = 100},
             new Effect("Diamond Pickaxe", "give_diamond_pickaxe", "give_item") {Price = 250},
-            new Effect("Netherite Pickaxe", "give_netherite_pickaxe", "give_item") {Price = 350},
+//            new Effect("Netherite Pickaxe", "give_netherite_pickaxe", "give_item") {Price = 350}, //API8
             new Effect("Golden Apple", "give_golden_apple", "give_item") {Price = 200},
-            new Effect("Enchanted Golden Apple", "give_enchanted_golden_apple", "give_item") {Price = 300},
+//            new Effect("Enchanted Golden Apple", "give_enchanted_golden_apple", "give_item") {Price = 300}, //API8
             new Effect("Eye of Ender", "give_ender_eye", "give_item") {Price = 100},
             new Effect("End Portal Frame", "give_end_portal_frame", "give_item") {Price = 300},
             new Effect("Iron Ingot", "give_iron_ingot", "give_item") {Price = 300},
             new Effect("Gold Ingot", "give_gold_ingot", "give_item") {Price = 300},
-            new Effect("Netherite Ingot", "give_netherite_ingot", "give_item") {Price = 300},
+//            new Effect("Netherite Ingot", "give_netherite_ingot", "give_item") {Price = 300}, //API8
             new Effect("Diamond", "give_diamond", "give_item") {Price = 300},
             // takes 1 item
             new Effect("Take an Item", "take_item", ItemKind.Folder),
@@ -383,14 +368,14 @@ namespace CrowdControl.Games.Packs
             new Effect("Golden Pickaxe", "take_golden_pickaxe", "take_item") {Price = 50},
             new Effect("Iron Pickaxe", "take_iron_pickaxe", "take_item") {Price = 300},
             new Effect("Diamond Pickaxe", "take_diamond_pickaxe", "take_item") {Price = 600},
-            new Effect("Netherite Pickaxe", "take_netherite_pickaxe", "take_item") {Price = 750},
+//            new Effect("Netherite Pickaxe", "take_netherite_pickaxe", "take_item") {Price = 750}, //API8
             new Effect("Golden Apple", "take_golden_apple", "take_item") {Price = 500},
-            new Effect("Enchanted Golden Apple", "take_enchanted_golden_apple", "take_item") {Price = 600},
+//            new Effect("Enchanted Golden Apple", "take_enchanted_golden_apple", "take_item") {Price = 600}, //API8
             new Effect("Eye of Ender", "take_ender_eye", "take_item") {Price = 300},
             new Effect("End Portal Frame", "take_end_portal_frame", "take_item") {Price = 600},
             new Effect("Iron Ingot", "take_iron_ingot", "take_item") {Price = 300},
             new Effect("Gold Ingot", "take_gold_ingot", "take_item") {Price = 300},
-            new Effect("Netherite Ingot", "take_netherite_ingot", "take_item") {Price = 300},
+//            new Effect("Netherite Ingot", "take_netherite_ingot", "take_item") {Price = 300}, //API8
             new Effect("Diamond", "take_diamond", "take_item") {Price = 300},
         };
     }

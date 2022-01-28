@@ -202,6 +202,7 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "hoglin"),
 			Key.key(MINECRAFT_NAMESPACE, "horse"),
 			Key.key(MINECRAFT_NAMESPACE, "husk"),
+			Key.key(MINECRAFT_NAMESPACE, "illusion_illager"),
 			Key.key(MINECRAFT_NAMESPACE, "illusioner"),
 			Key.key(MINECRAFT_NAMESPACE, "iron_golem"),
 			Key.key(MINECRAFT_NAMESPACE, "lightning"), // 1.12.2

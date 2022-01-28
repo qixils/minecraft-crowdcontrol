@@ -60,10 +60,12 @@ public class Sponge7TextUtil extends TextUtil {
 				return "primed_tnt";
 			case "zombie_pigman":
 				return "zombified_piglin";
-			case "illusioner_villager":
+			case "illusion_illager":
 				return "illusioner";
 			case "vindication_illager":
 				return "vindicator";
+			case "sweeping":
+				return "sweeping_edge";
 			default:
 				return value;
 		}

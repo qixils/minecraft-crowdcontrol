@@ -1,18 +1,24 @@
 using System;
 using System.Collections.Generic;
+using ConnectorLib;
 using CrowdControl.Common;
+using CrowdControl.Games.Packs;
+using ConnectorType = CrowdControl.Common.ConnectorType;
 
 namespace CrowdControl.Games.Packs
 {
-    public class MinecraftServer : SimpleTCPPack
+    public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
     {
-        public override string Host => "127.0.0.1";
+        // default port: 58731
+        public override ISimpleTCPPack.PromptType PromptType => ISimpleTCPPack.PromptType.Host | ISimpleTCPPack.PromptType.Password;
 
-        public override ushort Port => 58431;
+        public override ISimpleTCPPack.AuthenticationType AuthenticationMode => ISimpleTCPPack.AuthenticationType.SimpleTCPSendKey;
+
+        public override ISimpleTCPPack.DigestAlgorithm AuthenticationHashMode => ISimpleTCPPack.DigestAlgorithm.SHA_512;
 
         public MinecraftServer(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
 
-        public override Game Game => new Game(108, "Minecraft (Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPConnector);
+        public override Game Game => new Game(108, "Minecraft (Paper Server)", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
 
         public override List<Effect> Effects => new List<Effect>
         {
@@ -20,22 +26,23 @@ namespace CrowdControl.Games.Packs
             new Effect("Miscellaneous", "miscellaneous", ItemKind.Folder),
             new Effect("-1 Max Health", "max_health_sub1", "miscellaneous") {Price = 100, Description = "Subtracts half a heart from the streamer's max health"},
             new Effect("+1 Max Health", "max_health_plus1", "miscellaneous") {Price = 50, Description = "Adds half a heart to the streamer's max health"},
-            new Effect("Camera Lock (7s)", "camera_lock", "miscellaneous") {Price = 100, Description = "Temporarily freeze the streamer's camera"},
-            new Effect("Camera Lock To Ground (7s)", "camera_lock_to_ground", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the ground"},
-            new Effect("Camera Lock To Sky (7s)", "camera_lock_to_sky", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the sky"},
+            new Effect("Annoying Pop-Ups", "toast", "miscellaneous") {Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound"},
+            new Effect("Camera Lock (10s)", "camera_lock", "miscellaneous") {Price = 100, Description = "Temporarily freeze the streamer's camera"},
+            new Effect("Camera Lock To Ground (10s)", "camera_lock_to_ground", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the ground"},
+            new Effect("Camera Lock To Sky (10s)", "camera_lock_to_sky", "miscellaneous") {Price = 150, Description = "Temporarily locks the streamer's camera to the sky"},
             new Effect("Clutter Inventory", "clutter", "miscellaneous") {Price = 50, Description = "Shuffles around items in the streamer's inventory"},
             new Effect("Damage Held Item", "damage_item", "miscellaneous") {Price = 100, Description = "Halves the durability of the held item"},
             new Effect("Damage Player (1 Heart)", "damage_1", "miscellaneous") {Price = 25},
             new Effect("Delete Held Item", "delete_item", "miscellaneous") {Price = 200},
             new Effect("Dig Hole", "dig", "miscellaneous") {Price = 250, Description = "Digs a small hole underneath the streamer"},
-            new Effect("Dinnerbone", "dinnerbone", "miscellaneous") {Price = 25, Description = "Flips nearby mobs upside-down"},
             new Effect("Disable Jumping (10s)", "disable_jumping", "miscellaneous") {Price = 25, Description = "Temporarily prevents the streamer from jumping"},
             new Effect("Do-or-Die", "do_or_die", "miscellaneous") {Price = 500, Description = "Gives the streamer a task to complete within 30 seconds or else they die"},
             new Effect("Drop Held Item", "drop_item", "miscellaneous") {Price = 25, Description = "Makes the streamer drop their held item"},
             new Effect("Eat Chorus Fruit", "chorus_fruit", "miscellaneous") {Price = 75, Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit"},
             new Effect("Feed Player", "feed", "miscellaneous") {Price = 15, Description = "Replenishes the hunger bar"},
             new Effect("Feed Player (1 Bar)", "feed_1", "miscellaneous") {Price = 1, Description = "Replenishes a single bar of hunger"},
-            new Effect("Freeze (7s)", "freeze", "miscellaneous") {Price = 100, Description = "Temporarily prohibits movement"},
+            new Effect("Flip Mobs Upside-Down", "dinnerbone", "miscellaneous") {Price = 25, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone"},
+            new Effect("Freeze (10s)", "freeze", "miscellaneous") {Price = 100, Description = "Temporarily prohibits movement"},
             new Effect("Give One XP Level", "xp_plus1", "miscellaneous") {Price = 75, Description = "Adds one level of experience"},
             new Effect("Heal Player", "full_heal", "miscellaneous") {Price = 50},
             new Effect("Heal Player (1 Heart)", "heal_1", "miscellaneous") {Price = 10},
@@ -48,10 +55,9 @@ namespace CrowdControl.Games.Packs
             new Effect("Put Held Item on Head", "hat", "miscellaneous") {Price = 25}, // swaps the held item and the player's head item
             new Effect("Remove One Hunger Bar", "starve_1", "miscellaneous") {Price = 75},
             new Effect("Remove Torches", "dim", "miscellaneous") {Price = 200, Description = "Removes all nearby torches"},
-            new Effect("Render Toasts", "toast", "miscellaneous") {Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound"},
             new Effect("Repair Held Item", "repair_item", "miscellaneous") {Price = 100, Description = "Fully repairs a damaged item"},
             new Effect("Replace Area With Gravel", "gravel_hell", "miscellaneous") {Price = 300, Description = "Replaces nearby stone-like blocks with gravel"},
-            new Effect("Reset Experience Progress", "reset_exp_progress", "miscellaneous") {Price = 300, Description = "Clears the streamer's progress towards their next XP level"},
+            new Effect("Reset Experience", "reset_exp_progress", "miscellaneous") {Price = 1000, Description = "Clears all of the streamer's XP"},
             new Effect("Respawn Player", "respawn", "miscellaneous") {Price = 500, Description = "Sends the streamer to their spawn point"},
             new Effect("Spawn Ore Veins", "vein", "miscellaneous") {Price = 100, Description = "Places random ore veins (ore lava) near the streamer"},
             new Effect("Spooky Sound Effect", "sfx", "miscellaneous") {Price = 50, Description = "Plays a random spooky sound effect"},
@@ -119,9 +125,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Magma Cube", "entity_magma_cube", "summon_entity") {Price = 350},
             new Effect("Minecart", "entity_minecart", "summon_entity") {Price = 10},
             new Effect("Minecart with Chest", "entity_minecart_chest", "summon_entity") {Price = 100},
-            new Effect("Minecart with Furnace", "entity_minecart_furnace", "summon_entity") {Price = 10},
-            new Effect("Minecart with Hopper", "entity_minecart_hopper", "summon_entity") {Price = 50},
-            new Effect("Minecart with TNT", "entity_minecart_tnt", "summon_entity") {Price = 100},
             new Effect("Mooshroom", "entity_mushroom_cow", "summon_entity") {Price = 200},
             new Effect("Mule", "entity_mule", "summon_entity") {Price = 200},
             new Effect("Ocelot", "entity_ocelot", "summon_entity") {Price = 100},
@@ -203,9 +206,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Magma Cube", "remove_entity_magma_cube", "remove_entity") {Price = 300},
             new Effect("Minecart", "remove_entity_minecart", "remove_entity") {Price = 25},
             new Effect("Minecart with Chest", "remove_entity_minecart_chest", "remove_entity") {Price = 50},
-            new Effect("Minecart with Furnace", "remove_entity_minecart_furnace", "remove_entity") {Price = 1},
-            new Effect("Minecart with Hopper", "remove_entity_minecart_hopper", "remove_entity") {Price = 30},
-            new Effect("Minecart with TNT", "remove_entity_minecart_tnt", "remove_entity") {Price = 50},
             new Effect("Mooshroom", "remove_entity_mushroom_cow", "remove_entity") {Price = 200},
             new Effect("Mule", "remove_entity_mule", "remove_entity") {Price = 200},
             new Effect("Ocelot", "remove_entity_ocelot", "remove_entity") {Price = 50},
@@ -298,6 +298,7 @@ namespace CrowdControl.Games.Packs
             new Effect("TNT", "block_tnt", "place_block") {Price = 400, Description = "Places a TNT block on the streamer"},
             new Effect("Wither Rose", "block_wither_rose", "place_block") {Price = 100, Description = "Places a wither rose on the streamer"},
             new Effect("Lightning Rod", "block_lightning_rod", "place_block") {Price = 25, Description = "Places a lightning rod on the streamer"},
+            new Effect("Water", "block_water", "place_block") {Price = 50, Description = "Places a flowing water block on the streamer"},
             // places a block several blocks above everyone's head
             new Effect("Place Falling Block", "place_falling_block", ItemKind.Folder),
             new Effect("Anvil", "falling_block_anvil", "place_falling_block") {Price = 75, Description = "Drops an anvil block on the streamer"},
@@ -363,6 +364,10 @@ namespace CrowdControl.Games.Packs
             new Effect("Enchanted Golden Apple", "give_enchanted_golden_apple", "give_item") {Price = 300},
             new Effect("Eye of Ender", "give_ender_eye", "give_item") {Price = 100},
             new Effect("End Portal Frame", "give_end_portal_frame", "give_item") {Price = 300},
+            new Effect("Iron Ingot", "give_iron_ingot", "give_item") {Price = 300},
+            new Effect("Gold Ingot", "give_gold_ingot", "give_item") {Price = 300},
+            new Effect("Netherite Ingot", "give_netherite_ingot", "give_item") {Price = 300},
+            new Effect("Diamond", "give_diamond", "give_item") {Price = 300},
             // takes 1 item
             new Effect("Take an Item", "take_item", ItemKind.Folder),
             new Effect("Elytra", "take_elytra", "take_item") {Price = 1000},
@@ -376,6 +381,10 @@ namespace CrowdControl.Games.Packs
             new Effect("Enchanted Golden Apple", "take_enchanted_golden_apple", "take_item") {Price = 600},
             new Effect("Eye of Ender", "take_ender_eye", "take_item") {Price = 300},
             new Effect("End Portal Frame", "take_end_portal_frame", "take_item") {Price = 600},
+            new Effect("Iron Ingot", "take_iron_ingot", "take_item") {Price = 300},
+            new Effect("Gold Ingot", "take_gold_ingot", "take_item") {Price = 300},
+            new Effect("Netherite Ingot", "take_netherite_ingot", "take_item") {Price = 300},
+            new Effect("Diamond", "take_diamond", "take_item") {Price = 300},
         };
     }
 }
