@@ -195,8 +195,6 @@ public class CommandRegister {
 		for (Command command : getCommands()) {
 			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
 			plugin.registerCommand(name, command);
-			plugin.getLogger().info("Registering " + command.getDisplayName()
-					+ " (" + command.getEffectName() + ")");
 
 			if (firstRegistry && command.isEventListener())
 				plugin.getGame().getEventManager().registerListeners(plugin, command);
