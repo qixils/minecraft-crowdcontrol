@@ -30,18 +30,6 @@ public class GiveItemCommand extends ImmediateCommand {
 		this.displayName = "Give " + plugin.getTextUtil().translate(item);
 	}
 
-	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		ItemStack itemStack = new ItemStack(item);
-		for (Player player : players) {
-			sync(() -> giveItemTo(player, itemStack));
-			// workaround to limit the circulation of end portal frames in the economy
-			if (item == Material.END_PORTAL_FRAME)
-				break;
-		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
-	}
-
 	@Blocking
 	public static void giveItemTo(Entity player, ItemStack itemStack) {
 		Location location = player.getLocation();
@@ -52,5 +40,19 @@ public class GiveItemCommand extends ImmediateCommand {
 		item.setCanMobPickup(false);
 		item.setCanPlayerPickup(true);
 		item.setPickupDelay(0);
+	}
+
+	@Override
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		ItemStack itemStack = new ItemStack(item);
+		sync(() -> {
+			for (Player player : players) {
+				giveItemTo(player, itemStack);
+				// workaround to limit the circulation of end portal frames in the economy
+				if (item == Material.END_PORTAL_FRAME)
+					break;
+			}
+		});
+		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

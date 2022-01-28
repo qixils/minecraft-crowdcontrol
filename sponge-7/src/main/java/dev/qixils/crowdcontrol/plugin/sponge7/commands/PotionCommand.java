@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -32,7 +33,7 @@ public class PotionCommand extends ImmediateCommand {
 		this.potionEffectType = potionEffectType;
 		boolean isMinimal = potionEffectType.isInstant();
 		duration = isMinimal ? 1 : TICKS;
-		this.effectName = "potion_" + potionEffectType.getTranslation().get();
+		this.effectName = "potion_" + Sponge7TextUtil.csIdOf(potionEffectType);
 		this.displayName = "Apply " + TextUtil.titleCase(potionEffectType.getTranslation().get()) + " Potion Effect (" + SECONDS + "s)";
 	}
 

@@ -305,6 +305,7 @@ namespace CrowdControl.Games.Packs
             new Effect("TNT", "block_tnt", "place_block") {Price = 400, Description = "Places a TNT block on the streamer"},
             new Effect("Wither Rose", "block_wither_rose", "place_block") {Price = 100, Description = "Places a wither rose on the streamer"},
             new Effect("Lightning Rod", "block_lightning_rod", "place_block") {Price = 25, Description = "Places a lightning rod on the streamer"},
+            new Effect("Water", "block_water", "place_block") {Price = 50, Description = "Places a flowing water block on the streamer"},
             // places a block several blocks above everyone's head
             new Effect("Place Falling Block", "place_falling_block", ItemKind.Folder),
             new Effect("Anvil", "falling_block_anvil", "place_falling_block") {Price = 75, Description = "Drops an anvil block on the streamer"},

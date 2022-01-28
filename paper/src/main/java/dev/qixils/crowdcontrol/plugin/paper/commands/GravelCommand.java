@@ -32,7 +32,7 @@ public class GravelCommand extends ImmediateCommand {
 			locations.addAll(BlockUtil.BlockFinder.builder()
 					.origin(player.getLocation())
 					.locationValidator(loc ->
-							CommonTags.STONES_EXCEPT_GRAVEL.contains(loc.getBlock().getType().getKey()))
+							CommonTags.STONES_EXCEPT_GRAVEL.contains(loc.getBlock().getType().getKey().asString()))
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());

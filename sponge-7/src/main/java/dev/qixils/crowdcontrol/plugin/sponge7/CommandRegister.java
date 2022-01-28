@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.TypedTag;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.effect.potion.PotionEffectType;
@@ -21,9 +22,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 public class CommandRegister {
@@ -34,6 +37,8 @@ public class CommandRegister {
 	private MappedKeyedTag<BlockType> setFallingBlocks;
 	private MappedKeyedTag<ItemType> giveTakeItems;
 	private List<Command> registeredCommands;
+	private final Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
+	private final Map<Class<? extends Command>, Command> singleCommandInstances = new HashMap<>();
 
 	public CommandRegister(SpongeCrowdControlPlugin plugin) {
 		this.plugin = plugin;
@@ -173,6 +178,15 @@ public class CommandRegister {
 		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
 		plugin.getGame().getEventManager().registerListeners(plugin, new GameModeCommand.Manager());
 
+		for (Command command : commands) {
+			Class<? extends Command> clazz = command.getClass();
+			if (registeredCommandClasses.contains(clazz))
+				singleCommandInstances.remove(clazz);
+			else
+				singleCommandInstances.put(clazz, command);
+			registeredCommandClasses.add(clazz);
+		}
+
 		return registeredCommands = commands;
 	}
 
@@ -185,6 +199,25 @@ public class CommandRegister {
 			if (firstRegistry && command.isEventListener())
 				plugin.getGame().getEventManager().registerListeners(plugin, command);
 		}
+	}
+
+	/**
+	 * Gets an instance of a registered command.
+	 * Only commands that register a sole instance can be returned by this method.
+	 *
+	 * @param tClass class of the desired command
+	 * @param <T>    type of the desired command
+	 * @return the command instance
+	 * @throws IllegalArgumentException the request command has not been registered or has been
+	 *                                  registered several times
+	 */
+	@NotNull
+	public <T> T getCommand(@NotNull Class<T> tClass) throws IllegalArgumentException {
+		if (!singleCommandInstances.containsKey(tClass))
+			throw new IllegalArgumentException("Requested class " + tClass.getName()
+					+ " is invalid. Please ensure that only one instance of this command is registered.");
+		//noinspection unchecked
+		return (T) singleCommandInstances.get(tClass);
 	}
 
 	public void writeCommands(List<Command> commands) {

@@ -8,10 +8,12 @@ import org.spongepowered.api.item.ItemType;
 
 @Getter
 public class ObtainItemCondition implements SuccessCondition {
+	private final int rewardLuck;
 	private final ItemType item;
 	private final Component component;
 
-	public ObtainItemCondition(String displayText, ItemType item) {
+	public ObtainItemCondition(int rewardLuck, String displayText, ItemType item) {
+		this.rewardLuck = rewardLuck;
 		this.item = item;
 		component = Component.text("Obtain ").append(Component.text(displayText)
 				.replaceText(builder -> builder.matchLiteral("%s").once()

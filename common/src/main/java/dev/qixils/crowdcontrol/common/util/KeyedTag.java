@@ -138,6 +138,24 @@ public final class KeyedTag implements Iterable<Key> {
 	}
 
 	/**
+	 * Returns {@code true} if the provided key is contained in this tag.
+	 * Usage of this method overload is only recommended for platforms that have their own Key class
+	 * which may not produce expected results for {@link Key#equals(Object)}. It may not be as
+	 * performant as other overloads.
+	 *
+	 * @param item key whose presence in this tag is to be tested
+	 * @return {@code true} if this tag contains the provided key
+	 */
+	@Contract("null -> false; !null -> _")
+	public boolean contains(@Nullable String item) {
+		for (Key key : keyedSet) {
+			if (key.asString().equals(item))
+				return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Creates a new {@link KeyedTag} containing both the contents of this tag and the provided
 	 * keys.
 	 *

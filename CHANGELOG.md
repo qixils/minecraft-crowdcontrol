@@ -8,6 +8,8 @@ A list of all changes made to the software in reverse chronological order.
   while your chat spawns dragons and creepers on you!
 - Enchantment commands now apply enchantments higher than the maximum level if the held item already
   has the maximum enchantment level.
+- Enchantment commands now apply to items in the off-hand and in armor slots.
+- Certain enchantments could not be applied to certain items; this has been fixed.
 - Potion effect commands now increase the level of existing effects and set the duration to at least
   15 seconds.
 - Fixed the Take Item commands erroneously returning `SUCCESS` responses when it changed nothing.
@@ -26,6 +28,7 @@ A list of all changes made to the software in reverse chronological order.
 - Do-or-Die now grants the streamer a reward for completing their task which generates a random item
   similarly to the Open Lootbox command but which a much higher likelihood of receiving a "good"
   item depending on the difficulty of the completed task.
+- The Chorus Fruit command no longer teleports players into blocks.
 
 ## 3.1.3
 

@@ -47,7 +47,7 @@ public class MaxHealthCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.FAILURE)
-				.message("All players are at minimum health (" + MIN_MAX_HEALTH / 2 + " hearts)");
+				.message("All players are at minimum health (" + (MIN_MAX_HEALTH / 2) + " hearts)");
 		for (Player player : players) {
 			AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 			if (maxHealth == null) {
@@ -67,6 +67,8 @@ public class MaxHealthCommand extends ImmediateCommand {
 			if (current != newVal)
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			maxHealth.addModifier(new AttributeModifier(MODIFIER_UUID, MODIFIER_NAME, newVal, AttributeModifier.Operation.ADD_NUMBER));
+			if (amount > 0)
+				player.setHealth(player.getHealth() + amount);
 		}
 		return result;
 	}

@@ -68,7 +68,7 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Material> items = new ArrayList<>(ITEMS);
 		Collections.shuffle(items, random);
 		Material item = null;
-		for (int i = 0; i <= luck * 3; i++) {
+		for (int i = 0; i <= luck * 4; i++) {
 			Material oldItem = item;
 			item = items.get(i);
 			if (isGoodItem(item) && !isGoodItem(oldItem))

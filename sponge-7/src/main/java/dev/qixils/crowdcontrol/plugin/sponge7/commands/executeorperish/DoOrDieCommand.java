@@ -4,6 +4,8 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.VoidCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.commands.GiveItemCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -12,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.ArrayList;
@@ -79,9 +82,11 @@ public class DoOrDieCommand extends VoidCommand {
 									if (player == null) continue;
 
 									if (finalCondition.hasSucceeded(player)) {
-										plugin.asAudience(player).showTitle(DO_OR_DIE_SUCCESS);
+										ItemStack item = plugin.getRegister().getCommand(LootboxCommand.class).createRandomItem(finalCondition.getRewardLuck());
+										plugin.asAudience(player).showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
 										notCompleted.remove(uuid);
 										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get());
+										GiveItemCommand.giveItemTo(plugin, player, item);
 									} else if (isTimeUp) {
 										plugin.asAudience(player).showTitle(DO_OR_DIE_FAILURE);
 										player.offer(Keys.HEALTH, 0d);

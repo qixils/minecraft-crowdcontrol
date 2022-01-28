@@ -13,11 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 public enum Condition {
-	STAND_ON_DIRT(new StandOnBlockCondition("a %s block", BlockTypes.DIRT)),
-	STAND_ON_STONE(new StandOnBlockCondition("a %s block", BlockTypes.STONE)),
-	STAND_ON_COBBLESTONE(new StandOnBlockCondition("a %s block", BlockTypes.COBBLESTONE)),
-	STAND_ON_SAND(new StandOnBlockCondition("a %s block", BlockTypes.SAND)),
-	STAND_ON_A_BED(new StandOnBlockCondition(new TextBuilder("a &abed").build(),
+	STAND_ON_DIRT(new StandOnBlockCondition(0, "a %s block", BlockTypes.DIRT)),
+	STAND_ON_STONE(new StandOnBlockCondition(0, "a %s block", BlockTypes.STONE)),
+	STAND_ON_COBBLESTONE(new StandOnBlockCondition(0, "a %s block", BlockTypes.COBBLESTONE)),
+	STAND_ON_SAND(new StandOnBlockCondition(1, "a %s block", BlockTypes.SAND)),
+	STAND_ON_A_BED(new StandOnBlockCondition(2, new TextBuilder("a &abed").build(),
 			BlockTypes.BED
 //			BlockTypes.WHITE_BED,
 //			BlockTypes.ORANGE_BED,
@@ -36,7 +36,7 @@ public enum Condition {
 //			BlockTypes.RED_BED,
 //			BlockTypes.BLACK_BED
 	)),
-	STAND_ON_A_PLANK(new StandOnBlockCondition(new TextBuilder("a &awooden plank").build(),
+	STAND_ON_A_PLANK(new StandOnBlockCondition(0, new TextBuilder("a &awooden plank").build(),
 			BlockTypes.PLANKS
 //			BlockTypes.OAK_PLANKS,
 //			BlockTypes.BIRCH_PLANKS,
@@ -47,7 +47,7 @@ public enum Condition {
 //			BlockTypes.DARK_OAK_PLANKS,
 //			BlockTypes.SPRUCE_PLANKS
 	)),
-	//	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(new TextBuilder("a &astripped log").build(),
+	//	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(2, new TextBuilder("a &astripped log").build(),
 //			BlockTypes.STRIPPED_OAK_LOG,
 //			BlockTypes.STRIPPED_BIRCH_LOG,
 //			BlockTypes.STRIPPED_ACACIA_LOG,
@@ -65,9 +65,9 @@ public enum Condition {
 //			BlockTypes.STRIPPED_CRIMSON_HYPHAE,
 //			BlockTypes.STRIPPED_WARPED_HYPHAE
 //	)),
-	OBTAIN_STONE_HOE(new ObtainItemCondition("a %s", ItemTypes.STONE_HOE)),
-	OBTAIN_WOODEN_HOE(new ObtainItemCondition("a %s", ItemTypes.WOODEN_HOE)),
-	OBTAIN_STONE(new ObtainItemCondition("a %s block", ItemTypes.STONE)),
+	OBTAIN_STONE_HOE(new ObtainItemCondition(1, "a %s", ItemTypes.STONE_HOE)),
+	OBTAIN_WOODEN_HOE(new ObtainItemCondition(0, "a %s", ItemTypes.WOODEN_HOE)),
+	OBTAIN_STONE(new ObtainItemCondition(3, "a %s block", ItemTypes.STONE)),
 	;
 
 	private static final List<SuccessCondition> CONDITIONS;

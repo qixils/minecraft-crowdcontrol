@@ -14,10 +14,12 @@ import java.util.Set;
 
 @Getter
 public class StandOnBlockCondition implements SuccessCondition {
+	private final int rewardLuck;
 	private final Set<BlockType> blocks;
 	private final Component component;
 
-	public StandOnBlockCondition(String displayText, BlockType displayItem, BlockType... otherItems) {
+	public StandOnBlockCondition(int rewardLuck, String displayText, BlockType displayItem, BlockType... otherItems) {
+		this.rewardLuck = rewardLuck;
 		this.blocks = new HashSet<>(otherItems.length + 1);
 		this.blocks.add(displayItem);
 		this.blocks.addAll(Arrays.asList(otherItems));
@@ -29,7 +31,8 @@ public class StandOnBlockCondition implements SuccessCondition {
 		);
 	}
 
-	public StandOnBlockCondition(Component display, BlockType... blocks) {
+	public StandOnBlockCondition(int rewardLuck, Component display, BlockType... blocks) {
+		this.rewardLuck = rewardLuck;
 		this.blocks = new HashSet<>(Arrays.asList(blocks));
 		this.component = Component.text("Stand on ").append(display);
 	}

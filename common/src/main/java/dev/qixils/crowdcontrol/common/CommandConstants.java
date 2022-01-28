@@ -13,7 +13,6 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.translation.Translatable;
-import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -60,7 +59,7 @@ public class CommandConstants {
 	/**
 	 * The amount of time in the day to skip from the Zip Time command.
 	 */
-	public static final long ZIP_TIME_TICKS = 10000; // roughly a day
+	public static final long ZIP_TIME_TICKS = 8000;
 	/**
 	 * The amount of time to disable jumping for.
 	 */
@@ -135,7 +134,8 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "redstone_torch"),
 			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
 			Key.key(MINECRAFT_NAMESPACE, "lightning_rod"),
-			Key.key(MINECRAFT_NAMESPACE, "bedrock")
+			Key.key(MINECRAFT_NAMESPACE, "bedrock"),
+			Key.key(MINECRAFT_NAMESPACE, "water")
 	);
 
 	/**
@@ -204,7 +204,8 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "husk"),
 			Key.key(MINECRAFT_NAMESPACE, "illusioner"),
 			Key.key(MINECRAFT_NAMESPACE, "iron_golem"),
-			Key.key(MINECRAFT_NAMESPACE, "lightning"),
+			Key.key(MINECRAFT_NAMESPACE, "lightning"), // 1.12.2
+			Key.key(MINECRAFT_NAMESPACE, "lightning_bolt"), // 1.13+
 			Key.key(MINECRAFT_NAMESPACE, "llama"),
 			Key.key(MINECRAFT_NAMESPACE, "magma_cube"),
 			Key.key(MINECRAFT_NAMESPACE, "minecart"),
@@ -223,7 +224,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "piglin_brute"),
 			Key.key(MINECRAFT_NAMESPACE, "pillager"),
 			Key.key(MINECRAFT_NAMESPACE, "polar_bear"),
-			Key.key(MINECRAFT_NAMESPACE, "primed_tnt"),
 			Key.key(MINECRAFT_NAMESPACE, "pufferfish"),
 			Key.key(MINECRAFT_NAMESPACE, "rabbit"),
 			Key.key(MINECRAFT_NAMESPACE, "ravager"),
@@ -239,6 +239,7 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "squid"),
 			Key.key(MINECRAFT_NAMESPACE, "stray"),
 			Key.key(MINECRAFT_NAMESPACE, "strider"),
+			Key.key(MINECRAFT_NAMESPACE, "tnt"),
 			Key.key(MINECRAFT_NAMESPACE, "trader_llama"),
 			Key.key(MINECRAFT_NAMESPACE, "tropical_fish"),
 			Key.key(MINECRAFT_NAMESPACE, "turtle"),
@@ -318,16 +319,6 @@ public class CommandConstants {
 	 * Color used for the subtitle of the Do-or-Die success message.
 	 */
 	private static final TextColor SUCCESS_SUBTITLE_COLOR = TextColor.color(0x99ff99);
-	/**
-	 * Message to show to users when they complete a Do-or-Die task.
-	 */
-	@Deprecated
-	@ScheduledForRemoval
-	public static final Title DO_OR_DIE_SUCCESS = Title.title(
-			Component.text("Task Completed!").color(NamedTextColor.GREEN),
-			Component.empty(),
-			DO_OR_DIE_TIMES
-	);
 	/**
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */

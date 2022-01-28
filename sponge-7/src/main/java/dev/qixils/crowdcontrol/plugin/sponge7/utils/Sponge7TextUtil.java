@@ -26,6 +26,8 @@ public class Sponge7TextUtil extends TextUtil {
 			return "Minecart with TNT";
 		if (translatable.equals(EntityTypes.HOPPER_MINECART))
 			return "Minecart with Hopper";
+		if (translatable.equals(EntityTypes.LIGHTNING))
+			return "Lightning";
 		return translatable.getTranslation().get();
 	}
 

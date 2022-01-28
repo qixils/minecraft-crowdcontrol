@@ -23,9 +23,12 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players have XP");
 		for (Player player : players) {
-			if (player.getTotalExperience() > 0) {
+			if (player.getLevel() > 0) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.setTotalExperience(0));
+				sync(() -> {
+					player.setExp(0);
+					player.setLevel(0);
+				});
 			}
 		}
 		return result;
