@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -7,6 +8,8 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -48,9 +51,14 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	private void alert(List<Player> players) {
-		Audience audience = players.stream().map(plugin::asAudience).collect(Audience.toAudience());
-		audience.sendActionBar(enable ? KEEP_INVENTORY_MESSAGE : LOSE_INVENTORY_MESSAGE);
-		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get());
+		Component actionBar = enable ? KEEP_INVENTORY_MESSAGE : LOSE_INVENTORY_MESSAGE;
+		Sound sound = (enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get();
+		for (Player player : players) {
+			Audience audience = plugin.asAudience(player);
+			audience.sendActionBar(actionBar);
+			Vector3d pos = player.getPosition();
+			audience.playSound(sound, pos.getX(), pos.getY(), pos.getZ());
+		}
 	}
 
 	@NotNull

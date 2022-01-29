@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands.executeorperish;
 
+import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -85,7 +86,8 @@ public class DoOrDieCommand extends VoidCommand {
 										ItemStack item = plugin.getRegister().getCommand(LootboxCommand.class).createRandomItem(finalCondition.getRewardLuck());
 										plugin.asAudience(player).showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
 										notCompleted.remove(uuid);
-										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get());
+										Vector3d pos = player.getPosition();
+										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
 										GiveItemCommand.giveItemTo(plugin, player, item);
 									} else if (isTimeUp) {
 										plugin.asAudience(player).showTitle(DO_OR_DIE_FAILURE);
@@ -93,8 +95,10 @@ public class DoOrDieCommand extends VoidCommand {
 									} else {
 										Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
 										plugin.asAudience(player).showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
-										if (isNewValue)
-											plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_TICK.get());
+										if (isNewValue) {
+											Vector3d pos = player.getPosition();
+											plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_TICK.get(), pos.getX(), pos.getY(), pos.getZ());
+										}
 									}
 								}
 

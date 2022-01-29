@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -59,7 +60,8 @@ public class ToastCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		sync(() -> {
 			for (Player player : players) {
-				plugin.asAudience(player).playSound(Sounds.ANNOYING.get());
+				Vector3d pos = player.getPosition();
+				plugin.asAudience(player).playSound(Sounds.ANNOYING.get(), pos.getX(), pos.getY(), pos.getZ());
 				// API8: recipes
 
 				// actual pop-up

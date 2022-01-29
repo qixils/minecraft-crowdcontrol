@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
@@ -171,7 +172,8 @@ public class LootboxCommand extends ImmediateCommand {
 				}
 			}
 			// sound & open
-			plugin.asAudience(player).playSound(Sounds.LOOTBOX_CHIME.get());
+			Vector3d pos = player.getPosition();
+			plugin.asAudience(player).playSound(Sounds.LOOTBOX_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
 			sync(() -> player.openInventory(lootbox));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
