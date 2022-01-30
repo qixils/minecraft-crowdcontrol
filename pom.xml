@@ -5,21 +5,30 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.qixils.crowdcontrol.plugin</groupId>
-    <artifactId>Minecraft-CrowdControl</artifactId>
-    <version>3.1.3</version>
-    <packaging>jar</packaging>
+    <artifactId>minecraft-crowd-control</artifactId>
+    <version>3.2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>CrowdControl-Plugin</name>
+    <modules>
+        <module>common</module>
+        <module>paper</module>
+        <module>sponge-7</module>
+    </modules>
 
-    <description>Allows viewers to interact with your Minecraft world</description>
+    <name>Minecraft Crowd Control: Parent</name>
+    <description>Allows viewers to interact with your Minecraft server</description>
+    <url>https://github.com/qixils/minecraft-crowdcontrol</url>
+
     <properties>
-        <java.version>16</java.version>
+        <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.compiler.release>${java.version}</maven.compiler.release>
+<!--        <maven.compiler.release>${java.version}</maven.compiler.release>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adventure.version>4.9.3</adventure.version>
+        <cloud.version>1.6.1</cloud.version>
+        <crowdcontrol.version>3.3.3</crowdcontrol.version>
     </properties>
-    <url>https://github.com/qixils/minecraft-crowdcontrol</url>
 
     <pluginRepositories>
         <pluginRepository>
@@ -28,65 +37,14 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>me.lucko.commodore</pattern>
-                                    <shadedPattern>dev.qixils.crowdcontrol.plugin.commodore</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <!-- allow plugin.yml to use variables from this file -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>plugin.yml</include>
-                    <include>config.yml</include>
-                </includes>
-            </resource>
-        </resources>
-    </build>
-
     <repositories>
-        <repository>
-            <id>papermc-repo</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
-        </repository>
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>minecraft-repo</id>
-            <url>https://libraries.minecraft.net/</url>
-        </repository>
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.17.1-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -101,13 +59,45 @@
         <dependency>
             <groupId>dev.qixils.crowdcontrol</groupId>
             <artifactId>crowd-control-receiver</artifactId>
-            <version>3.3.1</version>
+            <version>${crowdcontrol.version}</version>
         </dependency>
         <dependency>
-            <groupId>me.lucko</groupId>
-            <artifactId>commodore</artifactId>
-            <version>1.11</version>
-            <scope>compile</scope>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>${adventure.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-serializer-plain</artifactId>
+            <version>${adventure.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-serializer-legacy</artifactId>
+            <version>${adventure.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-core</artifactId>
+            <version>${cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>${cloud.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.3.0-SNAPSHOT</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
 </project>
