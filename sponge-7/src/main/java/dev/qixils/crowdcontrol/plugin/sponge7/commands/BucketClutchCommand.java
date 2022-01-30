@@ -14,6 +14,7 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.slot.EquipmentSlot;
+import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -36,6 +37,8 @@ public class BucketClutchCommand extends ImmediateCommand {
 				.type(Response.ResultType.RETRY)
 				.message("No players are on the surface");
 		for (Player player : players) {
+			if (!player.getWorld().getDimension().getType().equals(DimensionTypes.OVERWORLD))
+				continue;
 			Location<World> curr = player.getLocation();
 			boolean obstruction = false;
 			for (int y = 1; y <= OFFSET; y++) {

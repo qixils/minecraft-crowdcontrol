@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,7 +36,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
@@ -91,24 +94,25 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public void initCrowdControl() {
 		reloadConfig();
 		config = getConfig();
-		String password = Objects.requireNonNullElseGet(manualPassword, () -> config.getString("password", ""));
-		String ip = config.getString("ip", "127.0.0.1");
+		int port = config.getInt("port", DEFAULT_PORT);
 
 		if (!config.getBoolean("legacy", false)) {
 			isServer = true;
+			String password = Objects.requireNonNullElseGet(manualPassword, () -> config.getString("password", ""));
 			if (!password.isBlank()) {
 				getLogger().info("Running Crowd Control in server mode");
-				crowdControl = CrowdControl.server().port(PORT).password(password).build();
+				crowdControl = CrowdControl.server().port(port).password(password).build();
 			} else {
 				getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
 				return;
 			}
 		} else {
 			isServer = false;
+			String ip = config.getString("ip", "127.0.0.1");
 			if (ip.isBlank())
-				throw new IllegalStateException("IP address is blank. Please fix this in the config.yml file");
+				throw new IllegalStateException("IP address is blank. Please fix this in the plugins/CrowdControl/config.yml file.");
 			getLogger().info("Running Crowd Control in client mode");
-			crowdControl = CrowdControl.client().port(PORT).ip(ip).build();
+			crowdControl = CrowdControl.client().port(port).ip(ip).build();
 		}
 
 		if (commands == null)
@@ -204,6 +208,13 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public boolean isAdmin(@NotNull CommandSender commandSource) {
 		return commandSource.hasPermission(ADMIN_PERMISSION) || commandSource.isOp();
+	}
+
+	@Override
+	public @NotNull Optional<UUID> getUUID(@NotNull CommandSender entity) {
+		if (entity instanceof Entity trueEntity)
+			return Optional.of(trueEntity.getUniqueId());
+		return Plugin.super.getUUID(entity);
 	}
 
 	@EventHandler

@@ -59,7 +59,7 @@ public interface Plugin<P extends S, S> {
 	/**
 	 * Port that the {@link CrowdControl} service connects to or listen on.
 	 */
-	int PORT = 58431;
+	int DEFAULT_PORT = 58431;
 
 	/**
 	 * The first message to send to a player when they join the server.

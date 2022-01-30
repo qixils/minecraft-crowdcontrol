@@ -290,27 +290,28 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			hosts = Collections.unmodifiableSet(loweredHosts);
 		}
 		isServer = !config.getNode("legacy").getBoolean(false);
+		int port = config.getNode("port").getInt(DEFAULT_PORT);
 		if (isServer) {
 			getLogger().info("Running Crowd Control in server mode");
 			String password;
 			if (manualPassword != null)
 				password = manualPassword;
 			else {
-				password = config.getNode("password").getString();
+				password = config.getNode("password").getString("crowdcontrol");
 				if (password == null || password.isEmpty()) {
 					logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowd-control.conf or set a temporary password using the /password command.");
 					return;
 				}
 			}
-			crowdControl = CrowdControl.server().port(PORT).password(password).build();
+			crowdControl = CrowdControl.server().port(port).password(password).build();
 		} else {
 			getLogger().info("Running Crowd Control in legacy client mode");
-			String ip = config.getNode("ip").getString();
+			String ip = config.getNode("ip").getString("127.0.0.1");
 			if (ip == null || ip.isEmpty()) {
 				logger.error("No IP address has been set in the plugin's config file. Please set one by editing config/crowd-control.conf");
 				return;
 			}
-			crowdControl = CrowdControl.client().port(PORT).ip(ip).build();
+			crowdControl = CrowdControl.client().port(port).ip(ip).build();
 		}
 
 		register.register();
