@@ -2,9 +2,12 @@ package dev.qixils.crowdcontrol.plugin.sponge8;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.sponge.SpongeCommandManager;
+import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
@@ -75,6 +78,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -257,7 +261,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void initCrowdControl() {
-		CommandConstants.SOUND_VALIDATOR = key -> game.registry(SoundType.class).findEntry(ResourceKey.resolve(key.asString())).isPresent();
+		CommandConstants.SOUND_VALIDATOR = key -> game.registry(RegistryTypes.SOUND_TYPE).findEntry(ResourceKey.resolve(key.asString())).isPresent();
 
 		ConfigurationNode config;
 		try {
@@ -267,21 +271,24 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 		}
 
 		try {
-			hosts = Collections.unmodifiableCollection(config.getNode("hosts").getList(TypeToken.of(String.class)));
-		} catch (ObjectMappingException e) {
+			hosts = Collections.unmodifiableCollection(ExceptionUtil.validateNotNullElseGet(
+					config.node("hosts").getList(String.class),
+					Collections::emptyList
+			));
+		} catch (SerializationException e) {
 			throw new RuntimeException("Could not parse 'hosts' config variable", e);
 		}
 
-		global = config.getNode("global").getBoolean(false);
-		announce = config.getNode("announce").getBoolean(true);
+		global = config.node("global").getBoolean(false);
+		announce = config.node("announce").getBoolean(true);
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
 				loweredHosts.add(host.toLowerCase(Locale.ROOT));
 			hosts = Collections.unmodifiableSet(loweredHosts);
 		}
-		isServer = !config.getNode("legacy").getBoolean(false);
-		int port = config.getNode("port").getInt(DEFAULT_PORT);
+		isServer = !config.node("legacy").getBoolean(false);
+		int port = config.node("port").getInt(DEFAULT_PORT);
 		if (isServer) {
 			getLogger().info("Running Crowd Control in server mode");
 			String password;
@@ -297,7 +304,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 			crowdControl = CrowdControl.server().port(port).password(password).build();
 		} else {
 			getLogger().info("Running Crowd Control in legacy client mode");
-			String ip = config.getNode("ip").getString("127.0.0.1");
+			String ip = config.node("ip").getString("127.0.0.1");
 			if (ip == null || ip.isEmpty()) {
 				logger.error("No IP address has been set in the plugin's config file. Please set one by editing config/crowd-control.conf");
 				return;
