@@ -1,33 +1,34 @@
-package dev.qixils.crowdcontrol.plugin.sponge7;
+package dev.qixils.crowdcontrol.plugin.sponge8;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.sponge7.SpongeCommandManager;
-import com.flowpowered.math.vector.Vector3d;
+import cloud.commandframework.sponge.SpongeCommandManager;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableGameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableOriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.GameModeEffectData;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.GameModeEffectDataBuilder;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ImmutableGameModeEffectData;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ImmutableOriginalDisplayNameData;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ImmutableViewerSpawnedData;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.OriginalDisplayNameData;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.OriginalDisplayNameDataBuilder;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ViewerSpawnedData;
+import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ViewerSpawnedDataBuilder;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.Sponge7TextUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
-import net.kyori.adventure.text.serializer.spongeapi.SpongeComponentSerializer;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -80,25 +81,18 @@ import java.util.function.Function;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
-@Plugin(
-		id = "crowd-control",
-		name = "Crowd Control",
-		version = "3.3.0-SNAPSHOT",
-		description = "Allows viewers to interact with your Minecraft world",
-		url = "https://github.com/qixils/minecraft-crowdcontrol",
-		authors = {"qixils"}
-)
+// TODO plugin file
 @Getter
-public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSource> {
+public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subject> { // TODO idk abt these interfaces
 	// keys (though they don't really work)
-	public static Key<Value<Text>> ORIGINAL_DISPLAY_NAME = DummyObjectProvider.createExtendedFor(Key.class, "ORIGINAL_DISPLAY_NAME");
+	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME = DummyObjectProvider.createExtendedFor(Key.class, "ORIGINAL_DISPLAY_NAME");
 	public static Key<Value<Boolean>> VIEWER_SPAWNED = DummyObjectProvider.createExtendedFor(Key.class, "VIEWER_SPAWNED");
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
 	// "real" variables
 	private final CommandRegister register = new CommandRegister(this);
 	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
 	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
-	private SpongeCommandManager<CommandSource> commandManager;
+	private SpongeCommandManager<Subject> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
 	private SpongeComponentSerializer spongeSerializer;
@@ -124,21 +118,19 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	private Path configPath;
 	@Inject
 	private SpongeAudiences audiences;
-	@Inject
-	private GameRegistry registry;
 	// registries
 	private DataRegistration<OriginalDisplayNameData, ImmutableOriginalDisplayNameData> ORIGINAL_DISPLAY_NAME_DATA_REGISTRATION;
 	private DataRegistration<ViewerSpawnedData, ImmutableViewerSpawnedData> VIEWER_SPAWNED_DATA_REGISTRATION;
 	private DataRegistration<GameModeEffectData, ImmutableGameModeEffectData> GAME_MODE_EFFECT_DATA_REGISTRATION;
 
 	public SpongeCrowdControlPlugin() {
-		super(Player.class, CommandSource.class);
+		super(ServerPlayer.class, Subject.class);
 	}
 
 	public static void spawnPlayerParticles(Entity entity, ParticleEffect particle) {
-		World world = entity.getWorld();
-		Location<World> location = entity.getLocation();
-		Vector3d position = new Vector3d(location.getX(), Math.ceil(location.getY()), location.getZ());
+		World<?, ?> world = entity.world();
+		Location<?, ?> location = entity.location();
+		Vector3d position = new Vector3d(location.x(), Math.ceil(location.y()), location.z());
 		world.spawnParticles(particle, position, 75);
 	}
 
@@ -165,28 +157,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		return isMatter(block, Matter.LIQUID);
 	}
 
-	public @NotNull SpongeAudiences adventure() {
-		//noinspection ConstantConditions
-		if (audiences == null)
-			throw new IllegalStateException("Tried to access adventure before plugin loaded");
-		return audiences;
-	}
-
 	@Override
-	@NotNull
-	public Audience asAudience(@NotNull CommandSource source) {
-		if (source instanceof Player)
-			return adventure().player((Player) source);
-		return adventure().receiver(source);
-	}
-
-	@NotNull
-	public Audience asAudience(@NotNull World world) {
-		return adventure().world(net.kyori.adventure.key.Key.key(MINECRAFT_NAMESPACE, world.getName()));
-	}
-
-	@Override
-	public boolean isAdmin(@NotNull CommandSource commandSource) {
+	public boolean isAdmin(@NotNull Subject commandSource) {
 		return commandSource.hasPermission(ADMIN_PERMISSION);
 	}
 
@@ -285,7 +257,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void initCrowdControl() {
-		CommandConstants.SOUND_VALIDATOR = key -> registry.getType(SoundType.class, key.asString()).isPresent();
+		CommandConstants.SOUND_VALIDATOR = key -> game.registry(SoundType.class).findEntry(ResourceKey.resolve(key.asString())).isPresent();
 
 		ConfigurationNode config;
 		try {

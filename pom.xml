@@ -6,13 +6,14 @@
 
     <groupId>dev.qixils.crowdcontrol.plugin</groupId>
     <artifactId>minecraft-crowd-control</artifactId>
-    <version>3.2.0-SNAPSHOT</version>
+    <version>3.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>common</module>
         <module>paper</module>
         <module>sponge-7</module>
+        <module>sponge-8</module>
     </modules>
 
     <name>Minecraft Crowd Control: Parent</name>
@@ -26,7 +27,7 @@
 <!--        <maven.compiler.release>${java.version}</maven.compiler.release>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adventure.version>4.9.3</adventure.version>
-        <cloud.version>1.6.1</cloud.version>
+        <cloud.version>1.7.0-SNAPSHOT</cloud.version>
         <crowdcontrol.version>3.3.3</crowdcontrol.version>
     </properties>
 

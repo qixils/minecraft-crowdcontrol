@@ -9,13 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>minecraft-sponge-7</artifactId>
-    <name>Minecraft Crowd Control: Sponge 7</name>
+    <artifactId>minecraft-sponge-8</artifactId>
+    <name>Minecraft Crowd Control: Sponge 8</name>
     <description>Allows viewers to interact with your Minecraft world</description>
     <url>https://github.com/qixils/minecraft-crowdcontrol</url>
 
     <build>
-        <finalName>CrowdControl-Sponge7-v${project.version}</finalName>
+        <finalName>CrowdControl-Sponge8-v${project.version}</finalName>
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>7.4.0</version>
+            <version>8.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -71,13 +71,8 @@
         </dependency>
         <dependency>
             <groupId>cloud.commandframework</groupId>
-            <artifactId>cloud-sponge7</artifactId>
+            <artifactId>cloud-sponge</artifactId>
             <version>${cloud.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.kyori</groupId>
-            <artifactId>adventure-platform-spongeapi</artifactId>
-            <version>4.0.1</version>
         </dependency>
     </dependencies>
 </project>
