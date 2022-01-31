@@ -39,7 +39,7 @@ Control.
 12. Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and
     its Crowd Control server.
 
-Users may now connect using the ["Joining a Server"](sponge_7_joining_a_server.md) guide. Make sure
+Users may now connect using the [**Joining a Server**](sponge_7_joining_a_server.md) guide. Make sure
 to provide your public IP address and the password used in the config file to your streamers.
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This
