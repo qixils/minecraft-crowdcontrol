@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameRegistry;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetId;
 import org.spongepowered.api.block.BlockState;
@@ -366,7 +367,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Listener
 	public void onConnection(ClientConnectionEvent.Join event) {
 		onPlayerJoin(event.getTargetEntity());
-		if (game.getPlatform().getType().isClient() && clientHost == null) {
+		Platform platform = game.getPlatform();
+		if ((platform.getType().isClient() || platform.getExecutionType().isClient()) && clientHost == null) {
 			clientHost = event.getTargetEntity().getUniqueId().toString();
 		}
 	}
