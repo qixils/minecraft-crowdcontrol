@@ -9,11 +9,11 @@ import java.util.Collection;
 import java.util.UUID;
 
 /**
- * Abstraction layer for {@link PlayerMapper} which implements platform-agnostic methods.
+ * Abstraction layer for {@link PlayerManager} which implements platform-agnostic methods.
  *
  * @param <P> class used to represent online players
  */
-public abstract class AbstractPlayerMapper<P> implements PlayerMapper<P> {
+public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
 	protected final Multimap<String, UUID> twitchToUserMap =
 			Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));

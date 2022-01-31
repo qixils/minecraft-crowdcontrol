@@ -13,7 +13,7 @@ import java.util.UUID;
  *
  * @param <P> class used to represent online players
  */
-public interface PlayerMapper<P> {
+public interface PlayerManager<P> {
 
 	/**
 	 * Fetches all online players that should be affected by the provided {@link Request}.

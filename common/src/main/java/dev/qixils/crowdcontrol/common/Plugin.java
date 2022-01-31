@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -34,7 +33,7 @@ import java.util.UUID;
  * @param <P> class used to represent online players
  * @param <S> class used to represent command senders in Cloud Command Framework
  */
-public interface Plugin<P extends S, S> {
+public interface Plugin<P, S> {
 
 	/**
 	 * Text color to use for usernames.
@@ -132,6 +131,7 @@ public interface Plugin<P extends S, S> {
 		CommandManager<S> manager = getCommandManager();
 		if (manager == null)
 			throw new IllegalStateException("CommandManager is null");
+		EntityMapper<S> mapper = commandSenderMapper();
 
 		//// Account Command ////
 
@@ -148,14 +148,13 @@ public interface Plugin<P extends S, S> {
 		manager.command(account.literal("link")
 				.meta(CommandMeta.DESCRIPTION, "Link a Twitch account to your Minecraft account")
 				.argument(usernameArg, usernameDesc)
-				.senderType(getPlayerClass())
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
-					Audience audience = asAudience(sender);
-					UUID uuid = getUUID(sender).orElseThrow(() ->
+					Audience audience = mapper.asAudience(sender);
+					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerMapper().linkPlayer(uuid, username))
+					if (getPlayerManager().linkPlayer(uuid, username))
 						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.next(username, NamedTextColor.AQUA)
 								.rawNext(" has been added to your linked Twitch accounts"));
@@ -172,10 +171,10 @@ public interface Plugin<P extends S, S> {
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
-					Audience audience = asAudience(sender);
-					UUID uuid = getUUID(sender).orElseThrow(() ->
+					Audience audience = mapper.asAudience(sender);
+					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerMapper().unlinkPlayer(uuid, username))
+					if (getPlayerManager().unlinkPlayer(uuid, username))
 						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
 								.next(username, NamedTextColor.AQUA)
 								.rawNext(" has been removed from your linked Twitch accounts"));
@@ -191,7 +190,7 @@ public interface Plugin<P extends S, S> {
 		// base command
 		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
 				.meta(CommandMeta.DESCRIPTION, "Manage the Crowd Control socket")
-				.permission(this::isAdmin);
+				.permission(mapper::isAdmin);
 
 		// connect command
 		final Component serviceNotDisconnected = TextBuilder.fromPrefix(PREFIX,
@@ -201,7 +200,7 @@ public interface Plugin<P extends S, S> {
 		manager.command(ccCmd.literal("connect")
 				.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
 				.handler(commandContext -> {
-					Audience sender = asAudience(commandContext.getSender());
+					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (getCrowdControl() != null)
 						sender.sendMessage(serviceNotDisconnected);
 					else {
@@ -217,7 +216,7 @@ public interface Plugin<P extends S, S> {
 		manager.command(ccCmd.literal("disconnect")
 				.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
 				.handler(commandContext -> {
-					Audience sender = asAudience(commandContext.getSender());
+					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (getCrowdControl() == null)
 						sender.sendMessage(serviceNotRunning);
 					else {
@@ -232,7 +231,7 @@ public interface Plugin<P extends S, S> {
 		manager.command(ccCmd.literal("reconnect")
 				.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
 				.handler(commandContext -> {
-					Audience audience = asAudience(commandContext.getSender());
+					Audience audience = mapper.asAudience(commandContext.getSender());
 					CrowdControl cc = getCrowdControl();
 					if (cc != null)
 						cc.shutdown("Reconnect issued by server administrator");
@@ -245,7 +244,7 @@ public interface Plugin<P extends S, S> {
 		final Component isRunning = TextBuilder.fromPrefix(PREFIX, "The service is currently running").build();
 		manager.command(ccCmd.literal("status")
 				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-				.handler(commandContext -> asAudience(commandContext.getSender()).sendMessage(
+				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(
 						getCrowdControl() == null ? notRunning : isRunning)));
 
 		//// Password Command ////
@@ -261,10 +260,10 @@ public interface Plugin<P extends S, S> {
 				.build();
 		manager.command(manager.commandBuilder("password")
 				.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
-				.permission(this::isAdmin)
+				.permission(mapper::isAdmin)
 				.argument(StringArgument.<S>newBuilder("password").greedy().asRequired())
 				.handler(commandContext -> {
-					Audience sender = asAudience(commandContext.getSender());
+					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (!isServer()) {
 						sender.sendMessage(passwordFailureMessage);
 						return;
@@ -277,30 +276,22 @@ public interface Plugin<P extends S, S> {
 
 		new MinecraftExceptionHandler<S>().withDefaultHandlers()
 				.withDecorator(component -> TextBuilder.fromPrefix(PREFIX, component).color(NamedTextColor.RED).build())
-				.apply(manager, this::asAudience);
+				.apply(manager, mapper::asAudience);
 	}
 
 	/**
-	 * Converts the command sender object to an adventure {@link Audience}.
+	 * Gets the {@link EntityMapper} for this implementation's player object.
 	 *
-	 * @param source command sender
-	 * @return adventure audience
+	 * @return player entity mapper
 	 */
-	default Audience asAudience(@NotNull S source) {
-		if (source instanceof Audience)
-			return (Audience) source;
-		throw new UnsupportedOperationException("#asAudience is unsupported");
-	}
+	EntityMapper<P> playerMapper();
 
 	/**
-	 * Converts the command senders to an adventure {@link Audience}.
+	 * Gets the {@link EntityMapper} for this implementation's command sender object.
 	 *
-	 * @param source command sender
-	 * @return adventure audience
+	 * @return command sender mapper
 	 */
-	default Audience asAudience(@NotNull Collection<S> source) {
-		return source.stream().map(this::asAudience).collect(Audience.toAudience());
-	}
+	EntityMapper<S> commandSenderMapper();
 
 	/**
 	 * Gets the player class utilized by this implementation.
@@ -327,7 +318,7 @@ public interface Plugin<P extends S, S> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	PlayerMapper<P> getPlayerMapper();
+	PlayerManager<P> getPlayerManager();
 
 	/**
 	 * Fetches all online players that should be affected by the provided {@link Request}.
@@ -337,7 +328,7 @@ public interface Plugin<P extends S, S> {
 	 */
 	@CheckReturnValue
 	default @NotNull List<P> getPlayers(@NotNull Request request) {
-		return getPlayerMapper().getPlayers(request);
+		return getPlayerManager().getPlayers(request);
 	}
 
 	/**
@@ -348,7 +339,7 @@ public interface Plugin<P extends S, S> {
 	@CheckReturnValue
 	@NotNull
 	default List<@NotNull P> getAllPlayers() {
-		return getPlayerMapper().getAllPlayers();
+		return getPlayerManager().getAllPlayers();
 	}
 
 	/**
@@ -390,19 +381,8 @@ public interface Plugin<P extends S, S> {
 	 */
 	@CheckReturnValue
 	default @NotNull String getUsername(@NotNull P player) {
-		return asAudience(player).get(Identity.NAME).orElseThrow(() ->
+		return playerMapper().asAudience(player).get(Identity.NAME).orElseThrow(() ->
 				new UnsupportedOperationException("Player object does not support Identity.NAME"));
-	}
-
-	/**
-	 * Fetches the UUID of an entity.
-	 *
-	 * @param entity the entity to fetch the UUID of
-	 * @return the UUID of the entity
-	 */
-	@CheckReturnValue
-	default @NotNull Optional<UUID> getUUID(@NotNull S entity) {
-		return asAudience(entity).get(Identity.UUID);
 	}
 
 	/**
@@ -502,28 +482,20 @@ public interface Plugin<P extends S, S> {
 	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
 
 	/**
-	 * Determines if the provided object is an administrator. This is defined as the object having
-	 * the {@link #ADMIN_PERMISSION} permission node or being a Minecraft operator.
-	 *
-	 * @param commandSource the command source to check
-	 * @return true if the source is an administrator
-	 */
-	boolean isAdmin(@NotNull S commandSource);
-
-	/**
 	 * Renders messages to a player. This should be called by an event handler that listens for
 	 * players joining the server.
 	 *
 	 * @param player player to send messages to
 	 */
 	default void onPlayerJoin(P player) {
-		Audience audience = asAudience(player);
+		EntityMapper<P> mapper = playerMapper();
+		Audience audience = mapper.asAudience(player);
 		audience.sendMessage(JOIN_MESSAGE_1);
 		//noinspection OptionalGetWithoutIsPresent
-		if (!isGlobal() && isServer() && getPlayerMapper().getLinkedAccounts(getUUID(player).get()).size() == 0)
+		if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.getUniqueId(player).get()).size() == 0)
 			audience.sendMessage(JOIN_MESSAGE_2);
 		if (getCrowdControl() == null) {
-			if (isAdmin(player)) {
+			if (mapper.isAdmin(player)) {
 				if (isServer() && getPassword() == null)
 					audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
 				else

@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectDataBuilder;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableGameModeEffectData;
@@ -20,6 +21,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedDataBuild
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 import net.kyori.adventure.text.serializer.spongeapi.SpongeComponentSerializer;
@@ -97,7 +99,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	// "real" variables
 	private final CommandRegister register = new CommandRegister(this);
 	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
-	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
+	@Accessors(fluent = true)
+	private final EntityMapper<CommandSource> commandSenderMapper = new CommandSourceMapper<>(this);
+	@Accessors(fluent = true)
+	private final EntityMapper<Player> playerMapper = new CommandSourceMapper<>(this);
+	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
@@ -172,22 +178,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		return audiences;
 	}
 
-	@Override
 	@NotNull
 	public Audience asAudience(@NotNull CommandSource source) {
-		if (source instanceof Player)
-			return adventure().player((Player) source);
-		return adventure().receiver(source);
+		return commandSenderMapper().asAudience(source);
 	}
 
 	@NotNull
 	public Audience asAudience(@NotNull World world) {
 		return adventure().world(net.kyori.adventure.key.Key.key(MINECRAFT_NAMESPACE, world.getName()));
-	}
-
-	@Override
-	public boolean isAdmin(@NotNull CommandSource commandSource) {
-		return commandSource.hasPermission(ADMIN_PERMISSION);
 	}
 
 	@Override

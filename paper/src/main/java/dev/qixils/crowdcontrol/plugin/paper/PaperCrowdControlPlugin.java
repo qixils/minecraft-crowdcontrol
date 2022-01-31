@@ -4,18 +4,18 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,17 +35,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
+	@Getter @Accessors(fluent = true)
+	private final EntityMapper<Player> playerMapper = new PlayerMapper<>();
+	@Getter @Accessors(fluent = true)
+	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>();
 	@Getter
-	private final PaperPlayerMapper playerMapper = new PaperPlayerMapper(this);
+	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
 	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
 	@Getter
 	private final TextUtil textUtil = new TextUtil(Bukkit.getUnsafe().componentFlattener());
@@ -169,18 +170,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		return announce;
 	}
 
-	@CheckReturnValue
-	@NotNull
-	public List<@NotNull Player> getAllPlayers() {
-		return playerMapper.getAllPlayers();
-	}
-
-	@CheckReturnValue
-	@NotNull
-	public List<@NotNull Player> getPlayers(final @NotNull Request request) {
-		return playerMapper.getPlayers(request);
-	}
-
 	@Override
 	public void registerCommand(@NotNull String name, dev.qixils.crowdcontrol.common.@NotNull Command<Player> command) {
 		name = name.toLowerCase(Locale.ENGLISH);
@@ -203,18 +192,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		if (!isServer())
 			throw new IllegalStateException("Not running in server mode");
 		manualPassword = password;
-	}
-
-	@Override
-	public boolean isAdmin(@NotNull CommandSender commandSource) {
-		return commandSource.hasPermission(ADMIN_PERMISSION) || commandSource.isOp();
-	}
-
-	@Override
-	public @NotNull Optional<UUID> getUUID(@NotNull CommandSender entity) {
-		if (entity instanceof Entity trueEntity)
-			return Optional.of(trueEntity.getUniqueId());
-		return Plugin.super.getUUID(entity);
 	}
 
 	@EventHandler

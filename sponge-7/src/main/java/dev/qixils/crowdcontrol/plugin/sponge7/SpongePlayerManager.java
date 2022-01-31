@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7;
 
-import dev.qixils.crowdcontrol.common.AbstractPlayerMapper;
+import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class SpongePlayerMapper extends AbstractPlayerMapper<Player> {
+public class SpongePlayerManager extends AbstractPlayerManager<Player> {
 	private final SpongeCrowdControlPlugin plugin;
 
 	@Contract(value = "_ -> param1", mutates = "param1")

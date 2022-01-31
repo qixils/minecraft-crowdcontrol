@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * A command which handles incoming effects requested by Crowd Control server.
@@ -32,7 +31,7 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	Plugin<P, ? super P> getPlugin();
+	Plugin<P, ?> getPlugin();
 
 	/**
 	 * Executes this command. This will apply a certain effect to all the targeted {@code players}.
@@ -89,7 +88,7 @@ public interface Command<P> {
 	 * @param request request that prompted the execution of this command
 	 */
 	default void executeAndNotify(@NotNull Request request) {
-		Plugin<P, ? super P> plugin = getPlugin();
+		Plugin<P, ?> plugin = getPlugin();
 		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
 		List<P> players = plugin.getPlayers(request);
 
@@ -104,7 +103,7 @@ public interface Command<P> {
 			response.send();
 
 			if (response.getResultType() == Response.ResultType.SUCCESS)
-				announce(players.stream().map(plugin::asAudience).collect(Audience.toAudience()), request);
+				announce(plugin.playerMapper().asAudience(players), request);
 		});
 	}
 
@@ -117,7 +116,7 @@ public interface Command<P> {
 	 */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	default boolean isGlobalCommandUsable(@Nullable List<P> players, @NotNull Request request) {
-		Plugin<P, ? super P> plugin = getPlugin();
+		Plugin<P, ?> plugin = getPlugin();
 		if (plugin.isGlobal(request))
 			return true;
 
@@ -136,7 +135,7 @@ public interface Command<P> {
 			players = plugin.getPlayers(request);
 
 		for (P player : players) {
-			String uuidStr = plugin.getUUID(player).toString().toLowerCase(Locale.ENGLISH);
+			String uuidStr = plugin.playerMapper().getUniqueId(player).toString().toLowerCase(Locale.ENGLISH);
 			if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
 				return true;
 			if (hosts.contains(plugin.getUsername(player).toLowerCase(Locale.ENGLISH)))
@@ -157,9 +156,9 @@ public interface Command<P> {
 	 */
 	@Deprecated
 	default void announce(final Request request) {
-		Plugin<P, ? super P> plugin = getPlugin();
+		Plugin<P, ?> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
-		announce(plugin.getPlayers(request).stream().map(plugin::asAudience).collect(Audience.toAudience()), request);
+		announce(plugin.playerMapper().asAudience(plugin.getPlayers(request)), request);
 	}
 
 	/**
@@ -181,9 +180,9 @@ public interface Command<P> {
 	 * @param request request that prompted the execution of this command
 	 */
 	default void playerAnnounce(final Collection<P> players, final Request request) {
-		Plugin<P, ? super P> plugin = getPlugin();
+		Plugin<P, ?> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
-		announce(players.stream().map(plugin::asAudience).collect(Collectors.toList()), request);
+		announce(plugin.playerMapper().asAudience(players), request);
 	}
 
 	/**

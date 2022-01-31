@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import dev.qixils.crowdcontrol.common.AbstractPlayerMapper;
+import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.plugin.paper.commands.GamemodeCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public final class PaperPlayerMapper extends AbstractPlayerMapper<Player> {
+public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 	private final PaperCrowdControlPlugin plugin;
 
 	@Contract(value = "_ -> param1", mutates = "param1")
