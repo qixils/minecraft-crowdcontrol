@@ -1,5 +1,10 @@
 ## SpongeForge 1.12.2 Manual Installation
 
+The following steps detail how to manually set up a Minecraft Forge 1.12.2 server with Crowd
+Control.
+
+**Note:** As of writing, Sponge 7 is **not yet available** in the Crowd Control application.
+
 1. Download and install [Java 8](https://adoptium.net/?variant=openjdk8&jvmVariant=hotspot).
 2. Download and run the latest build (14.23.5.2860)
    of [Forge 1.12.2](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html).
@@ -34,8 +39,8 @@
 12. Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and
     its Crowd Control server.
 
-Users may now connect using the ["Joining a Server"](sponge_joining_a_server.md) guide. Make sure to
-provide your public IP address and the password used in the config file to your streamers.
+Users may now connect using the ["Joining a Server"](sponge_7_joining_a_server.md) guide. Make sure
+to provide your public IP address and the password used in the config file to your streamers.
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This
 prevents unknown players from joining the server and potentially griefing your builds.

@@ -1,7 +1,6 @@
 ## Paper 1.18 Manual Installation
 
-If you are hosting a server for streamers to join or otherwise need to manually set up the plugin,
-you may use the following steps to set up a Minecraft server running with Crowd Control.
+The following steps detail how to manually set up a Minecraft 1.18.1 server with Crowd Control.
 
 1. Download and
    install [the latest version of Java](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).

@@ -1,8 +1,10 @@
-## Paper: Joining a Server
+## Sponge 7: Joining a Server
 
 This document contains separate guides for
 [connecting to a local server](#local-server)
 and [connecting to an external server](#external-server).
+
+**Note:** As of writing, Sponge 7 is **not yet available** in the Crowd Control application.
 
 ### Local Server
 
@@ -10,7 +12,7 @@ The following steps are for streamers connecting to a local server, i.e. the Cro
 setup.
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the **Game Selection** tab, select **Minecraft (Paper Server) (PC)**.
+2. In the **Game Selection** tab, select **Minecraft (Sponge 7) (PC)**.
 3. Click **Start**. A pop-up menu will appear prompting you for information required to connect to
    the server. In the host field, enter `localhost`. In the password field, enter the default
    password `crowdcontrol` or a custom password if you set one.
@@ -23,7 +25,7 @@ setup.
 The following steps are for streamers who are connecting to another individual's server.
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the **Game Selection** tab, select **Minecraft (Paper Server) (PC)**.
+2. In the **Game Selection** tab, select **Minecraft (Sponge 7) (PC)**.
 3. Click **Start**. A pop-up menu will appear prompting you for information that you should have
    received from your server administrator.
     - In the host field, you should enter an IP address or a website URL. This will usually be the
