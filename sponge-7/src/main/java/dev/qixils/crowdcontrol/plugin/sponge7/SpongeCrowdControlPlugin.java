@@ -69,6 +69,7 @@ import org.spongepowered.api.world.World;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -100,6 +101,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
 	private SpongeComponentSerializer spongeSerializer;
+	private String clientHost = null;
 	// injected variables
 	@Inject
 	private Logger logger;
@@ -185,6 +187,22 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Override
 	public boolean isAdmin(@NotNull CommandSource commandSource) {
 		return commandSource.hasPermission(ADMIN_PERMISSION);
+	}
+
+	@Override
+	public @NotNull Logger getSLF4JLogger() {
+		return logger;
+	}
+
+	@Override
+	public @NotNull Collection<String> getHosts() {
+		Collection<String> confHosts = super.getHosts();
+		if (clientHost == null)
+			return confHosts;
+		Set<String> hosts = new HashSet<>(confHosts.size() + 1);
+		hosts.addAll(confHosts);
+		hosts.add(clientHost);
+		return hosts;
 	}
 
 	@Override
@@ -348,10 +366,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Listener
 	public void onConnection(ClientConnectionEvent.Join event) {
 		onPlayerJoin(event.getTargetEntity());
-	}
-
-	@Override
-	public @NotNull Logger getSLF4JLogger() {
-		return logger;
+		if (game.getPlatform().getType().isClient() && clientHost == null) {
+			clientHost = event.getTargetEntity().getUniqueId().toString();
+		}
 	}
 }
