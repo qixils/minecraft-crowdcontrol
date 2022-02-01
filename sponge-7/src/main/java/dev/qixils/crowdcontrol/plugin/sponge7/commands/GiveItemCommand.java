@@ -39,8 +39,7 @@ public class GiveItemCommand extends ImmediateCommand {
 	public static void giveItemTo(SpongeCrowdControlPlugin plugin, Entity player, ItemStack itemStack) {
 		Item entity = (Item) player.getLocation().createEntity(EntityTypes.ITEM);
 		entity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-		// seems like Sponge 7 doesn't support any of the other keys used in the Paper impl
-		// so this is a note to add them back in the Sponge 8 impl [API8]
+		entity.offer(Keys.PICKUP_DELAY, 0);
 
 		// give entity a cause & spawn it
 		try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {

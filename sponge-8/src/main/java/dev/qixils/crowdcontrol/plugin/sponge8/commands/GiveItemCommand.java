@@ -7,17 +7,19 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.event.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.SpawnTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.util.Ticks;
 
 import java.util.List;
 
@@ -30,21 +32,21 @@ public class GiveItemCommand extends ImmediateCommand {
 	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemType item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "give_" + SpongeTextUtil.valueOf(item);
-		this.displayName = "Give " + item.getTranslation().get();
+		this.effectName = "give_" + item.key(RegistryTypes.ITEM_TYPE).value();
+		this.displayName = "Give " + plugin.getTextUtil().asPlain(item);
 	}
 
 	@Blocking
 	public static void giveItemTo(SpongeCrowdControlPlugin plugin, Entity player, ItemStack itemStack) {
-		Item entity = (Item) player.getLocation().createEntity(EntityTypes.ITEM);
-		entity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-		// seems like Sponge 7 doesn't support any of the other keys used in the Paper impl
-		// so this is a note to add them back in the Sponge 8 impl [API8]
+		Item entity = player.world().createEntity(EntityTypes.ITEM, player.position());
+		entity.offer(Keys.ITEM_STACK_SNAPSHOT, itemStack.createSnapshot());
+		entity.offer(Keys.CREATOR, player.uniqueId());
+		entity.offer(Keys.PICKUP_DELAY, Ticks.of(0));
 
 		// give entity a cause & spawn it
-		try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
+		try (StackFrame frame = plugin.getGame().client().causeStackManager().pushCauseFrame()) {
 			frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
-			player.getWorld().spawnEntity(entity);
+			player.world().spawnEntity(entity);
 		}
 	}
 
@@ -54,13 +56,13 @@ public class GiveItemCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		ItemStack itemStack = ItemStack.of(item);
 		sync(() -> {
-			for (Player player : players) {
+			for (ServerPlayer player : players) {
 				giveItemTo(player, itemStack);
 				// workaround to limit the circulation of end portal frames in the economy
-				if (item.equals(ItemTypes.END_PORTAL_FRAME))
+				if (item.equals(ItemTypes.END_PORTAL_FRAME.get()))
 					break;
 			}
 		});
