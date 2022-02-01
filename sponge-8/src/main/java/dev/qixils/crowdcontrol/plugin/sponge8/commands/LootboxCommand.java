@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
@@ -10,22 +9,21 @@ import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.sound.Sound.Emitter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.item.UseLimitProperty;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.menu.InventoryMenu;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,11 +35,6 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.buildLootboxTitle;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-	private static final InventoryArchetype ARCHETYPE = InventoryArchetype.builder()
-			.from(InventoryArchetypes.MENU_GRID)
-			.title(Text.of("Lootbox"))
-			.property(InventoryCapacity.of(27))
-			.build("crowd-control:lootbox", "Lootbox");
 	private final List<ItemType> allItems;
 	private final List<ItemType> goodItems;
 	private final String effectName = "lootbox";
@@ -49,15 +42,16 @@ public class LootboxCommand extends ImmediateCommand {
 
 	public LootboxCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
-		allItems = new ArrayList<>(plugin.getRegistry().getAllOf(ItemType.class));
+		allItems = plugin.getGame().registry(RegistryTypes.ITEM_TYPE).stream().collect(Collectors.toList());
 		goodItems = allItems.stream()
 				.filter(itemType ->
-						itemType.getDefaultProperty(UseLimitProperty.class).map(UseLimitProperty::getValue).orElse(0) > 1
-								// API8: enchanted golden apple and netherite block
-								|| itemType.equals(ItemTypes.GOLDEN_APPLE)
-								|| itemType.equals(ItemTypes.DIAMOND_BLOCK)
-								|| itemType.equals(ItemTypes.IRON_BLOCK)
-								|| itemType.equals(ItemTypes.GOLD_BLOCK))
+						itemType.get(Keys.MAX_DURABILITY).orElse(0) > 1
+								|| itemType.equals(ItemTypes.GOLDEN_APPLE.get())
+								|| itemType.equals(ItemTypes.ENCHANTED_GOLDEN_APPLE.get())
+								|| itemType.equals(ItemTypes.NETHERITE_BLOCK.get())
+								|| itemType.equals(ItemTypes.DIAMOND_BLOCK.get())
+								|| itemType.equals(ItemTypes.IRON_BLOCK.get())
+								|| itemType.equals(ItemTypes.GOLD_BLOCK.get()))
 				.collect(Collectors.toList());
 	}
 
@@ -88,9 +82,9 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// determine the size of the item stack
 		int quantity = 1;
-		if (item.getMaxStackQuantity() > 1) {
+		if (item.maxStackQuantity() > 1) {
 			for (int i = 0; i <= luck; i++) {
-				quantity = Math.max(quantity, RandomUtil.nextInclusiveInt(1, item.getMaxStackQuantity()));
+				quantity = Math.max(quantity, RandomUtil.nextInclusiveInt(1, item.maxStackQuantity()));
 			}
 		}
 
@@ -98,14 +92,14 @@ public class LootboxCommand extends ImmediateCommand {
 		ItemStack itemStack = ItemStack.of(item, quantity);
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
-			itemStack.offer(Keys.UNBREAKABLE, true);
+			itemStack.offer(Keys.IS_UNBREAKABLE, true);
 
 		// determine enchantments to add
 		int enchantments = 0;
 		for (int i = 0; i <= luck; i++) {
 			enchantments = Math.max(enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
-		List<EnchantmentType> enchantmentList = plugin.getRegistry().getAllOf(EnchantmentType.class).stream()
+		List<EnchantmentType> enchantmentList = plugin.getGame().registry(RegistryTypes.ENCHANTMENT_TYPE).stream()
 				.filter(enchantmentType -> enchantmentType.canBeAppliedToStack(itemStack)).collect(Collectors.toList());
 		List<EnchantmentType> addedEnchantments = new ArrayList<>(enchantments);
 
@@ -120,10 +114,10 @@ public class LootboxCommand extends ImmediateCommand {
 			enchantments--;
 
 			// determine enchantment level
-			int level = enchantment.getMinimumLevel();
-			if (enchantment.getMaximumLevel() > enchantment.getMinimumLevel()) {
+			int level = enchantment.minimumLevel();
+			if (enchantment.maximumLevel() > enchantment.minimumLevel()) {
 				for (int j = 0; j <= luck; j++) {
-					level = Math.max(level, RandomUtil.nextInclusiveInt(enchantment.getMinimumLevel(), enchantment.getMaximumLevel()));
+					level = Math.max(level, RandomUtil.nextInclusiveInt(enchantment.minimumLevel(), enchantment.maximumLevel()));
 				}
 				if (random.nextDouble() >= (0.5D - (luck * .07D)))
 					level += random.nextInt(4);
@@ -134,7 +128,7 @@ public class LootboxCommand extends ImmediateCommand {
 					.type(enchantment)
 					.level(level)
 					.build();
-			itemStack.transform(Keys.ITEM_ENCHANTMENTS, enchants -> {
+			itemStack.transform(Keys.APPLIED_ENCHANTMENTS, enchants -> {
 				enchants = ExceptionUtil.validateNotNullElseGet(enchants, ArrayList::new);
 				enchants.add(builtEnchantment);
 				return enchants;
@@ -149,32 +143,36 @@ public class LootboxCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		for (Player player : players) {
-			Inventory lootbox = Inventory.builder()
-					.of(ARCHETYPE)
-					.property(new InventoryTitle(spongeSerializer.serialize(buildLootboxTitle(request))))
-					.build(plugin);
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		for (ServerPlayer player : players) {
+			ViewableInventory inventory = Inventory.builder()
+					.grid(9, 3)
+					.completeStructure()
+					.plugin(plugin.getPluginContainer())
+					.build()
+					.asViewable().orElseThrow(() -> new IllegalStateException("Could not create custom inventory"));
+			InventoryMenu menu = inventory.asMenu();
+			menu.setTitle(buildLootboxTitle(request));
+			menu.setReadOnly(false);
 
 			// create item
 			ItemStack itemStack = createRandomItem(0);
 			itemStack.offer(
-					Keys.ITEM_LORE,
-					Collections.singletonList(spongeSerializer.serialize(buildLootboxLore(request)))
+					Keys.LORE,
+					Collections.singletonList(buildLootboxLore(request))
 			);
 
 			// the custom inventory does not implement anything sensible so enjoy this hack
 			int i = 0;
-			for (Inventory slot : lootbox.slots()) {
+			for (Slot slot : inventory.slots()) {
 				if (i++ == 13) {
 					slot.offer(itemStack);
 					break;
 				}
 			}
 			// sound & open
-			Vector3d pos = player.getPosition();
-			plugin.asAudience(player).playSound(Sounds.LOOTBOX_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
-			sync(() -> player.openInventory(lootbox));
+			player.playSound(Sounds.LOOTBOX_CHIME.get(), (Emitter) player);
+			sync(() -> menu.open(player));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
