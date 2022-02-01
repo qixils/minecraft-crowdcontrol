@@ -68,7 +68,7 @@ import java.util.function.Function;
 
 @Getter
 @Plugin("crowd-control")
-public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> { // TODO idk abt these interfaces
+public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> {
 	// keys (though they don't really work)
 	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME;
 	public static Key<Value<Boolean>> VIEWER_SPAWNED;

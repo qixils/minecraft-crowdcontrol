@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands.executeorperish;
 
-import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -9,14 +8,17 @@ import dev.qixils.crowdcontrol.plugin.sponge8.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,19 +40,19 @@ public class DoOrDieCommand extends VoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
 		new TimedEffect.Builder()
 				.request(request)
 				.duration(DO_OR_DIE_COOLDOWN)
 				.startCallback(effect -> {
-					List<Player> players = plugin.getPlayers(request);
+					List<ServerPlayer> players = plugin.getPlayers(request);
 					List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
 					Collections.shuffle(conditions, random);
 					SuccessCondition condition = null;
 					while (condition == null && !conditions.isEmpty()) {
 						SuccessCondition next = conditions.remove(0);
 						boolean isPassing = false;
-						for (Player player : players) {
+						for (ServerPlayer player : players) {
 							if (next.hasSucceeded(player)) {
 								isPassing = true;
 								break;
@@ -66,46 +68,44 @@ public class DoOrDieCommand extends VoidCommand {
 					final SuccessCondition finalCondition = condition;
 					Component subtitle = condition.getComponent();
 
-					Set<UUID> notCompleted = players.stream().map(Player::getUniqueId).collect(Collectors.toSet());
-					Server server = plugin.getGame().getServer();
-					int startedAt = server.getRunningTimeTicks();
+					Set<UUID> notCompleted = players.stream().map(Player::uniqueId).collect(Collectors.toSet());
+					Server server = plugin.getGame().server();
+					long startedAt = server.runningTimeTicks().ticks();
 
 					AtomicInteger pastValue = new AtomicInteger(0);
-					Task.builder()
-							.intervalTicks(2)
+					plugin.getSyncScheduler().submit(Task.builder()
+							.interval(Ticks.of(2))
 							.execute(task -> {
-								int ticksElapsed = server.getRunningTimeTicks() - startedAt;
+								long ticksElapsed = server.runningTimeTicks().ticks() - startedAt;
 								int secondsLeft = (int) DO_OR_DIE_DURATION.getSeconds() - (int) Math.ceil(ticksElapsed / 20f);
 								boolean isNewValue = secondsLeft != pastValue.getAndSet(secondsLeft);
 								boolean isTimeUp = secondsLeft <= 0;
 								for (UUID uuid : notCompleted) {
-									Player player = server.getPlayer(uuid).orElse(null);
+									ServerPlayer player = server.player(uuid).orElse(null);
 									if (player == null) continue;
 
 									if (finalCondition.hasSucceeded(player)) {
 										ItemStack item = plugin.getRegister().getCommand(LootboxCommand.class).createRandomItem(finalCondition.getRewardLuck());
-										plugin.asAudience(player).showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
+										player.showTitle(doOrDieSuccess(item.asComponent()));
 										notCompleted.remove(uuid);
-										Vector3d pos = player.getPosition();
-										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
+										player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());
 										GiveItemCommand.giveItemTo(plugin, player, item);
 									} else if (isTimeUp) {
-										plugin.asAudience(player).showTitle(DO_OR_DIE_FAILURE);
+										player.showTitle(DO_OR_DIE_FAILURE);
 										player.offer(Keys.HEALTH, 0d);
 									} else {
 										Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-										plugin.asAudience(player).showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
-										if (isNewValue) {
-											Vector3d pos = player.getPosition();
-											plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_TICK.get(), pos.getX(), pos.getY(), pos.getZ());
-										}
+										player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+										if (isNewValue)
+											player.playSound(Sounds.DO_OR_DIE_TICK.get(), Sound.Emitter.self());
 									}
 								}
 
 								if (isTimeUp)
 									task.cancel();
 							})
-							.submit(plugin);
+							.plugin(plugin.getPluginContainer())
+							.build());
 
 					playerAnnounce(players, request);
 					return null;

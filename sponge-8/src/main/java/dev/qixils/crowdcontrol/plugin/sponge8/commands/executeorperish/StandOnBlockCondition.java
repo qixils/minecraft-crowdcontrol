@@ -4,9 +4,8 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,8 +25,7 @@ public class StandOnBlockCondition implements SuccessCondition {
 
 		component = Component.text("Stand on ").append(Component.text(displayText)
 				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(displayItem.getTranslation().getId())
-								.color(NamedTextColor.GREEN)))
+						.replacement(displayItem.asComponent().color(NamedTextColor.GREEN)))
 		);
 	}
 
@@ -38,9 +36,9 @@ public class StandOnBlockCondition implements SuccessCondition {
 	}
 
 	@Override
-	public boolean hasSucceeded(Player player) {
-		Location<World> location = player.getLocation();
-		return blocks.contains(location.getBlock().getType())
-				|| blocks.contains(location.sub(0, 1, 0).getBlock().getType());
+	public boolean hasSucceeded(ServerPlayer player) {
+		ServerLocation location = player.serverLocation();
+		return blocks.contains(location.blockType())
+				|| blocks.contains(location.sub(0, 1, 0).blockType());
 	}
 }
