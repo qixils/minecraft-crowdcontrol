@@ -1,13 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import lombok.Getter;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.math.vector.Vector3d;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
@@ -15,16 +15,15 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 	private final String displayName = "Summon Charged Creeper";
 
 	public ChargedCreeperCommand(SpongeCrowdControlPlugin plugin) {
-		super(plugin, EntityTypes.CREEPER);
+		super(plugin, EntityTypes.CREEPER.get());
 	}
 
 	@Override
-	protected Entity spawnEntity(String viewer, Player player) {
+	protected Entity spawnEntity(String viewer, ServerPlayer player) {
 		Entity creeper = super.spawnEntity(viewer, player);
-		creeper.offer(Keys.CREEPER_CHARGED, true);
-		Vector3d pos = player.getTransform().getPosition();
-		plugin.asAudience(player.getWorld())
-				.playSound(Sounds.LIGHTNING_STRIKE.get(), pos.getX(), pos.getY(), pos.getZ());
+		creeper.offer(Keys.IS_CHARGED, true);
+		Vector3d pos = player.position();
+		player.world().playSound(Sounds.LIGHTNING_STRIKE.get(), pos.x(), pos.y(), pos.z());
 		return creeper;
 	}
 }

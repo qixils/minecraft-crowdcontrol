@@ -13,19 +13,15 @@ import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityCategories;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.living.Monster;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.SpawnTypes;
 import org.spongepowered.api.registry.RegistryTypes;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
@@ -67,7 +63,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 		entity.offer(Keys.IS_TAMED, true);
 		entity.offer(Keys.TAMER, player.uniqueId());
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
-		// loot table data not supported in v7
+		// API8: loot table data
 
 		try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
 			frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
