@@ -7,8 +7,8 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,11 +29,11 @@ public class ExperienceCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse()
 				.type(ResultType.FAILURE)
 				.message("Player does not have enough XP levels");
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			Optional<Integer> optionalLevel = player.get(Keys.EXPERIENCE_LEVEL);
 			if (!optionalLevel.isPresent())
 				continue;
