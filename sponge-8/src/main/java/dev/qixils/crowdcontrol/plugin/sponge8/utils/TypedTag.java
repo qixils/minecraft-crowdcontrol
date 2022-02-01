@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.ResourceKeyed;
 import org.spongepowered.api.registry.RegistryType;
 
 public class TypedTag<T> extends MappedKeyedTag<T> {

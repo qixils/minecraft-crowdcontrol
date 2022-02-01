@@ -1,13 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector3i;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.FALLING_BLOCK_FALL_DISTANCE;
 
@@ -17,31 +18,31 @@ public class FallingBlockCommand extends BlockCommand {
 		super(
 				plugin,
 				blockType,
-				"falling_block_" + SpongeTextUtil.valueOf(blockType),
-				"Place Falling " + blockType.getTranslation().get() + " Block"
+				"falling_block_" + blockType.key(RegistryTypes.BLOCK_TYPE),
+				"Place Falling " + plugin.getTextUtil().asPlain(blockType) + " Block"
 		);
 	}
 
 	@Override
-	protected Location<World> getLocation(Player player) {
-		Location<World> playerLoc = player.getLocation();
-		World world = playerLoc.getExtent();
+	protected Location<?, ?> getLocation(ServerPlayer player) {
+		Location<?, ?> playerLoc = player.location();
+		World<?, ?> world = playerLoc.world();
 		Vector3i position = new Vector3i(
-				playerLoc.getX(),
+				playerLoc.x(),
 				Math.min(
-						playerLoc.getY() + FALLING_BLOCK_FALL_DISTANCE,
-						world.getBlockMax().getY()
+						playerLoc.y() + FALLING_BLOCK_FALL_DISTANCE,
+						world.maximumHeight()
 				),
-				playerLoc.getZ()
+				playerLoc.z()
 		);
 		// the below for loop does not use <= because the main execute method performs its own
 		// checks
-		for (int y = playerLoc.getBlockY(); y < position.getY(); y++) {
-			BlockState block = world.getBlock(new Vector3i(position.getX(), y, position.getZ()));
+		for (int y = playerLoc.blockY(); y < position.y(); y++) {
+			BlockState block = world.block(new Vector3i(position.x(), y, position.z()));
 			if (!BlockFinder.isPassable(block)) {
 				return null;
 			}
 		}
-		return playerLoc.setBlockPosition(position);
+		return playerLoc.withBlockPosition(position);
 	}
 }

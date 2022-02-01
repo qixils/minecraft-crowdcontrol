@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ public class BlockCommand extends ImmediateCommand {
 		this(
 				plugin,
 				blockType,
-				"block_" + SpongeTextUtil.csIdOf(blockType),
-				"Place " + blockType.getTranslation().get() + " Block"
+				"block_" + blockType.key(RegistryTypes.BLOCK_TYPE).value(),
+				"Place " + plugin.getTextUtil().asPlain(blockType) + " Block"
 		);
 	}
 
@@ -40,24 +40,24 @@ public class BlockCommand extends ImmediateCommand {
 	}
 
 	@Nullable
-	protected Location<World> getLocation(Player player) {
-		return player.getLocation();
+	protected Location<?, ?> getLocation(ServerPlayer player) {
+		return player.location();
 	}
 
 	@NotNull
 	@Override
-	public Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Builder result = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("No available locations to set blocks");
-		for (Player player : players) {
-			if (!BlockFinder.isReplaceable(player.getLocation().getBlock()))
+		for (ServerPlayer player : players) {
+			if (!BlockFinder.isReplaceable(player.location().block()))
 				continue;
-			Location<World> location = getLocation(player);
+			Location<?, ?> location = getLocation(player);
 			if (location == null)
 				continue;
-			BlockState currentBlock = location.getBlock();
-			BlockType currentType = currentBlock.getType();
+			BlockState currentBlock = location.block();
+			BlockType currentType = currentBlock.type();
 			if (BlockFinder.isReplaceable(currentBlock) && !currentType.equals(blockType)) {
 				result.type(ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> location.setBlockType(blockType));

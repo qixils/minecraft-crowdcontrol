@@ -2,23 +2,15 @@ package dev.qixils.crowdcontrol.plugin.sponge8;
 
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
-import dev.qixils.crowdcontrol.plugin.sponge7.commands.*;
+import dev.qixils.crowdcontrol.plugin.sponge8.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.TypedTag;
-import dev.qixils.crowdcontrol.plugin.sponge8.commands.*;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.registry.RegistryTypes;
-import org.spongepowered.api.world.difficulty.Difficulty;
-import org.spongepowered.api.world.weather.Weather;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,7 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CommandRegister {
 	private final SpongeCrowdControlPlugin plugin;
