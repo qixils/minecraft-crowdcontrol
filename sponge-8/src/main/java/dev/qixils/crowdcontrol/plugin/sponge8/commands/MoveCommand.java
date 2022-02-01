@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -9,8 +8,10 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
 
@@ -41,20 +42,20 @@ public final class MoveCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (vector.getY() > 0.0 && TimedEffect.isActive("disable_jumping", request.getTargets()))
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		if (vector.y() > 0.0 && TimedEffect.isActive("disable_jumping", request.getTargets()))
 			return request.buildResponse().type(ResultType.RETRY).message("Effect cannot be used while Disable Jumping is active");
 
 		Response.Builder response = request.buildResponse().type(ResultType.RETRY).message("All players were grounded");
-		boolean isDownwards = vector.getY() < 0.0;
-		for (Player player : players) {
-			if (isDownwards && player.isOnGround())
+		boolean isDownwards = vector.y() < 0.0;
+		for (ServerPlayer player : players) {
+			if (isDownwards && player.onGround().get())
 				continue;
 			response.type(ResultType.SUCCESS).message("SUCCESS");
 			sync(() -> {
-				try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
+				try (StackFrame frame = plugin.getGame().client().causeStackManager().pushCauseFrame()) {
 					frame.pushCause(plugin.getPluginContainer());
-					player.setVelocity(vector);
+					player.offer(Keys.VELOCITY, vector);
 				}
 			});
 		}
