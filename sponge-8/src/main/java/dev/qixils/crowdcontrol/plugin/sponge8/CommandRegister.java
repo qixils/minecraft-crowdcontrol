@@ -16,6 +16,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
@@ -29,13 +30,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CommandRegister {
 	private final SpongeCrowdControlPlugin plugin;
 	private final Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
 	private final Map<Class<? extends Command>, Command> singleCommandInstances = new HashMap<>();
 	private boolean tagsRegistered = false;
-	private Set<EntityType> safeEntities;
+	private Set<EntityType<?>> safeEntities;
 	private MappedKeyedTag<BlockType> setBlocks;
 	private MappedKeyedTag<BlockType> setFallingBlocks;
 	private MappedKeyedTag<ItemType> giveTakeItems;
@@ -48,14 +50,10 @@ public class CommandRegister {
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class).getAll());
-			safeEntities.add(EntityTypes.MUSHROOM_COW);
-			safeEntities.add(EntityTypes.IRON_GOLEM);
-			safeEntities.add(EntityTypes.PRIMED_TNT);
-			safeEntities.add(EntityTypes.PIG_ZOMBIE);
-			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, plugin.getRegistry(), BlockType.class);
-			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, plugin.getRegistry(), BlockType.class);
-			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
+			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, plugin, RegistryTypes.ENTITY_TYPE).getAll());
+			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, plugin, RegistryTypes.BLOCK_TYPE);
+			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, plugin, RegistryTypes.BLOCK_TYPE);
+			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, plugin, RegistryTypes.ITEM_TYPE);
 		}
 	}
 
@@ -125,41 +123,35 @@ public class CommandRegister {
 		));
 
 		// entity commands
-		for (EntityType entity : safeEntities) {
+		for (EntityType<?> entity : safeEntities) {
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}
 
 		// register difficulty commands
-		for (Difficulty difficulty : plugin.getRegistry().getAllOf(Difficulty.class)) {
-			commands.add(new DifficultyCommand(plugin, difficulty));
-		}
+		plugin.getGame().registry(RegistryTypes.DIFFICULTY).stream().forEach(
+				difficulty -> commands.add(new DifficultyCommand(plugin, difficulty)));
 
 		// potions
-		for (PotionEffectType potionEffectType : plugin.getRegistry().getAllOf(PotionEffectType.class)) {
-			commands.add(new PotionCommand(plugin, potionEffectType));
-		}
+		plugin.getGame().registry(RegistryTypes.POTION_EFFECT_TYPE).stream().forEach(
+				potionEffectType -> commands.add(new PotionCommand(plugin, potionEffectType)));
 
 		// block sets
 		for (BlockType block : setBlocks) {
 			commands.add(new BlockCommand(plugin, block));
 		}
-		// cobweb is named differently in 1.12.2 & I'm not refactoring KeyedTag to support fallbacks
-		commands.add(new BlockCommand(plugin, BlockTypes.WEB));
 
 		for (BlockType block : setFallingBlocks) {
 			commands.add(new FallingBlockCommand(plugin, block));
 		}
 
 		// weather commands
-		for (Weather weather : plugin.getRegistry().getAllOf(Weather.class)) {
-			commands.add(new WeatherCommand(plugin, weather));
-		}
+		plugin.getGame().registry(RegistryTypes.WEATHER_TYPE).stream().forEach(
+				weather -> commands.add(new WeatherCommand(plugin, weather)));
 
 		// enchantments
-		for (EnchantmentType enchantment : plugin.getRegistry().getAllOf(EnchantmentType.class)) {
-			commands.add(new EnchantmentCommand(plugin, enchantment));
-		}
+		plugin.getGame().registry(RegistryTypes.ENCHANTMENT_TYPE).stream().forEach(
+				enchantmentType -> commands.add(new EnchantmentCommand(plugin, enchantmentType)));
 
 		// give/take items
 		for (ItemType item : giveTakeItems) {
@@ -168,16 +160,10 @@ public class CommandRegister {
 		}
 
 		// gamemode commands
-		for (GameMode gamemode : plugin.getRegistry().getAllOf(GameMode.class)) {
-			if (gamemode.equals(GameModes.SURVIVAL))
-				continue;
-			commands.add(new GameModeCommand(plugin, gamemode,
-					gamemode.equals(GameModes.SPECTATOR) ? 8L : 15L)); // duration (in seconds)
-		}
-
-		// register keep inventory event handler
-		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
-		plugin.getGame().getEventManager().registerListeners(plugin, new GameModeCommand.Manager());
+		plugin.getGame().registry(RegistryTypes.GAME_MODE).stream()
+				.filter(gamemode -> !gamemode.equals(GameModes.SURVIVAL.get()))
+				.forEach(gamemode -> commands.add(new GameModeCommand(plugin, gamemode,
+						gamemode.equals(GameModes.SPECTATOR.get()) ? 8L : 15L)));
 
 		for (Command command : commands) {
 			Class<? extends Command> clazz = command.getClass();
@@ -198,7 +184,11 @@ public class CommandRegister {
 			plugin.registerCommand(name, command);
 
 			if (firstRegistry && command.isEventListener())
-				plugin.getGame().getEventManager().registerListeners(plugin, command);
+				plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), command);
+		}
+		if (firstRegistry) {
+			plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), new KeepInventoryCommand.Manager());
+			plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), new GameModeCommand.Manager());
 		}
 	}
 

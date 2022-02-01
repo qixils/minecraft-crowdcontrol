@@ -18,7 +18,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameDat
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameDataBuilder;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedData;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -98,7 +98,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
 	// "real" variables
 	private final CommandRegister register = new CommandRegister(this);
-	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
+	private final SpongeTextUtil textUtil = new SpongeTextUtil();
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSource> commandSenderMapper = new CommandSourceMapper<>(this);
 	@Accessors(fluent = true)

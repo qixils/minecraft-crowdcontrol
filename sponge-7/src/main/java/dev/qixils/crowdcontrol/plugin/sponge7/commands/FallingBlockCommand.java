@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -18,7 +18,7 @@ public class FallingBlockCommand extends BlockCommand {
 		super(
 				plugin,
 				blockType,
-				"falling_block_" + Sponge7TextUtil.valueOf(blockType),
+				"falling_block_" + SpongeTextUtil.valueOf(blockType),
 				"Place Falling " + blockType.getTranslation().get() + " Block"
 		);
 	}

@@ -2,75 +2,57 @@ package dev.qixils.crowdcontrol.plugin.sponge8;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.sponge.SpongeCommandManager;
-import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
-import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.registry.RegistryTypes;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.configurate.serialize.SerializationException;
-import org.spongepowered.math.vector.Vector3d;
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.GameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.GameModeEffectDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ImmutableGameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ImmutableOriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ImmutableViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.OriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.OriginalDisplayNameDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.ViewerSpawnedDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.Sponge7TextUtil;
+import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.kyori.adventure.audience.Audience;
+import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
-import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
-import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Platform;
-import org.spongepowered.api.asset.Asset;
-import org.spongepowered.api.asset.AssetId;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataRegistration;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.property.block.MatterProperty;
-import org.spongepowered.api.data.property.block.MatterProperty.Matter;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataStore;
+import org.spongepowered.api.data.type.MatterType;
+import org.spongepowered.api.data.type.MatterTypes;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
-import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.GameRegistryEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.AsynchronousExecutor;
-import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
-import org.spongepowered.api.scheduler.SynchronousExecutor;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.registry.DefaultedRegistryReference;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -78,57 +60,42 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
-
-// TODO plugin file
 @Getter
-public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subject> { // TODO idk abt these interfaces
+@Plugin("crowd-control")
+public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> { // TODO idk abt these interfaces
 	// keys (though they don't really work)
-	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME = DummyObjectProvider.createExtendedFor(Key.class, "ORIGINAL_DISPLAY_NAME");
-	public static Key<Value<Boolean>> VIEWER_SPAWNED = DummyObjectProvider.createExtendedFor(Key.class, "VIEWER_SPAWNED");
-	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
+	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME;
+	public static Key<Value<Boolean>> VIEWER_SPAWNED;
+	public static Key<Value<GameMode>> GAME_MODE_EFFECT;
 	// "real" variables
 	private final CommandRegister register = new CommandRegister(this);
-	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
-	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
-	private SpongeCommandManager<Subject> commandManager;
+	private final TextUtil textUtil = new TextUtil(null);
+	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
+	@Accessors(fluent = true)
+	private final CommandCauseMapper commandSenderMapper = new CommandCauseMapper();
+	@Accessors(fluent = true)
+	private final ServerPlayerMapper playerMapper = new ServerPlayerMapper();
+	private SpongeCommandManager<CommandCause> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
-	private Scheduler scheduler;
-	private SpongeComponentSerializer spongeSerializer;
 	private String clientHost = null;
+	private TaskExecutorService syncExecutor;
+	private TaskExecutorService asyncExecutor;
 	// injected variables
 	@Inject
 	private Logger logger;
 	@Inject
 	private PluginContainer pluginContainer;
 	@Inject
-	@SynchronousExecutor
-	private SpongeExecutorService syncExecutor;
-	@Inject
-	@AsynchronousExecutor
-	private SpongeExecutorService asyncExecutor;
-	@Inject
 	private Game game;
-	@Inject
-	@AssetId("default.conf")
-	private Asset defaultConfig;
 	@Inject
 	@DefaultConfig(sharedRoot = true)
 	private Path configPath;
-	@Inject
-	private SpongeAudiences audiences;
-	// registries
-	private DataRegistration<OriginalDisplayNameData, ImmutableOriginalDisplayNameData> ORIGINAL_DISPLAY_NAME_DATA_REGISTRATION;
-	private DataRegistration<ViewerSpawnedData, ImmutableViewerSpawnedData> VIEWER_SPAWNED_DATA_REGISTRATION;
-	private DataRegistration<GameModeEffectData, ImmutableGameModeEffectData> GAME_MODE_EFFECT_DATA_REGISTRATION;
 
 	public SpongeCrowdControlPlugin() {
-		super(ServerPlayer.class, Subject.class);
+		super(ServerPlayer.class, CommandCause.class);
 	}
 
 	public static void spawnPlayerParticles(Entity entity, ParticleEffect particle) {
@@ -148,22 +115,16 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 		);
 	}
 
-	public static net.kyori.adventure.key.Key key(final CatalogType catalogType) {
-		return net.kyori.adventure.key.Key.key(catalogType.getId());
+	public static boolean isMatter(BlockState block, MatterType matter) {
+		return block.get(Keys.MATTER_TYPE).map(actual -> actual.equals(matter)).orElse(false);
 	}
 
-	public static boolean isMatter(BlockState block, Matter matter) {
-		Optional<MatterProperty> matterProp = block.getProperty(MatterProperty.class);
-		return matterProp.isPresent() && matter.equals(matterProp.get().getValue());
+	public static boolean isMatter(BlockState block, DefaultedRegistryReference<MatterType> matter) {
+		return matter.find().map(matterType -> isMatter(block, matter)).orElse(false);
 	}
 
 	public static boolean isLiquid(BlockState block) {
-		return isMatter(block, Matter.LIQUID);
-	}
-
-	@Override
-	public boolean isAdmin(@NotNull Subject commandSource) {
-		return commandSource.hasPermission(ADMIN_PERMISSION);
+		return isMatter(block, MatterTypes.LIQUID);
 	}
 
 	@Override
@@ -190,7 +151,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 		if (manualPassword != null)
 			return manualPassword;
 		try {
-			return configLoader.load().getNode("password").getString();
+			return configLoader.load().node("password").getString();
 		} catch (IOException e) {
 			logger.warn("Could not load config", e);
 			return null;
@@ -199,66 +160,51 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Listener
-	public void onKeyRegistration(GameRegistryEvent.Register<Key<?>> event) {
+	public void onKeyRegistration(RegisterDataEvent event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
-				.type(new TypeToken<Value<Text>>() {
-				})
-				.id("original_display_name")
-				.name("Original Display Name")
-				.query(DataQuery.of("OriginalDisplayName"))
+				.elementType(Component.class)
+				.key(ResourceKey.of(pluginContainer, "original_display_name"))
+				// TODO may need a comparator
 				.build();
 		VIEWER_SPAWNED = Key.builder()
-				.type(new TypeToken<Value<Boolean>>() {
-				})
-				.id("viewer_spawned")
-				.name("Viewer Spawned")
-				.query(DataQuery.of("ViewerSpawned"))
+				.elementType(Boolean.class)
+				.key(ResourceKey.of(pluginContainer, "viewer_spawned"))
 				.build();
 		GAME_MODE_EFFECT = Key.builder()
-				.type(new TypeToken<Value<GameMode>>() {
-				})
-				.id("game_mode_effect")
-				.name("Game Mode Effect State")
-				.query(DataQuery.of("GameModeEffect"))
+				.elementType(GameMode.class)
+				.key(ResourceKey.of(pluginContainer, "game_mode_effect"))
 				.build();
 
-		event.register(ORIGINAL_DISPLAY_NAME);
-		event.register(VIEWER_SPAWNED);
-		event.register(GAME_MODE_EFFECT);
+		DataRegistration ogNameRegister = DataRegistration.builder()
+				.dataKey(ORIGINAL_DISPLAY_NAME)
+				.store(DataStore.of(
+						ORIGINAL_DISPLAY_NAME,
+						DataQuery.of("GameModeEffect"),
+						Entity.class
+				))
+				.build();
+		DataRegistration viewerRegister = DataRegistration.builder()
+				.dataKey(VIEWER_SPAWNED)
+				.store(DataStore.of(
+						VIEWER_SPAWNED,
+						DataQuery.of("ViewerSpawned"),
+						Entity.class
+				))
+				.build();
+		DataRegistration gameModeRegister = DataRegistration.builder()
+				.dataKey(GAME_MODE_EFFECT)
+				.store(DataStore.of(
+						GAME_MODE_EFFECT,
+						DataQuery.of("GameModeEffect"),
+						ServerPlayer.class
+				))
+				.build();
+
+		event.register(ogNameRegister);
+		event.register(viewerRegister);
+		event.register(gameModeRegister);
 	}
 
-	@Listener
-	public void onDataRegistration(GameRegistryEvent.Register<DataRegistration<?, ?>> event) {
-		ORIGINAL_DISPLAY_NAME_DATA_REGISTRATION = DataRegistration.builder()
-				.dataClass(OriginalDisplayNameData.class)
-				.immutableClass(ImmutableOriginalDisplayNameData.class)
-				.dataImplementation(OriginalDisplayNameData.class)
-				.immutableImplementation(ImmutableOriginalDisplayNameData.class)
-				.builder(new OriginalDisplayNameDataBuilder())
-				.id("original_display_name")
-				.name("Original Display Name")
-				.build();
-		VIEWER_SPAWNED_DATA_REGISTRATION = DataRegistration.builder()
-				.dataClass(ViewerSpawnedData.class)
-				.immutableClass(ImmutableViewerSpawnedData.class)
-				.dataImplementation(ViewerSpawnedData.class)
-				.immutableImplementation(ImmutableViewerSpawnedData.class)
-				.builder(new ViewerSpawnedDataBuilder())
-				.id("viewer_spawned")
-				.name("Viewer Spawned")
-				.build();
-		GAME_MODE_EFFECT_DATA_REGISTRATION = DataRegistration.builder()
-				.dataClass(GameModeEffectData.class)
-				.immutableClass(ImmutableGameModeEffectData.class)
-				.dataImplementation(GameModeEffectData.class)
-				.immutableImplementation(ImmutableGameModeEffectData.class)
-				.builder(new GameModeEffectDataBuilder())
-				.id("game_mode_effect")
-				.name("Game Mode Effect State")
-				.build();
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void initCrowdControl() {
 		CommandConstants.SOUND_VALIDATOR = key -> game.registry(RegistryTypes.SOUND_TYPE).findEntry(ResourceKey.resolve(key.asString())).isPresent();
@@ -295,7 +241,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 			if (manualPassword != null)
 				password = manualPassword;
 			else {
-				password = config.getNode("password").getString("crowdcontrol");
+				password = config.node("password").getString("crowdcontrol");
 				if (password == null || password.isEmpty()) {
 					logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowd-control.conf or set a temporary password using the /password command.");
 					return;
@@ -317,17 +263,17 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 
 	@SneakyThrows(IOException.class)
 	@Listener
-	public void onServerStart(GameStartedServerEvent event) {
-		spongeSerializer = SpongeComponentSerializer.get();
-		scheduler = game.getScheduler();
-		defaultConfig.copyToFile(configPath, false, true);
+	public void onServerStart(StartingEngineEvent<Server> event) {
+		syncExecutor = game.server().scheduler().executor(pluginContainer);
+		asyncExecutor = game.asyncScheduler().executor(pluginContainer);
+		// TODO copy default config to config folder
 		configLoader = HoconConfigurationLoader.builder()
-				.setPath(configPath)
+				.path(configPath)
 				.build();
 		initCrowdControl();
 		commandManager = new SpongeCommandManager<>(
 				pluginContainer,
-				AsynchronousCommandExecutionCoordinator.<CommandSource>newBuilder()
+				AsynchronousCommandExecutionCoordinator.<CommandCause>newBuilder()
 						.withAsynchronousParsing().withExecutor(asyncExecutor).build(),
 				Function.identity(),
 				Function.identity()
@@ -336,7 +282,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 	}
 
 	@Listener
-	public void onServerStop(GameStoppingServerEvent event) {
+	public void onServerStop(StoppingEngineEvent<Server> event) {
+		syncExecutor = null;
 		if (crowdControl != null) {
 			crowdControl.shutdown("Minecraft server is shutting down");
 			crowdControl = null;
@@ -344,11 +291,12 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Subje
 	}
 
 	@Listener
-	public void onConnection(ClientConnectionEvent.Join event) {
-		onPlayerJoin(event.getTargetEntity());
-		Platform platform = game.getPlatform();
-		if ((platform.getType().isClient() || platform.getExecutionType().isClient()) && clientHost == null) {
-			clientHost = event.getTargetEntity().getUniqueId().toString();
+	public void onConnection(ServerSideConnectionEvent.Join event) {
+		onPlayerJoin(event.player());
+		Platform platform = game.platform();
+		if ((platform.type().isClient() || platform.executionType().isClient() || game.isClientAvailable())
+				&& clientHost == null) {
+			clientHost = event.player().uniqueId().toString();
 		}
 	}
 }

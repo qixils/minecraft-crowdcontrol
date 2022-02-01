@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
@@ -28,8 +27,8 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + Sponge7TextUtil.csIdOf(entityType);
-		this.displayName = "Remove " + Sponge7TextUtil.getFixedName(entityType);
+		this.effectName = "remove_entity_" + SpongeTextUtil.csIdOf(entityType);
+		this.displayName = "Remove " + SpongeTextUtil.getFixedName(entityType);
 	}
 
 	@NotNull

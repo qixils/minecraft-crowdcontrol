@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -36,7 +35,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		super(plugin);
 		this.enchantmentType = enchantmentType;
 		this.maxLevel = enchantmentType.getMaximumLevel();
-		this.effectName = "enchant_" + Sponge7TextUtil.csIdOf(enchantmentType);
+		this.effectName = "enchant_" + SpongeTextUtil.csIdOf(enchantmentType);
 		this.displayName = "Apply " + enchantmentType.getTranslation().get();
 	}
 

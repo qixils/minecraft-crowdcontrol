@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.utils;
 
 import dev.qixils.crowdcontrol.common.util.TextUtil;
-import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.translation.Translatable;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.CatalogType;
@@ -9,9 +8,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.text.translation.Translation;
 
-public class Sponge7TextUtil extends TextUtil {
-	public Sponge7TextUtil() {
-		super(ComponentFlattener.basic());
+public class SpongeTextUtil extends TextUtil {
+	public SpongeTextUtil() {
+		super(null);
 	}
 
 	@NotNull

@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -28,7 +27,7 @@ public class BlockCommand extends ImmediateCommand {
 		this(
 				plugin,
 				blockType,
-				"block_" + Sponge7TextUtil.csIdOf(blockType),
+				"block_" + SpongeTextUtil.csIdOf(blockType),
 				"Place " + blockType.getTranslation().get() + " Block"
 		);
 	}

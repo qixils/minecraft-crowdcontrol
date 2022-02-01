@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.GameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,7 @@ public class GameModeCommand extends TimedCommand {
 		this.duration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
 		this.displayName = gamemode.getTranslation().get();
-		this.effectName = Sponge7TextUtil.valueOf(gamemode) + "_mode";
+		this.effectName = SpongeTextUtil.valueOf(gamemode) + "_mode";
 	}
 
 	@Override

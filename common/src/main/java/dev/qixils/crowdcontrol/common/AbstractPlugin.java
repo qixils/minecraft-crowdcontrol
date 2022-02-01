@@ -15,7 +15,7 @@ import java.util.Locale;
  * @param <P> class used to represent online players
  * @param <S> class used to represent command senders in Cloud Command Framework
  */
-public abstract class AbstractPlugin<P extends S, S> implements Plugin<P, S> {
+public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 
 	@Getter
 	private final Class<P> playerClass;

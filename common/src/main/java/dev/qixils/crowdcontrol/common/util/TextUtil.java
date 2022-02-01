@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.common.util;
 
 import lombok.Getter;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
@@ -15,19 +16,19 @@ import org.jetbrains.annotations.Nullable;
  */
 @Getter
 public class TextUtil {
-	private final ComponentFlattener flattener;
-	private final PlainTextComponentSerializer serializer;
+	private final @Nullable ComponentFlattener flattener;
+	private final @NotNull PlainTextComponentSerializer serializer;
 
 	/**
 	 * Creates a new TextUtil given a {@link ComponentFlattener}.
 	 *
 	 * @param flattener component flattener
 	 */
-	public TextUtil(@NotNull ComponentFlattener flattener) {
+	public TextUtil(@Nullable ComponentFlattener flattener) {
 		this.flattener = flattener;
-		serializer = PlainTextComponentSerializer.builder()
-				.flattener(flattener)
-				.build();
+		this.serializer = flattener == null
+				? PlainTextComponentSerializer.plainText() // uses impl's default flattener
+				: PlainTextComponentSerializer.builder().flattener(flattener).build();
 	}
 
 	/**
@@ -52,8 +53,6 @@ public class TextUtil {
 		return asPlain(Component.translatable(translatable));
 	}
 
-	// borrowed from https://www.baeldung.com/java-string-title-case
-
 	/**
 	 * Converts a string to Title Case.
 	 * Underscores will be replaced with spaces.
@@ -63,6 +62,7 @@ public class TextUtil {
 	 */
 	@Contract("null -> null; !null -> !null")
 	public static String titleCase(@Nullable String text) {
+		// borrowed from https://www.baeldung.com/java-string-title-case
 		if (text == null || text.isEmpty()) {
 			return text;
 		}

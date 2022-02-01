@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -28,7 +27,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	public TakeItemCommand(SpongeCrowdControlPlugin plugin, ItemType item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "take_" + Sponge7TextUtil.valueOf(item);
+		this.effectName = "take_" + SpongeTextUtil.valueOf(item);
 		this.displayName = "Take " + item.getTranslation().get();
 	}
 
