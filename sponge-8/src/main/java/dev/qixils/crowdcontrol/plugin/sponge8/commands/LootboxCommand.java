@@ -9,7 +9,7 @@ import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.sound.Sound.Emitter;
+import net.kyori.adventure.sound.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.Keys;
@@ -171,7 +171,7 @@ public class LootboxCommand extends ImmediateCommand {
 				}
 			}
 			// sound & open
-			player.playSound(Sounds.LOOTBOX_CHIME.get(), (Emitter) player);
+			player.playSound(Sounds.LOOTBOX_CHIME.get(), Sound.Emitter.self());
 			sync(() -> menu.open(player));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
