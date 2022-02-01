@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.utils;
 
+// TODO: remove?
 public class MinecraftMath {
 	private static final double[] SIN = new double[65536];
 

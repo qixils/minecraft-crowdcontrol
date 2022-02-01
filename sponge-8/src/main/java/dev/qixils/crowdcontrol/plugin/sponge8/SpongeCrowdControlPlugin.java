@@ -158,7 +158,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		}
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Listener
 	public void onKeyRegistration(RegisterDataEvent event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
