@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -11,10 +10,10 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
 
@@ -28,13 +27,13 @@ public class TeleportCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.FAILURE)
 				.message("No teleportation destinations were available");
-		for (Player player : players) {
-			Location<World> tempDest = BlockFinder.builder()
-					.origin(player.getLocation())
+		for (ServerPlayer player : players) {
+			ServerLocation tempDest = BlockFinder.builder()
+					.origin(player.serverLocation())
 					.minRadius(3)
 					.maxRadius(15)
 					.locationValidator(BlockFinder.SPAWNING_SPACE)
@@ -42,10 +41,10 @@ public class TeleportCommand extends ImmediateCommand {
 			if (tempDest == null) {
 				continue;
 			}
-			final Location<World> destination = tempDest.add(.5, 0, .5);
+			final ServerLocation destination = tempDest.add(.5, 0, .5);
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			sync(() -> {
-				player.setLocation(destination.getBlockRelative(Direction.NONE));
+				player.setLocation(destination.relativeToBlock(Direction.NONE));
 				SpongeCrowdControlPlugin.spawnPlayerParticles(
 						player,
 						ParticleEffect.builder()
@@ -54,12 +53,7 @@ public class TeleportCommand extends ImmediateCommand {
 								.offset(new Vector3d(.5d, 1d, .5d))
 								.build()
 				);
-				plugin.asAudience(player.getWorld()).playSound(
-						Sounds.TELEPORT.get(),
-						destination.getX(),
-						destination.getY(),
-						destination.getZ()
-				);
+				player.world().playSound(Sounds.TELEPORT.get(), destination.position());
 			});
 		}
 		return result;
