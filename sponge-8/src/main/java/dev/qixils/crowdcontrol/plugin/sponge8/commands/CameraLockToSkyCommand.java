@@ -1,14 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Duration;
 import java.util.List;
@@ -30,23 +32,24 @@ public class CameraLockToSkyCommand extends TimedCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		AtomicReference<Task> task = new AtomicReference<>();
+	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+		AtomicReference<ScheduledTask> task = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
 				.duration(getDuration())
 				.startCallback($ -> {
-					List<Player> players = plugin.getPlayers(request);
-					task.set(Task.builder()
-							.intervalTicks(1)
-							.delayTicks(1)
+					List<ServerPlayer> players = plugin.getPlayers(request);
+					task.set(plugin.getSyncScheduler().submit(Task.builder()
+							.interval(Ticks.of(1))
+							.delay(Ticks.of(1))
 							.execute(() -> players.forEach(player -> {
-								Vector3d rotation = player.getRotation();
-								if (rotation.getX() > -89.99)
-									player.setRotation(new Vector3d(-90, rotation.getY(), rotation.getZ()));
+								Vector3d rotation = player.rotation();
+								if (rotation.x() > -89.99)
+									player.setRotation(new Vector3d(-90, rotation.y(), rotation.z()));
 							}))
-							.submit(plugin));
+							.plugin(plugin.getPluginContainer())
+							.build()));
 					playerAnnounce(players, request);
 					return null;
 				})

@@ -42,6 +42,7 @@ import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.registry.DefaultedRegistryReference;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -81,6 +82,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private SpongeCommandManager<CommandCause> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private String clientHost = null;
+	private Scheduler syncScheduler;
+	private Scheduler asyncScheduler;
 	private TaskExecutorService syncExecutor;
 	private TaskExecutorService asyncExecutor;
 	// injected variables
@@ -263,8 +266,10 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(StartingEngineEvent<Server> event) {
-		syncExecutor = game.server().scheduler().executor(pluginContainer);
-		asyncExecutor = game.asyncScheduler().executor(pluginContainer);
+		syncScheduler = game.server().scheduler();
+		asyncScheduler = game.asyncScheduler();
+		syncExecutor = syncScheduler.executor(pluginContainer);
+		asyncExecutor = asyncScheduler.executor(pluginContainer);
 		// TODO copy default config to config folder
 		configLoader = HoconConfigurationLoader.builder()
 				.path(configPath)
@@ -282,6 +287,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 
 	@Listener
 	public void onServerStop(StoppingEngineEvent<Server> event) {
+		syncScheduler = null;
 		syncExecutor = null;
 		if (crowdControl != null) {
 			crowdControl.shutdown("Minecraft server is shutting down");
