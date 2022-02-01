@@ -7,9 +7,9 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.List;
 
@@ -42,12 +42,12 @@ public class MaxHealthCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.FAILURE)
 				.message("All players are at minimum health (" + (MIN_MAX_HEALTH / 2) + " hearts)");
-		for (Player player : players) {
-			MutableBoundedValue<Double> data = player.maxHealth();
+		for (ServerPlayer player : players) {
+			Value.Mutable<Double> data = player.maxHealth();
 			double newVal = data.get() + amount;
 			if (newVal < MIN_MAX_HEALTH)
 				continue;
