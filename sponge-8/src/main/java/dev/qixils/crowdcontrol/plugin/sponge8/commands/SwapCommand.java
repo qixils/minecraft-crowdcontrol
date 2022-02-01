@@ -10,8 +10,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +30,7 @@ public class SwapCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		if (players.size() < 2)
 			return request.buildResponse().type(ResultType.FAILURE).message("Not enough participating players online");
 
@@ -41,9 +41,9 @@ public class SwapCommand extends ImmediateCommand {
 		offset.addAll(players.subList(1, players.size()));
 		offset.add(players.get(0));
 		// get teleport destinations
-		Map<Player, Location<World>> destinations = new HashMap<>(players.size());
+		Map<ServerPlayer, ServerLocation> destinations = new HashMap<>(players.size());
 		for (int i = 0; i < players.size(); i++)
-			destinations.put(players.get(i), offset.get(i).getLocation());
+			destinations.put(players.get(i), offset.get(i).serverLocation());
 		// teleport
 		sync(() -> destinations.forEach(Entity::setLocation));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
