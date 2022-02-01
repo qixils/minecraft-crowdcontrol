@@ -8,12 +8,12 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 import java.time.Duration;
 import java.util.List;
@@ -29,21 +29,21 @@ public class FlightCommand extends TimedCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
 				.duration(duration)
 				.startCallback($ -> {
-					List<Player> players = plugin.getPlayers(request);
+					List<ServerPlayer> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
 							.type(ResultType.RETRY)
 							.message("Target is already flying or able to fly");
-					for (Player player : players) {
+					for (ServerPlayer player : players) {
 						GameMode gameMode = player.gameMode().get();
-						if (gameMode.equals(GameModes.CREATIVE))
+						if (gameMode.equals(GameModes.CREATIVE.get()))
 							continue;
-						if (gameMode.equals(GameModes.SPECTATOR))
+						if (gameMode.equals(GameModes.SPECTATOR.get()))
 							continue;
 						if (player.get(Keys.CAN_FLY).orElse(false))
 							continue;
@@ -60,7 +60,7 @@ public class FlightCommand extends TimedCommand {
 					return response;
 				})
 				.completionCallback($ -> {
-					List<Player> players = plugin.getPlayers(request);
+					List<ServerPlayer> players = plugin.getPlayers(request);
 					sync(() -> players.forEach(player -> {
 						player.offer(Keys.CAN_FLY, false);
 						player.offer(Keys.IS_FLYING, false);
@@ -75,13 +75,13 @@ public class FlightCommand extends TimedCommand {
 	}
 
 	@Listener
-	public void onJoin(ClientConnectionEvent.Join event) {
-		Player player = event.getTargetEntity();
+	public void onJoin(ServerSideConnectionEvent.Join event) {
+		ServerPlayer player = event.player();
 		GameMode gameMode = player.gameMode().get();
 		// this is a work of art
-		if (gameMode.equals(GameModes.CREATIVE))
+		if (gameMode.equals(GameModes.CREATIVE.get()))
 			return;
-		if (gameMode.equals(GameModes.SPECTATOR))
+		if (gameMode.equals(GameModes.SPECTATOR.get()))
 			return;
 		if (!player.get(Keys.CAN_FLY).orElse(false))
 			return;
