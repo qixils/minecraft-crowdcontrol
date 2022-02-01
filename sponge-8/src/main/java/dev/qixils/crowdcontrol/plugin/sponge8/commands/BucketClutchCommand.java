@@ -10,16 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.slot.EquipmentSlot;
-import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldTypes;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 public class BucketClutchCommand extends ImmediateCommand {
@@ -32,17 +31,17 @@ public class BucketClutchCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.RETRY)
 				.message("No players are on the surface");
 		for (Player player : players) {
-			if (!player.getWorld().getDimension().getType().equals(DimensionTypes.OVERWORLD))
+			if (!player.world().worldType().equals(WorldTypes.OVERWORLD.get()))
 				continue;
-			Location<World> curr = player.getLocation();
+			ServerLocation curr = player.serverLocation();
 			boolean obstruction = false;
 			for (int y = 1; y <= OFFSET; y++) {
-				BlockState block = curr.add(0, y, 0).getBlock();
+				BlockState block = curr.add(0, y, 0).block();
 				if (BlockFinder.isPassable(block))
 					continue;
 				obstruction = true;
@@ -52,18 +51,18 @@ public class BucketClutchCommand extends ImmediateCommand {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> {
 					player.setLocation(curr.add(0, OFFSET, 0));
-					ItemStack hand = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
-					if (hand != null && !hand.isEmpty() && !hand.getType().equals(ItemTypes.WATER_BUCKET)) {
-						Optional<ItemStack> offhand = player.getItemInHand(HandTypes.OFF_HAND);
-						if (!offhand.isPresent() || offhand.get().isEmpty()) {
+					ItemStack hand = player.itemInHand(HandTypes.MAIN_HAND);
+					if (hand != null && !hand.isEmpty() && !hand.type().equals(ItemTypes.WATER_BUCKET.get())) {
+						ItemStack offhand = player.itemInHand(HandTypes.OFF_HAND);
+						if (offhand.isEmpty()) {
 							player.setItemInHand(HandTypes.OFF_HAND, hand);
 						} else {
 							boolean slotFound = false;
-							for (Inventory slot : player.getInventory().slots()) {
+							for (Slot slot : player.inventory().slots()) {
 								if (slot instanceof EquipmentSlot)
 									continue;
-								Optional<ItemStack> item = slot.peek();
-								if (!item.isPresent() || item.get().isEmpty()) {
+								ItemStack item = slot.peek();
+								if (item.isEmpty()) {
 									slotFound = true;
 									slot.set(hand);
 									break;
