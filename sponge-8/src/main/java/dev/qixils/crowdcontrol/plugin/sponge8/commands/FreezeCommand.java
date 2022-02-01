@@ -6,10 +6,11 @@ import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -35,33 +36,34 @@ public final class FreezeCommand extends TimedCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		AtomicReference<Task> task = new AtomicReference<>();
+	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+		AtomicReference<ScheduledTask> task = new AtomicReference<>();
 
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
 				.duration(getDuration())
 				.startCallback($ -> {
-					List<Player> players = plugin.getPlayers(request);
-					Map<UUID, Location<World>> locations = new HashMap<>(players.size());
-					players.forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
-					task.set(Task.builder()
-							.delayTicks(1)
-							.intervalTicks(1)
+					List<ServerPlayer> players = plugin.getPlayers(request);
+					Map<UUID, ServerLocation> locations = new HashMap<>(players.size());
+					players.forEach(player -> locations.put(player.uniqueId(), player.serverLocation()));
+					task.set(plugin.getSyncScheduler().submit(Task.builder()
+							.delay(Ticks.of(1))
+							.interval(Ticks.of(1))
 							.execute(() -> players.forEach(player -> {
-								if (!locations.containsKey(player.getUniqueId()))
+								if (!locations.containsKey(player.uniqueId()))
 									return;
 
-								Location<World> location = locations.get(player.getUniqueId());
-								Location<World> playerLoc = player.getLocation();
-								if (!location.getExtent().equals(playerLoc.getExtent()))
+								ServerLocation location = locations.get(player.uniqueId());
+								ServerLocation playerLoc = player.serverLocation();
+								if (!location.world().equals(playerLoc.world()))
 									return;
 								if (location.equals(playerLoc))
 									return;
 								player.setLocation(location);
 							}))
-							.submit(plugin));
+							.plugin(plugin.getPluginContainer())
+							.build()));
 					playerAnnounce(players, request);
 					return null;
 				})
