@@ -7,8 +7,8 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 
 import java.util.List;
@@ -24,18 +24,19 @@ public class HalfHealthCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.FAILURE)
 				.message("Health is already minimum");
 
-		for (Player player : players) {
-			double health = player.getHealthData().health().get();
+		for (ServerPlayer player : players) {
+			Value.Mutable<Double> healthData = player.health();
+			double health = healthData.get();
 			if (health > 0.5) {
 				response.type(ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> {
 					player.damage(.01, DamageSources.GENERIC);
-					player.offer(Keys.HEALTH, health / 2);
+					player.offer(healthData.set(health / 2d));
 				});
 			}
 		}
