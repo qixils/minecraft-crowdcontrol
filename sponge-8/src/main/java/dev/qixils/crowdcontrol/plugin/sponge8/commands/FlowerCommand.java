@@ -11,10 +11,10 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,23 +32,23 @@ public class FlowerCommand extends ImmediateCommand {
 
 	public FlowerCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
-		flowers = new TypedTag<>(CommandConstants.FLOWERS, plugin, BlockType.class);
+		flowers = new TypedTag<>(CommandConstants.FLOWERS, plugin, RegistryTypes.BLOCK_TYPE);
 	}
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Set<Location<World>> placeLocations = new HashSet<>(FLOWER_MAX * players.size());
-		for (Player player : players) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		Set<ServerLocation> placeLocations = new HashSet<>(FLOWER_MAX * players.size());
+		for (ServerPlayer player : players) {
 			BlockFinder finder = BlockFinder.builder()
-					.origin(player.getLocation())
+					.origin(player.serverLocation())
 					.maxRadius(FLOWER_RADIUS)
 					.locationValidator(location ->
 							!placeLocations.contains(location)
-									&& BlockFinder.isReplaceable(location.getBlock())
-									&& BlockFinder.isSolid(location.sub(0, 1, 0).getBlock()))
+									&& BlockFinder.isReplaceable(location.block())
+									&& BlockFinder.isSolid(location.sub(0, 1, 0).block()))
 					.build();
-			Location<World> location = finder.next();
+			ServerLocation location = finder.next();
 			int placed = 0;
 			int toPlace = RandomUtil.nextInclusiveInt(FLOWER_MIN, FLOWER_MAX);
 			while (location != null) {
@@ -65,8 +65,8 @@ public class FlowerCommand extends ImmediateCommand {
 					.message("Could not find a suitable location to place flowers");
 
 		sync(() -> {
-			try (StackFrame ignored = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
-				for (Location<World> location : placeLocations) {
+			try (StackFrame ignored = plugin.getGame().client().causeStackManager().pushCauseFrame()) {
+				for (ServerLocation location : placeLocations) {
 					location.setBlockType(flowers.getRandom());
 				}
 			}
