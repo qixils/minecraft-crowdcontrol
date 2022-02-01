@@ -42,6 +42,7 @@ import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.registry.DefaultedRegistryReference;
+import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.TaskExecutorService;
@@ -129,6 +130,10 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 
 	public static boolean isLiquid(BlockState block) {
 		return isMatter(block, MatterTypes.LIQUID);
+	}
+
+	public <T> Iterable<T> registryIterable(RegistryType<T> registryType) {
+		return () -> game.registry(registryType).stream().iterator();
 	}
 
 	@Override

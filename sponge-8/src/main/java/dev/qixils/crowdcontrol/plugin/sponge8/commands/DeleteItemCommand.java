@@ -8,10 +8,10 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 public class DeleteItemCommand extends ImmediateCommand {
@@ -24,16 +24,13 @@ public class DeleteItemCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.RETRY)
 				.message("No players were holding items");
 		for (Player player : players) {
-			for (HandType hand : plugin.getRegistry().getAllOf(HandType.class)) {
-				Optional<ItemStack> optionalItem = player.getItemInHand(hand);
-				if (!optionalItem.isPresent())
-					continue;
-				if (optionalItem.get().isEmpty())
+			for (HandType hand : plugin.registryIterable(RegistryTypes.HAND_TYPE)) {
+				if (player.itemInHand(hand).isEmpty())
 					continue;
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				player.setItemInHand(hand, null);
