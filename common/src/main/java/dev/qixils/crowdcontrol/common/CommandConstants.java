@@ -456,8 +456,9 @@ public class CommandConstants {
 		NONE(0, 167),
 		ONE(1, 20),
 		TWO(2, 10),
-		THREE(3, 2),
-		FOUR(4, 1);
+		THREE(3, 4),
+		FOUR(4, 2),
+		FIVE(5, 1);
 
 		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(AttributeWeights::getWeight).sum();
 		private final int level;

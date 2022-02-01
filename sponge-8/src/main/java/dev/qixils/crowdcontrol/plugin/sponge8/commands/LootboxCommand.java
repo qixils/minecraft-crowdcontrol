@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.CommandConstants.AttributeWeights;
 import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
@@ -13,6 +14,10 @@ import net.kyori.adventure.sound.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.attribute.AttributeModifier;
+import org.spongepowered.api.entity.attribute.AttributeOperations;
+import org.spongepowered.api.entity.attribute.type.AttributeType;
+import org.spongepowered.api.entity.attribute.type.AttributeTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -21,11 +26,14 @@ import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +43,18 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.buildLootboxTitle;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
+	private static final @NotNull EquipmentType MAIN_HAND = EquipmentTypes.MAIN_HAND.get();
+	private static final @NotNull EquipmentType OFF_HAND = EquipmentTypes.OFF_HAND.get();
+	private static final List<AttributeType> ATTRIBUTES = Arrays.asList(
+			AttributeTypes.GENERIC_MAX_HEALTH.get(),
+			AttributeTypes.GENERIC_KNOCKBACK_RESISTANCE.get(),
+			AttributeTypes.GENERIC_MOVEMENT_SPEED.get(),
+			AttributeTypes.GENERIC_ATTACK_DAMAGE.get(),
+			AttributeTypes.GENERIC_ARMOR.get(),
+			AttributeTypes.GENERIC_ARMOR_TOUGHNESS.get(),
+			AttributeTypes.GENERIC_ATTACK_KNOCKBACK.get(),
+			AttributeTypes.GENERIC_ATTACK_SPEED.get()
+	);
 	private final List<ItemType> allItems;
 	private final List<ItemType> goodItems;
 	private final String effectName = "lootbox";
@@ -135,9 +155,38 @@ public class LootboxCommand extends ImmediateCommand {
 			});
 		}
 
-		// API8: attributes
-		// (attributes kinda exist in Sponge 7 but they are not available as a CatalogType, just
-		//  as Keys, and even then I don't think I can add them to items)
+		// determine attributes to add
+		int attributes = 0;
+		for (int i = 0; i <= luck; i++) {
+			attributes = Math.max(attributes, RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel());
+		}
+		// add attributes
+		if (attributes > 0) {
+			List<AttributeType> attributeList = new ArrayList<>(ATTRIBUTES);
+			Collections.shuffle(attributeList, random);
+			for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
+				AttributeType attribute = attributeList.get(i);
+				String name = "lootbox_" + attribute.key(RegistryTypes.ATTRIBUTE_TYPE).value();
+				// determine percent amount for the modifier
+				double amount = 0d;
+				for (int j = 0; j <= luck; j++) {
+					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
+				}
+				// create & add attribute
+				AttributeModifier attributeModifier = AttributeModifier.builder()
+						.name(name)
+						.randomId()
+						.amount(amount)
+						.operation(AttributeOperations.MULTIPLY_TOTAL)
+						.build();
+				EquipmentType equipmentType = itemStack.get(Keys.EQUIPMENT_TYPE).orElse(MAIN_HAND);
+				if (equipmentType.equals(MAIN_HAND) || equipmentType.equals(OFF_HAND)) {
+					itemStack.addAttributeModifier(attribute, attributeModifier, MAIN_HAND);
+					itemStack.addAttributeModifier(attribute, attributeModifier, OFF_HAND);
+				} else
+					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentType);
+			}
+		}
 
 		return itemStack;
 	}
