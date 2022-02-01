@@ -32,20 +32,15 @@ public class HatCommand extends ImmediateCommand {
 
 		for (Player player : players) {
 			Optional<ItemStack> head = player.getHelmet();
-			HandType usedHandType = null;
-			Optional<ItemStack> hand = Optional.empty();
 			for (HandType handType : plugin.getRegistry().getAllOf(HandType.class)) {
-				hand = player.getItemInHand(handType);
-				if (!isSimilar(hand, head)) {
-					usedHandType = handType;
-					break;
-				}
+				Optional<ItemStack> hand = player.getItemInHand(handType);
+				if (isSimilar(hand, head))
+					continue;
+				response.type(ResultType.SUCCESS).message("SUCCESS");
+				player.setHelmet(hand.orElse(null));
+				player.setItemInHand(handType, head.orElse(null));
+				break;
 			}
-			if (usedHandType == null)
-				continue;
-			response.type(ResultType.SUCCESS).message("SUCCESS");
-			player.setHelmet(hand.orElse(null));
-			player.setItemInHand(usedHandType, head.orElse(null));
 		}
 
 		return response;
