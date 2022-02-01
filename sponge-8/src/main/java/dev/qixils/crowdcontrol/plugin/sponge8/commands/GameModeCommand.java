@@ -3,21 +3,23 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
+import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.GAME_MODE_EFFECT;
 
 @Getter
 public class GameModeCommand extends TimedCommand {
@@ -30,50 +32,50 @@ public class GameModeCommand extends TimedCommand {
 		super(plugin);
 		this.duration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = gamemode.getTranslation().get();
-		this.effectName = SpongeTextUtil.valueOf(gamemode) + "_mode";
+		this.displayName = plugin.getTextUtil().asPlain(gamemode);
+		this.effectName = gamemode.key(RegistryTypes.GAME_MODE).value() + "_mode";
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		List<Player> players = new ArrayList<>();
+	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+		List<ServerPlayer> players = new ArrayList<>();
 
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
 				.duration(duration)
 				.startCallback($ -> {
-					List<Player> curPlayers = plugin.getPlayers(request);
+					List<ServerPlayer> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);
 					players.addAll(curPlayers);
 					playerAnnounce(players, request);
 					return null;
 				})
-				.completionCallback($ -> setGameMode(null, players, GameModes.SURVIVAL))
+				.completionCallback($ -> setGameMode(null, players, GameModes.SURVIVAL.get()))
 				.build().queue();
 	}
 
 	private void setGameMode(@Nullable Request request,
-							 @NotNull List<@NotNull Player> players,
+							 @NotNull List<@NotNull ServerPlayer> players,
 							 @NotNull GameMode gamemode) {
 		if (players.isEmpty())
 			return;
 		sync(() -> players.forEach(player -> {
 			player.offer(Keys.GAME_MODE, gamemode);
 			if (request == null)
-				player.remove(GameModeEffectData.class);
+				player.remove(GAME_MODE_EFFECT);
 			else
-				player.offer(new GameModeEffectData(gamemode));
+				player.offer(GAME_MODE_EFFECT, gamemode);
 		}));
 	}
 
 	public static final class Manager {
 		@Listener
-		public void onJoin(ClientConnectionEvent.Join event) {
-			Player player = event.getTargetEntity();
-			if (!player.get(GameModeEffectData.class).isPresent()) return;
-			player.remove(GameModeEffectData.class);
-			player.gameMode().set(GameModes.SURVIVAL);
+		public void onJoin(ServerSideConnectionEvent.Join event) {
+			ServerPlayer player = event.player();
+			if (!player.get(GAME_MODE_EFFECT).isPresent()) return;
+			player.remove(GAME_MODE_EFFECT);
+			player.offer(Keys.GAME_MODE, GameModes.SURVIVAL.get());
 		}
 	}
 

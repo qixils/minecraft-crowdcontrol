@@ -74,7 +74,7 @@ public class GameModeCommand extends TimedCommand {
 			Player player = event.getTargetEntity();
 			if (!player.get(GameModeEffectData.class).isPresent()) return;
 			player.remove(GameModeEffectData.class);
-			player.gameMode().set(GameModes.SURVIVAL);
+			player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
 		}
 	}
 
