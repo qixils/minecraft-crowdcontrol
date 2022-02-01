@@ -10,12 +10,11 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.gen.PopulatorObject;
 import org.spongepowered.api.world.gen.PopulatorObjects;
 import org.spongepowered.api.world.gen.type.BiomeTreeType;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,24 +45,24 @@ public class PlantTreeCommand extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Streamer is not in a suitable place for tree planting");
 		PopulatorObject treeType = RandomUtil.randomElementFrom(trees);
 
 		Collection<CompletableFuture<?>> futures = new ArrayList<>(players.size());
-		for (Player player : players) {
-			Location<World> location = player.getLocation();
+		for (ServerPlayer player : players) {
+			ServerLocation location = player.serverLocation();
 			CompletableFuture<Void> future = new CompletableFuture<>();
 			futures.add(future);
 
 			// the #canPlaceAt method sometimes erroneously trips up the async catcher
 			// so this is run as sync to avoid confusing, useless errors
 			sync(() -> {
-				if (treeType.canPlaceAt(location.getExtent(), location.getBlockX(), location.getBlockY(), location.getBlockZ())) {
+				if (treeType.canPlaceAt(location.world(), location.blockX(), location.blockY(), location.blockZ())) {
 					resp.type(ResultType.SUCCESS).message("SUCCESS");
-					treeType.placeObject(location.getExtent(), random, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+					treeType.placeObject(location.world(), random, location.blockX(), location.blockY(), location.blockZ());
 				}
 				future.complete(null);
 			});

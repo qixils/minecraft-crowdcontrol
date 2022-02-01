@@ -84,7 +84,6 @@ public class DisableJumpingCommand extends TimedCommand {
 			return;
 		}
 
-		// validate that this is a jump (improved in API8 maybe?)
 		if (!entity.getType().equals(EntityTypes.PLAYER))
 			return;
 		if (event.getToTransform().getPosition().getY() <= event.getFromTransform().getPosition().getY())

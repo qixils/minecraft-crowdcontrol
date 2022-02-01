@@ -63,7 +63,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 		entity.offer(Keys.IS_TAMED, true);
 		entity.offer(Keys.TAMER, player.uniqueId());
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
-		// API8: loot table data
+		// API8: loot table data | TODO: still no API for it; may need to open an issue
 
 		try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
 			frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);

@@ -63,7 +63,6 @@ public class DropItemCommand extends ImmediateCommand {
 			if (itemStack.isEmpty())
 				continue;
 
-			// API8: drop item naturally if available
 			Vector3d rotation = asItemVector(player.getHeadRotation());
 
 			// spawn the entity
