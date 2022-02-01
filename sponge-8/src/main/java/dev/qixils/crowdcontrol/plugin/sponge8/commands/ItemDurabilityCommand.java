@@ -8,15 +8,14 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
-import org.spongepowered.api.data.property.item.UseLimitProperty;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 public abstract class ItemDurabilityCommand extends ImmediateCommand {
@@ -29,48 +28,37 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 		this.effectName = displayName.replace(' ', '_');
 	}
 
-	protected abstract void modifyDurability(MutableBoundedValue<Integer> data, int maxDurability);
+	protected abstract void modifyDurability(Value.Mutable<Integer> data, int maxDurability);
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Targets not holding a durable item");
 
-		for (Player player : players) {
-			Optional<ItemStack> optionalItem = Optional.empty();
-			for (HandType hand : plugin.getRegistry().getAllOf(HandType.class)) {
-				Optional<ItemStack> heldItem = player.getItemInHand(hand);
-				if (!heldItem.isPresent())
+		for (ServerPlayer player : players) {
+			for (HandType hand : plugin.registryIterable(RegistryTypes.HAND_TYPE)) {
+				ItemStack item = player.itemInHand(hand);
+				if (item.isEmpty())
 					continue;
-				ItemStack heldItemStack = heldItem.get();
-				if (!heldItemStack.isEmpty()
-						&& heldItemStack.supports(DurabilityData.class)
-						&& heldItemStack.getProperty(UseLimitProperty.class).isPresent()) {
-					optionalItem = heldItem;
-					break;
-				}
+				if (!item.supports(Keys.ITEM_DURABILITY))
+					continue;
+				if (!item.supports(Keys.MAX_DURABILITY))
+					continue;
+
+				Value.Mutable<Integer> durabilityData = item.requireValue(Keys.ITEM_DURABILITY).asMutable();
+				int current = durabilityData.get();
+				int max = item.requireValue(Keys.MAX_DURABILITY).get();
+
+				// attempt to modify durability and ensure it was updated
+				modifyDurability(durabilityData, max);
+				if (!CommandConstants.canApplyDurability(current, durabilityData.get(), max))
+					continue;
+
+				result.type(ResultType.SUCCESS).message("SUCCESS");
+				item.offer(durabilityData);
+				break;
 			}
-
-			if (!optionalItem.isPresent())
-				continue;
-			ItemStack item = optionalItem.get();
-
-			//noinspection OptionalGetWithoutIsPresent - it is checked in the for loop
-			MutableBoundedValue<Integer> data = item.get(DurabilityData.class).get().durability();
-			//noinspection OptionalGetWithoutIsPresent - it is checked in the for loop
-			Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
-			if (max == null)
-				continue;
-
-			// attempt to modify durability and ensure it was updated
-			int current = data.get();
-			modifyDurability(data, max);
-			if (!CommandConstants.canApplyDurability(current, data.get(), max))
-				continue;
-
-			result.type(ResultType.SUCCESS).message("SUCCESS");
-			item.offer(data);
 		}
 
 		return result;

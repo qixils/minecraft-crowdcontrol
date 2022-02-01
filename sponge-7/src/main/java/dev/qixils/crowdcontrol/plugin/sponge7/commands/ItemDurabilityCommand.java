@@ -38,6 +38,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.message("Targets not holding a durable item");
 
 		for (Player player : players) {
+			// todo: this is messy; see api8 impl for cleanup inspiration
 			Optional<ItemStack> optionalItem = Optional.empty();
 			for (HandType hand : plugin.getRegistry().getAllOf(HandType.class)) {
 				Optional<ItemStack> heldItem = player.getItemInHand(hand);
