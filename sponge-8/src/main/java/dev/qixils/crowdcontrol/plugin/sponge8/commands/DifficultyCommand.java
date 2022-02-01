@@ -8,10 +8,11 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.difficulty.Difficulty;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 
 import java.util.List;
 
@@ -24,22 +25,22 @@ public class DifficultyCommand extends ImmediateCommand {
 	public DifficultyCommand(SpongeCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
-		this.effectName = "difficulty_" + SpongeTextUtil.valueOf(difficulty);
-		this.displayName = difficulty.getTranslation().get() + " Mode";
+		this.effectName = "difficulty_" + difficulty.key(RegistryTypes.DIFFICULTY).value();
+		this.displayName = plugin.getTextUtil().asPlain(difficulty) + " Mode";
 	}
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		if (!isGlobalCommandUsable(players, request))
 			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
 
 		Builder response = request.buildResponse().type(ResultType.FAILURE)
 				.message("Server difficulty is already on " + displayName);
 
-		for (World world : plugin.getGame().getServer().getWorlds()) {
-			WorldProperties properties = world.getProperties();
-			if (!properties.getDifficulty().equals(difficulty)) {
+		for (ServerWorld world : plugin.getGame().server().worldManager().worlds()) {
+			ServerWorldProperties properties = world.properties();
+			if (!properties.difficulty().equals(difficulty)) {
 				response.type(ResultType.SUCCESS).message("SUCCESS");
 				properties.setDifficulty(difficulty);
 			}
