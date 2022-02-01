@@ -7,9 +7,8 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.List;
 
@@ -27,13 +26,12 @@ public class FeedCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Player's hunger is already max or empty");
-		for (Player player : players) {
-			FoodData data = player.getFoodData();
-			MutableBoundedValue<Integer> foodData = data.foodLevel();
+		for (ServerPlayer player : players) {
+			Value.Mutable<Integer> foodData = player.foodLevel();
 			int currFood = foodData.get();
-			MutableBoundedValue<Double> saturationData = player.saturation();
+			Value.Mutable<Double> saturationData = player.saturation();
 			double currSaturation = saturationData.get();
 
 			int newFood = Math.max(0, Math.min(20, currFood + amount));
