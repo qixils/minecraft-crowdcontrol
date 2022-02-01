@@ -109,21 +109,11 @@ public class EnchantmentCommand extends ImmediateCommand {
 			public Optional<ItemStack> getItem(Player player) {
 				return player.getItemInHand(HandTypes.MAIN_HAND);
 			}
-
-			@Override
-			public void setItem(Player player, ItemStack item) {
-				player.setItemInHand(HandTypes.MAIN_HAND, item);
-			}
 		},
 		OFF_HAND {
 			@Override
 			public Optional<ItemStack> getItem(Player player) {
 				return player.getItemInHand(HandTypes.OFF_HAND);
-			}
-
-			@Override
-			public void setItem(Player player, ItemStack item) {
-				player.setItemInHand(HandTypes.OFF_HAND, item);
 			}
 		},
 		HELMET {
@@ -131,21 +121,11 @@ public class EnchantmentCommand extends ImmediateCommand {
 			public Optional<ItemStack> getItem(Player player) {
 				return player.getHelmet();
 			}
-
-			@Override
-			public void setItem(Player player, ItemStack item) {
-				player.setHelmet(item);
-			}
 		},
 		CHESTPLATE {
 			@Override
 			public Optional<ItemStack> getItem(Player player) {
 				return player.getChestplate();
-			}
-
-			@Override
-			public void setItem(Player player, ItemStack item) {
-				player.setChestplate(item);
 			}
 		},
 		LEGGINGS {
@@ -153,26 +133,14 @@ public class EnchantmentCommand extends ImmediateCommand {
 			public Optional<ItemStack> getItem(Player player) {
 				return player.getLeggings();
 			}
-
-			@Override
-			public void setItem(Player player, ItemStack item) {
-				player.setLeggings(item);
-			}
 		},
 		BOOTS {
 			@Override
 			public Optional<ItemStack> getItem(Player player) {
 				return player.getBoots();
 			}
-
-			@Override
-			public void setItem(Player player, ItemStack item) {
-				player.setBoots(item);
-			}
 		};
 
 		public abstract Optional<ItemStack> getItem(Player player);
-
-		public abstract void setItem(Player player, ItemStack item);
 	}
 }

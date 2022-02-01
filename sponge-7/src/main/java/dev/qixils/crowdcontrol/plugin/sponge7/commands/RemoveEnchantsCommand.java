@@ -8,9 +8,8 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -53,18 +52,12 @@ public final class RemoveEnchantsCommand extends ImmediateCommand {
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	@Contract
 	private boolean tryRemoveEnchants(Response.Builder result, Optional<ItemStack> optionalItem) {
-		if (!optionalItem.isPresent())
-			return false;
-		ItemStack item = optionalItem.get();
-		Optional<EnchantmentData> optionalEnchantmentData = item.get(EnchantmentData.class);
-		if (!optionalEnchantmentData.isPresent())
-			return false;
-		EnchantmentData data = optionalEnchantmentData.get();
-		ListValue<Enchantment> enchants = data.enchantments();
-		if (enchants.isEmpty())
+		Optional<List<Enchantment>> optionalEnchantments = optionalItem
+				.flatMap(item -> item.get(Keys.ITEM_ENCHANTMENTS));
+		if (!optionalEnchantments.isPresent() || optionalEnchantments.get().isEmpty())
 			return false;
 		result.type(ResultType.SUCCESS).message("SUCCESS");
-		item.offer(data.set(enchants.removeAll($ -> true)));
+		optionalItem.get().remove(Keys.ITEM_ENCHANTMENTS);
 		return true;
 	}
 }

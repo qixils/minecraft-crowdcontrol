@@ -8,10 +8,9 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -29,42 +28,39 @@ public final class RemoveEnchantsCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Target was not holding an enchanted item");
 
-		for (Player player : players) {
-			if (tryRemoveEnchants(result, player.getItemInHand(HandTypes.MAIN_HAND)))
+		for (ServerPlayer player : players) {
+			if (tryRemoveEnchants(result, player.itemInHand(HandTypes.MAIN_HAND)))
 				continue;
-			if (tryRemoveEnchants(result, player.getItemInHand(HandTypes.OFF_HAND)))
+			if (tryRemoveEnchants(result, player.itemInHand(HandTypes.OFF_HAND)))
 				continue;
-			if (tryRemoveEnchants(result, player.getChestplate()))
+			if (tryRemoveEnchants(result, player.chest()))
 				continue;
-			if (tryRemoveEnchants(result, player.getLeggings()))
+			if (tryRemoveEnchants(result, player.legs()))
 				continue;
-			if (tryRemoveEnchants(result, player.getHelmet()))
+			if (tryRemoveEnchants(result, player.head()))
 				continue;
-			tryRemoveEnchants(result, player.getBoots());
+			tryRemoveEnchants(result, player.feet());
 		}
 		return result;
 	}
 
-	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	@Contract
-	private boolean tryRemoveEnchants(Response.Builder result, Optional<ItemStack> optionalItem) {
-		if (!optionalItem.isPresent())
+	private boolean tryRemoveEnchants(Response.Builder result, ItemStack item) {
+		if (item.isEmpty())
 			return false;
-		ItemStack item = optionalItem.get();
-		Optional<EnchantmentData> optionalEnchantmentData = item.get(EnchantmentData.class);
-		if (!optionalEnchantmentData.isPresent())
+		Optional<List<Enchantment>> optionalEnchantments = item.get(Keys.APPLIED_ENCHANTMENTS);
+		if (!optionalEnchantments.isPresent())
 			return false;
-		EnchantmentData data = optionalEnchantmentData.get();
-		ListValue<Enchantment> enchants = data.enchantments();
+		List<Enchantment> enchants = optionalEnchantments.get();
 		if (enchants.isEmpty())
 			return false;
 		result.type(ResultType.SUCCESS).message("SUCCESS");
-		item.offer(data.set(enchants.removeAll($ -> true)));
+		item.remove(Keys.APPLIED_ENCHANTMENTS);
 		return true;
 	}
 }
