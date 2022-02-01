@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import lombok.Getter;
@@ -76,9 +77,9 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private final TextUtil textUtil = new TextUtil(null);
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	@Accessors(fluent = true)
-	private final CommandCauseMapper commandSenderMapper = new CommandCauseMapper();
+	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper();
 	@Accessors(fluent = true)
-	private final ServerPlayerMapper playerMapper = new ServerPlayerMapper();
+	private final EntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper();
 	private SpongeCommandManager<CommandCause> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private String clientHost = null;

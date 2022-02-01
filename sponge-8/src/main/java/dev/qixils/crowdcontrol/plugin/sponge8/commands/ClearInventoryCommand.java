@@ -8,7 +8,8 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 
 import java.util.List;
 
@@ -23,14 +24,14 @@ public class ClearInventoryCommand extends ImmediateCommand {
 
 	@Override
 	@NotNull
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("All inventories are already empty or protected");
 		for (Player player : players) {
 			if (KeepInventoryCommand.isKeepingInventory(player)) continue;
-			CarriedInventory<?> inv = player.getInventory();
-			if (inv.size() == 0) continue;
+			PlayerInventory inv = player.inventory();
+			if (inv.capacity() == inv.freeCapacity()) continue;
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
 			sync(inv::clear);
 		}

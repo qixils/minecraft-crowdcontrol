@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -9,10 +8,10 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 
@@ -47,28 +46,23 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	public static boolean isKeepingInventory(Entity player) {
-		return isKeepingInventory(player.getUniqueId());
+		return isKeepingInventory(player.uniqueId());
 	}
 
-	private void alert(List<Player> players) {
-		Component actionBar = enable ? KEEP_INVENTORY_MESSAGE : LOSE_INVENTORY_MESSAGE;
-		Sound sound = (enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get();
-		for (Player player : players) {
-			Audience audience = plugin.asAudience(player);
-			audience.sendActionBar(actionBar);
-			Vector3d pos = player.getPosition();
-			audience.playSound(sound, pos.getX(), pos.getY(), pos.getZ());
-		}
+	private void alert(List<ServerPlayer> players) {
+		Audience audience = plugin.playerMapper().asAudience(players);
+		audience.sendActionBar(enable ? KEEP_INVENTORY_MESSAGE : LOSE_INVENTORY_MESSAGE);
+		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get(), Sound.Emitter.self());
 	}
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse();
 
 		List<UUID> uuids = new ArrayList<>(players.size());
 		for (Player player : players)
-			uuids.add(player.getUniqueId());
+			uuids.add(player.uniqueId());
 
 		if (enable) {
 			if (keepingInventory.addAll(uuids)) {
@@ -88,7 +82,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	public static final class Manager {
 		@Listener
 		public void onDeath(DestructEntityEvent.Death event) {
-			if (!keepingInventory.contains(event.getTargetEntity().getUniqueId())) return;
+			if (!keepingInventory.contains(event.entity().uniqueId())) return;
 			event.setKeepInventory(true);
 		}
 	}
