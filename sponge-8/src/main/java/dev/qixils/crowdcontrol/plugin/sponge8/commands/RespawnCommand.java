@@ -6,17 +6,18 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.manipulator.mutable.entity.RespawnLocationData;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.RespawnLocation;
-import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldTypes;
+import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.WorldManager;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Getter
 public class RespawnCommand extends ImmediateCommand {
@@ -29,18 +30,18 @@ public class RespawnCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		sync(() -> {
-			for (Player player : players) {
-				if (player.respawnPlayer())
+			for (ServerPlayer player : players) {
+				if (player.respawn())
 					continue;
-				Optional<RespawnLocationData> optionalData = player.get(RespawnLocationData.class);
+				Optional<Map<ResourceKey, RespawnLocation>> optionalData = player.get(Keys.RESPAWN_LOCATIONS);
 				if (!optionalData.isPresent()) {
-					player.setLocationSafely(getDefaultSpawn());
+					player.setLocation(getDefaultSpawn());
 					continue;
 				}
-				Map<UUID, RespawnLocation> data = optionalData.get().respawnLocation().get();
-				RespawnLocation location = data.get(player.getWorldUniqueId().orElse(null));
+				Map<ResourceKey, RespawnLocation> data = optionalData.get();
+				RespawnLocation location = data.get(player.world().key());
 				if ((location == null || !location.asLocation().isPresent()) && !data.isEmpty()) {
 					for (RespawnLocation curLocation : data.values()) {
 						if (curLocation.asLocation().isPresent()) {
@@ -49,27 +50,30 @@ public class RespawnCommand extends ImmediateCommand {
 						}
 					}
 				}
-				Location<World> asLocation;
+				ServerLocation asLocation;
 				if (location == null) {
 					asLocation = getDefaultSpawn();
 				} else {
 					asLocation = location.asLocation().get();
 				}
-				player.setLocationSafely(asLocation);
+				player.setLocation(asLocation);
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 
-	private Location<World> getDefaultSpawn() {
-		return getDefaultWorld().getSpawnLocation();
+	private ServerLocation getDefaultSpawn() {
+		// TODO i cannot find a new version of #getSpawnLocation for the life of me and this impl
+		//   will not work for the nether
+		return getDefaultWorld().location(0, 0, 0).asHighestLocation();
 	}
 
-	private World getDefaultWorld() {
-		Optional<World> world = plugin.getGame().getServer().getWorld("world");
+	private ServerWorld getDefaultWorld() {
+		WorldManager manager = plugin.getGame().server().worldManager();
+		Optional<ServerWorld> world = manager.world(ResourceKey.minecraft("world"));
 		if (!world.isPresent()) {
-			for (World iworld : plugin.getGame().getServer().getWorlds()) {
-				if (iworld.getDimension().getType().equals(DimensionTypes.OVERWORLD)) {
+			for (ServerWorld iworld : manager.worlds()) {
+				if (iworld.worldType().equals(WorldTypes.OVERWORLD.get())) {
 					world = Optional.of(iworld);
 					break;
 				}
