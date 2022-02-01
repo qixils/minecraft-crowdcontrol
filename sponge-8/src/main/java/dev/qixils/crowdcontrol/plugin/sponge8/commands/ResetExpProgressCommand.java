@@ -6,8 +6,8 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.List;
 
@@ -21,12 +21,12 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players have XP");
-		for (Player player : players) {
-			if (player.get(Keys.TOTAL_EXPERIENCE).orElse(0) > 0) {
+		for (ServerPlayer player : players) {
+			if (player.get(Keys.EXPERIENCE).orElse(0) > 0) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.offer(Keys.TOTAL_EXPERIENCE, 0));
+				sync(() -> player.offer(Keys.EXPERIENCE, 0));
 			}
 		}
 		return result;
