@@ -2,17 +2,17 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge8.Command;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.data.entity.OriginalDisplayNameData;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,28 +34,28 @@ public class DinnerboneCommand extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
 		sync(() -> {
 			Set<Entity> entities = new HashSet<>();
 			for (Player player : players) {
-				List<Entity> toAdd = new ArrayList<>(player.getWorld().getNearbyEntities(player.getPosition(), DINNERBONE_RADIUS));
-				toAdd.removeIf(entity -> entity.getType().equals(EntityTypes.PLAYER));
+				List<Entity> toAdd = new ArrayList<>(player.world().nearbyEntities(player.position(), DINNERBONE_RADIUS));
+				toAdd.removeIf(entity -> entity.type().equals(EntityTypes.PLAYER.get()));
 				entities.addAll(toAdd);
 			}
 			successFuture.complete(!entities.isEmpty());
 			entities.forEach(entity -> {
-				Text oldName = entity.get(OriginalDisplayNameData.class).map(data -> data.originalDisplayName().get()).orElse(Text.EMPTY);
-				Text currentName = entity.getOrElse(Keys.DISPLAY_NAME, Text.EMPTY);
-				if (currentName.equals(Text.of(DINNERBONE_NAME))) {
+				Component oldName = entity.get(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME).orElseGet(Component::empty);
+				Component currentName = entity.getOrElse(Keys.DISPLAY_NAME, Component.empty());
+				if (currentName.equals(Component.text(DINNERBONE_NAME))) {
 					entity.offer(Keys.DISPLAY_NAME, oldName);
-					entity.remove(OriginalDisplayNameData.class);
+					entity.remove(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME);
 					if (entity.getOrElse(VIEWER_SPAWNED, false))
-						entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
+						entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
 				} else {
-					entity.offer(new OriginalDisplayNameData(currentName));
-					entity.offer(Keys.DISPLAY_NAME, Text.of(DINNERBONE_NAME));
-					entity.offer(Keys.CUSTOM_NAME_VISIBLE, false);
+					entity.offer(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME, currentName);
+					entity.offer(Keys.DISPLAY_NAME, Component.text(DINNERBONE_NAME));
+					entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, false);
 				}
 			});
 		});
