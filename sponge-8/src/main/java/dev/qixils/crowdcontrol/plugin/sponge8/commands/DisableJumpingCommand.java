@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -15,10 +13,13 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ import java.util.UUID;
 
 @Getter
 public class DisableJumpingCommand extends TimedCommand {
-	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>(1);
+	private final Map<UUID, Long> jumpsBlockedAt = new HashMap<>(1);
 	private final String effectName = "disable_jumping";
 	private final String displayName = "Disable Jumping";
 
@@ -50,19 +51,19 @@ public class DisableJumpingCommand extends TimedCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
 		new TimedEffect.Builder().request(request)
 				.duration(CommandConstants.DISABLE_JUMPING_DURATION)
 				.startCallback($ -> {
-					List<Player> players = plugin.getPlayers(request);
+					List<ServerPlayer> players = plugin.getPlayers(request);
 					if (players.isEmpty())
 						return request.buildResponse()
 								.type(ResultType.FAILURE)
 								.message("No players online");
 
-					int tick = plugin.getGame().getServer().getRunningTimeTicks();
+					long tick = plugin.getGame().server().runningTimeTicks().ticks();
 					for (Player player : players)
-						jumpsBlockedAt.put(player.getUniqueId(), tick);
+						jumpsBlockedAt.put(player.uniqueId(), tick);
 					playerAnnounce(players, request);
 
 					return null; // success
@@ -71,56 +72,56 @@ public class DisableJumpingCommand extends TimedCommand {
 
 	@SuppressWarnings("DuplicatedCode")
 	@Listener
-	public void onMoveEvent(MoveEntityEvent.Position event) {
-		Entity entity = event.getTargetEntity();
-		UUID uuid = entity.getUniqueId();
+	public void onMoveEvent(MoveEntityEvent event) {
+		Entity entity = event.entity();
+		UUID uuid = entity.uniqueId();
 		if (!jumpsBlockedAt.containsKey(uuid))
 			return;
 
-		int blockedAt = jumpsBlockedAt.get(uuid);
+		long blockedAt = jumpsBlockedAt.get(uuid);
 		// if this effect has expired then remove its data from the map
-		if ((blockedAt + CommandConstants.DISABLE_JUMPING_TICKS) < plugin.getGame().getServer().getRunningTimeTicks()) {
+		if ((blockedAt + CommandConstants.DISABLE_JUMPING_TICKS) < plugin.getGame().server().runningTimeTicks().ticks()) {
 			jumpsBlockedAt.remove(uuid, blockedAt);
 			return;
 		}
 
 		// validate that this is a jump (improved in API8 maybe?)
-		if (!entity.getType().equals(EntityTypes.PLAYER))
+		if (!entity.type().equals(EntityTypes.PLAYER.get()))
 			return;
-		if (event.getToTransform().getPosition().getY() <= event.getFromTransform().getPosition().getY())
+		if (event.destinationPosition().y() <= event.originalPosition().y())
 			return;
-		if (entity.isOnGround())
+		if (entity.onGround().get())
 			return;
-		if (entity.getVelocity().getY() <= 0)
+		if (entity.velocity().get().y() <= 0)
 			return;
-		if (event.getCause().contains(plugin.getPluginContainer()))
+		if (event.cause().contains(plugin.getPluginContainer()))
 			return;
 
 		// ensure player hit-box is not inside a liquid (i.e. they are probably just swimming up
 		// which is okay in Paper)
-		Optional<AABB> optAABB = entity.getBoundingBox();
+		Optional<AABB> optAABB = entity.boundingBox();
 		if (optAABB.isPresent()) {
-			World world = entity.getWorld();
+			World<?, ?> world = entity.world();
 			AABB bbox = optAABB.get();
 
 			Set<Vector3i> checked = new HashSet<>(7);
-			Vector3d min = bbox.getMin();
+			Vector3d min = bbox.min();
 			if (canAscendAt(checked, world, min.toInt()))
 				return;
-			Vector3d max = bbox.getMax();
+			Vector3d max = bbox.max();
 			if (canAscendAt(checked, world, max.toInt()))
 				return;
-			if (canAscendAt(checked, world, new Vector3i(min.getX(), min.getY(), max.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(min.x(), min.y(), max.z())))
 				return;
-			if (canAscendAt(checked, world, new Vector3i(min.getX(), max.getY(), max.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(min.x(), max.y(), max.z())))
 				return;
-			if (canAscendAt(checked, world, new Vector3i(max.getX(), min.getY(), max.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(max.x(), min.y(), max.z())))
 				return;
-			if (canAscendAt(checked, world, new Vector3i(max.getX(), min.getY(), min.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(max.x(), min.y(), min.z())))
 				return;
-			if (canAscendAt(checked, world, new Vector3i(max.getX(), max.getY(), min.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(max.x(), max.y(), min.z())))
 				return;
-			if (canAscendAt(checked, world, new Vector3i(min.getX(), max.getY(), min.getZ())))
+			if (canAscendAt(checked, world, new Vector3i(min.x(), max.y(), min.z())))
 				return;
 		}
 
@@ -128,11 +129,11 @@ public class DisableJumpingCommand extends TimedCommand {
 		event.setCancelled(true);
 	}
 
-	private static boolean canAscendAt(Set<Vector3i> checked, World world, Vector3i pos) {
+	private static boolean canAscendAt(Set<Vector3i> checked, World<?, ?> world, Vector3i pos) {
 		if (checked.contains(pos))
 			return false;
 		checked.add(pos);
-		BlockState block = world.getBlock(pos);
-		return block.getType().equals(BlockTypes.LADDER) || SpongeCrowdControlPlugin.isLiquid(block);
+		BlockState block = world.block(pos);
+		return block.type().equals(BlockTypes.LADDER.get()) || SpongeCrowdControlPlugin.isLiquid(block);
 	}
 }
