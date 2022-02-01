@@ -12,12 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.BlockChangeFlags;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,18 +42,18 @@ public class TorchCommand extends ImmediateCommand {
 		this.placeTorches = placeTorches;
 		this.effectName = placeTorches ? "Lit" : "Dim";
 		this.displayName = (placeTorches ? "Place" : "Break") + " Torches";
-		this.torches = new TypedTag<>(CommandConstants.TORCHES, plugin, BlockType.class);
+		this.torches = new TypedTag<>(CommandConstants.TORCHES, plugin, RegistryTypes.BLOCK_TYPE);
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Predicate<Location<World>> predicate = placeTorches
-				? loc -> BlockFinder.isReplaceable(loc.getBlock())
-				: loc -> torches.contains(loc.getBlock().getType());
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		Predicate<ServerLocation> predicate = placeTorches
+				? loc -> BlockFinder.isReplaceable(loc.block())
+				: loc -> torches.contains(loc.blockType());
 
-		List<Location<World>> nearbyBlocks = new ArrayList<>();
+		List<ServerLocation> nearbyBlocks = new ArrayList<>();
 		players.forEach(player -> nearbyBlocks.addAll(BlockFinder.builder()
-				.origin(player.getLocation())
+				.origin(player.serverLocation())
 				.maxRadius(5)
 				.locationValidator(predicate)
 				.shuffleLocations(false)
@@ -63,27 +63,27 @@ public class TorchCommand extends ImmediateCommand {
 			return request.buildResponse().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
 
 		sync(() -> {
-			for (Location<World> location : nearbyBlocks) {
+			for (ServerLocation location : nearbyBlocks) {
 				if (placeTorches)
 					placeTorch(location);
 				else
-					location.setBlockType(BlockTypes.AIR, BlockChangeFlags.NONE);
+					location.setBlockType(BlockTypes.AIR.get(), BlockChangeFlags.NONE);
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 
-	protected void placeTorch(Location<World> location) {
+	protected void placeTorch(ServerLocation location) {
 		Direction placeFace = null;
 		for (Direction blockFace : BLOCK_FACES) {
 			boolean facingDown = blockFace == Direction.DOWN;
 			if (!facingDown && placeFace != null) {
 				continue;
 			}
-			BlockState target = location.getBlockRelative(facingDown
+			BlockState target = location.relativeToBlock(facingDown
 					? blockFace
-					: blockFace.getOpposite()
-			).getBlock();
+					: blockFace.opposite()
+			).block();
 			if (BlockFinder.isSolid(target)) {
 				placeFace = blockFace;
 				// down takes priority
