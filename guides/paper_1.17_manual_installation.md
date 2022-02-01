@@ -32,7 +32,7 @@ The following steps detail how to manually set up a Minecraft 1.17.1 server with
    like [Chunkmaster](https://www.spigotmc.org/resources/chunkmaster.71351/) is recommended for
    optimal performance though not required.
 
-Users may now connect using the ["Joining a Server"](paper_joining_a_server.md) guide. Make sure to
+Users may now connect using the [**Joining a Server**](paper_joining_a_server.md) guide. Make sure to
 provide your public IP address and the password used in the config file to your streamers.
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This

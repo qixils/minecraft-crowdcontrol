@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
+import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
@@ -144,12 +145,19 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 		Bukkit.getPluginManager().registerEvents(this, this);
 
-		commandManager = new PaperCommandManager<>(this,
-				CommandExecutionCoordinator.simpleCoordinator(),
-				Function.identity(),
-				Function.identity()
-		);
-		registerChatCommands();
+		try {
+			commandManager = new PaperCommandManager<>(this,
+					AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder()
+							.withAsynchronousParsing().build(),
+					Function.identity(),
+					Function.identity()
+			);
+			commandManager.registerBrigadier();
+			commandManager.registerAsynchronousCompletions();
+			registerChatCommands();
+		} catch (Exception exception) {
+			throw new IllegalStateException("The command manager was unable to load. Please ensure you are using the latest version of Paper.", exception);
+		}
 	}
 
 	@Override

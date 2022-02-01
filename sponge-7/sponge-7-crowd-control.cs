@@ -7,7 +7,7 @@ using ConnectorType = CrowdControl.Common.ConnectorType;
 
 namespace CrowdControl.Games.Packs
 {
-    public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
+    public class MinecraftSponge : SimpleTCPPack<SimpleTCPClientConnector>
     {
         // default port: 58731
         public override ISimpleTCPPack.PromptType PromptType => ISimpleTCPPack.PromptType.Host | ISimpleTCPPack.PromptType.Password;
@@ -16,7 +16,7 @@ namespace CrowdControl.Games.Packs
 
         public override ISimpleTCPPack.DigestAlgorithm AuthenticationHashMode => ISimpleTCPPack.DigestAlgorithm.SHA_512;
 
-        public MinecraftServer(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
+        public MinecraftSponge(IPlayer player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
 
         public override Game Game => new Game(125, "Minecraft (Sponge 7)", "MinecraftSponge", "PC", ConnectorType.SimpleTCPClientConnector);
 

@@ -52,6 +52,7 @@ public class CommandRegister {
 			safeEntities.add(EntityTypes.IRON_GOLEM);
 			safeEntities.add(EntityTypes.PRIMED_TNT);
 			safeEntities.add(EntityTypes.PIG_ZOMBIE);
+			safeEntities.add(EntityTypes.ILLUSION_ILLAGER);
 			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, plugin.getRegistry(), BlockType.class);
 			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, plugin.getRegistry(), BlockType.class);
 			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
