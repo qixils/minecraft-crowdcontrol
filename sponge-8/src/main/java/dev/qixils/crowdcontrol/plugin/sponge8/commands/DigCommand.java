@@ -8,8 +8,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,11 +29,11 @@ public class DigCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Set<Location<World>> locations = new HashSet<>();
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		Set<ServerLocation> locations = new HashSet<>();
 		int depth = getDigDepth();
 		for (Player player : players) {
-			Location<World> playerLocation = player.getLocation();
+			ServerLocation playerLocation = player.serverLocation();
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 				for (int y = depth; y < 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
@@ -47,8 +47,8 @@ public class DigCommand extends ImmediateCommand {
 			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any earthly blocks");
 
 		sync(() -> {
-			for (Location<World> location : locations)
-				location.setBlockType(BlockTypes.AIR);
+			for (ServerLocation location : locations)
+				location.setBlockType(BlockTypes.AIR.get());
 		});
 
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
