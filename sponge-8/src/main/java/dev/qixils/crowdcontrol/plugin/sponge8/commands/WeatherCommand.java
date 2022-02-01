@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -8,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.WorldTypes;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -28,10 +30,11 @@ public class WeatherCommand extends ImmediateCommand {
 	public WeatherCommand(SpongeCrowdControlPlugin plugin, WeatherType weather) {
 		super(plugin);
 		this.weather = weather;
-		this.displayName = "Set Weather to " + SpongeTextUtil.titleCase(SpongeTextUtil.valueOf(weather));
+		String valueKey = weather.key(RegistryTypes.WEATHER_TYPE).value();
+		this.displayName = "Set Weather to " + TextUtil.titleCase(valueKey);
 		this.effectName = weather.equals(WeatherTypes.RAIN.get())
 				? "downfall"
-				: SpongeTextUtil.valueOf(weather);
+				: valueKey;
 	}
 
 	@NotNull
