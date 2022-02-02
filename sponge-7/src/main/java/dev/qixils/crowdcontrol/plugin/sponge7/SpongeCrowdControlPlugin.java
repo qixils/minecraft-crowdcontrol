@@ -95,6 +95,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	public static Key<Value<Boolean>> VIEWER_SPAWNED = DummyObjectProvider.createExtendedFor(Key.class, "VIEWER_SPAWNED");
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
 	// "real" variables
+	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final CommandRegister register = new CommandRegister(this);
 	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
 	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
@@ -339,6 +340,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
+		game.getEventManager().registerListeners(this, softLockResolver);
 		spongeSerializer = SpongeComponentSerializer.get();
 		scheduler = game.getScheduler();
 		defaultConfig.copyToFile(configPath, false, true);

@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.CommandConstants;
@@ -46,6 +45,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
+	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerMapper playerMapper = new PaperPlayerMapper(this);
 	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
@@ -143,6 +143,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		initCrowdControl();
 
 		Bukkit.getPluginManager().registerEvents(this, this);
+		Bukkit.getPluginManager().registerEvents(softLockResolver, this);
 
 		try {
 			commandManager = new PaperCommandManager<>(this,
