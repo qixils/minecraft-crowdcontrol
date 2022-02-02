@@ -89,7 +89,8 @@ public class RegisterCommands {
 				new DoOrDieCommand(plugin),
 				new ClearWeatherCommand(plugin),
 				new RainyWeatherCommand(plugin),
-				new ThunderingWeatherCommand(plugin)
+				new ThunderingWeatherCommand(plugin),
+				new StructureCommand(plugin)
 		));
 
 		// entity commands
