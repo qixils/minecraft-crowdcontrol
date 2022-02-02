@@ -62,20 +62,16 @@ public class StructureCommand extends VoidCommand {
 
 		for (Player player : players) {
 			World world = player.getWorld();
-			plugin.getLogger().info("ajkfnd jskm  cf");
 			if (!world.canGenerateStructures())
 				continue;
-			plugin.getLogger().info("fdlks,.mfv ");
 			Location location = player.getLocation();
 			List<StructureType> structures = new ArrayList<>(STRUCTURES.get(world.getEnvironment()));
 			Collections.shuffle(structures, random);
 			sync(() -> {
 				for (StructureType structure : structures) {
-					plugin.getLogger().info("hmmmmmm ");
 					Location destination = world.locateNearestStructure(location, structure, 70, false);
 					if (destination == null)
 						continue;
-					plugin.getLogger().info("!!!!!!!!!!!!! ");
 					destination = destination.toHighestLocation().add(0, 1, 0);
 					player.teleportAsync(destination).thenAccept(success -> {
 						if (!success)
