@@ -7,6 +7,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Hostile;
+import org.spongepowered.api.entity.living.complex.EnderDragonPart;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent.Death;
@@ -31,6 +32,10 @@ public class SoftLockResolver extends SoftLockObserver<Player> {
 		for (Entity entity : world.getNearbyEntities(pos, SEARCH_HORIZ)) {
 			if (entity instanceof Hostile)
 				entity.remove();
+			else if (entity instanceof EnderDragonPart) {
+				((EnderDragonPart) entity).getParent().remove();
+				entity.remove();
+			}
 		}
 		// remove nearby dangerous blocks
 		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {

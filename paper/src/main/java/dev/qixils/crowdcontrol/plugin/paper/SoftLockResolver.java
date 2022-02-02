@@ -4,6 +4,8 @@ import dev.qixils.crowdcontrol.common.SoftLockObserver;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.EnderDragonPart;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -35,8 +37,12 @@ public class SoftLockResolver extends SoftLockObserver<Player> implements Listen
 		Location location = player.getLocation();
 		// kill nearby monsters
 		for (Entity entity : location.getNearbyEntities(SEARCH_HORIZ, SEARCH_VERT, SEARCH_HORIZ)) {
-			if (entity instanceof Monster)
+			if (entity instanceof Monster || entity instanceof EnderDragon)
 				entity.remove();
+			else if (entity instanceof EnderDragonPart enderDragonPart) {
+				enderDragonPart.getParent().remove();
+				enderDragonPart.remove();
+			}
 		}
 		// remove nearby dangerous blocks
 		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {
