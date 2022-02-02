@@ -43,7 +43,6 @@ import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
-import org.spongepowered.api.registry.DefaultedRegistryReference;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Scheduler;
@@ -74,7 +73,7 @@ import java.util.function.Function;
 @Plugin("crowd-control")
 public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> {
 	// keys
-	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME;
+	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME; // TODO: component cannot be serialized ??
 	public static Key<Value<Boolean>> VIEWER_SPAWNED;
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT;
 	// "real" variables
@@ -127,12 +126,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		return block.get(Keys.MATTER_TYPE).map(actual -> actual.equals(matter)).orElse(false);
 	}
 
-	public static boolean isMatter(BlockState block, DefaultedRegistryReference<MatterType> matter) {
-		return matter.find().map(matterType -> isMatter(block, matter)).orElse(false);
-	}
-
 	public static boolean isLiquid(BlockState block) {
-		return isMatter(block, MatterTypes.LIQUID);
+		return isMatter(block, MatterTypes.LIQUID.get());
 	}
 
 	public <T> Iterable<T> registryIterable(RegistryType<T> registryType) {

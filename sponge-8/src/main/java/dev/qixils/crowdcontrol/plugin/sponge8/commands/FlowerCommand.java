@@ -65,7 +65,7 @@ public class FlowerCommand extends ImmediateCommand {
 					.message("Could not find a suitable location to place flowers");
 
 		sync(() -> {
-			try (StackFrame ignored = plugin.getGame().client().causeStackManager().pushCauseFrame()) {
+			try (StackFrame ignored = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
 				for (ServerLocation location : placeLocations) {
 					location.setBlockType(flowers.getRandom());
 				}

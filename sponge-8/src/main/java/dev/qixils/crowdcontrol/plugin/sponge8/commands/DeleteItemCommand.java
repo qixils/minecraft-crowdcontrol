@@ -33,7 +33,7 @@ public class DeleteItemCommand extends ImmediateCommand {
 				if (player.itemInHand(hand).isEmpty())
 					continue;
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				player.setItemInHand(hand, null);
+				sync(() -> player.setItemInHand(hand, null));
 				break;
 			}
 		}

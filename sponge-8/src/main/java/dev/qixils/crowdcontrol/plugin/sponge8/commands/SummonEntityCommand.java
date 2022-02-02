@@ -58,7 +58,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 	@Blocking
 	protected Entity spawnEntity(String viewer, ServerPlayer player) {
 		Entity entity = player.world().createEntity(entityType, player.position());
-		entity.offer(Keys.DISPLAY_NAME, Component.text(viewer));
+		entity.offer(Keys.CUSTOM_NAME, Component.text(viewer));
 		entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.IS_TAMED, true);
 		entity.offer(Keys.TAMER, player.uniqueId());

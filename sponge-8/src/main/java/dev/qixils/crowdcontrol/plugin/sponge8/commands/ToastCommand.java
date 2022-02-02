@@ -12,8 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.scheduler.Task;
@@ -60,8 +61,9 @@ public class ToastCommand extends ImmediateCommand {
 				// API8: recipes | TODO: still no API for it; may need to open an issue
 
 				// actual pop-up
-				ViewableInventory inv = Inventory.builder()
-						.grid(9, 3)
+				ViewableInventory inv = ViewableInventory.builder()
+						.type(ContainerTypes.GENERIC_9X3)
+						.fillDummy()
 						.completeStructure()
 						.plugin(plugin.getPluginContainer())
 						.build()
@@ -69,7 +71,7 @@ public class ToastCommand extends ImmediateCommand {
 						.orElseThrow(() -> new IllegalStateException("Could not create custom inventory"));
 				InventoryMenu menu = inv.asMenu();
 				menu.setTitle(TITLE);
-				menu.setReadOnly(true);
+				menu.setReadOnly(true); // TODO this is not working
 				sync(() -> player.openInventory(inv));
 
 				AtomicInteger atomicIndex = new AtomicInteger(random.nextInt(MATERIALS.length));
@@ -87,9 +89,9 @@ public class ToastCommand extends ImmediateCommand {
 							int index = atomicIndex.getAndIncrement();
 							ItemType item = MATERIALS[index % MATERIALS.length];
 							inv.clear();
-							for (Inventory slot : inv.slots()) {
-								slot.offer(ItemStack.of(item));
-							}
+							// TODO i think every slot in the inventory might be the same (for some reason??)
+							for (Slot slot : inv.slots())
+								slot.offer(ItemStack.of(item, 1));
 						})
 						.plugin(plugin.getPluginContainer())
 						.build());

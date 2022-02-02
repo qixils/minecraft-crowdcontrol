@@ -53,9 +53,10 @@ public final class MoveCommand extends ImmediateCommand {
 				continue;
 			response.type(ResultType.SUCCESS).message("SUCCESS");
 			sync(() -> {
-				try (StackFrame frame = plugin.getGame().client().causeStackManager().pushCauseFrame()) {
+				try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
 					frame.pushCause(plugin.getPluginContainer());
 					player.offer(Keys.VELOCITY, vector);
+					frame.popCause();
 				}
 			});
 		}

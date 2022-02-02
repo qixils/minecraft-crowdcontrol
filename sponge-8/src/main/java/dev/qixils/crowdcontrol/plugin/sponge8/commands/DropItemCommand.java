@@ -52,6 +52,7 @@ public class DropItemCommand extends ImmediateCommand {
 		double x = (-f3 * f2 * 0.3d) + Math.cos(f5) * f6;
 		double y = -f1 * 0.3d + 0.1d + (rng.nextDouble() - rng.nextDouble()) * 0.1d;
 		double z = (f4 * f2 * 0.3d) + Math.sin(f5) * f6;
+		// TODO: this is broken (order may have swapped?)
 		return new Vector3d(x, y, z);
 	}
 

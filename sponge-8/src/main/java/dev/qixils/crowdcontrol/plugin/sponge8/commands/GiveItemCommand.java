@@ -44,7 +44,7 @@ public class GiveItemCommand extends ImmediateCommand {
 		entity.offer(Keys.PICKUP_DELAY, Ticks.of(0));
 
 		// give entity a cause & spawn it
-		try (StackFrame frame = plugin.getGame().client().causeStackManager().pushCauseFrame()) {
+		try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
 			frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
 			player.world().spawnEntity(entity);
 		}

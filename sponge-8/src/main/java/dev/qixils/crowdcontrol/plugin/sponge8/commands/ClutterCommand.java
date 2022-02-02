@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.CauseStackManager.StackFrame;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PrimaryPlayerInventory;
@@ -36,8 +37,8 @@ public class ClutterCommand extends ImmediateCommand {
 		int rows = inventory.rows();
 		int columns = inventory.columns();
 		List<Vector2i> allSlots = new ArrayList<>(rows * columns);
-		for (int x = 0; x < columns; x++) {
-			for (int y = 0; y < rows; y++) {
+		for (int x = 0; x < rows; x++) {
+			for (int y = 0; y < columns; y++) {
 				allSlots.add(Vector2i.from(x, y));
 			}
 		}
@@ -57,23 +58,17 @@ public class ClutterCommand extends ImmediateCommand {
 	}
 
 	private static Slot unwrap(GridInventory inventory, Vector2i pos) {
-		try {
-			return unwrap(inventory.slot(pos).orElse(null), pos);
-		} catch (IndexOutOfBoundsException e) {
-			// workaround for Sponge#3584 | TODO: test if needed still
-			int offset = 9 * (pos.y() - 1);
-			Vector2i hackPos = Vector2i.from(pos.x() + offset, 1);
-			return unwrap(inventory.slot(hackPos).orElse(null), pos);
-		}
+		return unwrap(inventory.slot(pos).orElse(null), pos);
 	}
 
-	private static void swap(PrimaryPlayerInventory inv, Vector2i slotPos1, Vector2i slotPos2) {
-		Slot slot1 = unwrap(inv.asGrid(), slotPos1);
-		Slot slot2 = unwrap(inv.asGrid(), slotPos2);
+	private static void swap(GridInventory inv, Vector2i slotPos1, Vector2i slotPos2) {
+		Slot slot1 = unwrap(inv, slotPos1);
+		Slot slot2 = unwrap(inv, slotPos2);
 
 		ItemStack slot1item = slot1.poll().polledItem().createStack();
 		ItemStack slot2item = slot2.poll().polledItem().createStack();
 
+		// this is throwing warnings in the console which I cannot silence >.>
 		slot2.offer(slot1item);
 		slot1.offer(slot2item);
 	}
@@ -81,25 +76,31 @@ public class ClutterCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		// swaps random items in player's inventory
-		for (ServerPlayer player : players) {
-			PrimaryPlayerInventory inventory = player.inventory().primary();
-			GridInventory gridInventory = inventory.asGrid();
-			Set<Vector2i> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
+		sync(() -> {
+			try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
+				frame.pushCause(plugin.getPluginContainer());
+				for (ServerPlayer player : players) {
+					PrimaryPlayerInventory inventory = player.inventory().primary();
+					GridInventory gridInventory = inventory.asGrid();
+					Set<Vector2i> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
 
-			Vector2i heldItemSlot = Vector2i.from(inventory.hotbar().selectedSlotIndex(), 0);
-			swappedSlots.add(heldItemSlot);
-			Vector2i swapItemWith = uniqueSlot(gridInventory, swappedSlots);
-			swappedSlots.add(swapItemWith);
-			swap(inventory, heldItemSlot, swapItemWith);
+					Vector2i heldItemSlot = Vector2i.from(3, inventory.hotbar().selectedSlotIndex());
+					swappedSlots.add(heldItemSlot);
+					Vector2i swapItemWith = uniqueSlot(gridInventory, swappedSlots);
+					swappedSlots.add(swapItemWith);
+					swap(gridInventory, heldItemSlot, swapItemWith);
 
-			while (swappedSlots.size() < CLUTTER_ITEMS) {
-				Vector2i newSlot1 = uniqueSlot(gridInventory, swappedSlots);
-				swappedSlots.add(newSlot1);
-				Vector2i newSlot2 = uniqueSlot(gridInventory, swappedSlots);
-				swappedSlots.add(newSlot2);
-				swap(inventory, newSlot1, newSlot2);
+					while (swappedSlots.size() < CLUTTER_ITEMS) {
+						Vector2i newSlot1 = uniqueSlot(gridInventory, swappedSlots);
+						swappedSlots.add(newSlot1);
+						Vector2i newSlot2 = uniqueSlot(gridInventory, swappedSlots);
+						swappedSlots.add(newSlot2);
+						swap(gridInventory, newSlot1, newSlot2);
+					}
+				}
+				frame.popCause();
 			}
-		}
+		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

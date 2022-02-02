@@ -55,6 +55,7 @@ public final class MoveCommand extends ImmediateCommand {
 				try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
 					frame.pushCause(plugin.getPluginContainer());
 					player.setVelocity(vector);
+					frame.popCause();
 				}
 			});
 		}

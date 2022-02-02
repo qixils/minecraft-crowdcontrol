@@ -28,8 +28,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.menu.InventoryMenu;
-import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.ArrayList;
@@ -194,15 +192,11 @@ public class LootboxCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		for (ServerPlayer player : players) {
-			ViewableInventory inventory = Inventory.builder()
+			Inventory inventory = Inventory.builder()
 					.grid(9, 3)
 					.completeStructure()
 					.plugin(plugin.getPluginContainer())
-					.build()
-					.asViewable().orElseThrow(() -> new IllegalStateException("Could not create custom inventory"));
-			InventoryMenu menu = inventory.asMenu();
-			menu.setTitle(buildLootboxTitle(request));
-			menu.setReadOnly(false);
+					.build();
 
 			// create item
 			ItemStack itemStack = createRandomItem(0);
@@ -221,7 +215,7 @@ public class LootboxCommand extends ImmediateCommand {
 			}
 			// sound & open
 			player.playSound(Sounds.LOOTBOX_CHIME.get(), Sound.Emitter.self());
-			sync(() -> menu.open(player));
+			sync(() -> player.openInventory(inventory, buildLootboxTitle(request))); // TODO: not working; 0 errors
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}

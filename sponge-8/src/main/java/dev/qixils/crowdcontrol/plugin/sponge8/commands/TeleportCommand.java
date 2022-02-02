@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -44,7 +43,7 @@ public class TeleportCommand extends ImmediateCommand {
 			final ServerLocation destination = tempDest.add(.5, 0, .5);
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			sync(() -> {
-				player.setLocation(destination.relativeToBlock(Direction.NONE));
+				player.setLocation(destination);
 				SpongeCrowdControlPlugin.spawnPlayerParticles(
 						player,
 						ParticleEffect.builder()
