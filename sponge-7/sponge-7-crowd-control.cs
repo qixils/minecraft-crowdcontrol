@@ -64,6 +64,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Starve Player", "starve", "miscellaneous") {Price = 500}, // makes everyone hungry
             new Effect("Swap Locations", "swap", "miscellaneous") {Price = 1000, Description = "Swaps the locations of all players participating in a multiplayer Crowd Control session"},
             new Effect("Take One XP Level", "xp_sub1", "miscellaneous") {Price = 500},
+            // disabled for lack of relevant API: new Effect("Teleport to a Nearby Structure", "structure", "miscellaneous") {Price = 1000, Description = "Teleports players to a random nearby structure"},
             new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous") {Price = 3000},
             new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous") {Price = 400, Description = "Teleports players 30 blocks up and gives them a water bucket"},
             new Effect("Zip Time", "zip", "miscellaneous") {Price = 50, Description = "Adds several minutes to the in-game time"},
