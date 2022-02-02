@@ -9,7 +9,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -35,7 +34,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.RETRY)
 				.message("No players are on the surface");
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			if (!player.world().worldType().equals(WorldTypes.OVERWORLD.get()))
 				continue;
 			ServerLocation curr = player.serverLocation();

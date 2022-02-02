@@ -10,7 +10,6 @@ import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -269,7 +268,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		register.register();
 	}
 
-	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(StartingEngineEvent<Server> event) {
 		syncScheduler = game.server().scheduler();
