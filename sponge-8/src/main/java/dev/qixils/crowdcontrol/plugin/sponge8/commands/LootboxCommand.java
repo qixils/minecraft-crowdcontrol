@@ -65,7 +65,7 @@ public class LootboxCommand extends ImmediateCommand {
 		allItems = plugin.getGame().registry(RegistryTypes.ITEM_TYPE).stream().collect(Collectors.toList());
 		goodItems = allItems.stream()
 				.filter(itemType ->
-						itemType.get(Keys.MAX_DURABILITY).orElse(0) > 1
+						ItemStack.of(itemType).get(Keys.MAX_DURABILITY).orElse(0) > 1
 								|| itemType.equals(ItemTypes.GOLDEN_APPLE.get())
 								|| itemType.equals(ItemTypes.ENCHANTED_GOLDEN_APPLE.get())
 								|| itemType.equals(ItemTypes.NETHERITE_BLOCK.get())

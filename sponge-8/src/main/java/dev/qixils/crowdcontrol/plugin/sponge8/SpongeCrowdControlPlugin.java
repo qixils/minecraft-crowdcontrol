@@ -15,11 +15,13 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.data.DataRegistration;
@@ -36,6 +38,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
@@ -57,6 +60,8 @@ import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -68,11 +73,12 @@ import java.util.function.Function;
 @Getter
 @Plugin("crowd-control")
 public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> {
-	// keys (though they don't really work)
+	// keys
 	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME;
 	public static Key<Value<Boolean>> VIEWER_SPAWNED;
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT;
 	// "real" variables
+	private final Logger logger = LoggerFactory.getLogger("crowd-control");
 	private final CommandRegister register = new CommandRegister(this);
 	private final TextUtil textUtil = new TextUtil(null);
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
@@ -88,8 +94,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private TaskExecutorService syncExecutor;
 	private TaskExecutorService asyncExecutor;
 	// injected variables
-	@Inject
-	private Logger logger;
 	@Inject
 	private PluginContainer pluginContainer;
 	@Inject
@@ -269,16 +273,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	}
 
 	@Listener
-	public void onServerStart(StartingEngineEvent<Server> event) {
-		syncScheduler = game.server().scheduler();
-		asyncScheduler = game.asyncScheduler();
-		syncExecutor = syncScheduler.executor(pluginContainer);
-		asyncExecutor = asyncScheduler.executor(pluginContainer);
-		// TODO copy default config to config folder
-		configLoader = HoconConfigurationLoader.builder()
-				.path(configPath)
-				.build();
-		initCrowdControl();
+	public void onCommandRegister(RegisterCommandEvent<Command.Raw> event) {
+		// TODO this is not working; move this to guice injection
 		commandManager = new SpongeCommandManager<>(
 				pluginContainer,
 				AsynchronousCommandExecutionCoordinator.<CommandCause>newBuilder()
@@ -287,6 +283,30 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 				Function.identity()
 		);
 		registerChatCommands();
+	}
+
+	@Listener
+	public void onServerStart(StartingEngineEvent<Server> event) {
+		syncScheduler = game.server().scheduler();
+		asyncScheduler = game.asyncScheduler();
+		syncExecutor = syncScheduler.executor(pluginContainer);
+		asyncExecutor = asyncScheduler.executor(pluginContainer);
+		if (!configPath.toFile().exists()) {
+			// read the default config
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("default.conf");
+			if (inputStream == null)
+				throw new IllegalStateException("Could not find default config file; please report to qixils");
+			// copy the default config to the config path
+			try {
+				Files.copy(inputStream, configPath);
+			} catch (IOException e) {
+				throw new IllegalStateException("Could not copy default config file to " + configPath, e);
+			}
+		}
+		configLoader = HoconConfigurationLoader.builder()
+				.path(configPath)
+				.build();
+		initCrowdControl();
 	}
 
 	@Listener
