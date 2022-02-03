@@ -1,27 +1,20 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.VoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.StructureType;
-import org.bukkit.World;
 import org.bukkit.World.Environment;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 @Getter
-public class StructureCommand extends VoidCommand {
+public class StructureCommand extends NearbyLocationCommand<StructureType> {
 	private static final Map<Environment, List<StructureType>> STRUCTURES = Map.of(
 			Environment.NORMAL, List.of(
 					StructureType.MINESHAFT,
@@ -57,37 +50,17 @@ public class StructureCommand extends VoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		request.buildResponse().type(ResultType.SUCCESS).send();
+	protected @Nullable Location search(@NotNull Location origin, @NotNull StructureType searchType) {
+		return origin.getWorld().locateNearestStructure(origin, searchType, 100, false);
+	}
 
-		for (Player player : players) {
-			World world = player.getWorld();
-			if (!world.canGenerateStructures())
-				continue;
-			Location location = player.getLocation();
-			List<StructureType> structures = new ArrayList<>(STRUCTURES.get(world.getEnvironment()));
-			Collections.shuffle(structures, random);
-			sync(() -> {
-				for (StructureType structure : structures) {
-					Location destination = world.locateNearestStructure(location, structure, 70, false);
-					if (destination == null)
-						continue;
-					destination = destination.toHighestLocation().add(0, 1, 0);
-					player.teleportAsync(destination).thenAccept(success -> {
-						if (!success)
-							return;
-						announce(player, request);
-						player.sendActionBar(new TextBuilder(
-								"You have been teleported to the nearest ",
-								NamedTextColor.WHITE
-						).next(
-								TextUtil.titleCase(structure.getName()),
-								NamedTextColor.YELLOW
-						));
-					});
-					break;
-				}
-			});
-		}
+	@Override
+	protected @NotNull Collection<StructureType> getSearchTypes(@NotNull Environment environment) {
+		return STRUCTURES.get(environment);
+	}
+
+	@Override
+	protected @NotNull String nameOf(@NotNull StructureType searchType) {
+		return TextUtil.titleCase(searchType.getName());
 	}
 }
