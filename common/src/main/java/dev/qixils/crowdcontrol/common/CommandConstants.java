@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Predicate;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
@@ -469,6 +471,22 @@ public class CommandConstants {
 	 */
 	public static boolean shouldSpawnFire() {
 		return RandomUtil.RNG.nextDouble() >= 0.95;
+	}
+
+	/**
+	 * Fetches a collection of inventory item slots in which a random item should be placed.
+	 *
+	 * @param luck player's luck value
+	 * @return collection of ints
+	 */
+	@NotNull
+	public static Collection<@NotNull Integer> lootboxItemSlots(int luck) {
+		if (luck >= 10)
+			return Arrays.asList(11, 13, 15);
+		else if (luck >= 5)
+			return Arrays.asList(12, 14);
+		else
+			return Collections.singletonList(13);
 	}
 
 	/**

@@ -73,7 +73,7 @@ public class CommandRegister {
 				new SwapCommand(plugin),
 				new DinnerboneCommand(plugin),
 				new ClutterCommand(plugin),
-				new LootboxCommand(plugin),
+				new LootboxCommand(plugin, "Open Lootbox", 0),
 				new TeleportCommand(plugin),
 				new ToastCommand(plugin),
 				new FreezeCommand(plugin),

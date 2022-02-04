@@ -14,6 +14,7 @@ import java.util.function.Predicate;
  * This may be due to various reasons such as randomization or fallbacks for unsupported platforms.
  */
 public interface DynamicSound {
+
 	/**
 	 * Gets the current {@link Sound} represented by this object.
 	 * This may not return the same object every time.
@@ -22,11 +23,12 @@ public interface DynamicSound {
 	 * (i.e. sounds that are not present in an older version) are not returned.
 	 * If no valid sound can be found, an {@link IllegalArgumentException} will be thrown.
 	 *
+	 * @param args arguments that may or may not be used by the implementing class
 	 * @return current {@link Sound}
 	 */
 	@NotNull
-	default Sound get() {
-		return get(CommandConstants.SOUND_VALIDATOR)
+	default Sound get(Object... args) {
+		return get(CommandConstants.SOUND_VALIDATOR, args)
 				.orElseThrow(() -> new IllegalStateException("No sound could be found"));
 	}
 
@@ -40,11 +42,12 @@ public interface DynamicSound {
 	 *
 	 * @param validator method that returns {@code true} if the given sound is supported by the
 	 *                  current platform
+	 * @param args      arguments that may or may not be used by the implementing class
 	 * @return an {@link Optional} containing a supported {@link Sound} if one is found, else an
 	 * {@link Optional#empty() empty optional}
 	 */
 	@NotNull
-	Optional<Sound> get(@Nullable Predicate<@NotNull Key> validator);
+	Optional<Sound> get(@Nullable Predicate<@NotNull Key> validator, Object... args);
 
 	/**
 	 * Gets the current {@link Sound} represented by this object.
@@ -61,8 +64,8 @@ public interface DynamicSound {
 	 * @throws IllegalArgumentException if no valid sound is found
 	 */
 	@NotNull
-	default Sound getOrThrow(@Nullable Predicate<@NotNull Key> validator) throws IllegalArgumentException {
-		return get(validator).orElseThrow(() ->
+	default Sound getOrThrow(@Nullable Predicate<@NotNull Key> validator, Object... args) throws IllegalArgumentException {
+		return get(validator, args).orElseThrow(() ->
 				new IllegalArgumentException("No supported sound could be found for this platform"));
 	}
 

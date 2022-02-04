@@ -4,7 +4,6 @@ import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.SoftLockObserver;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Hostile;
 import org.spongepowered.api.entity.living.complex.EnderDragonPart;
@@ -49,11 +48,11 @@ public class SoftLockResolver extends SoftLockObserver<Player> {
 			}
 		}
 		// reset spawn point
-		player.transform(Keys.RESPAWN_LOCATIONS, map -> {
-			if (map == null) return null;
-			map.remove(world.getUniqueId());
-			return map;
-		});
+//		player.transform(Keys.RESPAWN_LOCATIONS, map -> {
+//			if (map == null) return null;
+//			map.remove(world.getUniqueId());
+//			return map;
+//		});
 		// alert player
 		plugin.asAudience(player).sendMessage(ALERT);
 	}

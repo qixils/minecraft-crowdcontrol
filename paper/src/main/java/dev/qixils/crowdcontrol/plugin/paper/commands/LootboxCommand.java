@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.lootboxItemSlots;
+
 @Getter
 public class LootboxCommand extends ImmediateCommand {
 	private static final List<Material> ITEMS = Arrays.stream(Material.values()).filter(Material::isItem).toList();
@@ -44,11 +46,21 @@ public class LootboxCommand extends ImmediateCommand {
 					|| material == Material.GOLD_BLOCK
 	).collect(Collectors.toUnmodifiableSet());
 	private static final List<Attribute> ATTRIBUTES = Arrays.asList(Attribute.values());
-	private final String effectName = "lootbox";
-	private final String displayName = "Open Lootbox";
+	private final String effectName;
+	private final String displayName;
+	private final int luck;
 
-	public LootboxCommand(PaperCrowdControlPlugin plugin) {
+	public LootboxCommand(PaperCrowdControlPlugin plugin, String displayName, int luck) {
 		super(plugin);
+
+		this.displayName = displayName;
+		this.luck = luck;
+
+		// set effect name to an ID like "lootbox_5" or just "lootbox" for luck level of 1
+		StringBuilder effectName = new StringBuilder("lootbox");
+		if (luck > 0)
+			effectName.append('_').append(luck);
+		this.effectName = effectName.toString();
 	}
 
 	private static boolean isGoodItem(@Nullable Material item) {
@@ -121,7 +133,7 @@ public class LootboxCommand extends ImmediateCommand {
 						level += random.nextInt(4);
 				}
 				// add enchant
-				itemStack.addEnchantment(enchantment, level);
+				itemStack.addUnsafeEnchantment(enchantment, level);
 			}
 		}
 
@@ -157,16 +169,18 @@ public class LootboxCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		for (Player player : players) {
 			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(request));
-			// create item
-			ItemStack randomItem = createRandomItem(0);
-			ItemMeta itemMeta = randomItem.getItemMeta();
-			itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(request)));
-			randomItem.setItemMeta(itemMeta);
+			for (int slot : lootboxItemSlots(luck)) {
+				// create item
+				ItemStack randomItem = createRandomItem(luck);
+				ItemMeta itemMeta = randomItem.getItemMeta();
+				itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(request)));
+				randomItem.setItemMeta(itemMeta);
+				lootbox.setItem(slot, randomItem);
+			}
 			// display lootbox
-			lootbox.setItem(13, randomItem);
 			sync(() -> player.openInventory(lootbox));
 			player.playSound(
-					Sounds.LOOTBOX_CHIME.get(),
+					Sounds.LOOTBOX_CHIME.get(luck),
 					Sound.Emitter.self()
 			);
 		}

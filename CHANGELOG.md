@@ -30,7 +30,12 @@ A list of all changes made to the software in reverse chronological order.
   item depending on the difficulty of the completed task.
 - The Chorus Fruit command no longer teleports players into blocks.
 - Added a new effect: Teleport to a Nearby Structure
-- Automatic detection and resolution of soft-locks (i.e. death loops) has been implemented.
+- Added a new effect: Teleport to a Random Biome
+- Added a new effect: Open Lucky Lootbox
+- Added some secret new effects for a secret new feature :)
+- Automatic detection and resolution of soft-locks (i.e. death loops) has been implemented. When the
+  plugin detects that you are in a death loop, it will kill nearby hostile mobs and delete dangerous
+  blocks.
 
 ## 3.1.3
 

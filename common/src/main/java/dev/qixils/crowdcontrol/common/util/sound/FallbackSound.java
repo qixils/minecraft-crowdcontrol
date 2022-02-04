@@ -14,7 +14,7 @@ class FallbackSound extends AbstractCollectionSound {
 	}
 
 	@Override
-	public @NotNull Optional<Sound> get(@Nullable Predicate<@NotNull Key> validator) {
+	public @NotNull Optional<Sound> get(@Nullable Predicate<@NotNull Key> validator, Object... args) {
 		if (validator == null)
 			return Optional.of(sounds.get(0));
 		for (Sound sound : sounds) {

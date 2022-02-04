@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
@@ -44,11 +45,23 @@ public class LootboxCommand extends ImmediateCommand {
 			.build("crowd-control:lootbox", "Lootbox");
 	private final List<ItemType> allItems;
 	private final List<ItemType> goodItems;
-	private final String effectName = "lootbox";
-	private final String displayName = "Open Lootbox";
+	private final String effectName;
+	private final String displayName;
+	private final int luck;
 
-	public LootboxCommand(SpongeCrowdControlPlugin plugin) {
+	public LootboxCommand(SpongeCrowdControlPlugin plugin, String displayName, int luck) {
+		// init basic variables
 		super(plugin);
+		this.displayName = displayName;
+		this.luck = luck;
+
+		// set effect name to an ID like "lootbox_5" or just "lootbox" for luck level of 1
+		StringBuilder effectName = new StringBuilder("lootbox");
+		if (luck > 0)
+			effectName.append('_').append(luck);
+		this.effectName = effectName.toString();
+
+		// create item collections
 		allItems = new ArrayList<>(plugin.getRegistry().getAllOf(ItemType.class));
 		goodItems = allItems.stream()
 				.filter(itemType ->
@@ -156,24 +169,27 @@ public class LootboxCommand extends ImmediateCommand {
 					.property(new InventoryTitle(spongeSerializer.serialize(buildLootboxTitle(request))))
 					.build(plugin);
 
-			// create item
-			ItemStack itemStack = createRandomItem(0);
-			itemStack.offer(
-					Keys.ITEM_LORE,
-					Collections.singletonList(spongeSerializer.serialize(buildLootboxLore(request)))
-			);
+			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
+				// create item
+				ItemStack itemStack = createRandomItem(luck);
+				itemStack.offer(
+						Keys.ITEM_LORE,
+						Collections.singletonList(spongeSerializer.serialize(buildLootboxLore(request)))
+				);
 
-			// the custom inventory does not implement anything sensible so enjoy this hack
-			int i = 0;
-			for (Inventory slot : lootbox.slots()) {
-				if (i++ == 13) {
-					slot.offer(itemStack);
-					break;
+				// the custom inventory does not implement anything sensible so enjoy this hack
+				int i = 0;
+				for (Inventory slotInv : lootbox.slots()) {
+					if (i++ == slot) {
+						slotInv.offer(itemStack);
+						break;
+					}
 				}
 			}
+
 			// sound & open
 			Vector3d pos = player.getPosition();
-			plugin.asAudience(player).playSound(Sounds.LOOTBOX_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
+			plugin.asAudience(player).playSound(Sounds.LOOTBOX_CHIME.get(luck), pos.getX(), pos.getY(), pos.getZ());
 			sync(() -> player.openInventory(lootbox));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
