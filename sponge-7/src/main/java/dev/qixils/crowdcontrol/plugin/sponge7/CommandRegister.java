@@ -122,7 +122,8 @@ public class CommandRegister {
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin),
 				new PlantTreeCommand(plugin),
-				new DoOrDieCommand(plugin)
+				new DoOrDieCommand(plugin),
+				new ExplodeCommand(plugin)
 		));
 
 		// entity commands

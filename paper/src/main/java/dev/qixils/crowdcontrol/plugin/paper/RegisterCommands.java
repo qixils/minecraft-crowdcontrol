@@ -92,7 +92,8 @@ public class RegisterCommands {
 				new RainyWeatherCommand(plugin),
 				new ThunderingWeatherCommand(plugin),
 				new StructureCommand(plugin),
-				new BiomeCommand(plugin)
+				new BiomeCommand(plugin),
+				new ExplodeCommand(plugin)
 		));
 
 		// entity commands

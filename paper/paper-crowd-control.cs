@@ -39,6 +39,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Do-or-Die", "do_or_die", "miscellaneous") {Price = 500, Description = "Gives the streamer a task to complete within 30 seconds or else they die"},
             new Effect("Drop Held Item", "drop_item", "miscellaneous") {Price = 25, Description = "Makes the streamer drop their held item"},
             new Effect("Eat Chorus Fruit", "chorus_fruit", "miscellaneous") {Price = 75, Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit"},
+            new Effect("Explode", "explode", "miscellaneous") {Price = 750, Description = "Spawns a TNT-like explosion at the streamer's feet"},
             new Effect("Feed Player", "feed", "miscellaneous") {Price = 15, Description = "Replenishes the hunger bar"},
             new Effect("Feed Player (1 Bar)", "feed_1", "miscellaneous") {Price = 1, Description = "Replenishes a single bar of hunger"},
             new Effect("Flip Mobs Upside-Down", "dinnerbone", "miscellaneous") {Price = 25, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone"},

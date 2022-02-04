@@ -27,11 +27,6 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 public class CommandConstants {
 
 	/**
-	 * The default validator which ensures that a given sound is available.
-	 * This should be set when the plugin is enabled.
-	 */
-	public static Predicate<Key> SOUND_VALIDATOR = null;
-	/**
 	 * The radius to search for an entity to remove during the execution of the Remove XYZ Entity
 	 * command.
 	 */
@@ -97,10 +92,6 @@ public class CommandConstants {
 	public static final Component LOSE_INVENTORY_MESSAGE = new TextBuilder(NamedTextColor.RED)
 			.next("Your inventory will &lnot&r be kept on death").build();
 	/**
-	 * The minimum amount of durability allowed to be set by the Damage Item command.
-	 */
-	private static final int MIN_ITEM_DAMAGE = 15;
-	/**
 	 * The minimum amount of health allowed to be set by the -1 Max Health command.
 	 */
 	public static final int MIN_MAX_HEALTH = 10;
@@ -121,9 +112,6 @@ public class CommandConstants {
 	 * How long the freeze commands should last.
 	 */
 	public static final Duration FREEZE_DURATION = Duration.ofSeconds(10);
-
-	// tags
-
 	/**
 	 * Collection of blocks to be used in the Place Block command.
 	 */
@@ -137,7 +125,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "bedrock"),
 			Key.key(MINECRAFT_NAMESPACE, "water")
 	);
-
 	/**
 	 * Collection of blocks to be used in the Place Falling Block command.
 	 */
@@ -148,6 +135,7 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "gravel")
 	);
 
+	// tags
 	/**
 	 * Collection of items to be used in the Give Item and Take Item commands.
 	 */
@@ -168,7 +156,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "diamond"),
 			Key.key(MINECRAFT_NAMESPACE, "netherite_ingot")
 	);
-
 	/**
 	 * Collection of entities that are safe to summon into the world.
 	 */
@@ -257,7 +244,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "zombie_villager"),
 			Key.key(MINECRAFT_NAMESPACE, "zombified_piglin")
 	);
-
 	/**
 	 * Collection of flower blocks.
 	 */
@@ -279,7 +265,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "red_flower"),
 			Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
 	);
-
 	/**
 	 * Collection of torch blocks.
 	 */
@@ -291,9 +276,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "redstone_wall_torch"),
 			Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
 	);
-
-	// do-or-die
-
 	/**
 	 * How long streamers should be given to complete a Do-or-Die task.
 	 */
@@ -303,6 +285,24 @@ public class CommandConstants {
 	 * from being excessively spammed to prevent the streamer from progressing.
 	 */
 	public static final Duration DO_OR_DIE_COOLDOWN = DO_OR_DIE_DURATION.multipliedBy(3);
+
+	// do-or-die
+	/**
+	 * How long Do-or-Die's on-screen Titles should last.
+	 */
+	public static final Title.Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
+	/**
+	 * Message to show to users when they fail a Do-or-Die task.
+	 */
+	public static final Title DO_OR_DIE_FAILURE = Title.title(
+			Component.text("Task Failed").color(NamedTextColor.RED),
+			Component.empty(),
+			DO_OR_DIE_TIMES
+	);
+	/**
+	 * The minimum amount of durability allowed to be set by the Damage Item command.
+	 */
+	private static final int MIN_ITEM_DAMAGE = 15;
 	/**
 	 * The color used at the start of the countdown timer.
 	 */
@@ -312,21 +312,18 @@ public class CommandConstants {
 	 */
 	private static final TextColor DO_OR_DIE_END_COLOR = TextColor.color(0xF42929);
 	/**
-	 * How long Do-or-Die's on-screen Titles should last.
-	 */
-	public static final Title.Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
-	/**
 	 * Color used for the subtitle of the Do-or-Die success message.
 	 */
 	private static final TextColor SUCCESS_SUBTITLE_COLOR = TextColor.color(0x99ff99);
 	/**
-	 * Message to show to users when they fail a Do-or-Die task.
+	 * The default validator which ensures that a given sound is available.
+	 * This should be set when the plugin is enabled.
 	 */
-	public static final Title DO_OR_DIE_FAILURE = Title.title(
-			Component.text("Task Failed").color(NamedTextColor.RED),
-			Component.empty(),
-			DO_OR_DIE_TIMES
-	);
+	public static Predicate<Key> SOUND_VALIDATOR = null;
+
+	private CommandConstants() {
+		throw new UnsupportedOperationException("Utility class cannot be instantiated");
+	}
 
 	/**
 	 * Creates the title to display to a user upon the completion of a Do-or-Die task.
@@ -357,6 +354,8 @@ public class CommandConstants {
 		);
 	}
 
+	// misc methods
+
 	/**
 	 * Returns the text color used at the given point during the countdown.
 	 *
@@ -366,8 +365,6 @@ public class CommandConstants {
 	public static TextColor doOrDieColor(int secondsLeft) {
 		return TextColor.lerp((secondsLeft - 1f) / DO_OR_DIE_DURATION.getSeconds(), DO_OR_DIE_END_COLOR, DO_OR_DIE_START_COLOR);
 	}
-
-	// misc methods
 
 	/**
 	 * Determines whether a change to an item's durability can be applied by one of the durability
@@ -448,6 +445,33 @@ public class CommandConstants {
 	}
 
 	/**
+	 * The power of the explosion that should be used in the "Explode" command.
+	 * This returns a random positive double that tends towards 4 (TNT strength) but can be any
+	 * value between 2.5 (a little less than a creeper; inclusive)
+	 * and 7 (wither skull spawn; exclusive).
+	 *
+	 * @return random value between [2.5,7) that tends towards 4
+	 */
+	public static double explosionPower() {
+		return Math.max(
+				Math.round(RandomUtil.RNG.doubles(4, 1, 7)
+						.average()
+						.orElse(5)), // failsafe? shouldn't be necessary though lol
+				2.5
+		);
+	}
+
+	/**
+	 * Whether explosions created from the "Explode" command should place fire blocks.
+	 * Currently, this has a 5% chance.
+	 *
+	 * @return whether to place fire blocks
+	 */
+	public static boolean shouldSpawnFire() {
+		return RandomUtil.RNG.nextDouble() >= 0.95;
+	}
+
+	/**
 	 * Weights used for randomly determining how many random attributes should be applied to the
 	 * random item generated by the Lootbox Command.
 	 */
@@ -489,9 +513,5 @@ public class CommandConstants {
 			this.level = level;
 			this.weight = weight;
 		}
-	}
-
-	private CommandConstants() {
-		throw new UnsupportedOperationException("Utility class cannot be instantiated");
 	}
 }
