@@ -45,7 +45,16 @@ public class LootboxCommand extends ImmediateCommand {
 					|| material == Material.IRON_BLOCK
 					|| material == Material.GOLD_BLOCK
 	).collect(Collectors.toUnmodifiableSet());
-	private static final List<Attribute> ATTRIBUTES = Arrays.asList(Attribute.values());
+	private static final List<Attribute> ATTRIBUTES = Arrays.asList(
+			Attribute.GENERIC_MAX_HEALTH,
+			Attribute.GENERIC_KNOCKBACK_RESISTANCE,
+			Attribute.GENERIC_MOVEMENT_SPEED,
+			Attribute.GENERIC_ATTACK_DAMAGE,
+			Attribute.GENERIC_ARMOR,
+			Attribute.GENERIC_ARMOR_TOUGHNESS,
+			Attribute.GENERIC_ATTACK_KNOCKBACK,
+			Attribute.GENERIC_ATTACK_SPEED
+	);
 	private final String effectName;
 	private final String displayName;
 	private final int luck;
