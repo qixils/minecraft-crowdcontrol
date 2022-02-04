@@ -48,10 +48,13 @@ public class RegisterCommands {
 				new FlowerCommand(plugin),
 				new MoveCommand(plugin, 0, 1, 0, "Up"),
 				new MoveCommand(plugin, 0, -2, 0, "Down"),
+				// begin: deprecated effects
 				new MoveCommand(plugin, 2, 0.2, 0, "xplus", "East"),
 				new MoveCommand(plugin, -2, 0.2, 0, "xminus", "West"),
 				new MoveCommand(plugin, 0, 0.2, 2, "zplus", "South"),
 				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
+				// end: deprecated effects
+				new FlingCommand(plugin),
 				new TorchCommand(plugin, true),
 				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),

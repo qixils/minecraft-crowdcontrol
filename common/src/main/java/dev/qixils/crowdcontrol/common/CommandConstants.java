@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
 
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
 /**
@@ -443,7 +444,7 @@ public class CommandConstants {
 	 * @return depth to dig as a random negative integer
 	 */
 	public static int getDigDepth() {
-		return -(3 + RandomUtil.RNG.nextInt(5));
+		return -(3 + RNG.nextInt(5));
 	}
 
 	/**
@@ -456,7 +457,7 @@ public class CommandConstants {
 	 */
 	public static double explosionPower() {
 		return Math.max(
-				Math.round(RandomUtil.RNG.doubles(4, 1, 7)
+				Math.round(RNG.doubles(4, 1, 7)
 						.average()
 						.orElse(5)), // failsafe? shouldn't be necessary though lol
 				2.5
@@ -470,7 +471,7 @@ public class CommandConstants {
 	 * @return whether to place fire blocks
 	 */
 	public static boolean shouldSpawnFire() {
-		return RandomUtil.RNG.nextDouble() >= 0.95;
+		return RNG.nextDouble() >= 0.95;
 	}
 
 	/**
@@ -487,6 +488,28 @@ public class CommandConstants {
 			return Arrays.asList(12, 14);
 		else
 			return Collections.singletonList(13);
+	}
+
+	/**
+	 * Creates a random X or Z velocity for the fling command.
+	 *
+	 * @return random double corresponding to X or Z velocity
+	 */
+	private static double randomFlingHoriz() {
+		return (RNG.nextBoolean() ? -1 : 1) * (RandomUtil.nextDouble(1.2, 3));
+	}
+
+	/**
+	 * Gets a random X,Y,Z vector for the fling command.
+	 *
+	 * @return array with 3 values corresponding to a vector
+	 */
+	public static double @NotNull [] randomFlingVector() {
+		return new double[]{
+				randomFlingHoriz(),
+				RandomUtil.nextDouble(.2, 2),
+				randomFlingHoriz()
+		};
 	}
 
 	/**

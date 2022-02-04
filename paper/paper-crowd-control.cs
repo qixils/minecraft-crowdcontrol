@@ -86,10 +86,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Fling Players", "teleportation", ItemKind.Folder),
             new Effect("Fling Up", "up", "teleportation") {Price = 100, Description = "Flings the streamer high into the air"},
             new Effect("Fling Down", "down", "teleportation") {Price = 100, Description = "Every few seconds, this will try to suddenly fling the streamer downwards if they're in the air"},
-            new Effect("Fling East", "xplus", "teleportation") {Price = 50},
-            new Effect("Fling West", "xminus", "teleportation") {Price = 50},
-            new Effect("Fling South", "zplus", "teleportation") {Price = 50},
-            new Effect("Fling North", "zminus", "teleportation") {Price = 50},
+            new Effect("Fling Randomly", "fling", "teleportation") {Price = 100, Description = "Flings the streamer in a totally random direction"},
             // summons a mob around each player
             new Effect("Summon Entity", "summon_entity", ItemKind.Folder),
             new Effect("Armor Stand", "entity_armor_stand", "summon_entity") {Price = 10},

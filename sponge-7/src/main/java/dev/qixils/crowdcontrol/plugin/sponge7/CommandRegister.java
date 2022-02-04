@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class CommandRegister {
-	private final SpongeCrowdControlPlugin plugin;
-	private final Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
-	private final Map<Class<? extends Command>, Command> singleCommandInstances = new HashMap<>();
+	private final @NotNull SpongeCrowdControlPlugin plugin;
+	private final @NotNull Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
+	private final @NotNull Map<Class<? extends Command>, Command> singleCommandInstances = new HashMap<>();
 	private boolean tagsRegistered = false;
 	private Set<EntityType> safeEntities;
 	private MappedKeyedTag<BlockType> setBlocks;
@@ -59,7 +59,7 @@ public class CommandRegister {
 		}
 	}
 
-	public List<Command> getCommands() {
+	public @NotNull List<Command> getCommands() {
 		if (registeredCommands != null)
 			return registeredCommands;
 
@@ -81,10 +81,13 @@ public class CommandRegister {
 				new FlowerCommand(plugin),
 				new MoveCommand(plugin, 0, 1, 0, "Up"),
 				new MoveCommand(plugin, 0, -2, 0, "Down"),
+				// begin: deprecated effects
 				new MoveCommand(plugin, 2, 0.2, 0, "xplus", "East"),
 				new MoveCommand(plugin, -2, 0.2, 0, "xminus", "West"),
 				new MoveCommand(plugin, 0, 0.2, 2, "zplus", "South"),
 				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
+				// end: deprecated effects
+				new FlingCommand(plugin),
 				new TorchCommand(plugin, true),
 				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),

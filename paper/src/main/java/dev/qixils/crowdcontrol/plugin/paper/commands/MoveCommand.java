@@ -10,13 +10,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 @Getter
+@ParametersAreNonnullByDefault
 public class MoveCommand extends ImmediateCommand {
-	protected final Vector vector;
-	protected final String effectName;
-	protected final String displayName;
+	protected final @NotNull Vector vector;
+	protected final @NotNull String effectName;
+	protected final @NotNull String displayName;
 
 	public MoveCommand(PaperCrowdControlPlugin plugin, Vector displacement, String effectName, String displayName) {
 		super(plugin);
@@ -38,7 +40,7 @@ public class MoveCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(List<@NotNull Player> players, Request request) {
 		Response.Builder resp = request.buildResponse().type(ResultType.RETRY).message("All players were grounded");
 		boolean isDownwards = vector.getY() < 0.0;
 		for (Player player : players) {
