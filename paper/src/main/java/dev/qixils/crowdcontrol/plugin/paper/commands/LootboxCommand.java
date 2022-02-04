@@ -18,6 +18,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.lootboxItemSlots;
@@ -152,7 +154,10 @@ public class LootboxCommand extends ImmediateCommand {
 			attributes = Math.max(attributes, RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		// add attributes
-		if (attributes > 0) {
+		if (attributes > 0
+				&& item.getMaxDurability() <= 1 // TODO: add default attributes to items and remove this
+		) {
+			EquipmentSlot target = item.getEquipmentSlot();
 			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
@@ -164,14 +169,27 @@ public class LootboxCommand extends ImmediateCommand {
 					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
 				}
 				// create & add attribute
-				AttributeModifier attributeModifier = new AttributeModifier(name, amount, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-				itemMeta.addAttributeModifier(attribute, attributeModifier);
+				if (target == EquipmentSlot.HAND || target == EquipmentSlot.OFF_HAND) {
+					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.HAND));
+					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.OFF_HAND));
+				} else {
+					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, target));
+				}
 			}
 		}
 
 		// finish up
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
+	}
+
+	@NotNull
+	private static AttributeModifier createModifier(@NotNull String name, double amount, @NotNull EquipmentSlot slot) {
+		return new AttributeModifier(
+				UUID.randomUUID(), name, amount,
+				AttributeModifier.Operation.MULTIPLY_SCALAR_1,
+				slot
+		);
 	}
 
 	@Override
