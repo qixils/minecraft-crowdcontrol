@@ -77,6 +77,7 @@ public class RegisterCommands {
 				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
 				new MaxHealthCommand(plugin, -1),
 				new MaxHealthCommand(plugin, 1),
+				new MaxHealthCommand(plugin, 4), // used in hype trains only
 				new DisableJumpingCommand(plugin),
 				new EntityChaosCommand(plugin),
 				new CameraLockToSkyCommand(plugin),
