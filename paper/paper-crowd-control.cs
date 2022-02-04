@@ -257,7 +257,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Normal Mode", "difficulty_normal", "difficulty") {Price = 200},
             new Effect("Hard Mode", "difficulty_hard", "difficulty") {Price = 400},
             // applies potion effects to every player
-            new Effect("Apply Potion (15s)", "apply_potion_effect", ItemKind.Folder),
+            new Effect("Apply Potion (20s)", "apply_potion_effect", ItemKind.Folder),
             new Effect("Absorption", "potion_absorption", "apply_potion_effect") {Price = 50, Description = "Grants extra health that cannot be regenerated"},
             //new Effect("Bad Luck", "potion_bad_luck", "apply_potion_effect"),
             new Effect("Bad Omen", "potion_bad_omen", "apply_potion_effect") {Price = 500, Description = "Causes a village raid when a player possessing this effect is inside of a village"},

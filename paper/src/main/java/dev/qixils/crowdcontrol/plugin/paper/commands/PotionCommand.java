@@ -16,10 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.POTION_SECONDS;
+
 @Getter
 public class PotionCommand extends ImmediateCommand {
-	private static final int SECONDS = 15;
-	private static final int MAX_DURATION = 20 * SECONDS;
+	private static final int MAX_DURATION = 20 * POTION_SECONDS;
 	private final PotionEffectType potionEffectType;
 	private final int duration;
 	private final String effectName;
@@ -31,7 +32,7 @@ public class PotionCommand extends ImmediateCommand {
 		boolean isMinimal = potionEffectType.isInstant();
 		duration = isMinimal ? 1 : MAX_DURATION;
 		this.effectName = "potion_" + nameOf(potionEffectType);
-		this.displayName = "Apply " + TextUtil.titleCase(nameOf(potionEffectType)) + " Potion Effect (" + SECONDS + "s)";
+		this.displayName = "Apply " + TextUtil.titleCase(nameOf(potionEffectType)) + " Potion Effect (" + POTION_SECONDS + "s)";
 	}
 
 	private static String nameOf(PotionEffectType type) {

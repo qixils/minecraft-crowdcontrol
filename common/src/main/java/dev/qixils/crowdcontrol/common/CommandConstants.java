@@ -287,7 +287,7 @@ public class CommandConstants {
 	 * How long the grace period should last for the Do-or-Die command. This prevents the command
 	 * from being excessively spammed to prevent the streamer from progressing.
 	 */
-	public static final Duration DO_OR_DIE_COOLDOWN = DO_OR_DIE_DURATION.multipliedBy(3);
+	public static final Duration DO_OR_DIE_COOLDOWN = DO_OR_DIE_DURATION.plusSeconds(5);
 
 	// do-or-die
 	/**
@@ -323,6 +323,10 @@ public class CommandConstants {
 	 * This should be set when the plugin is enabled.
 	 */
 	public static Predicate<Key> SOUND_VALIDATOR = null;
+	/**
+	 * How long potion effects given by the potion command should last in seconds.
+	 */
+	public static final int POTION_SECONDS = 20;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");
