@@ -11,7 +11,7 @@ A list of all changes made to the software in reverse chronological order.
 - Enchantment commands now apply to items in the off-hand and in armor slots.
 - Certain enchantments could not be applied to certain items; this has been fixed.
 - Potion effect commands now increase the level of existing effects and set the duration to at least
-  15 seconds.
+  20 seconds.
 - Fixed the Take Item commands erroneously returning `SUCCESS` responses when it changed nothing.
 - Created a new Thunderstorm command to start a thunderstorm.
 - Downfall command no longer has a 50% chance of starting a thunderstorm.
@@ -32,6 +32,8 @@ A list of all changes made to the software in reverse chronological order.
 - Added a new effect: Teleport to a Nearby Structure
 - Added a new effect: Teleport to a Random Biome
 - Added a new effect: Open Lucky Lootbox
+- Added new effects for setting the time to day or night.
+- Added new effects for giving and taking items.
 - Items from lootboxes now have less spammy descriptions.
 - Added some secret new effects for a secret new feature :)
 - Automatic detection and resolution of soft-locks (i.e. death loops) has been implemented. When the
