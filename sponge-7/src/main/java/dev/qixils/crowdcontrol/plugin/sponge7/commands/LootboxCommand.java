@@ -85,13 +85,15 @@ public class LootboxCommand extends ImmediateCommand {
 	 * @param luck zero-indexed level of luck
 	 * @return new random item
 	 */
-	public ItemStack createRandomItem(int luck) {
+	public @NotNull ItemStack createRandomItem(int luck) {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<ItemType> items = new ArrayList<>(allItems);
 		Collections.shuffle(items, random);
 		ItemType item = null;
-		for (int i = 0; i <= luck * 4; i++) {
+		// multiplier is slightly lower on sponge than paper due to smaller item count
+		// (due to a ton of items just. having the same item ID.)
+		for (int i = 0; i <= luck * 3; i++) {
 			ItemType oldItem = item;
 			item = items.get(i);
 			if (isGoodItem(item) && !isGoodItem(oldItem))
@@ -121,6 +123,7 @@ public class LootboxCommand extends ImmediateCommand {
 		List<EnchantmentType> enchantmentList = plugin.getRegistry().getAllOf(EnchantmentType.class).stream()
 				.filter(enchantmentType -> enchantmentType.canBeAppliedToStack(itemStack)).collect(Collectors.toList());
 		List<EnchantmentType> addedEnchantments = new ArrayList<>(enchantments);
+		// TODO: chance to remove curses with good luck
 
 		// add enchantments
 		while (enchantments > 0 && !enchantmentList.isEmpty()) {

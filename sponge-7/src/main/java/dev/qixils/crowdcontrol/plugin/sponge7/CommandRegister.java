@@ -77,6 +77,8 @@ public class CommandRegister {
 				new DinnerboneCommand(plugin),
 				new ClutterCommand(plugin),
 				new LootboxCommand(plugin, "Open Lootbox", 0),
+				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
+				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
 				new TeleportCommand(plugin),
 				new ToastCommand(plugin),
 				new FreezeCommand(plugin),

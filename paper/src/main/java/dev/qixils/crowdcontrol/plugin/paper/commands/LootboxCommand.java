@@ -91,7 +91,7 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Material> items = new ArrayList<>(ITEMS);
 		Collections.shuffle(items, random);
 		Material item = null;
-		for (int i = 0; i <= luck * 4; i++) {
+		for (int i = 0; i <= luck * 5; i++) {
 			Material oldItem = item;
 			item = items.get(i);
 			if (isGoodItem(item) && !isGoodItem(oldItem))
@@ -122,17 +122,16 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Enchantment> enchantmentList = Arrays.stream(EnchantmentWrapper.values())
 				.filter(enchantment -> enchantment.canEnchantItem(itemStack))
 				.collect(Collectors.toList());
+		// TODO: chance to remove curses with good luck
 		// add enchantments
 		if (enchantments > 0 && !enchantmentList.isEmpty()) {
 			Collections.shuffle(enchantmentList, random);
 			List<Enchantment> addedEnchantments = new ArrayList<>(enchantments);
-			int count = 0;
-			for (int i = 0; i < enchantmentList.size() && count < enchantments; ++i) {
+			for (int i = 0; i < enchantmentList.size() && addedEnchantments.size() < enchantments; ++i) {
 				Enchantment enchantment = enchantmentList.get(i);
 				// block conflicting enchantments (unless the die roll decides otherwise)
 				if (addedEnchantments.stream().anyMatch(x -> x.conflictsWith(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
 					continue;
-				++count;
 				addedEnchantments.add(enchantment);
 				// determine enchantment level
 				int level = enchantment.getStartLevel();
@@ -144,7 +143,7 @@ public class LootboxCommand extends ImmediateCommand {
 						level += random.nextInt(4);
 				}
 				// add enchant
-				itemStack.addUnsafeEnchantment(enchantment, level);
+				itemMeta.addEnchant(enchantment, level, true);
 			}
 		}
 
