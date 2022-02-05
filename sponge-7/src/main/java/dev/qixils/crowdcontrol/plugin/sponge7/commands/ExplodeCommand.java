@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -34,13 +35,16 @@ public class ExplodeCommand extends ImmediateCommand {
 
 		// spawn explosions
 		for (Player player : players) {
-			player.getWorld().triggerExplosion(Explosion.builder()
-					.canCauseFire(fire)
-					.location(player.getLocation().sub(0, .5, 0))
-					.shouldBreakBlocks(true)
-					.shouldDamageEntities(true)
-					.radius(power)
-					.build());
+			sync(() -> {
+				player.getWorld().triggerExplosion(Explosion.builder()
+						.canCauseFire(fire)
+						.location(player.getLocation().sub(0, .5, 0))
+						.shouldBreakBlocks(true)
+						.shouldDamageEntities(true)
+						.radius(power)
+						.build());
+				player.setVelocity(new Vector3d(0, .5, 0));
+			});
 		}
 
 		// return
