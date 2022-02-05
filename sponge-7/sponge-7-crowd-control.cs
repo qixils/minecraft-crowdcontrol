@@ -363,23 +363,74 @@ namespace CrowdControl.Games.Packs
             new Effect("Gold Ingot", "give_gold_ingot", "give_item") {Price = 300},
 //            new Effect("Netherite Ingot", "give_netherite_ingot", "give_item") {Price = 300}, //API8
             new Effect("Diamond", "give_diamond", "give_item") {Price = 300},
+
+            // gives 1 item
+            new Effect("Give an Item", "give_item", ItemKind.Folder),
+            new Effect("Elytra", "give_elytra", "give_item") {Price = 500},
+            new Effect("Eye of Ender", "give_ender_eye", "give_item") {Price = 100},
+            new Effect("End Portal Frame", "give_end_portal_frame", "give_item") {Price = 300},
+
+            new Effect("Food", "give_food", ItemKind.Folder, "give_item"),
+            new Effect("Cooked Porkchop", "give_cooked_porkchop", "give_food") {Price = 20},
+            new Effect("Golden Apple", "give_golden_apple", "give_food") {Price = 200},
+//            new Effect("Enchanted Golden Apple", "give_enchanted_golden_apple", "give_food") {Price = 300}, // API8
+
+            new Effect("Minerals", "give_minerals", ItemKind.Folder, "give_item"),
+            new Effect("Coal", "give_coal", "give_minerals") {Price = 20},
+            new Effect("Iron Ingot", "give_iron_ingot", "give_minerals") {Price = 300},
+            new Effect("Gold Ingot", "give_gold_ingot", "give_minerals") {Price = 300},
+//            new Effect("Netherite Ingot", "give_netherite_ingot", "give_minerals") {Price = 300}, // API8
+            new Effect("Diamond", "give_diamond", "give_minerals") {Price = 300},
+
+            new Effect("Tools", "give_tools", ItemKind.Folder, "give_item"),
+            new Effect("Wooden Pickaxe", "give_wooden_pickaxe", "give_tools") {Price = 25},
+            new Effect("Stone Pickaxe", "give_stone_pickaxe", "give_tools") {Price = 50},
+            new Effect("Golden Pickaxe", "give_golden_pickaxe", "give_tools") {Price = 25},
+            new Effect("Iron Pickaxe", "give_iron_pickaxe", "give_tools") {Price = 100},
+            new Effect("Diamond Pickaxe", "give_diamond_pickaxe", "give_tools") {Price = 250},
+//            new Effect("Netherite Pickaxe", "give_netherite_pickaxe", "give_tools") {Price = 350}, // API8
+
+            new Effect("Weapons", "give_weapons", ItemKind.Folder, "give_item"),
+            new Effect("Wooden Sword", "give_wooden_sword", "give_weapons") {Price = 25},
+            new Effect("Stone Sword", "give_stone_sword", "give_weapons") {Price = 50},
+            new Effect("Golden Sword", "give_golden_sword", "give_weapons") {Price = 25},
+            new Effect("Iron Sword", "give_iron_sword", "give_weapons") {Price = 100},
+            new Effect("Diamond Sword", "give_diamond_sword", "give_weapons") {Price = 250},
+//            new Effect("Netherite Sword", "give_netherite_sword", "give_weapons") {Price = 350}, // API8
+
             // takes 1 item
             new Effect("Take an Item", "take_item", ItemKind.Folder),
             new Effect("Elytra", "take_elytra", "take_item") {Price = 1000},
-            new Effect("Wooden Pickaxe", "take_wooden_pickaxe", "take_item") {Price = 50},
-            new Effect("Stone Pickaxe", "take_stone_pickaxe", "take_item") {Price = 75},
-            new Effect("Golden Pickaxe", "take_golden_pickaxe", "take_item") {Price = 50},
-            new Effect("Iron Pickaxe", "take_iron_pickaxe", "take_item") {Price = 300},
-            new Effect("Diamond Pickaxe", "take_diamond_pickaxe", "take_item") {Price = 600},
-//            new Effect("Netherite Pickaxe", "take_netherite_pickaxe", "take_item") {Price = 750}, //API8
-            new Effect("Golden Apple", "take_golden_apple", "take_item") {Price = 500},
-//            new Effect("Enchanted Golden Apple", "take_enchanted_golden_apple", "take_item") {Price = 600}, //API8
             new Effect("Eye of Ender", "take_ender_eye", "take_item") {Price = 300},
             new Effect("End Portal Frame", "take_end_portal_frame", "take_item") {Price = 600},
-            new Effect("Iron Ingot", "take_iron_ingot", "take_item") {Price = 300},
-            new Effect("Gold Ingot", "take_gold_ingot", "take_item") {Price = 300},
-//            new Effect("Netherite Ingot", "take_netherite_ingot", "take_item") {Price = 300}, //API8
-            new Effect("Diamond", "take_diamond", "take_item") {Price = 300},
+
+            new Effect("Food", "take_food", ItemKind.Folder, "take_item"),
+            new Effect("Cooked Porkchop", "take_cooked_porkchop", "take_food") {Price = 50},
+            new Effect("Golden Apple", "take_golden_apple", "take_food") {Price = 500},
+//            new Effect("Enchanted Golden Apple", "take_enchanted_golden_apple", "take_food") {Price = 600}, // API8
+
+            new Effect("Minerals", "take_minerals", ItemKind.Folder, "take_item"),
+            new Effect("Coal", "take_coal", "take_minerals") {Price = 50},
+            new Effect("Iron Ingot", "take_iron_ingot", "take_minerals") {Price = 200},
+            new Effect("Gold Ingot", "take_gold_ingot", "take_minerals") {Price = 200},
+//            new Effect("Netherite Ingot", "take_netherite_ingot", "take_minerals") {Price = 700}, // API8
+            new Effect("Diamond", "take_diamond", "take_minerals") {Price = 500},
+
+            new Effect("Tools", "take_tools", ItemKind.Folder, "take_item"),
+            new Effect("Wooden Pickaxe", "take_wooden_pickaxe", "take_tools") {Price = 50},
+            new Effect("Stone Pickaxe", "take_stone_pickaxe", "take_tools") {Price = 75},
+            new Effect("Golden Pickaxe", "take_golden_pickaxe", "take_tools") {Price = 50},
+            new Effect("Iron Pickaxe", "take_iron_pickaxe", "take_tools") {Price = 300},
+            new Effect("Diamond Pickaxe", "take_diamond_pickaxe", "take_tools") {Price = 600},
+//            new Effect("Netherite Pickaxe", "take_netherite_pickaxe", "take_tools") {Price = 750}, // API8
+
+            new Effect("Weapons", "take_weapons", ItemKind.Folder, "take_item"),
+            new Effect("Wooden Sword", "take_wooden_sword", "take_weapons") {Price = 50},
+            new Effect("Stone Sword", "take_stone_sword", "take_weapons") {Price = 75},
+            new Effect("Golden Sword", "take_golden_sword", "take_weapons") {Price = 50},
+            new Effect("Iron Sword", "take_iron_sword", "take_weapons") {Price = 300},
+            new Effect("Diamond Sword", "take_diamond_sword", "take_weapons") {Price = 600},
+//            new Effect("Netherite Sword", "take_netherite_sword", "take_weapons") {Price = 750}, // API8
         };
     }
 }

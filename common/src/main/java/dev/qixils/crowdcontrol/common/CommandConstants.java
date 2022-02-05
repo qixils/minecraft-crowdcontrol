@@ -145,6 +145,7 @@ public class CommandConstants {
 	);
 
 	// tags
+
 	/**
 	 * Collection of items to be used in the Give Item and Take Item commands.
 	 */
@@ -160,10 +161,18 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "ender_eye"),
 			Key.key(MINECRAFT_NAMESPACE, "end_portal_frame"),
 			Key.key(MINECRAFT_NAMESPACE, "elytra"),
+			Key.key(MINECRAFT_NAMESPACE, "coal"),
 			Key.key(MINECRAFT_NAMESPACE, "iron_ingot"),
 			Key.key(MINECRAFT_NAMESPACE, "gold_ingot"),
 			Key.key(MINECRAFT_NAMESPACE, "diamond"),
-			Key.key(MINECRAFT_NAMESPACE, "netherite_ingot")
+			Key.key(MINECRAFT_NAMESPACE, "netherite_ingot"),
+			Key.key(MINECRAFT_NAMESPACE, "wooden_sword"),
+			Key.key(MINECRAFT_NAMESPACE, "stone_sword"),
+			Key.key(MINECRAFT_NAMESPACE, "golden_sword"),
+			Key.key(MINECRAFT_NAMESPACE, "iron_sword"),
+			Key.key(MINECRAFT_NAMESPACE, "diamond_sword"),
+			Key.key(MINECRAFT_NAMESPACE, "netherite_sword"),
+			Key.key(MINECRAFT_NAMESPACE, "cooked_porkchop")
 	);
 	/**
 	 * Collection of entities that are safe to summon into the world.

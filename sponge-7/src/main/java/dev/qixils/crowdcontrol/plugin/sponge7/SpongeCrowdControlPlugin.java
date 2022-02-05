@@ -83,7 +83,7 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 @Plugin(
 		id = "crowd-control",
 		name = "Crowd Control",
-		version = "3.2.0-SNAPSHOT",
+		version = "3.2.0",
 		description = "Allows viewers to interact with your Minecraft world",
 		url = "https://github.com/qixils/minecraft-crowdcontrol",
 		authors = {"qixils"}
