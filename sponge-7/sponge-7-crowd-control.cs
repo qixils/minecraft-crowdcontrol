@@ -346,23 +346,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Apply Sweeping Edge III", "enchant_sweeping_edge", "enchantments") {Price = 50, Description = "Increases the damage done by sweeping attacks"},
             new Effect("Apply Thorns III", "enchant_thorns", "enchantments") {Price = 50, Description = "Deals damage to attackers when hit"},
             new Effect("Apply Unbreaking III", "enchant_unbreaking", "enchantments") {Price = 50, Description = "Lessens the speed at which items break"},
-            // gives 1 item
-            new Effect("Give an Item", "give_item", ItemKind.Folder),
-            new Effect("Elytra", "give_elytra", "give_item") {Price = 500},
-            new Effect("Wooden Pickaxe", "give_wooden_pickaxe", "give_item") {Price = 25},
-            new Effect("Stone Pickaxe", "give_stone_pickaxe", "give_item") {Price = 50},
-            new Effect("Golden Pickaxe", "give_golden_pickaxe", "give_item") {Price = 25},
-            new Effect("Iron Pickaxe", "give_iron_pickaxe", "give_item") {Price = 100},
-            new Effect("Diamond Pickaxe", "give_diamond_pickaxe", "give_item") {Price = 250},
-//            new Effect("Netherite Pickaxe", "give_netherite_pickaxe", "give_item") {Price = 350}, //API8
-            new Effect("Golden Apple", "give_golden_apple", "give_item") {Price = 200},
-//            new Effect("Enchanted Golden Apple", "give_enchanted_golden_apple", "give_item") {Price = 300}, //API8
-            new Effect("Eye of Ender", "give_ender_eye", "give_item") {Price = 100},
-            new Effect("End Portal Frame", "give_end_portal_frame", "give_item") {Price = 300},
-            new Effect("Iron Ingot", "give_iron_ingot", "give_item") {Price = 300},
-            new Effect("Gold Ingot", "give_gold_ingot", "give_item") {Price = 300},
-//            new Effect("Netherite Ingot", "give_netherite_ingot", "give_item") {Price = 300}, //API8
-            new Effect("Diamond", "give_diamond", "give_item") {Price = 300},
 
             // gives 1 item
             new Effect("Give an Item", "give_item", ItemKind.Folder),
