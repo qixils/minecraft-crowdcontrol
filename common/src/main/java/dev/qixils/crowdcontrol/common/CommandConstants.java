@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.translation.Translatable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -30,6 +31,11 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 public class CommandConstants {
 
 	/**
+	 * The default validator which ensures that a given sound is available.
+	 * This should be set when the plugin is enabled.
+	 */
+	public static @Nullable Predicate<Key> SOUND_VALIDATOR = null;
+	/**
 	 * The radius to search for an entity to remove during the execution of the Remove XYZ Entity
 	 * command.
 	 */
@@ -37,11 +43,11 @@ public class CommandConstants {
 	/**
 	 * The name to apply to entities to turn them upside-down.
 	 */
-	public static final String DINNERBONE_NAME = "Dinnerbone";
+	public static final @NotNull String DINNERBONE_NAME = "Dinnerbone";
 	/**
 	 * The name to apply to entities to turn them upside-down as a text component.
 	 */
-	public static final Component DINNERBONE_COMPONENT = Component.text(DINNERBONE_NAME);
+	public static final @NotNull Component DINNERBONE_COMPONENT = Component.text(DINNERBONE_NAME);
 	/**
 	 * The radius to search for entities to flip upside-down.
 	 */
@@ -61,7 +67,7 @@ public class CommandConstants {
 	/**
 	 * The amount of time to disable jumping for.
 	 */
-	public static final Duration DISABLE_JUMPING_DURATION = Duration.ofSeconds(10);
+	public static final @NotNull Duration DISABLE_JUMPING_DURATION = Duration.ofSeconds(10);
 	/**
 	 * The amount of time to disable jumping for in ticks.
 	 */
@@ -85,14 +91,14 @@ public class CommandConstants {
 	/**
 	 * The message to display to players when Keep Inventory has been enabled for them.
 	 */
-	public static final Component KEEP_INVENTORY_MESSAGE = Component.text(
+	public static final @NotNull Component KEEP_INVENTORY_MESSAGE = Component.text(
 			"Your inventory will be kept on death",
 			NamedTextColor.GREEN
 	);
 	/**
 	 * The message to display to players when Keep Inventory has been disabled for them.
 	 */
-	public static final Component LOSE_INVENTORY_MESSAGE = new TextBuilder(NamedTextColor.RED)
+	public static final @NotNull Component LOSE_INVENTORY_MESSAGE = new TextBuilder(NamedTextColor.RED)
 			.next("Your inventory will &lnot&r be kept on death").build();
 	/**
 	 * The minimum amount of health allowed to be set by the -1 Max Health command.
@@ -114,11 +120,11 @@ public class CommandConstants {
 	/**
 	 * How long the freeze commands should last.
 	 */
-	public static final Duration FREEZE_DURATION = Duration.ofSeconds(10);
+	public static final @NotNull Duration FREEZE_DURATION = Duration.ofSeconds(10);
 	/**
 	 * Collection of blocks to be used in the Place Block command.
 	 */
-	public static final KeyedTag SET_BLOCKS = new KeyedTag(
+	public static final @NotNull KeyedTag SET_BLOCKS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "tnt"),
 			Key.key(MINECRAFT_NAMESPACE, "fire"),
 			Key.key(MINECRAFT_NAMESPACE, "cobweb"),
@@ -131,7 +137,7 @@ public class CommandConstants {
 	/**
 	 * Collection of blocks to be used in the Place Falling Block command.
 	 */
-	public static final KeyedTag SET_FALLING_BLOCKS = new KeyedTag(
+	public static final @NotNull KeyedTag SET_FALLING_BLOCKS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "anvil"),
 			Key.key(MINECRAFT_NAMESPACE, "sand"),
 			Key.key(MINECRAFT_NAMESPACE, "red_sand"),
@@ -142,7 +148,7 @@ public class CommandConstants {
 	/**
 	 * Collection of items to be used in the Give Item and Take Item commands.
 	 */
-	public static final KeyedTag GIVE_TAKE_ITEMS = new KeyedTag(
+	public static final @NotNull KeyedTag GIVE_TAKE_ITEMS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "wooden_pickaxe"),
 			Key.key(MINECRAFT_NAMESPACE, "stone_pickaxe"),
 			Key.key(MINECRAFT_NAMESPACE, "golden_pickaxe"),
@@ -162,7 +168,7 @@ public class CommandConstants {
 	/**
 	 * Collection of entities that are safe to summon into the world.
 	 */
-	public static final KeyedTag SAFE_ENTITIES = new KeyedTag(
+	public static final @NotNull KeyedTag SAFE_ENTITIES = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "armor_stand"),
 			Key.key(MINECRAFT_NAMESPACE, "axolotl"),
 			Key.key(MINECRAFT_NAMESPACE, "bat"),
@@ -250,7 +256,7 @@ public class CommandConstants {
 	/**
 	 * Collection of flower blocks.
 	 */
-	public static final KeyedTag FLOWERS = new KeyedTag(
+	public static final @NotNull KeyedTag FLOWERS = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "poppy"),
 			Key.key(MINECRAFT_NAMESPACE, "dandelion"),
 			Key.key(MINECRAFT_NAMESPACE, "blue_orchid"),
@@ -271,7 +277,7 @@ public class CommandConstants {
 	/**
 	 * Collection of torch blocks.
 	 */
-	public static final KeyedTag TORCHES = new KeyedTag(
+	public static final @NotNull KeyedTag TORCHES = new KeyedTag(
 			Key.key(MINECRAFT_NAMESPACE, "torch"),
 			Key.key(MINECRAFT_NAMESPACE, "redstone_torch"),
 			Key.key(MINECRAFT_NAMESPACE, "soul_torch"),
@@ -280,24 +286,36 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
 	);
 	/**
+	 * How long potion effects given by the potion command should last in seconds.
+	 */
+	public static final int POTION_SECONDS = 20;
+	/**
+	 * The time in ticks that represents the start of the day.
+	 */
+	public static final long DAY = 1000;
+	/**
+	 * The time in ticks that represents the start of the night.
+	 */
+	public static final long NIGHT = 13000;
+
+	// do-or-die
+	/**
 	 * How long streamers should be given to complete a Do-or-Die task.
 	 */
-	public static final Duration DO_OR_DIE_DURATION = Duration.ofSeconds(31);
+	public static final @NotNull Duration DO_OR_DIE_DURATION = Duration.ofSeconds(31);
 	/**
 	 * How long the grace period should last for the Do-or-Die command. This prevents the command
 	 * from being excessively spammed to prevent the streamer from progressing.
 	 */
-	public static final Duration DO_OR_DIE_COOLDOWN = DO_OR_DIE_DURATION.plusSeconds(5);
-
-	// do-or-die
+	public static final @NotNull Duration DO_OR_DIE_COOLDOWN = DO_OR_DIE_DURATION.plusSeconds(5);
 	/**
 	 * How long Do-or-Die's on-screen Titles should last.
 	 */
-	public static final Title.Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
+	public static final Title.@NotNull Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
 	/**
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */
-	public static final Title DO_OR_DIE_FAILURE = Title.title(
+	public static final @NotNull Title DO_OR_DIE_FAILURE = Title.title(
 			Component.text("Task Failed").color(NamedTextColor.RED),
 			Component.empty(),
 			DO_OR_DIE_TIMES
@@ -309,24 +327,15 @@ public class CommandConstants {
 	/**
 	 * The color used at the start of the countdown timer.
 	 */
-	private static final TextColor DO_OR_DIE_START_COLOR = TextColor.color(0xE4F73D);
+	private static final @NotNull TextColor DO_OR_DIE_START_COLOR = TextColor.color(0xE4F73D);
 	/**
 	 * The color used at the end of the countdown timer.
 	 */
-	private static final TextColor DO_OR_DIE_END_COLOR = TextColor.color(0xF42929);
+	private static final @NotNull TextColor DO_OR_DIE_END_COLOR = TextColor.color(0xF42929);
 	/**
 	 * Color used for the subtitle of the Do-or-Die success message.
 	 */
-	private static final TextColor SUCCESS_SUBTITLE_COLOR = TextColor.color(0x99ff99);
-	/**
-	 * The default validator which ensures that a given sound is available.
-	 * This should be set when the plugin is enabled.
-	 */
-	public static Predicate<Key> SOUND_VALIDATOR = null;
-	/**
-	 * How long potion effects given by the potion command should last in seconds.
-	 */
-	public static final int POTION_SECONDS = 20;
+	private static final @NotNull TextColor SUCCESS_SUBTITLE_COLOR = TextColor.color(0x99ff99);
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");
@@ -340,7 +349,7 @@ public class CommandConstants {
 	 * @return title to display
 	 */
 	@NotNull
-	public static Title doOrDieSuccess(Translatable rewardItem) {
+	public static Title doOrDieSuccess(@NotNull Translatable rewardItem) {
 		return doOrDieSuccess(Component.translatable(rewardItem));
 	}
 

@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -147,6 +148,16 @@ public interface Command<P> {
 	}
 
 	/**
+	 * Returns a response indicating that global commands cannot be used for the targeted streamer.
+	 *
+	 * @param request originating request
+	 * @return response
+	 */
+	default Response.@NotNull Builder globalCommandUnusable(final @NotNull Request request) {
+		return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+	}
+
+	/**
 	 * Announces the {@link #execute(List, Request) execution} of this command.
 	 *
 	 * @param request request that prompted the execution of this command
@@ -156,7 +167,7 @@ public interface Command<P> {
 	 * @deprecated usage of {@link #playerAnnounce(Collection, Request)} is preferred
 	 */
 	@Deprecated
-	default void announce(final Request request) {
+	default void announce(final @NotNull Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
 		if (!plugin.announceEffects()) return;
 		announce(plugin.getPlayers(request).stream().map(plugin::asAudience).collect(Audience.toAudience()), request);

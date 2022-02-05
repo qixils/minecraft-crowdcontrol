@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
+import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
+
 public class RegisterCommands {
 	@SuppressWarnings("deprecation") // Bukkit is dumb
 	public static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
@@ -98,7 +101,9 @@ public class RegisterCommands {
 				new ThunderingWeatherCommand(plugin),
 				new StructureCommand(plugin),
 				new BiomeCommand(plugin),
-				new ExplodeCommand(plugin)
+				new ExplodeCommand(plugin),
+				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
+				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
 		));
 
 		// entity commands

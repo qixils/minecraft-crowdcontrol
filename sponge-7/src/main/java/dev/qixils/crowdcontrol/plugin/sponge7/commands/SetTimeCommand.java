@@ -2,31 +2,28 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.List;
 
 @Getter
-public class DifficultyCommand extends ImmediateCommand {
-	private final Difficulty difficulty;
-	private final String effectName;
-	private final String displayName;
+public class SetTimeCommand extends ImmediateCommand {
+	private final @NotNull String displayName;
+	private final @NotNull String effectName;
+	private final long time;
 
-	public DifficultyCommand(SpongeCrowdControlPlugin plugin, Difficulty difficulty) {
+	public SetTimeCommand(SpongeCrowdControlPlugin plugin, String displayName, String effectName, long time) {
 		super(plugin);
-		this.difficulty = difficulty;
-		this.effectName = "difficulty_" + Sponge7TextUtil.valueOf(difficulty);
-		this.displayName = difficulty.getTranslation().get() + " Mode";
+		this.displayName = displayName;
+		this.effectName = effectName;
+		this.time = time;
 	}
 
 	@NotNull
@@ -34,18 +31,17 @@ public class DifficultyCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (!isGlobalCommandUsable(players, request))
 			return globalCommandUnusable(request);
-
-		Builder response = request.buildResponse().type(ResultType.FAILURE)
-				.message("Server difficulty is already on " + displayName);
-
 		for (World world : plugin.getGame().getServer().getWorlds()) {
 			WorldProperties properties = world.getProperties();
-			if (!properties.getDifficulty().equals(difficulty)) {
-				response.type(ResultType.SUCCESS).message("SUCCESS");
-				properties.setDifficulty(difficulty);
-			}
+			long setTime = properties.getWorldTime();
+			while ((setTime % 24000) != time)
+				// I could be awesome and use the prefix add operator in the while condition and use
+				// an empty body but then IntelliJ would yell at me and I don't like being yelled at
+				// :(
+				setTime++;
+			final long finalSetTime = setTime;
+			sync(() -> world.getProperties().setWorldTime(finalSetTime));
 		}
-
-		return response;
+		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 }

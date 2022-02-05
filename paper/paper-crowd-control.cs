@@ -61,6 +61,8 @@ namespace CrowdControl.Games.Packs
             new Effect("Replace Area With Gravel", "gravel_hell", "miscellaneous") {Price = 300, Description = "Replaces nearby stone-like blocks with gravel"},
             new Effect("Reset Experience", "reset_exp_progress", "miscellaneous") {Price = 1000, Description = "Clears all of the streamer's XP"},
             new Effect("Respawn Player", "respawn", "miscellaneous") {Price = 500, Description = "Sends the streamer to their spawn point"},
+            new Effect("Set Time to Day", "time_day", "miscellaneous") {Price = 50, Description = "Jumps the clock ahead to daytime"},
+            new Effect("Set Time to Night", "time_night", "miscellaneous") {Price = 50, Description = "Jumps the clock ahead to nighttime"},
             new Effect("Spawn Ore Veins", "vein", "miscellaneous") {Price = 100, Description = "Places random ore veins (ore lava) near the streamer"},
             new Effect("Spooky Sound Effect", "sfx", "miscellaneous") {Price = 50, Description = "Plays a random spooky sound effect"},
             new Effect("Starve Player", "starve", "miscellaneous") {Price = 500, Description = "Drains the players' hunger bar"},
@@ -70,7 +72,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Teleport to a Random Biome", "biome", "miscellaneous") {Price = 1000, Description = "Teleports players to a random nearby biome"},
             new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous") {Price = 2000, Description = "Teleports every loaded mob on the server to the targeted streamers in an even split"},
             new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous") {Price = 400, Description = "Teleports players 30 blocks up and gives them a water bucket"},
-            new Effect("Zip Time", "zip", "miscellaneous") {Price = 50, Description = "Adds several minutes to the in-game time"},
+            new Effect("Zip Time", "zip", "miscellaneous") {Price = 30, Description = "Adds several minutes to the in-game time"},
             // inventory commands
             new Effect("Inventory", "inventory", ItemKind.Folder),
             new Effect("Clear Inventory", "clear_inventory", "inventory") {Price = 1000, Description = "Wipes every item from the streamer's inventory"},

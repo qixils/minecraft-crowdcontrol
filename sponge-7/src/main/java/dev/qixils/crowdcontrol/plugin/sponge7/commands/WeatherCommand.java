@@ -37,7 +37,7 @@ public class WeatherCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (!isGlobalCommandUsable(players, request))
-			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+			return globalCommandUnusable(request);
 
 		Response.Builder builder = request.buildResponse().type(ResultType.FAILURE).message("Requested weather is already active");
 		for (World world : plugin.getGame().getServer().getWorlds()) {

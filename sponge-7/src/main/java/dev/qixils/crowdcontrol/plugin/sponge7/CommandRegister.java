@@ -29,6 +29,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
+import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
+
 public class CommandRegister {
 	private final @NotNull SpongeCrowdControlPlugin plugin;
 	private final @NotNull Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
@@ -126,7 +129,9 @@ public class CommandRegister {
 				new ClearInventoryCommand(plugin),
 				new PlantTreeCommand(plugin),
 				new DoOrDieCommand(plugin),
-				new ExplodeCommand(plugin)
+				new ExplodeCommand(plugin),
+				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
+				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
 		));
 
 		// entity commands

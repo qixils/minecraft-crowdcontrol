@@ -29,7 +29,7 @@ public class DifficultyCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (!isGlobalCommandUsable(players, request))
-			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
+			return globalCommandUnusable(request);
 
 		boolean success = false;
 		for (World world : plugin.getServer().getWorlds()) {
