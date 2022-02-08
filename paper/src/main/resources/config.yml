@@ -1,6 +1,6 @@
 # Password that Crowd Control clients must enter to connect to this Crowd Control server.
 # This may be temporarily overridden using the "/password" command.
-password: ""
+password: "crowdcontrol"
 
 # The port to listen for incoming connections on.
 # This port must be opened in your system's (or router's) firewall.

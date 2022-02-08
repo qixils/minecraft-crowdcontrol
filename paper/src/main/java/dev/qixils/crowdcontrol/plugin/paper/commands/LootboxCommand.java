@@ -18,6 +18,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,7 +30,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static dev.qixils.crowdcontrol.common.CommandConstants.lootboxItemSlots;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
@@ -53,11 +57,21 @@ public class LootboxCommand extends ImmediateCommand {
 			Attribute.GENERIC_ATTACK_KNOCKBACK,
 			Attribute.GENERIC_ATTACK_SPEED
 	);
-	private final String effectName = "lootbox";
-	private final String displayName = "Open Lootbox";
+	private final String effectName;
+	private final String displayName;
+	private final int luck;
 
-	public LootboxCommand(PaperCrowdControlPlugin plugin) {
+	public LootboxCommand(PaperCrowdControlPlugin plugin, String displayName, int luck) {
 		super(plugin);
+
+		this.displayName = displayName;
+		this.luck = luck;
+
+		// set effect name to an ID like "lootbox_5" or just "lootbox" for luck level of 1
+		StringBuilder effectName = new StringBuilder("lootbox");
+		if (luck > 0)
+			effectName.append('_').append(luck);
+		this.effectName = effectName.toString();
 	}
 
 	private static boolean isGoodItem(@Nullable Material item) {
@@ -77,7 +91,7 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Material> items = new ArrayList<>(ITEMS);
 		Collections.shuffle(items, random);
 		Material item = null;
-		for (int i = 0; i <= luck * 4; i++) {
+		for (int i = 0; i <= luck * 5; i++) {
 			Material oldItem = item;
 			item = items.get(i);
 			if (isGoodItem(item) && !isGoodItem(oldItem))
@@ -108,17 +122,16 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Enchantment> enchantmentList = Arrays.stream(EnchantmentWrapper.values())
 				.filter(enchantment -> enchantment.canEnchantItem(itemStack))
 				.collect(Collectors.toList());
+		// TODO: chance to remove curses with good luck
 		// add enchantments
 		if (enchantments > 0 && !enchantmentList.isEmpty()) {
 			Collections.shuffle(enchantmentList, random);
 			List<Enchantment> addedEnchantments = new ArrayList<>(enchantments);
-			int count = 0;
-			for (int i = 0; i < enchantmentList.size() && count < enchantments; ++i) {
+			for (int i = 0; i < enchantmentList.size() && addedEnchantments.size() < enchantments; ++i) {
 				Enchantment enchantment = enchantmentList.get(i);
 				// block conflicting enchantments (unless the die roll decides otherwise)
 				if (addedEnchantments.stream().anyMatch(x -> x.conflictsWith(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
 					continue;
-				++count;
 				addedEnchantments.add(enchantment);
 				// determine enchantment level
 				int level = enchantment.getStartLevel();
@@ -130,7 +143,7 @@ public class LootboxCommand extends ImmediateCommand {
 						level += random.nextInt(4);
 				}
 				// add enchant
-				itemStack.addEnchantment(enchantment, level);
+				itemMeta.addEnchant(enchantment, level, true);
 			}
 		}
 
@@ -140,7 +153,10 @@ public class LootboxCommand extends ImmediateCommand {
 			attributes = Math.max(attributes, RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		// add attributes
-		if (attributes > 0) {
+		if (attributes > 0
+				&& item.getMaxDurability() <= 1 // TODO: add default attributes to items and remove this
+		) {
+			EquipmentSlot target = item.getEquipmentSlot();
 			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
@@ -152,8 +168,12 @@ public class LootboxCommand extends ImmediateCommand {
 					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
 				}
 				// create & add attribute
-				AttributeModifier attributeModifier = new AttributeModifier(name, amount, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-				itemMeta.addAttributeModifier(attribute, attributeModifier);
+				if (target == EquipmentSlot.HAND || target == EquipmentSlot.OFF_HAND) {
+					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.HAND));
+					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.OFF_HAND));
+				} else {
+					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, target));
+				}
 			}
 		}
 
@@ -162,20 +182,31 @@ public class LootboxCommand extends ImmediateCommand {
 		return itemStack;
 	}
 
+	@NotNull
+	private static AttributeModifier createModifier(@NotNull String name, double amount, @NotNull EquipmentSlot slot) {
+		return new AttributeModifier(
+				UUID.randomUUID(), name, amount,
+				AttributeModifier.Operation.MULTIPLY_SCALAR_1,
+				slot
+		);
+	}
+
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		for (Player player : players) {
 			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(request));
-			// create item
-			ItemStack randomItem = createRandomItem(0);
-			ItemMeta itemMeta = randomItem.getItemMeta();
-			itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(request)));
-			randomItem.setItemMeta(itemMeta);
+			for (int slot : lootboxItemSlots(luck)) {
+				// create item
+				ItemStack randomItem = createRandomItem(luck);
+				ItemMeta itemMeta = randomItem.getItemMeta();
+				itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(request)));
+				randomItem.setItemMeta(itemMeta);
+				lootbox.setItem(slot, randomItem);
+			}
 			// display lootbox
-			lootbox.setItem(13, randomItem);
 			sync(() -> player.openInventory(lootbox));
 			player.playSound(
-					Sounds.LOOTBOX_CHIME.get(),
+					Sounds.LOOTBOX_CHIME.get(luck),
 					Sound.Emitter.self()
 			);
 		}

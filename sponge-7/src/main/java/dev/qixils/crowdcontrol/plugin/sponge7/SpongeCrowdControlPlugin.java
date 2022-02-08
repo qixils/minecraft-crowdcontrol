@@ -85,7 +85,7 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 @Plugin(
 		id = "crowd-control",
 		name = "Crowd Control",
-		version = "3.3.0-SNAPSHOT",
+		version = "3.3.0",
 		description = "Allows viewers to interact with your Minecraft world",
 		url = "https://github.com/qixils/minecraft-crowdcontrol",
 		authors = {"qixils"}
@@ -97,6 +97,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	public static Key<Value<Boolean>> VIEWER_SPAWNED = DummyObjectProvider.createExtendedFor(Key.class, "VIEWER_SPAWNED");
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
 	// "real" variables
+	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final CommandRegister register = new CommandRegister(this);
 	private final SpongeTextUtil textUtil = new SpongeTextUtil();
 	@Accessors(fluent = true)
@@ -337,6 +338,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
+		game.getEventManager().registerListeners(this, softLockResolver);
 		spongeSerializer = SpongeComponentSerializer.get();
 		scheduler = game.getScheduler();
 		defaultConfig.copyToFile(configPath, false, true);

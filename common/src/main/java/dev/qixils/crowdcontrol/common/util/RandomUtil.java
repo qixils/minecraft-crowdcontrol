@@ -20,7 +20,7 @@ public class RandomUtil {
 	/**
 	 * A {@link Random} instance.
 	 */
-	public static final Random RNG = new Random();
+	public static final @NotNull Random RNG = new Random();
 
 	/**
 	 * Picks a random item from the provided collection of items.
@@ -166,5 +166,15 @@ public class RandomUtil {
 		return from + RNG.nextInt(to - from + 1);
 	}
 
+	/**
+	 * Randomly generates a new double between {@code from} (inclusive) and {@code to} (exclusive).
+	 *
+	 * @param from inclusive minimum value
+	 * @param to   exclusive maximum value
+	 * @return random double between {@code from} and {@code to}
+	 */
+	public static double nextDouble(double from, double to) {
+		return from + (RNG.nextDouble() * (to - from));
+	}
 
 }

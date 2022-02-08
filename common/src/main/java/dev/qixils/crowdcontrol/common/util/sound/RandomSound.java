@@ -16,7 +16,7 @@ class RandomSound extends AbstractCollectionSound {
 	}
 
 	@Override
-	public @NotNull Optional<Sound> get(@Nullable Predicate<@NotNull Key> validator) {
+	public @NotNull Optional<Sound> get(@Nullable Predicate<@NotNull Key> validator, Object... args) {
 		if (validator == null)
 			return Optional.of(RandomUtil.randomElementFrom(sounds));
 		else
