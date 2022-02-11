@@ -2,8 +2,6 @@
 
 The following steps detail how to manually set up a Minecraft 1.12.2 server with Crowd Control.
 
-**Note:** As of writing, Sponge 7 is **not yet available** in the Crowd Control application.
-
 1. Download and install [Java 8](https://adoptium.net/?variant=openjdk8&jvmVariant=hotspot).
 2. Download the latest recommended build
    of [SpongeVanilla 1.12.2](https://www.spongepowered.org/downloads/spongevanilla?minecraft=1.12.2&offset=0)

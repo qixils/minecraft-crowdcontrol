@@ -3,8 +3,6 @@
 The following steps detail how to manually set up a Minecraft Forge 1.12.2 server with Crowd
 Control.
 
-**Note:** As of writing, Sponge 7 is **not yet available** in the Crowd Control application.
-
 1. Download and install [Java 8](https://adoptium.net/?variant=openjdk8&jvmVariant=hotspot).
 2. Download and run the latest build (14.23.5.2860)
    of [Forge 1.12.2](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html).
