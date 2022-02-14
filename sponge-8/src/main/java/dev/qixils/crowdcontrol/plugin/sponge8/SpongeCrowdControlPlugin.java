@@ -38,6 +38,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
@@ -58,6 +59,7 @@ import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -71,12 +73,14 @@ import java.util.function.Function;
 
 @Getter
 @Plugin("crowd-control")
+@ParametersAreNonnullByDefault
 public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> {
 	// keys
 	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME; // TODO: component cannot be serialized ??
 	public static Key<Value<Boolean>> VIEWER_SPAWNED;
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT;
 	// "real" variables
+	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Logger logger = LoggerFactory.getLogger("crowd-control");
 	private final CommandRegister register = new CommandRegister(this);
 	private final TextUtil textUtil = new TextUtil(null);
@@ -312,6 +316,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 			crowdControl.shutdown("Minecraft server is shutting down");
 			crowdControl = null;
 		}
+	}
+
+	@Listener
+	public void onLoad(LoadedGameEvent event) {
+		game.eventManager().registerListeners(pluginContainer, softLockResolver);
 	}
 
 	@Listener

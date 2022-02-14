@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.CommandConstants.AttributeWeights;
 import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
@@ -25,7 +26,6 @@ import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.RegistryTypes;
@@ -55,11 +55,23 @@ public class LootboxCommand extends ImmediateCommand {
 	);
 	private final List<ItemType> allItems;
 	private final List<ItemType> goodItems;
-	private final String effectName = "lootbox";
-	private final String displayName = "Open Lootbox";
+	private final String effectName;
+	private final String displayName;
+	private final int luck;
 
-	public LootboxCommand(SpongeCrowdControlPlugin plugin) {
+	public LootboxCommand(SpongeCrowdControlPlugin plugin, String displayName, int luck) {
+		// init basic variables
 		super(plugin);
+		this.displayName = displayName;
+		this.luck = luck;
+
+		// set effect name to an ID like "lootbox_5" or just "lootbox" for luck level of 1
+		StringBuilder effectName = new StringBuilder("lootbox");
+		if (luck > 0)
+			effectName.append('_').append(luck);
+		this.effectName = effectName.toString();
+
+		// create item collections
 		allItems = plugin.getGame().registry(RegistryTypes.ITEM_TYPE).stream().collect(Collectors.toList());
 		goodItems = allItems.stream()
 				.filter(itemType ->
@@ -90,7 +102,7 @@ public class LootboxCommand extends ImmediateCommand {
 		List<ItemType> items = new ArrayList<>(allItems);
 		Collections.shuffle(items, random);
 		ItemType item = null;
-		for (int i = 0; i <= luck * 4; i++) {
+		for (int i = 0; i <= luck * 5; i++) {
 			ItemType oldItem = item;
 			item = items.get(i);
 			if (isGoodItem(item) && !isGoodItem(oldItem))
@@ -113,23 +125,24 @@ public class LootboxCommand extends ImmediateCommand {
 			itemStack.offer(Keys.IS_UNBREAKABLE, true);
 
 		// determine enchantments to add
-		int enchantments = 0;
+		int _enchantments = 0;
 		for (int i = 0; i <= luck; i++) {
-			enchantments = Math.max(enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
+			_enchantments = Math.max(_enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
+		final int enchantments = _enchantments;
 		List<EnchantmentType> enchantmentList = plugin.getGame().registry(RegistryTypes.ENCHANTMENT_TYPE).stream()
 				.filter(enchantmentType -> enchantmentType.canBeAppliedToStack(itemStack)).collect(Collectors.toList());
+		// TODO: chance to remove curses with good luck
 		List<EnchantmentType> addedEnchantments = new ArrayList<>(enchantments);
 
 		// add enchantments
-		while (enchantments > 0 && !enchantmentList.isEmpty()) {
+		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
 			EnchantmentType enchantment = enchantmentList.remove(0);
 
 			// block conflicting enchantments (unless the die roll decides otherwise)
 			if (addedEnchantments.stream().anyMatch(x -> !x.isCompatibleWith(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
 				continue;
 			addedEnchantments.add(enchantment);
-			enchantments--;
 
 			// determine enchantment level
 			int level = enchantment.minimumLevel();
@@ -198,23 +211,22 @@ public class LootboxCommand extends ImmediateCommand {
 					.plugin(plugin.getPluginContainer())
 					.build();
 
-			// create item
-			ItemStack itemStack = createRandomItem(0);
-			itemStack.offer(
-					Keys.LORE,
-					Collections.singletonList(buildLootboxLore(request))
-			);
+			// add items
+			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
+				// create item
+				ItemStack itemStack = createRandomItem(luck);
+				itemStack.offer(
+						Keys.LORE,
+						Collections.singletonList(buildLootboxLore(request))
+				);
 
-			// the custom inventory does not implement anything sensible so enjoy this hack
-			int i = 0;
-			for (Slot slot : inventory.slots()) {
-				if (i++ == 13) {
-					slot.offer(itemStack);
-					break;
-				}
+				inventory.slot(slot)
+						.orElseThrow(() -> new IllegalStateException("Could not find requested inventory slot " + slot))
+						.set(itemStack);
 			}
+
 			// sound & open
-			player.playSound(Sounds.LOOTBOX_CHIME.get(), Sound.Emitter.self());
+			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
 			sync(() -> player.openInventory(inventory, buildLootboxTitle(request))); // TODO: not working; 0 errors
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

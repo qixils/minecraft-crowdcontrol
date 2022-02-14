@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.common;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import net.kyori.adventure.text.Component;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.UUID;
  *
  * @param <P> The implementation's player type.
  */
+@ParametersAreNonnullByDefault
 public abstract class SoftLockObserver<P> {
 	protected static final int SEARCH_HORIZ = 20;
 	protected static final int SEARCH_VERT = 8;
@@ -27,14 +29,14 @@ public abstract class SoftLockObserver<P> {
 	/**
 	 * The plugin instance which provides player UUIDs.
 	 */
-	protected final Plugin<P, ? super P> plugin;
+	protected final Plugin<P, ?> plugin;
 
 	/**
 	 * Initializes the observer.
 	 *
 	 * @param plugin The plugin instance which provides player UUIDs.
 	 */
-	protected SoftLockObserver(Plugin<P, ? super P> plugin) {
+	protected SoftLockObserver(Plugin<P, ?> plugin) {
 		this.plugin = plugin;
 	}
 
@@ -51,7 +53,8 @@ public abstract class SoftLockObserver<P> {
 	 * @param player The player who died.
 	 */
 	protected void onDeath(P player) {
-		UUID uuid = plugin.getUUID(player).orElseThrow(() -> new IllegalArgumentException("Expected player to have a UUID"));
+		UUID uuid = plugin.playerMapper().getUniqueId(player)
+				.orElseThrow(() -> new IllegalArgumentException("Expected player to have a UUID"));
 		DeathData data = deathData.computeIfAbsent(uuid, $ -> new DeathData());
 		if (data.isSoftLocked()) {
 			onSoftLock(player);

@@ -23,6 +23,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
+import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
+
 public class CommandRegister {
 	private final SpongeCrowdControlPlugin plugin;
 	private final Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
@@ -62,7 +65,9 @@ public class CommandRegister {
 				new SwapCommand(plugin),
 				new DinnerboneCommand(plugin),
 				new ClutterCommand(plugin),
-				new LootboxCommand(plugin),
+				new LootboxCommand(plugin, "Open Lootbox", 0),
+				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
+				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
 				new TeleportCommand(plugin),
 				new ToastCommand(plugin),
 				new FreezeCommand(plugin),
@@ -70,10 +75,13 @@ public class CommandRegister {
 				new FlowerCommand(plugin),
 				new MoveCommand(plugin, 0, 1, 0, "Up"),
 				new MoveCommand(plugin, 0, -2, 0, "Down"),
+				// begin: deprecated effects
 				new MoveCommand(plugin, 2, 0.2, 0, "xplus", "East"),
 				new MoveCommand(plugin, -2, 0.2, 0, "xminus", "West"),
 				new MoveCommand(plugin, 0, 0.2, 2, "zplus", "South"),
 				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
+				// end: deprecated effects
+				new FlingCommand(plugin),
 				new TorchCommand(plugin, true),
 				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
@@ -101,6 +109,7 @@ public class CommandRegister {
 				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
 				new MaxHealthCommand(plugin, -1),
 				new MaxHealthCommand(plugin, 1),
+				new MaxHealthCommand(plugin, 4), // used in hype trains only
 				new DisableJumpingCommand(plugin),
 				new EntityChaosCommand(plugin),
 				new CameraLockToSkyCommand(plugin),
@@ -110,7 +119,10 @@ public class CommandRegister {
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin),
 				new PlantTreeCommand(plugin),
-				new DoOrDieCommand(plugin)
+				new DoOrDieCommand(plugin),
+				new ExplodeCommand(plugin),
+				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
+				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
 		));
 
 		// entity commands

@@ -116,24 +116,24 @@ public class LootboxCommand extends ImmediateCommand {
 			itemStack.offer(Keys.UNBREAKABLE, true);
 
 		// determine enchantments to add
-		int enchantments = 0;
+		int _enchantments = 0;
 		for (int i = 0; i <= luck; i++) {
-			enchantments = Math.max(enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
+			_enchantments = Math.max(_enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
+		final int enchantments = _enchantments;
 		List<EnchantmentType> enchantmentList = plugin.getRegistry().getAllOf(EnchantmentType.class).stream()
 				.filter(enchantmentType -> enchantmentType.canBeAppliedToStack(itemStack)).collect(Collectors.toList());
 		List<EnchantmentType> addedEnchantments = new ArrayList<>(enchantments);
 		// TODO: chance to remove curses with good luck
 
 		// add enchantments
-		while (enchantments > 0 && !enchantmentList.isEmpty()) {
+		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
 			EnchantmentType enchantment = enchantmentList.remove(0);
 
 			// block conflicting enchantments (unless the die roll decides otherwise)
 			if (addedEnchantments.stream().anyMatch(x -> !x.isCompatibleWith(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
 				continue;
 			addedEnchantments.add(enchantment);
-			enchantments--;
 
 			// determine enchantment level
 			int level = enchantment.getMinimumLevel();
@@ -172,6 +172,7 @@ public class LootboxCommand extends ImmediateCommand {
 					.property(new InventoryTitle(spongeSerializer.serialize(buildLootboxTitle(request))))
 					.build(plugin);
 
+			// add items
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
 				// create item
 				ItemStack itemStack = createRandomItem(luck);
