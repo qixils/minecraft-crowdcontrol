@@ -6,6 +6,7 @@ import com.google.common.collect.Multimaps;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -20,17 +21,17 @@ public abstract class AbstractPlayerMapper<P> implements PlayerMapper<P> {
 
 	@Override
 	public boolean linkPlayer(@NotNull UUID uuid, @NotNull String twitchUsername) {
-		return twitchToUserMap.put(twitchUsername, uuid);
+		return twitchToUserMap.put(twitchUsername.toLowerCase(Locale.ENGLISH), uuid);
 	}
 
 	@Override
 	public boolean unlinkPlayer(@NotNull UUID uuid, @NotNull String twitchUsername) {
-		return twitchToUserMap.remove(twitchUsername, uuid);
+		return twitchToUserMap.remove(twitchUsername.toLowerCase(Locale.ENGLISH), uuid);
 	}
 
 	@Override
 	public @NotNull Collection<@NotNull UUID> getLinkedPlayers(@NotNull String twitchUsername) {
-		return twitchToUserMap.get(twitchUsername);
+		return twitchToUserMap.get(twitchUsername.toLowerCase(Locale.ENGLISH));
 	}
 
 	@Override
