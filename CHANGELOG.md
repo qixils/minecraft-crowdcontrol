@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.2.1
+
+The `/account` command is no longer case-sensitive.
+
 ## 3.2.0
 
 - Created a Sponge 7 implementation for SpongeForge 1.12.2 and SpongeVanilla 1.12.2. Play Pixelmon

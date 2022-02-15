@@ -2,8 +2,6 @@
 
 The following steps provide a quick setup for running a local game server.
 
-**Note:** As of writing, Sponge 7 is **not yet available** in the Crowd Control application.
-
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
 2. In the Game Selection tab, select **Minecraft (Sponge 7) (PC)**.
 3. Click **One Click Server Setup** to automatically set up a server. This may take several minutes

@@ -44,7 +44,7 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 
 		List<Player> players = new ArrayList<>(request.getTargets().length);
 		for (Target target : request.getTargets()) {
-			for (UUID uuid : twitchToUserMap.get(target.getName()))
+			for (UUID uuid : getLinkedPlayers(target.getName()))
 				players.add(Bukkit.getPlayer(uuid));
 		}
 

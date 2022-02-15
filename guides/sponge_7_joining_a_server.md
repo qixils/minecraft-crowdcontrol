@@ -4,8 +4,6 @@ This document contains separate guides for
 [connecting to a local server](#local-server)
 and [connecting to an external server](#external-server).
 
-**Note:** As of writing, Sponge 7 is **not yet available** in the Crowd Control application.
-
 ### Local Server
 
 The following steps are for streamers connecting to a local server, i.e. the Crowd Control one-click
