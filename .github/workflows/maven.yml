@@ -40,3 +40,9 @@ jobs:
         with:
           name: crowdcontrol-sponge7
           path: "sponge-7/target/CrowdControl-*.jar"
+
+      - name: Upload Sponge 8 Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: crowdcontrol-sponge7
+          path: "sponge-8/target/CrowdControl-*.jar"
