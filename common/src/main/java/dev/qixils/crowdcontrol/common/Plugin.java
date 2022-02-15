@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response.PacketType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -25,6 +26,7 @@ import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The main class used by a Crowd Control implementation which defines numerous methods for
@@ -408,6 +410,13 @@ public interface Plugin<P, S> {
 	void registerCommand(@NotNull String name, @NotNull Command<P> command);
 
 	/**
+	 * Returns an unmodifiable view of the registered {@link Command}s.
+	 *
+	 * @return unmodifiable view of registered {@link Command}s
+	 */
+	Collection<Command<P>> registeredCommands();
+
+	/**
 	 * Gets the {@link CrowdControl} instance.
 	 *
 	 * @return crowd control instance
@@ -420,6 +429,22 @@ public interface Plugin<P, S> {
 	 * (Re)initializes the {@link CrowdControl} instance.
 	 */
 	void initCrowdControl();
+
+	/**
+	 * Performs actions that are reliant on the initialization of a {@link CrowdControl} instance.
+	 *
+	 * @param service the initialized {@link CrowdControl} instance
+	 */
+	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
+	default void postInitCrowdControl(CrowdControl service) {
+		service.buildResponse(0)
+				.packetType(PacketType.KEEP_ALIVE)
+				.message("_mc_cc_server_status_" + new ServerStatus(
+						isGlobal() || getHosts().isEmpty(),
+						registeredCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
+				).toJSON())
+				.build().send();
+	}
 
 	/**
 	 * Updates the {@link CrowdControl} instance.

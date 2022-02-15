@@ -121,6 +121,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			commands = RegisterCommands.register(this);
 		else
 			RegisterCommands.register(this, commands);
+
+		postInitCrowdControl(crowdControl);
 	}
 
 	@Override
@@ -184,6 +186,11 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		name = name.toLowerCase(Locale.ENGLISH);
 		crowdControl.registerHandler(name, command::executeAndNotify);
 		getLogger().fine("Registered CC command '" + name + "'");
+	}
+
+	@Override
+	public Collection<dev.qixils.crowdcontrol.common.Command<Player>> registeredCommands() {
+		return Collections.unmodifiableCollection(commands);
 	}
 
 	@Override

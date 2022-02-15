@@ -28,7 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adventure.version>4.9.3</adventure.version>
         <cloud.version>1.7.0-SNAPSHOT</cloud.version>
-        <crowdcontrol.version>3.3.3</crowdcontrol.version>
+        <crowdcontrol.version>3.3.4-SNAPSHOT</crowdcontrol.version>
     </properties>
 
     <pluginRepositories>

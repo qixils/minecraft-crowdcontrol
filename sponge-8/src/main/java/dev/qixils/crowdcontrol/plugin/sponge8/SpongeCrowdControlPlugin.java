@@ -169,6 +169,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		}
 	}
 
+	@Override
+	public Collection<dev.qixils.crowdcontrol.common.Command<ServerPlayer>> registeredCommands() {
+		return Collections.unmodifiableCollection(register.getCommands());
+	}
+
 	@Listener
 	public void onKeyRegistration(RegisterDataEvent event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
@@ -269,6 +274,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		}
 
 		register.register();
+		postInitCrowdControl(crowdControl);
 	}
 
 	@Listener

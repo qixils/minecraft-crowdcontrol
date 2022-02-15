@@ -1,6 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.sponge8;
 
 import dev.qixils.crowdcontrol.common.SoftLockObserver;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
@@ -19,7 +21,7 @@ import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 public class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
-	private final Collection<BlockType> dangerousBlocks;
+	private @Nullable Collection<BlockType> dangerousBlocks;
 
 	/**
 	 * Initializes the observer.
@@ -28,7 +30,11 @@ public class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 	 */
 	protected SoftLockResolver(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
-		dangerousBlocks = Arrays.asList(
+	}
+
+	public @NotNull Collection<BlockType> getDangerousBlocks() {
+		if (dangerousBlocks != null) return dangerousBlocks;
+		return dangerousBlocks = Arrays.asList(
 				BlockTypes.LAVA.get(),
 				BlockTypes.FIRE.get(),
 				BlockTypes.WITHER_ROSE.get()
@@ -54,7 +60,7 @@ public class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
 					ServerLocation loc = world.location(pos.add(x, y, z));
 					BlockType type = loc.blockType();
-					if (dangerousBlocks.contains(type))
+					if (getDangerousBlocks().contains(type))
 						loc.setBlockType(BlockTypes.AIR.get());
 				}
 			}

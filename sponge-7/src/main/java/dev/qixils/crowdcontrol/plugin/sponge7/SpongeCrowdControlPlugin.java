@@ -220,6 +220,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		}
 	}
 
+	@Override
+	public Collection<dev.qixils.crowdcontrol.common.Command<Player>> registeredCommands() {
+		return Collections.unmodifiableCollection(register.getCommands());
+	}
+
 	@SuppressWarnings("UnstableApiUsage")
 	@Listener
 	public void onKeyRegistration(GameRegistryEvent.Register<Key<?>> event) {
@@ -333,6 +338,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		}
 
 		register.register();
+		postInitCrowdControl(crowdControl);
 	}
 
 	@SneakyThrows(IOException.class)
