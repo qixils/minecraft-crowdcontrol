@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -21,6 +22,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.common.CommandConstants.WEATHER_TICKS;
 
 @Getter
+@Global
 public class WeatherCommand extends ImmediateCommand {
 	private final Ticks weatherTicks = Ticks.of(WEATHER_TICKS);
 	private final String effectName;
@@ -40,9 +42,6 @@ public class WeatherCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (!isGlobalCommandUsable(players, request))
-			return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
-
 		Response.Builder builder = request.buildResponse().type(ResultType.FAILURE).message("Requested weather is already active");
 		for (ServerWorld world : plugin.getGame().server().worldManager().worlds()) {
 			if (!world.worldType().equals(WorldTypes.OVERWORLD.get()))

@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -17,6 +18,7 @@ import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import java.util.List;
 
 @Getter
+@Global
 public class SetTimeCommand extends ImmediateCommand {
 	private final @NotNull String displayName;
 	private final @NotNull String effectName;
@@ -32,8 +34,6 @@ public class SetTimeCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (!isGlobalCommandUsable(players, request))
-			return globalCommandUnusable(request);
 		Server server = plugin.getGame().server();
 		for (ServerWorld world : server.worldManager().worlds()) {
 			ServerWorldProperties properties = world.properties();

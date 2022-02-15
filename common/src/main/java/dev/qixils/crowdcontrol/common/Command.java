@@ -106,6 +106,15 @@ public interface Command<P> {
 		if (players.isEmpty())
 			throw new NoApplicableTarget();
 
+		// disallow execution of global commands
+		if (getClass().isAnnotationPresent(Global.class) && !isGlobalCommandUsable(players, request)) {
+			request.buildResponse()
+					.type(ResultType.UNAVAILABLE)
+					.message("Global commands are disabled or cannot be used on the targeted streamer")
+					.send();
+			return;
+		}
+
 		execute(new ArrayList<>(players), request).thenAccept(builder -> {
 			if (builder == null) return;
 
@@ -153,16 +162,6 @@ public interface Command<P> {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Returns a response indicating that global commands cannot be used for the targeted streamer.
-	 *
-	 * @param request originating request
-	 * @return response
-	 */
-	default Response.@NotNull Builder globalCommandUnusable(final @NotNull Request request) {
-		return request.buildResponse().type(ResultType.UNAVAILABLE).message("Global command cannot be used on this streamer");
 	}
 
 	/**

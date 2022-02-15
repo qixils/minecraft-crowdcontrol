@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Getter
+@Global
 public class DifficultyCommand extends ImmediateCommand {
 	private final Difficulty difficulty;
 	private final String effectName;
@@ -28,9 +30,6 @@ public class DifficultyCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (!isGlobalCommandUsable(players, request))
-			return globalCommandUnusable(request);
-
 		boolean success = false;
 		for (World world : plugin.getServer().getWorlds()) {
 			if (world.getDifficulty() != difficulty) {

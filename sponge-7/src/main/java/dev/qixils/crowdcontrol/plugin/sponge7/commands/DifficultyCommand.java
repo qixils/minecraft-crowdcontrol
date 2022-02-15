@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -17,6 +18,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import java.util.List;
 
 @Getter
+@Global
 public class DifficultyCommand extends ImmediateCommand {
 	private final Difficulty difficulty;
 	private final String effectName;
@@ -32,9 +34,6 @@ public class DifficultyCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (!isGlobalCommandUsable(players, request))
-			return globalCommandUnusable(request);
-
 		Builder response = request.buildResponse().type(ResultType.FAILURE)
 				.message("Server difficulty is already on " + displayName);
 

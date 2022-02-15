@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Global
 public class EntityChaosCommand extends ImmediateCommand {
 	private final String displayName = "Entity Chaos";
 	private final String effectName = "entity_chaos";
@@ -26,9 +28,6 @@ public class EntityChaosCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (!isGlobalCommandUsable(players, request))
-			return globalCommandUnusable(request);
-
 		List<Entity> entities = new ArrayList<>(200);
 		for (World world : plugin.getGame().getServer().getWorlds()) {
 			entities.addAll(world.getEntities(entity -> !entity.getType().equals(EntityTypes.PLAYER)));

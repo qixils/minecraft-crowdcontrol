@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Global
 public class EntityChaosCommand extends ImmediateCommand {
 	private final String displayName = "Entity Chaos";
 	private final String effectName = "entity_chaos";
@@ -26,9 +28,6 @@ public class EntityChaosCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (!isGlobalCommandUsable(players, request))
-			return globalCommandUnusable(request);
-
 		sync(() -> {
 			List<Entity> entities = new ArrayList<>(200);
 			for (World world : Bukkit.getWorlds()) {
