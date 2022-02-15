@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public abstract class AbstractPlayerMapper<P> implements PlayerMapper<P> {
 
-	protected final Multimap<String, UUID> twitchToUserMap =
+	private final Multimap<String, UUID> twitchToUserMap =
 			Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
 
 	@Override

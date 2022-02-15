@@ -44,7 +44,7 @@ public class SpongePlayerMapper extends AbstractPlayerMapper<Player> {
 		Server server = plugin.getGame().getServer();
 		List<Player> players = new ArrayList<>(request.getTargets().length);
 		for (Target target : request.getTargets()) {
-			for (UUID uuid : twitchToUserMap.get(target.getName()))
+			for (UUID uuid : getLinkedPlayers(target.getName()))
 				players.add(server.getPlayer(uuid).orElse(null));
 		}
 
