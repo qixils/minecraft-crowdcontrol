@@ -456,8 +456,8 @@ namespace CrowdControl.Games.Packs
         private void OnKeepAlivePacket(Response response)
         {
             // load packet data
-            string payload = response.message.Replace("_mc_cc_server_status_", "");
-            ServerStatus? status = JsonConvert.DeserializeObject<ServerStatus>(payload);
+            var payload = response.message.Replace("_mc_cc_server_status_", "");
+            var status = JsonConvert.DeserializeObject<ServerStatus>(payload);
             if (status == null) return;
 
             // reset all effects back to visible first
@@ -479,10 +479,10 @@ namespace CrowdControl.Games.Packs
 
         private void OnUnavailablePacket(Response response)
         {
-            Match match = UnavailableEffectPattern.Match(response.message);
+            var match = UnavailableEffectPattern.Match(response.message);
             if (!match.Success) return;
-            string effectCode = match.Groups[0].Value;
-            Effect? effect = Effects.FirstOrDefault(e => e.Code == effectCode);
+            var effectCode = match.Groups[0].Value;
+            var effect = AllEffects.Find(e => e.Code == effectCode);
             if (effect != null)
                 ReportStatus(effect, EffectStatus.MenuHidden);
         }
