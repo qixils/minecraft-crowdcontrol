@@ -112,3 +112,12 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# Visual Studio 2022
+/.vs/
+/bin/
+/obj/
+
+# VS Project Files (these don't meaningfully help external developers)
+MinecraftServer.csproj
+MinecraftServer.sln
