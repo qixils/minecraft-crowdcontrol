@@ -1,4 +1,5 @@
-﻿// these imports are not actually unused... ignore VS
+﻿// ReSharper disable RedundantUsingDirective
+// (these imports are required by CC)
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -33,7 +34,7 @@ namespace CrowdControl.Games.Packs
 
         public override Game Game => new(108, "Minecraft", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
 
-        private static readonly List<Effect> effects = new()
+        private static readonly List<Effect> AllEffects = new()
         {
             // miscellaneous
             new Effect("Miscellaneous", "miscellaneous", ItemKind.Folder),
@@ -429,14 +430,13 @@ namespace CrowdControl.Games.Packs
             new Effect("Netherite Sword", "take_netherite_sword", "take_weapons") { Price = 750 },
         };
 
-        private static readonly Regex UnavailableEffectPattern = new Regex(@"^.+ \[effect: ([a-zA-Z0-9_])\]$", RegexOptions.Compiled);
+        private static readonly Regex UnavailableEffectPattern = new(@"^.+ \[effect: ([a-zA-Z0-9_])\]$", RegexOptions.Compiled);
 
-        public override List<Effect> Effects => effects;
+        public override List<Effect> Effects => AllEffects;
 
         public override void OnMessageParsed(object sender, Response response, object context)
         {
             base.OnMessageParsed(sender, response, context);
-            if (response == null) return;
             if (response.message == null) return;
 
             if (response.type == ResponseType.KeepAlive
@@ -461,19 +461,19 @@ namespace CrowdControl.Games.Packs
             if (status == null) return;
 
             // reset all effects back to visible first
-            effects.ForEach(effect => ReportStatus(effect, EffectStatus.MenuVisible));
+            AllEffects.ForEach(effect => ReportStatus(effect, EffectStatus.MenuVisible));
 
             // hide global effects if they are not usable
             if (!status.GlobalEffects)
             {
                 // TODO: test how this works with folders marked as global effects.
                 // does the folder actually get hidden? if so, do its contents also get hidden from search?
-                effects.FindAll(effect => effect is GlobalEffect)
+                AllEffects.FindAll(effect => effect is GlobalEffect)
                     .ForEach(effect => ReportStatus(effect, EffectStatus.MenuHidden));
             }
 
             // hide effects that are unsupported by the platform
-            effects.FindAll(effect => effect.Kind == ItemKind.Effect && !status.RegisteredEffects.Contains(effect.Code))
+            AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !status.RegisteredEffects.Contains(effect.Code))
                 .ForEach(effect => ReportStatus(effect, EffectStatus.MenuHidden));
         }
 
