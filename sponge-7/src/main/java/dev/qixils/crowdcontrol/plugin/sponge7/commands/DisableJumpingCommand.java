@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@EventListener
 public class DisableJumpingCommand extends TimedCommand {
 	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>(1);
 	private final String effectName = "disable_jumping";
@@ -42,11 +44,6 @@ public class DisableJumpingCommand extends TimedCommand {
 	@Override
 	public @NotNull Duration getDuration() {
 		return CommandConstants.DISABLE_JUMPING_DURATION;
-	}
-
-	@Override
-	public boolean isEventListener() {
-		return true;
 	}
 
 	@Override

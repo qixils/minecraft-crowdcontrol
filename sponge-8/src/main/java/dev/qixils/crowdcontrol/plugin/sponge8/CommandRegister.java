@@ -12,8 +12,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.registry.RegistryTypes;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -212,18 +210,5 @@ public class CommandRegister {
 					+ " is invalid. Please ensure that only one instance of this command is registered.");
 		//noinspection unchecked
 		return (T) singleCommandInstances.get(tClass);
-	}
-
-	public void writeCommands(List<Command> commands) {
-		try {
-			FileWriter fileWriter = new FileWriter("crowdcontrol_commands.txt");
-			for (Command command : commands)
-				fileWriter.write("        new Effect(\"" + command.getDisplayName() + "\", \"" + command.getEffectName().toLowerCase(Locale.ENGLISH) + "\"),\n");
-			fileWriter.close();
-		} catch (IOException e) {
-			if (plugin != null)
-				plugin.getLogger().warn("Failed to write commands to file.");
-			e.printStackTrace();
-		}
 	}
 }

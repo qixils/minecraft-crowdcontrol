@@ -14,12 +14,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
@@ -153,7 +150,7 @@ public class RegisterCommands {
 					gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
 		}
 
-		// register event handlers/managers
+		// register event handlers/managers | todo: ensure these are not duplicated on reload (similar to sponge 7/8)
 		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
 		Bukkit.getPluginManager().registerEvents(new GamemodeCommand.Manager(plugin), plugin);
 
@@ -176,18 +173,5 @@ public class RegisterCommands {
 		}
 
 		return commands;
-	}
-
-	public static void writeCommands(PaperCrowdControlPlugin plugin, List<Command> commands) {
-		try {
-			FileWriter fileWriter = new FileWriter("crowdcontrol_commands.txt");
-			for (Command command : commands)
-				fileWriter.write("        new Effect(\"" + command.getDisplayName() + "\", \"" + command.getEffectName().toLowerCase(Locale.ENGLISH) + "\"),\n");
-			fileWriter.close();
-		} catch (IOException e) {
-			if (plugin != null)
-				plugin.getLogger().warning("Failed to write commands to file.");
-			e.printStackTrace();
-		}
 	}
 }

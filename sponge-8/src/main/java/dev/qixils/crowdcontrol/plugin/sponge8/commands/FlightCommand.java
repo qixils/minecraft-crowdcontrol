@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -19,6 +20,7 @@ import java.time.Duration;
 import java.util.List;
 
 @Getter
+@EventListener
 public class FlightCommand extends TimedCommand {
 	private final String effectName = "flight";
 	private final String displayName = "Enable Flight";
@@ -67,11 +69,6 @@ public class FlightCommand extends TimedCommand {
 					}));
 				})
 				.build().queue();
-	}
-
-	@Override
-	public boolean isEventListener() {
-		return true;
 	}
 
 	@Listener

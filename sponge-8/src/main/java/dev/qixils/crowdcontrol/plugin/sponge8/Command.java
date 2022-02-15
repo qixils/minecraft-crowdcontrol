@@ -12,16 +12,9 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final SpongeCrowdControlPlugin plugin;
-	@Getter
-	private final boolean isEventListener;
-
-	protected Command(@NotNull SpongeCrowdControlPlugin plugin, boolean isEventListener) {
-		this.plugin = Objects.requireNonNull(plugin, "plugin");
-		this.isEventListener = isEventListener;
-	}
 
 	protected Command(@NotNull SpongeCrowdControlPlugin plugin) {
-		this(plugin, false);
+		this.plugin = Objects.requireNonNull(plugin, "plugin");
 	}
 
 	protected void sync(Runnable runnable) {

@@ -18,8 +18,6 @@ import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +41,7 @@ public class CommandRegister {
 	private MappedKeyedTag<ItemType> giveTakeItems;
 	private List<Command> registeredCommands;
 
-	public CommandRegister(SpongeCrowdControlPlugin plugin) {
+	public CommandRegister(@NotNull SpongeCrowdControlPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -187,10 +185,6 @@ public class CommandRegister {
 					gamemode.equals(GameModes.SPECTATOR) ? 8L : 15L)); // duration (in seconds)
 		}
 
-		// register keep inventory event handler
-		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
-		plugin.getGame().getEventManager().registerListeners(plugin, new GameModeCommand.Manager());
-
 		for (Command command : commands) {
 			Class<? extends Command> clazz = command.getClass();
 			if (registeredCommandClasses.contains(clazz))
@@ -212,6 +206,10 @@ public class CommandRegister {
 			if (firstRegistry && command.isEventListener())
 				plugin.getGame().getEventManager().registerListeners(plugin, command);
 		}
+		if (firstRegistry) {
+			plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
+			plugin.getGame().getEventManager().registerListeners(plugin, new GameModeCommand.Manager());
+		}
 	}
 
 	/**
@@ -231,18 +229,5 @@ public class CommandRegister {
 					+ " is invalid. Please ensure that only one instance of this command is registered.");
 		//noinspection unchecked
 		return (T) singleCommandInstances.get(tClass);
-	}
-
-	public void writeCommands(List<Command> commands) {
-		try {
-			FileWriter fileWriter = new FileWriter("crowdcontrol_commands.txt");
-			for (Command command : commands)
-				fileWriter.write("        new Effect(\"" + command.getDisplayName() + "\", \"" + command.getEffectName().toLowerCase(Locale.ENGLISH) + "\"),\n");
-			fileWriter.close();
-		} catch (IOException e) {
-			if (plugin != null)
-				plugin.getLogger().warn("Failed to write commands to file.");
-			e.printStackTrace();
-		}
 	}
 }

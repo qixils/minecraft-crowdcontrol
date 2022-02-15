@@ -48,6 +48,15 @@ public interface Command<P> {
 	CompletableFuture<@Nullable Builder> execute(@NotNull List<@NotNull P> players, @NotNull Request request);
 
 	/**
+	 * Determines if this command object listens for events dispatched by the Minecraft server API.
+	 *
+	 * @return if events are being listened to
+	 */
+	default boolean isEventListener() {
+		return getClass().isAnnotationPresent(EventListener.class);
+	}
+
+	/**
 	 * Gets the internal code name for an effect.
 	 * It should match the name of an effect from the project's .cs file.
 	 *

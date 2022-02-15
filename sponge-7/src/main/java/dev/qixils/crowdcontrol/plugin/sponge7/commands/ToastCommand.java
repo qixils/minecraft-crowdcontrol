@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -27,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
+@EventListener
 public class ToastCommand extends ImmediateCommand {
 	private static final Text TITLE = Text.of("Pop-Up");
 	private static final ItemType ITEM = ItemTypes.STAINED_GLASS_PANE;
@@ -99,10 +101,5 @@ public class ToastCommand extends ImmediateCommand {
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
-	}
-
-	@Override
-	public boolean isEventListener() {
-		return true;
 	}
 }

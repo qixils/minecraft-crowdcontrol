@@ -14,17 +14,10 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 	@Getter
 	protected final SpongeCrowdControlPlugin plugin;
 	protected final SpongeComponentSerializer spongeSerializer;
-	@Getter
-	private final boolean isEventListener;
-
-	protected Command(@NotNull SpongeCrowdControlPlugin plugin, boolean isEventListener) {
-		this.plugin = Objects.requireNonNull(plugin, "plugin");
-		this.isEventListener = isEventListener;
-		this.spongeSerializer = Objects.requireNonNull(plugin.getSpongeSerializer());
-	}
 
 	protected Command(@NotNull SpongeCrowdControlPlugin plugin) {
-		this(plugin, false);
+		this.plugin = Objects.requireNonNull(plugin, "plugin");
+		this.spongeSerializer = Objects.requireNonNull(plugin.getSpongeSerializer());
 	}
 
 	protected void sync(Runnable runnable) {

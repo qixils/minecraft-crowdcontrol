@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -20,5 +21,10 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 
 	protected void sync(Runnable runnable) {
 		Bukkit.getScheduler().runTask(plugin, runnable);
+	}
+
+	@Override
+	public boolean isEventListener() {
+		return this instanceof Listener;
 	}
 }
