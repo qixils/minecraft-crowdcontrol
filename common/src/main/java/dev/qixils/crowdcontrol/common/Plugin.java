@@ -276,7 +276,8 @@ public interface Plugin<P, S> {
 				})
 		);
 
-		new MinecraftExceptionHandler<S>().withDefaultHandlers()
+		new MinecraftExceptionHandler<S>()
+				.withDefaultHandlers()
 				.withDecorator(component -> TextBuilder.fromPrefix(PREFIX, component).color(NamedTextColor.RED).build())
 				.apply(manager, mapper::asAudience);
 	}

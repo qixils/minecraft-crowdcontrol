@@ -1,8 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.sponge8;
 
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
+import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.sponge.CloudInjectionModule;
 import cloud.commandframework.sponge.SpongeCommandManager;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.TypeLiteral;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.CommandConstants;
@@ -21,7 +24,6 @@ import org.spongepowered.api.Platform;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.data.DataRegistration;
@@ -39,7 +41,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
-import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
@@ -69,7 +70,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.Function;
 
 @Getter
 @Plugin("crowd-control")
@@ -89,24 +89,38 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper();
 	@Accessors(fluent = true)
 	private final EntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper();
-	private SpongeCommandManager<CommandCause> commandManager;
-	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
+	private final SpongeCommandManager<CommandCause> commandManager;
+	private final ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private String clientHost = null;
 	private Scheduler syncScheduler;
 	private Scheduler asyncScheduler;
 	private TaskExecutorService syncExecutor;
 	private TaskExecutorService asyncExecutor;
 	// injected variables
-	@Inject
-	private PluginContainer pluginContainer;
-	@Inject
-	private Game game;
-	@Inject
-	@DefaultConfig(sharedRoot = true)
-	private Path configPath;
+	private final PluginContainer pluginContainer;
+	private final Game game;
+	private final Path configPath;
 
-	public SpongeCrowdControlPlugin() {
+	@Inject
+	public SpongeCrowdControlPlugin(final @NotNull Injector injector, final @DefaultConfig(sharedRoot = true) Path configPath) {
 		super(ServerPlayer.class, CommandCause.class);
+
+		this.game = injector.getInstance(Game.class);
+		this.pluginContainer = injector.getInstance(PluginContainer.class);
+		this.configPath = configPath;
+		this.configLoader = HoconConfigurationLoader.builder()
+				.path(configPath)
+				.build();
+
+		// create child injector with cloud module
+		final Injector childInjector = injector.createChildInjector(
+				CloudInjectionModule.createNative(CommandExecutionCoordinator.simpleCoordinator())
+		);
+		// create command manager instance
+		this.commandManager = childInjector.getInstance(com.google.inject.Key.get(new TypeLiteral<SpongeCommandManager<CommandCause>>() {
+		}));
+		// register chat commands
+		registerChatCommands();
 	}
 
 	public static void spawnPlayerParticles(Entity entity, ParticleEffect particle) {
@@ -278,19 +292,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	}
 
 	@Listener
-	public void onCommandRegister(RegisterCommandEvent<Command.Raw> event) {
-		// TODO this is not working; move this to guice injection
-		commandManager = new SpongeCommandManager<>(
-				pluginContainer,
-				AsynchronousCommandExecutionCoordinator.<CommandCause>newBuilder()
-						.withAsynchronousParsing().withExecutor(asyncExecutor).build(),
-				Function.identity(),
-				Function.identity()
-		);
-		registerChatCommands();
-	}
-
-	@Listener
 	public void onServerStart(StartingEngineEvent<Server> event) {
 		syncScheduler = game.server().scheduler();
 		asyncScheduler = game.asyncScheduler();
@@ -308,9 +309,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 				throw new IllegalStateException("Could not copy default config file to " + configPath, e);
 			}
 		}
-		configLoader = HoconConfigurationLoader.builder()
-				.path(configPath)
-				.build();
 		initCrowdControl();
 	}
 
