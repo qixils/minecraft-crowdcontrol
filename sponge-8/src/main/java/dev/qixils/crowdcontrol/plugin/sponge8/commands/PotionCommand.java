@@ -19,10 +19,11 @@ import org.spongepowered.api.util.Ticks;
 import java.util.Collections;
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.POTION_SECONDS;
+
 @Getter
 public class PotionCommand extends ImmediateCommand {
-	private static final int SECONDS = 15;
-	private static final int TICKS = 20 * SECONDS;
+	private static final int TICKS = 20 * POTION_SECONDS;
 	private final PotionEffectType potionEffectType;
 	private final Ticks duration;
 	private final String effectName;
@@ -35,7 +36,7 @@ public class PotionCommand extends ImmediateCommand {
 		duration = Ticks.of(isMinimal ? 1 : TICKS);
 		this.effectName = "potion_" + potionEffectType.key(RegistryTypes.POTION_EFFECT_TYPE).value();
 		// TODO for some reason the sponge 7 impl uses title case for potion effect name; test if this is still necessary
-		this.displayName = "Apply " + plugin.getTextUtil().asPlain(potionEffectType) + " Potion Effect (" + SECONDS + "s)";
+		this.displayName = "Apply " + plugin.getTextUtil().asPlain(potionEffectType) + " Potion Effect (" + POTION_SECONDS + "s)";
 	}
 
 	@NotNull

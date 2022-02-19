@@ -157,6 +157,22 @@ public class CommandConstants {
 	 * @see #ENTITY_ARMOR_START
 	 */
 	public static final int ENTITY_ARMOR_INC = 2;
+	/**
+	 * How long potion effects given by the potion command should last in seconds.
+	 */
+	public static final int POTION_SECONDS = 20;
+	/**
+	 * The time in ticks that represents the start of the day.
+	 */
+	public static final long DAY = 1000;
+	/**
+	 * The time in ticks that represents the start of the night.
+	 */
+	public static final long NIGHT = 13000;
+	/**
+	 * The minimum amount of durability allowed to be set by the Damage Item command.
+	 */
+	private static final int MIN_ITEM_DAMAGE = 15;
 
 	// tags
 
@@ -308,18 +324,6 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "redstone_wall_torch"),
 			Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
 	);
-	/**
-	 * How long potion effects given by the potion command should last in seconds.
-	 */
-	public static final int POTION_SECONDS = 20;
-	/**
-	 * The time in ticks that represents the start of the day.
-	 */
-	public static final long DAY = 1000;
-	/**
-	 * The time in ticks that represents the start of the night.
-	 */
-	public static final long NIGHT = 13000;
 
 	// do-or-die
 	/**
@@ -343,10 +347,6 @@ public class CommandConstants {
 			Component.empty(),
 			DO_OR_DIE_TIMES
 	);
-	/**
-	 * The minimum amount of durability allowed to be set by the Damage Item command.
-	 */
-	private static final int MIN_ITEM_DAMAGE = 15;
 	/**
 	 * The color used at the start of the countdown timer.
 	 */
