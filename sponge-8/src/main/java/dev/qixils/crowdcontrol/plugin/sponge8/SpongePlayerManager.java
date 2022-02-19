@@ -45,7 +45,7 @@ public class SpongePlayerManager extends AbstractPlayerManager<ServerPlayer> {
 		Server server = plugin.getGame().server();
 		List<ServerPlayer> players = new ArrayList<>(request.getTargets().length);
 		for (Target target : request.getTargets()) {
-			for (UUID uuid : twitchToUserMap.get(target.getName()))
+			for (UUID uuid : getLinkedPlayers(target.getName()))
 				players.add(server.player(uuid).orElse(null));
 		}
 
