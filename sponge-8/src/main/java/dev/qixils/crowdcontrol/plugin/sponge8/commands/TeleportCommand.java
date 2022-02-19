@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.sound.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
@@ -52,7 +53,7 @@ public class TeleportCommand extends ImmediateCommand {
 								.offset(new Vector3d(.5d, 1d, .5d))
 								.build()
 				);
-				player.world().playSound(Sounds.TELEPORT.get(), destination.position());
+				player.world().playSound(Sounds.TELEPORT.get(), Sound.Emitter.self());
 			});
 		}
 		return result;
