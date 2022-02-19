@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.Keys;
@@ -120,6 +121,19 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// create item stack
 		ItemStack itemStack = ItemStack.of(item, quantity);
+		randomlyModifyItem(itemStack, luck);
+		return itemStack;
+	}
+
+	/**
+	 * Applies various random modifications to an item including enchantments, attributes, and
+	 * unbreaking.
+	 *
+	 * @param itemStack item to modify
+	 * @param luck      zero-indexed level of luck
+	 */
+	@Contract(mutates = "param1")
+	public void randomlyModifyItem(ItemStack itemStack, int luck) {
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
 			itemStack.offer(Keys.IS_UNBREAKABLE, true);
@@ -172,7 +186,9 @@ public class LootboxCommand extends ImmediateCommand {
 			attributes = Math.max(attributes, RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		// add attributes
-		if (attributes > 0) {
+		if (attributes > 0
+				&& itemStack.getOrElse(Keys.MAX_DURABILITY, 0) <= 1 // TODO: add default attributes to items and remove this
+		) {
 			List<AttributeType> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
@@ -198,8 +214,6 @@ public class LootboxCommand extends ImmediateCommand {
 					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentType);
 			}
 		}
-
-		return itemStack;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.key.Keys;
@@ -111,6 +112,18 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// create item stack
 		ItemStack itemStack = ItemStack.of(item, quantity);
+		randomlyModifyItem(itemStack, luck);
+		return itemStack;
+	}
+
+	/**
+	 * Applies various random modifications to an item including enchantments and unbreaking.
+	 *
+	 * @param itemStack item to modify
+	 * @param luck      zero-indexed level of luck
+	 */
+	@Contract(mutates = "param1")
+	public void randomlyModifyItem(ItemStack itemStack, int luck) {
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
 			itemStack.offer(Keys.UNBREAKABLE, true);
@@ -156,12 +169,6 @@ public class LootboxCommand extends ImmediateCommand {
 				return enchants;
 			});
 		}
-
-		// API8: attributes
-		// (attributes kinda exist in Sponge 7 but they are not available as a CatalogType, just
-		//  as Keys, and even then I don't think I can add them to items)
-
-		return itemStack;
 	}
 
 	@Override

@@ -143,6 +143,20 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "red_sand"),
 			Key.key(MINECRAFT_NAMESPACE, "gravel")
 	);
+	/**
+	 * The starting denominator for odds when randomly giving armor to summoned entities. A value
+	 * of 4 means that the odds will begin as a 1 in 4 chance of applying a given armor piece.
+	 *
+	 * @see #ENTITY_ARMOR_INC
+	 */
+	public static final int ENTITY_ARMOR_START = 4;
+	/**
+	 * The amount to increment the denominator for odds when randomly giving armor to summoned
+	 * entities.
+	 *
+	 * @see #ENTITY_ARMOR_START
+	 */
+	public static final int ENTITY_ARMOR_INC = 2;
 
 	// tags
 

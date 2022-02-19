@@ -2,6 +2,16 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.0
+
+- Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16. Speedrun Minecraft
+  while your chat spawns dragons and creepers on you!
+- The Minecraft servers have all been consolidated into one standard server to reduce confusion
+  during setup.
+- Global effects like changing the server difficulty are now hidden from the streamer's effect menu
+  if the effects have not been enabled.
+- Summoned armor stands now come equipped with random armor.
+
 ## 3.2.1
 
 The `/account` command is no longer case-sensitive.

@@ -22,6 +22,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,6 +110,20 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// create item stack
 		ItemStack itemStack = new ItemStack(item, quantity);
+		randomlyModifyItem(itemStack, luck);
+		return itemStack;
+	}
+
+	/**
+	 * Applies various random modifications to an item including enchantments, attributes, and
+	 * unbreaking.
+	 *
+	 * @param itemStack item to modify
+	 * @param luck      zero-indexed level of luck
+	 */
+	@Contract(mutates = "param1")
+	public static void randomlyModifyItem(ItemStack itemStack, int luck) {
+		Material item = itemStack.getType();
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
@@ -179,7 +194,6 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// finish up
 		itemStack.setItemMeta(itemMeta);
-		return itemStack;
 	}
 
 	@NotNull

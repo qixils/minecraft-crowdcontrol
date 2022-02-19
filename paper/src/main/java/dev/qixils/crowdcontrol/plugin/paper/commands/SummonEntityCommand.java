@@ -9,27 +9,58 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTables;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static dev.qixils.crowdcontrol.common.CommandConstants.ENTITY_ARMOR_INC;
+import static dev.qixils.crowdcontrol.common.CommandConstants.ENTITY_ARMOR_START;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
+	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
 
 	static {
+		// --- equipment --- //
+
+		// pre-compute the map of valid armor pieces
+		Map<EquipmentSlot, List<Material>> armor = new EnumMap<>(EquipmentSlot.class);
+		for (Material material : Material.values()) {
+			if (!material.isItem()) continue;
+			EquipmentSlot slot = material.getEquipmentSlot();
+			if (slot == EquipmentSlot.HAND) continue;
+			if (slot == EquipmentSlot.OFF_HAND) continue;
+			armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(material);
+		}
+
+		// make collections unmodifiable
+		for (Map.Entry<EquipmentSlot, List<Material>> entry : Set.copyOf(armor.entrySet()))
+			armor.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
+		ARMOR = Collections.unmodifiableMap(armor);
+
+		// --- loot tables --- //
 		EnumSet<LootTables> lootTables = EnumSet.noneOf(LootTables.class);
 		for (LootTables lootTable : LootTables.values()) {
 			String key = lootTable.getKey().getKey();
@@ -77,10 +108,34 @@ public class SummonEntityCommand extends ImmediateCommand {
 		Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
 		entity.setCustomName(viewer);
 		entity.setCustomNameVisible(true);
+
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
+
 		if (entity instanceof LootableInventory lootable)
 			lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
+
+		if (entity instanceof ArmorStand) {
+			// could add some chaos (GH#64) here eventually
+			// chaos idea: set drop chance for each slot to a random float
+			EntityEquipment equipment = ((LivingEntity) entity).getEquipment();
+			if (equipment != null) {
+				List<EquipmentSlot> slots = new ArrayList<>(ARMOR.keySet());
+				Collections.shuffle(slots, random);
+				// begins as a 1 in 4 chance to add a random item but becomes less likely each time
+				// an item is added
+				int odds = ENTITY_ARMOR_START;
+				for (EquipmentSlot slot : slots) {
+					if (random.nextInt(odds) > 0)
+						continue;
+					odds += ENTITY_ARMOR_INC;
+					ItemStack item = new ItemStack(RandomUtil.randomElementFrom(ARMOR.get(slot)));
+					LootboxCommand.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
+					equipment.setItem(slot, item, true);
+				}
+			}
+		}
+
 		entity.getPersistentDataContainer().set(mobKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, true);
 		return entity;
 	}
