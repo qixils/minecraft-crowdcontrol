@@ -108,11 +108,29 @@ public interface Command<P> {
 
 		// disallow execution of global commands
 		if (getClass().isAnnotationPresent(Global.class) && !isGlobalCommandUsable(players, request)) {
+			// TODO don't return unavailable for "cannot be used on the targeted streamer"
 			request.buildResponse()
 					.type(ResultType.UNAVAILABLE)
-					.message("Global commands are disabled or cannot be used on the targeted streamer")
+					.message("Global effects are disabled or cannot be used on the targeted streamer")
 					.send();
 			return;
+		}
+
+		// disallow execution of client commands
+		if (getClass().isAnnotationPresent(ClientOnly.class)) {
+			if (!supportsClientOnly()) {
+				request.buildResponse()
+						.type(ResultType.UNAVAILABLE)
+						.message("Client-side effects are not supported by this streamer's setup")
+						.send();
+				return;
+			} else if (!isClientAvailable(players, request)) {
+				request.buildResponse()
+						.type(ResultType.FAILURE)
+						.message("Client-side effects are currently unavailable or cannot be used on this streamer")
+						.send();
+				return;
+			}
 		}
 
 		execute(new ArrayList<>(players), request).thenAccept(builder -> {
@@ -124,6 +142,33 @@ public interface Command<P> {
 			if (response.getResultType() == Response.ResultType.SUCCESS)
 				announce(plugin.playerMapper().asAudience(players), request);
 		});
+	}
+
+	/**
+	 * Whether this plugin implementation supports {@link ClientOnly} effects.
+	 *
+	 * @return whether client effects are supported
+	 */
+	default boolean supportsClientOnly() {
+		return false;
+	}
+
+	/**
+	 * Whether a {@link ClientOnly} effect with the provided arguments would be able to successfully
+	 * execute. For example, this will return false if {@link #supportsClientOnly()} returns
+	 * {@code false}, if the client is unavailable, or if the client user does not match the
+	 * targeted player.
+	 *
+	 * @param players list of players targeted by the effect
+	 * @param request request that triggered this effect
+	 * @return whether a client-only effect could execute
+	 */
+	default boolean isClientAvailable(@Nullable List<P> players, @NotNull Request request) {
+		if (supportsClientOnly())
+			throw new UnsupportedOperationException(
+					"Plugin reports that it supports client-only effects but has no implementation for #isClientAvailable"
+			);
+		return false;
 	}
 
 	/**
