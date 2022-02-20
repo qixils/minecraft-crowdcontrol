@@ -23,11 +23,6 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 	}
 
 	@Override
-	public boolean supportsClientOnly() {
-		return true;
-	}
-
-	@Override
 	public boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request) {
 		final List<ServerPlayer> players = validateNotNullElseGet(possiblePlayers, () -> plugin.getPlayers(request));
 		if (players.size() != 1)

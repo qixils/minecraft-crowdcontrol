@@ -158,6 +158,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	}
 
 	@Override
+	public boolean supportsClientOnly() {
+		return true;
+	}
+
+	@Override
 	public @NotNull Collection<String> getHosts() {
 		Collection<String> confHosts = super.getHosts();
 		if (clientHost == null)

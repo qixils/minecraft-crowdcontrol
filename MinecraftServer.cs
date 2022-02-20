@@ -12,13 +12,20 @@ using ConnectorType = CrowdControl.Common.ConnectorType;
 namespace CrowdControl.Games.Packs
 {
     [Serializable]
-    public record ServerStatus(bool GlobalEffects, List<string> RegisteredEffects);
+    public record ServerStatus(bool GlobalEffects, bool ClientEffects, List<string> RegisteredEffects);
 
     public sealed class GlobalEffect : Effect
     {
         public GlobalEffect(string name, string code, string parent) : base(name, code, parent) { }
         public GlobalEffect(string name, string code, ItemKind kind) : base(name, code, kind) { }
         public GlobalEffect(string name, string code, ItemKind kind, string auto) : base(name, code, kind, auto) { }
+    }
+
+    public sealed class ClientEffect : Effect
+    {
+        public ClientEffect(string name, string code, string parent) : base(name, code, parent) { }
+        public ClientEffect(string name, string code, ItemKind kind) : base(name, code, kind) { }
+        public ClientEffect(string name, string code, ItemKind kind, string auto) : base(name, code, kind, auto) { }
     }
 
     public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
@@ -468,13 +475,18 @@ namespace CrowdControl.Games.Packs
             {
                 // TODO: test how this works with folders marked as global effects.
                 // does the folder actually get hidden? if so, do its contents also get hidden from search?
-                AllEffects.FindAll(effect => effect is GlobalEffect)
-                    .ForEach(effect => ReportStatus(effect, EffectStatus.MenuHidden));
+                AllEffects.FindAll(effect => effect is GlobalEffect).ForEach(HideEffect);
+            }
+            // hide client effects if running on a server
+            if (!status.ClientEffects)
+            {
+                // same TODO as above
+                AllEffects.FindAll(effect => effect is ClientEffect).ForEach(HideEffect);
             }
 
             // hide effects that are unsupported by the platform
             AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !status.RegisteredEffects.Contains(effect.Code))
-                .ForEach(effect => ReportStatus(effect, EffectStatus.MenuHidden));
+                .ForEach(HideEffect);
         }
 
         private void OnUnavailablePacket(Response response)
@@ -485,6 +497,11 @@ namespace CrowdControl.Games.Packs
             var effect = AllEffects.Find(e => e.Code == effectCode);
             if (effect != null)
                 ReportStatus(effect, EffectStatus.MenuHidden);
+        }
+
+        private void HideEffect(Effect effect)
+        {
+            ReportStatus(effect, EffectStatus.MenuHidden);
         }
     }
 }

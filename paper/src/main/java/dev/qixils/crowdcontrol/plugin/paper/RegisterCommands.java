@@ -150,10 +150,6 @@ public class RegisterCommands {
 					gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
 		}
 
-		// register event handlers/managers | todo: ensure these are not duplicated on reload (similar to sponge 7/8)
-		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
-		Bukkit.getPluginManager().registerEvents(new GamemodeCommand.Manager(plugin), plugin);
-
 		return commands;
 	}
 
@@ -163,6 +159,9 @@ public class RegisterCommands {
 			if (command instanceof Listener listener)
 				Bukkit.getPluginManager().registerEvents(listener, plugin);
 		}
+		// register event handlers/managers
+		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
+		Bukkit.getPluginManager().registerEvents(new GamemodeCommand.Manager(plugin), plugin);
 		return commands;
 	}
 

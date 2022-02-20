@@ -118,7 +118,7 @@ public interface Command<P> {
 
 		// disallow execution of client commands
 		if (getClass().isAnnotationPresent(ClientOnly.class)) {
-			if (!supportsClientOnly()) {
+			if (!getPlugin().supportsClientOnly()) {
 				request.buildResponse()
 						.type(ResultType.UNAVAILABLE)
 						.message("Client-side effects are not supported by this streamer's setup")
@@ -145,17 +145,8 @@ public interface Command<P> {
 	}
 
 	/**
-	 * Whether this plugin implementation supports {@link ClientOnly} effects.
-	 *
-	 * @return whether client effects are supported
-	 */
-	default boolean supportsClientOnly() {
-		return false;
-	}
-
-	/**
 	 * Whether a {@link ClientOnly} effect with the provided arguments would be able to successfully
-	 * execute. For example, this will return false if {@link #supportsClientOnly()} returns
+	 * execute. For example, this will return false if {@link Plugin#supportsClientOnly()} returns
 	 * {@code false}, if the client is unavailable, or if the client user does not match the
 	 * targeted player.
 	 *
@@ -164,7 +155,7 @@ public interface Command<P> {
 	 * @return whether a client-only effect could execute
 	 */
 	default boolean isClientAvailable(@Nullable List<P> players, @NotNull Request request) {
-		if (supportsClientOnly())
+		if (getPlugin().supportsClientOnly())
 			throw new UnsupportedOperationException(
 					"Plugin reports that it supports client-only effects but has no implementation for #isClientAvailable"
 			);

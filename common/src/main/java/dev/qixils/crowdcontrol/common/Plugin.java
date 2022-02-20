@@ -441,7 +441,8 @@ public interface Plugin<P, S> {
 		service.buildResponse(0)
 				.packetType(PacketType.KEEP_ALIVE)
 				.message("_mc_cc_server_status_" + new ServerStatus(
-						isGlobal() || getHosts().isEmpty(),
+						isGlobal() || !getHosts().isEmpty(),
+						supportsClientOnly(),
 						registeredCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
 				).toJSON())
 				.build().send();
@@ -466,6 +467,15 @@ public interface Plugin<P, S> {
 			cc.shutdown("Service is restarting");
 		updateCrowdControl(null);
 		initCrowdControl();
+	}
+
+	/**
+	 * Whether this plugin implementation supports {@link ClientOnly} effects.
+	 *
+	 * @return whether client effects are supported
+	 */
+	default boolean supportsClientOnly() {
+		return false;
 	}
 
 	/**
