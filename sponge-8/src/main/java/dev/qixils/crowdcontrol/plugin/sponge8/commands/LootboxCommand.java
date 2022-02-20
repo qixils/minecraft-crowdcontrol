@@ -146,10 +146,11 @@ public class LootboxCommand extends ImmediateCommand {
 		final int enchantments = _enchantments;
 		List<EnchantmentType> enchantmentList = plugin.getGame().registry(RegistryTypes.ENCHANTMENT_TYPE).stream()
 				.filter(enchantmentType -> enchantmentType.canBeAppliedToStack(itemStack)).collect(Collectors.toList());
-		// TODO: chance to remove curses with good luck
-		List<EnchantmentType> addedEnchantments = new ArrayList<>(enchantments);
+		if (random.nextDouble() >= (.8d - (luck * .2d)))
+			enchantmentList.removeIf(EnchantmentType::isCurse);
 
 		// add enchantments
+		List<EnchantmentType> addedEnchantments = new ArrayList<>(enchantments);
 		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
 			EnchantmentType enchantment = enchantmentList.remove(0);
 

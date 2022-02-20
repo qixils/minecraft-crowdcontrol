@@ -137,7 +137,9 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Enchantment> enchantmentList = Arrays.stream(EnchantmentWrapper.values())
 				.filter(enchantment -> enchantment.canEnchantItem(itemStack))
 				.collect(Collectors.toList());
-		// TODO: chance to remove curses with good luck
+		if (random.nextDouble() >= (.8d - (luck * .2d)))
+			enchantmentList.removeIf(Enchantment::isCursed);
+
 		// add enchantments
 		if (enchantments > 0 && !enchantmentList.isEmpty()) {
 			Collections.shuffle(enchantmentList, random);
