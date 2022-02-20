@@ -107,13 +107,21 @@ public interface Command<P> {
 			throw new NoApplicableTarget();
 
 		// disallow execution of global commands
-		if (getClass().isAnnotationPresent(Global.class) && !isGlobalCommandUsable(players, request)) {
-			// TODO don't return unavailable for "cannot be used on the targeted streamer"
-			request.buildResponse()
-					.type(ResultType.UNAVAILABLE)
-					.message("Global effects are disabled or cannot be used on the targeted streamer")
-					.send();
-			return;
+		if (getClass().isAnnotationPresent(Global.class)) {
+			if (!plugin.isGlobal() && plugin.getHosts().isEmpty()) {
+				request.buildResponse()
+						.type(ResultType.UNAVAILABLE)
+						.message("Global effects are disabled")
+						.send();
+				return;
+			} else if (!isGlobalCommandUsable(players, request)) {
+				request.buildResponse()
+						.type(ResultType.FAILURE)
+						.message("Global effects cannot be used on the targeted streamer")
+						.send();
+				return;
+			}
+
 		}
 
 		// disallow execution of client commands
