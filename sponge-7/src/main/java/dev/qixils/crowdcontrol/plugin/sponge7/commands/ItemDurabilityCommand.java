@@ -38,40 +38,35 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.message("Targets not holding a durable item");
 
 		for (Player player : players) {
-			// todo: this is messy; see api8 impl for cleanup inspiration
-			Optional<ItemStack> optionalItem = Optional.empty();
 			for (HandType hand : plugin.getRegistry().getAllOf(HandType.class)) {
-				Optional<ItemStack> heldItem = player.getItemInHand(hand);
-				if (!heldItem.isPresent())
+				Optional<ItemStack> optionalItem = player.getItemInHand(hand);
+				if (!optionalItem.isPresent())
 					continue;
-				ItemStack heldItemStack = heldItem.get();
-				if (!heldItemStack.isEmpty()
-						&& heldItemStack.supports(DurabilityData.class)
-						&& heldItemStack.getProperty(UseLimitProperty.class).isPresent()) {
-					optionalItem = heldItem;
-					break;
-				}
+				ItemStack item = optionalItem.get();
+				if (item.isEmpty())
+					continue;
+				if (!item.supports(DurabilityData.class))
+					continue;
+				Optional<UseLimitProperty> optionalProperty = item.getProperty(UseLimitProperty.class);
+				if (!optionalProperty.isPresent())
+					continue;
+				Integer _max = optionalProperty.get().getValue();
+				if (_max == null)
+					continue;
+
+				MutableBoundedValue<Integer> durabilityData = item.require(DurabilityData.class).durability();
+				int current = durabilityData.get();
+				int max = _max;
+
+				// attempt to modify durability and ensure it was updated
+				modifyDurability(durabilityData, max);
+				if (!CommandConstants.canApplyDurability(current, durabilityData.get(), max))
+					continue;
+
+				result.type(ResultType.SUCCESS).message("SUCCESS");
+				item.offer(durabilityData);
+				break;
 			}
-
-			if (!optionalItem.isPresent())
-				continue;
-			ItemStack item = optionalItem.get();
-
-			//noinspection OptionalGetWithoutIsPresent - it is checked in the for loop
-			MutableBoundedValue<Integer> data = item.get(DurabilityData.class).get().durability();
-			//noinspection OptionalGetWithoutIsPresent - it is checked in the for loop
-			Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
-			if (max == null)
-				continue;
-
-			// attempt to modify durability and ensure it was updated
-			int current = data.get();
-			modifyDurability(data, max);
-			if (!CommandConstants.canApplyDurability(current, data.get(), max))
-				continue;
-
-			result.type(ResultType.SUCCESS).message("SUCCESS");
-			item.offer(data);
 		}
 
 		return result;
