@@ -37,8 +37,10 @@ public class HatCommand extends ImmediateCommand {
 				if (isSimilar(hand, head))
 					continue;
 				response.type(ResultType.SUCCESS).message("SUCCESS");
-				player.setHead(hand);
-				player.setItemInHand(handType, head);
+				sync(() -> {
+					player.setHead(hand);
+					player.setItemInHand(handType, head);
+				});
 				break;
 			}
 		}

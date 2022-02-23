@@ -35,7 +35,6 @@ public class PotionCommand extends ImmediateCommand {
 		boolean isMinimal = potionEffectType.isInstant();
 		duration = Ticks.of(isMinimal ? 1 : TICKS);
 		this.effectName = "potion_" + potionEffectType.key(RegistryTypes.POTION_EFFECT_TYPE).value();
-		// TODO for some reason the sponge 7 impl uses title case for potion effect name; test if this is still necessary
 		this.displayName = "Apply " + plugin.getTextUtil().asPlain(potionEffectType) + " Potion Effect (" + POTION_SECONDS + "s)";
 	}
 

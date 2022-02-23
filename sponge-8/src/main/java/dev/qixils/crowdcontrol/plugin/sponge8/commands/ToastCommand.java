@@ -73,8 +73,8 @@ public class ToastCommand extends ImmediateCommand {
 						.orElseThrow(() -> new IllegalStateException("Could not create custom inventory"));
 				InventoryMenu menu = inv.asMenu();
 				menu.setTitle(TITLE);
-				menu.setReadOnly(true); // TODO this is not working
-				sync(() -> player.openInventory(inv));
+				menu.setReadOnly(true);
+				sync(() -> menu.open(player));
 
 				AtomicInteger atomicIndex = new AtomicInteger(random.nextInt(MATERIALS.length));
 				// future ensures the task doesn't get cancelled before the inventory is opened
@@ -91,9 +91,14 @@ public class ToastCommand extends ImmediateCommand {
 							int index = atomicIndex.getAndIncrement();
 							ItemType item = MATERIALS[index % MATERIALS.length];
 							inv.clear();
-							// TODO i think every slot in the inventory might be the same (for some reason??)
-							for (Slot slot : inv.slots())
+							for (Slot slot : inv.slots()) {
+								// slots seem to be duplicated in the ViewableInventory,
+								// so skip an iteration if a non-empty slot is encountered
+								if (!slot.peek().isEmpty())
+									continue;
+								// set item
 								slot.offer(ItemStack.of(item, 1));
+							}
 						})
 						.plugin(plugin.getPluginContainer())
 						.build());

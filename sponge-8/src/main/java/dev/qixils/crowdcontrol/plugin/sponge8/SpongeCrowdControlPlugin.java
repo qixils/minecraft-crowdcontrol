@@ -12,9 +12,10 @@ import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -76,19 +77,20 @@ import java.util.Set;
 @ParametersAreNonnullByDefault
 public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> {
 	// keys
-	public static Key<Value<Component>> ORIGINAL_DISPLAY_NAME; // TODO: component cannot be serialized ??
+	public static Key<Value<String>> ORIGINAL_DISPLAY_NAME; // TODO: report inability to serialize components
 	public static Key<Value<Boolean>> VIEWER_SPAWNED;
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT;
 	// "real" variables
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Logger logger = LoggerFactory.getLogger("crowd-control");
 	private final CommandRegister register = new CommandRegister(this);
-	private final TextUtil textUtil = new TextUtil(null);
+	private final TextUtil textUtil = new SpongeTextUtil();
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper();
 	@Accessors(fluent = true)
 	private final EntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper();
+	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
 	private final ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private String clientHost = null;
@@ -196,9 +198,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	@Listener
 	public void onKeyRegistration(RegisterDataEvent event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
-				.elementType(Component.class)
+				.elementType(String.class)
 				.key(ResourceKey.of(pluginContainer, "original_display_name"))
-				// TODO may need a comparator
 				.build();
 		VIEWER_SPAWNED = Key.builder()
 				.elementType(Boolean.class)

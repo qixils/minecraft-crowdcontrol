@@ -25,10 +25,12 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
+import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.ArrayList;
@@ -220,8 +222,15 @@ public class LootboxCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		for (ServerPlayer player : players) {
-			Inventory inventory = Inventory.builder()
+			Inventory baseInventory = Inventory.builder()
 					.grid(9, 3)
+					.completeStructure()
+					.plugin(plugin.getPluginContainer())
+					.build();
+
+			ViewableInventory inventory = ViewableInventory.builder()
+					.type(ContainerTypes.GENERIC_9X3)
+					.slots(baseInventory.slots(), 0)
 					.completeStructure()
 					.plugin(plugin.getPluginContainer())
 					.build();
@@ -242,7 +251,7 @@ public class LootboxCommand extends ImmediateCommand {
 
 			// sound & open
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
-			sync(() -> player.openInventory(inventory, buildLootboxTitle(request))); // TODO: not working; 0 errors
+			sync(() -> player.openInventory(inventory, buildLootboxTitle(request)));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}

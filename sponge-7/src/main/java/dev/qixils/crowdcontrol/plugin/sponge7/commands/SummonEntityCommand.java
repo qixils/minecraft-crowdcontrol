@@ -116,7 +116,8 @@ public class SummonEntityCommand extends ImmediateCommand {
 					continue;
 				odds += ENTITY_ARMOR_INC;
 				ItemStack item = ItemStack.of(RandomUtil.randomElementFrom(armor.get(type)));
-				plugin.getRegister().getCommand(LootboxCommand.class).randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
+				plugin.getRegister().getCommandByName("lootbox", LootboxCommand.class)
+						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
 				((ArmorEquipable) entity).equip(type, item);
 			}
 		}

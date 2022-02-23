@@ -16,7 +16,6 @@ import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class TorchCommand extends ImmediateCommand {
 				if (placeTorches)
 					placeTorch(location);
 				else
-					location.setBlockType(BlockTypes.AIR.get(), BlockChangeFlags.NONE);
+					location.setBlockType(BlockTypes.AIR.get());
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
@@ -98,8 +97,8 @@ public class TorchCommand extends ImmediateCommand {
 
 		BlockState.Builder setBlock = BlockState.builder().blockType(BlockTypes.TORCH);
 		if (placeFace != Direction.DOWN)
-			setBlock.add(Keys.DIRECTION, placeFace);
+			setBlock.blockType(BlockTypes.WALL_TORCH).add(Keys.DIRECTION, placeFace);
 
-		location.setBlock(setBlock.build(), BlockChangeFlags.NONE);
+		location.setBlock(setBlock.build());
 	}
 }

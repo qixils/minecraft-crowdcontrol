@@ -83,7 +83,9 @@ public class DoOrDieCommand extends VoidCommand {
 									if (player == null) continue;
 
 									if (finalCondition.hasSucceeded(player)) {
-										ItemStack item = plugin.getRegister().getCommand(LootboxCommand.class).createRandomItem(finalCondition.getRewardLuck());
+										ItemStack item = plugin.getRegister()
+												.getCommandByName("lootbox", LootboxCommand.class)
+												.createRandomItem(finalCondition.getRewardLuck());
 										plugin.asAudience(player).showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
 										notCompleted.remove(uuid);
 										Vector3d pos = player.getPosition();

@@ -7,12 +7,14 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +39,7 @@ public class EntityChaosCommand extends ImmediateCommand {
 		sync(() -> {
 			for (int i = 0; i < entities.size(); i++) {
 				Entity entity = entities.get(i);
-				// TODO clear passengers
+				entity.offer(Keys.PASSENGERS, Collections.emptyList());
 				entity.setLocation(players.get(i % players.size()).serverLocation());
 			}
 		});

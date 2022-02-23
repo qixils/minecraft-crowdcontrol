@@ -85,7 +85,9 @@ public class DoOrDieCommand extends VoidCommand {
 									if (player == null) continue;
 
 									if (finalCondition.hasSucceeded(player)) {
-										ItemStack item = plugin.getRegister().getCommand(LootboxCommand.class).createRandomItem(finalCondition.getRewardLuck());
+										ItemStack item = plugin.getRegister()
+												.getCommandByName("lootbox", LootboxCommand.class)
+												.createRandomItem(finalCondition.getRewardLuck());
 										player.showTitle(doOrDieSuccess(item.asComponent()));
 										notCompleted.remove(uuid);
 										player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());

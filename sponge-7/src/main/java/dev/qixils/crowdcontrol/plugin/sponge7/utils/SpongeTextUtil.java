@@ -36,8 +36,12 @@ public class SpongeTextUtil extends TextUtil {
 		return Sponge.getRegistry().getTranslationById(key).map(Translation::get).orElse(key);
 	}
 
+	@NotNull
 	public static String valueOf(CatalogType type) {
-		return type.getId().replaceFirst("minecraft:", "");
+		String id = type.getId();
+		if (!id.startsWith("minecraft:"))
+			return id;
+		return id.replaceFirst("minecraft:", "");
 	}
 
 	/**
@@ -46,8 +50,13 @@ public class SpongeTextUtil extends TextUtil {
 	 * @param type typed object
 	 * @return its CS file ID
 	 */
+	@NotNull
 	public static String csIdOf(CatalogType type) {
 		String value = valueOf(type);
+
+		if (!type.getId().startsWith("minecraft:"))
+			return value;
+
 		switch (value) {
 			case "villager_golem":
 				return "iron_golem";

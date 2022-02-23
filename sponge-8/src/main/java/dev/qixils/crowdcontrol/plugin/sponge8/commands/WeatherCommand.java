@@ -32,11 +32,17 @@ public class WeatherCommand extends ImmediateCommand {
 	public WeatherCommand(SpongeCrowdControlPlugin plugin, WeatherType weather) {
 		super(plugin);
 		this.weather = weather;
+
 		String valueKey = weather.key(RegistryTypes.WEATHER_TYPE).value();
 		this.displayName = "Set Weather to " + TextUtil.titleCase(valueKey);
-		this.effectName = weather.equals(WeatherTypes.RAIN.get())
-				? "downfall"
-				: valueKey;
+
+		if (weather.equals(WeatherTypes.RAIN.get())) {
+			this.effectName = "downfall";
+		} else if (weather.equals(WeatherTypes.THUNDER.get())) {
+			this.effectName = "thunder_storm";
+		} else {
+			this.effectName = valueKey;
+		}
 	}
 
 	@NotNull

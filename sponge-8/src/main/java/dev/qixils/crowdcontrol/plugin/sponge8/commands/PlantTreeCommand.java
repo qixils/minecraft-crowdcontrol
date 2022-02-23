@@ -372,6 +372,7 @@ public class PlantTreeCommand extends ImmediateCommand {
 			BlockState.Builder builder = BlockState.builder().blockType(blockType);
 			if (woodAxis != null)
 				builder.add(Keys.AXIS, woodAxis);
+			location.setBlock(builder.build());
 			children.forEach((direction, treeBlock) -> treeBlock.place(location.add(direction.asBlockOffset())));
 		}
 

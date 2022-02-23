@@ -18,7 +18,7 @@ public class FallingBlockCommand extends BlockCommand {
 		super(
 				plugin,
 				blockType,
-				"falling_block_" + blockType.key(RegistryTypes.BLOCK_TYPE),
+				"falling_block_" + blockType.key(RegistryTypes.BLOCK_TYPE).value(),
 				"Place Falling " + plugin.getTextUtil().asPlain(blockType) + " Block"
 		);
 	}

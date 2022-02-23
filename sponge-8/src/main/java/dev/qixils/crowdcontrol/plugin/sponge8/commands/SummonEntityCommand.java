@@ -57,7 +57,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentType, List<ItemType>> armor = new HashMap<>(4);
 		for (ItemType item : plugin.registryIterable(RegistryTypes.ITEM_TYPE)) {
-			Optional<EquipmentType> optionalType = item.get(Keys.EQUIPMENT_TYPE);
+			Optional<EquipmentType> optionalType = ItemStack.of(item).get(Keys.EQUIPMENT_TYPE);
 			if (!optionalType.isPresent()) continue;
 
 			EquipmentType type = optionalType.get();
@@ -110,12 +110,14 @@ public class SummonEntityCommand extends ImmediateCommand {
 			// begins as a 1 in 4 chance to add a random item but becomes less likely each time
 			// an item is added
 			int odds = ENTITY_ARMOR_START;
-			for (EquipmentType type : armor.keySet()) {
+			for (EquipmentType type : slots) {
 				if (random.nextInt(odds) > 0)
 					continue;
 				odds += ENTITY_ARMOR_INC;
 				ItemStack item = ItemStack.of(RandomUtil.randomElementFrom(armor.get(type)));
-				plugin.getRegister().getCommand(LootboxCommand.class).randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
+				plugin.getRegister()
+						.getCommandByName("lootbox", LootboxCommand.class)
+						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
 				((ArmorEquipable) entity).equip(type, item);
 			}
 		}

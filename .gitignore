@@ -121,3 +121,6 @@ run/
 # VS Project Files (these don't meaningfully help external developers)
 MinecraftServer.csproj
 MinecraftServer.sln
+
+# Compiled Crowd Control package
+MinecraftServer.ccpak

@@ -36,7 +36,7 @@ public class DropItemCommand extends ImmediateCommand {
 	}
 
 	// rotation->vector stuff that is totally definitely not decompiled/reverse-engineered
-	private static Vector3d asItemVector(Vector3d headRotation) {
+	private static Vector3d asItemVector(final Vector3d headRotation) {
 		Random rng = RandomUtil.RNG;
 
 		double xRot = headRotation.x();
@@ -45,14 +45,14 @@ public class DropItemCommand extends ImmediateCommand {
 		double f2 = MinecraftMath.cos(xRot * SIN_MULT_CONSTANT);
 		double f3 = MinecraftMath.sin(yRot * SIN_MULT_CONSTANT);
 		double f4 = MinecraftMath.cos(yRot * SIN_MULT_CONSTANT);
-		double f5 = rng.nextFloat() * 6.2831855d;
-		double f6 = 0.02d * RandomUtil.RNG.nextFloat();
+		double f5 = rng.nextDouble() * 6.2831855d;
+		double f6 = 0.02d * rng.nextDouble();
 
 		// these don't use the weird sine table for some reason
 		double x = (-f3 * f2 * 0.3d) + Math.cos(f5) * f6;
 		double y = -f1 * 0.3d + 0.1d + (rng.nextDouble() - rng.nextDouble()) * 0.1d;
 		double z = (f4 * f2 * 0.3d) + Math.sin(f5) * f6;
-		// TODO: this is broken (order may have swapped?)
+		// todo why the hell is this broken
 		return new Vector3d(x, y, z);
 	}
 

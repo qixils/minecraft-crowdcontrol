@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -44,17 +45,20 @@ public class DinnerboneCommand extends Command {
 				entities.addAll(toAdd);
 			}
 			successFuture.complete(!entities.isEmpty());
+			GsonComponentSerializer serializer = plugin.getSerializer();
 			entities.forEach(entity -> {
-				Component oldName = entity.get(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME).orElseGet(Component::empty);
-				Component currentName = entity.getOrElse(Keys.DISPLAY_NAME, Component.empty());
+				Component oldName = entity.get(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME)
+						.map(serializer::deserialize)
+						.orElseGet(Component::empty);
+				Component currentName = entity.getOrElse(Keys.CUSTOM_NAME, Component.empty());
 				if (currentName.equals(Component.text(DINNERBONE_NAME))) {
-					entity.offer(Keys.DISPLAY_NAME, oldName);
+					entity.offer(Keys.CUSTOM_NAME, oldName);
 					entity.remove(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME);
 					if (entity.getOrElse(VIEWER_SPAWNED, false))
 						entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
 				} else {
-					entity.offer(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME, currentName);
-					entity.offer(Keys.DISPLAY_NAME, Component.text(DINNERBONE_NAME));
+					entity.offer(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME, serializer.serialize(currentName));
+					entity.offer(Keys.CUSTOM_NAME, Component.text(DINNERBONE_NAME));
 					entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, false);
 				}
 			});

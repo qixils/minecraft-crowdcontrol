@@ -34,6 +34,7 @@ public class CommandRegister {
 	private final @NotNull SpongeCrowdControlPlugin plugin;
 	private final @NotNull Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
 	private final @NotNull Map<Class<? extends Command>, Command> singleCommandInstances = new HashMap<>();
+	private final Map<String, Command> registeredCommandMap = new HashMap<>();
 	private boolean tagsRegistered = false;
 	private Set<EntityType> safeEntities;
 	private MappedKeyedTag<BlockType> setBlocks;
@@ -186,6 +187,8 @@ public class CommandRegister {
 		}
 
 		for (Command command : commands) {
+			registeredCommandMap.put(command.getEffectName().toLowerCase(Locale.ENGLISH), command);
+
 			Class<? extends Command> clazz = command.getClass();
 			if (registeredCommandClasses.contains(clazz))
 				singleCommandInstances.remove(clazz);
@@ -223,11 +226,47 @@ public class CommandRegister {
 	 *                                  registered several times
 	 */
 	@NotNull
-	public <T> T getCommand(@NotNull Class<T> tClass) throws IllegalArgumentException {
+	public <T extends Command> T getCommand(@NotNull Class<T> tClass) throws IllegalArgumentException {
 		if (!singleCommandInstances.containsKey(tClass))
 			throw new IllegalArgumentException("Requested class " + tClass.getName()
 					+ " is invalid. Please ensure that only one instance of this command is registered.");
 		//noinspection unchecked
 		return (T) singleCommandInstances.get(tClass);
+	}
+
+	/**
+	 * Fetches a command by the given effect name.
+	 *
+	 * @param name effect name of a command
+	 * @return the requested command
+	 * @throws IllegalArgumentException the requested command does not exist
+	 */
+	@NotNull
+	public Command getCommandByName(@NotNull String name) throws IllegalArgumentException {
+		name = name.toLowerCase(Locale.ENGLISH);
+		if (!registeredCommandMap.containsKey(name))
+			throw new IllegalArgumentException("Could not find a command by the name of " + name);
+		return registeredCommandMap.get(name);
+	}
+
+	/**
+	 * Fetches a command by the given effect name and expected command type.
+	 *
+	 * @param name          effect name of a command
+	 * @param expectedClass class of the expected command type
+	 * @param <T>           expected command type
+	 * @return the requested command
+	 * @throws IllegalArgumentException the requested command does not exist or does not match the
+	 *                                  expected class
+	 */
+	@NotNull
+	public <T extends Command> T getCommandByName(@NotNull String name, @NotNull Class<T> expectedClass) throws IllegalArgumentException {
+		Command command = getCommandByName(name);
+		if (!expectedClass.isInstance(command))
+			throw new IllegalArgumentException("Expected command '" + name
+					+ "' to an instance of " + expectedClass.getSimpleName()
+					+ ", not " + command.getClass().getSimpleName());
+		//noinspection unchecked
+		return (T) command;
 	}
 }

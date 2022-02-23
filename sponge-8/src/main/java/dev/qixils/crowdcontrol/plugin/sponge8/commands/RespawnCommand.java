@@ -31,6 +31,9 @@ public class RespawnCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		// todo this is teleporting players to 0 0 0
+		//   maybe RESPAWN_LOCATIONS is broken
+		//   need to add some debugging to find out
 		sync(() -> {
 			for (ServerPlayer player : players) {
 				if (player.respawn())
@@ -56,7 +59,8 @@ public class RespawnCommand extends ImmediateCommand {
 				} else {
 					asLocation = location.asLocation().get();
 				}
-				player.setLocation(asLocation);
+				player.setLocation(plugin.getGame().server().teleportHelper().findSafeLocation(asLocation)
+						.orElseGet(asLocation::asHighestLocation));
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
@@ -64,7 +68,8 @@ public class RespawnCommand extends ImmediateCommand {
 
 	private ServerLocation getDefaultSpawn() {
 		// TODO i cannot find a new version of #getSpawnLocation for the life of me and this impl
-		//   will not work for the nether
+		//   will not work for the nether (edit: there should be a new util method for nether-
+		//   compatible asHighestLocation but i forget where and i sleepy)
 		return getDefaultWorld().location(0, 0, 0).asHighestLocation();
 	}
 
