@@ -91,7 +91,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Take One XP Level", "xp_sub1", "miscellaneous") { Price = 500, Description = "Removes one level of experience" },
             new Effect("Teleport to a Nearby Structure", "structure", "miscellaneous") { Price = 1000, Description = "Teleports players to a random nearby structure" },
             new Effect("Teleport to a Random Biome", "biome", "miscellaneous") { Price = 1000, Description = "Teleports players to a random nearby biome" },
-            new GlobalEffect("Teleport All Entities To Players", "entity_chaos", "miscellaneous") { Price = 2000, Description = "Teleports every loaded mob on the server to the targeted streamers in an even split" },
+            new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous") { Price = 2000, Description = "Teleports every loaded mob on the server to the targeted streamers in an even split. Depending on the server configuration, this may only teleport nearby mobs." },
             new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous") { Price = 400, Description = "Teleports players 30 blocks up and gives them a water bucket" },
             new GlobalEffect("Zip Time", "zip", "miscellaneous") { Price = 30, Description = "Adds several minutes to the in-game time" },
             // inventory commands

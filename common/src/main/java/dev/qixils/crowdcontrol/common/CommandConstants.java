@@ -173,6 +173,10 @@ public class CommandConstants {
 	 * The minimum amount of durability allowed to be set by the Damage Item command.
 	 */
 	private static final int MIN_ITEM_DAMAGE = 15;
+	/**
+	 * Radius to search for entities when executing Entity Chaos with global effects disabled.
+	 */
+	public static final int CHAOS_LOCAL_RADIUS = 20;
 
 	// tags
 
