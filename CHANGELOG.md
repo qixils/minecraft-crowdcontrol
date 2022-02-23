@@ -11,6 +11,9 @@ A list of all changes made to the software in reverse chronological order.
 - Global effects like changing the server difficulty are now hidden from the streamer's effect menu
   if the effects have not been enabled.
 - Summoned armor stands now come equipped with random armor.
+- The missing effects for giving and taking enchanted golden apples on Sponge 7 have been added.
+- Cursed enchantments are less likely to be applied to items awarded by Do-or-Die and lucky
+  lootboxes.
 
 ## 3.2.1
 
