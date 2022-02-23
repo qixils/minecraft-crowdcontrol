@@ -8,13 +8,17 @@ import dev.qixils.crowdcontrol.plugin.sponge7.utils.TypedTag;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.GoldenApples;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
@@ -132,7 +136,17 @@ public class CommandRegister {
 				new DoOrDieCommand(plugin),
 				new ExplodeCommand(plugin),
 				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
-				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
+				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT),
+				// manual implementation of enchanted gapple commands
+				new GiveItemCommand(plugin, ItemStack.builder()
+						.itemType(ItemTypes.GOLDEN_APPLE)
+						.quantity(1)
+						.add(Keys.GOLDEN_APPLE_TYPE, GoldenApples.ENCHANTED_GOLDEN_APPLE)
+						.build(),
+						"give_enchanted_golden_apple",
+						"Give Enchanted Golden Apple"
+				),
+				new TakeItemCommand(plugin, ItemTypes.GOLDEN_APPLE, GoldenApples.ENCHANTED_GOLDEN_APPLE)
 		));
 
 		// entity commands

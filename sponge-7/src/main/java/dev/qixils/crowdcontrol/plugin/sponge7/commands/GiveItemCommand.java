@@ -19,26 +19,34 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.List;
 
 @Getter
 public class GiveItemCommand extends ImmediateCommand {
-	private final ItemType item;
+	private final ItemStackSnapshot item;
 	private final String effectName;
 	private final String displayName;
 
 	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemType item) {
 		super(plugin);
-		this.item = item;
+		this.item = ItemStack.of(item).createSnapshot();
 		this.effectName = "give_" + SpongeTextUtil.valueOf(item);
 		this.displayName = "Give " + item.getTranslation().get();
 	}
 
+	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemStack item, String effectName, String displayName) {
+		super(plugin);
+		this.item = item.createSnapshot();
+		this.effectName = effectName;
+		this.displayName = displayName;
+	}
+
 	@Blocking
-	public static void giveItemTo(SpongeCrowdControlPlugin plugin, Entity player, ItemStack itemStack) {
+	public static void giveItemTo(SpongeCrowdControlPlugin plugin, Entity player, ItemStackSnapshot item) {
 		Item entity = (Item) player.getLocation().createEntity(EntityTypes.ITEM);
-		entity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+		entity.offer(Keys.REPRESENTED_ITEM, item);
 		entity.offer(Keys.PICKUP_DELAY, 0);
 
 		// give entity a cause & spawn it
@@ -48,19 +56,18 @@ public class GiveItemCommand extends ImmediateCommand {
 		}
 	}
 
-	private void giveItemTo(Entity player, ItemStack itemStack) {
-		giveItemTo(plugin, player, itemStack);
+	private void giveItemTo(Entity player, ItemStackSnapshot item) {
+		giveItemTo(plugin, player, item);
 	}
 
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		ItemStack itemStack = ItemStack.of(item);
 		sync(() -> {
 			for (Player player : players) {
-				giveItemTo(player, itemStack);
+				giveItemTo(player, item);
 				// workaround to limit the circulation of end portal frames in the economy
-				if (item.equals(ItemTypes.END_PORTAL_FRAME))
+				if (item.getType().equals(ItemTypes.END_PORTAL_FRAME))
 					break;
 			}
 		});

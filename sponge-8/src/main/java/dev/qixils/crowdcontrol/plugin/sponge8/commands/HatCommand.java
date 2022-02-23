@@ -14,6 +14,8 @@ import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.plugin.sponge8.utils.ItemUtil.isSimilar;
+
 @Getter
 public class HatCommand extends ImmediateCommand {
 	private final String effectName = "hat";
@@ -46,19 +48,5 @@ public class HatCommand extends ImmediateCommand {
 		}
 
 		return response;
-	}
-
-	private boolean isSimilar(ItemStack item1, ItemStack item2) {
-		if (item1.isEmpty() && item2.isEmpty())
-			return true;
-		if (item1.isEmpty())
-			return false;
-		if (item2.isEmpty())
-			return false;
-		ItemStack itemClone1 = item1.copy();
-		itemClone1.setQuantity(1);
-		ItemStack itemClone2 = item2.copy();
-		itemClone2.setQuantity(1);
-		return itemClone1.equalTo(itemClone2);
 	}
 }

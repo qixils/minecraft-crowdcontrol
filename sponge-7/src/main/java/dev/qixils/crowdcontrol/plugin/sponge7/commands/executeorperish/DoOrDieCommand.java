@@ -90,7 +90,7 @@ public class DoOrDieCommand extends VoidCommand {
 										notCompleted.remove(uuid);
 										Vector3d pos = player.getPosition();
 										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
-										GiveItemCommand.giveItemTo(plugin, player, item);
+										GiveItemCommand.giveItemTo(plugin, player, item.createSnapshot());
 									} else if (isTimeUp) {
 										plugin.asAudience(player).showTitle(DO_OR_DIE_FAILURE);
 										player.offer(Keys.HEALTH, 0d);
