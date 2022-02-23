@@ -108,7 +108,7 @@ public interface Command<P> {
 
 		// disallow execution of global commands
 		if (getClass().isAnnotationPresent(Global.class)) {
-			if (!plugin.isGlobal() && plugin.getHosts().isEmpty()) {
+			if (!plugin.globalEffectsUsable()) {
 				request.buildResponse()
 						.type(ResultType.UNAVAILABLE)
 						.message("Global effects are disabled")

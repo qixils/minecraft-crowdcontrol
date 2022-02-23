@@ -38,6 +38,11 @@ import java.util.stream.Collectors;
 public interface Plugin<P, S> {
 
 	/**
+	 * The color to use for basic messages rendered to players when joining the server.
+	 */
+	TextColor JOIN_MESSAGE_COLOR = TextColor.color(0xFCE9D4);
+
+	/**
 	 * Text color to use for usernames.
 	 */
 	TextColor USER_COLOR = TextColor.color(0x9f44db);
@@ -63,9 +68,9 @@ public interface Plugin<P, S> {
 	int DEFAULT_PORT = 58431;
 
 	/**
-	 * The first message to send to a player when they join the server.
+	 * The message to send to a player when they join the server.
 	 */
-	Component JOIN_MESSAGE_1 = new TextBuilder(TextColor.color(0xFCE9D4))
+	Component JOIN_MESSAGE_1 = new TextBuilder(JOIN_MESSAGE_COLOR)
 			.rawNext("This server is running ")
 			.next("Crowd Control", TextColor.color(0xFAE100)) // picked a color from the CC logo/icon
 			.rawNext(", developed by ")
@@ -79,7 +84,8 @@ public interface Plugin<P, S> {
 			.build();
 
 	/**
-	 * The second message to send to a player when they join the server.
+	 * A warning message sent to players when they join the server if they have no Twitch account
+	 * linked.
 	 */
 	Component JOIN_MESSAGE_2 = new TextBuilder(TextColor.color(0xF1D4FC))
 			.rawNext("Please link your Twitch account using ")
@@ -89,6 +95,20 @@ public interface Plugin<P, S> {
 			.rawNext(" to do so.")
 			.suggest("/account link ")
 			.hover(Component.text("Click here to link your Twitch account").asHoverEvent())
+			.build();
+
+	/**
+	 * A warning message sent to players when they join the server if global effects are
+	 * completely unavailable.
+	 */
+	Component NO_GLOBAL_EFFECTS_MESSAGE = new TextBuilder(JOIN_MESSAGE_COLOR)
+			.next("Warning: ", NamedTextColor.YELLOW, TextDecoration.BOLD)
+			.rawNext("Effects that alter server settings (such as the server difficulty) are currently unavailable. " +
+					"If this isn't intended then please open the plugin's config file and set ")
+			.next("global", TextColor.color(0xEBBD8D))
+			.rawNext(" to ")
+			.next("true", TextColor.color(0xEBBD8D))
+			.rawNext(" to enable these effects.")
 			.build();
 
 	/**
@@ -354,6 +374,15 @@ public interface Plugin<P, S> {
 	boolean isGlobal();
 
 	/**
+	 * Determines whether it's possible for global effects to execute.
+	 *
+	 * @return true if global effects could execute
+	 */
+	default boolean globalEffectsUsable() {
+		return isGlobal() || !getHosts().isEmpty();
+	}
+
+	/**
 	 * Determines if a request should apply to all online players or only a select few.
 	 *
 	 * @param request the request to be processed
@@ -441,7 +470,7 @@ public interface Plugin<P, S> {
 		service.buildResponse(0)
 				.packetType(PacketType.KEEP_ALIVE)
 				.message("_mc_cc_server_status_" + new ServerStatus(
-						isGlobal() || !getHosts().isEmpty(),
+						globalEffectsUsable(),
 						supportsClientOnly(),
 						registeredCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
 				).toJSON())
@@ -530,6 +559,8 @@ public interface Plugin<P, S> {
 		//noinspection OptionalGetWithoutIsPresent
 		if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.getUniqueId(player).get()).size() == 0)
 			audience.sendMessage(JOIN_MESSAGE_2);
+		if (!globalEffectsUsable())
+			audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
 		if (getCrowdControl() == null) {
 			if (mapper.isAdmin(player)) {
 				if (isServer() && getPassword() == null)
