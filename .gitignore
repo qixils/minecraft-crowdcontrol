@@ -124,3 +124,7 @@ MinecraftServer.sln
 
 # Compiled Crowd Control package
 MinecraftServer.ccpak
+
+# Gradle
+.gradle/
+buildSrc/
