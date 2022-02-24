@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>minecraft-common</artifactId>
+    <artifactId>common-platform</artifactId>
     <name>Minecraft Crowd Control: Common</name>
     <description>Common interfaces and classes for Minecraft Crowd Control projects</description>
     <url>https://github.com/qixils/minecraft-crowdcontrol</url>

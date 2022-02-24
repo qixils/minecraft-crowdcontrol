@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>minecraft-sponge-7</artifactId>
+    <artifactId>sponge7-platform</artifactId>
     <name>Minecraft Crowd Control: Sponge 7</name>
     <description>Allows viewers to interact with your Minecraft world</description>
     <url>https://github.com/qixils/minecraft-crowdcontrol</url>
@@ -66,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>dev.qixils.crowdcontrol.plugin</groupId>
-            <artifactId>minecraft-common</artifactId>
+            <artifactId>common-platform</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

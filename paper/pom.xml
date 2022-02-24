@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>minecraft-paper</artifactId>
+    <artifactId>paper-platform</artifactId>
     <name>Minecraft Crowd Control: Paper</name>
     <description>Paper implementation for the Minecraft Crowd Control plugin</description>
     <url>https://github.com/qixils/minecraft-crowdcontrol</url>
@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>dev.qixils.crowdcontrol.plugin</groupId>
-            <artifactId>minecraft-common</artifactId>
+            <artifactId>common-platform</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
