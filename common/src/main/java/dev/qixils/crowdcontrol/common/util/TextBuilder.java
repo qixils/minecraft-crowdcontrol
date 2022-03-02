@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.common.util;
 
-import lombok.NoArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
@@ -27,13 +26,20 @@ import java.util.function.Consumer;
  * A simpler {@link Component} builder.
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-@NoArgsConstructor
 public class TextBuilder implements ComponentLike {
 	private static final LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.legacyAmpersand();
-	@NotNull private Builder builder = Component.text();
-	@NotNull private Builder result = Component.text();
+	@NotNull
+	private Builder builder = Component.text();
+	@NotNull
+	private Builder result = Component.text();
 
 	private boolean initialized = false;
+
+	/**
+	 * Creates an empty new builder.
+	 */
+	public TextBuilder() {
+	}
 
 	/**
 	 * Creates a new builder with its color set

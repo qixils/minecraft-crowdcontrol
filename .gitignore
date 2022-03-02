@@ -128,3 +128,4 @@ MinecraftServer.ccpak
 # Gradle
 .gradle/
 buildSrc/
+build/

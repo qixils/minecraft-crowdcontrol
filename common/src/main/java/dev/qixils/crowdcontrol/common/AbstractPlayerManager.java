@@ -30,12 +30,12 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 	}
 
 	@Override
-	public @NotNull Collection<@NotNull UUID> getLinkedPlayers(@NotNull String twitchUsername) {
+	public @NotNull Collection<UUID> getLinkedPlayers(@NotNull String twitchUsername) {
 		return twitchToUserMap.get(twitchUsername.toLowerCase(Locale.ENGLISH));
 	}
 
 	@Override
-	public @NotNull Collection<@NotNull String> getLinkedAccounts(@NotNull UUID uuid) {
+	public @NotNull Collection<String> getLinkedAccounts(@NotNull UUID uuid) {
 		return Multimaps.invertFrom(twitchToUserMap, HashMultimap.create(twitchToUserMap.size(), 1)).get(uuid);
 	}
 }
