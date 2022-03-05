@@ -27,10 +27,13 @@ import java.util.concurrent.Executors;
 public final class FabricCrowdControlPlugin extends AbstractPlugin<ServerPlayerEntity, ServerCommandSource> implements ModInitializer {
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
+	private static final TextUtil EMPTY_TEXT_UTIL = new TextUtil(null);
 	// platform stuff
-	private MinecraftServer server;
-	private FabricServerAudiences adventure;
-	private TextUtil textUtil;
+	@Accessors(fluent = true)
+	private @Nullable MinecraftServer server;
+	@Accessors(fluent = true)
+	private @Nullable FabricServerAudiences adventure;
+	private @NotNull TextUtil textUtil = EMPTY_TEXT_UTIL;
 	// usual plugin stuff
 	private final ExecutorService syncExecutor = Util.getMainWorkerExecutor();
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
@@ -81,7 +84,7 @@ public final class FabricCrowdControlPlugin extends AbstractPlugin<ServerPlayerE
 		if (server == null) {
 			this.server = null;
 			this.adventure = null;
-			this.textUtil = new TextUtil(null);
+			this.textUtil = EMPTY_TEXT_UTIL;
 		} else {
 			this.server = server;
 			this.adventure = FabricServerAudiences.of(server);
