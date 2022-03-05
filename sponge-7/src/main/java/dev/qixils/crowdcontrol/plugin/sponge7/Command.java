@@ -19,12 +19,4 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 		this.plugin = Objects.requireNonNull(plugin, "plugin");
 		this.spongeSerializer = Objects.requireNonNull(plugin.getSpongeSerializer());
 	}
-
-	protected void sync(Runnable runnable) {
-		plugin.getSyncExecutor().execute(runnable);
-	}
-
-	protected void async(Runnable runnable) {
-		plugin.getAsyncExecutor().execute(runnable);
-	}
 }

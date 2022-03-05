@@ -2,6 +2,7 @@ val minecraftVersion: String by project
 val yarnMappings: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
+val cloudVersion: String by project
 
 plugins {
     id("fabric-loom") version "0.11-SNAPSHOT"
@@ -12,6 +13,7 @@ dependencies {
     mappings("net.fabricmc:yarn:${yarnMappings}:v2")
     modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.2.0")!!)
 }
 
 tasks.withType<ProcessResources> {

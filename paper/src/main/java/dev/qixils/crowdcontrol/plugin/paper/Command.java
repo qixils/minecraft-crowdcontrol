@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -17,10 +16,6 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 
 	protected Command(@NotNull PaperCrowdControlPlugin plugin) {
 		this.plugin = Objects.requireNonNull(plugin, "plugin");
-	}
-
-	protected void sync(Runnable runnable) {
-		Bukkit.getScheduler().runTask(plugin, runnable);
 	}
 
 	@Override

@@ -24,21 +24,13 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.Command<
 
 	@Override
 	public boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request) {
+		if (!plugin.getGame().isClientAvailable())
+			return false;
 		final List<ServerPlayer> players = validateNotNullElseGet(possiblePlayers, () -> plugin.getPlayers(request));
 		if (players.size() != 1)
-			return false;
-		if (!plugin.getGame().isClientAvailable())
 			return false;
 		return plugin.getGame().client().player()
 				.map(player -> player.uniqueId().equals(players.get(0).uniqueId()))
 				.orElse(false);
-	}
-
-	protected void sync(Runnable runnable) {
-		plugin.getSyncExecutor().execute(runnable);
-	}
-
-	protected void async(Runnable runnable) {
-		plugin.getAsyncExecutor().execute(runnable);
 	}
 }

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.10" apply false
+    kotlin("jvm") version "1.6.10" apply true
     id("io.freefair.lombok") version "6.4.1" apply false
 }
 
@@ -12,6 +12,10 @@ subprojects {
     repositories {
         mavenCentral()
         mavenLocal() // TODO remove -- included to allow builds w/ 1.7.0-SNAPSHOT
+    }
+
+    dependencies {
+        implementation(project(":common-platform"))
     }
 
     // TODO: shading

@@ -263,4 +263,23 @@ public interface Command<P> {
 				.next(getProcessedDisplayName(), Plugin.CMD_COLOR)
 		);
 	}
+
+	/**
+	 * Helper method which executes some code synchronously (i.e. on the server's main thread).
+	 *
+	 * @param runnable command to execute synchronously
+	 */
+	default void sync(@NotNull Runnable runnable) {
+		getPlugin().getSyncExecutor().execute(runnable);
+	}
+
+
+	/**
+	 * Helper method which executes some code asynchronously (i.e. off the server's main thread).
+	 *
+	 * @param runnable command to execute asynchronously
+	 */
+	default void async(@NotNull Runnable runnable) {
+		getPlugin().getAsyncExecutor().execute(runnable);
+	}
 }

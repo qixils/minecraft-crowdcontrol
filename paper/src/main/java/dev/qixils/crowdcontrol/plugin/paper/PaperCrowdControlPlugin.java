@@ -36,15 +36,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
-	@Getter @Accessors(fluent = true)
+	@Getter
+	private final Executor syncExecutor = runnable -> Bukkit.getScheduler().runTask(this, runnable);
+	@Getter
+	private final Executor asyncExecutor = runnable -> Bukkit.getScheduler().runTaskAsynchronously(this, runnable);
+	@Getter
+	@Accessors(fluent = true)
 	private final EntityMapper<Player> playerMapper = new PlayerMapper<>();
-	@Getter @Accessors(fluent = true)
+	@Getter
+	@Accessors(fluent = true)
 	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>();
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter

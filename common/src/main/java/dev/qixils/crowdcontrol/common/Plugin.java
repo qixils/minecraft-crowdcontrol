@@ -26,6 +26,7 @@ import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 /**
@@ -579,4 +580,18 @@ public interface Plugin<P, S> {
 	 */
 	@NotNull
 	Logger getSLF4JLogger();
+
+	/**
+	 * Gets the executor which runs code synchronously (i.e. on the server's main thread).
+	 *
+	 * @return synchronous executor
+	 */
+	Executor getSyncExecutor();
+
+	/**
+	 * Gets the executor which runs code asynchronously (i.e. off the server's main thread).
+	 *
+	 * @return asynchronous executor
+	 */
+	Executor getAsyncExecutor();
 }

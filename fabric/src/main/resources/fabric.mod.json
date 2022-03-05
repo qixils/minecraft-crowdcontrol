@@ -16,10 +16,10 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "dev.qixils.crowdcontrol.plugin.client.FabricPlatformClient"
+      "dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient"
     ],
     "main": [
-      "dev.qixils.crowdcontrol.plugin.FabricCrowdControlPlugin"
+      "dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin"
     ]
   },
   "mixins": [
