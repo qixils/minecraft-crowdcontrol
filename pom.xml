@@ -26,7 +26,7 @@
 <!--        <maven.compiler.release>${java.version}</maven.compiler.release>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <adventure.version>4.9.3</adventure.version>
-        <cloud.version>1.6.1</cloud.version>
+        <cloud.version>1.6.2</cloud.version>
         <crowdcontrol.version>3.3.3</crowdcontrol.version>
     </properties>
 
