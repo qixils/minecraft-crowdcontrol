@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "fabric-platform",
+  "version": "${version}",
+  "name": "Crowd Control",
+  "description": "Allows viewers to interact with your Minecraft world",
+  "authors": [
+    "qixils"
+  ],
+  "contact": {
+    "website": "https://github.com/qixils/minecraft-crowdcontrol",
+    "repo": "https://github.com/qixils/minecraft-crowdcontrol.git"
+  },
+  "license": "MIT",
+  "icon": "assets/crowd-control/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "dev.qixils.crowdcontrol.plugin.client.FabricPlatformClient"
+    ],
+    "main": [
+      "dev.qixils.crowdcontrol.plugin.FabricCrowdControlPlugin"
+    ]
+  },
+  "mixins": [
+    "fabric-platform.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.13.3",
+    "fabric": "*",
+    "minecraft": "1.18.2"
+  }
+}
