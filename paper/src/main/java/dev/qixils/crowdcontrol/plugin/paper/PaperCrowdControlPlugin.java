@@ -152,8 +152,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 					Function.identity(),
 					Function.identity()
 			);
-			commandManager.registerBrigadier();
-			commandManager.registerAsynchronousCompletions();
+			try {
+				commandManager.registerBrigadier();
+				commandManager.registerAsynchronousCompletions();
+			} catch (Exception exception) {
+				getSLF4JLogger().error("The command manager was unable to fully initialize. Please report this error to the developer.", exception);
+			}
 			registerChatCommands();
 		} catch (Exception exception) {
 			throw new IllegalStateException("The command manager was unable to load. Please ensure you are using the latest version of Paper.", exception);

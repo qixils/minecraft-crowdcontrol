@@ -5,7 +5,7 @@
     <parent>
         <artifactId>minecraft-crowd-control</artifactId>
         <groupId>dev.qixils.crowdcontrol.plugin</groupId>
-        <version>3.2.1</version>
+        <version>3.2.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -50,6 +50,11 @@
             <artifactId>cloud-paper</artifactId>
             <version>${cloud.version}</version>
         </dependency>
+        <dependency>
+            <groupId>me.lucko</groupId>
+            <artifactId>commodore</artifactId>
+            <version>1.13</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -68,7 +73,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>me.lucko.commodore</pattern>
-                                    <shadedPattern>dev.qixils.crowdcontrol.plugin.commodore</shadedPattern>
+                                    <shadedPattern>dev.qixils.crowdcontrol.plugin.paper.commodore</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
