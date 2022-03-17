@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.mojmap;
 
 import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new RemoveEnchantsCommand(plugin),
 //				new HatCommand(plugin),
 //				new RespawnCommand(plugin),
-//				new DropItemCommand(plugin),
+				new DropItemCommand(plugin)
 //				new DeleteItemCommand(plugin),
 //				new BucketClutchCommand(plugin),
 //				new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
