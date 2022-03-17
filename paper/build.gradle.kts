@@ -12,9 +12,9 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
 }
 
-// Java 17 boilerplate
+// Java 16 boilerplate
 
-val targetJavaVersion = 17
+val targetJavaVersion = 16
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(targetJavaVersion)
 }

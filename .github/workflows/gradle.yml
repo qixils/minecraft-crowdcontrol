@@ -26,23 +26,31 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        with:
+          arguments: build
 
       - name: Upload Paper Artifact
         uses: actions/upload-artifact@v2
         with:
           name: crowdcontrol-paper
-          path: "paper/target/CrowdControl-*.jar"
+          path: "paper/build/libs/CrowdControl-*.jar"
 
       - name: Upload Sponge 7 Artifact
         uses: actions/upload-artifact@v2
         with:
           name: crowdcontrol-sponge7
-          path: "sponge-7/target/CrowdControl-*.jar"
+          path: "sponge-7/build/libs/CrowdControl-*.jar"
 
       - name: Upload Sponge 8 Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: crowdcontrol-sponge7
-          path: "sponge-8/target/CrowdControl-*.jar"
+          name: crowdcontrol-sponge8
+          path: "sponge-8/build/libs/CrowdControl-*.jar"
+
+      - name: Upload Fabric Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: crowdcontrol-fabric
+          path: "fabric/build/libs/CrowdControl-*.jar"
