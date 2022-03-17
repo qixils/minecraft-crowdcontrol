@@ -14,5 +14,6 @@ minecraft {
 }
 
 dependencies {
+    api(project(":common-platform"))
     implementation("net.kyori:adventure-platform-api:4.1.0")
 }

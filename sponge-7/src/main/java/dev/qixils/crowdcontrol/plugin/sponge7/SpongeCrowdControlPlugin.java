@@ -173,7 +173,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	}
 
 	public @NotNull SpongeAudiences adventure() {
-		//noinspection ConstantConditions
 		if (audiences == null)
 			throw new IllegalStateException("Tried to access adventure before plugin loaded");
 		return audiences;
@@ -225,7 +224,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		return Collections.unmodifiableCollection(register.getCommands());
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Listener
 	public void onKeyRegistration(GameRegistryEvent.Register<Key<?>> event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
@@ -286,11 +284,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 				.build();
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void initCrowdControl() {
 		CommandConstants.SOUND_VALIDATOR = key -> registry.getType(SoundType.class, key.asString()).isPresent();
 
+		// TODO this config stuff (and a CommandRegister interface) should all be abstracted out
+		//  into the Plugin interface so that this doesn't need to be copy/pasted into every impl
+		//  Paper can just override the relevant method(s) with its own shit i guess if configurate
+		//  doesn't work
 		ConfigurationNode config;
 		try {
 			config = configLoader.load();

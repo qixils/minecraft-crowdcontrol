@@ -8,13 +8,21 @@ plugins {
     id("fabric-loom") version "0.11-SNAPSHOT"
 }
 
+repositories {
+    maven {
+        name = "Sonatype Snapshots"
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+    }
+}
+
 dependencies {
-    implementation(project(":mojmap-common"))
+    implementation(include(project(":mojmap-common"))!!)
     minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
     modImplementation(include("net.kyori:adventure-platform-fabric:5.2.0")!!)
+    modImplementation(include("cloud.commandframework:cloud-fabric:${cloudVersion}")!!)
 }
 
 tasks.withType<ProcessResources> {

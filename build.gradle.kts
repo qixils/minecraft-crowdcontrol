@@ -3,6 +3,10 @@ plugins {
     id("io.freefair.lombok") version "6.4.1" apply false
 }
 
+repositories {
+    mavenCentral()
+}
+
 subprojects {
     apply {
         plugin("org.jetbrains.kotlin.jvm")
@@ -12,10 +16,6 @@ subprojects {
     repositories {
         mavenCentral()
         mavenLocal() // TODO remove -- included to allow builds w/ 1.7.0-SNAPSHOT
-    }
-
-    dependencies {
-        implementation(project(":common-platform"))
     }
 
     // TODO: shading

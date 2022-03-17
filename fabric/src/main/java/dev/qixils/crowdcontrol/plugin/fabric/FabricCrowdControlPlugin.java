@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
+import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
+import cloud.commandframework.fabric.FabricServerCommandManager;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.mojmap.MojmapPlugin;
@@ -19,9 +21,15 @@ public final class FabricCrowdControlPlugin extends MojmapPlugin implements ModI
 	public static boolean CLIENT_AVAILABLE = false;
 	private static final TextUtil EMPTY_TEXT_UTIL = new TextUtil(null);
 	// platform stuff
-	private @NotNull TextUtil textUtil = EMPTY_TEXT_UTIL;
+	private final @NotNull TextUtil textUtil = EMPTY_TEXT_UTIL;
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(this);
+	private final FabricServerCommandManager<CommandSourceStack> commandManager
+			= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>newBuilder()
+				.withAsynchronousParsing()
+				.withExecutor(getAsyncExecutor())
+				.build()
+	);
 
 	public FabricCrowdControlPlugin() {
 	}
