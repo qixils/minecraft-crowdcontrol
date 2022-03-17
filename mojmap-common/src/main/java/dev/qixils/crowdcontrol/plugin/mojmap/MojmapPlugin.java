@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
+import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.platform.AudienceProvider;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,6 +51,8 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	protected MojmapPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
 	}
+
+	public abstract boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request);
 
 	@Override
 	public boolean supportsClientOnly() {

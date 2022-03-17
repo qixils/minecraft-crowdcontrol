@@ -15,14 +15,14 @@ pluginManagement {
 }
 
 // TODO reduce code repetition using a function
-include(":common-platform")
+include(":base-common")
 include(":configurate-common")
 include(":mojmap-common")
 include(":sponge7-platform")
 include(":sponge8-platform")
 include(":paper-platform")
 include(":fabric-platform")
-project(":common-platform").projectDir = file("common")
+project(":base-common").projectDir = file("common")
 project(":sponge7-platform").projectDir = file("sponge-7")
 project(":sponge8-platform").projectDir = file("sponge-8")
 project(":paper-platform").projectDir = file("paper")

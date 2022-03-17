@@ -8,9 +8,11 @@ dependencies {
     compileOnly("org.spongepowered:spongeapi:8.0.0")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
+tasks.withType<ProcessResources> {
+    inputs.property("version", project.version)
+    filteringCharset = "UTF-8"
 
-// TODO: auto apply version to the plugin json
+    filesMatching("META-INF/sponge_plugins.json") {
+        expand("version" to project.version)
+    }
+}

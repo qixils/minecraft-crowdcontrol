@@ -34,9 +34,10 @@ tasks.withType<ProcessResources> {
     }
 }
 
+// Java 17 boilerplate
+
 val targetJavaVersion = 17
 tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
     options.release.set(targetJavaVersion)
 }
 
@@ -45,5 +46,7 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
     }
-    withSourcesJar()
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+//    withSourcesJar()
 }
