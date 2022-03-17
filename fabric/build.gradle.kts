@@ -9,8 +9,9 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":mojmap-common"))
     minecraft("com.mojang:minecraft:${minecraftVersion}")
-    mappings("net.fabricmc:yarn:${yarnMappings}:v2")
+    mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
     modImplementation(include("net.kyori:adventure-platform-fabric:5.2.0")!!)

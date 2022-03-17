@@ -1,4 +1,4 @@
-package dev.qixils.crowdcontrol.plugin.fabric;
+package dev.qixils.crowdcontrol.mojmap;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -12,13 +12,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class CommandRegister {
-	private final FabricCrowdControlPlugin plugin;
+	private final MojmapPlugin plugin;
 	private final Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
 	private final Map<Class<? extends Command>, Command> singleCommandInstances = new HashMap<>();
 	private final Map<String, Command> registeredCommandMap = new HashMap<>();
 	private List<Command> registeredCommands;
 
-	public CommandRegister(FabricCrowdControlPlugin plugin) {
+	public CommandRegister(MojmapPlugin plugin) {
 		this.plugin = plugin;
 	}
 

@@ -5,8 +5,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
 @Environment(EnvType.CLIENT)
 public final class FabricPlatformClient implements ClientModInitializer {
 	private static @Nullable FabricPlatformClient INSTANCE = null;
-	private MinecraftClient client = null;
+	private Minecraft client = null;
 
 	/**
 	 * Fetches the initialized client.
@@ -42,7 +42,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
 	}
 
-	private void setClient(@Nullable MinecraftClient client) {
+	private void setClient(@Nullable Minecraft client) {
 		if (client == null) {
 			this.client = null;
 			FabricCrowdControlPlugin.CLIENT_AVAILABLE = false;
@@ -52,7 +52,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		}
 	}
 
-	public @NotNull Optional<ClientPlayerEntity> player() {
+	public @NotNull Optional<LocalPlayer> player() {
 		if (client == null) return Optional.empty();
 		return Optional.ofNullable(client.player);
 	}
