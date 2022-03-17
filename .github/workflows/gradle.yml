@@ -27,9 +27,7 @@ jobs:
           cache: gradle
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
-        with:
-          arguments: build
+        run: ./gradlew build --no-daemon
 
       - name: Upload Paper Artifact
         uses: actions/upload-artifact@v2
