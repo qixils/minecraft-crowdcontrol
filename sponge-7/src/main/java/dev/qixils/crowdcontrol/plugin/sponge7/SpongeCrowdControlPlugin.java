@@ -98,7 +98,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
 	// "real" variables
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
-	private final CommandRegister register = new CommandRegister(this);
+	@Accessors(fluent = true)
+	private final CommandRegister commandRegister = new CommandRegister(this);
 	private final SpongeTextUtil textUtil = new SpongeTextUtil();
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSource> commandSenderMapper = new CommandSourceMapper<>(this);
@@ -219,11 +220,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		}
 	}
 
-	@Override
-	public Collection<dev.qixils.crowdcontrol.common.Command<Player>> registeredCommands() {
-		return Collections.unmodifiableCollection(register.getCommands());
-	}
-
 	@Listener
 	public void onKeyRegistration(GameRegistryEvent.Register<Key<?>> event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
@@ -286,12 +282,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	@Override
 	public void initCrowdControl() {
-		CommandConstants.SOUND_VALIDATOR = key -> registry.getType(SoundType.class, key.asString()).isPresent();
-
-		// TODO this config stuff (and a CommandRegister interface) should all be abstracted out
-		//  into the Plugin interface so that this doesn't need to be copy/pasted into every impl
-		//  Paper can just override the relevant method(s) with its own shit i guess if configurate
-		//  doesn't work
 		ConfigurationNode config;
 		try {
 			config = configLoader.load();
@@ -338,13 +328,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			crowdControl = CrowdControl.client().port(port).ip(ip).build();
 		}
 
-		register.register();
+		commandRegister.register();
 		postInitCrowdControl(crowdControl);
 	}
 
 	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
+		CommandConstants.SOUND_VALIDATOR = key -> registry.getType(SoundType.class, key.asString()).isPresent();
 		game.getEventManager().registerListeners(this, softLockResolver);
 		spongeSerializer = SpongeComponentSerializer.get();
 		scheduler = game.getScheduler();

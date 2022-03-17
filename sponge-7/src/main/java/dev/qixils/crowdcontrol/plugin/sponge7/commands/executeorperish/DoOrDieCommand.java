@@ -26,7 +26,12 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_COOLDOWN;
+import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_DURATION;
+import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_FAILURE;
+import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_TIMES;
+import static dev.qixils.crowdcontrol.common.CommandConstants.doOrDieColor;
+import static dev.qixils.crowdcontrol.common.CommandConstants.doOrDieSuccess;
 
 @Getter
 public class DoOrDieCommand extends VoidCommand {
@@ -83,7 +88,7 @@ public class DoOrDieCommand extends VoidCommand {
 									if (player == null) continue;
 
 									if (finalCondition.hasSucceeded(player)) {
-										ItemStack item = plugin.getRegister()
+										ItemStack item = plugin.commandRegister()
 												.getCommandByName("lootbox", LootboxCommand.class)
 												.createRandomItem(finalCondition.getRewardLuck());
 										plugin.asAudience(player).showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));

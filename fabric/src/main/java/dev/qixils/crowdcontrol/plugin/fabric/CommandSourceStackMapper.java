@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
-import dev.qixils.crowdcontrol.mojmap.AbstractCommandSourceStackMapper;
+import dev.qixils.crowdcontrol.plugin.mojmap.AbstractCommandSourceStackMapper;
 import lombok.AllArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.minecraft.commands.CommandSourceStack;

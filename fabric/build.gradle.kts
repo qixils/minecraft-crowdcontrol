@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation(include(project(":mojmap-common"))!!)
+    implementation(project(":mojmap-common"))
     minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")

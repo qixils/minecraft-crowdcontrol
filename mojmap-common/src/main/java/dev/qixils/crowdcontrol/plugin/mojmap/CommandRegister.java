@@ -1,33 +1,21 @@
-package dev.qixils.crowdcontrol.mojmap;
+package dev.qixils.crowdcontrol.plugin.mojmap;
 
-import org.jetbrains.annotations.NotNull;
+import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
+import dev.qixils.crowdcontrol.common.Command;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
-public class CommandRegister {
-	private final MojmapPlugin plugin;
-	private final Set<Class<? extends Command>> registeredCommandClasses = new HashSet<>();
-	private final Map<Class<? extends Command>, Command> singleCommandInstances = new HashMap<>();
-	private final Map<String, Command> registeredCommandMap = new HashMap<>();
-	private List<Command> registeredCommands;
-
+public class CommandRegister extends AbstractCommandRegister<ServerPlayer, MojmapPlugin, Command<ServerPlayer>> {
 	public CommandRegister(MojmapPlugin plugin) {
-		this.plugin = plugin;
+		super(plugin);
 	}
 
-	public List<Command> getCommands() {
-		if (registeredCommands != null)
-			return registeredCommands;
-
-		// register normal commands
-		List<Command> commands = new ArrayList<>(Arrays.asList(
+	@Override
+	protected List<Command<ServerPlayer>> createCommands() {
+		List<Command<ServerPlayer>> commands = new ArrayList<>(Arrays.asList(
 //				new VeinCommand(plugin),
 //				new SoundCommand(plugin),
 //				new ChargedCreeperCommand(plugin),
@@ -137,90 +125,16 @@ public class CommandRegister {
 //				.forEach(gamemode -> commands.add(new GameModeCommand(plugin, gamemode,
 //						gamemode.equals(GameModes.SPECTATOR.get()) ? 8L : 15L)));
 
-		for (Command command : commands) {
-			registeredCommandMap.put(command.getEffectName().toLowerCase(Locale.ENGLISH), command);
-
-			Class<? extends Command> clazz = command.getClass();
-			if (registeredCommandClasses.contains(clazz))
-				singleCommandInstances.remove(clazz);
-			else
-				singleCommandInstances.put(clazz, command);
-			registeredCommandClasses.add(clazz);
-		}
-
-		return registeredCommands = commands;
+		return commands;
 	}
 
-	public void register() {
-		boolean firstRegistry = registeredCommands == null;
-		for (Command command : getCommands()) {
-			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
-			plugin.registerCommand(name, command);
-
-			if (firstRegistry && command.isEventListener()) {
-				// TODO
-//				plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), command);
-			}
-		}
-		if (firstRegistry) {
-			// TODO
-//			plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), new KeepInventoryCommand.Manager());
-//			plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), new GameModeCommand.Manager());
-		}
+	@Override
+	protected void onFirstRegistry() {
+		// TODO register KeepInventoryCommand.Manager and GameModeCommand.Manager
 	}
 
-	/**
-	 * Gets an instance of a registered command.
-	 * Only commands that register a sole instance can be returned by this method.
-	 *
-	 * @param tClass class of the desired command
-	 * @param <T>    type of the desired command
-	 * @return the command instance
-	 * @throws IllegalArgumentException the requested command has not been registered or has been
-	 *                                  registered several times
-	 */
-	@NotNull
-	public <T extends Command> T getCommand(@NotNull Class<T> tClass) throws IllegalArgumentException {
-		if (!singleCommandInstances.containsKey(tClass))
-			throw new IllegalArgumentException("Requested class " + tClass.getName()
-					+ " is invalid. Please ensure that only one instance of this command is registered.");
-		//noinspection unchecked
-		return (T) singleCommandInstances.get(tClass);
-	}
-
-	/**
-	 * Fetches a command by the given effect name.
-	 *
-	 * @param name effect name of a command
-	 * @return the requested command
-	 * @throws IllegalArgumentException the requested command does not exist
-	 */
-	@NotNull
-	public Command getCommandByName(@NotNull String name) throws IllegalArgumentException {
-		name = name.toLowerCase(Locale.ENGLISH);
-		if (!registeredCommandMap.containsKey(name))
-			throw new IllegalArgumentException("Could not find a command by the name of " + name);
-		return registeredCommandMap.get(name);
-	}
-
-	/**
-	 * Fetches a command by the given effect name and expected command type.
-	 *
-	 * @param name          effect name of a command
-	 * @param expectedClass class of the expected command type
-	 * @param <T>           expected command type
-	 * @return the requested command
-	 * @throws IllegalArgumentException the requested command does not exist or does not match the
-	 *                                  expected class
-	 */
-	@NotNull
-	public <T extends Command> T getCommandByName(@NotNull String name, @NotNull Class<T> expectedClass) throws IllegalArgumentException {
-		Command command = getCommandByName(name);
-		if (!expectedClass.isInstance(command))
-			throw new IllegalArgumentException("Expected command '" + name
-					+ "' to an instance of " + expectedClass.getSimpleName()
-					+ ", not " + command.getClass().getSimpleName());
-		//noinspection unchecked
-		return (T) command;
+	@Override
+	protected void registerListener(Command<ServerPlayer> command) {
+		// TODO
 	}
 }

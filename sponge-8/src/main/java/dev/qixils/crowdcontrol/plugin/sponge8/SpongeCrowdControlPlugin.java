@@ -6,18 +6,15 @@ import cloud.commandframework.sponge.SpongeCommandManager;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
-import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
+import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
@@ -52,24 +49,15 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
-import org.spongepowered.configurate.loader.ConfigurationLoader;
-import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 @Getter
@@ -83,7 +71,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	// "real" variables
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Logger logger = LoggerFactory.getLogger("crowd-control");
-	private final CommandRegister register = new CommandRegister(this);
+	@Accessors(fluent = true)
+	private final CommandRegister commandRegister = new CommandRegister(this);
 	private final TextUtil textUtil = new SpongeTextUtil();
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	@Accessors(fluent = true)
@@ -92,7 +81,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private final EntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper();
 	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
-	private final ConfigurationLoader<CommentedConfigurationNode> configLoader;
+	private final HoconConfigurationLoader configLoader;
 	private String clientHost = null;
 	private Scheduler syncScheduler;
 	private Scheduler asyncScheduler;
@@ -101,7 +90,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	// injected variables
 	private final PluginContainer pluginContainer;
 	private final Game game;
-	private final Path configPath;
 
 	@Inject
 	public SpongeCrowdControlPlugin(final @NotNull Injector injector, final @DefaultConfig(sharedRoot = true) Path configPath) {
@@ -109,10 +97,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 
 		this.game = injector.getInstance(Game.class);
 		this.pluginContainer = injector.getInstance(PluginContainer.class);
-		this.configPath = configPath;
-		this.configLoader = HoconConfigurationLoader.builder()
-				.path(configPath)
-				.build();
+		this.configLoader = createConfigLoader(configPath.toFile());
 
 		// create child injector with cloud module
 		final Injector childInjector = injector.createChildInjector(
@@ -175,26 +160,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		return hosts;
 	}
 
-	@Override
-	public @Nullable String getPassword() {
-		if (!isServer()) return null;
-		if (crowdControl != null)
-			return crowdControl.getPassword();
-		if (manualPassword != null)
-			return manualPassword;
-		try {
-			return configLoader.load().node("password").getString();
-		} catch (IOException e) {
-			logger.warn("Could not load config", e);
-			return null;
-		}
-	}
-
-	@Override
-	public Collection<dev.qixils.crowdcontrol.common.Command<ServerPlayer>> registeredCommands() {
-		return Collections.unmodifiableCollection(register.getCommands());
-	}
-
 	@Listener
 	public void onKeyRegistration(RegisterDataEvent event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
@@ -240,81 +205,13 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		event.register(gameModeRegister);
 	}
 
-	@Override
-	public void initCrowdControl() {
-		CommandConstants.SOUND_VALIDATOR = key -> game.registry(RegistryTypes.SOUND_TYPE).findEntry(ResourceKey.resolve(key.asString())).isPresent();
-
-		ConfigurationNode config;
-		try {
-			config = configLoader.load();
-		} catch (IOException e) {
-			throw new RuntimeException("Could not load plugin config", e);
-		}
-
-		try {
-			hosts = Collections.unmodifiableCollection(ExceptionUtil.validateNotNullElseGet(
-					config.node("hosts").getList(String.class),
-					Collections::emptyList
-			));
-		} catch (SerializationException e) {
-			throw new RuntimeException("Could not parse 'hosts' config variable", e);
-		}
-
-		global = config.node("global").getBoolean(false);
-		announce = config.node("announce").getBoolean(true);
-		if (!hosts.isEmpty()) {
-			Set<String> loweredHosts = new HashSet<>(hosts.size());
-			for (String host : hosts)
-				loweredHosts.add(host.toLowerCase(Locale.ROOT));
-			hosts = Collections.unmodifiableSet(loweredHosts);
-		}
-		isServer = !config.node("legacy").getBoolean(false);
-		int port = config.node("port").getInt(DEFAULT_PORT);
-		if (isServer) {
-			getLogger().info("Running Crowd Control in server mode");
-			String password;
-			if (manualPassword != null)
-				password = manualPassword;
-			else {
-				password = config.node("password").getString("crowdcontrol");
-				if (password == null || password.isEmpty()) {
-					logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowd-control.conf or set a temporary password using the /password command.");
-					return;
-				}
-			}
-			crowdControl = CrowdControl.server().port(port).password(password).build();
-		} else {
-			getLogger().info("Running Crowd Control in legacy client mode");
-			String ip = config.node("ip").getString("127.0.0.1");
-			if (ip == null || ip.isEmpty()) {
-				logger.error("No IP address has been set in the plugin's config file. Please set one by editing config/crowd-control.conf");
-				return;
-			}
-			crowdControl = CrowdControl.client().port(port).ip(ip).build();
-		}
-
-		register.register();
-		postInitCrowdControl(crowdControl);
-	}
-
 	@Listener
 	public void onServerStart(StartingEngineEvent<Server> event) {
+		CommandConstants.SOUND_VALIDATOR = key -> game.registry(RegistryTypes.SOUND_TYPE).findEntry(ResourceKey.resolve(key.asString())).isPresent();
 		syncScheduler = game.server().scheduler();
 		asyncScheduler = game.asyncScheduler();
 		syncExecutor = syncScheduler.executor(pluginContainer);
 		asyncExecutor = asyncScheduler.executor(pluginContainer);
-		if (!configPath.toFile().exists()) {
-			// read the default config
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("default.conf");
-			if (inputStream == null)
-				throw new IllegalStateException("Could not find default config file; please report to qixils");
-			// copy the default config to the config path
-			try {
-				Files.copy(inputStream, configPath);
-			} catch (IOException e) {
-				throw new IllegalStateException("Could not copy default config file to " + configPath, e);
-			}
-		}
 		initCrowdControl();
 	}
 

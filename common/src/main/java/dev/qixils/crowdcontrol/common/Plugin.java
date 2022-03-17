@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -441,11 +442,24 @@ public interface Plugin<P, S> {
 	void registerCommand(@NotNull String name, @NotNull Command<P> command);
 
 	/**
+	 * Returns the object that manages the registering of effects/commands.
+	 * Not to be confused with the {@link #getCommandManager() chat command manager}.
+	 *
+	 * @return command registry manager
+	 */
+	@NotNull
+	AbstractCommandRegister<P, ?, ?> commandRegister();
+
+	/**
 	 * Returns an unmodifiable view of the registered {@link Command}s.
 	 *
 	 * @return unmodifiable view of registered {@link Command}s
+	 * @deprecated in favor of {@link #commandRegister()}
 	 */
-	Collection<Command<P>> registeredCommands();
+	@Deprecated
+	default Collection<Command<P>> registeredCommands() {
+		return Collections.unmodifiableCollection(commandRegister().getCommands());
+	}
 
 	/**
 	 * Gets the {@link CrowdControl} instance.

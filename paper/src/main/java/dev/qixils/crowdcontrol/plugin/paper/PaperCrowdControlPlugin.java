@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -68,7 +67,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	String manualPassword = null; // set via /password
 	@Getter
 	CrowdControl crowdControl = null;
-	List<Command> commands;
 	@Getter
 	private PaperCommandManager<CommandSender> commandManager;
 	@Getter
@@ -78,6 +76,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	private Collection<String> hosts = Collections.emptyList();
 	private boolean announce = true;
+	@Getter
+	@Accessors(fluent = true)
+	private final CommandRegister commandRegister = new CommandRegister(this);
 
 	@Override
 	public void onLoad() {
@@ -124,11 +125,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			crowdControl = CrowdControl.client().port(port).ip(ip).build();
 		}
 
-		if (commands == null)
-			commands = RegisterCommands.register(this);
-		else
-			RegisterCommands.register(this, commands);
-
+		commandRegister().register();
 		postInitCrowdControl(crowdControl);
 	}
 
@@ -181,7 +178,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			crowdControl.shutdown("Plugin is unloading (server may be shutting down)");
 			crowdControl = null;
 		}
-		commands = null;
 	}
 
 	public boolean announceEffects() {
@@ -193,11 +189,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		name = name.toLowerCase(Locale.ENGLISH);
 		crowdControl.registerHandler(name, command::executeAndNotify);
 		getLogger().fine("Registered CC command '" + name + "'");
-	}
-
-	@Override
-	public Collection<dev.qixils.crowdcontrol.common.Command<Player>> registeredCommands() {
-		return Collections.unmodifiableCollection(commands);
 	}
 
 	@Override

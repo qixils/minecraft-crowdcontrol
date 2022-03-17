@@ -1,9 +1,9 @@
-package dev.qixils.crowdcontrol.mojmap;
+package dev.qixils.crowdcontrol.plugin.mojmap;
 
-import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.platform.AudienceProvider;
@@ -11,24 +11,26 @@ import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
- * for managing Crowd Control server/client connections and handling {@link Command}s.
+ * for managing Crowd Control server/client connections and handling
+ * {@link dev.qixils.crowdcontrol.common.Command Commands}.
  */
 @Getter
 public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandSourceStack> {
 	private static final TextUtil EMPTY_TEXT_UTIL = new TextUtil(null);
-	private final CommandRegister register = new CommandRegister(this);
+	@Accessors(fluent = true)
+	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Nullable
 	protected MinecraftServer server;
 	@Nullable @Accessors(fluent = true)
@@ -42,6 +44,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)
 	private final EntityMapper<ServerPlayer> playerMapper = new PlayerEntityMapper(this);
+	private @MonotonicNonNull HoconConfigurationLoader configLoader;
 
 	protected MojmapPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
@@ -50,11 +53,6 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	@Override
 	public boolean supportsClientOnly() {
 		return true;
-	}
-
-	@Override
-	public Collection<dev.qixils.crowdcontrol.common.Command<ServerPlayer>> registeredCommands() {
-		return Collections.unmodifiableCollection(register.getCommands());
 	}
 
 	@NotNull
@@ -83,6 +81,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 			this.server = server;
 			this.adventure = initAdventure(server);
 			this.textUtil = new TextUtil(this.adventure.flattener());
+			this.configLoader = createConfigLoader(server.getFile("config"));
 		}
 	}
 }

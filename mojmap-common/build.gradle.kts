@@ -1,3 +1,5 @@
+val configurateVersion: String by project
+
 description = "Minecraft Crowd Control: Common Mixins for Mojang Mappings"
 
 plugins {
@@ -14,6 +16,6 @@ minecraft {
 }
 
 dependencies {
-    api(project(":common-platform"))
-    implementation("net.kyori:adventure-platform-api:4.1.0")
+    api(project(":configurate-common"))
+    api("net.kyori:adventure-platform-api:4.1.0")
 }

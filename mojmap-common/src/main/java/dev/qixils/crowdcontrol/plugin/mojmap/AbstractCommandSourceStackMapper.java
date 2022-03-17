@@ -1,4 +1,4 @@
-package dev.qixils.crowdcontrol.mojmap;
+package dev.qixils.crowdcontrol.plugin.mojmap;
 
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import net.minecraft.commands.CommandSourceStack;

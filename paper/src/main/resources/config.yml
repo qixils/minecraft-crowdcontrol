@@ -16,7 +16,7 @@ global: false
 #  UUIDs (formatted with or without dashes), Twitch usernames, and Twitch IDs.
 # Example:
 #hosts: ["MinecraftUsername1", "TwitchUsername2", "123456", "d1de9ca878f64aae87a18c112f675f12"]
-hosts: [ ]
+hosts: []
 
 # Determines whether to alert streamers in chat when an effect has been activated.
 announce: true

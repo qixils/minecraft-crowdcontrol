@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
+import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
@@ -11,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
@@ -21,16 +23,20 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
 
-public class RegisterCommands {
+public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdControlPlugin, Command> {
 	@SuppressWarnings("deprecation") // Bukkit is dumb
-	public static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
+	private static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
 			new MappedKeyedTag<>(CommandConstants.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
-	public static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
-	public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommandConstants.SET_FALLING_BLOCKS);
-	public static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommandConstants.GIVE_TAKE_ITEMS);
+	private static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
+	private static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommandConstants.SET_FALLING_BLOCKS);
+	private static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommandConstants.GIVE_TAKE_ITEMS);
 
-	public static List<Command> getCommands(PaperCrowdControlPlugin plugin) {
-		// register normal commands
+	protected CommandRegister(PaperCrowdControlPlugin plugin) {
+		super(plugin);
+	}
+
+	@Override
+	protected List<Command> createCommands() {
 		List<Command> commands = new ArrayList<>(Arrays.asList(
 				new VeinCommand(plugin),
 				new SoundCommand(plugin),
@@ -153,24 +159,14 @@ public class RegisterCommands {
 		return commands;
 	}
 
-	public static List<Command> register(PaperCrowdControlPlugin plugin) {
-		List<Command> commands = register(plugin, getCommands(plugin));
-		for (Command command : commands) {
-			if (command instanceof Listener listener)
-				Bukkit.getPluginManager().registerEvents(listener, plugin);
-		}
-		// register event handlers/managers
-		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
-		Bukkit.getPluginManager().registerEvents(new GamemodeCommand.Manager(plugin), plugin);
-		return commands;
+	@Override
+	protected void registerListener(Command command) {
+		Bukkit.getPluginManager().registerEvents((Listener) command, plugin);
 	}
 
-	public static List<Command> register(PaperCrowdControlPlugin plugin, List<Command> commands) {
-		for (Command cmd : commands) {
-			String name = cmd.getEffectName().toLowerCase(java.util.Locale.ENGLISH);
-			plugin.registerCommand(name, cmd);
-		}
-
-		return commands;
+	@Override
+	protected void onFirstRegistry() {
+		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
+		Bukkit.getPluginManager().registerEvents(new GamemodeCommand.Manager(plugin), plugin);
 	}
 }

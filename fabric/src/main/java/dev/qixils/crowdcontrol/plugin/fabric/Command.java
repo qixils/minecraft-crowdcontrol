@@ -14,7 +14,7 @@ import java.util.Random;
 
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
 
-public abstract class Command implements dev.qixils.crowdcontrol.mojmap.Command {
+public abstract class Command implements dev.qixils.crowdcontrol.common.Command<ServerPlayer> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final FabricCrowdControlPlugin plugin;
