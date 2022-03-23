@@ -27,7 +27,17 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
 public class RegisterCommands {
 	@SuppressWarnings("deprecation") // Bukkit is dumb
 	public static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
-			new MappedKeyedTag<>(CommandConstants.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
+			new MappedKeyedTag<>(CommandConstants.SAFE_ENTITIES, key -> {
+				EntityType entity = EntityType.fromName(key.value());
+				if (entity == null) {
+					try {
+						entity = EntityType.valueOf(key.value().toUpperCase(Locale.ENGLISH));
+					} catch (IllegalArgumentException e) {
+						return null;
+					}
+				}
+				return entity;
+			});
 	public static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
 	public static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommandConstants.SET_FALLING_BLOCKS);
 	public static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommandConstants.GIVE_TAKE_ITEMS);

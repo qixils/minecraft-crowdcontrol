@@ -197,8 +197,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public void registerCommand(@NotNull String name, dev.qixils.crowdcontrol.common.@NotNull Command<Player> command) {
 		name = name.toLowerCase(Locale.ENGLISH);
-		crowdControl.registerHandler(name, command::executeAndNotify);
-		getLogger().fine("Registered CC command '" + name + "'");
+		try {
+			crowdControl.registerHandler(name, command::executeAndNotify);
+			getLogger().fine("Registered CC command '" + name + "'");
+		} catch (IllegalArgumentException e) {
+			getSLF4JLogger().warn("Failed to register command: " + name, e);
+		}
 	}
 
 	@Override

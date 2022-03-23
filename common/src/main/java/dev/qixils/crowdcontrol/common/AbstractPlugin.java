@@ -57,7 +57,11 @@ public abstract class AbstractPlugin<P extends S, S> implements Plugin<P, S> {
 	@Override
 	public void registerCommand(@NotNull String name, @NotNull Command<P> command) {
 		name = name.toLowerCase(Locale.ENGLISH);
-		crowdControl.registerHandler(name, command::executeAndNotify);
-		getSLF4JLogger().debug("Registered CC command '" + name + "'");
+		try {
+			crowdControl.registerHandler(name, command::executeAndNotify);
+			getSLF4JLogger().debug("Registered CC command '" + name + "'");
+		} catch (IllegalArgumentException e) {
+			getSLF4JLogger().warn("Failed to register command: " + name, e);
+		}
 	}
 }
