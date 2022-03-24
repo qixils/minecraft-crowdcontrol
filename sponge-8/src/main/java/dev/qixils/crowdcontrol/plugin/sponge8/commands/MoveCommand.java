@@ -44,6 +44,7 @@ public final class MoveCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		if (vector.y() > 0.0 && TimedEffect.isActive("disable_jumping", request.getTargets()))
+			// TODO: why not just have a collection of users being affected which Disable Jumping can check against?
 			return request.buildResponse().type(ResultType.RETRY).message("Effect cannot be used while Disable Jumping is active");
 
 		Response.Builder response = request.buildResponse().type(ResultType.RETRY).message("All players were grounded");
