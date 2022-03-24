@@ -1,16 +1,15 @@
-package dev.qixils.crowdcontrol.plugin.sponge8.commands;
+package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
-import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +22,7 @@ public class SwapCommand extends ImmediateCommand {
 	private final String effectName = "swap";
 	private final String displayName = "Swap Locations";
 
-	public SwapCommand(SpongeCrowdControlPlugin plugin) {
+	public SwapCommand(MojmapPlugin plugin) {
 		super(plugin);
 	}
 
@@ -40,11 +39,21 @@ public class SwapCommand extends ImmediateCommand {
 		offset.addAll(players.subList(1, players.size()));
 		offset.add(players.get(0));
 		// get teleport destinations
-		Map<ServerPlayer, ServerLocation> destinations = new HashMap<>(players.size());
+		Map<ServerPlayer, Location> destinations = new HashMap<>(players.size());
 		for (int i = 0; i < players.size(); i++)
-			destinations.put(players.get(i), offset.get(i).serverLocation());
+			destinations.put(players.get(i), new Location(offset.get(i)));
 		// teleport
-		sync(() -> destinations.forEach(Entity::setLocation));
+		sync(() -> destinations.forEach((player, location) -> location.setLocation(player)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
+
+	private record Location(ServerLevel level, double x, double y, double z, float yaw, float pitch) {
+		public Location(ServerPlayer player) {
+			this(player.getLevel(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+		}
+
+		public void setLocation(ServerPlayer player) {
+			player.teleportTo(level, x, y, z, yaw, pitch);
+		}
 	}
 }

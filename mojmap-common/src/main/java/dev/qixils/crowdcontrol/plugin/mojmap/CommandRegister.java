@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new VeinCommand(plugin),
 				new SoundCommand(plugin),
 //				new ChargedCreeperCommand(plugin),
-//				new SwapCommand(plugin),
+				new SwapCommand(plugin),
 //				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin),
 //				new LootboxCommand(plugin, "Open Lootbox", 0),
