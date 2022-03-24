@@ -63,10 +63,6 @@ public final class FabricCrowdControlPlugin extends MojmapPlugin implements ModI
 
 	// boilerplate
 
-	public @NotNull FabricServerAudiences adventure() {
-		return (FabricServerAudiences) super.adventure();
-	}
-
 	@Override
 	protected @NotNull AudienceProvider initAdventure(@NotNull MinecraftServer server) {
 		return FabricServerAudiences.of(server);

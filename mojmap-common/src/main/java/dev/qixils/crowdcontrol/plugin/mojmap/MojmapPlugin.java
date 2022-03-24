@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.mojmap;
 
+import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
@@ -10,6 +11,8 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.platform.AudienceProvider;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -36,7 +39,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	@Nullable
 	protected MinecraftServer server;
 	@Nullable @Accessors(fluent = true)
-	protected AudienceProvider adventure;
+	protected WrappedAudienceProvider adventure;
 	@NotNull
 	private TextUtil textUtil = EMPTY_TEXT_UTIL;
 	// TODO is this actually the sync executor?? 'Main' sounds sync but 'background' doesn't
@@ -50,6 +53,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 
 	protected MojmapPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
+		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 	}
 
 	public abstract boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request);
@@ -67,7 +71,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	}
 
 	@NotNull
-	public AudienceProvider adventure() throws IllegalStateException {
+	public WrappedAudienceProvider adventure() throws IllegalStateException {
 		if (this.adventure == null)
 			throw new IllegalStateException("Tried to access Adventure without running a server");
 		return this.adventure;
@@ -83,7 +87,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 			this.textUtil = EMPTY_TEXT_UTIL;
 		} else {
 			this.server = server;
-			this.adventure = initAdventure(server);
+			this.adventure = new WrappedAudienceProvider(initAdventure(server));
 			this.textUtil = new TextUtil(this.adventure.flattener());
 			this.configLoader = createConfigLoader(server.getFile("config"));
 		}
