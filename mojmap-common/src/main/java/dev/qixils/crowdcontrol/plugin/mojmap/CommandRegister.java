@@ -37,8 +37,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new FreezeCommand(plugin),
 //				new CameraLockCommand(plugin),
 //				new FlowerCommand(plugin),
-//				new MoveCommand(plugin, 0, 1, 0, "Up"),
-//				new MoveCommand(plugin, 0, -2, 0, "Down"),
+				new MoveCommand(plugin, 0, 1, 0, "Up"),
+				new MoveCommand(plugin, 0, -2, 0, "Down"),
 				// begin: deprecated effects
 				new MoveCommand(plugin, 2, 0.2, 0, "xplus", "East"),
 				new MoveCommand(plugin, -2, 0.2, 0, "xminus", "West"),
