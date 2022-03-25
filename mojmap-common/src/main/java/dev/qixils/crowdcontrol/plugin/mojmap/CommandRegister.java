@@ -2,10 +2,12 @@ package dev.qixils.crowdcontrol.plugin.mojmap;
 
 import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.ClearInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DeleteItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
@@ -84,9 +86,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new CameraLockToSkyCommand(plugin),
 //				new CameraLockToGroundCommand(plugin),
 //				new FlightCommand(plugin),
-//				new KeepInventoryCommand(plugin, true),
-//				new KeepInventoryCommand(plugin, false),
-//				new ClearInventoryCommand(plugin),
+				new KeepInventoryCommand(plugin, true),
+				new KeepInventoryCommand(plugin, false),
+				new ClearInventoryCommand(plugin),
 //				new PlantTreeCommand(plugin),
 //				new DoOrDieCommand(plugin),
 //				new ExplodeCommand(plugin),

@@ -4,6 +4,7 @@
   "package": "dev.qixils.crowdcontrol.plugin.mojmap.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "InventoryAccessor"
   ],
   "client": [
   ],

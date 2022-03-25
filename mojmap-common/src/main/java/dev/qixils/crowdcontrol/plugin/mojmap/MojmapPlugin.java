@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+// TODO: implement soft lock resolver
+
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
  * for managing Crowd Control server/client connections and handling
