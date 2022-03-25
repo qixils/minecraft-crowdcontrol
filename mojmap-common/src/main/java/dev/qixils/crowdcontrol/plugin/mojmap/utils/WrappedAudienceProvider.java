@@ -1,4 +1,4 @@
-package dev.qixils.crowdcontrol.plugin.mojmap;
+package dev.qixils.crowdcontrol.plugin.mojmap.utils;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;

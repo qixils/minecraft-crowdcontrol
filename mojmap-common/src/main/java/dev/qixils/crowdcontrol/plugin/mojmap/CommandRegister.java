@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new LootboxCommand(plugin, "Open Lootbox", 0),
 //				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
 //				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
-//				new TeleportCommand(plugin),
+				new TeleportCommand(plugin),
 //				new ToastCommand(plugin),
 //				new FreezeCommand(plugin),
 //				new CameraLockCommand(plugin),

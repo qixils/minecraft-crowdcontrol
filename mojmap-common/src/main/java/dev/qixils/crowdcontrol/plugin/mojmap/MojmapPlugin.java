@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.WrappedAudienceProvider;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.experimental.Accessors;

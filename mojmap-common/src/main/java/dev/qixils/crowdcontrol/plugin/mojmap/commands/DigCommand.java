@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.Location;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -47,7 +47,7 @@ public class DigCommand extends ImmediateCommand {
 
 		sync(() -> {
 			for (Location location : locations)
-				location.setBlock(Blocks.AIR.defaultBlockState());
+				location.block(Blocks.AIR.defaultBlockState());
 		});
 
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

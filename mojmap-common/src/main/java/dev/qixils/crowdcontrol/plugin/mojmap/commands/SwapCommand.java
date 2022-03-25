@@ -2,8 +2,8 @@ package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.Location;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -43,7 +43,7 @@ public class SwapCommand extends ImmediateCommand {
 		for (int i = 0; i < players.size(); i++)
 			destinations.put(players.get(i), new Location(offset.get(i)));
 		// teleport
-		sync(() -> destinations.forEach((player, location) -> location.setLocation(player)));
+		sync(() -> destinations.forEach((player, location) -> location.teleportHere(player)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }
