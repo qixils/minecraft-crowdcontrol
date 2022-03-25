@@ -1,14 +1,14 @@
-package dev.qixils.crowdcontrol.plugin.sponge8.commands;
+package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
-import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class DeleteItemCommand extends ImmediateCommand {
 	private final String effectName = "delete_item";
 	private final String displayName = "Delete Held Item";
 
-	public DeleteItemCommand(SpongeCrowdControlPlugin plugin) {
+	public DeleteItemCommand(MojmapPlugin plugin) {
 		super(plugin);
 	}
 
@@ -28,11 +28,11 @@ public class DeleteItemCommand extends ImmediateCommand {
 				.type(Response.ResultType.RETRY)
 				.message("No players were holding items");
 		for (ServerPlayer player : players) {
-			for (HandType hand : plugin.registryIterable(RegistryTypes.HAND_TYPE)) {
-				if (player.itemInHand(hand).isEmpty())
+			for (InteractionHand hand : InteractionHand.values()) {
+				if (player.getItemInHand(hand).isEmpty())
 					continue;
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.setItemInHand(hand, null));
+				sync(() -> player.setItemInHand(hand, ItemStack.EMPTY));
 				break;
 			}
 		}

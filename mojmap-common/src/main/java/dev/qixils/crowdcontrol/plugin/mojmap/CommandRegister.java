@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.mojmap;
 
 import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.DeleteItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
@@ -55,8 +56,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new RemoveEnchantsCommand(plugin),
 //				new HatCommand(plugin),
 //				new RespawnCommand(plugin),
-				new DropItemCommand(plugin)
-//				new DeleteItemCommand(plugin),
+				new DropItemCommand(plugin),
+				new DeleteItemCommand(plugin)
 //				new BucketClutchCommand(plugin),
 //				new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
 //				new DamageCommand(plugin, "damage_1", "Damage Players (1 Heart)", 2f),
