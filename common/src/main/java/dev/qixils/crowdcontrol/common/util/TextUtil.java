@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.common.util;
 
-import lombok.Getter;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
@@ -14,22 +12,22 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Utility class for working with Kyori Adventure objects.
  */
-@Getter
-public class TextUtil {
-	private final @Nullable ComponentFlattener flattener;
-	private final @NotNull PlainTextComponentSerializer serializer;
+public interface TextUtil {
 
 	/**
-	 * Creates a new TextUtil given a {@link ComponentFlattener}.
+	 * Gets the {@link ComponentFlattener} instance.
+	 * May be null if unsupported by the platform or if the server has not yet been initialized.
 	 *
-	 * @param flattener component flattener
+	 * @return flattener
 	 */
-	public TextUtil(@Nullable ComponentFlattener flattener) {
-		this.flattener = flattener;
-		this.serializer = flattener == null
-				? PlainTextComponentSerializer.plainText() // uses impl's default flattener
-				: PlainTextComponentSerializer.builder().flattener(flattener).build();
-	}
+	@Nullable ComponentFlattener flattener();
+
+	/**
+	 * Gets the {@link PlainTextComponentSerializer} instance.
+	 *
+	 * @return serializer
+	 */
+	@NotNull PlainTextComponentSerializer serializer();
 
 	/**
 	 * Converts a component to plain text.
@@ -38,8 +36,8 @@ public class TextUtil {
 	 * @return converted text
 	 */
 	@NotNull
-	public String asPlain(@NotNull ComponentLike component) {
-		return serializer.serialize(component.asComponent());
+	default String asPlain(@NotNull ComponentLike component) {
+		return serializer().serialize(component.asComponent());
 	}
 
 	/**
@@ -49,7 +47,7 @@ public class TextUtil {
 	 * @return translated string
 	 */
 	@NotNull
-	public String translate(@NotNull Translatable translatable) {
+	default String translate(@NotNull Translatable translatable) {
 		return asPlain(Component.translatable(translatable));
 	}
 
@@ -61,7 +59,7 @@ public class TextUtil {
 	 * @return converted text
 	 */
 	@Contract("null -> null; !null -> !null")
-	public static String titleCase(@Nullable String text) {
+	static String titleCase(@Nullable String text) {
 		// borrowed from https://www.baeldung.com/java-string-title-case
 		if (text == null || text.isEmpty()) {
 			return text;
@@ -94,7 +92,7 @@ public class TextUtil {
 	 * @return converted text
 	 */
 	@Contract("null -> null; !null -> !null")
-	public static String titleCase(@Nullable Enum<?> enm) {
+	static String titleCase(@Nullable Enum<?> enm) {
 		if (enm == null) return null;
 		return titleCase(enm.name());
 	}

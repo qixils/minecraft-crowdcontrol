@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -57,7 +57,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
 	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
 	@Getter
-	private final TextUtil textUtil = new TextUtil(Bukkit.getUnsafe().componentFlattener());
+	private final TextUtilImpl textUtil = new TextUtilImpl(Bukkit.getUnsafe().componentFlattener());
 	@Getter
 	private final Class<Player> playerClass = Player.class;
 	@Getter

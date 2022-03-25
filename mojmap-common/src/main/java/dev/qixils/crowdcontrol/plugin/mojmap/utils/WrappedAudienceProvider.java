@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.mojmap.utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.AudienceProvider;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -11,10 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public final class WrappedAudienceProvider implements AudienceProvider {
+public abstract class WrappedAudienceProvider implements AudienceProvider {
 	private final AudienceProvider provider;
 
-	public WrappedAudienceProvider(final AudienceProvider provider) {
+	protected WrappedAudienceProvider(final AudienceProvider provider) {
 		this.provider = provider;
 	}
 
@@ -79,4 +80,26 @@ public final class WrappedAudienceProvider implements AudienceProvider {
 		ResourceLocation key = world.dimension().location();
 		return world(Key.key(key.getNamespace(), key.getPath()));
 	}
+
+	// kyori <-> native methods
+
+	/**
+	 * Get a native {@link net.minecraft.network.chat.Component} from an adventure {@link Component}.
+	 *
+	 * <p>The specific type of the returned component is undefined. For example, it may be a wrapper object.</p>
+	 *
+	 * @param adventure adventure input
+	 * @return native representation
+	 * @since 4.0.0
+	 */
+	public abstract net.minecraft.network.chat.@NotNull Component toNative(final @NotNull Component adventure);
+
+	/**
+	 * Get an adventure {@link Component} from a native {@link net.minecraft.network.chat.Component}.
+	 *
+	 * @param vanilla the native component
+	 * @return adventure component
+	 * @since 4.0.0
+	 */
+	public abstract @NotNull Component toAdventure(final net.minecraft.network.chat.@NotNull Component vanilla);
 }

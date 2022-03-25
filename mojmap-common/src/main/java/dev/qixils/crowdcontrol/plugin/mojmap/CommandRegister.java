@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.ClearInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DeleteItemCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.DifficultyCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
@@ -14,6 +15,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Difficulty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,8 +105,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //		}
 
 		// register difficulty commands
-//		plugin.getGame().registry(RegistryTypes.DIFFICULTY).stream().forEach(
-//				difficulty -> commands.add(new DifficultyCommand(plugin, difficulty)));
+		for (Difficulty difficulty : Difficulty.values()) {
+			commands.add(new DifficultyCommand(plugin, difficulty));
+		}
 
 		// potions
 //		plugin.getGame().registry(RegistryTypes.POTION_EFFECT_TYPE).stream().forEach(

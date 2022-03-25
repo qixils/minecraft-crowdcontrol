@@ -34,7 +34,8 @@ public class DifficultyCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Builder response = request.buildResponse().type(ResultType.FAILURE)
+		Builder response = request.buildResponse()
+				.type(ResultType.FAILURE)
 				.message("Server difficulty is already on " + displayName);
 
 		for (ServerWorld world : plugin.getGame().server().worldManager().worlds()) {

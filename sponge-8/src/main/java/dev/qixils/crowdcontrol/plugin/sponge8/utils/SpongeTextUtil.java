@@ -1,13 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.utils;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
-public class SpongeTextUtil extends TextUtil {
+public class SpongeTextUtil extends TextUtilImpl {
 
 	/**
 	 * Creates a new {@link SpongeTextUtil}.

@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.utils;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import net.kyori.adventure.translation.Translatable;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.CatalogType;
@@ -8,7 +8,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.text.translation.Translation;
 
-public class SpongeTextUtil extends TextUtil {
+public class SpongeTextUtil extends TextUtilImpl {
 	public SpongeTextUtil() {
 		super(null);
 	}

@@ -8,7 +8,6 @@ import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
 import lombok.Getter;
@@ -73,7 +72,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private final Logger logger = LoggerFactory.getLogger("crowd-control");
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
-	private final TextUtil textUtil = new SpongeTextUtil();
+	private final SpongeTextUtil textUtil = new SpongeTextUtil();
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper();

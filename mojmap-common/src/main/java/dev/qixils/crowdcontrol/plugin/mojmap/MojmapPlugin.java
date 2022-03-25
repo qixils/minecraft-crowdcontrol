@@ -3,13 +3,12 @@ package dev.qixils.crowdcontrol.plugin.mojmap;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.WrappedAudienceProvider;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import net.kyori.adventure.platform.AudienceProvider;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Registry;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,7 +36,6 @@ import java.util.concurrent.Executors;
  */
 @Getter
 public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandSourceStack> {
-	private static final TextUtil EMPTY_TEXT_UTIL = new TextUtil(null);
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Nullable
@@ -44,7 +43,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	@Nullable @Accessors(fluent = true)
 	protected WrappedAudienceProvider adventure;
 	@NotNull
-	private TextUtil textUtil = EMPTY_TEXT_UTIL;
+	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
 	// TODO is this actually the sync executor?? 'Main' sounds sync but 'background' doesn't
 	private final ExecutorService syncExecutor = Util.backgroundExecutor();
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
@@ -81,17 +80,21 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	}
 
 	@NotNull
-	protected abstract AudienceProvider initAdventure(@NotNull MinecraftServer server);
+	public Optional<WrappedAudienceProvider> adventureOptional() {
+		return Optional.ofNullable(this.adventure);
+	}
+
+	@NotNull
+	protected abstract WrappedAudienceProvider initAdventure(@NotNull MinecraftServer server);
 
 	protected void setServer(@Nullable MinecraftServer server) {
 		if (server == null) {
 			this.server = null;
 			this.adventure = null;
-			this.textUtil = EMPTY_TEXT_UTIL;
 		} else {
 			this.server = server;
-			this.adventure = new WrappedAudienceProvider(initAdventure(server));
-			this.textUtil = new TextUtil(this.adventure.flattener());
+			this.adventure = initAdventure(server);
+			this.textUtil = new MojmapTextUtil(this);
 			this.configLoader = createConfigLoader(server.getFile("config"));
 		}
 	}

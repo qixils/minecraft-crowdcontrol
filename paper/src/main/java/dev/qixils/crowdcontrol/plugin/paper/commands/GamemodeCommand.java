@@ -47,7 +47,7 @@ public class GamemodeCommand extends TimedCommand {
 		return player.getPersistentDataContainer().getOrDefault(key, PaperCrowdControlPlugin.BOOLEAN_TYPE, false);
 	}
 
-	public static boolean isEffectActive(Plugin plugin, Entity player) {
+	public static boolean isEffectActive(@Nullable Plugin plugin, Entity player) {
 		if (plugin == null) return false;
 		return isEffectActive(getGamemodeKey(plugin), player);
 	}
