@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.mojmap;
 
 import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
@@ -47,7 +48,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new TorchCommand(plugin, true),
 //				new TorchCommand(plugin, false),
 //				new GravelCommand(plugin),
-//				new DigCommand(plugin),
+				new DigCommand(plugin),
 //				new TimeCommand(plugin),
 //				new ItemRepairCommand(plugin),
 //				new ItemDamageCommand(plugin),

@@ -2,12 +2,12 @@ package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.Location;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,15 +45,5 @@ public class SwapCommand extends ImmediateCommand {
 		// teleport
 		sync(() -> destinations.forEach((player, location) -> location.setLocation(player)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
-	}
-
-	private record Location(ServerLevel level, double x, double y, double z, float yaw, float pitch) {
-		public Location(ServerPlayer player) {
-			this(player.getLevel(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
-		}
-
-		public void setLocation(ServerPlayer player) {
-			player.teleportTo(level, x, y, z, yaw, pitch);
-		}
 	}
 }
