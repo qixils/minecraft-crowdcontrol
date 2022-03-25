@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -451,17 +450,6 @@ public interface Plugin<P, S> {
 	AbstractCommandRegister<P, ?, ?> commandRegister();
 
 	/**
-	 * Returns an unmodifiable view of the registered {@link Command}s.
-	 *
-	 * @return unmodifiable view of registered {@link Command}s
-	 * @deprecated in favor of {@link #commandRegister()}
-	 */
-	@Deprecated
-	default Collection<Command<P>> registeredCommands() {
-		return Collections.unmodifiableCollection(commandRegister().getCommands());
-	}
-
-	/**
 	 * Gets the {@link CrowdControl} instance.
 	 *
 	 * @return crowd control instance
@@ -487,7 +475,7 @@ public interface Plugin<P, S> {
 				.message("_mc_cc_server_status_" + new ServerStatus(
 						globalEffectsUsable(),
 						supportsClientOnly(),
-						registeredCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
+						commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
 				).toJSON())
 				.build().send();
 	}
