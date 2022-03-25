@@ -34,7 +34,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			if (KeepInventoryCommand.isKeepingInventory(player)) continue;
 			Inventory inv = player.getInventory();
 			// ensure inventory is not empty
-			if (((InventoryAccessor)inv).compartments().stream().anyMatch(
+			if (((InventoryAccessor)inv).getCompartments().stream().anyMatch(
 					compartment -> compartment.stream().allMatch(ItemStack::isEmpty)))
 				continue;
 			// clear inventory

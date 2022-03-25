@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
 
-@SuppressWarnings({"MixinAnnotationTarget", "UnusedMixin"})
+@SuppressWarnings("UnusedMixin")
 @Mixin(Inventory.class)
 public interface InventoryAccessor {
 	@Accessor
-	List<NonNullList<ItemStack>> compartments();
+	List<NonNullList<ItemStack>> getCompartments();
 }
