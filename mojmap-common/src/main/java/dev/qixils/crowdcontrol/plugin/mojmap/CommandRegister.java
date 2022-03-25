@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
@@ -15,6 +16,9 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
+import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, MojmapPlugin, Command<ServerPlayer>> {
 	public CommandRegister(MojmapPlugin plugin) {
@@ -58,7 +62,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new HatCommand(plugin),
 //				new RespawnCommand(plugin),
 				new DropItemCommand(plugin),
-				new DeleteItemCommand(plugin)
+				new DeleteItemCommand(plugin),
 //				new BucketClutchCommand(plugin),
 //				new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
 //				new DamageCommand(plugin, "damage_1", "Damage Players (1 Heart)", 2f),
@@ -86,8 +90,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new PlantTreeCommand(plugin),
 //				new DoOrDieCommand(plugin),
 //				new ExplodeCommand(plugin),
-//				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
-//				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
+				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
+				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
 		));
 
 		// entity commands
