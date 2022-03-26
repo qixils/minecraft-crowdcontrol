@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
@@ -160,7 +161,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 
 		// give/take items
 		for (Item item : giveTakeItems) {
-//			commands.add(new GiveItemCommand(plugin, item));
+			commands.add(new GiveItemCommand(plugin, item));
 			commands.add(new TakeItemCommand(plugin, item));
 		}
 
