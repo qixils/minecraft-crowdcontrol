@@ -9,15 +9,18 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.ClearInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DeleteItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DifficultyCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.DinnerboneCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.SummonEntityCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.TakeItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
@@ -68,11 +71,11 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new SoundCommand(plugin),
 //				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
-//				new DinnerboneCommand(plugin),
+				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin),
-//				new LootboxCommand(plugin, "Open Lootbox", 0),
-//				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
-//				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
+				new LootboxCommand(plugin, "Open Lootbox", 0),
+				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
+				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
 				new TeleportCommand(plugin),
 //				new ToastCommand(plugin),
 //				new FreezeCommand(plugin),
@@ -135,7 +138,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 
 		// entity commands
 		for (EntityType<?> entity : safeEntities) {
-//			commands.add(new SummonEntityCommand(plugin, entity));
+			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}
 

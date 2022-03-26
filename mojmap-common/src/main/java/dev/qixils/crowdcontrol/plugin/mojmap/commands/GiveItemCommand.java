@@ -6,10 +6,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.core.Registry;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -35,11 +32,11 @@ public class GiveItemCommand extends ImmediateCommand {
 
 	@Blocking
 	public static void giveItemTo(MojmapPlugin plugin, Player player, ItemStack itemStack) {
-		// TODO make sure the item stack and creator is set
-		//    if it isn't then i probably need to #create instead of #spawn
-		ItemEntity entity = (ItemEntity) EntityType.ITEM.spawn((ServerLevel) player.level, itemStack, player, player.blockPosition(), MobSpawnType.COMMAND, false, false);
+		ItemEntity entity = player.spawnAtLocation(itemStack);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn item entity");
+		entity.setOwner(player.getUUID());
+		entity.setThrower(player.getUUID());
 		entity.setPickUpDelay(0);
 	}
 

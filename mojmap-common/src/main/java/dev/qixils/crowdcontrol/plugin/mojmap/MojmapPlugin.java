@@ -12,9 +12,14 @@ import lombok.experimental.Accessors;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +41,10 @@ import java.util.concurrent.Executors;
  */
 @Getter
 public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandSourceStack> {
+	// accessors
+	public static final EntityDataAccessor<Optional<Component>> ORIGINAL_DISPLAY_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
+	public static final EntityDataAccessor<Boolean> VIEWER_SPAWNED = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+	// variables
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Nullable
