@@ -15,6 +15,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.RemoveEntityCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
@@ -133,10 +134,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 		));
 
 		// entity commands
-//		for (EntityType<?> entity : safeEntities) {
+		for (EntityType<?> entity : safeEntities) {
 //			commands.add(new SummonEntityCommand(plugin, entity));
-//			commands.add(new RemoveEntityCommand(plugin, entity));
-//		}
+			commands.add(new RemoveEntityCommand(plugin, entity));
+		}
 
 		// register difficulty commands
 		for (Difficulty difficulty : Difficulty.values())
