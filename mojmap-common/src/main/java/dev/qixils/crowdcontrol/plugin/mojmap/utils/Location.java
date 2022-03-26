@@ -21,6 +21,10 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 		this(level, x, y, z, 0, 0);
 	}
 
+	public Location(ServerLevel level, BlockPos pos, float yaw, float pitch) {
+		this(level, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch);
+	}
+
 	public Location(ServerLevel level, BlockPos pos) {
 		this(level, pos.getX(), pos.getY(), pos.getZ());
 	}
@@ -51,6 +55,12 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	@Contract("-> new")
 	public Location atVertCeil() {
 		return new Location(level, x, Math.ceil(y), z, yaw, pitch);
+	}
+
+	@CheckReturnValue
+	@Contract("_ -> new")
+	public Location at(BlockPos pos) {
+		return new Location(level, pos, yaw, pitch);
 	}
 
 	public BlockState block() {

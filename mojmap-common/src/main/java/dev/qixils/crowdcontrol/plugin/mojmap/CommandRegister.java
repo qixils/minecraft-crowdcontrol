@@ -2,11 +2,15 @@ package dev.qixils.crowdcontrol.plugin.mojmap;
 
 import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
+import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.BlockCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.ClearInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DeleteItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DifficultyCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
@@ -15,23 +19,47 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.WeatherCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.TypedTag;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, MojmapPlugin, Command<ServerPlayer>> {
+	private boolean tagsRegistered = false;
+	private Set<EntityType<?>> safeEntities;
+	private MappedKeyedTag<Block> setBlocks;
+	private MappedKeyedTag<Block> setFallingBlocks;
+	private MappedKeyedTag<Item> giveTakeItems;
+
 	public CommandRegister(MojmapPlugin plugin) {
 		super(plugin);
 	}
 
+	private void registerTags() {
+		if (!tagsRegistered) {
+			tagsRegistered = true;
+			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, Registry.ENTITY_TYPE).getAll());
+			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, Registry.BLOCK);
+			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, Registry.BLOCK);
+			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, Registry.ITEM);
+		}
+	}
+
 	@Override
 	protected List<Command<ServerPlayer>> createCommands() {
+		registerTags();
 		List<Command<ServerPlayer>> commands = new ArrayList<>(Arrays.asList(
 //				new VeinCommand(plugin),
 				new SoundCommand(plugin),
@@ -117,13 +145,13 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				potionEffectType -> commands.add(new PotionCommand(plugin, potionEffectType)));
 
 		// block sets
-//		for (BlockType block : setBlocks) {
-//			commands.add(new BlockCommand(plugin, block));
-//		}
+		for (Block block : setBlocks) {
+			commands.add(new BlockCommand(plugin, block));
+		}
 
-//		for (BlockType block : setFallingBlocks) {
-//			commands.add(new FallingBlockCommand(plugin, block));
-//		}
+		for (Block block : setFallingBlocks) {
+			commands.add(new FallingBlockCommand(plugin, block));
+		}
 
 		// enchantments
 //		plugin.getGame().registry(RegistryTypes.ENCHANTMENT_TYPE).stream().forEach(

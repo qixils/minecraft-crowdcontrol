@@ -28,8 +28,8 @@ public class FallingBlockCommand extends BlockCommand {
 		World world = playerLoc.getWorld();
 		destination.setY(Math.min(
 				destination.getY() + FALLING_BLOCK_FALL_DISTANCE,
-				world.getMaxHeight() - 1)
-		);
+				world.getMaxHeight() - 1
+		));
 		// the below for loop does not use <= because the main execute method performs its own
 		// checks
 		for (int y = playerLoc.getBlockY(); y < destination.getBlockY(); y++) {

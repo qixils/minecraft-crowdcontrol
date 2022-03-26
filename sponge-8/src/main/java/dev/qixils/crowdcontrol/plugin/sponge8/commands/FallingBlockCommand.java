@@ -13,7 +13,6 @@ import org.spongepowered.math.vector.Vector3i;
 import static dev.qixils.crowdcontrol.common.CommandConstants.FALLING_BLOCK_FALL_DISTANCE;
 
 public class FallingBlockCommand extends BlockCommand {
-
 	public FallingBlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType) {
 		super(
 				plugin,
@@ -31,7 +30,7 @@ public class FallingBlockCommand extends BlockCommand {
 				playerLoc.x(),
 				Math.min(
 						playerLoc.y() + FALLING_BLOCK_FALL_DISTANCE,
-						world.maximumHeight()
+						world.maximumHeight() - 1
 				),
 				playerLoc.z()
 		);
