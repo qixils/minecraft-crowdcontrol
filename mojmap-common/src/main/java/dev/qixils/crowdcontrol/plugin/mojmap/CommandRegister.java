@@ -17,6 +17,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.TakeItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.WeatherCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.TypedTag;
@@ -158,10 +159,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				enchantmentType -> commands.add(new EnchantmentCommand(plugin, enchantmentType)));
 
 		// give/take items
-//		for (ItemType item : giveTakeItems) {
+		for (Item item : giveTakeItems) {
 //			commands.add(new GiveItemCommand(plugin, item));
-//			commands.add(new TakeItemCommand(plugin, item));
-//		}
+			commands.add(new TakeItemCommand(plugin, item));
+		}
 
 		// gamemode commands
 //		plugin.getGame().registry(RegistryTypes.GAME_MODE).stream()
