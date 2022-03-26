@@ -184,9 +184,11 @@ public class LootboxCommand extends ImmediateCommand {
 			attributes = Math.max(attributes, RandomUtil.weightedRandom(AttributeWeights.values(), AttributeWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		// add attributes
-		if (attributes > 0
-				&& itemStack.getMaxDamage() <= 1 // TODO: add default attributes to items and remove this
-		) {
+		if (attributes > 0) {
+			// get equipment slot(s)
+			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getSlot() : null;
+			EquipmentSlot[] equipmentSlots = equipmentSlot == null ? new EquipmentSlot[]{MAINHAND, OFFHAND} : new EquipmentSlot[]{equipmentSlot};
+			// add custom attributes
 			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
@@ -199,16 +201,18 @@ public class LootboxCommand extends ImmediateCommand {
 				}
 				// create & add attribute
 				AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name, amount, Operation.ADDITION);
-				EquipmentSlot equipmentType = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getSlot() : null;
-				if (equipmentType == null) {
-					itemStack.addAttributeModifier(attribute, attributeModifier, MAINHAND);
-					itemStack.addAttributeModifier(attribute, attributeModifier, OFFHAND);
-				} else
-					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentType);
+				for (EquipmentSlot type : equipmentSlots)
+					itemStack.addAttributeModifier(attribute, attributeModifier, type);
+			}
+			// add default attributes
+			for (EquipmentSlot type : equipmentSlots) {
+				itemStack.getItem().getDefaultAttributeModifiers(type)
+						.forEach((attribute, modifiers) -> itemStack.addAttributeModifier(attribute, modifiers, type));
 			}
 		}
 	}
 
+	// lore getter
 	private static List<Component> getLore(ItemStack itemStack) {
 		final CompoundTag displayTag = itemStack.getTag();
 		if (displayTag == null || !displayTag.contains("display"))
@@ -218,6 +222,7 @@ public class LootboxCommand extends ImmediateCommand {
 		return list.isEmpty() ? new ArrayList<>() : list.stream().map(tag -> Component.Serializer.fromJson(tag.getAsString())).collect(Collectors.toList());
 	}
 
+	// lore setter
 	private static void setLore(ItemStack itemStack, List<Component> lore) {
 		if (lore.isEmpty()) {
 			final CompoundTag tag = itemStack.getTag();
@@ -233,6 +238,7 @@ public class LootboxCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		for (ServerPlayer player : players) {
+			// init container
 			SimpleContainer container = new SimpleContainer(27);
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
 				ItemStack itemStack = createRandomItem(luck);
@@ -241,7 +247,6 @@ public class LootboxCommand extends ImmediateCommand {
 				setLore(itemStack, lore);
 				container.setItem(slot, itemStack);
 			}
-
 
 			// sound & open
 			plugin.adventure().player(player).playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
