@@ -33,6 +33,7 @@ import java.util.Map;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.ENTITY_ARMOR_INC;
 import static dev.qixils.crowdcontrol.common.CommandConstants.ENTITY_ARMOR_START;
+import static dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin.VIEWER_SPAWNED;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
@@ -94,8 +95,8 @@ public class SummonEntityCommand extends ImmediateCommand {
 		entity.setCustomNameVisible(true);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
-		// TODO set viewer spawned
-		// TODO loot table data
+		entity.getEntityData().set(VIEWER_SPAWNED, true);
+		// TODO: random loot table data
 
 		// add random armor to armor stands
 		if (entity instanceof ArmorStand) {
