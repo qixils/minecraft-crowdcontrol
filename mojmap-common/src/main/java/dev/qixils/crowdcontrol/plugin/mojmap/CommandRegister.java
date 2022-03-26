@@ -14,6 +14,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.WeatherCommand;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 
@@ -95,7 +96,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new DoOrDieCommand(plugin),
 //				new ExplodeCommand(plugin),
 				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
-				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
+				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT),
+				WeatherCommand.clear(plugin),
+				WeatherCommand.downfall(plugin),
+				WeatherCommand.storm(plugin)
 		));
 
 		// entity commands
@@ -105,9 +109,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //		}
 
 		// register difficulty commands
-		for (Difficulty difficulty : Difficulty.values()) {
+		for (Difficulty difficulty : Difficulty.values())
 			commands.add(new DifficultyCommand(plugin, difficulty));
-		}
 
 		// potions
 //		plugin.getGame().registry(RegistryTypes.POTION_EFFECT_TYPE).stream().forEach(
@@ -121,10 +124,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //		for (BlockType block : setFallingBlocks) {
 //			commands.add(new FallingBlockCommand(plugin, block));
 //		}
-
-		// weather commands
-//		plugin.getGame().registry(RegistryTypes.WEATHER_TYPE).stream().forEach(
-//				weather -> commands.add(new WeatherCommand(plugin, weather)));
 
 		// enchantments
 //		plugin.getGame().registry(RegistryTypes.ENCHANTMENT_TYPE).stream().forEach(
