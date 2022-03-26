@@ -13,6 +13,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.DinnerboneCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.GameModeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.LootboxCommand;
@@ -31,6 +32,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
@@ -170,6 +172,11 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 		}
 
 		// gamemode commands
+		for (GameType gameType : GameType.values()) {
+			if (gameType == GameType.SURVIVAL) continue;
+			commands.add(new GameModeCommand(plugin, gameType,
+					gameType == GameType.SPECTATOR ? 8L : 15L));
+		}
 //		plugin.getGame().registry(RegistryTypes.GAME_MODE).stream()
 //				.filter(gamemode -> !gamemode.equals(GameModes.SURVIVAL.get()))
 //				.forEach(gamemode -> commands.add(new GameModeCommand(plugin, gamemode,
@@ -179,12 +186,12 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 	}
 
 	@Override
-	protected void onFirstRegistry() {
-		// TODO register KeepInventoryCommand.Manager and GameModeCommand.Manager
+	protected void registerListener(Command<ServerPlayer> command) {
+		plugin.getEventManager().registerListeners(command);
 	}
 
 	@Override
-	protected void registerListener(Command<ServerPlayer> command) {
-		// TODO
+	protected void onFirstRegistry() {
+		plugin.getEventManager().registerListeners(new GameModeCommand.Manager());
 	}
 }

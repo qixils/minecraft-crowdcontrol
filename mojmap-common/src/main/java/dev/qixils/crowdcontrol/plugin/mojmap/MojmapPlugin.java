@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.WrappedAudienceProvider;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -44,7 +45,10 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	// accessors
 	public static final EntityDataAccessor<Optional<Component>> ORIGINAL_DISPLAY_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
 	public static final EntityDataAccessor<Boolean> VIEWER_SPAWNED = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+	public static final EntityDataAccessor<String> GAME_MODE_EFFECT = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.STRING);
 	// variables
+	@NotNull
+	private final EventManager eventManager = new EventManager();
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Nullable

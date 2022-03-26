@@ -2,6 +2,8 @@ package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.event.Death;
+import dev.qixils.crowdcontrol.plugin.mojmap.event.Listener;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -10,7 +12,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		Response.Builder resp = request.buildResponse();
 
 		List<UUID> uuids = new ArrayList<>(players.size());
-		for (Player player : players)
+		for (ServerPlayer player : players)
 			uuids.add(player.getUUID());
 
 		if (enable) {
@@ -77,12 +78,11 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		}
 	}
 
-	// TODO (can't quite be a lazy mixin because the soft lock resolver needs the death event too)
-//	public static final class Manager {
-//		@Listener
-//		public void onDeath(DestructEntityEvent.Death event) {
-//			if (!keepingInventory.contains(event.entity().uniqueId())) return;
-//			event.setKeepInventory(true);
-//		}
-//	}
+	public static final class Manager {
+		@Listener
+		public void onDeath(Death event) {
+			if (!keepingInventory.contains(event.entity().getUUID())) return;
+			event.keepInventory(true);
+		}
+	}
 }
