@@ -4,30 +4,7 @@ import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.Command;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.BlockCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.ClearInventoryCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.DamageCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.DeleteItemCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.DifficultyCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.DigCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.DinnerboneCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.DropItemCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.FallingBlockCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.GameModeCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.GiveItemCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.HalfHealthCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.LootboxCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.RemoveEntityCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.SetTimeCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.SoundCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.SummonEntityCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.SwapCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.TakeItemCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.TeleportCommand;
-import dev.qixils.crowdcontrol.plugin.mojmap.commands.WeatherCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.*;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.TypedTag;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
@@ -112,10 +89,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new DamageCommand(plugin, "heal_1", "Heal Players (1 Heart)", -2f),
 				new DamageCommand(plugin, "full_heal", "Heal Players", Integer.MIN_VALUE),
 				new HalfHealthCommand(plugin),
-//				new FeedCommand(plugin, "feed", "Feed Players", 40),
-//				new FeedCommand(plugin, "feed_1", "Feed Players (1 Bar)", 2),
-//				new FeedCommand(plugin, "starve", "Starve Players", Integer.MIN_VALUE),
-//				new FeedCommand(plugin, "starve_1", "Remove One Hunger Bar", -2),
+				new FeedCommand(plugin, "feed", "Feed Players", 40),
+				new FeedCommand(plugin, "feed_1", "Feed Players (1 Bar)", 2),
+				new FeedCommand(plugin, "starve", "Starve Players", Integer.MIN_VALUE),
+				new FeedCommand(plugin, "starve_1", "Remove One Hunger Bar", -2),
 //				new ResetExpProgressCommand(plugin),
 //				new ExperienceCommand(plugin, "xp_plus1", "Give One XP Level", 1),
 //				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
