@@ -96,9 +96,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new ResetExpProgressCommand(plugin),
 				new ExperienceCommand(plugin, "xp_plus1", "Give One XP Level", 1),
 				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
-//				new MaxHealthCommand(plugin, -1),
-//				new MaxHealthCommand(plugin, 1),
-//				new MaxHealthCommand(plugin, 4), // used in hype trains only
+				new MaxHealthCommand(plugin, -1),
+				new MaxHealthCommand(plugin, 1),
+				new MaxHealthCommand(plugin, 4), // used in hype trains only
 //				new DisableJumpingCommand(plugin),
 //				new EntityChaosCommand(plugin),
 //				new CameraLockToSkyCommand(plugin),
