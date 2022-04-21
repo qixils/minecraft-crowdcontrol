@@ -16,6 +16,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.commands.FallingBlockCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.FlingCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.GameModeCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.GiveItemCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.commands.HalfHealthCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.KeepInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.MoveCommand;
@@ -110,7 +111,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new DamageCommand(plugin, "damage_1", "Damage Players (1 Heart)", 2f),
 				new DamageCommand(plugin, "heal_1", "Heal Players (1 Heart)", -2f),
 				new DamageCommand(plugin, "full_heal", "Heal Players", Integer.MIN_VALUE),
-//				new HalfHealthCommand(plugin),
+				new HalfHealthCommand(plugin),
 //				new FeedCommand(plugin, "feed", "Feed Players", 40),
 //				new FeedCommand(plugin, "feed_1", "Feed Players (1 Bar)", 2),
 //				new FeedCommand(plugin, "starve", "Starve Players", Integer.MIN_VALUE),

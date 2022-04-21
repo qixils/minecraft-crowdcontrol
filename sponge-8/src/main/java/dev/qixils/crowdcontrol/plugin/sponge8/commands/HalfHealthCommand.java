@@ -34,10 +34,7 @@ public class HalfHealthCommand extends ImmediateCommand {
 			double health = healthData.get();
 			if (health > 0.5) {
 				response.type(ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> {
-					player.damage(.01, DamageSources.GENERIC);
-					player.offer(healthData.set(health / 2d));
-				});
+				sync(() -> player.damage(health / 2d, DamageSources.GENERIC));
 			}
 		}
 
