@@ -36,14 +36,14 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.ENTITY_ARMOR_START
 import static dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin.VIEWER_SPAWNED;
 
 @Getter
-public class SummonEntityCommand extends ImmediateCommand {
+public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 	private final Map<EquipmentSlot, List<Item>> armor;
-	protected final EntityType<?> entityType;
+	protected final EntityType<E> entityType;
 	protected final boolean isMonster;
 	private final String effectName;
 	private final String displayName;
 
-	public SummonEntityCommand(MojmapPlugin plugin, EntityType<?> entityType) {
+	public SummonEntityCommand(MojmapPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.isMonster = entityType.getCategory() == MobCategory.MONSTER;
@@ -85,8 +85,8 @@ public class SummonEntityCommand extends ImmediateCommand {
 	}
 
 	@Blocking
-	protected Entity spawnEntity(String viewer, ServerPlayer player) {
-		Entity entity = entityType.create(player.level);
+	protected E spawnEntity(String viewer, ServerPlayer player) {
+		E entity = entityType.create(player.level);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables

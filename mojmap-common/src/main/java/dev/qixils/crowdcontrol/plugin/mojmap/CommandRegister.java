@@ -50,7 +50,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 		List<Command<ServerPlayer>> commands = new ArrayList<>(Arrays.asList(
 //				new VeinCommand(plugin),
 				new SoundCommand(plugin),
-//				new ChargedCreeperCommand(plugin),
+				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
 				new DinnerboneCommand(plugin),
 //				new ClutterCommand(plugin),
@@ -119,7 +119,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 
 		// entity commands
 		for (EntityType<?> entity : safeEntities) {
-			commands.add(new SummonEntityCommand(plugin, entity));
+			commands.add(new SummonEntityCommand<>(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}
 
