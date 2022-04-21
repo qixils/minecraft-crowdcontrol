@@ -93,7 +93,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new FeedCommand(plugin, "feed_1", "Feed Players (1 Bar)", 2),
 				new FeedCommand(plugin, "starve", "Starve Players", Integer.MIN_VALUE),
 				new FeedCommand(plugin, "starve_1", "Remove One Hunger Bar", -2),
-//				new ResetExpProgressCommand(plugin),
+				new ResetExpProgressCommand(plugin),
 //				new ExperienceCommand(plugin, "xp_plus1", "Give One XP Level", 1),
 //				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
 //				new MaxHealthCommand(plugin, -1),
