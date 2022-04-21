@@ -1,14 +1,13 @@
-package dev.qixils.crowdcontrol.plugin.sponge8.commands;
+package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
-import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.value.Value;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 
 import java.util.List;
 
@@ -16,9 +15,9 @@ import java.util.List;
 public class DamageCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
-	private final double amount;
+	private final float amount;
 
-	public DamageCommand(SpongeCrowdControlPlugin plugin, String effectName, String displayName, double amount) {
+	public DamageCommand(MojmapPlugin plugin, String effectName, String displayName, float amount) {
 		super(plugin);
 		this.effectName = effectName;
 		this.displayName = displayName;
@@ -29,24 +28,23 @@ public class DamageCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		boolean success = false;
 		for (ServerPlayer player : players) {
-			Value.Mutable<Double> healthData = player.health();
+			float oldHealth = player.getHealth();
+			float maxHealth = player.getMaxHealth();
 			if (amount < 0) {
-				double oldHealth = healthData.get();
-				double newHealth = Math.max(0, Math.min(player.maxHealth().get(), oldHealth - amount));
+				float newHealth = Math.max(0, Math.min(maxHealth, oldHealth - amount));
 				if (newHealth != oldHealth) {
 					success = true;
-					sync(() -> player.offer(healthData.set(newHealth)));
+					sync(() -> player.setHealth(newHealth));
 				}
 			} else if (amount >= Short.MAX_VALUE) {
 				success = true;
-				sync(() -> player.offer(healthData.set(0d)));
+				sync(() -> player.setHealth(0f));
 			} else {
-				double oldHealth = healthData.get();
-				double newHealth = Math.max(1, oldHealth - amount);
-				double appliedDamage = oldHealth - newHealth;
+				float newHealth = Math.max(1, oldHealth - amount);
+				float appliedDamage = oldHealth - newHealth;
 				if (appliedDamage > 0) {
 					success = true;
-					sync(() -> player.damage(appliedDamage, DamageSources.MAGIC));
+					sync(() -> player.hurt(DamageSource.MAGIC, appliedDamage));
 				}
 			}
 		}
