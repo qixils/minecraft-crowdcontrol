@@ -80,7 +80,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new ItemDamageCommand(plugin),
 				new RemoveEnchantsCommand(plugin),
 				new HatCommand(plugin),
-//				new RespawnCommand(plugin),
+				new RespawnCommand(plugin),
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
 //				new BucketClutchCommand(plugin),
