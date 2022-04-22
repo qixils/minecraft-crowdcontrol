@@ -75,7 +75,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 //				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
 				new DigCommand(plugin),
-//				new TimeCommand(plugin),
+				new TimeCommand(plugin),
 //				new ItemRepairCommand(plugin),
 //				new ItemDamageCommand(plugin),
 //				new RemoveEnchantsCommand(plugin),
