@@ -73,7 +73,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new FlingCommand(plugin),
 //				new TorchCommand(plugin, true),
 //				new TorchCommand(plugin, false),
-//				new GravelCommand(plugin),
+				new GravelCommand(plugin),
 				new DigCommand(plugin),
 //				new TimeCommand(plugin),
 //				new ItemRepairCommand(plugin),
