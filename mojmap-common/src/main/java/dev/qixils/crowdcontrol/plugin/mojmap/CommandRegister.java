@@ -100,7 +100,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new MaxHealthCommand(plugin, 1),
 				new MaxHealthCommand(plugin, 4), // used in hype trains only
 //				new DisableJumpingCommand(plugin),
-//				new EntityChaosCommand(plugin),
+				new EntityChaosCommand(plugin),
 //				new CameraLockToSkyCommand(plugin),
 //				new CameraLockToGroundCommand(plugin),
 //				new FlightCommand(plugin),
