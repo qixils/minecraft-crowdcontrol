@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@SuppressWarnings("ReferenceToMixin")
 @Getter
 public class TakeItemCommand extends ImmediateCommand {
 	private final Item item;
@@ -38,15 +39,12 @@ public class TakeItemCommand extends ImmediateCommand {
 				.message("Item could not be found in target inventories");
 		for (ServerPlayer player : players) {
 			Inventory inventory = player.getInventory();
-			loop: // TODO i hope i'm using this feature correctly
-			for (List<ItemStack> items : ((InventoryAccessor) inventory).getCompartments()) {
-				for (ItemStack itemStack : items) {
-					if (itemStack.isEmpty()) continue;
-					if (itemStack.getItem() != this.item) continue;
-					response.type(ResultType.SUCCESS).message("SUCCESS");
-					itemStack.setCount(itemStack.getCount() - 1);
-					break loop;
-				}
+			for (ItemStack itemStack : ((InventoryAccessor) inventory).viewAllItems()) {
+				if (itemStack.isEmpty()) continue;
+				if (itemStack.getItem() != this.item) continue;
+				response.type(ResultType.SUCCESS).message("SUCCESS");
+				itemStack.setCount(itemStack.getCount() - 1);
+				break;
 			}
 
 			if (ResultType.SUCCESS == response.type() && item.equals(Items.END_PORTAL_FRAME))

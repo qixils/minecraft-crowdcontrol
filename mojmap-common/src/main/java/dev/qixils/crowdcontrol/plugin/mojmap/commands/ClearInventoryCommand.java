@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@SuppressWarnings("ReferenceToMixin")
 @Getter
 public class ClearInventoryCommand extends ImmediateCommand {
 	private final String effectName = "clear_inventory";
@@ -34,9 +35,14 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			if (KeepInventoryCommand.isKeepingInventory(player)) continue;
 			Inventory inv = player.getInventory();
 			// ensure inventory is not empty
-			if (((InventoryAccessor)inv).getCompartments().stream().anyMatch(
-					compartment -> compartment.stream().allMatch(ItemStack::isEmpty)))
-				continue;
+			boolean hasItems = false;
+			for (ItemStack item : ((InventoryAccessor) inv).viewAllItems()) {
+				if (!item.isEmpty()) {
+					hasItems = true;
+					break;
+				}
+			}
+			if (!hasItems) continue;
 			// clear inventory
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
 			sync(inv::clearContent);

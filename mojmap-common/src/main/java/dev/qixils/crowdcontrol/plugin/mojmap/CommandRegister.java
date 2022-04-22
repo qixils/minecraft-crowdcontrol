@@ -83,7 +83,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new RespawnCommand(plugin),
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
-//				new BucketClutchCommand(plugin),
+				new BucketClutchCommand(plugin),
 				new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
 				new DamageCommand(plugin, "damage_1", "Damage Players (1 Heart)", 2f),
 				new DamageCommand(plugin, "heal_1", "Heal Players (1 Heart)", -2f),
