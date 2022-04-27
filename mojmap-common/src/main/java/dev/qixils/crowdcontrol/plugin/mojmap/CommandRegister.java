@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.utils.TypedTag;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.GameType;
@@ -128,8 +129,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 			commands.add(new DifficultyCommand(plugin, difficulty));
 
 		// potions
-//		plugin.getGame().registry(RegistryTypes.POTION_EFFECT_TYPE).stream().forEach(
-//				potionEffectType -> commands.add(new PotionCommand(plugin, potionEffectType)));
+		for (MobEffect potion : Registry.MOB_EFFECT)
+			commands.add(new PotionCommand(plugin, potion));
 
 		// block sets
 		for (Block block : setBlocks) {
