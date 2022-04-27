@@ -48,7 +48,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 	protected List<Command<ServerPlayer>> createCommands() {
 		registerTags();
 		List<Command<ServerPlayer>> commands = new ArrayList<>(Arrays.asList(
-//				new VeinCommand(plugin),
+				new VeinCommand(plugin),
 				new SoundCommand(plugin),
 				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),

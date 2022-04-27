@@ -1,17 +1,20 @@
-package dev.qixils.crowdcontrol.plugin.paper.commands;
+package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
+import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil;
-import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil.BlockFinder;
+import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.BlockFinder;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.Location;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import net.minecraft.core.Registry;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,24 +28,26 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.VEIN_RADIUS;
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
+	private final TypedTag<Block> stones;
 	private final String effectName = "vein";
 	private final String displayName = "Spawn Ore Vein";
 
-	public VeinCommand(PaperCrowdControlPlugin plugin) {
+	public VeinCommand(MojmapPlugin plugin) {
 		super(plugin);
+		stones = new TypedTag<>(CommonTags.STONES, Registry.BLOCK);
 	}
 
 	// Gets a 2x2 chunk of blocks
 	@Contract(mutates = "param1, param2")
-	private static void addOreVein(List<Location> deepslateBlocks, List<Location> stoneBlocks, Location base) {
+	private void addOreVein(List<Location> deepslateBlocks, List<Location> stoneBlocks, Location base) {
 		for (int x = 0; x <= 1; ++x) {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 1; ++z) {
-					Location loc = base.clone().add(x, y, z);
-					Material matType = loc.getBlock().getType();
-					if (matType == Material.DEEPSLATE) {
+					Location loc = base.add(x, y, z);
+					Block matType = loc.block().getBlock();
+					if (matType == Blocks.DEEPSLATE) {
 						deepslateBlocks.add(loc);
-					} else if (BlockUtil.STONES_TAG.contains(matType)) {
+					} else if (stones.contains(matType)) {
 						stoneBlocks.add(loc);
 					}
 				}
@@ -60,13 +65,13 @@ public class VeinCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			BlockFinder finder = BlockFinder.builder()
-					.origin(player.getLocation())
+					.origin(new Location(player))
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(BlockUtil.STONES_TAG::contains)
+					.locationValidator(location -> stones.contains(location.block().getBlock()))
 					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {
@@ -90,9 +95,9 @@ public class VeinCommand extends ImmediateCommand {
 				randomlyShrinkOreVein(setDeepslateBlocks);
 
 				if (!setBlocks.isEmpty())
-					sync(() -> setBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getBlock())));
+					sync(() -> setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().defaultBlockState())));
 				if (!setDeepslateBlocks.isEmpty())
-					sync(() -> setDeepslateBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getDeepslateBlock())));
+					sync(() -> setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().defaultBlockState())));
 			}
 		}
 		return result;
@@ -100,31 +105,31 @@ public class VeinCommand extends ImmediateCommand {
 
 	@Getter
 	public enum Ores implements Weighted {
-		DIAMOND(Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE, 3),
-		IRON(Material.IRON_ORE, Material.DEEPSLATE_IRON_ORE, 3),
-		COAL(Material.COAL_ORE, Material.DEEPSLATE_COAL_ORE, 3),
-		EMERALD(Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE, 3),
-		GOLD(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE, 3),
-		REDSTONE(Material.REDSTONE_ORE, Material.DEEPSLATE_REDSTONE_ORE, 3),
-		LAPIS(Material.LAPIS_ORE, Material.DEEPSLATE_LAPIS_ORE, 3),
-		ANCIENT_DEBRIS(Material.ANCIENT_DEBRIS, 1),
-		QUARTZ(Material.NETHER_QUARTZ_ORE, 3),
-		NETHER_GOLD(Material.NETHER_GOLD_ORE, 3),
-		SILVERFISH(Material.INFESTED_STONE, Material.INFESTED_DEEPSLATE, 2),
-		LAVA(Material.LAVA, 8);
+		DIAMOND(Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, 3),
+		IRON(Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE, 3),
+		COAL(Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE, 3),
+		EMERALD(Blocks.EMERALD_ORE, Blocks.DEEPSLATE_EMERALD_ORE, 3),
+		GOLD(Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE, 3),
+		REDSTONE(Blocks.REDSTONE_ORE, Blocks.DEEPSLATE_REDSTONE_ORE, 3),
+		LAPIS(Blocks.LAPIS_ORE, Blocks.DEEPSLATE_LAPIS_ORE, 3),
+		ANCIENT_DEBRIS(Blocks.ANCIENT_DEBRIS, 1),
+		QUARTZ(Blocks.NETHER_QUARTZ_ORE, 3),
+		NETHER_GOLD(Blocks.NETHER_GOLD_ORE, 3),
+		SILVERFISH(Blocks.INFESTED_STONE, Blocks.INFESTED_DEEPSLATE, 2),
+		LAVA(Blocks.LAVA, 8);
 
 		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(Ores::getWeight).sum();
-		private final Material block;
-		private final Material deepslateBlock;
+		private final Block block;
+		private final Block deepslateBlock;
 		private final int weight;
 
-		Ores(Material block, Material deepslateBlock, int weight) {
+		Ores(Block block, Block deepslateBlock, int weight) {
 			this.block = block;
 			this.deepslateBlock = deepslateBlock;
 			this.weight = weight;
 		}
 
-		Ores(Material block, int weight) {
+		Ores(Block block, int weight) {
 			this(block, block, weight);
 		}
 	}
