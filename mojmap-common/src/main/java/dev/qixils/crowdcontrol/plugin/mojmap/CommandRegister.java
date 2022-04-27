@@ -76,8 +76,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new GravelCommand(plugin),
 				new DigCommand(plugin),
 				new TimeCommand(plugin),
-//				new ItemRepairCommand(plugin),
-//				new ItemDamageCommand(plugin),
+				ItemDurabilityCommand.damage(plugin),
+				ItemDurabilityCommand.repair(plugin),
 				new RemoveEnchantsCommand(plugin),
 				new HatCommand(plugin),
 				new RespawnCommand(plugin),
@@ -156,10 +156,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 			commands.add(new GameModeCommand(plugin, gameType,
 					gameType == GameType.SPECTATOR ? 8L : 15L));
 		}
-//		plugin.getGame().registry(RegistryTypes.GAME_MODE).stream()
-//				.filter(gamemode -> !gamemode.equals(GameModes.SURVIVAL.get()))
-//				.forEach(gamemode -> commands.add(new GameModeCommand(plugin, gamemode,
-//						gamemode.equals(GameModes.SPECTATOR.get()) ? 8L : 15L)));
 
 		return commands;
 	}
