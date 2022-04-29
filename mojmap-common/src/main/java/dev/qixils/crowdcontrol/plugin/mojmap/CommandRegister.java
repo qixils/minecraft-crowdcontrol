@@ -108,7 +108,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new KeepInventoryCommand(plugin, true),
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin),
-//				new PlantTreeCommand(plugin),
+				new PlantTreeCommand(plugin),
 //				new DoOrDieCommand(plugin),
 				new ExplodeCommand(plugin),
 				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
