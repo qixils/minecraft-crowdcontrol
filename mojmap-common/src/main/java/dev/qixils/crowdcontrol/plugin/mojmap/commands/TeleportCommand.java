@@ -20,7 +20,7 @@ public class TeleportCommand extends ImmediateCommand {
 	private final String effectName = "chorus_fruit";
 	private final String displayName = "Eat Chorus Fruit";
 
-	public TeleportCommand(MojmapPlugin plugin) {
+	public TeleportCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

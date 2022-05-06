@@ -17,7 +17,7 @@ public class ExperienceCommand extends ImmediateCommand {
 	private final String displayName;
 	private final int amount;
 
-	public ExperienceCommand(MojmapPlugin plugin, String effectName, String displayName, int amount) {
+	public ExperienceCommand(MojmapPlugin<?> plugin, String effectName, String displayName, int amount) {
 		super(plugin);
 		this.effectName = effectName;
 		this.displayName = displayName;

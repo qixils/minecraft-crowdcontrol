@@ -18,7 +18,7 @@ public class FeedCommand extends ImmediateCommand {
 	private final String displayName;
 	private final int amount;
 
-	public FeedCommand(MojmapPlugin plugin, String effectName, String displayName, int amount) {
+	public FeedCommand(MojmapPlugin<?> plugin, String effectName, String displayName, int amount) {
 		super(plugin);
 		this.effectName = effectName;
 		this.displayName = displayName;

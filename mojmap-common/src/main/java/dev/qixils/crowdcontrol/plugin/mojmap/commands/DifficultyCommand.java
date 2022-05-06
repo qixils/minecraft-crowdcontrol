@@ -21,7 +21,7 @@ public class DifficultyCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public DifficultyCommand(MojmapPlugin plugin, Difficulty difficulty) {
+	public DifficultyCommand(MojmapPlugin<?> plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
 		this.effectName = "difficulty_" + difficulty.getKey();

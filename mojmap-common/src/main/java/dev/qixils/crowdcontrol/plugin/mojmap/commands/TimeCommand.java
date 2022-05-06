@@ -18,7 +18,7 @@ public class TimeCommand extends ImmediateCommand {
 	private final String effectName = "zip";
 	private final String displayName = "Zip Time";
 
-	public TimeCommand(MojmapPlugin plugin) {
+	public TimeCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

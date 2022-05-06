@@ -15,7 +15,7 @@ public class DropItemCommand extends ImmediateCommand {
 	private final String effectName = "drop_item";
 	private final String displayName = "Drop Held Item";
 
-	public DropItemCommand(@NotNull MojmapPlugin plugin) {
+	public DropItemCommand(@NotNull MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

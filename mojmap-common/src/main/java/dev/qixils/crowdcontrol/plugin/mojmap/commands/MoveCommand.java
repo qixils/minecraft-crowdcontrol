@@ -19,22 +19,22 @@ public final class MoveCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public MoveCommand(MojmapPlugin plugin, Vec3 displacement, String effectName, String displayName) {
+	public MoveCommand(MojmapPlugin<?> plugin, Vec3 displacement, String effectName, String displayName) {
 		super(plugin);
 		vector = displacement;
 		this.effectName = effectName;
 		this.displayName = "Fling " + displayName;
 	}
 
-	public MoveCommand(MojmapPlugin plugin, double x, double y, double z, String effectName, String displayName) {
+	public MoveCommand(MojmapPlugin<?> plugin, double x, double y, double z, String effectName, String displayName) {
 		this(plugin, new Vec3(x, y, z), effectName, displayName);
 	}
 
-	public MoveCommand(MojmapPlugin plugin, Vec3 displacement, String effectName) {
+	public MoveCommand(MojmapPlugin<?> plugin, Vec3 displacement, String effectName) {
 		this(plugin, displacement, effectName, effectName);
 	}
 
-	public MoveCommand(MojmapPlugin plugin, double x, double y, double z, String effectName) {
+	public MoveCommand(MojmapPlugin<?> plugin, double x, double y, double z, String effectName) {
 		this(plugin, x, y, z, effectName, effectName);
 	}
 

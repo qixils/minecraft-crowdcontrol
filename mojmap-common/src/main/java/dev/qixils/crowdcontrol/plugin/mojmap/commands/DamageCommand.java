@@ -17,7 +17,7 @@ public class DamageCommand extends ImmediateCommand {
 	private final String displayName;
 	private final float amount;
 
-	public DamageCommand(MojmapPlugin plugin, String effectName, String displayName, float amount) {
+	public DamageCommand(MojmapPlugin<?> plugin, String effectName, String displayName, float amount) {
 		super(plugin);
 		this.effectName = effectName;
 		this.displayName = displayName;

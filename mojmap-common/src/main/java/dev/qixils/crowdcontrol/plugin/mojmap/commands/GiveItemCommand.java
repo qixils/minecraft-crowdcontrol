@@ -23,7 +23,7 @@ public class GiveItemCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public GiveItemCommand(MojmapPlugin plugin, Item item) {
+	public GiveItemCommand(MojmapPlugin<?> plugin, Item item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "give_" + Registry.ITEM.getKey(item).getPath();
@@ -31,7 +31,7 @@ public class GiveItemCommand extends ImmediateCommand {
 	}
 
 	@Blocking
-	public static void giveItemTo(MojmapPlugin plugin, Player player, ItemStack itemStack) {
+	public static void giveItemTo(MojmapPlugin<?> plugin, Player player, ItemStack itemStack) {
 		ItemEntity entity = player.spawnAtLocation(itemStack);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn item entity");

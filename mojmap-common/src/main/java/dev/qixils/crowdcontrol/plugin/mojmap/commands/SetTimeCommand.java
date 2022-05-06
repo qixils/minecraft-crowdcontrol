@@ -20,7 +20,7 @@ public class SetTimeCommand extends ImmediateCommand {
 	private final @NotNull String effectName;
 	private final long time;
 
-	public SetTimeCommand(MojmapPlugin plugin, @NotNull String displayName, @NotNull String effectName, long time) {
+	public SetTimeCommand(MojmapPlugin<?> plugin, @NotNull String displayName, @NotNull String effectName, long time) {
 		super(plugin);
 		this.displayName = displayName;
 		this.effectName = effectName;

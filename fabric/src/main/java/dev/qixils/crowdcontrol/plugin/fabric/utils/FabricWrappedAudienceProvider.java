@@ -5,15 +5,10 @@ import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-public class FabricWrappedAudienceProvider extends WrappedAudienceProvider {
+public class FabricWrappedAudienceProvider extends WrappedAudienceProvider<FabricServerAudiences> {
 
 	public FabricWrappedAudienceProvider(FabricServerAudiences provider) {
 		super(provider);
-	}
-
-	@Override
-	public @NotNull FabricServerAudiences provider() {
-		return (FabricServerAudiences) super.provider();
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public SummonEntityCommand(MojmapPlugin plugin, EntityType<E> entityType) {
+	public SummonEntityCommand(MojmapPlugin<?> plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.isMonster = entityType.getCategory() == MobCategory.MONSTER;

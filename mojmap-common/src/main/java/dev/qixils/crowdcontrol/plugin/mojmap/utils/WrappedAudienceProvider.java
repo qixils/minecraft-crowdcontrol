@@ -12,10 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public abstract class WrappedAudienceProvider implements AudienceProvider {
-	private final AudienceProvider provider;
+public abstract class WrappedAudienceProvider<P extends AudienceProvider> implements AudienceProvider {
+	private final P provider;
 
-	protected WrappedAudienceProvider(final AudienceProvider provider) {
+	protected WrappedAudienceProvider(final P provider) {
 		this.provider = provider;
 	}
 
@@ -68,7 +68,12 @@ public abstract class WrappedAudienceProvider implements AudienceProvider {
 
 	// convenience methods
 
-	public @NotNull AudienceProvider provider() {
+	/**
+	 * Gets the wrapped provider.
+	 *
+	 * @return the wrapped provider
+	 */
+	public @NotNull P provider() {
 		return provider;
 	}
 

@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
-	private final MojmapPlugin plugin;
+	private final MojmapPlugin<?> plugin;
 
 	@Contract(value = "_ -> param1", mutates = "param1")
 	private @NotNull List<@NotNull ServerPlayer> filter(@NotNull List<ServerPlayer> players) {

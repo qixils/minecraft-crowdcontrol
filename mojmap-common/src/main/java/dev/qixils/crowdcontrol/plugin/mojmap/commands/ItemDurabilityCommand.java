@@ -19,7 +19,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	protected ItemDurabilityCommand(MojmapPlugin plugin, String displayName) {
+	protected ItemDurabilityCommand(MojmapPlugin<?> plugin, String displayName) {
 		super(plugin);
 		this.displayName = displayName;
 		this.effectName = displayName.replace(' ', '_');
@@ -56,7 +56,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 
 	// repair command
 	@NotNull
-	public static ItemDurabilityCommand repair(MojmapPlugin plugin) {
+	public static ItemDurabilityCommand repair(MojmapPlugin<?> plugin) {
 		return new ItemDurabilityCommand(plugin, "Repair Item") {
 			@Override
 			protected int modifyDurability(int curDamage, int maxDamage) {
@@ -67,7 +67,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 
 	// damage command (cuts the usable durability in half)
 	@NotNull
-	public static ItemDurabilityCommand damage(MojmapPlugin plugin) {
+	public static ItemDurabilityCommand damage(MojmapPlugin<?> plugin) {
 		return new ItemDurabilityCommand(plugin, "Damage Item") {
 			@Override
 			protected int modifyDurability(int curDamage, int maxDamage) {

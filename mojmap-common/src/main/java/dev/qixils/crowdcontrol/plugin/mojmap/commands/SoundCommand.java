@@ -17,7 +17,7 @@ public class SoundCommand extends ImmediateCommand {
 	private final String effectName = "sfx";
 	private final String displayName = "Spooky Sound Effect";
 
-	public SoundCommand(MojmapPlugin plugin) {
+	public SoundCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

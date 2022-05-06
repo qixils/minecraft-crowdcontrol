@@ -14,9 +14,9 @@ import java.util.Random;
 public abstract class Command implements dev.qixils.crowdcontrol.common.Command<ServerPlayer> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
-	protected final MojmapPlugin plugin;
+	protected final MojmapPlugin<?> plugin;
 
-	protected Command(@NotNull MojmapPlugin plugin) {
+	protected Command(@NotNull MojmapPlugin<?> plugin) {
 		this.plugin = Objects.requireNonNull(plugin, "plugin");
 	}
 

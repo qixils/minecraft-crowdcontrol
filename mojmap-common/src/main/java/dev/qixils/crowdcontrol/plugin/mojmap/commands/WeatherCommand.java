@@ -24,7 +24,7 @@ public class WeatherCommand extends ImmediateCommand {
 	private final boolean rain;
 	private final boolean storm;
 
-	public WeatherCommand(MojmapPlugin plugin, String effectName, String displayName, boolean rain, boolean storm) {
+	public WeatherCommand(MojmapPlugin<?> plugin, String effectName, String displayName, boolean rain, boolean storm) {
 		super(plugin);
 		this.effectName = effectName;
 		this.displayName = displayName;
@@ -56,15 +56,15 @@ public class WeatherCommand extends ImmediateCommand {
 		return builder;
 	}
 
-	public static WeatherCommand clear(MojmapPlugin plugin) {
+	public static WeatherCommand clear(MojmapPlugin<?> plugin) {
 		return new WeatherCommand(plugin, "clear", "Set Weather to Clear", false, false);
 	}
 
-	public static WeatherCommand downfall(MojmapPlugin plugin) {
+	public static WeatherCommand downfall(MojmapPlugin<?> plugin) {
 		return new WeatherCommand(plugin, "downfall", "Set Weather to Rain", true, false);
 	}
 
-	public static WeatherCommand storm(MojmapPlugin plugin) {
+	public static WeatherCommand storm(MojmapPlugin<?> plugin) {
 		return new WeatherCommand(plugin, "thunder_storm", "Set Weather to Thunder Storm", true, true);
 	}
 }

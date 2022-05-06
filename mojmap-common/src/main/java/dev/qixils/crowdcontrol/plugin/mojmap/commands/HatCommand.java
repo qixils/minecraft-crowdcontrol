@@ -21,7 +21,7 @@ public class HatCommand extends ImmediateCommand {
 	private final String effectName = "hat";
 	private final String displayName = "Put Item on Head";
 
-	public HatCommand(MojmapPlugin plugin) {
+	public HatCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

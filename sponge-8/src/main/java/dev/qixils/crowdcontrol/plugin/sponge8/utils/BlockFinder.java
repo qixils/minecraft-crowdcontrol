@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public final class BlockFinder extends AbstractBlockFinder<ServerLocation, Vector3i, ServerWorld> {
-	public static Predicate<ServerLocation> SPAWNING_SPACE = location ->
+	public static final Predicate<ServerLocation> SPAWNING_SPACE = location ->
 			isPassable(location.block())
 					&& isPassable(location.add(0, 1, 0).block())
 					&& isSolid(location.sub(0, 1, 0).block());

@@ -17,7 +17,7 @@ public class HalfHealthCommand extends ImmediateCommand {
 	private final String effectName = "half_health";
 	private final String displayName = "Half Health";
 
-	public HalfHealthCommand(MojmapPlugin plugin) {
+	public HalfHealthCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

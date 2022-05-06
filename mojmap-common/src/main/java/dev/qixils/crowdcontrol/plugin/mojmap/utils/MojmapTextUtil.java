@@ -9,12 +9,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MojmapTextUtil implements TextUtil {
-	private final MojmapPlugin plugin;
+	private final MojmapPlugin<?> plugin;
 	private ComponentFlattener flattener = ComponentFlattener.basic();
 	private PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
 	private boolean initialized = false;
 
-	public MojmapTextUtil(@NotNull MojmapPlugin plugin) {
+	public MojmapTextUtil(@NotNull MojmapPlugin<?> plugin) {
 		this.plugin = plugin;
 	}
 

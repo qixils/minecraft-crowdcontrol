@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class PlayerEntityMapper implements EntityMapper<ServerPlayer> {
-	private final MojmapPlugin plugin;
+	private final MojmapPlugin<?> plugin;
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull ServerPlayer entity) {

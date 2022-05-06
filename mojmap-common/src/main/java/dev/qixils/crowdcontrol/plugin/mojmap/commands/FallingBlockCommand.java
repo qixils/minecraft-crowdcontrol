@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import static dev.qixils.crowdcontrol.common.CommandConstants.FALLING_BLOCK_FALL_DISTANCE;
 
 public class FallingBlockCommand extends BlockCommand {
-	public FallingBlockCommand(MojmapPlugin plugin, Block blockType) {
+	public FallingBlockCommand(MojmapPlugin<?> plugin, Block blockType) {
 		super(
 				plugin,
 				blockType,

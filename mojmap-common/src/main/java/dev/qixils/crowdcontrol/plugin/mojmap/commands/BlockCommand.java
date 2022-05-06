@@ -24,7 +24,7 @@ public class BlockCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public BlockCommand(MojmapPlugin plugin, Block blockType) {
+	public BlockCommand(MojmapPlugin<?> plugin, Block blockType) {
 		this(
 				plugin,
 				blockType,
@@ -33,7 +33,7 @@ public class BlockCommand extends ImmediateCommand {
 		);
 	}
 
-	protected BlockCommand(MojmapPlugin plugin, Block blockType, String effectName, String displayName) {
+	protected BlockCommand(MojmapPlugin<?> plugin, Block blockType, String effectName, String displayName) {
 		super(plugin);
 		this.blockType = blockType;
 		this.effectName = effectName;

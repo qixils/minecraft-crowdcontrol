@@ -24,7 +24,7 @@ public class EntityChaosCommand extends ImmediateCommand {
 	private final String displayName = "Entity Chaos";
 	private final String effectName = "entity_chaos";
 
-	public EntityChaosCommand(MojmapPlugin plugin) {
+	public EntityChaosCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

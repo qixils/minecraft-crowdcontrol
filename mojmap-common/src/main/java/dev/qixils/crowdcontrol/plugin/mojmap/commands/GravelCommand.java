@@ -22,7 +22,7 @@ public class GravelCommand extends ImmediateCommand {
 	private final String effectName = "gravel_hell";
 	private final String displayName = "Replace Area With Gravel";
 
-	public GravelCommand(MojmapPlugin plugin) {
+	public GravelCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

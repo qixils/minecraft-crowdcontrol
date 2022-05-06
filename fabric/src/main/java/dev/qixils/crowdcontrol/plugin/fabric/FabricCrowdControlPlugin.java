@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.FabricWrappedAudienceProvider;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
-import dev.qixils.crowdcontrol.plugin.mojmap.utils.WrappedAudienceProvider;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -24,7 +23,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
 
 @Getter
-public final class FabricCrowdControlPlugin extends MojmapPlugin implements ModInitializer {
+public final class FabricCrowdControlPlugin extends MojmapPlugin<FabricServerAudiences> implements ModInitializer {
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
 	@Accessors(fluent = true)
@@ -61,7 +60,7 @@ public final class FabricCrowdControlPlugin extends MojmapPlugin implements ModI
 	// boilerplate
 
 	@Override
-	protected @NotNull WrappedAudienceProvider initAdventure(@NotNull MinecraftServer server) {
+	protected @NotNull FabricWrappedAudienceProvider initAdventure(@NotNull MinecraftServer server) {
 		return new FabricWrappedAudienceProvider(FabricServerAudiences.of(server));
 	}
 }

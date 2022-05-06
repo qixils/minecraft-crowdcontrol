@@ -30,7 +30,7 @@ public class DinnerboneCommand extends Command {
 	private final String effectName = "dinnerbone";
 	private final String displayName = "Flip Mobs Upside-Down";
 
-	public DinnerboneCommand(MojmapPlugin plugin) {
+	public DinnerboneCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

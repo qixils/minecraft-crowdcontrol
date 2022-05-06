@@ -24,14 +24,14 @@ import java.util.Set;
 import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
 
-public class CommandRegister extends AbstractCommandRegister<ServerPlayer, MojmapPlugin, Command<ServerPlayer>> {
+public class CommandRegister extends AbstractCommandRegister<ServerPlayer, MojmapPlugin<?>, Command<ServerPlayer>> {
 	private boolean tagsRegistered = false;
 	private Set<EntityType<?>> safeEntities;
 	private MappedKeyedTag<Block> setBlocks;
 	private MappedKeyedTag<Block> setFallingBlocks;
 	private MappedKeyedTag<Item> giveTakeItems;
 
-	public CommandRegister(MojmapPlugin plugin) {
+	public CommandRegister(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

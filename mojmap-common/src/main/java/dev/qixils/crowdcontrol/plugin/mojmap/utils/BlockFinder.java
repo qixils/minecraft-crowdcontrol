@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, ServerLevel> {
-	public static Predicate<Location> SPAWNING_SPACE = location ->
+	public static final Predicate<Location> SPAWNING_SPACE = location ->
 			!location.block().getMaterial().blocksMotion()
 					&& isPassable(location.add(0, 1, 0).block())
 					&& isSolid(location.add(0, -1, 0).block());

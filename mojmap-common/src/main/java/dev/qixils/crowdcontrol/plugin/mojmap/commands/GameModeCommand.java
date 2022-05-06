@@ -25,7 +25,7 @@ public class GameModeCommand extends TimedCommand {
 	private final String displayName;
 	private final String effectName;
 
-	public GameModeCommand(MojmapPlugin plugin, GameType gamemode, long seconds) {
+	public GameModeCommand(MojmapPlugin<?> plugin, GameType gamemode, long seconds) {
 		super(plugin);
 		this.duration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;

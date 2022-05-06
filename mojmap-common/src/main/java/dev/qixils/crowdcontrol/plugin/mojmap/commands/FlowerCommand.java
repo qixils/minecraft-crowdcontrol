@@ -30,7 +30,7 @@ public class FlowerCommand extends ImmediateCommand {
 	private final String displayName = "Place Flowers";
 	private final MappedKeyedTag<Block> flowers = new TypedTag<>(FLOWERS, Registry.BLOCK);
 
-	public FlowerCommand(MojmapPlugin plugin) {
+	public FlowerCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

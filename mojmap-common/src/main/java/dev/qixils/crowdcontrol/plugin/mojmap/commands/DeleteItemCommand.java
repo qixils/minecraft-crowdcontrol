@@ -17,7 +17,7 @@ public class DeleteItemCommand extends ImmediateCommand {
 	private final String effectName = "delete_item";
 	private final String displayName = "Delete Held Item";
 
-	public DeleteItemCommand(MojmapPlugin plugin) {
+	public DeleteItemCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

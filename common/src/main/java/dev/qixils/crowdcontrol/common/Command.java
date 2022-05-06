@@ -188,7 +188,7 @@ public interface Command<P> {
 			return false;
 
 		for (Target target : request.getTargets()) {
-			if (hosts.contains(String.valueOf(target.getId())))
+			if (hosts.contains(target.getId()))
 				return true;
 			if (hosts.contains(target.getName().toLowerCase(Locale.ENGLISH)))
 				return true;

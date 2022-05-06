@@ -22,7 +22,7 @@ public class SwapCommand extends ImmediateCommand {
 	private final String effectName = "swap";
 	private final String displayName = "Swap Locations";
 
-	public SwapCommand(MojmapPlugin plugin) {
+	public SwapCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

@@ -12,6 +12,6 @@ public class CommandSourceStackMapper extends AbstractCommandSourceStackMapper {
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull CommandSourceStack entity) {
-		return plugin.adventure().audience(entity);
+		return plugin.adventure().provider().audience(entity);
 	}
 }

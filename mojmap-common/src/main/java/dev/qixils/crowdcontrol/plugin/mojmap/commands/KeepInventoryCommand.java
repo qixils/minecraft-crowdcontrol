@@ -33,7 +33,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public KeepInventoryCommand(MojmapPlugin plugin, boolean enable) {
+	public KeepInventoryCommand(MojmapPlugin<?> plugin, boolean enable) {
 		super(plugin);
 		this.enable = enable;
 		this.effectName = "keep_inventory_" + (enable ? "on" : "off");

@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import dev.qixils.crowdcontrol.common.EntityMapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 

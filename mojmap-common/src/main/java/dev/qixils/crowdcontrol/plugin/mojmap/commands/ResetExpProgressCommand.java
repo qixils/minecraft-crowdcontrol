@@ -15,7 +15,7 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 	private final String effectName = "reset_exp_progress";
 	private final String displayName = "Reset Experience Progress";
 
-	public ResetExpProgressCommand(MojmapPlugin plugin) {
+	public ResetExpProgressCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

@@ -24,7 +24,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public TakeItemCommand(MojmapPlugin plugin, Item item) {
+	public TakeItemCommand(MojmapPlugin<?> plugin, Item item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "take_" + Registry.ITEM.getKey(item).getPath();

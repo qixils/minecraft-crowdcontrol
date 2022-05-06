@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.plugin.mojmap.utils.WrappedAudienceProvider;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.kyori.adventure.platform.AudienceProvider;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Registry;
@@ -41,7 +42,7 @@ import java.util.concurrent.Executors;
  * {@link dev.qixils.crowdcontrol.common.Command Commands}.
  */
 @Getter
-public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandSourceStack> {
+public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractPlugin<ServerPlayer, CommandSourceStack> {
 	// accessors
 	public static final EntityDataAccessor<Optional<Component>> ORIGINAL_DISPLAY_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
 	public static final EntityDataAccessor<Boolean> VIEWER_SPAWNED = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
@@ -54,7 +55,7 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	@Nullable
 	protected MinecraftServer server;
 	@Nullable @Accessors(fluent = true)
-	protected WrappedAudienceProvider adventure;
+	protected WrappedAudienceProvider<P> adventure;
 	@NotNull
 	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
 	// TODO is this actually the sync executor?? 'Main' sounds sync but 'background' doesn't
@@ -86,19 +87,19 @@ public abstract class MojmapPlugin extends AbstractPlugin<ServerPlayer, CommandS
 	}
 
 	@NotNull
-	public WrappedAudienceProvider adventure() throws IllegalStateException {
+	public WrappedAudienceProvider<P> adventure() throws IllegalStateException {
 		if (this.adventure == null)
 			throw new IllegalStateException("Tried to access Adventure without running a server");
 		return this.adventure;
 	}
 
 	@NotNull
-	public Optional<WrappedAudienceProvider> adventureOptional() {
+	public Optional<WrappedAudienceProvider<P>> adventureOptional() {
 		return Optional.ofNullable(this.adventure);
 	}
 
 	@NotNull
-	protected abstract WrappedAudienceProvider initAdventure(@NotNull MinecraftServer server);
+	protected abstract WrappedAudienceProvider<P> initAdventure(@NotNull MinecraftServer server);
 
 	protected void setServer(@Nullable MinecraftServer server) {
 		if (server == null) {

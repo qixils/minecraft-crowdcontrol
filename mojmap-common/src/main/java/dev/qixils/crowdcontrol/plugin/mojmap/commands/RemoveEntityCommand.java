@@ -26,7 +26,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	private final String effectName;
 	private final String displayName;
 
-	public RemoveEntityCommand(MojmapPlugin plugin, EntityType<?> entityType) {
+	public RemoveEntityCommand(MojmapPlugin<?> plugin, EntityType<?> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + Registry.ENTITY_TYPE.getKey(entityType).getPath();

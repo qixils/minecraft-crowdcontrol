@@ -16,7 +16,7 @@ public class RespawnCommand extends ImmediateCommand {
 	private final String effectName = "respawn";
 	private final String displayName = "Respawn Players";
 
-	public RespawnCommand(MojmapPlugin plugin) {
+	public RespawnCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

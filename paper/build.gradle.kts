@@ -28,3 +28,7 @@ java {
     targetCompatibility = javaVersion
 //    withSourcesJar()
 }
+
+// TODO auto generate plugin.yml cus its auto-generated version field is broke rn
+//   i think paper's/paperweight's example plugin has an example of how to do this
+//   or i could just use the ProcessResources task used in the fabric platform

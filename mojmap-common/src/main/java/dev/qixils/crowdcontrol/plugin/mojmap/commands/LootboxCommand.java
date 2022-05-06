@@ -65,7 +65,7 @@ public class LootboxCommand extends ImmediateCommand {
 	private final String displayName;
 	private final int luck;
 
-	public LootboxCommand(MojmapPlugin plugin, String displayName, int luck) {
+	public LootboxCommand(MojmapPlugin<?> plugin, String displayName, int luck) {
 		// init basic variables
 		super(plugin);
 		this.displayName = displayName;

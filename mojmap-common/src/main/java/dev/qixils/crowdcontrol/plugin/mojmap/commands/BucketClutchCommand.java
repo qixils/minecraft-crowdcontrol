@@ -19,7 +19,7 @@ import java.util.List;
 public class BucketClutchCommand extends ImmediateCommand {
 	private static final int OFFSET = 30;
 
-	public BucketClutchCommand(MojmapPlugin plugin) {
+	public BucketClutchCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

@@ -21,7 +21,7 @@ public class ExplodeCommand extends ImmediateCommand {
 	private final String displayName = "Explode";
 	private final String effectName = "explode";
 
-	public ExplodeCommand(MojmapPlugin plugin) {
+	public ExplodeCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

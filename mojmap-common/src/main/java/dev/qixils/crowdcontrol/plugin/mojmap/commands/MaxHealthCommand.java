@@ -24,7 +24,7 @@ public class MaxHealthCommand extends ImmediateCommand {
 	private static final UUID MODIFIER_UUID = new UUID(-899185282624176127L, -7747914881652381318L);
 	private static final String MODIFIER_NAME = "max-health-cc";
 
-	public MaxHealthCommand(MojmapPlugin plugin, int amount) {
+	public MaxHealthCommand(MojmapPlugin<?> plugin, int amount) {
 		super(plugin);
 		String amountText;
 		String displayText;

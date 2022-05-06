@@ -15,7 +15,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 	private final String effectName = "entity_charged_creeper";
 	private final String displayName = "Summon Charged Creeper";
 
-	public ChargedCreeperCommand(MojmapPlugin plugin) {
+	public ChargedCreeperCommand(MojmapPlugin<?> plugin) {
 		super(plugin, EntityType.CREEPER);
 	}
 

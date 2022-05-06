@@ -27,7 +27,7 @@ public class PotionCommand extends ImmediateCommand {
 	private final String displayName;
 
 	@SuppressWarnings("ConstantConditions")
-	public PotionCommand(MojmapPlugin plugin, MobEffect potionEffectType) {
+	public PotionCommand(MojmapPlugin<?> plugin, MobEffect potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
 		boolean isMinimal = potionEffectType.isInstantenous();

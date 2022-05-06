@@ -31,7 +31,7 @@ public class PlantTreeCommand extends Command {
 	private final String effectName = "plant_tree";
 	private final String displayName = "Plant Tree";
 
-	public PlantTreeCommand(MojmapPlugin plugin) {
+	public PlantTreeCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 

@@ -32,7 +32,7 @@ public class VeinCommand extends ImmediateCommand {
 	private final String effectName = "vein";
 	private final String displayName = "Spawn Ore Vein";
 
-	public VeinCommand(MojmapPlugin plugin) {
+	public VeinCommand(MojmapPlugin<?> plugin) {
 		super(plugin);
 		stones = new TypedTag<>(CommonTags.STONES, Registry.BLOCK);
 	}
