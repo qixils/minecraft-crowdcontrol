@@ -171,5 +171,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 	@Override
 	protected void onFirstRegistry() {
 		plugin.getEventManager().registerListeners(new GameModeCommand.Manager());
+		plugin.getEventManager().registerListeners(new KeepInventoryCommand.Manager());
 	}
 }

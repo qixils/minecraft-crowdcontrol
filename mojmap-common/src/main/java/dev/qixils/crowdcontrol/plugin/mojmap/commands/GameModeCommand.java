@@ -67,6 +67,7 @@ public class GameModeCommand extends TimedCommand {
 	}
 
 	public static final class Manager {
+		@SuppressWarnings("unused")
 		@Listener
 		public void onJoin(Join event) {
 			ServerPlayer player = event.player();

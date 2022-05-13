@@ -79,6 +79,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	public static final class Manager {
+		@SuppressWarnings("unused")
 		@Listener
 		public void onDeath(Death event) {
 			if (!keepingInventory.contains(event.entity().getUUID())) return;
