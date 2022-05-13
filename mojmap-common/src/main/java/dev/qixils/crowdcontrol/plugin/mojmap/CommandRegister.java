@@ -54,7 +54,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new ChargedCreeperCommand(plugin),
 				new SwapCommand(plugin),
 				new DinnerboneCommand(plugin),
-//				new ClutterCommand(plugin),
+				new ClutterCommand(plugin),
 				new LootboxCommand(plugin, "Open Lootbox", 0),
 				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
 				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
