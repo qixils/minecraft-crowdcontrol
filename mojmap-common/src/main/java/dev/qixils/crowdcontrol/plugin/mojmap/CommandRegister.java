@@ -12,6 +12,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
@@ -142,8 +143,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 		}
 
 		// enchantments
-//		plugin.getGame().registry(RegistryTypes.ENCHANTMENT_TYPE).stream().forEach(
-//				enchantmentType -> commands.add(new EnchantmentCommand(plugin, enchantmentType)));
+		for (Enchantment enchantment : Registry.ENCHANTMENT) {
+			commands.add(new EnchantmentCommand(plugin, enchantment));
+		}
 
 		// give/take items
 		for (Item item : giveTakeItems) {
