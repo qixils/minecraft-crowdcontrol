@@ -30,6 +30,8 @@ public abstract class AbstractPlugin<P extends S, S> implements Plugin<P, S> {
 	protected boolean global = false;
 	protected boolean announce = true;
 	@Getter
+	protected boolean adminRequired = false;
+	@Getter
 	protected Collection<String> hosts = Collections.emptyList();
 
 	protected AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {

@@ -138,6 +138,8 @@ public interface Plugin<P extends S, S> {
 		// base command
 		Builder<S> account = manager.commandBuilder("account")
 				.meta(CommandMeta.DESCRIPTION, "Manage your connected Twitch account(s)");
+		if (isAdminRequired())
+			account = account.permission(ADMIN_PERMISSION);
 
 		// username arg
 		CommandArgument<S, String> usernameArg = StringArgument.<S>newBuilder("username")
@@ -383,6 +385,15 @@ public interface Plugin<P extends S, S> {
 	@NotNull Collection<String> getHosts();
 
 	/**
+	 * Determines whether a player must be an {@link #isAdmin(Object) admin} to use the
+	 * {@code /account} command.
+	 *
+	 * @return true if the player must be an admin to use the /account command
+	 */
+	@CheckReturnValue
+	boolean isAdminRequired();
+
+	/**
 	 * Fetches the username of a player.
 	 *
 	 * @param player the player to fetch the username of
@@ -520,7 +531,8 @@ public interface Plugin<P extends S, S> {
 		Audience audience = asAudience(player);
 		audience.sendMessage(JOIN_MESSAGE_1);
 		//noinspection OptionalGetWithoutIsPresent
-		if (!isGlobal() && isServer() && getPlayerMapper().getLinkedAccounts(getUUID(player).get()).size() == 0)
+		if (!isGlobal() && isServer() && getPlayerMapper().getLinkedAccounts(getUUID(player).get()).size() == 0
+				&& (!isAdminRequired() || isAdmin(player)))
 			audience.sendMessage(JOIN_MESSAGE_2);
 		if (getCrowdControl() == null) {
 			if (isAdmin(player)) {

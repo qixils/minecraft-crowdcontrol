@@ -188,7 +188,10 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	@Override
 	public boolean isAdmin(@NotNull CommandSource commandSource) {
-		return commandSource.hasPermission(ADMIN_PERMISSION);
+		if (commandSource.hasPermission(ADMIN_PERMISSION)) return true;
+		String uuid = getUUID(commandSource).map(id -> id.toString().toLowerCase(Locale.US).replace("-", "")).orElse(null);
+		if (uuid == null) return false;
+		return getHosts().stream().anyMatch(host -> host.toLowerCase(Locale.ENGLISH).replace("-", "").equals(uuid));
 	}
 
 	@Override
@@ -303,6 +306,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 		global = config.getNode("global").getBoolean(false);
 		announce = config.getNode("announce").getBoolean(true);
+		adminRequired = config.getNode("admin-required").getBoolean(false);
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)

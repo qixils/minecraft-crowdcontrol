@@ -70,6 +70,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	private Collection<String> hosts = Collections.emptyList();
 	private boolean announce = true;
+	@Getter
+	private boolean adminRequired = false;
 
 	@Override
 	public void onLoad() {
@@ -132,6 +134,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public void onEnable() {
 		global = config.getBoolean("global", false);
 		announce = config.getBoolean("announce", true);
+		adminRequired = config.getBoolean("admin-required", false);
 		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
@@ -224,7 +227,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 	@Override
 	public boolean isAdmin(@NotNull CommandSender commandSource) {
-		return commandSource.hasPermission(ADMIN_PERMISSION) || commandSource.isOp();
+		if (commandSource.hasPermission(ADMIN_PERMISSION) || commandSource.isOp()) return true;
+		String uuid = getUUID(commandSource).map(id -> id.toString().toLowerCase(Locale.US).replace("-", "")).orElse(null);
+		if (uuid == null) return false;
+		return getHosts().stream().anyMatch(host -> host.toLowerCase(Locale.ENGLISH).replace("-", "").equals(uuid));
 	}
 
 	@Override

@@ -21,6 +21,9 @@ hosts: [ ]
 # Determines whether to alert streamers in chat when an effect has been activated.
 announce: true
 
+# Determines whether a user must be an operator to use the "/account" command.
+admin-required: false
+
 ##################
 # Legacy Options #
 ##################
