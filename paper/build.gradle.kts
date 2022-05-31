@@ -2,6 +2,11 @@ val cloudVersion: String by project
 
 description = "Minecraft Crowd Control: Paper"
 
+plugins {
+    id("xyz.jpenilla.run-paper") version "1.0.6" // Adds runServer and runMojangMappedServer tasks for testing
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
+}
+
 repositories {
     maven("https://papermc.io/repo/repository/maven-public/")
 }
@@ -29,6 +34,15 @@ java {
 //    withSourcesJar()
 }
 
-// TODO auto generate plugin.yml cus its auto-generated version field is broke rn
-//   i think paper's/paperweight's example plugin has an example of how to do this
-//   or i could just use the ProcessResources task used in the fabric platform
+// plugin.yml generation
+bukkit {
+    name = "CrowdControl"
+    version = project.version.toString()
+    main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
+    apiVersion = "1.17"
+    prefix = "crowd-control"
+    authors = listOf("qixils")
+    description = "Allows viewers to interact with your Minecraft world"
+    website = "https://github.com/qixils/minecraft-crowdcontrol"
+    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+}

@@ -1,6 +1,6 @@
 val configurateVersion: String by project
 
-description = "Minecraft Crowd Control: Common Mixins for Mojang Mappings"
+description = "Minecraft Crowd Control: Common Implementation for Mojang Mappings"
 
 plugins {
     java
