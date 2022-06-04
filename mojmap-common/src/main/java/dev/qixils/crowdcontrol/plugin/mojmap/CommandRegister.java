@@ -134,18 +134,15 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 			commands.add(new PotionCommand(plugin, potion));
 
 		// block sets
-		for (Block block : setBlocks) {
+		for (Block block : setBlocks)
 			commands.add(new BlockCommand(plugin, block));
-		}
 
-		for (Block block : setFallingBlocks) {
+		for (Block block : setFallingBlocks)
 			commands.add(new FallingBlockCommand(plugin, block));
-		}
 
 		// enchantments
-		for (Enchantment enchantment : Registry.ENCHANTMENT) {
+		for (Enchantment enchantment : Registry.ENCHANTMENT)
 			commands.add(new EnchantmentCommand(plugin, enchantment));
-		}
 
 		// give/take items
 		for (Item item : giveTakeItems) {
@@ -170,6 +167,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 
 	@Override
 	protected void onFirstRegistry() {
+		// TODO: Join event is never dispatched; need to implement it with mixins
 		plugin.getEventManager().registerListeners(new GameModeCommand.Manager());
 		plugin.getEventManager().registerListeners(new KeepInventoryCommand.Manager());
 	}

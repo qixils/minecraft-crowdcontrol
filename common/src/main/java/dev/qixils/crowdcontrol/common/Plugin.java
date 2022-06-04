@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -464,20 +465,92 @@ public interface Plugin<P, S> {
 	void initCrowdControl();
 
 	/**
+	 * Sends a packet with an embedded message for the C# client.
+	 *
+	 * @param service the service to send the packet to
+	 * @param message the message to send
+	 */
+	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
+	default void sendEmbeddedMessagePacket(@NotNull CrowdControl service, @NotNull String message) {
+		getSLF4JLogger().warn("sending packet {}", message);
+		service.buildResponse(0)
+				.packetType(PacketType.KEEP_ALIVE)
+				.message("message")
+				.build().send();
+	}
+
+	/**
+	 * Sends a packet with an embedded message for the C# client.
+	 *
+	 * @param message the message to send
+	 */
+	default void sendEmbeddedMessagePacket(@NotNull String message) {
+		CrowdControl service = getCrowdControl();
+		if (service == null) {
+			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
+			return;
+		}
+		sendEmbeddedMessagePacket(service, message);
+	}
+
+	/**
 	 * Performs actions that are reliant on the initialization of a {@link CrowdControl} instance.
 	 *
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
-	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
-	default void postInitCrowdControl(CrowdControl service) {
-		service.buildResponse(0)
-				.packetType(PacketType.KEEP_ALIVE)
-				.message("_mc_cc_server_status_" + new ServerStatus(
-						globalEffectsUsable(),
-						supportsClientOnly(),
-						commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
-				).toJSON())
-				.build().send();
+	default void postInitCrowdControl(@NotNull CrowdControl service) {
+		sendEmbeddedMessagePacket(service, "_mc_cc_server_status_" + new ServerStatus(
+				globalEffectsUsable(),
+				supportsClientOnly(),
+				commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
+		).toJSON());
+	}
+
+	/**
+	 * Updates the visibility of a collection of {@link Command effect} IDs.
+	 *
+	 * @param effectIds IDs of the effect to update
+	 * @param visible   effects' new visibility
+	 */
+	default void updateEffectIdVisibility(@NotNull Collection<String> effectIds, boolean visible) {
+		StringBuilder message = new StringBuilder("_mc_cc_");
+		if (visible)
+			message.append("show");
+		else
+			message.append("hide");
+		message.append("_effects_:");
+		message.append(String.join(",", effectIds));
+		sendEmbeddedMessagePacket(message.toString());
+	}
+
+	/**
+	 * Updates the visibility of an {@link Command effect} ID.
+	 *
+	 * @param effectId ID of the effect to update
+	 * @param visible  effect's new visibility
+	 */
+	default void updateEffectIdVisibility(@NotNull String effectId, boolean visible) {
+		updateEffectIdVisibility(Collections.singletonList(effectId), visible);
+	}
+
+	/**
+	 * Updates the visibility of a collection of {@link Command effects}.
+	 *
+	 * @param effects the effect to update
+	 * @param visible effects' new visibility
+	 */
+	default void updateEffectVisibility(@NotNull Collection<Command<?>> effects, boolean visible) {
+		updateEffectIdVisibility(effects.stream().map(Command::getEffectName).collect(Collectors.toList()), visible);
+	}
+
+	/**
+	 * Updates the visibility of an {@link Command effect}.
+	 *
+	 * @param effect  the effect to update
+	 * @param visible effect's new visibility
+	 */
+	default void updateEffectIdVisibility(@NotNull Command<?> effect, boolean visible) {
+		updateEffectVisibility(Collections.singletonList(effect), visible);
 	}
 
 	/**

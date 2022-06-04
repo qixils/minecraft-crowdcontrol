@@ -446,11 +446,21 @@ namespace CrowdControl.Games.Packs
             base.OnMessageParsed(sender, response, context);
             if (response.message == null) return;
 
-            if (response.type == ResponseType.KeepAlive
-                && response.message.StartsWith("_mc_cc_server_status_"))
+            if (response.type == ResponseType.KeepAlive)
             {
-                // incoming packet contains info about supported effects
-                OnKeepAlivePacket(response);
+                if (response.message.StartsWith("_mc_cc_server_status_"))
+                {
+                    // incoming packet contains info about supported effects
+                    OnKeepAlivePacket(response);
+                }
+                else if (response.message.StartsWith("_mc_cc_hide_effects_:"))
+                {
+                    OnMenuStatusPacket(response, EffectStatus.MenuHidden);
+                }
+                else if (response.message.StartsWith("_mc_cc_show_effects_:"))
+                {
+                    OnMenuStatusPacket(response, EffectStatus.MenuVisible);
+                }
             }
             else if (response.status == EffectResult.Unavailable)
             {
@@ -487,6 +497,12 @@ namespace CrowdControl.Games.Packs
             // hide effects that are unsupported by the platform
             AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !status.RegisteredEffects.Contains(effect.Code))
                 .ForEach(HideEffect);
+        }
+
+        private void OnMenuStatusPacket(Response response, EffectStatus status) // TODO if EffectStatus is the wrong variable type then try byte
+        {
+            var effects = response.message.Split(':')[1].Split(',');
+            AllEffects.FindAll(effect => effects.Contains(effect.Code)).ForEach(effect => ReportStatus(effect, status));
         }
 
         private void OnUnavailablePacket(Response response)
