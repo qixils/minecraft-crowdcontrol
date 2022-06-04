@@ -502,8 +502,8 @@ namespace CrowdControl.Games.Packs
 
         private void OnMenuStatusPacket(Response response, EffectStatus status) // TODO if EffectStatus is the wrong variable type then try byte
         {
-            var effects = response.message.Split(':')[1].Split(',');
-            AllEffects.FindAll(effect => effects.Contains(effect.Code)).ForEach(effect => ReportStatus(effect, status));
+            var EffectsList = new List<string>(response.message.Split(':')[1].Split(','));
+            AllEffects.FindAll(effect => EffectsList.Contains(effect.Code)).ForEach(effect => ReportStatus(effect, status));
         }
 
         private void OnUnavailablePacket(Response response)
