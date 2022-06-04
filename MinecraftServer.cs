@@ -12,7 +12,7 @@ using ConnectorType = CrowdControl.Common.ConnectorType;
 namespace CrowdControl.Games.Packs
 {
     [Serializable]
-    public record ServerStatus(bool GlobalEffects, bool ClientEffects, List<string> RegisteredEffects);
+    public record ServerStatus(bool GlobalEffects, bool ClientEffects, string[] RegisteredEffects);
 
     public sealed class GlobalEffect : Effect
     {
@@ -495,7 +495,8 @@ namespace CrowdControl.Games.Packs
             }
 
             // hide effects that are unsupported by the platform
-            AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !status.RegisteredEffects.Contains(effect.Code))
+            var RegisteredEffectsList = new List<string>(status.RegisteredEffects);
+            AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !RegisteredEffectsList.Contains(effect.Code))
                 .ForEach(HideEffect);
         }
 
