@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.PacketType;
+import dev.qixils.crowdcontrol.socket.SocketManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -471,8 +472,8 @@ public interface Plugin<P, S> {
 	 * @param message the message to send
 	 */
 	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
-	default void sendEmbeddedMessagePacket(@NotNull CrowdControl service, @NotNull String message) {
-		getSLF4JLogger().warn("sending packet {}", message);
+	default void sendEmbeddedMessagePacket(@NotNull SocketManager service, @NotNull String message) {
+		getSLF4JLogger().warn("sending packet {} to {}", message, service);
 		service.buildResponse(0)
 				.packetType(PacketType.KEEP_ALIVE)
 				.message("message")
@@ -485,7 +486,7 @@ public interface Plugin<P, S> {
 	 * @param message the message to send
 	 */
 	default void sendEmbeddedMessagePacket(@NotNull String message) {
-		CrowdControl service = getCrowdControl();
+		SocketManager service = getCrowdControl();
 		if (service == null) {
 			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
 			return;
@@ -499,11 +500,13 @@ public interface Plugin<P, S> {
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
-		sendEmbeddedMessagePacket(service, "_mc_cc_server_status_" + new ServerStatus(
-				globalEffectsUsable(),
-				supportsClientOnly(),
-				commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
-		).toJSON());
+		service.addConnectListener(connectingService -> {
+			sendEmbeddedMessagePacket(service, "_mc_cc_server_status_" + new ServerStatus(
+					globalEffectsUsable(),
+					supportsClientOnly(),
+					commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
+			).toJSON());
+		});
 	}
 
 	/**
@@ -549,7 +552,7 @@ public interface Plugin<P, S> {
 	 * @param effect  the effect to update
 	 * @param visible effect's new visibility
 	 */
-	default void updateEffectIdVisibility(@NotNull Command<?> effect, boolean visible) {
+	default void updateEffectVisibility(@NotNull Command<?> effect, boolean visible) {
 		updateEffectVisibility(Collections.singletonList(effect), visible);
 	}
 
