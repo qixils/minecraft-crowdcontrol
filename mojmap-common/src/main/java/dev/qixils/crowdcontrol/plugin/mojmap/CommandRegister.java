@@ -167,7 +167,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 
 	@Override
 	protected void onFirstRegistry() {
-		// TODO: Join event is never dispatched; need to implement it with mixins
 		plugin.getEventManager().registerListeners(new GameModeCommand.Manager());
 		plugin.getEventManager().registerListeners(new KeepInventoryCommand.Manager());
 	}

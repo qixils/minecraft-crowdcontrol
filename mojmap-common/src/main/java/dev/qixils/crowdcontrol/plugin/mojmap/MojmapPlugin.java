@@ -66,10 +66,24 @@ public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractP
 	@Accessors(fluent = true)
 	private final EntityMapper<ServerPlayer> playerMapper = new PlayerEntityMapper(this);
 	private @MonotonicNonNull HoconConfigurationLoader configLoader;
+	private static @MonotonicNonNull MojmapPlugin<?> instance;
 
 	protected MojmapPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
 		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
+		instance = this;
+	}
+
+	/**
+	 * Gets the instance of the plugin.
+	 *
+	 * @return the instance of the plugin
+	 */
+	@NotNull
+	public static MojmapPlugin<?> getInstance() {
+		if (instance == null)
+			throw new IllegalStateException("Plugin instance not initialized");
+		return instance;
 	}
 
 	public abstract boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request);

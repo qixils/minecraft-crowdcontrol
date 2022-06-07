@@ -64,6 +64,5 @@ subprojects {
     }
 
     // TODO: auto-copy default config into appropriate resource paths
-    // (i.e. /config.yml for Paper, /assets/crowd-control/default.conf for Sponge 7, etc.)
-    // TODO: unrelated to this file but GH workflows need updating
+    //   (i.e. /config.yml for Paper, /assets/crowd-control/default.conf for Sponge 7, etc.)
 }
