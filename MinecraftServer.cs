@@ -8,6 +8,7 @@ using ConnectorLib.JSON;
 using CrowdControl.Common;
 using Newtonsoft.Json;
 using ConnectorType = CrowdControl.Common.ConnectorType;
+using Log = CrowdControl.Common.Log;
 
 namespace CrowdControl.Games.Packs
 {
@@ -444,38 +445,53 @@ namespace CrowdControl.Games.Packs
         public override void OnMessageParsed(object sender, Response response, object context)
         {
             base.OnMessageParsed(sender, response, context);
-            if (response.message == null) return;
-
-            if (response.type == ResponseType.KeepAlive)
+            Log.Debug("Parsing incoming message #" + response.id
+                                                     + " of type " + response.type
+                                                     + " with message \"" + response.message + "\"");
+            if (response.message == null)
             {
+                Log.Debug("Message has no message attribute; exiting");
+                return;
+            }
+
+            if (response.id == 0)
+            {
+                Log.Debug("Message is ID #0");
                 if (response.message.StartsWith("_mc_cc_server_status_"))
                 {
+                    Log.Debug("Message is server status packet");
                     // incoming packet contains info about supported effects
-                    OnKeepAlivePacket(response);
+                    OnServerStatusPacket(response);
                 }
                 else if (response.message.StartsWith("_mc_cc_hide_effects_:"))
                 {
+                    Log.Debug("Message is hide effects packet");
                     OnMenuStatusPacket(response, EffectStatus.MenuHidden);
                 }
                 else if (response.message.StartsWith("_mc_cc_show_effects_:"))
                 {
+                    Log.Debug("Message is show effects packet");
                     OnMenuStatusPacket(response, EffectStatus.MenuVisible);
                 }
             }
             else if (response.status == EffectResult.Unavailable)
             {
+                Log.Debug("Effect is unavailable");
                 // a requested effect was unavailable; it should be hidden from the menu
-                // TODO: double check CC doesn't do this by default (pretty sure it doesn't)
                 OnUnavailablePacket(response);
             }
         }
 
-        private void OnKeepAlivePacket(Response response)
+        private void OnServerStatusPacket(Response response)
         {
             // load packet data
             var payload = response.message.Replace("_mc_cc_server_status_", "");
             var status = JsonConvert.DeserializeObject<ServerStatus>(payload);
-            if (status == null) return;
+            if (status == null)
+            {
+                Log.Error("Message payload could not be converted to ServerStatus object");
+                return;
+            }
 
             // reset all effects back to visible first
             AllEffects.ForEach(effect => ReportStatus(effect, EffectStatus.MenuVisible));
@@ -495,29 +511,44 @@ namespace CrowdControl.Games.Packs
             }
 
             // hide effects that are unsupported by the platform
-            var RegisteredEffectsList = new List<string>(status.RegisteredEffects);
-            AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !RegisteredEffectsList.Contains(effect.Code))
+            var registeredEffectsList = new List<string>(status.RegisteredEffects).ConvertAll(input => input.ToLower());
+            AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !registeredEffectsList.Contains(effect.Code.ToLower()))
                 .ForEach(HideEffect);
+            
+            Log.Debug("Finished hiding effects");
         }
 
         private void OnMenuStatusPacket(Response response, EffectStatus status) // TODO if EffectStatus is the wrong variable type then try byte
         {
-            var EffectsList = new List<string>(response.message.Split(':')[1].Split(','));
-            AllEffects.FindAll(effect => EffectsList.Contains(effect.Code)).ForEach(effect => ReportStatus(effect, status));
+            var effectsList = new List<string>(response.message.Split(':')[1].Split(','));
+            AllEffects.FindAll(effect => effectsList.Contains(effect.Code)).ForEach(effect =>
+            {
+                ReportStatus(effect, status);
+                Log.Message("Updated visibility of " + effect.Code + " to " + status);
+            });
         }
 
         private void OnUnavailablePacket(Response response)
         {
             var match = UnavailableEffectPattern.Match(response.message);
-            if (!match.Success) return;
+            if (!match.Success)
+            {
+                Log.Error("Unavailable effect pattern match failed on \"" + response.message + "\"");
+                return;
+            }
             var effectCode = match.Groups[0].Value;
             var effect = AllEffects.Find(e => e.Code == effectCode);
-            if (effect != null)
-                ReportStatus(effect, EffectStatus.MenuHidden);
+            if (effect == null)
+            {
+                Log.Error("Could not find unavailable effect \"" + effect + "\" in known effect list");
+                return;
+            }
+            HideEffect(effect);
         }
 
         private void HideEffect(Effect effect)
         {
+            Log.Message("Permanently hiding effect " + effect.Code);
             ReportStatus(effect, EffectStatus.MenuHidden);
         }
     }

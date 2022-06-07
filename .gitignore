@@ -123,7 +123,7 @@ MinecraftServer.csproj
 MinecraftServer.sln
 
 # Compiled Crowd Control package
-MinecraftServer.ccpak
+*.ccpak
 
 # Gradle
 .gradle/
