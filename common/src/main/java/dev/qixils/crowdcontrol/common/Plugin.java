@@ -11,7 +11,9 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.PacketType;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
@@ -29,6 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -452,6 +456,14 @@ public interface Plugin<P, S> {
 	AbstractCommandRegister<P, ?, ?> commandRegister();
 
 	/**
+	 * Gets the {@link ScheduledExecutorService} used by the plugin.
+	 *
+	 * @return the executor service
+	 */
+	@NotNull
+	ScheduledExecutorService getScheduledExecutor();
+
+	/**
 	 * Gets the {@link CrowdControl} instance.
 	 *
 	 * @return crowd control instance
@@ -473,11 +485,16 @@ public interface Plugin<P, S> {
 	 */
 	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
 	default void sendEmbeddedMessagePacket(@NotNull SocketManager service, @NotNull String message) {
-		getSLF4JLogger().warn("sending packet {} to {}", message, service);
-		service.buildResponse(0)
-				.packetType(PacketType.KEEP_ALIVE)
-				.message("message")
-				.build().send();
+		getScheduledExecutor().schedule(() -> {
+			getSLF4JLogger().debug("sending packet {} to {}", message, service);
+			Response response = service.buildResponse(0)
+					.packetType(PacketType.EFFECT_RESULT)
+					.type(ResultType.SUCCESS)
+					.message(message)
+					.build();
+			getSLF4JLogger().debug("final packet: {}", response.toJSON());
+			response.send();
+		}, 3, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -500,13 +517,11 @@ public interface Plugin<P, S> {
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
-		service.addConnectListener(connectingService -> {
-			sendEmbeddedMessagePacket(service, "_mc_cc_server_status_" + new ServerStatus(
-					globalEffectsUsable(),
-					supportsClientOnly(),
-					commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
-			).toJSON());
-		});
+		service.addConnectListener(connectingService -> sendEmbeddedMessagePacket(service, "_mc_cc_server_status_" + new ServerStatus(
+				globalEffectsUsable(),
+				supportsClientOnly(),
+				commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
+		).toJSON()));
 	}
 
 	/**

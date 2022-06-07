@@ -65,6 +65,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		for (Player player : players)
 			uuids.add(player.getUniqueId());
 
+		plugin.updateEffectIdVisibility("clutter", enable);
 		if (enable) {
 			if (keepingInventory.addAll(uuids)) {
 				alert(players);

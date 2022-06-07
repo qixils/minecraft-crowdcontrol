@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public abstract class AbstractPlugin<P, S> extends dev.qixils.crowdcontrol.common.AbstractPlugin<P, S> {
+
 	public AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		super(playerClass, commandSenderClass);
 	}
