@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public final class EventManager {
@@ -36,11 +37,13 @@ public final class EventManager {
 	}
 
 	public void fire(Event event) {
-		for (Consumer<Event> listener : listeners.get((Class<Event>) event.getClass())) {
+		Class<? extends Event> eventClass = event.getClass();
+		for (Map.Entry<Class<Event>, Consumer<Event>> entry : listeners.entries()) {
+			if (!entry.getKey().isAssignableFrom(eventClass)) continue;
 			try {
-				listener.accept(event);
+				entry.getValue().accept(event);
 			} catch (Throwable t) {
-				LOGGER.warn("An error occurred while firing event " + event.getClass().getSimpleName(), t);
+				LOGGER.warn("An error occurred while firing event " + eventClass.getSimpleName(), t);
 			}
 		}
 	}

@@ -6,6 +6,7 @@
   "mixins": [
     "CreeperAccessor",
     "InventoryAccessor",
+    "LivingEntityMixin",
     "PlayerListMixin"
   ],
   "client": [

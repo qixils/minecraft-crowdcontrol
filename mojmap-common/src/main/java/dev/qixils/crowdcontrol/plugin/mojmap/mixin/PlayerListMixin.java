@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerListMixin {
 	@Inject(method = "placeNewPlayer", at = @At(value = "RETURN"))
 	private void impl$onInitPlayer_join(final Connection networkManager, final ServerPlayer mcPlayer, final CallbackInfo ci) {
+		if (!MojmapPlugin.isInstanceAvailable()) return;
 		MojmapPlugin.getInstance().getEventManager().fire(new Join(mcPlayer));
 	}
 }

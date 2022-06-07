@@ -86,6 +86,15 @@ public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractP
 		return instance;
 	}
 
+	/**
+	 * Determines whether the plugin instance is available.
+	 *
+	 * @return {@code true} if the plugin instance is available, {@code false} otherwise
+	 */
+	public static boolean isInstanceAvailable() {
+		return instance != null;
+	}
+
 	public abstract boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request);
 
 	@Override
