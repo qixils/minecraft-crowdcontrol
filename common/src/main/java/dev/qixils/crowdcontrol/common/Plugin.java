@@ -484,10 +484,16 @@ public interface Plugin<P, S> {
 	 * @param message the message to send
 	 */
 	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
-	default void sendEmbeddedMessagePacket(@NotNull SocketManager service, @NotNull String message) {
+	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String message) {
+		if (service == null) service = getCrowdControl();
+		if (service == null) {
+			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
+			return;
+		}
+		final @NotNull SocketManager finalService = service;
 		getScheduledExecutor().schedule(() -> {
-			getSLF4JLogger().debug("sending packet {} to {}", message, service);
-			Response response = service.buildResponse(0)
+			getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
+			Response response = finalService.buildResponse(0)
 					.packetType(PacketType.EFFECT_RESULT)
 					.type(ResultType.SUCCESS)
 					.message(message)
@@ -503,12 +509,7 @@ public interface Plugin<P, S> {
 	 * @param message the message to send
 	 */
 	default void sendEmbeddedMessagePacket(@NotNull String message) {
-		SocketManager service = getCrowdControl();
-		if (service == null) {
-			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
-			return;
-		}
-		sendEmbeddedMessagePacket(service, message);
+		sendEmbeddedMessagePacket(null, message);
 	}
 
 	/**
@@ -527,10 +528,11 @@ public interface Plugin<P, S> {
 	/**
 	 * Updates the visibility of a collection of {@link Command effect} IDs.
 	 *
+	 * @param service   the service to send the packet to
 	 * @param effectIds IDs of the effect to update
 	 * @param visible   effects' new visibility
 	 */
-	default void updateEffectIdVisibility(@NotNull Collection<String> effectIds, boolean visible) {
+	default void updateEffectIdVisibility(@Nullable SocketManager service, @NotNull Collection<String> effectIds, boolean visible) {
 		StringBuilder message = new StringBuilder("_mc_cc_");
 		if (visible)
 			message.append("show");
@@ -538,37 +540,40 @@ public interface Plugin<P, S> {
 			message.append("hide");
 		message.append("_effects_:");
 		message.append(String.join(",", effectIds));
-		sendEmbeddedMessagePacket(message.toString());
+		sendEmbeddedMessagePacket(service, message.toString());
 	}
 
 	/**
 	 * Updates the visibility of an {@link Command effect} ID.
 	 *
+	 * @param service  the service to send the packet to
 	 * @param effectId ID of the effect to update
 	 * @param visible  effect's new visibility
 	 */
-	default void updateEffectIdVisibility(@NotNull String effectId, boolean visible) {
-		updateEffectIdVisibility(Collections.singletonList(effectId), visible);
+	default void updateEffectIdVisibility(@Nullable SocketManager service, @NotNull String effectId, boolean visible) {
+		updateEffectIdVisibility(service, Collections.singletonList(effectId), visible);
 	}
 
 	/**
 	 * Updates the visibility of a collection of {@link Command effects}.
 	 *
+	 * @param service the service to send the packet to
 	 * @param effects the effect to update
 	 * @param visible effects' new visibility
 	 */
-	default void updateEffectVisibility(@NotNull Collection<Command<?>> effects, boolean visible) {
-		updateEffectIdVisibility(effects.stream().map(Command::getEffectName).collect(Collectors.toList()), visible);
+	default void updateEffectVisibility(@Nullable SocketManager service, @NotNull Collection<Command<?>> effects, boolean visible) {
+		updateEffectIdVisibility(service, effects.stream().map(Command::getEffectName).collect(Collectors.toList()), visible);
 	}
 
 	/**
 	 * Updates the visibility of an {@link Command effect}.
 	 *
+	 * @param service the service to send the packet to
 	 * @param effect  the effect to update
 	 * @param visible effect's new visibility
 	 */
-	default void updateEffectVisibility(@NotNull Command<?> effect, boolean visible) {
-		updateEffectVisibility(Collections.singletonList(effect), visible);
+	default void updateEffectVisibility(@Nullable SocketManager service, @NotNull Command<?> effect, boolean visible) {
+		updateEffectVisibility(service, Collections.singletonList(effect), visible);
 	}
 
 	/**
