@@ -63,6 +63,12 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 		return new Location(level, pos, yaw, pitch);
 	}
 
+	@CheckReturnValue
+	@Contract("_, _ -> new")
+	public Location withRotation(float yaw, float pitch) {
+		return new Location(level, x, y, z, yaw, pitch);
+	}
+
 	public BlockState block() {
 		return level.getBlockState(pos());
 	}

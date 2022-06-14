@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 // TODO: implement soft lock resolver
 
@@ -61,6 +62,7 @@ public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractP
 	// TODO is this actually the sync executor?? 'Main' sounds sync but 'background' doesn't
 	private final ExecutorService syncExecutor = Util.backgroundExecutor();
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
+	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowd-control");
 	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)

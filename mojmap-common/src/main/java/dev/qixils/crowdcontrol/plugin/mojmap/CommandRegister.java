@@ -61,7 +61,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
 				new TeleportCommand(plugin),
 //				new ToastCommand(plugin),
-//				new FreezeCommand(plugin),
+				new FreezeCommand(plugin),
 //				new CameraLockCommand(plugin),
 				new FlowerCommand(plugin),
 				new MoveCommand(plugin, 0, 1, 0, "Up"),
