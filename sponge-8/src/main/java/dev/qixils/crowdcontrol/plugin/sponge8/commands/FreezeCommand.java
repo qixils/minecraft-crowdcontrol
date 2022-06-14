@@ -41,7 +41,6 @@ public final class FreezeCommand extends TimedCommand {
 
 		new TimedEffect.Builder()
 				.request(request)
-				.effectGroup("gamemode")
 				.duration(getDuration())
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);

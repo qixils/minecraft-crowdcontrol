@@ -39,7 +39,6 @@ public final class FreezeCommand extends TimedCommand {
 		AtomicReference<Map<UUID, Location>> atomic = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
-				.effectGroup("gamemode")
 				.duration(getDuration())
 				.startCallback($ -> {
 					List<ServerPlayer> players = getPlugin().getPlayers(request);
