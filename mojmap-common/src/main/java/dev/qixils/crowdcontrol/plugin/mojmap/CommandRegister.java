@@ -105,7 +105,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new EntityChaosCommand(plugin),
 //				new CameraLockToSkyCommand(plugin),
 //				new CameraLockToGroundCommand(plugin),
-//				new FlightCommand(plugin),
+				new FlightCommand(plugin),
 				new KeepInventoryCommand(plugin, true),
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin),

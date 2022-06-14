@@ -80,9 +80,8 @@ public class FlightCommand extends TimedCommand {
 			return;
 		if (gameMode.equals(GameModes.SPECTATOR))
 			return;
-		if (!player.get(Keys.CAN_FLY).orElse(false))
-			return;
-		if (!player.get(Keys.IS_FLYING).orElse(false))
+		if (!player.get(Keys.CAN_FLY).orElse(false)
+				&& !player.get(Keys.IS_FLYING).orElse(false))
 			return;
 		player.offer(Keys.IS_FLYING, false);
 		player.offer(Keys.CAN_FLY, false);

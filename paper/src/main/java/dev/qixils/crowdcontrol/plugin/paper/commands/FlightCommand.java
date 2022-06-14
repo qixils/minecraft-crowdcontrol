@@ -77,9 +77,7 @@ public class FlightCommand extends TimedCommand implements Listener {
 			return;
 		if (gamemode.equals(GameMode.SPECTATOR))
 			return;
-		if (!player.isFlying())
-			return;
-		if (!player.getAllowFlight())
+		if (!player.isFlying() && !player.getAllowFlight())
 			return;
 		player.setFlying(false);
 		player.setAllowFlight(false);

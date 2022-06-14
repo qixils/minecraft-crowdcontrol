@@ -1,20 +1,19 @@
-package dev.qixils.crowdcontrol.plugin.sponge8.commands;
+package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
-import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
+import dev.qixils.crowdcontrol.plugin.mojmap.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.mojmap.event.Join;
+import dev.qixils.crowdcontrol.plugin.mojmap.event.Listener;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 import java.time.Duration;
 import java.util.List;
@@ -26,7 +25,7 @@ public class FlightCommand extends TimedCommand {
 	private final String displayName = "Enable Flight";
 	private final Duration duration = Duration.ofSeconds(15);
 
-	public FlightCommand(@NotNull SpongeCrowdControlPlugin plugin) {
+	public FlightCommand(@NotNull MojmapPlugin<?> plugin) {
 		super(plugin);
 	}
 
@@ -42,19 +41,21 @@ public class FlightCommand extends TimedCommand {
 							.type(ResultType.RETRY)
 							.message("Target is already flying or able to fly");
 					for (ServerPlayer player : players) {
-						GameMode gameMode = player.gameMode().get();
-						if (gameMode.equals(GameModes.CREATIVE.get()))
+						GameType gamemode = player.gameMode.getGameModeForPlayer();
+						if (gamemode == GameType.CREATIVE)
 							continue;
-						if (gameMode.equals(GameModes.SPECTATOR.get()))
+						if (gamemode == GameType.SPECTATOR)
 							continue;
-						if (player.get(Keys.CAN_FLY).orElse(false))
+						Abilities abilities = player.getAbilities();
+						if (abilities.mayfly)
 							continue;
-						if (player.get(Keys.IS_FLYING).orElse(false))
+						if (abilities.flying)
 							continue;
 						response.type(ResultType.SUCCESS).message("SUCCESS");
 						sync(() -> {
-							player.offer(Keys.CAN_FLY, true);
-							player.offer(Keys.IS_FLYING, true);
+							abilities.mayfly = true;
+							abilities.flying = true;
+							player.onUpdateAbilities();
 						});
 					}
 					if (response.type() == ResultType.SUCCESS)
@@ -64,26 +65,29 @@ public class FlightCommand extends TimedCommand {
 				.completionCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					sync(() -> players.forEach(player -> {
-						player.offer(Keys.CAN_FLY, false);
-						player.offer(Keys.IS_FLYING, false);
+						Abilities abilities = player.getAbilities();
+						abilities.mayfly = false;
+						abilities.flying = false;
+						player.onUpdateAbilities();
 					}));
 				})
 				.build().queue();
 	}
 
+	// clear flight on login if they disconnected mid-effect
 	@Listener
-	public void onJoin(ServerSideConnectionEvent.Join event) {
+	public void onJoin(Join event) {
 		ServerPlayer player = event.player();
-		GameMode gameMode = player.gameMode().get();
-		// this is a work of art
-		if (gameMode.equals(GameModes.CREATIVE.get()))
+		GameType gamemode = player.gameMode.getGameModeForPlayer();
+		if (gamemode == GameType.CREATIVE)
 			return;
-		if (gameMode.equals(GameModes.SPECTATOR.get()))
+		if (gamemode == GameType.SPECTATOR)
 			return;
-		if (!player.get(Keys.CAN_FLY).orElse(false)
-				&& !player.get(Keys.IS_FLYING).orElse(false))
+		Abilities abilities = player.getAbilities();
+		if (!abilities.flying && !abilities.mayfly)
 			return;
-		player.offer(Keys.IS_FLYING, false);
-		player.offer(Keys.CAN_FLY, false);
+		abilities.mayfly = false;
+		abilities.flying = false;
+		player.onUpdateAbilities();
 	}
 }
