@@ -6,7 +6,7 @@
 
     <groupId>dev.qixils.crowdcontrol.plugin</groupId>
     <artifactId>minecraft-crowd-control</artifactId>
-    <version>3.2.3-SNAPSHOT</version>
+    <version>3.2.3</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -25,9 +25,9 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 <!--        <maven.compiler.release>${java.version}</maven.compiler.release>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <adventure.version>4.9.3</adventure.version>
-        <cloud.version>1.6.2</cloud.version>
-        <crowdcontrol.version>3.4.0-SNAPSHOT</crowdcontrol.version>
+        <adventure.version>4.11.0</adventure.version>
+        <cloud.version>1.7.0</cloud.version>
+        <crowdcontrol.version>3.4.0</crowdcontrol.version>
     </properties>
 
     <pluginRepositories>
@@ -48,13 +48,13 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <version>1.18.24</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.0.1-jre</version>
+            <version>31.1-jre</version>
         </dependency>
         <dependency>
             <groupId>dev.qixils.crowdcontrol</groupId>
