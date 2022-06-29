@@ -10,7 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Accessors(fluent = true)
+@Accessors(fluent = true, chain = false)
 public final class Death implements CancellableEvent {
 	private final LivingEntity entity;
 	private boolean keepInventory = false;
