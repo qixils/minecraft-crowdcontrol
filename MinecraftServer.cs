@@ -442,12 +442,24 @@ namespace CrowdControl.Games.Packs
 
         public override List<Effect> Effects => AllEffects;
 
-        public override void OnMessageParsed(object sender, Response response, object context)
+        public override SimpleTCPClientConnector? Connector
         {
-            base.OnMessageParsed(sender, response, context);
+            get => base.Connector;
+            set
+            {
+                if (value != null)
+                {
+                    value.MessageParsed += OnMessageParsed;
+                }
+                base.Connector = value;
+            }
+        }
+
+        private void OnMessageParsed(ISimpleTCPConnector<Request, Response, ISimpleTCPContext.NullContext> sender, Response response, ISimpleTCPContext.NullContext context)
+        {
             Log.Debug("Parsing incoming message #" + response.id
-                                                     + " of type " + response.type
-                                                     + " with message \"" + response.message + "\"");
+                                                   + " of type " + response.type
+                                                   + " with message \"" + response.message + "\"");
             if (response.message == null)
             {
                 Log.Debug("Message has no message attribute; exiting");
