@@ -73,8 +73,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
 				// end: deprecated effects
 				new FlingCommand(plugin),
-//				new TorchCommand(plugin, true),
-//				new TorchCommand(plugin, false),
+				new TorchCommand(plugin, true),
+				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
 				new DigCommand(plugin),
 				new TimeCommand(plugin),
@@ -117,6 +117,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				WeatherCommand.clear(plugin),
 				WeatherCommand.downfall(plugin),
 				WeatherCommand.storm(plugin)
+
+				// location commands from paper
 		));
 
 		// entity commands

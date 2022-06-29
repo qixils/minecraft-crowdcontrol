@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.mojmap.utils;
 
 import com.mojang.math.Vector3d;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -79,5 +80,9 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 
 	public <T extends ParticleOptions> ParticleEffectBuilder<T> buildParticleEffect(T options) {
 		return new ParticleEffectBuilder<>(options).level(level).position(vector());
+	}
+
+	public Location relative(Direction direction) {
+		return new Location(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ(), yaw, pitch);
 	}
 }
