@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
@@ -26,7 +27,17 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
 public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdControlPlugin, Command> {
 	@SuppressWarnings("deprecation") // Bukkit is dumb
 	private static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
-			new MappedKeyedTag<>(CommandConstants.SAFE_ENTITIES, key -> EntityType.fromName(key.value()));
+			new MappedKeyedTag<>(CommandConstants.SAFE_ENTITIES, key -> {
+				EntityType entity = EntityType.fromName(key.value());
+				if (entity == null) {
+					try {
+						entity = EntityType.valueOf(key.value().toUpperCase(Locale.ENGLISH));
+					} catch (IllegalArgumentException e) {
+						return null;
+					}
+				}
+				return entity;
+			});
 	private static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
 	private static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommandConstants.SET_FALLING_BLOCKS);
 	private static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommandConstants.GIVE_TAKE_ITEMS);

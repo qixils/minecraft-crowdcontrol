@@ -248,10 +248,10 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "llama"),
 			Key.key(MINECRAFT_NAMESPACE, "magma_cube"),
 			Key.key(MINECRAFT_NAMESPACE, "minecart"),
-			Key.key(MINECRAFT_NAMESPACE, "minecart_chest"),
-			Key.key(MINECRAFT_NAMESPACE, "minecart_furnace"),
-			Key.key(MINECRAFT_NAMESPACE, "minecart_hopper"),
-			Key.key(MINECRAFT_NAMESPACE, "minecart_tnt"),
+			Key.key(MINECRAFT_NAMESPACE, "chest_minecart"),
+			Key.key(MINECRAFT_NAMESPACE, "furnace_minecart"),
+			Key.key(MINECRAFT_NAMESPACE, "hopper_minecart"),
+			Key.key(MINECRAFT_NAMESPACE, "tnt_minecart"),
 			Key.key(MINECRAFT_NAMESPACE, "mule"),
 			Key.key(MINECRAFT_NAMESPACE, "mushroom_cow"),
 			Key.key(MINECRAFT_NAMESPACE, "ocelot"),
@@ -342,7 +342,7 @@ public class CommandConstants {
 	/**
 	 * How long Do-or-Die's on-screen Titles should last.
 	 */
-	public static final Title.@NotNull Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
+	public static final Title.@NotNull Times DO_OR_DIE_TIMES = Title.Times.times(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
 	/**
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */

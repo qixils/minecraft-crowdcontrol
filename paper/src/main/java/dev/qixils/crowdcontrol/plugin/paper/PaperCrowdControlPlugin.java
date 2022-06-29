@@ -50,10 +50,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final Executor asyncExecutor = runnable -> Bukkit.getScheduler().runTaskAsynchronously(this, runnable);
 	@Getter
 	@Accessors(fluent = true)
-	private final EntityMapper<Player> playerMapper = new PlayerMapper<>();
+	private final EntityMapper<Player> playerMapper = new PlayerMapper<>(this);
 	@Getter
 	@Accessors(fluent = true)
-	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>();
+	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
@@ -78,6 +78,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	private Collection<String> hosts = Collections.emptyList();
 	private boolean announce = true;
+	@Getter
+	private boolean adminRequired = false;
 	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
@@ -143,6 +145,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public void onEnable() {
 		global = config.getBoolean("global", false);
 		announce = config.getBoolean("announce", true);
+		adminRequired = config.getBoolean("admin-required", false);
 		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
@@ -163,8 +166,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 					Function.identity(),
 					Function.identity()
 			);
-			commandManager.registerBrigadier();
-			commandManager.registerAsynchronousCompletions();
+			try {
+				commandManager.registerBrigadier();
+				commandManager.registerAsynchronousCompletions();
+			} catch (Exception exception) {
+				getSLF4JLogger().error("The command manager was unable to fully initialize. Please report this error to the developer.", exception);
+			}
 			registerChatCommands();
 		} catch (Exception exception) {
 			throw new IllegalStateException("The command manager was unable to load. Please ensure you are using the latest version of Paper.", exception);
@@ -191,8 +198,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public void registerCommand(@NotNull String name, dev.qixils.crowdcontrol.common.@NotNull Command<Player> command) {
 		name = name.toLowerCase(Locale.ENGLISH);
-		crowdControl.registerHandler(name, command::executeAndNotify);
-		getLogger().fine("Registered CC command '" + name + "'");
+		try {
+			crowdControl.registerHandler(name, command::executeAndNotify);
+			getLogger().fine("Registered CC command '" + name + "'");
+		} catch (IllegalArgumentException e) {
+			getSLF4JLogger().warn("Failed to register command: " + name, e);
+		}
 	}
 
 	@Override

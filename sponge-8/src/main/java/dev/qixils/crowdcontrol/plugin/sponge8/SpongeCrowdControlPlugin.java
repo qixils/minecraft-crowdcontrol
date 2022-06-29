@@ -75,9 +75,9 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private final SpongeTextUtil textUtil = new SpongeTextUtil();
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	@Accessors(fluent = true)
-	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper();
+	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper(this);
 	@Accessors(fluent = true)
-	private final EntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper();
+	private final EntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
 	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
 	private final HoconConfigurationLoader configLoader;

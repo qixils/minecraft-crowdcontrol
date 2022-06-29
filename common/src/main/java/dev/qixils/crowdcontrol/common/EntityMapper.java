@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +17,13 @@ import java.util.UUID;
  * @param <E> type of class being wrapped
  */
 public interface EntityMapper<E> {
+
+	/**
+	 * Gets the {@link Plugin} that this mapper is associated with.
+	 *
+	 * @return the plugin
+	 */
+	Plugin<?, ?> getPlugin();
 
 	/**
 	 * Converts an entity to an adventure {@link Audience}.
@@ -59,5 +67,17 @@ public interface EntityMapper<E> {
 	 * @param entity the entity to check
 	 * @return true if the entity is an administrator
 	 */
-	boolean isAdmin(@NotNull E entity);
+	default boolean isAdmin(@NotNull E entity) {
+		String uuid = getUniqueId(entity)
+				.map(id -> id.toString()
+						.toLowerCase(Locale.US)
+						.replace("-", ""))
+				.orElse(null);
+		if (uuid == null) return false;
+
+		return getPlugin().getHosts().stream()
+				.anyMatch(host -> host.toLowerCase(Locale.ENGLISH)
+						.replace("-", "")
+						.equals(uuid));
+	}
 }

@@ -1,7 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.mojmap;
 
 import dev.qixils.crowdcontrol.common.EntityMapper;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -9,9 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class PlayerEntityMapper implements EntityMapper<ServerPlayer> {
-	private final MojmapPlugin<?> plugin;
+	protected final MojmapPlugin<?> plugin;
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull ServerPlayer entity) {
@@ -25,6 +27,7 @@ public class PlayerEntityMapper implements EntityMapper<ServerPlayer> {
 
 	@Override
 	public boolean isAdmin(@NotNull ServerPlayer entity) {
-		return entity.hasPermissions(3);
+		if (entity.hasPermissions(3)) return true;
+		return EntityMapper.super.isAdmin(entity);
 	}
 }

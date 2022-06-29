@@ -2,17 +2,19 @@ package dev.qixils.crowdcontrol.common.util;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Function;
 
@@ -22,10 +24,10 @@ import java.util.function.Function;
  * @param <T> mapped type
  */
 public class MappedKeyedTag<T> implements Iterable<T> {
-	private final Map<Key, T> keyMap;
-	private final Function<Key, T> mapper;
-	private final KeyedTag tag;
-	private Collection<T> calculatedValues = null;
+	private final @NotNull Map<Key, T> keyMap;
+	private final @NotNull Function<Key, T> mapper;
+	private final @NotNull KeyedTag tag;
+	private @MonotonicNonNull Set<T> calculatedValues = null;
 
 	/**
 	 * Initializes a new mapped keyed tag using a backing tag and a function to map tags to the
@@ -49,20 +51,19 @@ public class MappedKeyedTag<T> implements Iterable<T> {
 	 *
 	 * <p>Keys that map to {@code null} will not be included in the resulting collection.</p>
 	 *
-	 * @return unmodifiable collection of values
+	 * @return unmodifiable set of unique values
 	 */
 	@NotNull
-	public Collection<@NotNull T> getAll() {
+	public Set<@NotNull T> getAll() {
 		if (calculatedValues != null)
 			return calculatedValues;
 		tag.getKeys().forEach(this::map);
-		return calculatedValues = keyMap.values();
+		return calculatedValues = Collections.unmodifiableSet(new HashSet<>(keyMap.values()));
 	}
 
 	@NotNull
 	@Override
 	public Iterator<T> iterator() {
-		// the performance of this could be improved, but it probably is not worth it
 		return getAll().iterator();
 	}
 

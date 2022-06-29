@@ -297,6 +297,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 		global = config.getNode("global").getBoolean(false);
 		announce = config.getNode("announce").getBoolean(true);
+		adminRequired = config.getNode("admin-required").getBoolean(false);
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)

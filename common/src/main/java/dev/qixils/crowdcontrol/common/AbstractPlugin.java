@@ -32,6 +32,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	@Getter
 	protected boolean global = false;
 	protected boolean announce = true;
+	@Getter
+	protected boolean adminRequired = false;
 	@Getter @NotNull
 	protected Collection<String> hosts = Collections.emptyList();
 	@Getter @NotNull
@@ -64,7 +66,11 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 		name = name.toLowerCase(Locale.ENGLISH);
 		if (crowdControl == null)
 			throw new IllegalStateException("CrowdControl is not initialized");
-		crowdControl.registerHandler(name, command::executeAndNotify);
-		getSLF4JLogger().debug("Registered CC command '" + name + "'");
+		try {
+			crowdControl.registerHandler(name, command::executeAndNotify);
+			getSLF4JLogger().debug("Registered CC command '" + name + "'");
+		} catch (IllegalArgumentException e) {
+			getSLF4JLogger().warn("Failed to register command: " + name, e);
+		}
 	}
 }

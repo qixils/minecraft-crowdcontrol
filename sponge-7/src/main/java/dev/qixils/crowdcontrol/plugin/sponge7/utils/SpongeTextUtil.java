@@ -74,6 +74,14 @@ public class SpongeTextUtil extends TextUtilImpl {
 				return "vindicator";
 			case "sweeping":
 				return "sweeping_edge";
+			case "chest_minecart":
+				return "minecart_chest";
+			case "furnace_minecart":
+				return "minecart_furnace";
+			case "hopper_minecart":
+				return "minecart_hopper";
+			case "tnt_minecart":
+				return "minecart_tnt";
 			default:
 				return value;
 		}
