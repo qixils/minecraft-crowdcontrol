@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import net.minecraft.world.entity.LivingEntity;
 
-// TODO: impl
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor

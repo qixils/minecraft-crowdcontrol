@@ -8,6 +8,7 @@
     "InventoryAccessor",
     "LivingEntityMixin",
     "PlayerListMixin",
+    "PlayerMixin",
     "ServerPlayerMixin"
   ],
   "client": [
