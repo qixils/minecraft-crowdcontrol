@@ -21,7 +21,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.2.0")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.3.1")!!)
     modImplementation(include("cloud.commandframework:cloud-fabric:${cloudVersion}")!!)
 }
 
