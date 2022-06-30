@@ -276,10 +276,10 @@ namespace CrowdControl.Games.Packs
             new Effect("Zombified Piglin", "remove_entity_zombified_piglin", "remove_entity") { Price = 150 },
             // sets the server difficulty (affects how much damage mobs deal)
             new GlobalEffect("Set Difficulty", "difficulty", ItemKind.Folder),
-            new Effect("Peaceful Mode", "difficulty_peaceful", "difficulty") { Price = 100, Description = "Removes all hostile mobs and prevents new ones spawning" },
-            new Effect("Easy Mode", "difficulty_easy", "difficulty") { Price = 100 },
-            new Effect("Normal Mode", "difficulty_normal", "difficulty") { Price = 200 },
-            new Effect("Hard Mode", "difficulty_hard", "difficulty") { Price = 400 },
+            new GlobalEffect("Peaceful Mode", "difficulty_peaceful", "difficulty") { Price = 100, Description = "Removes all hostile mobs and prevents new ones spawning" },
+            new GlobalEffect("Easy Mode", "difficulty_easy", "difficulty") { Price = 100 },
+            new GlobalEffect("Normal Mode", "difficulty_normal", "difficulty") { Price = 200 },
+            new GlobalEffect("Hard Mode", "difficulty_hard", "difficulty") { Price = 400 },
             // applies potion effects to every player
             new Effect("Apply Potion (20s)", "apply_potion_effect", ItemKind.Folder),
             new Effect("Absorption", "potion_absorption", "apply_potion_effect") { Price = 50, Description = "Grants extra health that cannot be regenerated" },
@@ -324,9 +324,9 @@ namespace CrowdControl.Games.Packs
             new Effect("Sand", "falling_block_sand", "place_falling_block") { Price = 25, Description = "Drops a sand block on the streamer" },
             // sets the server weather
             new GlobalEffect("Set Weather", "weather", ItemKind.Folder),
-            new Effect("Clear Weather", "clear", "weather") { Price = 25, Description = "Makes the weather sunny to allow rays of fire to shine down on hostile mobs" },
-            new Effect("Rainy Weather", "downfall", "weather") { Price = 50, Description = "Makes the weather rainy which prevents hostile mobs from burning in the daylight" },
-            new Effect("Stormy Weather", "thunder_storm", "weather") { Price = 75, Description = "Starts a thunderstorm with sporadic lightning strikes. Combine with placing a lightning rod to perform some electrocution!" },
+            new GlobalEffect("Clear Weather", "clear", "weather") { Price = 25, Description = "Makes the weather sunny to allow rays of fire to shine down on hostile mobs" },
+            new GlobalEffect("Rainy Weather", "downfall", "weather") { Price = 50, Description = "Makes the weather rainy which prevents hostile mobs from burning in the daylight" },
+            new GlobalEffect("Stormy Weather", "thunder_storm", "weather") { Price = 75, Description = "Starts a thunderstorm with sporadic lightning strikes. Combine with placing a lightning rod to perform some electrocution!" },
             // apply enchants
             new Effect("Enchantments", "enchantments", ItemKind.Folder),
             new Effect("Remove Enchants", "remove_enchants", "enchantments") { Price = 200, Description = "Removes all enchants from the held item" },
@@ -511,14 +511,12 @@ namespace CrowdControl.Games.Packs
             // hide global effects if they are not usable
             if (!status.GlobalEffects)
             {
-                // TODO: test how this works with folders marked as global effects.
                 // does the folder actually get hidden? if so, do its contents also get hidden from search?
                 AllEffects.FindAll(effect => effect is GlobalEffect).ForEach(HideEffect);
             }
             // hide client effects if running on a server
             if (!status.ClientEffects)
             {
-                // same TODO as above
                 AllEffects.FindAll(effect => effect is ClientEffect).ForEach(HideEffect);
             }
 
@@ -530,7 +528,7 @@ namespace CrowdControl.Games.Packs
             Log.Debug("Finished hiding effects");
         }
 
-        private void OnMenuStatusPacket(Response response, EffectStatus status) // TODO if EffectStatus is the wrong variable type then try byte
+        private void OnMenuStatusPacket(Response response, EffectStatus status)
         {
             var effectsList = new List<string>(response.message.Split(':')[1].Split(','));
             AllEffects.FindAll(effect => effectsList.Contains(effect.Code)).ForEach(effect =>

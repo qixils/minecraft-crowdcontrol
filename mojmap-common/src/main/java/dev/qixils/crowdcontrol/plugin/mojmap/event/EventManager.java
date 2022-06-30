@@ -26,6 +26,7 @@ public final class EventManager {
 			if (!method.isAnnotationPresent(Listener.class)) continue;
 			if (method.getParameterCount() != 1) continue;
 			if (!Event.class.isAssignableFrom(method.getParameterTypes()[0])) continue;
+			//noinspection unchecked
 			register((Class<Event>) method.getParameterTypes()[0], event -> {
 				try {
 					method.invoke(object, event);

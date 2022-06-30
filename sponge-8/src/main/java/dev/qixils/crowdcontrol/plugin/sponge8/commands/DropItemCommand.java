@@ -71,7 +71,7 @@ public class DropItemCommand extends ImmediateCommand {
 						player.position().add(0, 1.4, 0)
 				);
 				item.offer(Keys.ITEM_STACK_SNAPSHOT, itemStack.createSnapshot());
-				item.velocity().set(rotation);
+				item.offer(Keys.VELOCITY, rotation);
 				item.offer(Keys.PICKUP_DELAY, Ticks.of(40));
 
 				try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
