@@ -529,7 +529,7 @@ public interface Plugin<P, S> {
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
-		service.addConnectListener(connectingService -> sendEmbeddedMessagePacket(service, "_mc_cc_server_status_" + new ServerStatus(
+		service.addConnectListener(connectingService -> sendEmbeddedMessagePacket(connectingService, "_mc_cc_server_status_" + new ServerStatus(
 				globalEffectsUsable(),
 				supportsClientOnly(),
 				commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
