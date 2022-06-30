@@ -1,6 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.mojmap.utils;
 
 import com.mojang.math.Vector3d;
+import net.minecraft.FieldsAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -13,6 +15,8 @@ import org.jetbrains.annotations.Contract;
 
 import javax.annotation.CheckReturnValue;
 
+@FieldsAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public record Location(ServerLevel level, double x, double y, double z, float yaw, float pitch) {
 	public Location(Entity player) {
 		this((ServerLevel) player.getLevel(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
@@ -68,6 +72,24 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	@Contract("_, _ -> new")
 	public Location withRotation(float yaw, float pitch) {
 		return new Location(level, x, y, z, yaw, pitch);
+	}
+
+	@CheckReturnValue
+	@Contract("_ -> new")
+	public Location withRotationOf(Location other) {
+		return new Location(level, x, y, z, other.yaw, other.pitch);
+	}
+
+	@CheckReturnValue
+	@Contract("_, _, _ -> new")
+	public Location withPosition(double x, double y, double z) {
+		return new Location(level, x, y, z, yaw, pitch);
+	}
+
+	@CheckReturnValue
+	@Contract("_ -> new")
+	public Location withPositionOf(Location other) {
+		return new Location(other.level, other.x, other.y, other.z, yaw, pitch);
 	}
 
 	public BlockState block() {

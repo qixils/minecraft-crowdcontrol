@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.Command;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.mojmap.commands.*;
+import dev.qixils.crowdcontrol.plugin.mojmap.utils.Location;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.TypedTag;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
@@ -61,8 +62,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
 				new TeleportCommand(plugin),
 //				new ToastCommand(plugin),
-				new FreezeCommand(plugin),
-//				new CameraLockCommand(plugin),
+				FreezeCommand.createDefault(plugin),
+				new FreezeCommand(plugin, "camera_lock", "Camera Lock", Location::withRotationOf), // (cur, prev) -> cur.withRotationOf(prev)
 				new FlowerCommand(plugin),
 				new MoveCommand(plugin, 0, 1, 0, "Up"),
 				new MoveCommand(plugin, 0, -2, 0, "Down"),
@@ -103,8 +104,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new MaxHealthCommand(plugin, 4), // used in hype trains only
 				new DisableJumpingCommand(plugin),
 				new EntityChaosCommand(plugin),
-//				new CameraLockToSkyCommand(plugin),
-//				new CameraLockToGroundCommand(plugin),
+				new FreezeCommand(plugin, "camera_lock_to_sky", "Camera Lock to Sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90)),
+				new FreezeCommand(plugin, "camera_lock_to_ground", "Camera Lock to Ground", (cur, prev) -> cur.withRotation(prev.yaw(), 90)),
 				new FlightCommand(plugin),
 				new KeepInventoryCommand(plugin, true),
 				new KeepInventoryCommand(plugin, false),
