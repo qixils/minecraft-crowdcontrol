@@ -342,7 +342,8 @@ public class CommandConstants {
 	/**
 	 * How long Do-or-Die's on-screen Titles should last.
 	 */
-	public static final Title.@NotNull Times DO_OR_DIE_TIMES = Title.Times.times(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
+	@SuppressWarnings("UnstableApiUsage") // the new Times.times() method is unavailable in 1.17
+	public static final Title.@NotNull Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
 	/**
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */

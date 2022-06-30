@@ -46,3 +46,10 @@ bukkit {
     website = "https://github.com/qixils/minecraft-crowdcontrol"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 }
+
+// configure runServer task
+tasks {
+    runServer {
+        minecraftVersion("1.17.1")
+    }
+}
