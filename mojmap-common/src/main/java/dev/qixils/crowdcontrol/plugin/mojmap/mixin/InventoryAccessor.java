@@ -11,11 +11,11 @@ import java.util.List;
 
 @SuppressWarnings("UnusedMixin")
 @Mixin(Inventory.class)
-public interface InventoryAccessor {
+public abstract class InventoryAccessor {
 	@Accessor
-	List<NonNullList<ItemStack>> getCompartments();
+	public abstract List<NonNullList<ItemStack>> getCompartments();
 
-	default List<ItemStack> viewAllItems() {
+	public List<ItemStack> viewAllItems() {
 		// TODO test
 		//noinspection unchecked
 		return ConcatenatedList.of((Iterable<List<ItemStack>>) (Object) getCompartments());

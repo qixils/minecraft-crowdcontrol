@@ -71,10 +71,11 @@ public class GameModeCommand extends TimedCommand {
 		@Listener
 		public void onJoin(Join event) {
 			ServerPlayer player = event.player();
-			String gamemodeString = player.getEntityData().get(GAME_MODE_EFFECT);
-			if (gamemodeString == null) return;
-			if (gamemodeString.isEmpty()) return;
-			player.getEntityData().set(GAME_MODE_EFFECT, "");
+			// TODO fix and uncomment
+//			String gamemodeString = player.getEntityData().get(GAME_MODE_EFFECT);
+//			if (gamemodeString == null) return;
+//			if (gamemodeString.isEmpty()) return;
+//			player.getEntityData().set(GAME_MODE_EFFECT, "");
 			player.setGameMode(GameType.SURVIVAL);
 		}
 	}

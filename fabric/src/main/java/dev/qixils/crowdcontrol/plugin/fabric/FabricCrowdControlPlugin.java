@@ -52,9 +52,9 @@ public final class FabricCrowdControlPlugin extends MojmapPlugin<FabricServerAud
 
 	@Override
 	public void onInitialize() {
+		registerChatCommands();
 		ServerLifecycleEvents.SERVER_STARTING.register(this::setServer);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
-		// TODO render join message
 	}
 
 	// boilerplate

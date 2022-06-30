@@ -18,7 +18,7 @@ public class FabricWrappedAudienceProvider extends WrappedAudienceProvider<Fabri
 
 	@Override
 	public net.kyori.adventure.text.@NotNull Component toAdventure(@NotNull Component vanilla) {
-		return provider().toAdventure(vanilla);
+		return vanilla.asComponent();
 	}
 
 }

@@ -22,7 +22,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
     modImplementation(include("net.kyori:adventure-platform-fabric:5.3.1")!!)
-    modImplementation(include("cloud.commandframework:cloud-fabric:${cloudVersion}")!!)
+    modImplementation(include("cloud.commandframework:cloud-fabric:1.6.2")!!) // TODO: use cloudVersion variable after updating to 1.19
 }
 
 tasks.withType<ProcessResources> {

@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
 import dev.qixils.crowdcontrol.plugin.mojmap.event.EventManager;
+import dev.qixils.crowdcontrol.plugin.mojmap.event.Join;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.mojmap.utils.WrappedAudienceProvider;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -44,7 +45,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @Getter
 public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractPlugin<ServerPlayer, CommandSourceStack> {
-	// accessors
+	// accessors | TODO: these are not working
 	public static final EntityDataAccessor<Optional<Component>> ORIGINAL_DISPLAY_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
 	public static final EntityDataAccessor<Boolean> VIEWER_SPAWNED = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
 	public static final EntityDataAccessor<String> GAME_MODE_EFFECT = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.STRING);
@@ -74,6 +75,7 @@ public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractP
 		super(ServerPlayer.class, CommandSourceStack.class);
 		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
+		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
 	}
 
 	/**
@@ -130,11 +132,16 @@ public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractP
 		if (server == null) {
 			this.server = null;
 			this.adventure = null;
+			if (this.crowdControl != null) {
+				this.crowdControl.shutdown("Server is shutting down");
+				this.crowdControl = null;
+			}
 		} else {
 			this.server = server;
 			this.adventure = initAdventure(server);
 			this.textUtil = new MojmapTextUtil(this);
 			this.configLoader = createConfigLoader(server.getFile("config"));
+			initCrowdControl();
 		}
 	}
 }

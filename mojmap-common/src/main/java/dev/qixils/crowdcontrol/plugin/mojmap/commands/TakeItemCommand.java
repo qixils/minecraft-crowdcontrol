@@ -39,7 +39,7 @@ public class TakeItemCommand extends ImmediateCommand {
 				.message("Item could not be found in target inventories");
 		for (ServerPlayer player : players) {
 			Inventory inventory = player.getInventory();
-			for (ItemStack itemStack : ((InventoryAccessor) inventory).viewAllItems()) {
+			for (ItemStack itemStack : ((InventoryAccessor) (Object) inventory).viewAllItems()) {
 				if (itemStack.isEmpty()) continue;
 				if (itemStack.getItem() != this.item) continue;
 				response.type(ResultType.SUCCESS).message("SUCCESS");

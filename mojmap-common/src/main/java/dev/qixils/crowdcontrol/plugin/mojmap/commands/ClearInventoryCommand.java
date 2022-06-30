@@ -36,7 +36,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			Inventory inv = player.getInventory();
 			// ensure inventory is not empty
 			boolean hasItems = false;
-			for (ItemStack item : ((InventoryAccessor) inv).viewAllItems()) {
+			for (ItemStack item : ((InventoryAccessor) (Object) inv).viewAllItems()) {
 				if (!item.isEmpty()) {
 					hasItems = true;
 					break;
