@@ -502,7 +502,7 @@ public interface Plugin<P, S> {
 			return;
 		}
 		final @NotNull SocketManager finalService = service;
-		getScheduledExecutor().schedule(() -> { // TODO: ensure this is still needed
+		getScheduledExecutor().schedule(() -> {
 			getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
 			Response response = finalService.buildResponse(0)
 					.packetType(PacketType.EFFECT_RESULT)
@@ -511,7 +511,7 @@ public interface Plugin<P, S> {
 					.build();
 			getSLF4JLogger().debug("final packet: {}", response.toJSON());
 			response.send();
-		}, 3, TimeUnit.SECONDS);
+		}, 1, TimeUnit.SECONDS);
 	}
 
 	/**

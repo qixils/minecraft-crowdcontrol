@@ -52,7 +52,6 @@ public class DropItemCommand extends ImmediateCommand {
 		double x = (-f3 * f2 * 0.3d) + Math.cos(f5) * f6;
 		double y = -f1 * 0.3d + 0.1d + (rng.nextDouble() - rng.nextDouble()) * 0.1d;
 		double z = (f4 * f2 * 0.3d) + Math.sin(f5) * f6;
-		// todo why the hell is this broken
 		return new Vector3d(x, y, z);
 	}
 
@@ -68,7 +67,7 @@ public class DropItemCommand extends ImmediateCommand {
 			plugin.getSyncExecutor().execute(() -> {
 				Entity item = player.world().createEntity(
 						EntityTypes.ITEM,
-						player.position().add(0, 1.4, 0)
+						player.position().add(0, 1.35, 0)
 				);
 				item.offer(Keys.ITEM_STACK_SNAPSHOT, itemStack.createSnapshot());
 				item.offer(Keys.VELOCITY, rotation);
