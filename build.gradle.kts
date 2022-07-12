@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.10" apply true
+    id("java-library")
     id("io.freefair.lombok") version "6.4.1" apply false
     id("com.github.johnrengelman.shadow") version "7.1.2" apply true
 }
@@ -15,7 +15,7 @@ java {
 
 subprojects {
     apply {
-        plugin("org.jetbrains.kotlin.jvm")
+        plugin("java-library")
         plugin("io.freefair.lombok")
         plugin("com.github.johnrengelman.shadow")
     }
