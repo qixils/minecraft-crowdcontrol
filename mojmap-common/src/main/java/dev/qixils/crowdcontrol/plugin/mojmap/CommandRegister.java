@@ -61,7 +61,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
 				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
 				new TeleportCommand(plugin),
-//				new ToastCommand(plugin),
+//				TODO new ToastCommand(plugin),
 				FreezeCommand.createDefault(plugin),
 				new FreezeCommand(plugin, "camera_lock", "Camera Lock", Location::withRotationOf), // (cur, prev) -> cur.withRotationOf(prev)
 				new FlowerCommand(plugin),
@@ -111,7 +111,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin),
 				new PlantTreeCommand(plugin),
-//				new DoOrDieCommand(plugin),
+//				TODO new DoOrDieCommand(plugin),
 				new ExplodeCommand(plugin),
 				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
 				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT),
@@ -119,7 +119,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Mojma
 				WeatherCommand.downfall(plugin),
 				WeatherCommand.storm(plugin)
 
-				// location commands from paper
+				// TODO location commands from paper
 		));
 
 		// entity commands

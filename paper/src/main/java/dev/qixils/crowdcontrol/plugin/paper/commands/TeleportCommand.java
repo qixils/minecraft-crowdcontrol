@@ -34,15 +34,16 @@ public class TeleportCommand extends ImmediateCommand {
 					.maxRadius(15)
 					.locationValidator(BlockUtil.SPAWNING_SPACE)
 					.build().next();
-			if (destination == null) {
+			if (destination == null)
 				continue;
-			}
+			destination.add(.5, 0, .5);
+			if (!destination.getWorld().getWorldBorder().isInside(destination))
+				continue;
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			sync(() -> {
-				player.teleport(destination.add(.5, 0, .5));
+			sync(() -> player.teleportAsync(destination).thenRun(() -> {
 				ParticleUtil.spawnPlayerParticles(player, Particle.PORTAL, 100);
 				player.getWorld().playSound(Sounds.TELEPORT.get(), player);
-			});
+			}));
 		}
 		return result;
 	}

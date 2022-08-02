@@ -107,7 +107,9 @@ abstract class NearbyLocationCommand<S> extends Command {
 					Location destination = safeLocation(search(location, searchType));
 					if (destination == null)
 						continue;
-					if (destination.distanceSquared(location) <= 1000) // ~32 blocks
+					if (destination.distanceSquared(location) <= 2500) // 50 blocks
+						continue;
+					if (!world.getWorldBorder().isInside(destination))
 						continue;
 					player.teleportAsync(destination).thenAccept(success -> {
 						if (!success)
