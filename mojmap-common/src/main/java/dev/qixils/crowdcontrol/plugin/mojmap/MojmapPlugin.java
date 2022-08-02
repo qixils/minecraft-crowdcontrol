@@ -36,8 +36,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-// TODO: implement soft lock resolver
-
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
  * for managing Crowd Control server/client connections and handling
@@ -76,6 +74,7 @@ public abstract class MojmapPlugin<P extends AudienceProvider> extends AbstractP
 		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
+		getEventManager().registerListeners(new SoftLockResolver(this));
 	}
 
 	/**
