@@ -92,7 +92,10 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 					"WINDSWEPT_GRAVELLY_HILLS",
 					"WINDSWEPT_HILLS",
 					"WINDSWEPT_SAVANNA",
-					"WOODED_BADLANDS"
+					"WOODED_BADLANDS",
+					// 1.19 biomes
+					"MANGROVE_SWAMP",
+					"DEEP_DARK"
 			),
 			Environment.NETHER, List.of(
 					"NETHER_WASTES",
