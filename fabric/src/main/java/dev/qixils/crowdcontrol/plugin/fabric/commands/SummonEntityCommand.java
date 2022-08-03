@@ -9,7 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
@@ -116,7 +116,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
 		entity.setPos(player.position());
-		entity.setCustomName(new TextComponent(viewer));
+		entity.setCustomName(Component.literal(viewer));
 		entity.setCustomNameVisible(true);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);

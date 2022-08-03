@@ -3,8 +3,8 @@ val cloudVersion: String by project
 description = "Minecraft Crowd Control: Paper"
 
 plugins {
-    id("xyz.jpenilla.run-paper") version "1.0.6" // Adds runServer and runMojangMappedServer tasks for testing
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
+    id("xyz.jpenilla.run-paper") // Adds runServer and runMojangMappedServer tasks for testing
+    id("net.minecrell.plugin-yml.bukkit") // Generates plugin.yml
 }
 
 repositories {

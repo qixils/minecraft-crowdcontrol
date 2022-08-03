@@ -5,7 +5,7 @@ val cloudVersion: String by project
 val adventurePlatformVersion: String by project
 
 plugins {
-    id("fabric-loom") version "0.11-SNAPSHOT"
+    id("fabric-loom")
 }
 
 repositories {
@@ -22,7 +22,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformVersion")!!)
-    modImplementation(include("cloud.commandframework:cloud-fabric:1.6.2")!!) // TODO: use cloudVersion variable after updating to 1.19
+    modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
 }
 
 tasks.withType<ProcessResources> {

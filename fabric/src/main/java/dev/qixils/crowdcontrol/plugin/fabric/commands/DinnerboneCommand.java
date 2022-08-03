@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -47,11 +46,11 @@ public class DinnerboneCommand extends Command {
 			}
 			successFuture.complete(!entities.isEmpty());
 			entities.forEach(entity -> {
-				Component oldName = entity.getEntityData().get(ORIGINAL_DISPLAY_NAME).orElse(TextComponent.EMPTY);
+				Component oldName = entity.getEntityData().get(ORIGINAL_DISPLAY_NAME).orElse(Component.empty());
 				Component currentName = entity.getCustomName();
 				if (currentName == null)
-					currentName = TextComponent.EMPTY;
-				if (currentName.equals(new TextComponent(DINNERBONE_NAME))) {
+					currentName = Component.empty();
+				if (currentName.equals(Component.literal(DINNERBONE_NAME))) {
 					entity.setCustomName(oldName);
 					entity.getEntityData().set(ORIGINAL_DISPLAY_NAME, Optional.empty());
 					Boolean viewerSpawned = entity.getEntityData().get(VIEWER_SPAWNED);
@@ -59,7 +58,7 @@ public class DinnerboneCommand extends Command {
 						entity.setCustomNameVisible(true);
 				} else {
 					entity.getEntityData().set(ORIGINAL_DISPLAY_NAME, Optional.of(currentName));
-					entity.setCustomName(new TextComponent(DINNERBONE_NAME));
+					entity.setCustomName(Component.literal(DINNERBONE_NAME));
 					entity.setCustomNameVisible(false);
 				}
 			});
