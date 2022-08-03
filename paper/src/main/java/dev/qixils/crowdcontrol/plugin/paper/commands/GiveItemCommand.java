@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -46,11 +47,30 @@ public class GiveItemCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		ItemStack itemStack = new ItemStack(item);
 		sync(() -> {
+			LimitConfig config = getPlugin().getLimitConfig();
+			int recipients = 0;
+			int maxRecipients = config.getItemLimit(item.getKey().getKey());
+
+			// first pass (hosts)
 			for (Player player : players) {
-				giveItemTo(player, itemStack);
-				// workaround to limit the circulation of end portal frames in the economy
-				if (item == Material.END_PORTAL_FRAME)
+				if (!isHost(player))
+					continue;
+				if (!config.hostsBypass() && maxRecipients > -1 && recipients >= maxRecipients)
 					break;
+
+				recipients++;
+				giveItemTo(player, itemStack);
+			}
+
+			// second pass (guests)
+			for (Player player : players) {
+				if (isHost(player))
+					continue;
+				if (maxRecipients > -1 && recipients >= maxRecipients)
+					break;
+
+				giveItemTo(player, itemStack);
+				recipients++;
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -26,27 +27,52 @@ public class TakeItemCommand extends ImmediateCommand {
 		this.displayName = "Take " + plugin.getTextUtil().translate(item);
 	}
 
+	private boolean takeItemFrom(Player player) {
+		for (ItemStack itemStack : player.getInventory()) {
+			if (itemStack == null) {
+				continue;
+			}
+			if (itemStack.getType() == item) {
+				itemStack.setAmount(itemStack.getAmount() - 1);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");
+
+		LimitConfig config = getPlugin().getLimitConfig();
+		int victims = 0;
+		int maxVictims = config.getItemLimit(item.getKey().getKey());
+
+		// first pass (hosts)
 		for (Player player : players) {
-			boolean taken = false;
-			for (ItemStack itemStack : player.getInventory()) {
-				if (itemStack == null) {
-					continue;
-				}
-				if (itemStack.getType() == item) {
-					itemStack.setAmount(itemStack.getAmount() - 1);
-					response.type(ResultType.SUCCESS).message("SUCCESS");
-					taken = true;
-					break;
-				}
-			}
-			if (taken && item == Material.END_PORTAL_FRAME)
+			if (!isHost(player))
+				continue;
+			if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
 				break;
+			if (takeItemFrom(player))
+				victims++;
 		}
+
+		// second pass (guests)
+		for (Player player : players) {
+			if (isHost(player))
+				continue;
+			if (maxVictims > -1 && victims >= maxVictims)
+				break;
+			if (takeItemFrom(player))
+				victims++;
+		}
+
+		if (victims > 0)
+			response.type(ResultType.SUCCESS).message("SUCCESS");
+
 		return response;
 	}
 }

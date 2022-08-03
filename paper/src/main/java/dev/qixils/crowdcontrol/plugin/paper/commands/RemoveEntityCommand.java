@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -28,6 +29,14 @@ public final class RemoveEntityCommand extends Command {
 		this.displayName = "Remove " + plugin.getTextUtil().translate(entityType);
 	}
 
+	private boolean removeEntityFrom(Player player) {
+		for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
+			entity.remove();
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
@@ -35,13 +44,33 @@ public final class RemoveEntityCommand extends Command {
 			Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
 					.message("No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
 
+			LimitConfig config = plugin.getLimitConfig();
+			int maxVictims = config.getEntityLimit(entityType.getKey().getKey());
+			int victims = 0;
+
+			// first pass (hosts)
 			for (Player player : players) {
-				for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
-					result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-					entity.remove();
+				if (!isHost(player))
+					continue;
+				if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
 					break;
-				}
+				if (removeEntityFrom(player))
+					victims++;
 			}
+
+			// second pass (guests)
+			for (Player player : players) {
+				if (isHost(player))
+					continue;
+				if (maxVictims > -1 && victims >= maxVictims)
+					break;
+				if (removeEntityFrom(player))
+					victims++;
+			}
+
+			if (victims > 0)
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+
 			future.complete(result);
 		});
 		return future;

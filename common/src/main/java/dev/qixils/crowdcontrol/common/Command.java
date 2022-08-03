@@ -198,14 +198,30 @@ public interface Command<P> {
 			players = plugin.getPlayers(request);
 
 		for (P player : players) {
-			String uuidStr = plugin.playerMapper().getUniqueId(player).toString().toLowerCase(Locale.ENGLISH);
-			if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
-				return true;
-			if (hosts.contains(plugin.getUsername(player).toLowerCase(Locale.ENGLISH)))
+			if (isHost(player))
 				return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Whether the specified player is known to be a server host.
+	 *
+	 * @param player player to check
+	 * @return whether the player is a server host
+	 */
+	default boolean isHost(@NotNull P player) {
+		Plugin<P, ?> plugin = getPlugin();
+		Collection<String> hosts = plugin.getHosts();
+		if (hosts.isEmpty())
+			return false;
+
+		String uuidStr = plugin.playerMapper().getUniqueId(player).toString().toLowerCase(Locale.ENGLISH);
+		if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
+			return true;
+
+		return hosts.contains(plugin.getUsername(player).toLowerCase(Locale.ENGLISH));
 	}
 
 	/**

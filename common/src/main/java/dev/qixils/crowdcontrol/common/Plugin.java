@@ -696,6 +696,7 @@ public interface Plugin<P, S> {
 	 *
 	 * @return synchronous executor
 	 */
+	@NotNull
 	Executor getSyncExecutor();
 
 	/**
@@ -703,5 +704,14 @@ public interface Plugin<P, S> {
 	 *
 	 * @return asynchronous executor
 	 */
+	@NotNull
 	Executor getAsyncExecutor();
+
+	/**
+	 * Gets the plugin's {@link LimitConfig}.
+	 *
+	 * @return limit config parsed from the plugin's config file
+	 */
+	@NotNull
+	LimitConfig getLimitConfig();
 }

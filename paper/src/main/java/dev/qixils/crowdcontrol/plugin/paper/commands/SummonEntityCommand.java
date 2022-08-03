@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import com.destroystokyo.paper.loottable.LootableInventory;
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
@@ -100,7 +101,33 @@ public class SummonEntityCommand extends ImmediateCommand {
 					return request.buildResponse().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
 			}
 		}
-		sync(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
+
+		LimitConfig config = plugin.getLimitConfig();
+		int maxVictims = config.getEntityLimit(entityType.getKey().getKey());
+
+		sync(() -> {
+			int victims = 0;
+
+			// first pass (hosts)
+			for (Player player : players) {
+				if (!isHost(player))
+					continue;
+				if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
+					break;
+				spawnEntity(request.getViewer(), player);
+				victims++;
+			}
+
+			// second pass (guests)
+			for (Player player : players) {
+				if (isHost(player))
+					continue;
+				if (maxVictims > -1 && victims >= maxVictims)
+					break;
+				spawnEntity(request.getViewer(), player);
+				victims++;
+			}
+		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 
