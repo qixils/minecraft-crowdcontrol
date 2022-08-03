@@ -1,9 +1,13 @@
 package dev.qixils.crowdcontrol.common;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
 
 /**
  * The configuration for effect limits.
@@ -21,11 +25,18 @@ public final class LimitConfig {
 	 * @param entityLimits the limits on entity effects
 	 */
 	public LimitConfig(boolean hostsBypass,
-					   @NotNull Map<String, Integer> itemLimits,
-					   @NotNull Map<String, Integer> entityLimits) {
+					   @Nullable Map<String, Integer> itemLimits,
+					   @Nullable Map<String, Integer> entityLimits) {
 		this.hostsBypass = hostsBypass;
-		this.itemLimits = new HashMap<>(itemLimits);
-		this.entityLimits = new HashMap<>(entityLimits);
+		this.itemLimits = new HashMap<>(validateNotNullElseGet(itemLimits, Collections::emptyMap));
+		this.entityLimits = new HashMap<>(validateNotNullElseGet(entityLimits, Collections::emptyMap));
+	}
+
+	/**
+	 * Constructs an empty limit configuration.
+	 */
+	public LimitConfig() {
+		this(true, null, null);
 	}
 
 	/**

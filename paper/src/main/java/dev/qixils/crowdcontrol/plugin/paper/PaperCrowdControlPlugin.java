@@ -5,6 +5,7 @@ import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import lombok.Getter;
@@ -81,6 +82,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	private boolean adminRequired = false;
 	@Getter
+	private LimitConfig limitConfig = new LimitConfig();
+	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Getter @NotNull
@@ -153,6 +156,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 				loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
 			hosts = Collections.unmodifiableSet(loweredHosts);
 		}
+
+		// limit config
+		boolean hostsBypass = config.getBoolean("limits.hosts-bypass", true);
+		Map<String, Integer> itemLimits = config.getObject("limits", Map.class);
+		Map<String, Integer> entityLimits = config.getObject("limits.entities", Map.class);
+		limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
 
 		initCrowdControl();
 
