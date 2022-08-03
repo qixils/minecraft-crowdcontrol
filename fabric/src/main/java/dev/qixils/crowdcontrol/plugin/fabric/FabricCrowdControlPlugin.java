@@ -19,14 +19,9 @@ import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,6 +42,7 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 //  - Fix admin commands being unavailable to the host
 //  - Add config option for default Twitch channel
 //  - Add a GUI config library
+//  - Entity data accessors aren't persistent (very minor issue; probably only relevant to player data)
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
@@ -58,10 +54,6 @@ public class FabricCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
-	// accessors | TODO: these are not working
-	public static final EntityDataAccessor<Optional<Component>> ORIGINAL_DISPLAY_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
-	public static final EntityDataAccessor<Boolean> VIEWER_SPAWNED = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
-	public static final EntityDataAccessor<String> GAME_MODE_EFFECT = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.STRING);
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -92,7 +84,7 @@ public class FabricCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	private @MonotonicNonNull HoconConfigurationLoader configLoader;
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
-	protected FabricCrowdControlPlugin() {
+	public FabricCrowdControlPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
 		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;

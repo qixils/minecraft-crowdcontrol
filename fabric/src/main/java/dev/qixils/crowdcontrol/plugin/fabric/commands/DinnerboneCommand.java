@@ -2,18 +2,21 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.Command;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.LivingEntityData;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -21,11 +24,10 @@ import java.util.stream.StreamSupport;
 
 import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_NAME;
 import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_RADIUS;
-import static dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin.ORIGINAL_DISPLAY_NAME;
-import static dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin.VIEWER_SPAWNED;
 
 @Getter
 public class DinnerboneCommand extends Command {
+	private static final Component DINNERBONE_COMPONENT = Component.literal(DINNERBONE_NAME);
 	private final String effectName = "dinnerbone";
 	private final String displayName = "Flip Mobs Upside-Down";
 
@@ -37,28 +39,28 @@ public class DinnerboneCommand extends Command {
 	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
 		sync(() -> {
-			Set<Entity> entities = new HashSet<>();
+			Set<LivingEntity> entities = new HashSet<>();
 			for (ServerPlayer player : players) {
 				entities.addAll(StreamSupport.stream(player.getLevel().getAllEntities().spliterator(), false)
-						.filter(entity -> entity.getType() != EntityType.PLAYER
+						.filter(entity -> entity instanceof LivingEntity
+								&& entity.getType() != EntityType.PLAYER
 								&& entity.position().distanceToSqr(player.position()) <= (DINNERBONE_RADIUS * DINNERBONE_RADIUS))
+						.map(entity -> (LivingEntity) entity)
 						.toList());
 			}
 			successFuture.complete(!entities.isEmpty());
 			entities.forEach(entity -> {
-				Component oldName = entity.getEntityData().get(ORIGINAL_DISPLAY_NAME).orElse(Component.empty());
-				Component currentName = entity.getCustomName();
-				if (currentName == null)
-					currentName = Component.empty();
-				if (currentName.equals(Component.literal(DINNERBONE_NAME))) {
+				LivingEntityData data = (LivingEntityData) entity;
+				final @Nullable Component oldName = data.originalDisplayName().orElse(null);
+				final @Nullable Component currentName = entity.getCustomName();
+				if (Objects.equals(currentName, DINNERBONE_COMPONENT)) {
 					entity.setCustomName(oldName);
-					entity.getEntityData().set(ORIGINAL_DISPLAY_NAME, Optional.empty());
-					Boolean viewerSpawned = entity.getEntityData().get(VIEWER_SPAWNED);
-					if (viewerSpawned != null && viewerSpawned)
+					data.originalDisplayName(Optional.empty());
+					if (data.viewerSpawned())
 						entity.setCustomNameVisible(true);
 				} else {
-					entity.getEntityData().set(ORIGINAL_DISPLAY_NAME, Optional.of(currentName));
-					entity.setCustomName(Component.literal(DINNERBONE_NAME));
+					data.originalDisplayName(Optional.ofNullable(currentName));
+					entity.setCustomName(DINNERBONE_COMPONENT.copy());
 					entity.setCustomNameVisible(false);
 				}
 			});

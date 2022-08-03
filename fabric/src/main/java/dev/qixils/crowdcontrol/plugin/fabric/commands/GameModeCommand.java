@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.PlayerData;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,8 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-
-import static dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin.GAME_MODE_EFFECT;
 
 @Getter
 public class GameModeCommand extends TimedCommand {
@@ -58,11 +57,12 @@ public class GameModeCommand extends TimedCommand {
 		if (players.isEmpty())
 			return;
 		sync(() -> players.forEach(player -> {
+			PlayerData data = (PlayerData) player;
 			player.setGameMode(gamemode);
 			if (request == null)
-				player.getEntityData().set(GAME_MODE_EFFECT, "");
+				data.gameModeEffect(null);
 			else
-				player.getEntityData().set(GAME_MODE_EFFECT, gamemode.getName());
+				data.gameModeEffect(gamemode.getName());
 		}));
 	}
 
@@ -71,10 +71,10 @@ public class GameModeCommand extends TimedCommand {
 		@Listener
 		public void onJoin(Join event) {
 			ServerPlayer player = event.player();
-			String gamemodeString = player.getEntityData().get(GAME_MODE_EFFECT);
+			PlayerData data = (PlayerData) player;
+			String gamemodeString = data.gameModeEffect();
 			if (gamemodeString == null) return;
-			if (gamemodeString.isEmpty()) return;
-			player.getEntityData().set(GAME_MODE_EFFECT, "");
+			data.gameModeEffect(null);
 			player.setGameMode(GameType.SURVIVAL);
 		}
 	}

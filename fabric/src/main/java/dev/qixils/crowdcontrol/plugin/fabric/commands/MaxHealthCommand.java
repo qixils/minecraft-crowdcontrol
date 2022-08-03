@@ -67,8 +67,11 @@ public class MaxHealthCommand extends ImmediateCommand {
 			if (current != newVal)
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			maxHealth.addPermanentModifier(new AttributeModifier(MODIFIER_UUID, MODIFIER_NAME, newVal, AttributeModifier.Operation.ADDITION));
+			float computedMaxHealth = (float) (20 + newVal);
 			if (amount > 0)
 				player.setHealth(player.getHealth() + amount);
+			else
+				player.setHealth(Math.min(player.getHealth(), computedMaxHealth));
 		}
 		return result;
 	}
