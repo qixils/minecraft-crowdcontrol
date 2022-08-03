@@ -1,8 +1,8 @@
 val minecraftVersion: String by project
-val yarnMappings: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
 val cloudVersion: String by project
+val adventurePlatformVersion: String by project
 
 plugins {
     id("fabric-loom") version "0.11-SNAPSHOT"
@@ -16,12 +16,12 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":mojmap-common"))
-    minecraft("com.mojang:minecraft:${minecraftVersion}")
+    implementation(project(":configurate-common"))
+    minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricVersion}")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.3.1")!!)
+    modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
+    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformVersion")!!)
     modImplementation(include("cloud.commandframework:cloud-fabric:1.6.2")!!) // TODO: use cloudVersion variable after updating to 1.19
 }
 

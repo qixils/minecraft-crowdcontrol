@@ -17,7 +17,6 @@ pluginManagement {
 // TODO reduce code repetition using a function
 include(":base-common")
 include(":configurate-common")
-include(":mojmap-common")
 include(":sponge7-platform")
 include(":sponge8-platform")
 include(":paper-platform")
