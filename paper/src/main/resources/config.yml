@@ -28,7 +28,8 @@ admin-required: false
 # For example, if a viewer redeems Give End Portal Frame and the limit is set to 1, then only
 #  one random player will receive an end portal frame.
 # Players listed in the "hosts" field are prioritized over guests.
-# A value of -1 will disable that limit.
+# A value of 0 will disable that limit. If you instead wish to disable an effect entirely then you
+#  may do so in the Crowd Control app's pricing menu.
 limits:
 
   # Whether hosts should bypass limits entirely.
@@ -36,12 +37,12 @@ limits:
 
   # Limits for giving items.
   items:
-    default: -1
+    default: 0
     end_portal_frame: 1
 
   # Limits for spawning entities.
   entities:
-    default: -1
+    default: 0
     ender_dragon: 1
     wither: 1
 

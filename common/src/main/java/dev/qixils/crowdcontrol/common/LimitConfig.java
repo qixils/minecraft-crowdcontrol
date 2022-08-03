@@ -31,9 +31,9 @@ public final class LimitConfig {
 					   @Nullable Map<String, Integer> entityLimits) {
 		this.hostsBypass = hostsBypass;
 		this.itemLimits = new HashMap<>(validateNotNullElseGet(itemLimits, Collections::emptyMap));
-		itemDefaultLimit = itemLimits.getOrDefault("default", -1);
+		itemDefaultLimit = this.itemLimits.getOrDefault("default", 0);
 		this.entityLimits = new HashMap<>(validateNotNullElseGet(entityLimits, Collections::emptyMap));
-		entityDefaultLimit = entityLimits.getOrDefault("default", -1);
+		entityDefaultLimit = this.entityLimits.getOrDefault("default", 0);
 	}
 
 	/**

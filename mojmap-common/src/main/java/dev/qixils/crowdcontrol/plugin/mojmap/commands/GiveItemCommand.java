@@ -57,7 +57,7 @@ public class GiveItemCommand extends ImmediateCommand {
 
 			// first pass (hosts)
 			for (ServerPlayer player : players) {
-				if (!config.hostsBypass() && maxRecipients > -1 && recipients >= maxRecipients)
+				if (!config.hostsBypass() && maxRecipients > 0 && recipients >= maxRecipients)
 					break;
 				if (!isHost(player))
 					continue;
@@ -67,7 +67,7 @@ public class GiveItemCommand extends ImmediateCommand {
 
 			// second pass (guests)
 			for (ServerPlayer player : players) {
-				if (maxRecipients > -1 && recipients >= maxRecipients)
+				if (maxRecipients > 0 && recipients >= maxRecipients)
 					break;
 				if (isHost(player))
 					continue;

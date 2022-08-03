@@ -97,7 +97,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 
 			// first pass (hosts)
 			for (Player player : players) {
-				if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
+				if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
 					break;
 				if (!isHost(player))
 					continue;
@@ -107,7 +107,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 
 			// second pass (guests)
 			for (Player player : players) {
-				if (maxVictims > -1 && victims >= maxVictims)
+				if (maxVictims > 0 && victims >= maxVictims)
 					break;
 				if (isHost(player))
 					continue;
