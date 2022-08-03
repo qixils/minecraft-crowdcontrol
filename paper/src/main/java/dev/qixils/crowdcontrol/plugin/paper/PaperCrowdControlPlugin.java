@@ -159,7 +159,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 		// limit config
 		boolean hostsBypass = config.getBoolean("limits.hosts-bypass", true);
-		Map<String, Integer> itemLimits = config.getObject("limits", Map.class);
+		Map<String, Integer> itemLimits = config.getObject("limits.items", Map.class);
 		Map<String, Integer> entityLimits = config.getObject("limits.entities", Map.class);
 		limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
 

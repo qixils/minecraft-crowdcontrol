@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -51,36 +52,62 @@ public class TakeItemCommand extends ImmediateCommand {
 		this(plugin, item, item.equals(ItemTypes.GOLDEN_APPLE) ? GoldenApples.GOLDEN_APPLE : null);
 	}
 
+	private boolean takeItemFrom(Player player) {
+		CarriedInventory<? extends Carrier> inventory = player.getInventory();
+		for (Inventory invSlot : inventory.slots()) {
+			Optional<ItemStack> optionalStack = invSlot.peek();
+			if (!optionalStack.isPresent())
+				continue;
+
+			ItemStack stack = optionalStack.get();
+			if (!stack.getType().equals(item))
+				continue;
+			if (goldenAppleType != null && !stack.get(Keys.GOLDEN_APPLE_TYPE).map(goldenAppleType::equals).orElse(false))
+				continue;
+
+			sync(() -> {
+				stack.setQuantity(stack.getQuantity() - 1);
+				invSlot.set(stack);
+			});
+			return true;
+		}
+		return false;
+	}
+
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");
+
+		LimitConfig config = getPlugin().getLimitConfig();
+		int victims = 0;
+		int maxVictims = config.getItemLimit(SpongeTextUtil.valueOf(item.getType()));
+
+		// first pass (hosts)
 		for (Player player : players) {
-			CarriedInventory<? extends Carrier> inventory = player.getInventory();
-			for (Inventory invSlot : inventory.slots()) {
-				Optional<ItemStack> optionalStack = invSlot.peek();
-				if (!optionalStack.isPresent())
-					continue;
-
-				ItemStack stack = optionalStack.get();
-				if (!stack.getType().equals(item))
-					continue;
-				if (goldenAppleType != null && !stack.get(Keys.GOLDEN_APPLE_TYPE).map(goldenAppleType::equals).orElse(false))
-					continue;
-
-				response.type(ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> {
-					stack.setQuantity(stack.getQuantity() - 1);
-					invSlot.set(stack);
-				});
+			if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
 				break;
-			}
-
-			if (ResultType.SUCCESS == response.type() && item.equals(ItemTypes.END_PORTAL_FRAME))
-				break;
+			if (!isHost(player))
+				continue;
+			if (takeItemFrom(player))
+				victims++;
 		}
+
+		// second pass (guests)
+		for (Player player : players) {
+			if (maxVictims > -1 && victims >= maxVictims)
+				break;
+			if (isHost(player))
+				continue;
+			if (takeItemFrom(player))
+				victims++;
+		}
+
+		if (victims > 0)
+			response.type(ResultType.SUCCESS).message("SUCCESS");
+
 		return response;
 	}
 }

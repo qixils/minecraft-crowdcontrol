@@ -37,6 +37,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	@Getter @NotNull
 	protected Collection<String> hosts = Collections.emptyList();
 	@Getter @NotNull
+	protected LimitConfig limitConfig = new LimitConfig();
+	@Getter @NotNull
 	protected final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
 	protected AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {

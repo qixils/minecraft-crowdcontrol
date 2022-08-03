@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -88,7 +89,32 @@ public class SummonEntityCommand extends ImmediateCommand {
 			}
 		}
 
-		sync(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
+		LimitConfig config = getPlugin().getLimitConfig();
+		int maxVictims = config.getItemLimit(SpongeTextUtil.csIdOf(entityType));
+
+		sync(() -> {
+			int victims = 0;
+
+			// first pass (hosts)
+			for (Player player : players) {
+				if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
+					break;
+				if (!isHost(player))
+					continue;
+				spawnEntity(request.getViewer(), player);
+				victims++;
+			}
+
+			// second pass (guests)
+			for (Player player : players) {
+				if (maxVictims > -1 && victims >= maxVictims)
+					break;
+				if (isHost(player))
+					continue;
+				spawnEntity(request.getViewer(), player);
+				victims++;
+			}
+		});
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 

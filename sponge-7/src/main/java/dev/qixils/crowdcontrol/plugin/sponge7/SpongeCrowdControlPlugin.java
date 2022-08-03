@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectDataBuilder;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableGameModeEffectData;
@@ -76,6 +77,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -293,6 +295,17 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			hosts = Collections.unmodifiableCollection(config.getNode("hosts").getList(TypeToken.of(String.class)));
 		} catch (ObjectMappingException e) {
 			throw new RuntimeException("Could not parse 'hosts' config variable", e);
+		}
+
+		// limit config
+		boolean hostsBypass = config.getNode("limits", "hosts-bypass").getBoolean(true);
+		TypeToken<Map<String, Integer>> typeToken = new TypeToken<Map<String, Integer>>() {};
+		try {
+			Map<String, Integer> itemLimits = config.getNode("limits", "items").getValue(typeToken);
+			Map<String, Integer> entityLimits = config.getNode("limits", "entities").getValue(typeToken);
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		} catch (ObjectMappingException e) {
+			getSLF4JLogger().warn("Could not parse limits config", e);
 		}
 
 		global = config.getNode("global").getBoolean(false);

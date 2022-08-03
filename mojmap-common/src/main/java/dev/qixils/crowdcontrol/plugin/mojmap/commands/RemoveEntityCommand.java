@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -33,23 +34,51 @@ public class RemoveEntityCommand extends ImmediateCommand {
 		this.displayName = "Remove " + plugin.getTextUtil().asPlain(entityType.getDescription());
 	}
 
+	private boolean removeEntityFrom(ServerPlayer player) {
+		Vec3 playerPosition = player.position();
+		List<Entity> entities = StreamSupport.stream(player.getLevel().getAllEntities().spliterator(), false)
+				.filter(entity -> entity.getType() == entityType && entity.distanceToSqr(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
+				// TODO: ensure this sort is in the correct order
+				.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
+		if (entities.isEmpty())
+			return false;
+		entities.get(0).remove(RemovalReason.KILLED);
+		return true;
+	}
+
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Builder result = request.buildResponse().type(ResultType.FAILURE)
 				.message("No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
 
+		LimitConfig config = getPlugin().getLimitConfig();
+		int maxVictims = config.getItemLimit(Registry.ENTITY_TYPE.getKey(entityType).getPath());
+		int victims = 0;
+
+		// first pass (hosts)
 		for (ServerPlayer player : players) {
-			Vec3 playerPosition = player.position();
-			List<Entity> entities = StreamSupport.stream(player.getLevel().getAllEntities().spliterator(), false)
-					.filter(entity -> entity.getType() == entityType && entity.distanceToSqr(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
-					// TODO: ensure this sort is in the correct order
-					.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
-			if (entities.isEmpty())
+			if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
+				break;
+			if (!isHost(player))
 				continue;
-			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			entities.get(0).remove(RemovalReason.KILLED);
+			if (removeEntityFrom(player))
+				victims++;
 		}
+
+		// second pass (guests)
+		for (ServerPlayer player : players) {
+			if (maxVictims > -1 && victims >= maxVictims)
+				break;
+			if (isHost(player))
+				continue;
+			if (removeEntityFrom(player))
+				victims++;
+		}
+
+		if (victims > 0)
+			result.type(ResultType.SUCCESS).message("SUCCESS");
+
 		return result;
 	}
 }

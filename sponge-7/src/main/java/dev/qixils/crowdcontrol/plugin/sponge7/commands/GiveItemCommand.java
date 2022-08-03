@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -17,7 +18,6 @@ import org.spongepowered.api.event.CauseStackManager.StackFrame;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -64,11 +64,30 @@ public class GiveItemCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		sync(() -> {
+			LimitConfig config = getPlugin().getLimitConfig();
+			int recipients = 0;
+			int maxRecipients = config.getItemLimit(SpongeTextUtil.valueOf(item.getType()));
+
+			// first pass (hosts)
 			for (Player player : players) {
-				giveItemTo(player, item);
-				// workaround to limit the circulation of end portal frames in the economy
-				if (item.getType().equals(ItemTypes.END_PORTAL_FRAME))
+				if (!config.hostsBypass() && maxRecipients > -1 && recipients >= maxRecipients)
 					break;
+				if (!isHost(player))
+					continue;
+
+				giveItemTo(player, item);
+				recipients++;
+			}
+
+			// second pass (guests)
+			for (Player player : players) {
+				if (maxRecipients > -1 && recipients >= maxRecipients)
+					break;
+				if (isHost(player))
+					continue;
+
+				giveItemTo(player, item);
+				recipients++;
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

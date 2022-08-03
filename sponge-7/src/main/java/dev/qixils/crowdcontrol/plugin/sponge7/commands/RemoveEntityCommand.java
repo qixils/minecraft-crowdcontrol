@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -32,30 +32,57 @@ public class RemoveEntityCommand extends ImmediateCommand {
 		this.displayName = "Remove " + SpongeTextUtil.getFixedName(entityType);
 	}
 
+	private boolean removeEntityFrom(Player player) {
+		Vector3d playerPosition = player.getPosition();
+		List<Entity> entities = new ArrayList<>(player.getWorld().getNearbyEntities(player.getPosition(), REMOVE_ENTITY_RADIUS));
+		entities.removeIf(entity -> !entity.getType().equals(entityType));
+
+		if (entities.isEmpty())
+			return false;
+
+		if (entities.size() > 1) {
+			entities.sort((o1, o2) ->
+					(int) (o1.getLocation().getPosition().distanceSquared(playerPosition)
+							- o2.getLocation().getPosition().distanceSquared(playerPosition)));
+		}
+
+		entities.get(0).remove();
+		return true;
+	}
+
 	@NotNull
 	@Override
 	public Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Builder result = request.buildResponse().type(ResultType.FAILURE)
 				.message("No " + entityType.getTranslation().get() + "s found nearby to remove");
 
+		LimitConfig config = getPlugin().getLimitConfig();
+		int maxVictims = config.getItemLimit(SpongeTextUtil.csIdOf(entityType));
+		int victims = 0;
+
+		// first pass (hosts)
 		for (Player player : players) {
-			Vector3d playerPosition = player.getPosition();
-			List<Entity> entities = new ArrayList<>(player.getWorld().getNearbyEntities(player.getPosition(), REMOVE_ENTITY_RADIUS));
-			entities.removeIf(entity -> !entity.getType().equals(entityType));
-
-			if (entities.isEmpty())
+			if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
+				break;
+			if (!isHost(player))
 				continue;
-
-			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-
-			if (entities.size() > 1) {
-				entities.sort((o1, o2) ->
-						(int) (o1.getLocation().getPosition().distanceSquared(playerPosition)
-								- o2.getLocation().getPosition().distanceSquared(playerPosition)));
-			}
-
-			entities.get(0).remove();
+			if (removeEntityFrom(player))
+				victims++;
 		}
+
+		// second pass (guests)
+		for (Player player : players) {
+			if (maxVictims > -1 && victims >= maxVictims)
+				break;
+			if (isHost(player))
+				continue;
+			if (removeEntityFrom(player))
+				victims++;
+		}
+
+		if (victims > 0)
+			result.type(ResultType.SUCCESS).message("SUCCESS");
+
 		return result;
 	}
 }

@@ -36,10 +36,12 @@ limits:
 
   # Limits for giving items.
   items:
+    default: -1
     end_portal_frame: 1
 
   # Limits for spawning entities.
   entities:
+    default: -1
     ender_dragon: 1
     wither: 1
 

@@ -168,7 +168,7 @@ public interface Plugin<P, S> {
 		Builder<S> account = manager.commandBuilder("account")
 				.meta(CommandMeta.DESCRIPTION, "Manage your connected Twitch account(s)");
 		if (isAdminRequired())
-			account = account.permission(ADMIN_PERMISSION);
+			account = account.permission(mapper::isAdmin);
 
 		// username arg
 		CommandArgument<S, String> usernameArg = StringArgument.<S>newBuilder("username")

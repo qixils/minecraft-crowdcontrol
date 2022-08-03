@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
 import dev.qixils.crowdcontrol.plugin.mojmap.mixin.InventoryAccessor;
@@ -10,9 +11,9 @@ import lombok.Getter;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -31,25 +32,51 @@ public class TakeItemCommand extends ImmediateCommand {
 		this.displayName = "Take " + plugin.getTextUtil().asPlain(item.getName(new ItemStack(item)));
 	}
 
+	private boolean takeItemFrom(Player player) {
+		Inventory inventory = player.getInventory();
+		for (ItemStack itemStack : ((InventoryAccessor) (Object) inventory).viewAllItems()) {
+			if (itemStack.isEmpty()) continue;
+			if (itemStack.getItem() != this.item) continue;
+			itemStack.setCount(itemStack.getCount() - 1);
+			return true;
+		}
+		return false;
+	}
+
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");
-		for (ServerPlayer player : players) {
-			Inventory inventory = player.getInventory();
-			for (ItemStack itemStack : ((InventoryAccessor) (Object) inventory).viewAllItems()) {
-				if (itemStack.isEmpty()) continue;
-				if (itemStack.getItem() != this.item) continue;
-				response.type(ResultType.SUCCESS).message("SUCCESS");
-				itemStack.setCount(itemStack.getCount() - 1);
-				break;
-			}
 
-			if (ResultType.SUCCESS == response.type() && item.equals(Items.END_PORTAL_FRAME))
+		LimitConfig config = getPlugin().getLimitConfig();
+		int maxVictims = config.getItemLimit(Registry.ITEM.getKey(item).getPath());
+		int victims = 0;
+
+		// first pass (hosts)
+		for (ServerPlayer player : players) {
+			if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
 				break;
+			if (!isHost(player))
+				continue;
+			if (takeItemFrom(player))
+				victims++;
 		}
+
+		// second pass (guests)
+		for (ServerPlayer player : players) {
+			if (maxVictims > -1 && victims >= maxVictims)
+				break;
+			if (isHost(player))
+				continue;
+			if (takeItemFrom(player))
+				victims++;
+		}
+
+		if (victims > 0)
+			response.type(ResultType.SUCCESS).message("SUCCESS");
+
 		return response;
 	}
 }

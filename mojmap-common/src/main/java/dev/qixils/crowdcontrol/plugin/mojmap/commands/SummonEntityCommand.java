@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
@@ -9,7 +10,6 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
@@ -71,8 +71,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		if (isMonster) {
-			for (ServerLevel world : plugin.server().getAllLevels()) {
-				if (world.getDifficulty() == Difficulty.PEACEFUL) {
+			for (ServerPlayer player : players) {
+				if (player.getLevel().getDifficulty() == Difficulty.PEACEFUL) {
 					return request.buildResponse()
 							.type(ResultType.FAILURE)
 							.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
@@ -80,7 +80,32 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			}
 		}
 
-		sync(() -> players.forEach(player -> spawnEntity(request.getViewer(), player)));
+		LimitConfig config = getPlugin().getLimitConfig();
+		int maxVictims = config.getItemLimit(Registry.ENTITY_TYPE.getKey(entityType).getPath());
+
+		sync(() -> {
+			int victims = 0;
+
+			// first pass (hosts)
+			for (ServerPlayer player : players) {
+				if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
+					break;
+				if (!isHost(player))
+					continue;
+				spawnEntity(request.getViewer(), player);
+				victims++;
+			}
+
+			// second pass (guests)
+			for (ServerPlayer player : players) {
+				if (maxVictims > -1 && victims >= maxVictims)
+					break;
+				if (isHost(player))
+					continue;
+				spawnEntity(request.getViewer(), player);
+				victims++;
+			}
+		});
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 

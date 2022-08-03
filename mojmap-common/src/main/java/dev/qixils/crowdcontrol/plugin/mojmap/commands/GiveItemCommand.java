@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.mojmap.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.mojmap.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.mojmap.MojmapPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -11,7 +12,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,12 +48,31 @@ public class GiveItemCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		ItemStack itemStack = new ItemStack(item);
+
+		LimitConfig config = getPlugin().getLimitConfig();
+		int maxRecipients = config.getItemLimit(Registry.ITEM.getKey(item).getPath());
+
 		sync(() -> {
+			int recipients = 0;
+
+			// first pass (hosts)
 			for (ServerPlayer player : players) {
-				giveItemTo(player, itemStack);
-				// workaround to limit the circulation of end portal frames in the economy
-				if (item.equals(Items.END_PORTAL_FRAME))
+				if (!config.hostsBypass() && maxRecipients > -1 && recipients >= maxRecipients)
 					break;
+				if (!isHost(player))
+					continue;
+				giveItemTo(player, itemStack);
+				recipients++;
+			}
+
+			// second pass (guests)
+			for (ServerPlayer player : players) {
+				if (maxRecipients > -1 && recipients >= maxRecipients)
+					break;
+				if (isHost(player))
+					continue;
+				giveItemTo(player, itemStack);
+				recipients++;
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

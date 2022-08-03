@@ -1,7 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.configurate;
 
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
+import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -18,6 +20,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractPlugin<P, S> extends dev.qixils.crowdcontrol.common.AbstractPlugin<P, S> {
@@ -59,6 +62,17 @@ public abstract class AbstractPlugin<P, S> extends dev.qixils.crowdcontrol.commo
 			));
 		} catch (SerializationException e) {
 			throw new RuntimeException("Could not parse 'hosts' config variable", e);
+		}
+
+		// limit config
+		boolean hostsBypass = config.node("limits", "hosts-bypass").getBoolean(true);
+		TypeToken<Map<String, Integer>> typeToken = new TypeToken<Map<String, Integer>>() {};
+		try {
+			Map<String, Integer> itemLimits = config.node("limits", "items").get(typeToken);
+			Map<String, Integer> entityLimits = config.node("limits", "entities").get(typeToken);
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		} catch (SerializationException e) {
+			getSLF4JLogger().warn("Could not parse limits config", e);
 		}
 
 		global = config.node("global").getBoolean(false);

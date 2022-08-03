@@ -15,7 +15,9 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 public final class LimitConfig {
 	private final boolean hostsBypass;
 	private final @NotNull Map<String, Integer> itemLimits;
+	private final int itemDefaultLimit;
 	private final @NotNull Map<String, Integer> entityLimits;
+	private final int entityDefaultLimit;
 
 	/**
 	 * Constructs a new limit configuration.
@@ -29,7 +31,9 @@ public final class LimitConfig {
 					   @Nullable Map<String, Integer> entityLimits) {
 		this.hostsBypass = hostsBypass;
 		this.itemLimits = new HashMap<>(validateNotNullElseGet(itemLimits, Collections::emptyMap));
+		itemDefaultLimit = itemLimits.getOrDefault("default", -1);
 		this.entityLimits = new HashMap<>(validateNotNullElseGet(entityLimits, Collections::emptyMap));
+		entityDefaultLimit = entityLimits.getOrDefault("default", -1);
 	}
 
 	/**
@@ -55,7 +59,7 @@ public final class LimitConfig {
 	 * @return the limit on the given item effect
 	 */
 	public int getItemLimit(@NotNull String item) {
-		return itemLimits.getOrDefault(item, -1);
+		return itemLimits.getOrDefault(item, itemDefaultLimit);
 	}
 
 	/**
@@ -65,6 +69,6 @@ public final class LimitConfig {
 	 * @return the limit on the given entity effect
 	 */
 	public int getEntityLimit(@NotNull String entity) {
-		return entityLimits.getOrDefault(entity, -1);
+		return entityLimits.getOrDefault(entity, entityDefaultLimit);
 	}
 }

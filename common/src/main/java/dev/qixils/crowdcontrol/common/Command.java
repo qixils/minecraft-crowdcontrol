@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.CheckReturnValue;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -141,7 +142,11 @@ public interface Command<P> {
 			}
 		}
 
-		execute(new ArrayList<>(players), request).thenAccept(builder -> {
+		// create shuffled copy of players so that the recipients of limited effects are random
+		List<P> shuffledPlayers = new ArrayList<>(players);
+		Collections.shuffle(shuffledPlayers);
+
+		execute(shuffledPlayers, request).thenAccept(builder -> {
 			if (builder == null) return;
 
 			Response response = builder.build();

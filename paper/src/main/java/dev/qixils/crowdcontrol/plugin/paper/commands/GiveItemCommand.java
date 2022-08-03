@@ -53,21 +53,21 @@ public class GiveItemCommand extends ImmediateCommand {
 
 			// first pass (hosts)
 			for (Player player : players) {
-				if (!isHost(player))
-					continue;
 				if (!config.hostsBypass() && maxRecipients > -1 && recipients >= maxRecipients)
 					break;
+				if (!isHost(player))
+					continue;
 
-				recipients++;
 				giveItemTo(player, itemStack);
+				recipients++;
 			}
 
 			// second pass (guests)
 			for (Player player : players) {
-				if (isHost(player))
-					continue;
 				if (maxRecipients > -1 && recipients >= maxRecipients)
 					break;
+				if (isHost(player))
+					continue;
 
 				giveItemTo(player, itemStack);
 				recipients++;

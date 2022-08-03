@@ -50,20 +50,20 @@ public final class RemoveEntityCommand extends Command {
 
 			// first pass (hosts)
 			for (Player player : players) {
-				if (!isHost(player))
-					continue;
 				if (!config.hostsBypass() && maxVictims > -1 && victims >= maxVictims)
 					break;
+				if (!isHost(player))
+					continue;
 				if (removeEntityFrom(player))
 					victims++;
 			}
 
 			// second pass (guests)
 			for (Player player : players) {
-				if (isHost(player))
-					continue;
 				if (maxVictims > -1 && victims >= maxVictims)
 					break;
+				if (isHost(player))
+					continue;
 				if (removeEntityFrom(player))
 					victims++;
 			}
