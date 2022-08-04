@@ -2,7 +2,7 @@ val minecraftVersion: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
 val cloudVersion: String by project
-val adventurePlatformVersion: String by project
+val adventurePlatformFabricVersion: String by project
 
 plugins {
     id("fabric-loom")
@@ -21,7 +21,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformVersion")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
     modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
 }
 

@@ -53,7 +53,6 @@ public final class FabricPlatformClient implements ClientModInitializer {
 	}
 
 	public @NotNull Optional<LocalPlayer> player() {
-		if (client == null) return Optional.empty();
-		return Optional.ofNullable(client.player);
+		return Optional.ofNullable(client).map(minecraft -> minecraft.player);
 	}
 }

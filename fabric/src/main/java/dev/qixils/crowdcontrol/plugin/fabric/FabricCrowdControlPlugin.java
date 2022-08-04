@@ -29,8 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -134,6 +137,18 @@ public class FabricCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 	@Override
 	public boolean supportsClientOnly() {
 		return true;
+	}
+
+	@Override
+	public @NotNull Collection<String> getHosts() {
+		Set<String> hosts = new HashSet<>(super.getHosts());
+		if (CLIENT_AVAILABLE) {
+			FabricPlatformClient.get()
+					.player()
+					.map(player -> player.getUUID().toString())
+					.ifPresent(hosts::add);
+		}
+		return hosts;
 	}
 
 	@NotNull
