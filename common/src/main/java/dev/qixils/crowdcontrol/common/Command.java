@@ -276,9 +276,16 @@ public interface Command<P> {
 	 * @param request  request that prompted the execution of this command
 	 */
 	default void announce(final Audience audience, final Request request) {
-		Plugin<?, ?> plugin = getPlugin();
-		if (!plugin.announceEffects()) return;
-		audience.sendMessage(new TextBuilder()
+		Plugin<P, ?> plugin = getPlugin();
+
+		List<Audience> audiences = new ArrayList<>(3);
+		audiences.add(plugin.getConsole());
+		if (plugin.announceEffects()) {
+			audiences.add(plugin.playerMapper().asAudience(plugin.getPlayerManager().getSpectators()));
+			audiences.add(audience);
+		}
+
+		Audience.audience(audiences).sendMessage(new TextBuilder()
 				.next(request.getViewer(), Plugin.USER_COLOR)
 				.next(" used command ")
 				.next(getProcessedDisplayName(), Plugin.CMD_COLOR)

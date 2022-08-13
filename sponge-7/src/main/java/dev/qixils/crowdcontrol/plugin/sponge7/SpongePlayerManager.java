@@ -12,6 +12,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,5 +50,13 @@ public class SpongePlayerManager extends AbstractPlayerManager<Player> {
 		}
 
 		return filter(players);
+	}
+
+	@Override
+	public @NotNull Collection<@NotNull Player> getSpectators() {
+		List<Player> players = new ArrayList<>(plugin.getGame().getServer().getOnlinePlayers());
+		players.removeIf(player -> !player.gameMode().get().equals(GameModes.SPECTATOR)
+				|| player.get(GameModeEffectData.class).isPresent());
+		return players;
 	}
 }

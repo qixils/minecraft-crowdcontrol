@@ -181,6 +181,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		return audiences;
 	}
 
+	@Override
+	public @NotNull Audience getConsole() {
+		return adventure().console();
+	}
+
 	@NotNull
 	public Audience asAudience(@NotNull CommandSource source) {
 		return commandSenderMapper().asAudience(source);

@@ -8,10 +8,11 @@ import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
-import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
+import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ import java.util.Set;
 @Getter
 @Plugin("crowd-control")
 @ParametersAreNonnullByDefault
-public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandCause> {
+public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandCause> {
 	// keys
 	public static Key<Value<String>> ORIGINAL_DISPLAY_NAME; // TODO: report inability to serialize components
 	public static Key<Value<Boolean>> VIEWER_SPAWNED;
@@ -157,6 +158,11 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 		hosts.addAll(confHosts);
 		hosts.add(clientHost);
 		return hosts;
+	}
+
+	@Override
+	public @NotNull Audience getConsole() {
+		return game.systemSubject();
 	}
 
 	@Listener

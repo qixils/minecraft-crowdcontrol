@@ -35,6 +35,14 @@ public interface PlayerManager<P> {
 	List<@NotNull P> getAllPlayers();
 
 	/**
+	 * Gets all the spectators in the server.
+	 *
+	 * @return spectators
+	 */
+	@NotNull
+	Collection<@NotNull P> getSpectators();
+
+	/**
 	 * Links a Twitch account to a Minecraft account. Account links are not exclusive.
 	 *
 	 * @param uuid the UUID of the Minecraft account

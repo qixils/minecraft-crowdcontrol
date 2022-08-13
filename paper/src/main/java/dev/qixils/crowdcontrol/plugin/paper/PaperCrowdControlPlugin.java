@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
@@ -230,6 +231,11 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		if (!isServer())
 			throw new IllegalStateException("Not running in server mode");
 		manualPassword = password;
+	}
+
+	@Override
+	public @NotNull Audience getConsole() {
+		return Bukkit.getConsoleSender();
 	}
 
 	@EventHandler

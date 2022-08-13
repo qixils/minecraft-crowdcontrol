@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.Locale;
 
 @Getter
-public class GamemodeCommand extends TimedCommand {
+public class GameModeCommand extends TimedCommand {
 	private final Duration duration;
 	private final GameMode gamemode;
 	private final String displayName;
 	private final String effectName;
 	private final NamespacedKey gamemodeKey;
 
-	public GamemodeCommand(PaperCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
+	public GameModeCommand(PaperCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
 		super(plugin);
 		this.gamemodeKey = getGamemodeKey(plugin);
 		this.duration = Duration.ofSeconds(seconds);

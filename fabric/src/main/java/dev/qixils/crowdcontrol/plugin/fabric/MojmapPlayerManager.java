@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.PlayerData;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +24,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 						|| player.isRemoved()
 						|| player.isDeadOrDying()
 						|| player.getHealth() <= 0
-//				|| player.isSpectator() && !player.get(GAME_MODE_EFFECT).isPresent()) // TODO
+						|| (player.isSpectator() && ((PlayerData) player).gameModeEffect() == null)
 		);
 		return players;
 	}
@@ -45,5 +47,13 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 		}
 
 		return filter(players);
+	}
+
+	@Override
+	public @NotNull Collection<@NotNull ServerPlayer> getSpectators() {
+		List<ServerPlayer> players = new ArrayList<>(plugin.server().getPlayerList().getPlayers());
+		players.removeIf(player -> !player.isSpectator()
+				|| ((PlayerData) player).gameModeEffect() != null);
+		return players;
 	}
 }

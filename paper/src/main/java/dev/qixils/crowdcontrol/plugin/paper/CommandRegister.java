@@ -163,7 +163,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		// gamemode commands
 		for (GameMode gamemode : GameMode.values()) {
 			if (gamemode == GameMode.SURVIVAL) continue;
-			commands.add(new GamemodeCommand(plugin, gamemode,
+			commands.add(new GameModeCommand(plugin, gamemode,
 					gamemode == GameMode.SPECTATOR ? 8L : 15L)); // duration (in seconds)
 		}
 
@@ -178,6 +178,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 	@Override
 	protected void onFirstRegistry() {
 		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
-		Bukkit.getPluginManager().registerEvents(new GamemodeCommand.Manager(plugin), plugin);
+		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(plugin), plugin);
 	}
 }

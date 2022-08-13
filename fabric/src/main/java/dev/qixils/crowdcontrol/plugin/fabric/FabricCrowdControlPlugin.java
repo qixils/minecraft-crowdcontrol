@@ -5,7 +5,7 @@ import cloud.commandframework.fabric.FabricServerCommandManager;
 import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
-import dev.qixils.crowdcontrol.plugin.configurate.AbstractPlugin;
+import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -53,7 +54,7 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
  * {@link dev.qixils.crowdcontrol.common.Command Commands}.
  */
 @Getter
-public class FabricCrowdControlPlugin extends AbstractPlugin<ServerPlayer, CommandSourceStack> implements ModInitializer {
+public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> implements ModInitializer {
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
@@ -185,5 +186,10 @@ public class FabricCrowdControlPlugin extends AbstractPlugin<ServerPlayer, Comma
 			this.configLoader = createConfigLoader(server.getFile("config"));
 			initCrowdControl();
 		}
+	}
+
+	@Override
+	public @NotNull Audience getConsole() {
+		return adventure().console();
 	}
 }

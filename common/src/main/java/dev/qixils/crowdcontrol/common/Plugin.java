@@ -714,4 +714,12 @@ public interface Plugin<P, S> {
 	 */
 	@NotNull
 	LimitConfig getLimitConfig();
+
+	/**
+	 * Gets the server's console {@link Audience}.
+	 *
+	 * @return console audience
+	 */
+	@NotNull
+	Audience getConsole();
 }
