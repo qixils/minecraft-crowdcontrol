@@ -34,6 +34,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private final boolean enable;
 	private final String effectName;
 	private final String displayName;
+	private static boolean globalKeepInventory = false;
 
 	public KeepInventoryCommand(PaperCrowdControlPlugin plugin, boolean enable) {
 		super(plugin);
@@ -61,6 +62,15 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse();
 
+		if (isGlobalCommandUsable(players, request)) {
+			if (globalKeepInventory == enable) {
+				return resp.type(ResultType.FAILURE).message("Keep Inventory is already " + (enable ? "enabled" : "disabled"));
+			}
+			globalKeepInventory = enable;
+			alert(players);
+			return resp.type(ResultType.SUCCESS);
+		}
+
 		List<UUID> uuids = new ArrayList<>(players.size());
 		for (Player player : players)
 			uuids.add(player.getUniqueId());
@@ -83,7 +93,8 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	public static final class Manager implements Listener {
 		@EventHandler
 		public void onDeath(PlayerDeathEvent event) {
-			if (!keepingInventory.contains(event.getEntity().getUniqueId())) return;
+			if (!globalKeepInventory && !keepingInventory.contains(event.getEntity().getUniqueId()))
+				return;
 			event.setKeepInventory(true);
 			event.getDrops().clear();
 			event.setKeepLevel(true);

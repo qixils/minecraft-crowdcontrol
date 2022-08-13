@@ -32,6 +32,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private final boolean enable;
 	private final String effectName;
 	private final String displayName;
+	private static boolean globalKeepInventory = false;
 
 	public KeepInventoryCommand(FabricCrowdControlPlugin plugin, boolean enable) {
 		super(plugin);
@@ -59,6 +60,15 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse();
 
+		if (isGlobalCommandUsable(players, request)) {
+			if (globalKeepInventory == enable) {
+				return resp.type(ResultType.FAILURE).message("Keep Inventory is already " + (enable ? "enabled" : "disabled"));
+			}
+			globalKeepInventory = enable;
+			alert(players);
+			return resp.type(ResultType.SUCCESS);
+		}
+
 		List<UUID> uuids = new ArrayList<>(players.size());
 		for (ServerPlayer player : players)
 			uuids.add(player.getUUID());
@@ -82,7 +92,8 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		@SuppressWarnings("unused")
 		@Listener
 		public void onDeath(Death event) {
-			if (!keepingInventory.contains(event.entity().getUUID())) return;
+			if (!globalKeepInventory && !keepingInventory.contains(event.entity().getUUID()))
+				return;
 			event.keepInventory(true);
 		}
 	}
