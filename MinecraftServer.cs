@@ -391,6 +391,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Eye of Ender", "give_ender_eye", "give_item") { Price = 100 },
             new Effect("End Portal Frame", "give_end_portal_frame", "give_item") { Price = 300 },
             new Effect("Recovery Compass", "give_recovery_compass", "give_item") { Price = 700 },
+            new Effect("Trident", "give_trident", "give_item") { Price = 500 },
 
             new Effect("Food", "give_food", ItemKind.Folder, "give_item"),
             new Effect("Cooked Porkchop", "give_cooked_porkchop", "give_food") { Price = 20 },
@@ -426,6 +427,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Eye of Ender", "take_ender_eye", "take_item") { Price = 300 },
             new Effect("End Portal Frame", "take_end_portal_frame", "take_item") { Price = 600 },
             new Effect("Recovery Compass", "take_recovery_compass", "give_item") { Price = 1250 },
+            new Effect("Trident", "take_trident", "take_item") { Price = 1000 },
 
             new Effect("Food", "take_food", ItemKind.Folder, "take_item"),
             new Effect("Cooked Porkchop", "take_cooked_porkchop", "take_food") { Price = 50 },

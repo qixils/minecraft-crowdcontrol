@@ -195,6 +195,7 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "ender_eye"),
 			Key.key(MINECRAFT_NAMESPACE, "end_portal_frame"),
 			Key.key(MINECRAFT_NAMESPACE, "elytra"),
+			Key.key(MINECRAFT_NAMESPACE, "trident"),
 			Key.key(MINECRAFT_NAMESPACE, "coal"),
 			Key.key(MINECRAFT_NAMESPACE, "iron_ingot"),
 			Key.key(MINECRAFT_NAMESPACE, "gold_ingot"),
