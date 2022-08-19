@@ -6,6 +6,8 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
@@ -66,9 +69,13 @@ public class EnchantmentCommand extends ImmediateCommand {
 					.map(Entry::getKey).orElse(null);
 			if (slot == null)
 				continue;
-			// add enchant
+			// remove existing enchant
+			ResourceLocation tag = Registry.ENCHANTMENT.getKey(enchantment);
 			ItemStack item = getItem(inv, slot);
 			int curLevel = getEnchantmentLevel(item, enchantment);
+			item.getEnchantmentTags().removeIf(ench ->
+					Objects.equals(tag, EnchantmentHelper.getEnchantmentId((CompoundTag) ench)));
+			// add new enchant
 			if (curLevel >= level)
 				level = curLevel + 1;
 			item.enchant(enchantment, level);

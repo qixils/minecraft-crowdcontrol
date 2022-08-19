@@ -46,7 +46,8 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 //  - Fix admin commands being unavailable to the host
 //  - Add config option for default Twitch channel
 //  - Add a GUI config library
-//  - Entity data accessors aren't persistent (very minor issue; probably only relevant to player data)
+//  - Entity data accessors aren't persistent
+//    - I thought this was a minor issue at first but this is definitely important for single player (namely the game mode effect)
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
