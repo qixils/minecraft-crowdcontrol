@@ -27,7 +27,14 @@ public class DropItemCommand extends ImmediateCommand {
 				.message("No players were holding items");
 		for (ServerPlayer player : players) {
 			if (!player.getInventory().getSelected().isEmpty()) {
-				sync(() -> player.drop(true));
+				sync(() -> {
+					player.drop(true);
+					// for some reason the player's inventory is not getting updated
+					// my code seems identical to the paper implementation, but maybe they have some
+					//  weird listener that updates the inventory?
+					// either way, this workaround is fine
+					player.containerMenu.sendAllDataToRemote();
+				});
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 		}
