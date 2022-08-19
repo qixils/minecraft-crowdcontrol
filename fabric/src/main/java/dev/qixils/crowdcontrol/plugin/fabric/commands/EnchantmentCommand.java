@@ -86,7 +86,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 
 	public static ItemStack getItem(Inventory inv, EquipmentSlot slot) {
 		if (slot == EquipmentSlot.MAINHAND)
-			return inv.getItem(inv.selected); // TODO: ensure this has the correct offset
+			return inv.getItem(inv.selected);
 		if (slot == EquipmentSlot.OFFHAND)
 			return inv.offhand.get(0);
 		return inv.armor.get(slot.getIndex());

@@ -39,7 +39,7 @@ public class WeatherCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder builder = request.buildResponse().type(ResultType.FAILURE).message("Requested weather is already active");
 		for (ServerLevel world : plugin.server().getAllLevels()) {
-			if (!world.dimension().location().getPath().equals("overworld")) // TODO make sure this is correct
+			if (!world.dimension().location().getPath().equals("overworld"))
 				continue;
 			if (storm && world.isThundering())
 				continue;

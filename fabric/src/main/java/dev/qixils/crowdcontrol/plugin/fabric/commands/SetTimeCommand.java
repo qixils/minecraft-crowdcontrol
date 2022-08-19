@@ -31,7 +31,7 @@ public class SetTimeCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		for (ServerLevel level : plugin.server().getAllLevels()) {
-			// TODO: test if setGameTime should be used instead
+			// TODO: this resets the day to 0
 			sync(() -> level.setDayTime(time));
 		}
 		return request.buildResponse().type(ResultType.SUCCESS);

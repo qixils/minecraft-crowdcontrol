@@ -54,7 +54,6 @@ public class ClutterCommand extends ImmediateCommand {
 			Inventory inventory = player.getInventory();
 			Set<Integer> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
 
-			// TODO: this is the right variable but it probably has the wrong offset
 			int heldItemSlot = player.getInventory().selected;
 			swappedSlots.add(heldItemSlot);
 			int heldItemSwap = uniqueSlot(inventory, swappedSlots);

@@ -49,7 +49,7 @@ public final class RemoveEnchantsCommand extends ImmediateCommand {
 		ListTag enchantments = item.getEnchantmentTags();
 		if (enchantments.isEmpty())
 			return false;
-		enchantments.clear(); // TODO: test that this works; might need to item.getTag().put(...)?
+		enchantments.clear();
 		return true;
 	}
 }

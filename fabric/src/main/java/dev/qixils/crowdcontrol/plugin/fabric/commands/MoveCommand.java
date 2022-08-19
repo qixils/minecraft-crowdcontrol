@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -41,10 +40,6 @@ public final class MoveCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (vector.y() > 0.0 && TimedEffect.isActive("disable_jumping", request.getTargets()))
-			// TODO: remove this? or implement something similar to the TODO comment in Sponge8's impl
-			return request.buildResponse().type(ResultType.RETRY).message("Effect cannot be used while Disable Jumping is active");
-
 		Response.Builder response = request.buildResponse().type(ResultType.RETRY).message("All players were grounded");
 		boolean isDownwards = vector.y() < 0.0;
 		for (ServerPlayer player : players) {
