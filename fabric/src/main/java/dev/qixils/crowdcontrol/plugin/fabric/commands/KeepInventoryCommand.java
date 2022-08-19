@@ -2,8 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -88,13 +86,5 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		}
 	}
 
-	public static final class Manager {
-		@SuppressWarnings("unused")
-		@Listener
-		public void onDeath(Death event) {
-			if (!isKeepingInventory(event.entity()))
-				return;
-			event.keepInventory(true);
-		}
-	}
+	// management of this command is handled by mixins
 }
