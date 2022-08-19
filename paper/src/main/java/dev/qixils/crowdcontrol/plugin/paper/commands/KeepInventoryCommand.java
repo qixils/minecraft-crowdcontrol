@@ -28,6 +28,8 @@ import static dev.qixils.crowdcontrol.common.CommandConstants.LOSE_INVENTORY_MES
 import static dev.qixils.crowdcontrol.common.util.sound.Sounds.KEEP_INVENTORY_ALERT;
 import static dev.qixils.crowdcontrol.common.util.sound.Sounds.LOSE_INVENTORY_ALERT;
 
+// TODO most of this code is duplicated across all the plugins
+
 @Getter
 public class KeepInventoryCommand extends ImmediateCommand {
 	private static final Set<UUID> keepingInventory = Collections.synchronizedSet(new HashSet<>(1));
@@ -44,7 +46,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	public static boolean isKeepingInventory(UUID player) {
-		return keepingInventory.contains(player);
+		return globalKeepInventory || keepingInventory.contains(player);
 	}
 
 	public static boolean isKeepingInventory(Entity player) {
@@ -93,7 +95,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	public static final class Manager implements Listener {
 		@EventHandler
 		public void onDeath(PlayerDeathEvent event) {
-			if (!globalKeepInventory && !keepingInventory.contains(event.getEntity().getUniqueId()))
+			if (!isKeepingInventory(event.getEntity()))
 				return;
 			event.setKeepInventory(true);
 			event.getDrops().clear();

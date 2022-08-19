@@ -44,7 +44,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	public static boolean isKeepingInventory(UUID player) {
-		return keepingInventory.contains(player);
+		return globalKeepInventory || keepingInventory.contains(player);
 	}
 
 	public static boolean isKeepingInventory(Entity player) {
@@ -98,7 +98,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	public static final class Manager {
 		@Listener
 		public void onDeath(DestructEntityEvent.Death event) {
-			if (!globalKeepInventory && !keepingInventory.contains(event.getTargetEntity().getUniqueId()))
+			if (!isKeepingInventory(event.getTargetEntity()))
 				return;
 			event.setKeepInventory(true);
 		}

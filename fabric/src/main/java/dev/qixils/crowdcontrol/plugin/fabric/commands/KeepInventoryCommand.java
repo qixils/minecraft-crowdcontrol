@@ -42,7 +42,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	public static boolean isKeepingInventory(UUID player) {
-		return keepingInventory.contains(player);
+		return globalKeepInventory || keepingInventory.contains(player);
 	}
 
 	public static boolean isKeepingInventory(Entity player) {
@@ -92,7 +92,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		@SuppressWarnings("unused")
 		@Listener
 		public void onDeath(Death event) {
-			if (!globalKeepInventory && !keepingInventory.contains(event.entity().getUUID()))
+			if (!isKeepingInventory(event.entity()))
 				return;
 			event.keepInventory(true);
 		}
