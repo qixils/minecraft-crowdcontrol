@@ -26,7 +26,7 @@ public class FeedCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder resp = request.buildResponse().type(ResultType.FAILURE).message("Player's hunger is already max or empty");
+		Response.Builder resp = request.buildResponse().type(ResultType.RETRY).message("Player's hunger is already max or empty");
 		for (Player player : players) {
 			int currFood = player.getFoodLevel();
 			float currSaturation = player.getSaturation();

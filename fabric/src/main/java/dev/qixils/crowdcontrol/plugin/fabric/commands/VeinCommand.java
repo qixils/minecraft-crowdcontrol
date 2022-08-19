@@ -94,10 +94,10 @@ public class VeinCommand extends ImmediateCommand {
 				randomlyShrinkOreVein(setBlocks);
 				randomlyShrinkOreVein(setDeepslateBlocks);
 
-				if (!setBlocks.isEmpty())
-					sync(() -> setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().defaultBlockState())));
-				if (!setDeepslateBlocks.isEmpty())
-					sync(() -> setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().defaultBlockState())));
+				sync(() -> {
+					setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().defaultBlockState()));
+					setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().defaultBlockState()));
+				});
 			}
 		}
 		return result;

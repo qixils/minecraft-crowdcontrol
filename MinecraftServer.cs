@@ -72,7 +72,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Halve Health", "half_health", "miscellaneous") { Price = 300, Description = "Sets the player's health to 50% of what they currently have" },
             new Effect("Kill Player", "kill", "miscellaneous") { Price = 1500, Description = "Immediately kills the streamer on the spot" },
             new Effect("Open Lootbox", "lootbox", "miscellaneous") { Price = 100, Description = "Gifts a completely random item with varying enchants and modifiers" },
-            new Effect("Open Lucky Lootbox", "lootbox_5", "miscellaneous") { Price = 300, Description = "Gifts two random items with higher odds of having beneficial enchantments and modifiers" },
+            new Effect("Open Lucky Lootbox", "lootbox_5", "miscellaneous") { Price = 500, Description = "Gifts two random items with higher odds of having beneficial enchantments and modifiers" },
             new Effect("Place Flowers", "flowers", "miscellaneous") { Price = 25, Description = "Randomly places flowers nearby" },
             new Effect("Place Torches", "lit", "miscellaneous") { Price = 100, Description = "Places torches on every nearby block" },
             new Effect("Plant Tree", "plant_tree", "miscellaneous") { Price = 200, Description = "Plant a tree on top of the streamer" },

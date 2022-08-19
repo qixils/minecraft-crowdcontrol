@@ -22,7 +22,7 @@ public class RespawnCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		sync(() -> players.forEach(Player::respawn)); // TODO test this
+		sync(() -> players.forEach(Player::respawn)); // TODO: this doesn't work; it's for LAN only, not multiplayer
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

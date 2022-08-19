@@ -27,7 +27,7 @@ public class HalfHealthCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
-				.type(ResultType.FAILURE)
+				.type(ResultType.RETRY)
 				.message("Health is already minimum");
 
 		for (Player player : players) {

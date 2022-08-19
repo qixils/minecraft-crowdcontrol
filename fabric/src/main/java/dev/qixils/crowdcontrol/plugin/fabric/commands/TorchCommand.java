@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 
 @Getter
 public class TorchCommand extends ImmediateCommand {
+	// TODO: this is placing some torches on air
 	protected static final Direction[] BLOCK_FACES = new Direction[]{
 			Direction.DOWN,
 			Direction.EAST,
