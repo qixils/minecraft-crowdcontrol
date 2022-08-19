@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.mixin.InventoryAccessor;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.InventoryUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -34,7 +34,7 @@ public class TakeItemCommand extends ImmediateCommand {
 
 	private boolean takeItemFrom(Player player) {
 		Inventory inventory = player.getInventory();
-		for (ItemStack itemStack : ((InventoryAccessor) (Object) inventory).viewAllItems()) {
+		for (ItemStack itemStack : InventoryUtil.viewAllItems(inventory)) {
 			if (itemStack.isEmpty()) continue;
 			if (itemStack.getItem() != this.item) continue;
 			itemStack.setCount(itemStack.getCount() - 1);

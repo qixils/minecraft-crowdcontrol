@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.mixin.InventoryAccessor;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.InventoryUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -32,11 +32,12 @@ public class ClearInventoryCommand extends ImmediateCommand {
 				.message("All inventories are already empty or protected");
 		for (ServerPlayer player : players) {
 			// ensure keep inventory is not enabled
-			if (KeepInventoryCommand.isKeepingInventory(player)) continue;
+			if (KeepInventoryCommand.isKeepingInventory(player))
+				continue;
 			Inventory inv = player.getInventory();
 			// ensure inventory is not empty
 			boolean hasItems = false;
-			for (ItemStack item : ((InventoryAccessor) (Object) inv).viewAllItems()) {
+			for (ItemStack item : InventoryUtil.viewAllItems(inv)) {
 				if (!item.isEmpty()) {
 					hasItems = true;
 					break;
