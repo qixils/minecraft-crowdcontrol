@@ -365,6 +365,10 @@ public class CommandConstants {
 	 * Color used for the subtitle of the Do-or-Die success message.
 	 */
 	private static final @NotNull TextColor SUCCESS_SUBTITLE_COLOR = TextColor.color(0x99ff99);
+	/**
+	 * The minimum health that a player must have to be able to apply the Half Health effect.
+	 */
+	public static final double HALVE_HEALTH_MIN_HEALTH = 6; // 3 hearts
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");

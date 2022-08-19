@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.HALVE_HEALTH_MIN_HEALTH;
+
 @Getter
 public class HalfHealthCommand extends ImmediateCommand {
 	private final String effectName = "half_health";
@@ -30,9 +32,8 @@ public class HalfHealthCommand extends ImmediateCommand {
 
 		for (ServerPlayer player : players) {
 			float health = player.getHealth();
-			if (health > 0.5) {
+			if (health > HALVE_HEALTH_MIN_HEALTH) {
 				response.type(ResultType.SUCCESS).message("SUCCESS");
-				// TODO: test this new one-liner on fabric, sponge 7, and sponge 8
 				sync(() -> player.hurt(DamageSource.MAGIC, health / 2f));
 			}
 		}

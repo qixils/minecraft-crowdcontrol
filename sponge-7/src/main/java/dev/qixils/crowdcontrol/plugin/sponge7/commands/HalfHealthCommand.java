@@ -12,6 +12,8 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.HALVE_HEALTH_MIN_HEALTH;
+
 @Getter
 public class HalfHealthCommand extends ImmediateCommand {
 	private final String effectName = "half_health";
@@ -30,7 +32,7 @@ public class HalfHealthCommand extends ImmediateCommand {
 
 		for (Player player : players) {
 			double health = player.getHealthData().health().get();
-			if (health > 0.5) {
+			if (health > HALVE_HEALTH_MIN_HEALTH) {
 				response.type(ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> player.damage(health / 2, DamageSources.GENERIC));
 			}

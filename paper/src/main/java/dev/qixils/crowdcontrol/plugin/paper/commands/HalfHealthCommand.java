@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.CommandConstants.HALVE_HEALTH_MIN_HEALTH;
+
 @Getter
 public class HalfHealthCommand extends ImmediateCommand {
 	private final String effectName = "half_health";
@@ -28,7 +30,7 @@ public class HalfHealthCommand extends ImmediateCommand {
 
 		for (Player player : players) {
 			double health = player.getHealth();
-			if (health > 0.5) {
+			if (health > HALVE_HEALTH_MIN_HEALTH) {
 				resp.type(ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> {
 					player.damage(.1);
