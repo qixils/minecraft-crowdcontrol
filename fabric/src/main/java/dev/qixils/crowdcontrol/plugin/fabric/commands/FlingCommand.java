@@ -31,8 +31,10 @@ public class FlingCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		for (ServerPlayer player : players)
-			sync(() -> player.setDeltaMovement(randomVector()));
+		for (ServerPlayer player : players) sync(() -> {
+			player.setDeltaMovement(randomVector());
+			player.hurtMarked = true;
+		});
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 }

@@ -47,6 +47,7 @@ public class ExplodeCommand extends ImmediateCommand {
 						BlockInteraction.DESTROY
 				);
 				player.setDeltaMovement(0, .5, 0);
+				player.hurtMarked = true;
 			});
 		}
 

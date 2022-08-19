@@ -52,6 +52,7 @@ public final class MoveCommand extends ImmediateCommand {
 				continue;
 			response.type(ResultType.SUCCESS).message("SUCCESS");
 			player.setDeltaMovement(vector);
+			player.hurtMarked = true;
 		}
 		return response;
 	}
