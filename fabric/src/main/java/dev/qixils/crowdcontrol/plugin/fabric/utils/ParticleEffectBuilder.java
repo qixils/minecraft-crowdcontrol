@@ -8,6 +8,8 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Builds a particle effect.
@@ -17,18 +19,16 @@ import org.jetbrains.annotations.Contract;
 @Data
 @Accessors(fluent = true, chain = true)
 public class ParticleEffectBuilder<T extends ParticleOptions> {
-	private final T particleOptions;
-	private ServerLevel level;
-	private Vector3d position;
-	private Vector3f distance = new Vector3f(0, 0, 0);
+	private final @NotNull T particleOptions;
+	private @Nullable ServerLevel level = null;
+	private @Nullable Vector3d position = null;
+	private @NotNull Vector3f distance = new Vector3f(0, 0, 0);
 	private float maxSpeed = .1f;
 	private int count = 1;
 
 	@Contract("_ -> this")
 	public ParticleEffectBuilder<T> position(Vector3d position) {
-		this.position.x = position.x;
-		this.position.y = position.y;
-		this.position.z = position.z;
+		this.position = new Vector3d(position.x, position.y, position.z);
 		return this;
 	}
 
