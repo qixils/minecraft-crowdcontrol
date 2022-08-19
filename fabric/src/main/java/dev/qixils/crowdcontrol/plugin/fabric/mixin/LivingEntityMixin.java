@@ -1,8 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.LivingEntityData;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -28,11 +27,7 @@ public class LivingEntityMixin implements LivingEntityData {
 
 	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
 	private void callDeathEvent(final DamageSource cause, final CallbackInfo ci) {
-		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
-		if (this.dead) return;
-		Death event = new Death((LivingEntity) (Object) this);
-		FabricCrowdControlPlugin.getInstance().getEventManager().fire(event);
-		if (event.cancelled()) ci.cancel();
+		EntityUtil.handleDie((LivingEntity) (Object) this, cause, ci);
 	}
 
 	@Inject(method = "defineSynchedData", at = @At("TAIL"))

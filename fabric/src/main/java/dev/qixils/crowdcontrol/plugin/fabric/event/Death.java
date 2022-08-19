@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 
 @Data
@@ -12,5 +13,6 @@ import net.minecraft.world.entity.LivingEntity;
 @Accessors(fluent = true, chain = false)
 public final class Death implements CancellableEvent {
 	private final LivingEntity entity;
+	private final DamageSource source;
 	private boolean cancelled = false;
 }

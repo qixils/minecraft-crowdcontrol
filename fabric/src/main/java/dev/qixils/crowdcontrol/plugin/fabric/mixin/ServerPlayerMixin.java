@@ -2,9 +2,12 @@ package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand.FreezeData;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameRules.BooleanValue;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,6 +23,7 @@ import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInvento
 @SuppressWarnings("resource")
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin {
+
 	@Inject(method = "tick", at = @At("HEAD"))
 	void onTick(CallbackInfo ci) {
 		//noinspection ConstantConditions
@@ -48,5 +52,10 @@ public class ServerPlayerMixin {
 	)
 	private boolean restoreFromRedirectKeepInventory(GameRules gameRules, GameRules.Key<BooleanValue> key) {
 		return keepInventoryRedirect((Entity) (Object) this, gameRules, key);
+	}
+
+	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
+	private void callDeathEvent(final DamageSource cause, final CallbackInfo ci) {
+		EntityUtil.handleDie((LivingEntity) (Object) this, cause, ci);
 	}
 }

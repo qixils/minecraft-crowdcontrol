@@ -52,7 +52,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Camera Lock (10s)", "camera_lock", "miscellaneous") { Price = 100, Description = "Temporarily freeze the streamer's camera" },
             new Effect("Camera Lock To Ground (10s)", "camera_lock_to_ground", "miscellaneous") { Price = 150, Description = "Temporarily locks the streamer's camera to the ground" },
             new Effect("Camera Lock To Sky (10s)", "camera_lock_to_sky", "miscellaneous") { Price = 150, Description = "Temporarily locks the streamer's camera to the sky" },
-            new Effect("Clutter Inventory", "clutter", "miscellaneous") { Price = 50, Description = "Shuffles around items in the streamer's inventory" },
             new Effect("Damage Held Item", "damage_item", "miscellaneous") { Price = 100, Description = "Halves the durability of the held item" },
             new Effect("Damage Player (1 Heart)", "damage_1", "miscellaneous") { Price = 25, Description = "Removes a single heart of health from the streamer (unless it would kill them)" },
             new Effect("Delete Held Item", "delete_item", "miscellaneous") { Price = 200, Description = "Deletes whatever item the streamer is currently holding" },
@@ -76,7 +75,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Place Flowers", "flowers", "miscellaneous") { Price = 25, Description = "Randomly places flowers nearby" },
             new Effect("Place Torches", "lit", "miscellaneous") { Price = 100, Description = "Places torches on every nearby block" },
             new Effect("Plant Tree", "plant_tree", "miscellaneous") { Price = 200, Description = "Plant a tree on top of the streamer" },
-            new Effect("Put Held Item on Head", "hat", "miscellaneous") { Price = 25, Description = "Moves the item in the streamer's hand to their head" },
             new Effect("Remove One Hunger Bar", "starve_1", "miscellaneous") { Price = 50, Description = "Removes a single bar of food" },
             new Effect("Remove Torches", "dim", "miscellaneous") { Price = 200, Description = "Removes all nearby torches" },
             new Effect("Repair Held Item", "repair_item", "miscellaneous") { Price = 100, Description = "Fully repairs a damaged item" },
@@ -98,8 +96,10 @@ namespace CrowdControl.Games.Packs
             // inventory commands
             new Effect("Inventory", "inventory", ItemKind.Folder),
             new Effect("Clear Inventory", "clear_inventory", "inventory") { Price = 1000, Description = "Wipes every item from the streamer's inventory" },
+            new Effect("Clutter Inventory", "clutter", "inventory") { Price = 50, Description = "Shuffles around items in the streamer's inventory" },
             new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory") { Price = 200, Description = "Disallows the streamer from keeping their inventory upon death" },
             new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory") { Price = 100, Description = "Allows the streamer to keep their inventory upon death" },
+            new Effect("Put Held Item on Head", "hat", "inventory") { Price = 25, Description = "Moves the item in the streamer's hand to their head" },
             // set gamemode for 30 seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
             new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode") { Price = 200, Description = "Temporarily sets the streamer to Adventure mode, rendering them unable to place or break blocks" },

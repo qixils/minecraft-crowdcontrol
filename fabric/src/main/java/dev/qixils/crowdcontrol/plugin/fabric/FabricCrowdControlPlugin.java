@@ -88,6 +88,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			.withExecutor(getAsyncExecutor())
 			.build()
 	);
+	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private @MonotonicNonNull HoconConfigurationLoader configLoader;
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
@@ -96,7 +97,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
-		getEventManager().registerListeners(new SoftLockResolver(this));
+		getEventManager().registerListeners(softLockResolver);
 	}
 
 	@Override

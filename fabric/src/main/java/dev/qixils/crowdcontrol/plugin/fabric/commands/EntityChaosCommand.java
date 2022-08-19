@@ -40,7 +40,6 @@ public class EntityChaosCommand extends ImmediateCommand {
 					}
 				}
 			} else {
-				// TODO test this
 				for (ServerPlayer player : players) {
 					Vec3 pp = player.position();
 					for (Entity entity : player.getLevel().getAllEntities()) {
