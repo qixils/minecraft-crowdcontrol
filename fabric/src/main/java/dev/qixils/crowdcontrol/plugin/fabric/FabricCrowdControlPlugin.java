@@ -70,10 +70,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	protected FabricServerAudiences adventure;
 	@NotNull
 	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
-	// TODO is this actually the sync executor?? 'Main' sounds sync but 'background' doesn't
-	//   UPDATE: a sync() managed to crash the server once as it seemed to be on an async thread
-	//   so I think this is wrong
-	private final ExecutorService syncExecutor = Util.backgroundExecutor();
+	private final ExecutorService syncExecutor = Util.bootstrapExecutor();
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowd-control");
