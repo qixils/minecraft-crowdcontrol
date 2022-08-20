@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_COMPONENT;
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_COMPONENT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
 import static dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin.COMPONENT_TYPE;
 
 @Getter

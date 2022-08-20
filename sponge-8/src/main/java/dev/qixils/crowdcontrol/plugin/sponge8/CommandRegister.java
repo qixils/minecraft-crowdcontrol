@@ -1,7 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.sponge8;
 
-import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.executeorperish.DoOrDieCommand;
@@ -13,17 +14,15 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.registry.RegistryTypes;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
-import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
 
-public class CommandRegister extends AbstractCommandRegister<ServerPlayer, SpongeCrowdControlPlugin, Command> {
+public class CommandRegister extends AbstractCommandRegister<ServerPlayer, SpongeCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
 	private Set<EntityType<?>> safeEntities;
 	private MappedKeyedTag<BlockType> setBlocks;
@@ -45,10 +44,11 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 	}
 
 	@Override
-	protected List<Command> createCommands() {
+	protected void createCommands(List<Command<ServerPlayer>> commands) {
+		super.createCommands(commands);
 		registerTags();
 		// register normal commands
-		List<Command> commands = new ArrayList<>(Arrays.asList(
+		commands.addAll(Arrays.asList(
 				new VeinCommand(plugin),
 				new SoundCommand(plugin),
 				new ChargedCreeperCommand(plugin),
@@ -85,11 +85,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
 				new BucketClutchCommand(plugin),
-				new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
-				new DamageCommand(plugin, "damage_1", "Damage Players (1 Heart)", 2f),
-				new DamageCommand(plugin, "heal_1", "Heal Players (1 Heart)", -2f),
-				new DamageCommand(plugin, "full_heal", "Heal Players", Integer.MIN_VALUE),
-				new HalfHealthCommand(plugin),
 				new FeedCommand(plugin, "feed", "Feed Players", 40),
 				new FeedCommand(plugin, "feed_1", "Feed Players (1 Bar)", 2),
 				new FeedCommand(plugin, "starve", "Starve Players", Integer.MIN_VALUE),
@@ -97,9 +92,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 				new ResetExpProgressCommand(plugin),
 				new ExperienceCommand(plugin, "xp_plus1", "Give One XP Level", 1),
 				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
-				new MaxHealthCommand(plugin, -1),
-				new MaxHealthCommand(plugin, 1),
-				new MaxHealthCommand(plugin, 4), // used in hype trains only
 				new DisableJumpingCommand(plugin),
 				new EntityChaosCommand(plugin),
 				new CameraLockToSkyCommand(plugin),
@@ -157,23 +149,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 				.filter(gamemode -> !gamemode.equals(GameModes.SURVIVAL.get()))
 				.forEach(gamemode -> commands.add(new GameModeCommand(plugin, gamemode,
 						gamemode.equals(GameModes.SPECTATOR.get()) ? 8L : 15L)));
-
-		for (Command command : commands) {
-			registeredCommandMap.put(command.getEffectName().toLowerCase(Locale.ENGLISH), command);
-
-			Class<? extends Command> clazz = command.getClass();
-			if (registeredCommandClasses.contains(clazz))
-				singleCommandInstances.remove(clazz);
-			else
-				singleCommandInstances.put(clazz, command);
-			registeredCommandClasses.add(clazz);
-		}
-
-		return registeredCommands = commands;
 	}
 
 	@Override
-	protected void registerListener(Command command) {
+	protected void registerListener(Command<ServerPlayer> command) {
 		plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), command);
 	}
 

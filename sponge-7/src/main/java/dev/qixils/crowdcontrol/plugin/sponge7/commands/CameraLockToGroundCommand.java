@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
 public class CameraLockToGroundCommand extends TimedCommand {

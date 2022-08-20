@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.common.util.sound;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package dev.qixils.crowdcontrol.common;
+package dev.qixils.crowdcontrol.common.command;
 
 import org.jetbrains.annotations.NotNull;
 

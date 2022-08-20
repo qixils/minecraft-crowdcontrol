@@ -7,9 +7,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
-import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectDataBuilder;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableGameModeEffectData;
@@ -19,6 +20,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameDat
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameDataBuilder;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedData;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedDataBuilder;
+import dev.qixils.crowdcontrol.plugin.sponge7.mc.SpongePlayer;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -75,11 +77,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
@@ -108,6 +112,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Accessors(fluent = true)
 	private final EntityMapper<Player> playerMapper = new CommandSourceMapper<>(this);
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
+	@NotNull
+	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
@@ -384,9 +390,20 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Listener
 	public void onConnection(ClientConnectionEvent.Join event) {
 		onPlayerJoin(event.getTargetEntity());
+		ccPlayers.put(event.getTargetEntity().getUniqueId(), new SpongePlayer(event.getTargetEntity()));
 		Platform platform = game.getPlatform();
 		if ((platform.getType().isClient() || platform.getExecutionType().isClient()) && clientHost == null) {
 			clientHost = event.getTargetEntity().getUniqueId().toString();
 		}
+	}
+
+	@Listener
+	public void onDisconnect(ClientConnectionEvent.Disconnect event) {
+		ccPlayers.remove(event.getTargetEntity().getUniqueId());
+	}
+
+	@Override
+	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
+		return ccPlayers.computeIfAbsent(player.getUniqueId(), uuid -> new SpongePlayer(player));
 	}
 }

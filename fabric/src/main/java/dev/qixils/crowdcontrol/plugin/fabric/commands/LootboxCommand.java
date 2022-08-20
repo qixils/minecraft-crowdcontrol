@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.common.CommandConstants.AttributeWeights;
-import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.AttributeWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
@@ -42,8 +42,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.buildLootboxLore;
-import static dev.qixils.crowdcontrol.common.CommandConstants.buildLootboxTitle;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
 import static net.minecraft.world.entity.EquipmentSlot.MAINHAND;
 import static net.minecraft.world.entity.EquipmentSlot.OFFHAND;
 

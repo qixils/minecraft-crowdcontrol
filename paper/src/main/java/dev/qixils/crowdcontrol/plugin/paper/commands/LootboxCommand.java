@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.common.CommandConstants.AttributeWeights;
-import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.AttributeWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.lootboxItemSlots;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.lootboxItemSlots;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {

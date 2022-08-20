@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.utils;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
 import dev.qixils.crowdcontrol.common.util.CommonTags;
 import org.bukkit.Location;

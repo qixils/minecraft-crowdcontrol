@@ -13,7 +13,7 @@ import java.util.Random;
 
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
 
-public abstract class Command implements dev.qixils.crowdcontrol.common.Command<ServerPlayer> {
+public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<ServerPlayer> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final SpongeCrowdControlPlugin plugin;

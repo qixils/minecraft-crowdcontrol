@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.REMOVE_ENTITY_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
 
 @Getter
 public class RemoveEntityCommand extends ImmediateCommand {

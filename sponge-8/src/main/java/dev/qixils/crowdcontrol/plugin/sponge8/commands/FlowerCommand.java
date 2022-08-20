@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -20,9 +20,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.FLOWER_MAX;
-import static dev.qixils.crowdcontrol.common.CommandConstants.FLOWER_MIN;
-import static dev.qixils.crowdcontrol.common.CommandConstants.FLOWER_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_MAX;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_MIN;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_RADIUS;
 
 @Getter
 public class FlowerCommand extends ImmediateCommand {

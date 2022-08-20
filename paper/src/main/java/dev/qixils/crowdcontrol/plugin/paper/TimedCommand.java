@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A command which has a timed duration
  */
-public abstract class TimedCommand extends VoidCommand implements dev.qixils.crowdcontrol.common.TimedCommand<Player> {
+public abstract class TimedCommand extends VoidCommand implements dev.qixils.crowdcontrol.common.command.TimedCommand<Player> {
 	private String processedDisplayName;
 
 	public TimedCommand(@NotNull PaperCrowdControlPlugin plugin) {
@@ -16,7 +16,7 @@ public abstract class TimedCommand extends VoidCommand implements dev.qixils.cro
 	@Override
 	public @NotNull String getProcessedDisplayName() {
 		if (processedDisplayName == null)
-			processedDisplayName = dev.qixils.crowdcontrol.common.TimedCommand.super.getProcessedDisplayName();
+			processedDisplayName = dev.qixils.crowdcontrol.common.command.TimedCommand.super.getProcessedDisplayName();
 		return processedDisplayName;
 	}
 }

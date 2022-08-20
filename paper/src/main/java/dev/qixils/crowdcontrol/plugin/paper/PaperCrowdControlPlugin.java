@@ -3,11 +3,14 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
+import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -22,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -89,6 +94,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Getter @NotNull
 	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	@NotNull
+	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
 
 	@Override
 	public void onLoad() {
@@ -206,7 +213,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
-	public void registerCommand(@NotNull String name, dev.qixils.crowdcontrol.common.@NotNull Command<Player> command) {
+	public void registerCommand(@NotNull String name, @NotNull Command<Player> command) {
 		name = name.toLowerCase(Locale.ENGLISH);
 		try {
 			crowdControl.registerHandler(name, command::executeAndNotify);
@@ -241,6 +248,17 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		onPlayerJoin(event.getPlayer());
+		ccPlayers.put(event.getPlayer().getUniqueId(), new PaperPlayer(event.getPlayer()));
+	}
+
+	@EventHandler
+	public void onLeave(PlayerQuitEvent event) {
+		ccPlayers.remove(event.getPlayer().getUniqueId());
+	}
+
+	@Override
+	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
+		return ccPlayers.computeIfAbsent(player.getUniqueId(), uuid -> new PaperPlayer(player));
 	}
 
 	// boilerplate stuff for the data container storage

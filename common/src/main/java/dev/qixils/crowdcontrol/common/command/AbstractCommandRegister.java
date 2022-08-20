@@ -1,8 +1,14 @@
-package dev.qixils.crowdcontrol.common;
+package dev.qixils.crowdcontrol.common.command;
 
+import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.command.impl.DamageCommand;
+import dev.qixils.crowdcontrol.common.command.impl.HalfHealthCommand;
+import dev.qixils.crowdcontrol.common.command.impl.MaxHealthCommand;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,31 +21,42 @@ import java.util.Set;
  *
  * @param <PLAYER> the player class used by your plugin
  * @param <PLUGIN> the plugin class using this registry
- * @param <COMMAND> the command class used by your plugin
  */
-public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAYER, ?>, COMMAND extends Command<PLAYER>> {
+public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAYER, ?>> {
 	protected final @NotNull PLUGIN plugin;
-	protected final @NotNull Set<Class<? extends COMMAND>> registeredCommandClasses = new HashSet<>();
-	protected final @NotNull Map<Class<? extends COMMAND>, COMMAND> singleCommandInstances = new HashMap<>();
-	protected final @NotNull Map<String, COMMAND> registeredCommandMap = new HashMap<>();
-	protected @MonotonicNonNull List<COMMAND> registeredCommands;
+	protected final @NotNull Set<Class<? extends Command<PLAYER>>> registeredCommandClasses = new HashSet<>();
+	protected final @NotNull Map<Class<? extends Command<PLAYER>>, Command<PLAYER>> singleCommandInstances = new HashMap<>();
+	protected final @NotNull Map<String, Command<PLAYER>> registeredCommandMap = new HashMap<>();
+	protected @MonotonicNonNull List<Command<PLAYER>> registeredCommands;
 
 	protected AbstractCommandRegister(@NotNull PLUGIN plugin) {
 		this.plugin = plugin;
 	}
 
-	protected abstract List<COMMAND> createCommands();
+	protected void createCommands(List<Command<PLAYER>> commands) {
+		commands.addAll(Arrays.asList(
+				new HalfHealthCommand<>(plugin),
+				new MaxHealthCommand<>(plugin, -1),
+				new MaxHealthCommand<>(plugin, 1),
+				new MaxHealthCommand<>(plugin, 4), // used in hype trains only
+				new DamageCommand<>(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
+				new DamageCommand<>(plugin, 2f),
+				new DamageCommand<>(plugin, -2f),
+				new DamageCommand<>(plugin, "full_heal", "Heal Players", Integer.MIN_VALUE)
+		));
+	}
 
-	public final List<COMMAND> getCommands() {
+	public final List<Command<PLAYER>> getCommands() {
 		if (registeredCommands != null)
 			return registeredCommands;
 
-		List<COMMAND> commands = createCommands();
-		for (COMMAND command : commands) {
+		List<Command<PLAYER>> commands = new ArrayList<>();
+		createCommands(commands);
+		for (Command<PLAYER> command : commands) {
 			registeredCommandMap.put(command.getEffectName().toLowerCase(Locale.ENGLISH), command);
 
 			//noinspection unchecked
-			Class<COMMAND> clazz = (Class<COMMAND>) command.getClass();
+			Class<Command<PLAYER>> clazz = (Class<Command<PLAYER>>) command.getClass();
 			if (registeredCommandClasses.contains(clazz))
 				singleCommandInstances.remove(clazz);
 			else
@@ -52,11 +69,11 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 
 	protected abstract void onFirstRegistry();
 
-	protected abstract void registerListener(COMMAND command);
+	protected abstract void registerListener(Command<PLAYER> command);
 
 	public final void register() {
 		boolean firstRegistry = registeredCommands == null;
-		for (COMMAND command : getCommands()) {
+		for (Command<PLAYER> command : getCommands()) {
 			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
 			plugin.registerCommand(name, command);
 
@@ -79,7 +96,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	 *                                  registered several times
 	 */
 	@NotNull
-	public final <T extends COMMAND> T getCommand(@NotNull Class<T> tClass) throws IllegalArgumentException {
+	public final <T extends Command<PLAYER>> T getCommand(@NotNull Class<T> tClass) throws IllegalArgumentException {
 		if (!singleCommandInstances.containsKey(tClass))
 			throw new IllegalArgumentException("Requested class " + tClass.getName()
 					+ " is invalid. Please ensure that only one instance of this command is registered.");
@@ -95,7 +112,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	 * @throws IllegalArgumentException the requested command does not exist
 	 */
 	@NotNull
-	public final COMMAND getCommandByName(@NotNull String name) throws IllegalArgumentException {
+	public final Command<PLAYER> getCommandByName(@NotNull String name) throws IllegalArgumentException {
 		name = name.toLowerCase(Locale.ENGLISH);
 		if (!registeredCommandMap.containsKey(name))
 			throw new IllegalArgumentException("Could not find a command by the name of " + name);
@@ -113,8 +130,8 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	 *                                  expected class
 	 */
 	@NotNull
-	public final <T extends COMMAND> T getCommandByName(@NotNull String name, @NotNull Class<T> expectedClass) throws IllegalArgumentException {
-		COMMAND command = getCommandByName(name);
+	public final <T extends Command<PLAYER>> T getCommandByName(@NotNull String name, @NotNull Class<T> expectedClass) throws IllegalArgumentException {
+		Command<PLAYER> command = getCommandByName(name);
 		if (!expectedClass.isInstance(command))
 			throw new IllegalArgumentException("Expected command '" + name
 					+ "' to an instance of " + expectedClass.getSimpleName()

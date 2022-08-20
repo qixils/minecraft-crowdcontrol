@@ -26,12 +26,12 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_COOLDOWN;
-import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_DURATION;
-import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_FAILURE;
-import static dev.qixils.crowdcontrol.common.CommandConstants.DO_OR_DIE_TIMES;
-import static dev.qixils.crowdcontrol.common.CommandConstants.doOrDieColor;
-import static dev.qixils.crowdcontrol.common.CommandConstants.doOrDieSuccess;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_COOLDOWN;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_FAILURE;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_TIMES;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.doOrDieColor;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.doOrDieSuccess;
 
 @Getter
 public class DoOrDieCommand extends VoidCommand {

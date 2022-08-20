@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.REMOVE_ENTITY_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
 
 @Getter
 public final class RemoveEntityCommand extends Command {

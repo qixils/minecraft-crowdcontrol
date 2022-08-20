@@ -18,7 +18,7 @@ import org.spongepowered.api.world.weather.Weathers;
 
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.WEATHER_TICKS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.WEATHER_TICKS;
 
 @Getter
 @Global

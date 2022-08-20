@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.CHAOS_LOCAL_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCAL_RADIUS;
 
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {

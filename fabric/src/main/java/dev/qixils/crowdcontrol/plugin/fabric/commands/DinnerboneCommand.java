@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.StreamSupport;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_NAME;
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_NAME;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
 
 @Getter
 public class DinnerboneCommand extends Command {

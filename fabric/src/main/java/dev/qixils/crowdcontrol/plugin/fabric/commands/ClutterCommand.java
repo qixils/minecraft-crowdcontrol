@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.CLUTTER_ITEMS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.CLUTTER_ITEMS;
 
 @Getter
 public class ClutterCommand extends ImmediateCommand {

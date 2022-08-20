@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
-import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
@@ -34,8 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.buildLootboxLore;
-import static dev.qixils.crowdcontrol.common.CommandConstants.buildLootboxTitle;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {

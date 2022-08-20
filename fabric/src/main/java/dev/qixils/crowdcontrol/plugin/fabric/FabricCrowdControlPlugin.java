@@ -2,13 +2,17 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
-import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
+import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -31,10 +35,13 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,7 +50,6 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 
 // TODO:
 //  - Fix global effects being unavailable to the host
-//  - Fix admin commands being unavailable to the host
 //  - Add config option for default Twitch channel
 //  - Add a GUI config library
 //  - Entity data accessors aren't persistent
@@ -52,7 +58,7 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
  * for managing Crowd Control server/client connections and handling
- * {@link dev.qixils.crowdcontrol.common.Command Commands}.
+ * {@link Command Commands}.
  */
 @Getter
 public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> implements ModInitializer {
@@ -86,7 +92,10 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			.build()
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
-	private @MonotonicNonNull HoconConfigurationLoader configLoader;
+	@MonotonicNonNull
+	private HoconConfigurationLoader configLoader;
+	@NotNull
+	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
 	public FabricCrowdControlPlugin() {
@@ -94,6 +103,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
+		getEventManager().register(Leave.class, leave -> ccPlayers.remove(leave.player().getUUID()));
 		getEventManager().registerListeners(softLockResolver);
 	}
 
@@ -102,6 +112,17 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		registerChatCommands();
 		ServerLifecycleEvents.SERVER_STARTING.register(this::setServer);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
+	}
+
+	@Override
+	public void onPlayerJoin(ServerPlayer player) {
+		super.onPlayerJoin(player);
+		ccPlayers.put(player.getUUID(), new FabricPlayer(player));
+	}
+
+	@Override
+	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayer player) {
+		return ccPlayers.computeIfAbsent(player.getUUID(), uuid -> new FabricPlayer(player));
 	}
 
 	/**

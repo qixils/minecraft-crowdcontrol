@@ -8,6 +8,9 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -464,7 +467,7 @@ public interface Plugin<P, S> {
 	 * @return command registry manager
 	 */
 	@NotNull
-	AbstractCommandRegister<P, ?, ?> commandRegister();
+	AbstractCommandRegister<P, ?> commandRegister();
 
 	/**
 	 * Gets the {@link ScheduledExecutorService} used by the plugin.
@@ -722,4 +725,13 @@ public interface Plugin<P, S> {
 	 */
 	@NotNull
 	Audience getConsole();
+
+	/**
+	 * Gets the plugin's {@link CCPlayer wrapper} for a player.
+	 *
+	 * @param player player to get the wrapper for
+	 * @return wrapper for the player
+	 */
+	@NotNull
+	CCPlayer getPlayer(@NotNull P player);
 }

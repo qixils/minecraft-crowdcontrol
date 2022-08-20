@@ -1,5 +1,6 @@
-package dev.qixils.crowdcontrol.common;
+package dev.qixils.crowdcontrol.common.command;
 
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.KeyedTag;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;

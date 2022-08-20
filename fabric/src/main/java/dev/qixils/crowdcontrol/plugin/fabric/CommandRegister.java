@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
-import dev.qixils.crowdcontrol.common.AbstractCommandRegister;
-import dev.qixils.crowdcontrol.common.Command;
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
@@ -17,16 +17,15 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DAY;
-import static dev.qixils.crowdcontrol.common.CommandConstants.NIGHT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
 
-public class CommandRegister extends AbstractCommandRegister<ServerPlayer, FabricCrowdControlPlugin, Command<ServerPlayer>> {
+public class CommandRegister extends AbstractCommandRegister<ServerPlayer, FabricCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
 	private Set<EntityType<?>> safeEntities;
 	private MappedKeyedTag<Block> setBlocks;
@@ -48,9 +47,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 	}
 
 	@Override
-	protected List<Command<ServerPlayer>> createCommands() {
+	protected void createCommands(List<Command<ServerPlayer>> commands) {
+		super.createCommands(commands);
 		registerTags();
-		List<Command<ServerPlayer>> commands = new ArrayList<>(Arrays.asList(
+		commands.addAll(Arrays.asList(
 				new VeinCommand(plugin),
 				new SoundCommand(plugin),
 				new ChargedCreeperCommand(plugin),
@@ -87,11 +87,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
 				new BucketClutchCommand(plugin),
-				new DamageCommand(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
-				new DamageCommand(plugin, "damage_1", "Damage Players (1 Heart)", 2f),
-				new DamageCommand(plugin, "heal_1", "Heal Players (1 Heart)", -2f),
-				new DamageCommand(plugin, "full_heal", "Heal Players", Integer.MIN_VALUE),
-				new HalfHealthCommand(plugin),
 				new FeedCommand(plugin, "feed", "Feed Players", 40),
 				new FeedCommand(plugin, "feed_1", "Feed Players (1 Bar)", 2),
 				new FeedCommand(plugin, "starve", "Starve Players", Integer.MIN_VALUE),
@@ -99,9 +94,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new ResetExpProgressCommand(plugin),
 				new ExperienceCommand(plugin, "xp_plus1", "Give One XP Level", 1),
 				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
-				new MaxHealthCommand(plugin, -1),
-				new MaxHealthCommand(plugin, 1),
-				new MaxHealthCommand(plugin, 4), // used in hype trains only
 				new DisableJumpingCommand(plugin),
 				new EntityChaosCommand(plugin),
 				new FreezeCommand(plugin, "camera_lock_to_sky", "Camera Lock to Sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90)),
@@ -159,8 +151,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			commands.add(new GameModeCommand(plugin, gameType,
 					gameType == GameType.SPECTATOR ? 8L : 15L));
 		}
-
-		return commands;
 	}
 
 	@Override

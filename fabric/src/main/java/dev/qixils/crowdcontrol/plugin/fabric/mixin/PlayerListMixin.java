@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -16,5 +17,11 @@ public class PlayerListMixin {
 	private void impl$onInitPlayer_join(final Connection networkManager, final ServerPlayer mcPlayer, final CallbackInfo ci) {
 		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
 		FabricCrowdControlPlugin.getInstance().getEventManager().fire(new Join(mcPlayer));
+	}
+
+	@Inject(method = "remove", at = @At(value = "HEAD"))
+	private void impl$onRemovePlayer_leave(final ServerPlayer mcPlayer, final CallbackInfo ci) {
+		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
+		FabricCrowdControlPlugin.getInstance().getEventManager().fire(new Leave(mcPlayer));
 	}
 }

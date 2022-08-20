@@ -6,9 +6,11 @@ import cloud.commandframework.sponge.SpongeCommandManager;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
-import dev.qixils.crowdcontrol.common.CommandConstants;
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.mc.SpongePlayer;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -57,8 +59,11 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Plugin("crowd-control")
@@ -82,6 +87,8 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
 	private final HoconConfigurationLoader configLoader;
+	@NotNull
+	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
 	private String clientHost = null;
 	private Scheduler syncScheduler;
 	private Scheduler asyncScheduler;
@@ -238,10 +245,21 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Listener
 	public void onConnection(ServerSideConnectionEvent.Join event) {
 		onPlayerJoin(event.player());
+		ccPlayers.put(event.player().uniqueId(), new SpongePlayer(event.player()));
 		Platform platform = game.platform();
 		if ((platform.type().isClient() || platform.executionType().isClient() || game.isClientAvailable())
 				&& clientHost == null) {
 			clientHost = event.player().uniqueId().toString();
 		}
+	}
+
+	@Listener
+	public void onDisconnect(ServerSideConnectionEvent.Disconnect event) {
+		ccPlayers.remove(event.player().uniqueId());
+	}
+
+	@Override
+	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayer player) {
+		return ccPlayers.computeIfAbsent(player.uniqueId(), uuid -> new SpongePlayer(player));
 	}
 }

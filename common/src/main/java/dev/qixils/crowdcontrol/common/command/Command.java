@@ -1,5 +1,9 @@
-package dev.qixils.crowdcontrol.common;
+package dev.qixils.crowdcontrol.common.command;
 
+import dev.qixils.crowdcontrol.common.ClientOnly;
+import dev.qixils.crowdcontrol.common.EventListener;
+import dev.qixils.crowdcontrol.common.Global;
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;

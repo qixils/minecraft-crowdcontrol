@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.POTION_SECONDS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
 
 @Getter
 public class PotionCommand extends ImmediateCommand {

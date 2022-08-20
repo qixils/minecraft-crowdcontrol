@@ -19,7 +19,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.POTION_SECONDS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
 
 @Getter
 public class PotionCommand extends ImmediateCommand {

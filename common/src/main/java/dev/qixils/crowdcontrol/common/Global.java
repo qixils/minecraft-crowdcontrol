@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
+import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.socket.Request;
 
 import java.lang.annotation.ElementType;

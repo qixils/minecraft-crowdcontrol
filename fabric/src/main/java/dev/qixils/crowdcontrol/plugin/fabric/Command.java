@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public abstract class Command implements dev.qixils.crowdcontrol.common.Command<ServerPlayer> {
+public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<ServerPlayer> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final FabricCrowdControlPlugin plugin;

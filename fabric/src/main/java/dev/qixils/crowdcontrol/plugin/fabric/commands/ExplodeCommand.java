@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.explosionPower;
-import static dev.qixils.crowdcontrol.common.CommandConstants.shouldSpawnFire;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.explosionPower;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.shouldSpawnFire;
 
 @Getter
 public class ExplodeCommand extends ImmediateCommand {

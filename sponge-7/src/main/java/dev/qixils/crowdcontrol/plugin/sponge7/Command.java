@@ -9,7 +9,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.Objects;
 import java.util.Random;
 
-public abstract class Command implements dev.qixils.crowdcontrol.common.Command<Player> {
+public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<Player> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final SpongeCrowdControlPlugin plugin;

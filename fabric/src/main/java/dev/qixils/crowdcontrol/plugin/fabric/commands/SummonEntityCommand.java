@@ -33,8 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.ENTITY_ARMOR_INC;
-import static dev.qixils.crowdcontrol.common.CommandConstants.ENTITY_ARMOR_START;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
 
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {

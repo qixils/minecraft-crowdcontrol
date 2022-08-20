@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
 public final class FreezeCommand extends TimedCommand {

@@ -14,8 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DIG_RADIUS;
-import static dev.qixils.crowdcontrol.common.CommandConstants.getDigDepth;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DIG_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.getDigDepth;
 
 @Getter
 public class DigCommand extends ImmediateCommand {

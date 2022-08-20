@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.common;
 
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.common.command.Command;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
