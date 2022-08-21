@@ -10,7 +10,9 @@
     "LivingEntityMixin",
     "PlayerListMixin",
     "PlayerMixin",
-    "ServerPlayerMixin"
+    "RecipeBookAccessor",
+    "ServerPlayerMixin",
+    "TickMixin"
   ],
   "client": [
   ],

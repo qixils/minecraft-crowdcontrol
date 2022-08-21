@@ -61,7 +61,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
 				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
 				new TeleportCommand(plugin),
-//				TODO new ToastCommand(plugin),
+				new ToastCommand(plugin),
 				FreezeCommand.createDefault(plugin),
 				new FreezeCommand(plugin, "camera_lock", "Camera Lock", Location::withRotationOf), // (cur, prev) -> cur.withRotationOf(prev)
 				new FlowerCommand(plugin),
