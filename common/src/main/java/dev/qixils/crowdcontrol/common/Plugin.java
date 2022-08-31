@@ -97,15 +97,11 @@ public interface Plugin<P, S> {
 	 * A warning message sent to players when they join the server if they have no Twitch account
 	 * linked.
 	 */
-	Component JOIN_MESSAGE_2 = new TextBuilder(TextColor.color(0xF1D4FC))
-			.rawNext("Please link your Twitch account using ")
-			.next("/account link <username>", NamedTextColor.GOLD)
-			.rawNext(". You can ")
-			.next("click here", TextDecoration.BOLD)
-			.rawNext(" to do so.")
-			.suggest("/account link ")
-			.hover(Component.text("Click here to link your Twitch account").asHoverEvent())
-			.build();
+	Component JOIN_MESSAGE_2 = Component.translatable(
+			"cc.join.link.text",
+			TextColor.color(0xF1D4FC),
+			Component.text("/account link <username>", NamedTextColor.GOLD)
+	).hoverEvent(Component.translatable("cc.join.link.hover"));
 
 	/**
 	 * A warning message sent to players when they join the server if global effects are
@@ -129,10 +125,14 @@ public interface Plugin<P, S> {
 	/**
 	 * Error message displayed to non-admins when the service is not enabled.
 	 */
-	Component NO_CC_USER_ERROR = new TextBuilder(_ERROR_COLOR)
-			.next("WARNING: ", NamedTextColor.RED)
-			.rawNext("The Crowd Control plugin has failed to load. Please ask a server administrator to the console logs and address the error.")
-			.build();
+	Component NO_CC_USER_ERROR = Component.translatable(
+			"cc.error.prefix.critical",
+			NamedTextColor.RED,
+			Component.translatable(
+					"cc.error.user-error",
+					_ERROR_COLOR
+			)
+	);
 
 	/**
 	 * Error message displayed to admins when the password is not set.

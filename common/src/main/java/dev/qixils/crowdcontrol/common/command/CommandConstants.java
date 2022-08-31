@@ -92,15 +92,17 @@ public class CommandConstants {
 	/**
 	 * The message to display to players when Keep Inventory has been enabled for them.
 	 */
-	public static final @NotNull Component KEEP_INVENTORY_MESSAGE = Component.text(
-			"Your inventory will be kept on death",
+	public static final @NotNull Component KEEP_INVENTORY_MESSAGE = Component.translatable(
+			"cc.keep-inv.enable",
 			NamedTextColor.GREEN
 	);
 	/**
 	 * The message to display to players when Keep Inventory has been disabled for them.
 	 */
-	public static final @NotNull Component LOSE_INVENTORY_MESSAGE = new TextBuilder(NamedTextColor.RED)
-			.next("Your inventory will &lnot&r be kept on death").build();
+	public static final @NotNull Component LOSE_INVENTORY_MESSAGE = Component.translatable(
+			"cc.keep-inv.disable",
+			NamedTextColor.RED
+	);
 	/**
 	 * The minimum amount of health allowed to be set by the -1 Max Health command.
 	 */
@@ -350,7 +352,7 @@ public class CommandConstants {
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */
 	public static final @NotNull Title DO_OR_DIE_FAILURE = Title.title(
-			Component.text("Task Failed").color(NamedTextColor.RED),
+			Component.translatable("cc.do-or-die.failure", NamedTextColor.RED),
 			Component.empty(),
 			DO_OR_DIE_TIMES
 	);
@@ -397,9 +399,8 @@ public class CommandConstants {
 	@NotNull
 	public static Title doOrDieSuccess(@NotNull Component rewardItem) {
 		return Title.title(
-				Component.text("Task Completed!").color(NamedTextColor.GREEN),
-				Component.text("You have been rewarded with ", SUCCESS_SUBTITLE_COLOR)
-						.append(rewardItem),
+				Component.translatable("cc.do-or-die.title").color(NamedTextColor.GREEN),
+				Component.translatable("cc.do-or-die.subtitle", SUCCESS_SUBTITLE_COLOR, rewardItem),
 				DO_OR_DIE_TIMES
 		);
 	}
