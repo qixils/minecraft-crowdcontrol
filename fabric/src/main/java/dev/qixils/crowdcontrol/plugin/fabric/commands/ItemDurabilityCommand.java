@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,8 +35,8 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.message("Targets not holding a durable item");
 
 		for (ServerPlayer player : players) {
-			for (InteractionHand hand : InteractionHand.values()) {
-				ItemStack item = player.getItemInHand(hand);
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				ItemStack item = player.getItemBySlot(slot);
 				if (item.isEmpty())
 					continue;
 				int curDamage = item.getDamageValue();

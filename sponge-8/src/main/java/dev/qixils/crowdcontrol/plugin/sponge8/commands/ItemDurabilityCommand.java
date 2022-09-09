@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.Slot;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -37,8 +38,8 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.message("Targets not holding a durable item");
 
 		for (ServerPlayer player : players) {
-			for (HandType hand : plugin.registryIterable(RegistryTypes.HAND_TYPE)) {
-				ItemStack item = player.itemInHand(hand);
+			for (Slot slot : Slot.values()) {
+				ItemStack item = slot.getItem(player);
 				if (item.isEmpty())
 					continue;
 				if (!item.supports(Keys.ITEM_DURABILITY))

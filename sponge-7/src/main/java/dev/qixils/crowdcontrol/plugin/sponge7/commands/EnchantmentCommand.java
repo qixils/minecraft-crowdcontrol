@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.Slot;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -9,7 +10,6 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
@@ -103,44 +103,4 @@ public class EnchantmentCommand extends ImmediateCommand {
 		return response;
 	}
 
-	private enum Slot {
-		MAIN_HAND {
-			@Override
-			public Optional<ItemStack> getItem(Player player) {
-				return player.getItemInHand(HandTypes.MAIN_HAND);
-			}
-		},
-		OFF_HAND {
-			@Override
-			public Optional<ItemStack> getItem(Player player) {
-				return player.getItemInHand(HandTypes.OFF_HAND);
-			}
-		},
-		HELMET {
-			@Override
-			public Optional<ItemStack> getItem(Player player) {
-				return player.getHelmet();
-			}
-		},
-		CHESTPLATE {
-			@Override
-			public Optional<ItemStack> getItem(Player player) {
-				return player.getChestplate();
-			}
-		},
-		LEGGINGS {
-			@Override
-			public Optional<ItemStack> getItem(Player player) {
-				return player.getLeggings();
-			}
-		},
-		BOOTS {
-			@Override
-			public Optional<ItemStack> getItem(Player player) {
-				return player.getBoots();
-			}
-		};
-
-		public abstract Optional<ItemStack> getItem(Player player);
-	}
 }
