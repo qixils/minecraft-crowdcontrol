@@ -110,7 +110,11 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 				new BiomeCommand(plugin),
 				new ExplodeCommand(plugin),
 				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
-				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT)
+				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT),
+				GravityCommand.zero(plugin),
+				GravityCommand.low(plugin),
+				GravityCommand.high(plugin),
+				GravityCommand.maximum(plugin)
 		));
 
 		// entity commands
