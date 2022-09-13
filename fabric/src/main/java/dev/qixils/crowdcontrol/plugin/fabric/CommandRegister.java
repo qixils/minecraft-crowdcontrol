@@ -109,7 +109,11 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT),
 				WeatherCommand.clear(plugin),
 				WeatherCommand.downfall(plugin),
-				WeatherCommand.storm(plugin)
+				WeatherCommand.storm(plugin),
+				GravityCommand.zero(plugin),
+				GravityCommand.low(plugin),
+				GravityCommand.high(plugin),
+				GravityCommand.maximum(plugin)
 
 				// TODO location commands from paper
 		));
