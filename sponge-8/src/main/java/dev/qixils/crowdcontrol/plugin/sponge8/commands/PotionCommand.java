@@ -64,10 +64,16 @@ public class PotionCommand extends ImmediateCommand {
 					if (existingEffect.type().equals(potionEffectType)) {
 						plugin.getSLF4JLogger().debug("Updating existing effect");
 						overridden = true;
+
+						long newDuration = Math.max(TICKS, existingEffect.duration().ticks());
+						int newAmplifier = existingEffect.amplifier() + 1;
+						if (potionEffectType.equals(PotionEffectTypes.LEVITATION.get()) && newAmplifier > 127)
+							newAmplifier -= 1; // don't mess with gravity effects
+
 						effects.set(i, PotionEffect.builder()
 								.from(existingEffect)
-								.duration(Ticks.of(Math.max(TICKS, existingEffect.duration().ticks())))
-								.amplifier(existingEffect.amplifier() + 1)
+								.duration(Ticks.of(newDuration))
+								.amplifier(newAmplifier)
 								.build());
 						break;
 					}
