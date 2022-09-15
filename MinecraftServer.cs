@@ -221,7 +221,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Bee", "remove_entity_bee", "remove_entity") { Price = 50 },
             new Effect("Blaze", "remove_entity_blaze", "remove_entity") { Price = 300 },
             new Effect("Boat", "remove_entity_boat", "remove_entity") { Price = 100 },
-            new Effect("Boat with Chest", "remove_entity_boat", "remove_entity") { Price = 250 },
+            new Effect("Boat with Chest", "remove_entity_chest_boat", "remove_entity") { Price = 250 },
             new Effect("Cat", "remove_entity_cat", "remove_entity") { Price = 500 },
             new Effect("Cave Spider", "remove_entity_cave_spider", "remove_entity") { Price = 150 },
             new Effect("Chicken", "remove_entity_chicken", "remove_entity") { Price = 150 },
