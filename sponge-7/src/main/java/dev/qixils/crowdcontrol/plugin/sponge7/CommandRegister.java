@@ -130,7 +130,11 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 						"give_enchanted_golden_apple",
 						"Give Enchanted Golden Apple"
 				),
-				new TakeItemCommand(plugin, ItemTypes.GOLDEN_APPLE, GoldenApples.ENCHANTED_GOLDEN_APPLE)
+				new TakeItemCommand(plugin, ItemTypes.GOLDEN_APPLE, GoldenApples.ENCHANTED_GOLDEN_APPLE),
+				GravityCommand.zero(plugin),
+				GravityCommand.low(plugin),
+				GravityCommand.high(plugin),
+				GravityCommand.maximum(plugin)
 		));
 
 		// entity commands
