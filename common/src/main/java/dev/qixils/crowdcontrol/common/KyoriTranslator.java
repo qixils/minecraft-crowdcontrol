@@ -6,6 +6,8 @@ import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
 import net.kyori.adventure.util.UTF8ResourceBundleControl;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -17,6 +19,7 @@ public class KyoriTranslator {
 	private KyoriTranslator() {
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(KyoriTranslator.class);
 	private static volatile boolean initialized = false;
 
 	public static synchronized void initialize() {
@@ -28,7 +31,7 @@ public class KyoriTranslator {
 		translator.defaultLocale(Locale.US);
 
 		// find locale path
-		URL url = KyoriTranslator.class.getResource("i18n/");
+		URL url = KyoriTranslator.class.getResource("/i18n/");
 		File dir = getFileFromURL(url);
 		if (dir == null)
 			throw new IllegalStateException("Could not load language files (directory does not exist)");
@@ -39,7 +42,8 @@ public class KyoriTranslator {
 		// register locales
 		for (File file : files) {
 			String name = file.getName();
-			String[] segments = name.split("_", 1);
+			logger.debug("Processing " + name);
+			String[] segments = name.split("_", 2);
 			if (segments.length <= 1)
 				continue;
 			if (!segments[0].equals("CrowdControl"))
@@ -52,10 +56,12 @@ public class KyoriTranslator {
 				continue;
 			ResourceBundle bundle = ResourceBundle.getBundle("i18n.CrowdControl", locale, UTF8ResourceBundleControl.get());
 			translator.registerAll(locale, bundle, false);
+			logger.info("Registered locale " + locale);
 		}
 
 		// register translator
 		GlobalTranslator.translator().addSource(translator);
+		logger.info("Registered translator");
 	}
 
 	private static @Nullable File getFileFromURL(@Nullable URL url) {

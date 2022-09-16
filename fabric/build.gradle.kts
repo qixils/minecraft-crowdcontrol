@@ -4,6 +4,9 @@ val fabricVersion: String by project
 val cloudVersion: String by project
 val adventurePlatformFabricVersion: String by project
 
+// inherit resources from common module
+sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
+
 plugins {
     id("fabric-loom")
 }
