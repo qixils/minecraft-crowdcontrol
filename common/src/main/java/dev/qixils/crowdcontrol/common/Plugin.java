@@ -313,13 +313,13 @@ public interface Plugin<P, S> {
 						cc.shutdown("Reconnect issued by server administrator");
 					initCrowdControl();
 
-					audience.sendMessage(Component.translatable("cc.command.crowdcontrol.reconnect.output"));
+					audience.sendMessage(output(Component.translatable("cc.command.crowdcontrol.reconnect.output")));
 				}));
 		// status command
 		manager.command(ccCmd.literal("status")
 				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(
-						Component.translatable("cc.command.crowdcontrol.status." + (getCrowdControl() != null)))));
+				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(output(
+						Component.translatable("cc.command.crowdcontrol.status." + (getCrowdControl() != null))))));
 
 		//// Password Command ////
 		manager.command(manager.commandBuilder("password")
