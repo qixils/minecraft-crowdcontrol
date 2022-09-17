@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.common.ClientOnly;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -12,15 +11,12 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.CheckReturnValue;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -289,11 +285,11 @@ public interface Command<P> {
 			audiences.add(audience);
 		}
 
-		Audience.audience(audiences).sendMessage(new TextBuilder()
-				.next(request.getViewer(), Plugin.USER_COLOR)
-				.next(" used command ")
-				.next(getProcessedDisplayName(), Plugin.CMD_COLOR)
-		);
+		Audience.audience(audiences).sendMessage(Component.translatable(
+				"cc.effect.used",
+				Component.text(request.getViewer(), Plugin.USER_COLOR),
+				Component.text(getProcessedDisplayName(), Plugin.CMD_COLOR) // todo i18n
+		));
 	}
 
 	/**

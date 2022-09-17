@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -82,8 +82,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 	@NotNull
 	protected abstract Collection<S> getSearchTypes(@NotNull Environment environment);
 
-	@NotNull
-	protected abstract String nameOf(@NotNull S searchType);
+	protected abstract @NotNull Component nameOf(@NotNull S searchType);
 
 	@Nullable
 	protected S currentType(@NotNull Location origin) {
@@ -114,12 +113,9 @@ abstract class NearbyLocationCommand<S> extends Command {
 					player.teleportAsync(destination).thenAccept(success -> {
 						if (!success)
 							return;
-						player.sendActionBar(new TextBuilder(
-								"You have been teleported to the nearest ",
-								NamedTextColor.WHITE
-						).next(
-								nameOf(searchType),
-								NamedTextColor.YELLOW
+						player.sendActionBar(Component.translatable(
+								"cc.effect.nearby_location.output",
+								nameOf(searchType).color(NamedTextColor.YELLOW)
 						));
 					});
 					response.type(ResultType.SUCCESS).message("SUCCESS"); // technically this could still fail; unlikely tho.

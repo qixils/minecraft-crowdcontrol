@@ -1,5 +1,7 @@
 val cloudVersion: String by project
+val paperMinecraftVersion: String by project
 
+val mcVersionSplit = paperMinecraftVersion.split(".")
 description = "Minecraft Crowd Control: Paper"
 
 // inherit resources from common module
@@ -17,12 +19,12 @@ repositories {
 dependencies {
     implementation(project(":base-common"))
     implementation("cloud.commandframework:cloud-paper:${cloudVersion}")
-    compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:$paperMinecraftVersion-R0.1-SNAPSHOT")
 }
 
-// Java 16 boilerplate
+// Java 17 boilerplate
 
-val targetJavaVersion = 16
+val targetJavaVersion = 17
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(targetJavaVersion)
 }
@@ -42,7 +44,7 @@ bukkit {
     name = "CrowdControl"
     version = project.version.toString()
     main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
-    apiVersion = "1.17"
+    apiVersion = mcVersionSplit[0] + "." + mcVersionSplit[1]
     prefix = "crowd-control"
     authors = listOf("qixils")
     description = "Allows viewers to interact with your Minecraft world"
@@ -53,6 +55,6 @@ bukkit {
 // configure runServer task
 tasks {
     runServer {
-        minecraftVersion("1.17.1")
+        minecraftVersion(paperMinecraftVersion)
     }
 }

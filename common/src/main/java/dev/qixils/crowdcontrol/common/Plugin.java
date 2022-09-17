@@ -11,7 +11,6 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -349,7 +348,7 @@ public interface Plugin<P, S> {
 
 		new MinecraftExceptionHandler<S>()
 				.withDefaultHandlers()
-				.withDecorator(component -> TextBuilder.fromPrefix(PREFIX, component).color(NamedTextColor.RED).build())
+				.withDecorator(component -> output(component).color(NamedTextColor.RED))
 				.apply(manager, mapper::asAudience);
 	}
 

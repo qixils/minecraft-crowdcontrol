@@ -3,17 +3,14 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.StructureType;
 import org.bukkit.World.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 @Getter
@@ -82,7 +79,7 @@ public class StructureCommand extends NearbyLocationCommand<StructureType> {
 	}
 
 	@Override
-	protected @NotNull String nameOf(@NotNull StructureType searchType) {
-		return TextUtil.titleCase(searchType.getName());
+	protected @NotNull Component nameOf(@NotNull StructureType searchType) {
+		return Component.text(TextUtil.titleCase(searchType.getName())); // TODO: i18n (need to refactor entire class)
 	}
 }
