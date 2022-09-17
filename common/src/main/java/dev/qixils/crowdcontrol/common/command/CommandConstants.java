@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.common.command;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.KeyedTag;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
@@ -93,14 +92,14 @@ public class CommandConstants {
 	 * The message to display to players when Keep Inventory has been enabled for them.
 	 */
 	public static final @NotNull Component KEEP_INVENTORY_MESSAGE = Component.translatable(
-			"cc.keep-inv.enable",
+			"cc.effect.keep_inventory_on.output",
 			NamedTextColor.GREEN
 	);
 	/**
 	 * The message to display to players when Keep Inventory has been disabled for them.
 	 */
 	public static final @NotNull Component LOSE_INVENTORY_MESSAGE = Component.translatable(
-			"cc.keep-inv.disable",
+			"cc.effect.keep_inventory_off.output",
 			NamedTextColor.RED
 	);
 	/**
@@ -352,7 +351,7 @@ public class CommandConstants {
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */
 	public static final @NotNull Title DO_OR_DIE_FAILURE = Title.title(
-			Component.translatable("cc.do-or-die.failure", NamedTextColor.RED),
+			Component.translatable("cc.effect.do_or_die.failure", NamedTextColor.RED),
 			Component.empty(),
 			DO_OR_DIE_TIMES
 	);
@@ -399,8 +398,8 @@ public class CommandConstants {
 	@NotNull
 	public static Title doOrDieSuccess(@NotNull Component rewardItem) {
 		return Title.title(
-				Component.translatable("cc.do-or-die.title").color(NamedTextColor.GREEN),
-				Component.translatable("cc.do-or-die.subtitle", SUCCESS_SUBTITLE_COLOR, rewardItem),
+				Component.translatable("cc.effect.do_or_die.title").color(NamedTextColor.GREEN),
+				Component.translatable("cc.effect.do_or_die.subtitle", SUCCESS_SUBTITLE_COLOR, rewardItem),
 				DO_OR_DIE_TIMES
 		);
 	}
@@ -467,10 +466,10 @@ public class CommandConstants {
 	 * @return text component for the inventory title
 	 */
 	public static Component buildLootboxTitle(Request request) {
-		return new TextBuilder()
-				.next(request.getViewer(), Plugin.USER_COLOR)
-				.rawNext(" has gifted you...")
-				.build();
+		return Component.translatable(
+				"cc.effect.lootbox.title",
+				Component.text(request.getViewer(), Plugin.USER_COLOR)
+		);
 	}
 
 	/**
@@ -480,9 +479,10 @@ public class CommandConstants {
 	 * @return text component for the item's lore
 	 */
 	public static Component buildLootboxLore(Request request) {
-		return new TextBuilder("Donated by ")
-				.next(request.getViewer(), Plugin.USER_COLOR, TextDecoration.ITALIC)
-				.build();
+		return Component.translatable(
+				"cc.effect.lootbox.lore",
+				Component.text(request.getViewer(), Plugin.USER_COLOR, TextDecoration.ITALIC)
+		);
 	}
 
 	/**
