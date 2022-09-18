@@ -21,13 +21,11 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SEC
 public class GravityCommand extends TimedCommand {
 	private final Duration duration = Duration.ofSeconds(POTION_SECONDS);
 	private final String effectName;
-	private final String displayName;
 	private final int level;
 
-	private GravityCommand(FabricCrowdControlPlugin plugin, String effectName, String displayName, int level) {
+	private GravityCommand(FabricCrowdControlPlugin plugin, String effectName, int level) {
 		super(plugin);
 		this.effectName = effectName;
-		this.displayName = displayName;
 		this.level = level;
 	}
 
@@ -54,21 +52,21 @@ public class GravityCommand extends TimedCommand {
 
 	@NotNull
 	public static GravityCommand zero(FabricCrowdControlPlugin plugin) {
-		return new GravityCommand(plugin, "zero_gravity", "Zero Gravity", 255);
+		return new GravityCommand(plugin, "zero_gravity", 255);
 	}
 
 	@NotNull
 	public static GravityCommand low(FabricCrowdControlPlugin plugin) {
-		return new GravityCommand(plugin, "low_gravity", "Low Gravity", 254);
+		return new GravityCommand(plugin, "low_gravity", 254);
 	}
 
 	@NotNull
 	public static GravityCommand high(FabricCrowdControlPlugin plugin) {
-		return new GravityCommand(plugin, "high_gravity", "High Gravity", 250);
+		return new GravityCommand(plugin, "high_gravity", 250);
 	}
 
 	@NotNull
 	public static GravityCommand maximum(FabricCrowdControlPlugin plugin) {
-		return new GravityCommand(plugin, "maximum_gravity", "Maximum Gravity", 128);
+		return new GravityCommand(plugin, "maximum_gravity", 128);
 	}
 }

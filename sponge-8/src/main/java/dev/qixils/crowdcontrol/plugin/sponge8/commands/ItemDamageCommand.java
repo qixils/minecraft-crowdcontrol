@@ -5,7 +5,7 @@ import org.spongepowered.api.data.value.Value;
 
 public final class ItemDamageCommand extends ItemDurabilityCommand {
 	public ItemDamageCommand(SpongeCrowdControlPlugin plugin) {
-		super(plugin, "Damage Item");
+		super(plugin, "damage_item");
 	}
 
 	@Override

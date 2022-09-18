@@ -47,13 +47,11 @@ public class LootboxCommand extends ImmediateCommand {
 	private final List<ItemType> allItems;
 	private final List<ItemType> goodItems;
 	private final String effectName;
-	private final String displayName;
 	private final int luck;
 
-	public LootboxCommand(SpongeCrowdControlPlugin plugin, String displayName, int luck) {
+	public LootboxCommand(SpongeCrowdControlPlugin plugin, int luck) {
 		// init basic variables
 		super(plugin);
-		this.displayName = displayName;
 		this.luck = luck;
 
 		// set effect name to an ID like "lootbox_5" or just "lootbox" for luck level of 1

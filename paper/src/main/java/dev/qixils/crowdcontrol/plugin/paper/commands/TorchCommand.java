@@ -30,13 +30,11 @@ public class TorchCommand extends ImmediateCommand {
 	};
 	protected final boolean placeTorches;
 	protected final String effectName;
-	protected final String displayName;
 
 	public TorchCommand(PaperCrowdControlPlugin plugin, boolean placeTorches) {
 		super(plugin);
 		this.placeTorches = placeTorches;
-		this.effectName = placeTorches ? "Lit" : "Dim";
-		this.displayName = (placeTorches ? "Place" : "Break") + " Torches";
+		this.effectName = placeTorches ? "lit" : "dim";
 	}
 
 	@Override

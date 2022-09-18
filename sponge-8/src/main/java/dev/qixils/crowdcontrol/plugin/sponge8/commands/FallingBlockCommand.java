@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -18,7 +19,7 @@ public class FallingBlockCommand extends BlockCommand {
 				plugin,
 				blockType,
 				"falling_block_" + blockType.key(RegistryTypes.BLOCK_TYPE).value(),
-				"Place Falling " + plugin.getTextUtil().asPlain(blockType) + " Block"
+				Component.translatable("cc.effect.falling_block.name", blockType)
 		);
 	}
 

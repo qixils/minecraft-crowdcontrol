@@ -8,6 +8,8 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -16,18 +18,12 @@ import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.registry.RegistryTypes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
-	private final String displayName;
+	private final Component displayName;
 	private final String effectName;
 	private final EnchantmentType enchantmentType;
 	private final int maxLevel;
@@ -37,7 +33,10 @@ public class EnchantmentCommand extends ImmediateCommand {
 		this.enchantmentType = enchantmentType;
 		this.maxLevel = enchantmentType.maximumLevel();
 		this.effectName = "enchant_" + SpongeTextUtil.csIdOf(enchantmentType.key(RegistryTypes.ENCHANTMENT_TYPE));
-		this.displayName = "Apply " + plugin.getTextUtil().asPlain(enchantmentType);
+		this.displayName = Component.translatable(
+				"cc.effect.enchant.name",
+				((TranslatableComponent) enchantmentType.asComponent()).args(Component.text(enchantmentType.maximumLevel()))
+		);
 	}
 
 	private int getCurrentLevel(ItemStack item) {

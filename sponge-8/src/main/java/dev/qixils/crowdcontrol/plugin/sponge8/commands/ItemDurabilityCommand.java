@@ -10,23 +10,19 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
 
 @Getter
 public abstract class ItemDurabilityCommand extends ImmediateCommand {
 	private final String effectName;
-	private final String displayName;
 
-	protected ItemDurabilityCommand(SpongeCrowdControlPlugin plugin, String displayName) {
+	protected ItemDurabilityCommand(SpongeCrowdControlPlugin plugin, String effectName) {
 		super(plugin);
-		this.displayName = displayName;
-		this.effectName = displayName.replace(' ', '_');
+		this.effectName = effectName;
 	}
 
 	protected abstract void modifyDurability(Value.Mutable<Integer> data, int maxDurability);

@@ -44,7 +44,6 @@ public class StructureCommand extends NearbyLocationCommand<StructureType> {
 			Environment.CUSTOM,
 			StructureType.getStructureTypes().values().stream().map(StructureType::getName).toList()
 	);
-	private final String displayName = "Teleport to a Nearby Structure";
 	private final String effectName = "structure";
 
 	static {

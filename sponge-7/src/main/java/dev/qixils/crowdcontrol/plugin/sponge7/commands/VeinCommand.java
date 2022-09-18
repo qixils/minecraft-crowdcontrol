@@ -31,7 +31,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 public class VeinCommand extends ImmediateCommand {
 	private final TypedTag<BlockType> stones;
 	private final String effectName = "vein";
-	private final String displayName = "Spawn Ore Vein";
 
 	public VeinCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

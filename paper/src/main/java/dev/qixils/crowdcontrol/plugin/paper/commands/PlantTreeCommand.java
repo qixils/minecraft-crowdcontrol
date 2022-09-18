@@ -19,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
 @Getter
 public class PlantTreeCommand extends Command {
 	private final String effectName = "plant_tree";
-	private final String displayName = "Plant Tree";
 
 	public PlantTreeCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

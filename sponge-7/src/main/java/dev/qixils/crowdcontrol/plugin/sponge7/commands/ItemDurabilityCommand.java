@@ -11,7 +11,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
-import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -22,12 +21,10 @@ import java.util.Optional;
 @Getter
 public abstract class ItemDurabilityCommand extends ImmediateCommand {
 	private final String effectName;
-	private final String displayName;
 
-	protected ItemDurabilityCommand(SpongeCrowdControlPlugin plugin, String displayName) {
+	protected ItemDurabilityCommand(SpongeCrowdControlPlugin plugin, String effectName) {
 		super(plugin);
-		this.displayName = displayName;
-		this.effectName = displayName.replace(' ', '_');
+		this.effectName = effectName;
 	}
 
 	protected abstract void modifyDurability(MutableBoundedValue<Integer> data, int maxDurability);

@@ -22,15 +22,13 @@ import java.util.function.BiFunction;
 public class ItemDamageCommand extends ImmediateCommand {
 	private final BiFunction<Integer, Material, Integer> handleItem;
 	private final String effectName;
-	private final String displayName;
 
 	public ItemDamageCommand(PaperCrowdControlPlugin plugin, boolean repair) {
 		super(plugin);
 		handleItem = repair
 				? (damage, type) -> 0
 				: (damage, type) -> (type.getMaxDurability() + damage) / 2;
-		displayName = (repair ? "Repair" : "Damage") + " Item";
-		effectName = displayName.replace(' ', '_');
+		effectName = (repair ? "repair" : "damage") + "_item";
 	}
 
 	@Override

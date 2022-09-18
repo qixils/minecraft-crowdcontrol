@@ -20,14 +20,12 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.WEATHER_TI
 public class WeatherCommand extends ImmediateCommand {
 	private final int ticks = (int) WEATHER_TICKS;
 	private final String effectName;
-	private final String displayName;
 	private final boolean rain;
 	private final boolean storm;
 
-	public WeatherCommand(FabricCrowdControlPlugin plugin, String effectName, String displayName, boolean rain, boolean storm) {
+	private WeatherCommand(FabricCrowdControlPlugin plugin, String effectName, boolean rain, boolean storm) {
 		super(plugin);
 		this.effectName = effectName;
-		this.displayName = displayName;
 		this.rain = rain;
 		this.storm = storm;
 		if (storm && !rain)
@@ -57,14 +55,14 @@ public class WeatherCommand extends ImmediateCommand {
 	}
 
 	public static WeatherCommand clear(FabricCrowdControlPlugin plugin) {
-		return new WeatherCommand(plugin, "clear", "Set Weather to Clear", false, false);
+		return new WeatherCommand(plugin, "clear", false, false);
 	}
 
 	public static WeatherCommand downfall(FabricCrowdControlPlugin plugin) {
-		return new WeatherCommand(plugin, "downfall", "Set Weather to Rain", true, false);
+		return new WeatherCommand(plugin, "downfall", true, false);
 	}
 
 	public static WeatherCommand storm(FabricCrowdControlPlugin plugin) {
-		return new WeatherCommand(plugin, "thunder_storm", "Set Weather to Thunder Storm", true, true);
+		return new WeatherCommand(plugin, "thunder_storm", true, true);
 	}
 }

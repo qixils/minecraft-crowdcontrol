@@ -35,13 +35,11 @@ public class TorchCommand extends ImmediateCommand {
 	protected final TypedTag<BlockType> torches;
 	protected final boolean placeTorches;
 	protected final String effectName;
-	protected final String displayName;
 
 	public TorchCommand(SpongeCrowdControlPlugin plugin, boolean placeTorches) {
 		super(plugin);
 		this.placeTorches = placeTorches;
-		this.effectName = placeTorches ? "Lit" : "Dim";
-		this.displayName = (placeTorches ? "Place" : "Break") + " Torches";
+		this.effectName = placeTorches ? "lit" : "dim";
 		this.torches = new TypedTag<>(CommandConstants.TORCHES, plugin, BlockType.class);
 	}
 

@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -25,13 +26,13 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENT
 public class RemoveEntityCommand extends ImmediateCommand {
 	protected final EntityType<?> entityType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public RemoveEntityCommand(FabricCrowdControlPlugin plugin, EntityType<?> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + Registry.ENTITY_TYPE.getKey(entityType).getPath();
-		this.displayName = "Remove " + plugin.getTextUtil().asPlain(entityType.getDescription());
+		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType.getDescription());
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {

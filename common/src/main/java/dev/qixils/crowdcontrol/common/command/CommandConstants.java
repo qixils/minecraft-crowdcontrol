@@ -555,7 +555,7 @@ public class CommandConstants {
 	public static double @NotNull [] randomFlingVector() {
 		return new double[]{
 				randomFlingHoriz(),
-				RandomUtil.nextDouble(.2, 2),
+				RandomUtil.nextDouble(.2, 1.75),
 				randomFlingHoriz()
 		};
 	}

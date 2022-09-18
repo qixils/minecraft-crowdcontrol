@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.common.Global;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -24,13 +23,11 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.WEATHER_TI
 @Global
 public class WeatherCommand extends ImmediateCommand {
 	private final String effectName;
-	private final String displayName;
 	private final Weather weather;
 
 	public WeatherCommand(SpongeCrowdControlPlugin plugin, Weather weather) {
 		super(plugin);
 		this.weather = weather;
-		this.displayName = "Set Weather to " + TextUtil.titleCase(SpongeTextUtil.valueOf(weather));
 		this.effectName = weather.equals(Weathers.RAIN)
 				? "downfall"
 				: SpongeTextUtil.valueOf(weather);

@@ -25,13 +25,11 @@ public final class FreezeCommand extends TimedCommand {
 	public static final Map<UUID, FreezeData> DATA = new HashMap<>();
 
 	private final String effectName;
-	private final String displayName;
 	private final LocationModifier modifier;
 
-	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, String displayName, LocationModifier modifier) {
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier) {
 		super(plugin);
 		this.effectName = effectName;
-		this.displayName = displayName;
 		this.modifier = modifier;
 	}
 
@@ -74,7 +72,19 @@ public final class FreezeCommand extends TimedCommand {
 		}
 	}
 
-	public static FreezeCommand createDefault(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "freeze", "Freeze", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation));
+	public static FreezeCommand feet(FabricCrowdControlPlugin plugin) {
+		return new FreezeCommand(plugin, "freeze", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation));
+	}
+
+	public static FreezeCommand camera(FabricCrowdControlPlugin plugin) {
+		return new FreezeCommand(plugin, "camera_lock", Location::withRotationOf); // (cur, prev) -> cur.withRotationOf(prev)
+	}
+
+	public static FreezeCommand skyCamera(FabricCrowdControlPlugin plugin) {
+		return new FreezeCommand(plugin, "camera_lock_to_sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90));
+	}
+
+	public static FreezeCommand groundCamera(FabricCrowdControlPlugin plugin) {
+		return new FreezeCommand(plugin, "camera_lock_to_ground", (cur, prev) -> cur.withRotation(prev.yaw(), 90));
 	}
 }

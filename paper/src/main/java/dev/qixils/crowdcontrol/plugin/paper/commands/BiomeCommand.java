@@ -125,7 +125,6 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 		BIOMES = biomeMap;
 	}
 
-	private final String displayName = "Teleport to a Random Biome";
 	private final String effectName = "biome";
 
 	public BiomeCommand(PaperCrowdControlPlugin plugin) {

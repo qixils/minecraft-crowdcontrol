@@ -28,13 +28,7 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.difficulty.Difficulties;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
@@ -45,14 +39,14 @@ public class SummonEntityCommand extends ImmediateCommand {
 	protected final EntityType<?> entityType;
 	protected final boolean isMonster;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<?> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.isMonster = entityType.category().equals(EntityCategories.MONSTER.get());
 		this.effectName = "entity_" + entityType.key(RegistryTypes.ENTITY_TYPE).value();
-		this.displayName = "Summon " + plugin.getTextUtil().asPlain(entityType);
+		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType);
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentType, List<ItemType>> armor = new HashMap<>(4);

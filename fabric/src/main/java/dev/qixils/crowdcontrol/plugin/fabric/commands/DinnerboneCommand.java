@@ -14,11 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.StreamSupport;
 
@@ -29,7 +25,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE
 public class DinnerboneCommand extends Command {
 	private static final Component DINNERBONE_COMPONENT = Component.literal(DINNERBONE_NAME);
 	private final String effectName = "dinnerbone";
-	private final String displayName = "Flip Mobs Upside-Down";
 
 	public DinnerboneCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

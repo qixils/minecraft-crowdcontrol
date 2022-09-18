@@ -29,7 +29,6 @@ import java.util.Random;
 public class DropItemCommand extends ImmediateCommand {
 	private static final double SIN_MULT_CONSTANT = 0.017453292d;
 	private final String effectName = "drop_item";
-	private final String displayName = "Drop Held Item";
 
 	public DropItemCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

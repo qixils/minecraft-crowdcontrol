@@ -14,7 +14,6 @@ import java.util.List;
 @Getter
 public class RespawnCommand extends ImmediateCommand {
 	private final String effectName = "respawn";
-	private final String displayName = "Respawn Players";
 
 	public RespawnCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

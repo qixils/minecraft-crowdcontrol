@@ -20,25 +20,15 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_COOLDOWN;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_DURATION;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_FAILURE;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DO_OR_DIE_TIMES;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.doOrDieColor;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.doOrDieSuccess;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class DoOrDieCommand extends VoidCommand {
 	private final String effectName = "do_or_die";
-	private final String displayName = "Do-or-Die";
 
 	public DoOrDieCommand(@NotNull SpongeCrowdControlPlugin plugin) {
 		super(plugin);

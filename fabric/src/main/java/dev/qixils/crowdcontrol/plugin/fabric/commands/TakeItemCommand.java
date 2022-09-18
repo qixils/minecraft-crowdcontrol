@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,18 +19,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@SuppressWarnings("ReferenceToMixin")
 @Getter
 public class TakeItemCommand extends ImmediateCommand {
 	private final Item item;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public TakeItemCommand(FabricCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "take_" + Registry.ITEM.getKey(item).getPath();
-		this.displayName = "Take " + plugin.getTextUtil().asPlain(item.getName(new ItemStack(item)));
+		this.displayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
 	}
 
 	private boolean takeItemFrom(Player player) {

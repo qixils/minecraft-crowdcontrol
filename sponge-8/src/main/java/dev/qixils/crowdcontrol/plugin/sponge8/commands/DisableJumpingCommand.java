@@ -23,20 +23,13 @@ import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @EventListener
 public class DisableJumpingCommand extends TimedCommand {
 	private final Map<UUID, Long> jumpsBlockedAt = new HashMap<>(1);
 	private final String effectName = "disable_jumping";
-	private final String displayName = "Disable Jumping";
 
 	public DisableJumpingCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

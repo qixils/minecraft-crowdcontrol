@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 public class ClearInventoryCommand extends ImmediateCommand {
 	private final String effectName = "clear_inventory";
-	private final String displayName = "Clear Inventory";
 
 	public ClearInventoryCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

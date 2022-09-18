@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 @Getter
 public class PlantTreeCommand extends Command {
 	private final String effectName = "plant_tree";
-	private final String displayName = "Plant Tree";
 
 	public PlantTreeCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

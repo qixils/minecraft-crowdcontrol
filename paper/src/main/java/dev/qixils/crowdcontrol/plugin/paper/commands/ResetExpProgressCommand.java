@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 public class ResetExpProgressCommand extends ImmediateCommand {
 	private final String effectName = "reset_exp_progress";
-	private final String displayName = "Reset Experience Progress";
 
 	public ResetExpProgressCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

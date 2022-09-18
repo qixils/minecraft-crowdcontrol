@@ -21,11 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,7 +49,6 @@ public class ToastCommand extends ImmediateCommand implements Listener {
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private final Map<UUID, Inventory> openInventories = new HashMap<>();
 	private final String effectName = "toast";
-	private final String displayName = "Annoying Pop-Ups";
 
 	public ToastCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

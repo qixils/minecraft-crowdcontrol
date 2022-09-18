@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
 	private final String effectName = "entity_charged_creeper";
-	private final String displayName = "Summon Charged Creeper";
 
 	public ChargedCreeperCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin, EntityType.CREEPER);

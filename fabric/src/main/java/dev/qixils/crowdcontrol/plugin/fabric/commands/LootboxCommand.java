@@ -34,12 +34,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
@@ -62,13 +57,11 @@ public class LootboxCommand extends ImmediateCommand {
 	private final List<Item> allItems;
 	private final List<Item> goodItems;
 	private final String effectName;
-	private final String displayName;
 	private final int luck;
 
-	public LootboxCommand(FabricCrowdControlPlugin plugin, String displayName, int luck) {
+	public LootboxCommand(FabricCrowdControlPlugin plugin, int luck) {
 		// init basic variables
 		super(plugin);
-		this.displayName = displayName;
 		this.luck = luck;
 
 		// set effect name to an ID like "lootbox_5" or just "lootbox" for luck level of 1

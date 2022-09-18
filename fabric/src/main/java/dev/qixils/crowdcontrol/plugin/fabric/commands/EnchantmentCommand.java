@@ -5,8 +5,10 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,24 +18,23 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
 	protected final Enchantment enchantment;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public EnchantmentCommand(FabricCrowdControlPlugin plugin, Enchantment enchantment) {
 		super(plugin);
 		this.enchantment = enchantment;
 		this.effectName = "enchant_" + Registry.ENCHANTMENT.getKey(enchantment).getPath();
-		this.displayName = "Apply " + plugin.getTextUtil().asPlain(enchantment.getFullname(enchantment.getMaxLevel()));
+		this.displayName = Component.translatable(
+				"cc.effect.enchant.name",
+				enchantment.getFullname(enchantment.getMaxLevel()).copy().withStyle(Style.EMPTY)
+		);
 	}
 
 	@Override

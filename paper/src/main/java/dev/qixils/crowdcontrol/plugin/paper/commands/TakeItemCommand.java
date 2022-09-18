@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,13 +19,13 @@ import java.util.List;
 public class TakeItemCommand extends ImmediateCommand {
 	private final Material item;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public TakeItemCommand(PaperCrowdControlPlugin plugin, Material item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "take_" + item.name();
-		this.displayName = "Take " + plugin.getTextUtil().translate(item);
+		this.displayName = Component.translatable("cc.effect.take_item.name", Component.translatable(new ItemStack(item)));
 	}
 
 	private boolean takeItemFrom(Player player) {

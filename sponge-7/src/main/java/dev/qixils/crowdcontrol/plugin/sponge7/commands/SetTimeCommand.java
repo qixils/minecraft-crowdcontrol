@@ -17,13 +17,11 @@ import java.util.List;
 @Getter
 @Global
 public class SetTimeCommand extends ImmediateCommand {
-	private final @NotNull String displayName;
 	private final @NotNull String effectName;
 	private final long time;
 
-	public SetTimeCommand(SpongeCrowdControlPlugin plugin, String displayName, String effectName, long time) {
+	public SetTimeCommand(SpongeCrowdControlPlugin plugin, String effectName, long time) {
 		super(plugin);
-		this.displayName = displayName;
 		this.effectName = effectName;
 		this.time = time;
 	}

@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Blocking;
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 	private final String effectName = "entity_charged_creeper";
-	private final String displayName = "Summon Charged Creeper";
 
 	public ChargedCreeperCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin, EntityType.CREEPER);

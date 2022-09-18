@@ -7,7 +7,6 @@ import org.bukkit.World;
 @Getter
 public class ThunderingWeatherCommand extends AbstractWeatherCommand {
 	private final String effectName = "thunder_storm";
-	private final String displayName = "Set Weather to Thunder Storm";
 
 	public ThunderingWeatherCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

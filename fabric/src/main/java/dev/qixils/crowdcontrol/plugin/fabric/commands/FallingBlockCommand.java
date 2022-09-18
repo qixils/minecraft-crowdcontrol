@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
@@ -18,7 +19,7 @@ public class FallingBlockCommand extends BlockCommand {
 				plugin,
 				blockType,
 				"falling_block_" + Registry.BLOCK.getKey(blockType).getPath(),
-				"Place Falling " + plugin.getTextUtil().asPlain(blockType.getName()) + " Block"
+				Component.translatable("cc.effect.falling_block.name", blockType.getName())
 		);
 	}
 

@@ -24,7 +24,6 @@ public class BucketClutchCommand extends ImmediateCommand {
 	}
 
 	private final String effectName = "bucket_clutch";
-	private final String displayName = "Water Bucket Clutch";
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {

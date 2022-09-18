@@ -26,7 +26,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 @Getter
 public class VeinCommand extends ImmediateCommand {
 	private final String effectName = "vein";
-	private final String displayName = "Spawn Ore Vein";
 
 	public VeinCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

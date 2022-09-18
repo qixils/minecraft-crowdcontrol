@@ -18,7 +18,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.HALVE_HEAL
 @RequiredArgsConstructor
 public class HalfHealthCommand<P> implements ImmediateCommand<P> {
 	private final String effectName = "half_health";
-	private final String displayName = "Half Health";
 	private final Plugin<P, ?> plugin;
 
 	@NotNull

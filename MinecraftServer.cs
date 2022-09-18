@@ -46,7 +46,7 @@ namespace CrowdControl.Games.Packs
         {
             // miscellaneous
             new Effect("Miscellaneous", "miscellaneous", ItemKind.Folder),
-            new Effect("Annoying Pop-Ups", "toast", "miscellaneous") { Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound" },
+            new Effect("Annoy Players", "toast", "miscellaneous") { Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound" },
             new Effect("Damage Held Item", "damage_item", "miscellaneous") { Price = 100, Description = "Halves the durability of the held item" },
             new Effect("Delete Held Item", "delete_item", "miscellaneous") { Price = 200, Description = "Deletes whatever item the streamer is currently holding" },
             new Effect("Dig Hole", "dig", "miscellaneous") { Price = 250, Description = "Digs a small hole underneath the streamer" },
@@ -54,6 +54,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Drop Held Item", "drop_item", "miscellaneous") { Price = 25, Description = "Makes the streamer drop their held item" },
             new Effect("Eat Chorus Fruit", "chorus_fruit", "miscellaneous") { Price = 75, Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit" },
             new Effect("Explode", "explode", "miscellaneous") { Price = 750, Description = "Spawns a TNT-like explosion at the streamer's feet" },
+            new Effect("Fling Randomly", "fling", "miscellaneous") { Price = 200, Description = "Flings the streamer in a totally random direction" },
             new Effect("Flip Mobs Upside-Down", "dinnerbone", "miscellaneous") { Price = 25, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone" },
             new Effect("Open Lootbox", "lootbox", "miscellaneous") { Price = 100, Description = "Gifts a completely random item with varying enchants and modifiers" },
             new Effect("Open Lucky Lootbox", "lootbox_5", "miscellaneous") { Price = 500, Description = "Gifts two random items with higher odds of having beneficial enchantments and modifiers" },
@@ -62,7 +63,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Plant Tree", "plant_tree", "miscellaneous") { Price = 200, Description = "Plant a tree on top of the streamer" },
             new Effect("Remove Torches", "dim", "miscellaneous") { Price = 200, Description = "Removes all nearby torches" },
             new Effect("Repair Held Item", "repair_item", "miscellaneous") { Price = 100, Description = "Fully repairs a damaged item" },
-            new Effect("Replace Area With Gravel", "gravel_hell", "miscellaneous") { Price = 300, Description = "Replaces nearby stone-like blocks with gravel" },
+            new Effect("Replace Nearby Blocks with Gravel", "gravel_hell", "miscellaneous") { Price = 300, Description = "Replaces nearby stone-like blocks with gravel" },
             new Effect("Respawn Player", "respawn", "miscellaneous") { Price = 500, Description = "Sends the streamer to their spawn point" },
             new GlobalEffect("Set Time to Day", "time_day", "miscellaneous") { Price = 50, Description = "Jumps the clock ahead to daytime" },
             new GlobalEffect("Set Time to Night", "time_night", "miscellaneous") { Price = 50, Description = "Jumps the clock ahead to nighttime" },
@@ -120,11 +121,6 @@ namespace CrowdControl.Games.Packs
             new Effect("Creative Mode (15s)", "creative_mode", "change_gamemode") { Price = 150, Description = "Temporarily sets the streamer to Creative mode, allowing them to fly and spawn in items" },
             new Effect("Spectator Mode (8s)", "spectator_mode", "change_gamemode") { Price = 150, Description = "Temporarily sets the streamer to Spectator mode, turning them into a ghost that can fly through blocks" },
             new Effect("Allow Flight (15s)", "flight", "change_gamemode") { Price = 100, Description = "Temporarily allows the streamer to fly" },
-            // teleports players by a few blocks in the specified direction
-            new Effect("Fling Players", "teleportation", ItemKind.Folder),
-            new Effect("Fling Up", "up", "teleportation") { Price = 100, Description = "Flings the streamer high into the air" },
-            //new Effect("Fling Down", "down", "teleportation") { Price = 100, Description = "Every few seconds, this will try to suddenly fling the streamer downwards if they're in the air" }, // disabled because it barely ever did anything of value; use high gravity instead
-            new Effect("Fling Randomly", "fling", "teleportation") { Price = 200, Description = "Flings the streamer in a totally random direction" },
             // summons a mob around each player
             new Effect("Summon Entity", "summon_entity", ItemKind.Folder),
             new Effect("Allay", "entity_allay", "summon_entity") { Price = 100 },
@@ -356,7 +352,7 @@ namespace CrowdControl.Games.Packs
             new GlobalEffect("Stormy Weather", "thunder_storm", "weather") { Price = 75, Description = "Starts a thunderstorm with sporadic lightning strikes. Combine with placing a lightning rod to perform some electrocution!" },
             // apply enchants
             new Effect("Enchantments", "enchantments", ItemKind.Folder),
-            new Effect("Remove Enchants", "remove_enchants", "enchantments") { Price = 200, Description = "Removes all enchants from the held item" },
+            new Effect("Remove Enchantments", "remove_enchants", "enchantments") { Price = 200, Description = "Removes all enchants from the held item" },
             new Effect("Apply Aqua Affinity", "enchant_aqua_affinity", "enchantments") { Price = 50, Description = "Increases underwater mining speed" },
             new Effect("Apply Bane of Arthropods V", "enchant_bane_of_arthropods", "enchantments") { Price = 50, Description = "Increases damage dealt to arthropod mobs (spiders, cave spiders, bees, silverfish, and endermites)" },
             new Effect("Apply Blast Protection IV", "enchant_blast_protection", "enchantments") { Price = 50, Description = "Reduces damage taken from explosions" },

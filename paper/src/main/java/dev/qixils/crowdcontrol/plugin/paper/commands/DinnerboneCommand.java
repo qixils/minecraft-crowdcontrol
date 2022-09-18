@@ -28,7 +28,6 @@ import static dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin.COMPO
 public class DinnerboneCommand extends Command {
 	private final NamespacedKey key;
 	private final String effectName = "dinnerbone";
-	private final String displayName = "Flip Mobs Upside-Down";
 
 	public DinnerboneCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

@@ -5,7 +5,7 @@ import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 
 public final class ItemRepairCommand extends ItemDurabilityCommand {
 	public ItemRepairCommand(SpongeCrowdControlPlugin plugin) {
-		super(plugin, "Repair Item");
+		super(plugin, "repair_item");
 	}
 
 	@Override

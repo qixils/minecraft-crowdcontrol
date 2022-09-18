@@ -15,13 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.KEEP_INVENTORY_MESSAGE;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.LOSE_INVENTORY_MESSAGE;
@@ -35,14 +29,12 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private static final Set<UUID> keepingInventory = Collections.synchronizedSet(new HashSet<>(1));
 	private final boolean enable;
 	private final String effectName;
-	private final String displayName;
 	private static boolean globalKeepInventory = false;
 
 	public KeepInventoryCommand(PaperCrowdControlPlugin plugin, boolean enable) {
 		super(plugin);
 		this.enable = enable;
 		this.effectName = "keep_inventory_" + (enable ? "on" : "off");
-		this.displayName = (enable ? "Enable" : "Disable") + " Keep Inventory";
 	}
 
 	public static boolean isKeepingInventory(UUID player) {

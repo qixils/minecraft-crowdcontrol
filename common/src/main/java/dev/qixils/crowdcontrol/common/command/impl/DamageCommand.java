@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -14,14 +15,14 @@ import java.util.Locale;
 @Getter
 public class DamageCommand<P> implements ImmediateCommand<P> {
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 	private final double amount;
 	private final Plugin<P, ?> plugin;
 
-	public DamageCommand(Plugin<P, ?> plugin, String effectName, String displayName, double amount) {
+	public DamageCommand(Plugin<P, ?> plugin, String effectName, double amount) {
 		this.plugin = plugin;
 		this.effectName = effectName;
-		this.displayName = displayName;
+		this.displayName = getDefaultDisplayName();
 		this.amount = amount;
 	}
 
@@ -31,9 +32,15 @@ public class DamageCommand<P> implements ImmediateCommand<P> {
 		this.amount = amount;
 		int hearts = (int) amount / 2;
 
-		String type = amount > 0 ? "Damage" : "Heal";
+		String type = amount > 0 ? "damage" : "heal";
+		String key = "cc.effect.generic_" + type + ".name";
 		this.effectName = type.toLowerCase(Locale.US) + "_" + hearts;
-		this.displayName = type + " Players (" + hearts + " Heart" + (hearts == 1 ? "" : "s") + ")";
+		this.displayName = Component.translatable(key, Component.text(Math.abs(hearts)));
+	}
+
+	@Override
+	public @NotNull Component getDisplayName() {
+		return displayName;
 	}
 
 	@Override

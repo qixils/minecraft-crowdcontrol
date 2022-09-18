@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
@@ -22,18 +23,18 @@ import java.util.List;
 public class BlockCommand extends ImmediateCommand {
 	private final Block blockType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public BlockCommand(FabricCrowdControlPlugin plugin, Block blockType) {
 		this(
 				plugin,
 				blockType,
 				"block_" + Registry.BLOCK.getKey(blockType).getPath(),
-				"Place " + plugin.getTextUtil().asPlain(blockType.getName()) + " Block"
+				Component.translatable("cc.effect.block.name", blockType.getName())
 		);
 	}
 
-	protected BlockCommand(FabricCrowdControlPlugin plugin, Block blockType, String effectName, String displayName) {
+	protected BlockCommand(FabricCrowdControlPlugin plugin, Block blockType, String effectName, Component displayName) {
 		super(plugin);
 		this.blockType = blockType;
 		this.effectName = effectName;

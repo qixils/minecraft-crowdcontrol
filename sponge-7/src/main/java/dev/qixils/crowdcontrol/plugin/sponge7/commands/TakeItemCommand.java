@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.key.Keys;
@@ -32,7 +33,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	private final @NotNull ItemType item;
 	private final @Nullable GoldenApple goldenAppleType;
 	private final @NotNull String effectName;
-	private final @NotNull String displayName;
+	private final @NotNull Component displayName;
 
 	public TakeItemCommand(@NotNull SpongeCrowdControlPlugin plugin, @NotNull ItemType item, @Nullable GoldenApple goldenAppleType) {
 		super(plugin);
@@ -41,10 +42,10 @@ public class TakeItemCommand extends ImmediateCommand {
 
 		if (goldenAppleType == null || goldenAppleType.equals(GoldenApples.GOLDEN_APPLE)) {
 			this.effectName = "take_" + SpongeTextUtil.valueOf(item);
-			this.displayName = "Take " + item.getTranslation().get();
+			this.displayName = Component.translatable("cc.effect.take_item.name", Component.translatable(item.getTranslation().getId()));
 		} else {
 			this.effectName = "take_enchanted_golden_apple";
-			this.displayName = "Take Enchanted Golden Apple";
+			this.displayName = getDefaultDisplayName();
 		}
 	}
 

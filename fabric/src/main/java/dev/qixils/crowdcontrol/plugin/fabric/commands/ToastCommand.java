@@ -28,11 +28,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Getter
@@ -59,7 +55,6 @@ public final class ToastCommand extends ImmediateCommand {
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private static final Map<UUID, ToastInventory> OPEN_INVENTORIES = new HashMap<>();
 	private final String effectName = "toast";
-	private final String displayName = "Annoying Pop-Ups";
 
 	public ToastCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

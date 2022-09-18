@@ -49,7 +49,6 @@ public class ToastCommand extends ImmediateCommand {
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private final String effectName = "toast";
-	private final String displayName = "Annoying Pop-Ups";
 
 	public ToastCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

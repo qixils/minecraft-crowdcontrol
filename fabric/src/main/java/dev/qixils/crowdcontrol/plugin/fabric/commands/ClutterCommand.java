@@ -10,18 +10,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.CLUTTER_ITEMS;
 
 @Getter
 public class ClutterCommand extends ImmediateCommand {
 	private final String effectName = "clutter";
-	private final String displayName = "Clutter Inventory";
 
 	public ClutterCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

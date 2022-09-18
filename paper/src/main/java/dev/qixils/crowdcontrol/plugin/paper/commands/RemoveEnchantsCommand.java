@@ -19,7 +19,6 @@ import java.util.Set;
 @Getter
 public class RemoveEnchantsCommand extends ImmediateCommand {
 	private final String effectName = "remove_enchants";
-	private final String displayName = "Remove Enchants";
 
 	public RemoveEnchantsCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

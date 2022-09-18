@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -20,13 +21,13 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENT
 public final class RemoveEntityCommand extends Command {
 	private final EntityType entityType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public RemoveEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + entityType.name();
-		this.displayName = "Remove " + plugin.getTextUtil().translate(entityType);
+		this.displayName = Component.translatable("cc.effect.remove_entity.name", Component.translatable(entityType));
 	}
 
 	private boolean removeEntityFrom(Player player) {

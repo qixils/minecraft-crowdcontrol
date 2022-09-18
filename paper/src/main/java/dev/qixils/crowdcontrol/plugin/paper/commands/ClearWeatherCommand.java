@@ -7,7 +7,6 @@ import org.bukkit.World;
 @Getter
 public class ClearWeatherCommand extends AbstractWeatherCommand {
 	private final String effectName = "clear";
-	private final String displayName = "Set Weather to Clear";
 
 	public ClearWeatherCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

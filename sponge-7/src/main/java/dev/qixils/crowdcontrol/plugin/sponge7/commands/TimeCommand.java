@@ -17,7 +17,6 @@ import java.util.List;
 @Global
 public class TimeCommand extends ImmediateCommand {
 	private final String effectName = "zip";
-	private final String displayName = "Zip Time";
 
 	public TimeCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

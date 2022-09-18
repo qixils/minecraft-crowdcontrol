@@ -28,7 +28,6 @@ import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.VI
 @Getter
 public class DinnerboneCommand extends Command {
 	private final String effectName = "dinnerbone";
-	private final String displayName = "Flip Mobs Upside-Down";
 
 	public DinnerboneCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

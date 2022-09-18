@@ -18,7 +18,6 @@ import java.util.List;
 @Getter
 public class TeleportCommand extends ImmediateCommand {
 	private final String effectName = "chorus_fruit";
-	private final String displayName = "Eat Chorus Fruit";
 
 	public TeleportCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

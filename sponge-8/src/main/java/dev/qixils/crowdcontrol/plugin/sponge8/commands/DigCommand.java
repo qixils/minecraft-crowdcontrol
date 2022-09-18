@@ -21,7 +21,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.getDigDept
 @Getter
 public class DigCommand extends ImmediateCommand {
 	private final String effectName = "dig";
-	private final String displayName = "Dig Hole";
 
 	public DigCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

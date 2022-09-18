@@ -1,13 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -24,15 +24,20 @@ public class PotionCommand extends ImmediateCommand {
 	private final PotionEffectType potionEffectType;
 	private final int duration;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public PotionCommand(PaperCrowdControlPlugin plugin, PotionEffectType potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		boolean isMinimal = potionEffectType.isInstant();
-		duration = isMinimal ? 1 : MAX_DURATION;
 		this.effectName = "potion_" + nameOf(potionEffectType);
-		this.displayName = "Apply " + TextUtil.titleCase(nameOf(potionEffectType)) + " Potion Effect (" + POTION_SECONDS + "s)";
+
+		boolean isMinimal = potionEffectType.isInstant();
+		this.duration = isMinimal ? 1 : MAX_DURATION;
+
+		Component displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
+		if (!isMinimal)
+			displayName = displayName.append(Component.text(" (" + POTION_SECONDS + ")"));
+		this.displayName = displayName;
 	}
 
 	private static String nameOf(PotionEffectType type) {

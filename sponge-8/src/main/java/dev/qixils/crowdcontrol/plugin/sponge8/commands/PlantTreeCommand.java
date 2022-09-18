@@ -29,7 +29,6 @@ import java.util.function.Supplier;
 @Getter
 public class PlantTreeCommand extends ImmediateCommand {
 	private final String effectName = "plant_tree";
-	private final String displayName = "Plant Tree";
 
 	public PlantTreeCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

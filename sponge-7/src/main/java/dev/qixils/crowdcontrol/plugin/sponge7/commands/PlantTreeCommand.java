@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture;
 public class PlantTreeCommand extends Command {
 	private final List<PopulatorObject> trees;
 	private final String effectName = "plant_tree";
-	private final String displayName = "Plant Tree";
 
 	public PlantTreeCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

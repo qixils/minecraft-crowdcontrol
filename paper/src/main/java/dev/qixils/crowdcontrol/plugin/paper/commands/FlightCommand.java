@@ -20,7 +20,6 @@ import java.util.List;
 @Getter
 public class FlightCommand extends TimedCommand implements Listener {
 	private final String effectName = "flight";
-	private final String displayName = "Enable Flight";
 	private final Duration duration = Duration.ofSeconds(15);
 
 	public FlightCommand(@NotNull PaperCrowdControlPlugin plugin) {

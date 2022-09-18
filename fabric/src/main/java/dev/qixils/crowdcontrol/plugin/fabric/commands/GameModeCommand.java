@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.PlayerData;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.NotNull;
@@ -21,14 +22,14 @@ import java.util.List;
 public class GameModeCommand extends TimedCommand {
 	private final Duration duration;
 	private final GameType gamemode;
-	private final String displayName;
+	private final Component displayName;
 	private final String effectName;
 
 	public GameModeCommand(FabricCrowdControlPlugin plugin, GameType gamemode, long seconds) {
 		super(plugin);
 		this.duration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = plugin.getTextUtil().asPlain(gamemode.getShortDisplayName());
+		this.displayName = gamemode.getLongDisplayName().asComponent();
 		this.effectName = gamemode.getName() + "_mode";
 	}
 

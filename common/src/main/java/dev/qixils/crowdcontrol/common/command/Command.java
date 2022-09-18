@@ -68,6 +68,17 @@ public interface Command<P> {
 	String getEffectName();
 
 	/**
+	 * Gets the default display name for this command.
+	 *
+	 * @return default display name
+	 */
+	@NotNull
+	@CheckReturnValue
+	default Component getDefaultDisplayName() {
+		return Component.translatable("cc.effect." + getEffectName() + ".name");
+	}
+
+	/**
 	 * Gets the effect's raw display name. This is used when sending a chat message to streamers
 	 * informing them of the activation of an effect.
 	 *
@@ -77,7 +88,9 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	String getDisplayName();
+	default Component getDisplayName() {
+		return getDefaultDisplayName();
+	}
 
 	/**
 	 * Gets the effect's processed display name. This contains the contents of
@@ -88,7 +101,7 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	default String getProcessedDisplayName() {
+	default Component getProcessedDisplayName() {
 		return getDisplayName();
 	}
 
@@ -288,7 +301,7 @@ public interface Command<P> {
 		Audience.audience(audiences).sendMessage(Component.translatable(
 				"cc.effect.used",
 				Component.text(request.getViewer(), Plugin.USER_COLOR),
-				Component.text(getProcessedDisplayName(), Plugin.CMD_COLOR) // todo i18n
+				getProcessedDisplayName().colorIfAbsent(Plugin.CMD_COLOR)
 		));
 	}
 

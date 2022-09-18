@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
@@ -27,20 +28,20 @@ import java.util.List;
 public class GiveItemCommand extends ImmediateCommand {
 	private final ItemStackSnapshot item;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemType item) {
 		super(plugin);
 		this.item = ItemStack.of(item).createSnapshot();
 		this.effectName = "give_" + SpongeTextUtil.valueOf(item);
-		this.displayName = "Give " + item.getTranslation().get();
+		this.displayName = Component.translatable("cc.effect.give_item.name", Component.translatable(item.getTranslation().getId()));
 	}
 
-	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemStack item, String effectName, String displayName) {
+	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemStack item, String effectName) {
 		super(plugin);
 		this.item = item.createSnapshot();
 		this.effectName = effectName;
-		this.displayName = displayName;
+		this.displayName = getDefaultDisplayName();
 	}
 
 	@Blocking
