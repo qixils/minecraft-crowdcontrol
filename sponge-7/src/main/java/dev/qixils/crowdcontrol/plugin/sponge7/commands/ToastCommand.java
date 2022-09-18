@@ -27,10 +27,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
+
 @Getter
 @EventListener
 public class ToastCommand extends ImmediateCommand {
-	private static final Text TITLE = Text.of("Pop-Up");
 	private static final ItemType ITEM = ItemTypes.STAINED_GLASS_PANE;
 	private static final DyeColor[] COLORS = new DyeColor[]{
 			DyeColors.BROWN,
@@ -51,6 +52,7 @@ public class ToastCommand extends ImmediateCommand {
 			DyeColors.BLACK
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
+	private final Text title = spongeSerializer.serialize(POPUP_TITLE);
 	private final String effectName = "toast";
 
 	public ToastCommand(SpongeCrowdControlPlugin plugin) {
@@ -69,7 +71,7 @@ public class ToastCommand extends ImmediateCommand {
 				Inventory inv = Inventory.builder()
 						.of(InventoryArchetypes.CHEST)
 						.listener(ClickInventoryEvent.class, event -> event.setCancelled(true))
-						.property(new InventoryTitle(TITLE))
+						.property(new InventoryTitle(title))
 						.build(plugin);
 				sync(() -> player.openInventory(inv));
 

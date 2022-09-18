@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -25,9 +24,10 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
+
 @Getter
 public class ToastCommand extends ImmediateCommand implements Listener {
-	private static final Component TITLE = Component.text("Pop-Up");
 	private static final Material[] MATERIALS = new Material[]{
 			Material.BROWN_STAINED_GLASS_PANE,
 			Material.RED_STAINED_GLASS_PANE,
@@ -64,7 +64,7 @@ public class ToastCommand extends ImmediateCommand implements Listener {
 				player.discoverRecipes(recipes);
 
 				// actual pop-up
-				Inventory inv = Bukkit.getServer().createInventory(player, INVENTORY_SIZE, TITLE);
+				Inventory inv = Bukkit.getServer().createInventory(player, INVENTORY_SIZE, POPUP_TITLE);
 				openInventories.put(player.getUniqueId(), inv);
 				sync(() -> player.openInventory(inv));
 

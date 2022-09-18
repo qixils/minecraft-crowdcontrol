@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_NAME;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_COMPONENT;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
 import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.VIEWER_SPAWNED;
 
@@ -50,14 +50,14 @@ public class DinnerboneCommand extends Command {
 						.map(serializer::deserialize)
 						.orElseGet(Component::empty);
 				Component currentName = entity.getOrElse(Keys.CUSTOM_NAME, Component.empty());
-				if (currentName.equals(Component.text(DINNERBONE_NAME))) {
+				if (currentName.equals(DINNERBONE_COMPONENT)) {
 					entity.offer(Keys.CUSTOM_NAME, oldName);
 					entity.remove(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME);
 					if (entity.getOrElse(VIEWER_SPAWNED, false))
 						entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
 				} else {
 					entity.offer(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME, serializer.serialize(currentName));
-					entity.offer(Keys.CUSTOM_NAME, Component.text(DINNERBONE_NAME));
+					entity.offer(Keys.CUSTOM_NAME, DINNERBONE_COMPONENT);
 					entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, false);
 				}
 			});

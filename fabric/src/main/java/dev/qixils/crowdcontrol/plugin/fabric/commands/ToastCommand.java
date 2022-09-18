@@ -31,9 +31,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
+
 @Getter
 public final class ToastCommand extends ImmediateCommand {
-	private static final Component TITLE = Component.literal("Pop-Up");
 	private static final Item[] MATERIALS = new Item[]{
 			Items.BROWN_STAINED_GLASS_PANE,
 			Items.RED_STAINED_GLASS_PANE,
@@ -54,10 +55,12 @@ public final class ToastCommand extends ImmediateCommand {
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private static final Map<UUID, ToastInventory> OPEN_INVENTORIES = new HashMap<>();
+	private static Component TITLE;
 	private final String effectName = "toast";
 
 	public ToastCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);
+		TITLE = plugin.adventure().toNative(POPUP_TITLE);
 	}
 
 	@Override

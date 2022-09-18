@@ -179,6 +179,10 @@ public class CommandConstants {
 	 * Radius to search for entities when executing Entity Chaos with global effects disabled.
 	 */
 	public static final int CHAOS_LOCAL_RADIUS = 20;
+	/**
+	 * The title to use in the annoying pop-up menu.
+	 */
+	public static final Component POPUP_TITLE = Component.translatable("cc.effect.toast.title");
 
 	// tags
 
@@ -345,8 +349,7 @@ public class CommandConstants {
 	/**
 	 * How long Do-or-Die's on-screen Titles should last.
 	 */
-	@SuppressWarnings("UnstableApiUsage") // the new Times.times() method is unavailable in 1.17
-	public static final Title.@NotNull Times DO_OR_DIE_TIMES = Title.Times.of(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
+	public static final Title.@NotNull Times DO_OR_DIE_TIMES = Title.Times.times(Duration.ZERO, Duration.ofSeconds(4), Duration.ofSeconds(1));
 	/**
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */
