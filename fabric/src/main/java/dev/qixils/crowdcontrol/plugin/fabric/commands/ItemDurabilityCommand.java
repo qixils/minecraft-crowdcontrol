@@ -8,7 +8,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,12 +17,10 @@ import java.util.List;
 @Getter
 public abstract class ItemDurabilityCommand extends ImmediateCommand {
 	private final String effectName;
-	private final String displayName;
 
-	protected ItemDurabilityCommand(FabricCrowdControlPlugin plugin, String displayName) {
+	protected ItemDurabilityCommand(FabricCrowdControlPlugin plugin, String effectName) {
 		super(plugin);
-		this.displayName = displayName;
-		this.effectName = displayName.replace(' ', '_');
+		this.effectName = effectName;
 	}
 
 	protected abstract int modifyDurability(int curDamage, int maxDamage);
@@ -34,8 +32,8 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.message("Targets not holding a durable item");
 
 		for (ServerPlayer player : players) {
-			for (InteractionHand hand : InteractionHand.values()) {
-				ItemStack item = player.getItemInHand(hand);
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				ItemStack item = player.getItemBySlot(slot);
 				if (item.isEmpty())
 					continue;
 				int curDamage = item.getDamageValue();
@@ -56,23 +54,27 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 
 	// repair command
 	@NotNull
-	public static ItemDurabilityCommand repair(FabricCrowdControlPlugin plugin) {
-		return new ItemDurabilityCommand(plugin, "Repair Item") {
-			@Override
-			protected int modifyDurability(int curDamage, int maxDamage) {
-				return 0;
-			}
-		};
+	public static final class Repair extends ItemDurabilityCommand {
+		public Repair(FabricCrowdControlPlugin plugin) {
+			super(plugin, "repair_item");
+		}
+
+		@Override
+		protected int modifyDurability(int curDamage, int maxDamage) {
+			return 0;
+		}
 	}
 
 	// damage command (cuts the usable durability in half)
 	@NotNull
-	public static ItemDurabilityCommand damage(FabricCrowdControlPlugin plugin) {
-		return new ItemDurabilityCommand(plugin, "Damage Item") {
-			@Override
-			protected int modifyDurability(int curDamage, int maxDamage) {
-				return (maxDamage + curDamage) / 2;
-			}
-		};
+	public static final class Damage extends ItemDurabilityCommand {
+		public Damage(FabricCrowdControlPlugin plugin) {
+			super(plugin, "damage_item");
+		}
+
+		@Override
+		protected int modifyDurability(int curDamage, int maxDamage) {
+			return (maxDamage + curDamage) / 2;
+		}
 	}
 }

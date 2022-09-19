@@ -7,14 +7,7 @@ import dev.qixils.crowdcontrol.common.command.impl.MaxHealthCommand;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Manages the registry of commands (aka effects).
@@ -39,10 +32,10 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				new MaxHealthCommand<>(plugin, -1),
 				new MaxHealthCommand<>(plugin, 1),
 				new MaxHealthCommand<>(plugin, 4), // used in hype trains only
-				new DamageCommand<>(plugin, "kill", "Kill Players", Integer.MAX_VALUE),
+				new DamageCommand<>(plugin, "kill", Integer.MAX_VALUE),
 				new DamageCommand<>(plugin, 2f),
 				new DamageCommand<>(plugin, -2f),
-				new DamageCommand<>(plugin, "full_heal", "Heal Players", Integer.MIN_VALUE)
+				new DamageCommand<>(plugin, "full_heal", Integer.MIN_VALUE)
 		));
 	}
 

@@ -21,7 +21,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DUR
 @Getter
 public class CameraLockToGroundCommand extends TimedCommand {
 	private final String effectName = "camera_lock_to_ground";
-	private final String displayName = "Camera Lock To Ground";
 
 	public CameraLockToGroundCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

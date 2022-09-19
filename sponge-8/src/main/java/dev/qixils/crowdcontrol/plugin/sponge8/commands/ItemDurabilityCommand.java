@@ -3,29 +3,26 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.Slot;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
 
 @Getter
 public abstract class ItemDurabilityCommand extends ImmediateCommand {
 	private final String effectName;
-	private final String displayName;
 
-	protected ItemDurabilityCommand(SpongeCrowdControlPlugin plugin, String displayName) {
+	protected ItemDurabilityCommand(SpongeCrowdControlPlugin plugin, String effectName) {
 		super(plugin);
-		this.displayName = displayName;
-		this.effectName = displayName.replace(' ', '_');
+		this.effectName = effectName;
 	}
 
 	protected abstract void modifyDurability(Value.Mutable<Integer> data, int maxDurability);
@@ -37,8 +34,8 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.message("Targets not holding a durable item");
 
 		for (ServerPlayer player : players) {
-			for (HandType hand : plugin.registryIterable(RegistryTypes.HAND_TYPE)) {
-				ItemStack item = player.itemInHand(hand);
+			for (Slot slot : Slot.values()) {
+				ItemStack item = slot.getItem(player);
 				if (item.isEmpty())
 					continue;
 				if (!item.supports(Keys.ITEM_DURABILITY))

@@ -19,7 +19,6 @@ import static dev.qixils.crowdcontrol.plugin.fabric.utils.ItemUtil.isSimilar;
 @Getter
 public class HatCommand extends ImmediateCommand {
 	private final String effectName = "hat";
-	private final String displayName = "Put Item on Head";
 
 	public HatCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

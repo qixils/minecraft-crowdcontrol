@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.utils;
 
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.Translatable;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.CatalogType;
@@ -14,20 +15,14 @@ public class SpongeTextUtil extends TextUtilImpl {
 	}
 
 	@NotNull
-	public static String getFixedName(org.spongepowered.api.text.translation.@NotNull Translatable translatable) {
-		if (translatable.equals(EntityTypes.RIDEABLE_MINECART))
-			return "Minecart";
-		if (translatable.equals(EntityTypes.CHESTED_MINECART))
-			return "Minecart with Chest";
+	public static Component getFixedName(org.spongepowered.api.text.translation.@NotNull Translatable translatable) {
 		if (translatable.equals(EntityTypes.FURNACE_MINECART))
-			return "Minecart with Furnace";
+			return Component.translatable("cc.entity.furnace_minecart.name");
 		if (translatable.equals(EntityTypes.TNT_MINECART))
-			return "Minecart with TNT";
-		if (translatable.equals(EntityTypes.HOPPER_MINECART))
-			return "Minecart with Hopper";
+			return Component.translatable("cc.entity.tnt_minecart.name");
 		if (translatable.equals(EntityTypes.LIGHTNING))
-			return "Lightning";
-		return translatable.getTranslation().get();
+			return Component.translatable("cc.entity.lightning.name");
+		return Component.translatable(translatable.getTranslation().getId());
 	}
 
 	@Override

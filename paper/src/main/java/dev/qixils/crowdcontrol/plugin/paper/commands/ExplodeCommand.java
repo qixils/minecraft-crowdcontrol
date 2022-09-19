@@ -19,7 +19,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.shouldSpaw
 
 @Getter
 public class ExplodeCommand extends Command {
-	private final String displayName = "Explode";
 	private final String effectName = "explode";
 
 	public ExplodeCommand(PaperCrowdControlPlugin plugin) {

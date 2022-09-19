@@ -20,7 +20,6 @@ import java.util.Optional;
 @Getter
 public final class RemoveEnchantsCommand extends ImmediateCommand {
 	private final String effectName = "remove_enchants";
-	private final String displayName = "Remove Enchants";
 
 	public RemoveEnchantsCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

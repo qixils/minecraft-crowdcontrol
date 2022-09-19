@@ -12,7 +12,6 @@ import org.spongepowered.math.vector.Vector3d;
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
 	private final String effectName = "entity_charged_creeper";
-	private final String displayName = "Summon Charged Creeper";
 
 	public ChargedCreeperCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin, EntityTypes.CREEPER.get());

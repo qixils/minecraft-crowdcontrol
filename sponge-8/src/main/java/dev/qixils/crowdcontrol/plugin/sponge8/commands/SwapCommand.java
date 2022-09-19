@@ -12,16 +12,11 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.server.ServerLocation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class SwapCommand extends ImmediateCommand {
 	private final String effectName = "swap";
-	private final String displayName = "Swap Locations";
 
 	public SwapCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

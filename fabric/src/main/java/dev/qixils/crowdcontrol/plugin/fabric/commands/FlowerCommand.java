@@ -19,15 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWERS;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_MAX;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_MIN;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class FlowerCommand extends ImmediateCommand {
 	private final String effectName = "flowers";
-	private final String displayName = "Place Flowers";
 	private final MappedKeyedTag<Block> flowers = new TypedTag<>(FLOWERS, Registry.BLOCK);
 
 	public FlowerCommand(FabricCrowdControlPlugin plugin) {

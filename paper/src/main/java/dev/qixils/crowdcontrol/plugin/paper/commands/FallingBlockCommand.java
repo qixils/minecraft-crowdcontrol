@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,7 +18,7 @@ public class FallingBlockCommand extends BlockCommand {
 				plugin,
 				block,
 				"falling_block_" + block.name(),
-				"Place Falling " + plugin.getTextUtil().translate(block) + " Block"
+				Component.translatable("cc.effect.falling_block.name", Component.translatable(block))
 		);
 	}
 

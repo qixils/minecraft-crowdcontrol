@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands.executeorperish;
 
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.spongepowered.api.block.BlockTypes;
@@ -13,11 +12,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 public enum Condition {
-	STAND_ON_DIRT(new StandOnBlockCondition(0, "a %s block", BlockTypes.DIRT.get())),
-	STAND_ON_STONE(new StandOnBlockCondition(0, "a %s block", BlockTypes.STONE.get())),
-	STAND_ON_COBBLESTONE(new StandOnBlockCondition(0, "a %s block", BlockTypes.COBBLESTONE.get())),
-	STAND_ON_SAND(new StandOnBlockCondition(1, "a %s block", BlockTypes.SAND.get())),
-	STAND_ON_A_BED(new StandOnBlockCondition(2, new TextBuilder("a &abed").build(),
+	STAND_ON_DIRT(new StandOnBlockCondition(0, "generic", BlockTypes.DIRT.get())),
+	STAND_ON_STONE(new StandOnBlockCondition(0, "generic", BlockTypes.STONE.get())),
+	STAND_ON_COBBLESTONE(new StandOnBlockCondition(0, "generic", BlockTypes.COBBLESTONE.get())),
+	STAND_ON_SAND(new StandOnBlockCondition(1, "generic", BlockTypes.SAND.get())),
+	STAND_ON_A_BED(new StandOnBlockCondition(2, "bed",
 			BlockTypes.WHITE_BED.get(),
 			BlockTypes.ORANGE_BED.get(),
 			BlockTypes.MAGENTA_BED.get(),
@@ -35,7 +34,7 @@ public enum Condition {
 			BlockTypes.RED_BED.get(),
 			BlockTypes.BLACK_BED.get()
 	)),
-	STAND_ON_A_PLANK(new StandOnBlockCondition(0, new TextBuilder("a &awooden plank").build(),
+	STAND_ON_A_PLANK(new StandOnBlockCondition(0, "plank",
 			BlockTypes.OAK_PLANKS.get(),
 			BlockTypes.BIRCH_PLANKS.get(),
 			BlockTypes.ACACIA_PLANKS.get(),
@@ -45,7 +44,7 @@ public enum Condition {
 			BlockTypes.DARK_OAK_PLANKS.get(),
 			BlockTypes.SPRUCE_PLANKS.get()
 	)),
-	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(2, new TextBuilder("a &astripped log").build(),
+	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(2, "stripped_log",
 			BlockTypes.STRIPPED_OAK_LOG.get(),
 			BlockTypes.STRIPPED_BIRCH_LOG.get(),
 			BlockTypes.STRIPPED_ACACIA_LOG.get(),
@@ -63,9 +62,9 @@ public enum Condition {
 			BlockTypes.STRIPPED_CRIMSON_HYPHAE.get(),
 			BlockTypes.STRIPPED_WARPED_HYPHAE.get()
 	)),
-	OBTAIN_STONE_HOE(new ObtainItemCondition(1, "a %s", ItemTypes.STONE_HOE.get())),
-	OBTAIN_WOODEN_HOE(new ObtainItemCondition(0, "a %s", ItemTypes.WOODEN_HOE.get())),
-	OBTAIN_STONE(new ObtainItemCondition(3, "a %s block", ItemTypes.STONE.get())),
+	OBTAIN_STONE_HOE(new ObtainItemCondition(1, "generic", ItemTypes.STONE_HOE.get())),
+	OBTAIN_WOODEN_HOE(new ObtainItemCondition(0, "generic", ItemTypes.WOODEN_HOE.get())),
+	OBTAIN_STONE(new ObtainItemCondition(3, "generic_block", ItemTypes.STONE.get())),
 	;
 
 	private static final List<SuccessCondition> CONDITIONS;

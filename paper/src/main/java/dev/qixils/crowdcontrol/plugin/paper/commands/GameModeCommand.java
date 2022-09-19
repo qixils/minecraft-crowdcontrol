@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -26,7 +26,7 @@ import java.util.Locale;
 public class GameModeCommand extends TimedCommand {
 	private final Duration duration;
 	private final GameMode gamemode;
-	private final String displayName;
+	private final Component displayName;
 	private final String effectName;
 	private final NamespacedKey gamemodeKey;
 
@@ -35,7 +35,7 @@ public class GameModeCommand extends TimedCommand {
 		this.gamemodeKey = getGamemodeKey(plugin);
 		this.duration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = TextUtil.titleCase(gamemode) + " Mode";
+		this.displayName = Component.translatable(gamemode);
 		this.effectName = gamemode.name().toLowerCase(Locale.ENGLISH) + "_mode";
 	}
 

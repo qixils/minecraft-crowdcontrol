@@ -11,7 +11,6 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -21,6 +20,7 @@ import dev.qixils.crowdcontrol.socket.SocketManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -29,10 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -63,9 +60,25 @@ public interface Plugin<P, S> {
 	TextColor CMD_COLOR = TextColor.color(0xb15be3);
 
 	/**
+	 * The color used for displaying error messages on join.
+	 */
+	TextColor _ERROR_COLOR = TextColor.color(0xF78080);
+
+	/**
 	 * The prefix to use in command output.
 	 */
 	String PREFIX = "CrowdControl";
+
+	/**
+	 * The prefix to use in command output as a {@link Component}.
+	 */
+	Component PREFIX_COMPONENT = Component.text()
+			.color(NamedTextColor.DARK_AQUA)
+			.append(Component.text('[', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+			.append(Component.text(PREFIX, NamedTextColor.YELLOW))
+			.append(Component.text(']', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+			.append(Component.space())
+			.build();
 
 	/**
 	 * The permission node required to use administrative commands.
@@ -78,92 +91,126 @@ public interface Plugin<P, S> {
 	int DEFAULT_PORT = 58431;
 
 	/**
+	 * Formats the provided text as an error message.
+	 *
+	 * @param text text to format
+	 * @return formatted text
+	 */
+	static @NotNull Component error(@NotNull Component text) {
+		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
+			text = text.decoration(TextDecoration.BOLD, false);
+		return Component.translatable(
+				"cc.error.prefix.critical",
+				NamedTextColor.RED,
+				EnumSet.of(TextDecoration.BOLD),
+				text.colorIfAbsent(_ERROR_COLOR)
+		);
+	}
+
+	/**
+	 * Formats the provided text as a warning message.
+	 *
+	 * @param text text to format
+	 * @return formatted text
+	 */
+	static @NotNull Component warning(@NotNull Component text) {
+		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
+			text = text.decoration(TextDecoration.BOLD, false);
+		return Component.translatable(
+				"cc.error.prefix.warning",
+				NamedTextColor.RED,
+				EnumSet.of(TextDecoration.BOLD),
+				text.colorIfAbsent(_ERROR_COLOR)
+		);
+	}
+
+	/**
+	 * Formats the provided text as a command output.
+	 *
+	 * @param text text to format
+	 * @return formatted text
+	 */
+	static @NotNull Component output(@NotNull Component text) {
+		return PREFIX_COMPONENT.append(text);
+	}
+
+	/**
 	 * The message to send to a player when they join the server.
 	 */
-	Component JOIN_MESSAGE_1 = new TextBuilder(JOIN_MESSAGE_COLOR)
-			.rawNext("This server is running ")
-			.next("Crowd Control", TextColor.color(0xFAE100)) // picked a color from the CC logo/icon
-			.rawNext(", developed by ")
-			.next("qi", TextColor.color(0xFFC7B5))
-			.next("xi", TextColor.color(0xFFDECA))
-			.next("ls", TextColor.color(0xFFCEEA))
-			.next(".dev", TextColor.color(0xFFB7E5))
-			.rawNext(" in coordination with the ")
-			.next("crowdcontrol.live", TextColor.color(0xFAE100))
-			.rawNext(" team.")
-			.build();
+	Component JOIN_MESSAGE_1 = Component.translatable(
+			"cc.join.info",
+			JOIN_MESSAGE_COLOR,
+			Component.text("Crowd Control", TextColor.color(0xFAE100)),
+			Component.text("qi", TextColor.color(0xFFC7B5))
+					.append(Component.text("xi", TextColor.color(0xFFDECA)))
+					.append(Component.text("ls", TextColor.color(0xFFCEEA)))
+					.append(Component.text(".dev", TextColor.color(0xFFB7E5))),
+			Component.text("crowdcontrol.live", TextColor.color(0xFAE100))
+	);
 
 	/**
 	 * A warning message sent to players when they join the server if they have no Twitch account
 	 * linked.
 	 */
-	Component JOIN_MESSAGE_2 = new TextBuilder(TextColor.color(0xF1D4FC))
-			.rawNext("Please link your Twitch account using ")
-			.next("/account link <username>", NamedTextColor.GOLD)
-			.rawNext(". You can ")
-			.next("click here", TextDecoration.BOLD)
-			.rawNext(" to do so.")
-			.suggest("/account link ")
-			.hover(Component.text("Click here to link your Twitch account").asHoverEvent())
-			.build();
+	Component JOIN_MESSAGE_2 = Component.translatable(
+			"cc.join.link.text",
+			TextColor.color(0xF1D4FC),
+			Component.text("/account link <username>", NamedTextColor.GOLD)
+	)
+			.hoverEvent(Component.translatable("cc.join.link.hover"))
+			.clickEvent(ClickEvent.suggestCommand("/account link "));
 
 	/**
 	 * A warning message sent to players when they join the server if global effects are
 	 * completely unavailable.
 	 */
-	Component NO_GLOBAL_EFFECTS_MESSAGE = new TextBuilder(JOIN_MESSAGE_COLOR)
-			.next("Warning: ", NamedTextColor.YELLOW, TextDecoration.BOLD)
-			.rawNext("Effects that alter server settings (such as the server difficulty) are currently unavailable. " +
-					"If this isn't intended then please open the plugin's config file and set ")
-			.next("global", TextColor.color(0xEBBD8D))
-			.rawNext(" to ")
-			.next("true", TextColor.color(0xEBBD8D))
-			.rawNext(" to enable these effects.")
-			.build();
-
-	/**
-	 * The color used for displaying error messages on join.
-	 */
-	TextColor _ERROR_COLOR = TextColor.color(0xF78080);
+	Component NO_GLOBAL_EFFECTS_MESSAGE = warning(Component.translatable(
+			"cc.error.no-global-effects",
+			Component.text("global", TextColor.color(0xF9AD9E)),
+			Component.text("true", TextColor.color(0xF9AD9E))
+	));
 
 	/**
 	 * Error message displayed to non-admins when the service is not enabled.
 	 */
-	Component NO_CC_USER_ERROR = new TextBuilder(_ERROR_COLOR)
-			.next("WARNING: ", NamedTextColor.RED)
-			.rawNext("The Crowd Control plugin has failed to load. Please ask a server administrator to the console logs and address the error.")
-			.build();
+	Component NO_CC_USER_ERROR = Component.translatable(
+			"cc.error.prefix.critical",
+			NamedTextColor.RED,
+			Component.translatable(
+					"cc.error.user-error",
+					_ERROR_COLOR
+			)
+	);
 
 	/**
 	 * Error message displayed to admins when the password is not set.
 	 */
-	Component NO_CC_OP_ERROR_NO_PASSWORD = new TextBuilder(_ERROR_COLOR)
-			.next("WARNING: ", NamedTextColor.RED)
-			.rawNext("The Crowd Control plugin has failed to load due to a password not being set. Please use ")
-			.next("/password <password>", NamedTextColor.GOLD)
-			.rawNext(" to set a password and ")
-			.next("/crowdcontrol reconnect", NamedTextColor.GOLD)
-			.next(" to properly load the plugin. And be careful not to show the password on stream!")
-			.suggest("/password ")
-			.hover(Component.text("Click here to set the password").asHoverEvent())
-			.build();
+	Component NO_CC_OP_ERROR_NO_PASSWORD = warning(Component.translatable(
+			"cc.error.no-password.text",
+			Component.text("/password <password>", NamedTextColor.GOLD),
+			Component.text("/crowdcontrol reconnect", NamedTextColor.GOLD)
+	)
+			.clickEvent(ClickEvent.suggestCommand("/password "))
+			.hoverEvent(Component.translatable("cc.error.no-password.hover"))
+	);
 
 	/**
 	 * Error message displayed to admins when the error is unknown.
 	 */
-	Component NO_CC_UNKNOWN_ERROR = new TextBuilder(_ERROR_COLOR)
-			.next("WARNING: ", NamedTextColor.RED)
-			.rawNext("The Crowd Control plugin has failed to load. Please review the console logs and resolve the error.")
-			.build();
+	Component NO_CC_UNKNOWN_ERROR = error(Component.translatable("cc.error.unknown"));
 
 	/**
 	 * Registers the plugin's basic chat commands.
 	 */
 	default void registerChatCommands() {
+		KyoriTranslator.initialize();
+
 		CommandManager<S> manager = getCommandManager();
 		if (manager == null)
 			throw new IllegalStateException("CommandManager is null");
 		EntityMapper<S> mapper = commandSenderMapper();
+
+		// TODO: support i18n in cloud command descriptions
 
 		//// Account Command ////
 
@@ -189,14 +236,16 @@ public interface Plugin<P, S> {
 					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerManager().linkPlayer(uuid, username))
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.next(username, NamedTextColor.AQUA)
-								.rawNext(" has been added to your linked Twitch accounts"));
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.link.output",
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 					else
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.color(NamedTextColor.RED)
-								.next("You have already linked the Twitch account ")
-								.next(username, NamedTextColor.AQUA));
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.link.error",
+								NamedTextColor.RED,
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 				}));
 		// unlink command
 		manager.command(account.literal("unlink")
@@ -209,14 +258,16 @@ public interface Plugin<P, S> {
 					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerManager().unlinkPlayer(uuid, username))
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.next(username, NamedTextColor.AQUA)
-								.rawNext(" has been removed from your linked Twitch accounts"));
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.unlink.output",
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 					else
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.color(NamedTextColor.RED)
-								.next("You do not have a Twitch account linked named ")
-								.next(username, NamedTextColor.AQUA));
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.unlink.error",
+								NamedTextColor.RED,
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 				}));
 
 		//// CrowdControl Command ////
@@ -227,41 +278,31 @@ public interface Plugin<P, S> {
 				.permission(mapper::isAdmin);
 
 		// connect command
-		final Component serviceNotDisconnected = TextBuilder.fromPrefix(PREFIX,
-				"&cService is already running or attempting to establish a connection").build();
-		final Component serviceStarted = TextBuilder.fromPrefix(PREFIX,
-				"Service has been re-enabled and will be attempted in the background").build();
 		manager.command(ccCmd.literal("connect")
 				.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
 				.handler(commandContext -> {
 					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (getCrowdControl() != null)
-						sender.sendMessage(serviceNotDisconnected);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.connect.error", NamedTextColor.RED)));
 					else {
 						initCrowdControl();
-						sender.sendMessage(serviceStarted);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.connect.output")));
 					}
 				}));
 		// disconnect command
-		final Component serviceNotRunning = TextBuilder.fromPrefix(PREFIX,
-				"&cService is already disconnected").build();
-		final Component serviceStopped = TextBuilder.fromPrefix(PREFIX,
-				"Service has been disabled").build();
 		manager.command(ccCmd.literal("disconnect")
 				.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
 				.handler(commandContext -> {
 					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (getCrowdControl() == null)
-						sender.sendMessage(serviceNotRunning);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.disconnect.error", NamedTextColor.RED)));
 					else {
 						getCrowdControl().shutdown("Disconnected issued by server administrator");
 						updateCrowdControl(null);
-						sender.sendMessage(serviceStopped);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.disconnect.output")));
 					}
 				}));
 		// reconnect command
-		final Component serviceReset = TextBuilder.fromPrefix(PREFIX,
-				"Service has been reset").build();
 		manager.command(ccCmd.literal("reconnect")
 				.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
 				.handler(commandContext -> {
@@ -271,27 +312,15 @@ public interface Plugin<P, S> {
 						cc.shutdown("Reconnect issued by server administrator");
 					initCrowdControl();
 
-					audience.sendMessage(serviceReset);
+					audience.sendMessage(output(Component.translatable("cc.command.crowdcontrol.reconnect.output")));
 				}));
 		// status command
-		final Component notRunning = TextBuilder.fromPrefix(PREFIX, "The service is not currently running").build();
-		final Component isRunning = TextBuilder.fromPrefix(PREFIX, "The service is currently running").build();
 		manager.command(ccCmd.literal("status")
 				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(
-						getCrowdControl() == null ? notRunning : isRunning)));
+				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(output(
+						Component.translatable("cc.command.crowdcontrol.status." + (getCrowdControl() != null))))));
 
 		//// Password Command ////
-		final Component passwordSuccessMessage = TextBuilder.fromPrefix(Plugin.PREFIX)
-				.rawNext("The password has been updated. Please use ")
-				.next("/crowdcontrol reconnect", NamedTextColor.YELLOW)
-				.rawNext(" or click here to apply this change.")
-				.suggest("/crowdcontrol reconnect")
-				.hover(new TextBuilder().rawNext("Click here to run ").next("/crowdcontrol reconnect", NamedTextColor.YELLOW))
-				.build();
-		final Component passwordFailureMessage = TextBuilder.fromPrefix(Plugin.PREFIX)
-				.next("This command can only be used when running in server mode.", NamedTextColor.RED)
-				.build();
 		manager.command(manager.commandBuilder("password")
 				.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
 				.permission(mapper::isAdmin)
@@ -299,18 +328,27 @@ public interface Plugin<P, S> {
 				.handler(commandContext -> {
 					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (!isServer()) {
-						sender.sendMessage(passwordFailureMessage);
+						sender.sendMessage(output(Component.translatable("cc.command.password.error", NamedTextColor.RED)));
 						return;
 					}
 					String password = commandContext.get("password");
 					setPassword(password);
-					sender.sendMessage(passwordSuccessMessage);
+					sender.sendMessage(output(Component.translatable(
+							"cc.command.password.output",
+							Component.text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
+					)
+							.hoverEvent(Component.translatable(
+									"cc.command.password.output.hover",
+									Component.text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
+							))
+							.clickEvent(ClickEvent.runCommand("/crowdcontrol reconnect"))
+					));
 				})
 		);
 
 		new MinecraftExceptionHandler<S>()
 				.withDefaultHandlers()
-				.withDecorator(component -> TextBuilder.fromPrefix(PREFIX, component).color(NamedTextColor.RED).build())
+				.withDecorator(component -> output(component).color(NamedTextColor.RED))
 				.apply(manager, mapper::asAudience);
 	}
 
@@ -434,6 +472,7 @@ public interface Plugin<P, S> {
 	 */
 	@CheckReturnValue
 	default @NotNull String getUsername(@NotNull P player) {
+		// TODO: this should be moved to the EntityMapper
 		return playerMapper().asAudience(player).get(Identity.NAME).orElseThrow(() ->
 				new UnsupportedOperationException("Player object does not support Identity.NAME"));
 	}
@@ -499,7 +538,8 @@ public interface Plugin<P, S> {
 	 */
 	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
 	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String message) {
-		if (service == null) service = getCrowdControl();
+		if (service == null)
+			service = getCrowdControl();
 		if (service == null) {
 			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
 			return;

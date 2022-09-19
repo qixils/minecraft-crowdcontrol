@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
@@ -27,13 +28,13 @@ import java.util.List;
 public class GiveItemCommand extends ImmediateCommand {
 	private final ItemType item;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemType item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "give_" + item.key(RegistryTypes.ITEM_TYPE).value();
-		this.displayName = "Give " + plugin.getTextUtil().asPlain(item);
+		this.displayName = Component.translatable("cc.effect.give_item.name", item);
 	}
 
 	@Blocking

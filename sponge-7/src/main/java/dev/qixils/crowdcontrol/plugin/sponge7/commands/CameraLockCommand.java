@@ -22,7 +22,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DUR
 @Getter
 public final class CameraLockCommand extends TimedCommand {
 	private final String effectName = "camera_lock";
-	private final String displayName = "Camera Lock";
 
 	public CameraLockCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

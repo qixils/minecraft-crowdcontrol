@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.block.BlockState;
@@ -21,18 +22,18 @@ import java.util.List;
 public class BlockCommand extends ImmediateCommand {
 	private final BlockType blockType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType) {
 		this(
 				plugin,
 				blockType,
 				"block_" + blockType.key(RegistryTypes.BLOCK_TYPE).value(),
-				"Place " + plugin.getTextUtil().asPlain(blockType) + " Block"
+				Component.translatable("cc.effect.block.name", blockType)
 		);
 	}
 
-	protected BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName, String displayName) {
+	protected BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName, Component displayName) {
 		super(plugin);
 		this.blockType = blockType;
 		this.effectName = effectName;

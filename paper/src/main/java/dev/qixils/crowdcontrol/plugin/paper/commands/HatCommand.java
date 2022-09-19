@@ -18,7 +18,6 @@ import java.util.List;
 @Getter
 public class HatCommand extends ImmediateCommand {
 	private final String effectName = "hat";
-	private final String displayName = "Put Item on Head";
 
 	public HatCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

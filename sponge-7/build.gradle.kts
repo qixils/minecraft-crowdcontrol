@@ -3,6 +3,9 @@ val adventurePlatformVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 7"
 
+// inherit resources from common module
+sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
+
 repositories {
     maven("https://repo.spongepowered.org/maven/")
     mavenCentral()

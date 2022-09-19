@@ -15,19 +15,13 @@ import org.spongepowered.api.item.inventory.entity.PrimaryPlayerInventory;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.math.vector.Vector2i;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.CLUTTER_ITEMS;
 
 @Getter
 public class ClutterCommand extends ImmediateCommand {
 	private final String effectName = "clutter";
-	private final String displayName = "Clutter Inventory";
 
 	public ClutterCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

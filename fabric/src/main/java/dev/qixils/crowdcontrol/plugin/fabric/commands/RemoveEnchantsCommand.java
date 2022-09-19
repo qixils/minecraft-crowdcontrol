@@ -18,7 +18,6 @@ import java.util.List;
 @Getter
 public final class RemoveEnchantsCommand extends ImmediateCommand {
 	private final String effectName = "remove_enchants";
-	private final String displayName = "Remove Enchants";
 
 	public RemoveEnchantsCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

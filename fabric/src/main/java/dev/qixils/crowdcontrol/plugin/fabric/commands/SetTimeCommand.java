@@ -13,16 +13,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
+
 @Getter
 @Global
 public class SetTimeCommand extends ImmediateCommand {
-	private final @NotNull String displayName;
 	private final @NotNull String effectName;
 	private final long time;
 
-	public SetTimeCommand(FabricCrowdControlPlugin plugin, @NotNull String displayName, @NotNull String effectName, long time) {
+	public SetTimeCommand(FabricCrowdControlPlugin plugin, @NotNull String effectName, long time) {
 		super(plugin);
-		this.displayName = displayName;
 		this.effectName = effectName;
 		this.time = time;
 	}
@@ -35,5 +36,15 @@ public class SetTimeCommand extends ImmediateCommand {
 			sync(() -> level.setDayTime(time));
 		}
 		return request.buildResponse().type(ResultType.SUCCESS);
+	}
+
+	@NotNull
+	public static SetTimeCommand day(FabricCrowdControlPlugin plugin) {
+		return new SetTimeCommand(plugin, "time_day", DAY);
+	}
+
+	@NotNull
+	public static SetTimeCommand night(FabricCrowdControlPlugin plugin) {
+		return new SetTimeCommand(plugin, "time_night", NIGHT);
 	}
 }

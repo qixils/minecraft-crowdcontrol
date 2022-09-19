@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.common.ClientOnly;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -12,15 +11,12 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.CheckReturnValue;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -72,6 +68,17 @@ public interface Command<P> {
 	String getEffectName();
 
 	/**
+	 * Gets the default display name for this command.
+	 *
+	 * @return default display name
+	 */
+	@NotNull
+	@CheckReturnValue
+	default Component getDefaultDisplayName() {
+		return Component.translatable("cc.effect." + getEffectName() + ".name");
+	}
+
+	/**
 	 * Gets the effect's raw display name. This is used when sending a chat message to streamers
 	 * informing them of the activation of an effect.
 	 *
@@ -81,7 +88,9 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	String getDisplayName();
+	default Component getDisplayName() {
+		return getDefaultDisplayName();
+	}
 
 	/**
 	 * Gets the effect's processed display name. This contains the contents of
@@ -92,7 +101,7 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	default String getProcessedDisplayName() {
+	default Component getProcessedDisplayName() {
 		return getDisplayName();
 	}
 
@@ -289,11 +298,11 @@ public interface Command<P> {
 			audiences.add(audience);
 		}
 
-		Audience.audience(audiences).sendMessage(new TextBuilder()
-				.next(request.getViewer(), Plugin.USER_COLOR)
-				.next(" used command ")
-				.next(getProcessedDisplayName(), Plugin.CMD_COLOR)
-		);
+		Audience.audience(audiences).sendMessage(Component.translatable(
+				"cc.effect.used",
+				Component.text(request.getViewer(), Plugin.USER_COLOR),
+				getProcessedDisplayName().colorIfAbsent(Plugin.CMD_COLOR)
+		));
 	}
 
 	/**

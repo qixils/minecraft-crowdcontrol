@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -21,27 +22,23 @@ import java.util.List;
 public class GiveItemCommand extends ImmediateCommand {
 	private final Item item;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public GiveItemCommand(FabricCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "give_" + Registry.ITEM.getKey(item).getPath();
-		this.displayName = "Give " + plugin.getTextUtil().asPlain(item.getName(new ItemStack(item)));
+		this.displayName = Component.translatable("cc.effect.give_item.name", item.getName(new ItemStack(item)));
 	}
 
 	@Blocking
-	public static void giveItemTo(FabricCrowdControlPlugin plugin, Player player, ItemStack itemStack) {
+	public static void giveItemTo(Player player, ItemStack itemStack) {
 		ItemEntity entity = player.spawnAtLocation(itemStack);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn item entity");
 		entity.setOwner(player.getUUID());
 		entity.setThrower(player.getUUID());
 		entity.setPickUpDelay(0);
-	}
-
-	private void giveItemTo(Player player, ItemStack itemStack) {
-		giveItemTo(plugin, player, itemStack);
 	}
 
 	@NotNull

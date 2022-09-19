@@ -21,7 +21,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCA
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {
 	private static final int R = CHAOS_LOCAL_RADIUS;
-	private final String displayName = "Entity Chaos";
 	private final String effectName = "entity_chaos";
 
 	public EntityChaosCommand(PaperCrowdControlPlugin plugin) {

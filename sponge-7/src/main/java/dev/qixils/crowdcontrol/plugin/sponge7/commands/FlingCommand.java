@@ -15,7 +15,6 @@ import java.util.List;
 
 @Getter
 public class FlingCommand extends ImmediateCommand {
-	private final @NotNull String displayName = "Fling Randomly";
 	private final @NotNull String effectName = "fling";
 
 	public FlingCommand(@NotNull SpongeCrowdControlPlugin plugin) {

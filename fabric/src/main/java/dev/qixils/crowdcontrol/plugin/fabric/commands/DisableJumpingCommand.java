@@ -25,7 +25,6 @@ import java.util.UUID;
 public class DisableJumpingCommand extends TimedCommand {
 	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>();
 	private final String effectName = "disable_jumping";
-	private final String displayName = "Disable Jumping";
 
 	public DisableJumpingCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

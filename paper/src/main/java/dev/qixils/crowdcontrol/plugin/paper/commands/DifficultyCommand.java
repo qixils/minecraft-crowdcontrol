@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -19,13 +20,13 @@ import java.util.List;
 public class DifficultyCommand extends ImmediateCommand {
 	private final Difficulty difficulty;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public DifficultyCommand(PaperCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
 		this.effectName = "difficulty_" + difficulty.name();
-		this.displayName = "Set Difficulty: " + plugin.getTextUtil().translate(difficulty);
+		this.displayName = Component.translatable("cc.effect.difficulty.name", Component.translatable(difficulty));
 	}
 
 	@Override

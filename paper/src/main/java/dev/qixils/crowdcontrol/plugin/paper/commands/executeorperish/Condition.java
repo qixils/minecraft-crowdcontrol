@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
 
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -12,11 +11,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 public enum Condition {
-	STAND_ON_DIRT(new StandOnBlockCondition(0, "a %s block", Material.DIRT)),
-	STAND_ON_STONE(new StandOnBlockCondition(0, "a %s block", Material.STONE)),
-	STAND_ON_COBBLESTONE(new StandOnBlockCondition(0, "a %s block", Material.COBBLESTONE)),
-	STAND_ON_SAND(new StandOnBlockCondition(1, "a %s block", Material.SAND)),
-	STAND_ON_A_BED(new StandOnBlockCondition(2, new TextBuilder("a &abed").build(),
+	STAND_ON_DIRT(new StandOnBlockCondition(0, "generic", Material.DIRT)),
+	STAND_ON_STONE(new StandOnBlockCondition(0, "generic", Material.STONE)),
+	STAND_ON_COBBLESTONE(new StandOnBlockCondition(0, "generic", Material.COBBLESTONE)),
+	STAND_ON_SAND(new StandOnBlockCondition(1, "generic", Material.SAND)),
+	STAND_ON_A_BED(new StandOnBlockCondition(2, "bed",
 			Material.WHITE_BED,
 			Material.ORANGE_BED,
 			Material.MAGENTA_BED,
@@ -34,7 +33,7 @@ public enum Condition {
 			Material.RED_BED,
 			Material.BLACK_BED
 	)),
-	STAND_ON_A_PLANK(new StandOnBlockCondition(0, new TextBuilder("a &awooden plank").build(),
+	STAND_ON_A_PLANK(new StandOnBlockCondition(0, "plank",
 			Material.OAK_PLANKS,
 			Material.BIRCH_PLANKS,
 			Material.ACACIA_PLANKS,
@@ -44,7 +43,7 @@ public enum Condition {
 			Material.DARK_OAK_PLANKS,
 			Material.SPRUCE_PLANKS
 	)),
-	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(2, new TextBuilder("a &astripped log").build(),
+	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(2, "stripped_log",
 			Material.STRIPPED_OAK_LOG,
 			Material.STRIPPED_BIRCH_LOG,
 			Material.STRIPPED_ACACIA_LOG,
@@ -62,9 +61,9 @@ public enum Condition {
 			Material.STRIPPED_CRIMSON_HYPHAE,
 			Material.STRIPPED_WARPED_HYPHAE
 	)),
-	OBTAIN_STONE_HOE(new ObtainItemCondition(1, "a %s", Material.STONE_HOE)),
-	OBTAIN_WOODEN_HOE(new ObtainItemCondition(0, "a %s", Material.WOODEN_HOE)),
-	OBTAIN_STONE(new ObtainItemCondition(3, "a %s block", Material.STONE)),
+	OBTAIN_STONE_HOE(new ObtainItemCondition(1, "generic", Material.STONE_HOE)),
+	OBTAIN_WOODEN_HOE(new ObtainItemCondition(0, "generic", Material.WOODEN_HOE)),
+	OBTAIN_STONE(new ObtainItemCondition(3, "generic_block", Material.STONE)),
 	;
 
 	private static final List<SuccessCondition> CONDITIONS;

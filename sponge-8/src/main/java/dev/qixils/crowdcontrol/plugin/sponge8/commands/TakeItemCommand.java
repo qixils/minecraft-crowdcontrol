@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
@@ -21,13 +22,13 @@ import java.util.List;
 public class TakeItemCommand extends ImmediateCommand {
 	private final ItemType item;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public TakeItemCommand(SpongeCrowdControlPlugin plugin, ItemType item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "take_" + item.key(RegistryTypes.ITEM_TYPE).value();
-		this.displayName = "Take " + plugin.getTextUtil().asPlain(item);
+		this.displayName = Component.translatable("cc.effect.take_item.name", item);
 	}
 
 	private boolean takeItemFrom(ServerPlayer player) {

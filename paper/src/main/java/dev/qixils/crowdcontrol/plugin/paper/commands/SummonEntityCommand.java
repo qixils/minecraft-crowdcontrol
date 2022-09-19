@@ -8,18 +8,9 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
+import net.kyori.adventure.text.Component;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -27,13 +18,7 @@ import org.bukkit.loot.LootTables;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
@@ -73,14 +58,14 @@ public class SummonEntityCommand extends ImmediateCommand {
 
 	protected final EntityType entityType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 	private final NamespacedKey mobKey;
 
 	public SummonEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "entity_" + entityType.name();
-		this.displayName = "Summon " + plugin.getTextUtil().translate(entityType);
+		this.displayName = Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType));
 		this.mobKey = getMobKey(plugin);
 	}
 

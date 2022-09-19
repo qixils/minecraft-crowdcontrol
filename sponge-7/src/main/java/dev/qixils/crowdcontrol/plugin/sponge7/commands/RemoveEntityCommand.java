@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -23,13 +24,13 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENT
 public class RemoveEntityCommand extends ImmediateCommand {
 	protected final EntityType entityType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + SpongeTextUtil.csIdOf(entityType);
-		this.displayName = "Remove " + SpongeTextUtil.getFixedName(entityType);
+		this.displayName = Component.translatable("cc.effect.remove_entity.name", Component.translatable(entityType.getTranslation().getId()));
 	}
 
 	private boolean removeEntityFrom(Player player) {

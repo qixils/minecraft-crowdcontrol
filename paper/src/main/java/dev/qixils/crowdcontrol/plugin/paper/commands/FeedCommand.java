@@ -14,13 +14,11 @@ import java.util.List;
 @Getter
 public class FeedCommand extends ImmediateCommand {
 	private final String effectName;
-	private final String displayName;
 	private final int amount;
 
-	public FeedCommand(PaperCrowdControlPlugin plugin, String effectName, String displayName, int amount) {
+	public FeedCommand(PaperCrowdControlPlugin plugin, String effectName, int amount) {
 		super(plugin);
 		this.effectName = effectName;
-		this.displayName = displayName;
 		this.amount = amount;
 	}
 

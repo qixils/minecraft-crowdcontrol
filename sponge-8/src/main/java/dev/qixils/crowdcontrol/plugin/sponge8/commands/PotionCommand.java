@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -27,15 +28,20 @@ public class PotionCommand extends ImmediateCommand {
 	private final PotionEffectType potionEffectType;
 	private final Ticks duration;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public PotionCommand(SpongeCrowdControlPlugin plugin, PotionEffectType potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
+		this.effectName = "potion_" + potionEffectType.key(RegistryTypes.POTION_EFFECT_TYPE).value();
+
 		boolean isMinimal = potionEffectType.isInstant();
 		duration = Ticks.of(isMinimal ? 1 : TICKS);
-		this.effectName = "potion_" + potionEffectType.key(RegistryTypes.POTION_EFFECT_TYPE).value();
-		this.displayName = "Apply " + plugin.getTextUtil().asPlain(potionEffectType) + " Potion Effect (" + POTION_SECONDS + "s)";
+
+		Component displayName = Component.translatable("cc.effect.potion.name", potionEffectType);
+		if (!isMinimal)
+			displayName = displayName.append(Component.text(" (" + POTION_SECONDS + ")"));
+		this.displayName = displayName;
 	}
 
 	@NotNull
@@ -64,10 +70,16 @@ public class PotionCommand extends ImmediateCommand {
 					if (existingEffect.type().equals(potionEffectType)) {
 						plugin.getSLF4JLogger().debug("Updating existing effect");
 						overridden = true;
+
+						long newDuration = Math.max(TICKS, existingEffect.duration().ticks());
+						int newAmplifier = existingEffect.amplifier() + 1;
+						if (potionEffectType.equals(PotionEffectTypes.LEVITATION.get()) && newAmplifier > 127)
+							newAmplifier -= 1; // don't mess with gravity effects
+
 						effects.set(i, PotionEffect.builder()
 								.from(existingEffect)
-								.duration(Ticks.of(Math.max(TICKS, existingEffect.duration().ticks())))
-								.amplifier(existingEffect.amplifier() + 1)
+								.duration(Ticks.of(newDuration))
+								.amplifier(newAmplifier)
 								.build());
 						break;
 					}

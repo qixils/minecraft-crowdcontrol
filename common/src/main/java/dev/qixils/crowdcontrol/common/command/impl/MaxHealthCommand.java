@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.MIN_MAX_HE
 @RequiredArgsConstructor
 public class MaxHealthCommand<P> implements ImmediateCommand<P> {
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 	private final int amount;
 	private final Plugin<P, ?> plugin;
 
@@ -36,7 +37,7 @@ public class MaxHealthCommand<P> implements ImmediateCommand<P> {
 			displayText = "+" + amount;
 		}
 		this.effectName = "max_health_" + amountText;
-		this.displayName = displayText + " Max Health";
+		this.displayName = Component.translatable("cc.effect.max_health.name", Component.text(displayText));
 		this.amount = amount;
 	}
 

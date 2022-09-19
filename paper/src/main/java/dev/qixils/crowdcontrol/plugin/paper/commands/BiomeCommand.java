@@ -1,20 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 @Getter
@@ -130,7 +125,6 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 		BIOMES = biomeMap;
 	}
 
-	private final String displayName = "Teleport to a Random Biome";
 	private final String effectName = "biome";
 
 	public BiomeCommand(PaperCrowdControlPlugin plugin) {
@@ -148,8 +142,8 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 	}
 
 	@Override
-	protected @NotNull String nameOf(@NotNull Biome searchType) {
-		return TextUtil.titleCase(searchType.getKey().getKey());
+	protected @NotNull Component nameOf(@NotNull Biome searchType) {
+		return Component.translatable(searchType);
 	}
 
 	@Override

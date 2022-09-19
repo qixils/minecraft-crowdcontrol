@@ -20,7 +20,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DUR
 @Getter
 public final class CameraLockToSkyCommand extends TimedCommand {
 	private final String effectName = "camera_lock_to_sky";
-	private final String displayName = "Camera Lock To Sky";
 
 	public CameraLockToSkyCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

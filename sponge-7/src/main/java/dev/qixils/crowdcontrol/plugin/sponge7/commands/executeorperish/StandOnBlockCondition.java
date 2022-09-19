@@ -18,23 +18,15 @@ public class StandOnBlockCondition implements SuccessCondition {
 	private final Set<BlockType> blocks;
 	private final Component component;
 
-	public StandOnBlockCondition(int rewardLuck, String displayText, BlockType displayItem, BlockType... otherItems) {
+	public StandOnBlockCondition(int rewardLuck, String key, BlockType displayItem, BlockType... otherItems) {
 		this.rewardLuck = rewardLuck;
 		this.blocks = new HashSet<>(otherItems.length + 1);
 		this.blocks.add(displayItem);
 		this.blocks.addAll(Arrays.asList(otherItems));
-
-		component = Component.text("Stand on ").append(Component.text(displayText)
-				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(displayItem.getTranslation().getId())
-								.color(NamedTextColor.GREEN)))
+		this.component = Component.translatable(
+				"cc.effect.do_or_die.condition.stand." + key,
+				Component.translatable(displayItem.getTranslation().getId(), NamedTextColor.GREEN)
 		);
-	}
-
-	public StandOnBlockCondition(int rewardLuck, Component display, BlockType... blocks) {
-		this.rewardLuck = rewardLuck;
-		this.blocks = new HashSet<>(Arrays.asList(blocks));
-		this.component = Component.text("Stand on ").append(display);
 	}
 
 	@Override

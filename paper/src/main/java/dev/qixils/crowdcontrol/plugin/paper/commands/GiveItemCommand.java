@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -22,13 +23,13 @@ import java.util.List;
 public class GiveItemCommand extends ImmediateCommand {
 	private final Material item;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public GiveItemCommand(PaperCrowdControlPlugin plugin, Material item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "give_" + item.name();
-		this.displayName = "Give " + plugin.getTextUtil().translate(item);
+		this.displayName = Component.translatable("cc.effect.give_item.name", Component.translatable(new ItemStack(item)));
 	}
 
 	@Blocking

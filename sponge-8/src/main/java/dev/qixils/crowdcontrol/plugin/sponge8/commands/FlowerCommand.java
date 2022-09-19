@@ -20,15 +20,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_MAX;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_MIN;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FLOWER_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class FlowerCommand extends ImmediateCommand {
 	private final TypedTag<BlockType> flowers;
 	private final String effectName = "flowers";
-	private final String displayName = "Place Flowers";
 
 	public FlowerCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

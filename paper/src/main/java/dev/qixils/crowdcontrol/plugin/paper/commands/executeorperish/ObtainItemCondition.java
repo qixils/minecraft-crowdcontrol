@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @Getter
 public class ObtainItemCondition implements SuccessCondition {
@@ -12,12 +13,13 @@ public class ObtainItemCondition implements SuccessCondition {
 	private final Material item;
 	private final Component component;
 
-	public ObtainItemCondition(int rewardLuck, String displayText, Material item) {
+	public ObtainItemCondition(int rewardLuck, String key, Material item) {
 		this.rewardLuck = rewardLuck;
 		this.item = item;
-		component = Component.text("Obtain ").append(Component.text(displayText)
-				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(item).color(NamedTextColor.GREEN))));
+		this.component = Component.translatable(
+				"cc.effect.do_or_die.condition.obtain." + key,
+				Component.translatable(new ItemStack(item), NamedTextColor.GREEN)
+		);
 	}
 
 	@Override

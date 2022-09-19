@@ -8,7 +8,6 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
@@ -25,10 +24,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
+
 @Getter
 @EventListener
 public class ToastCommand extends ImmediateCommand {
-	private static final Component TITLE = Component.text("Pop-Up");
 	private static final ItemType[] MATERIALS = new ItemType[]{
 			ItemTypes.BROWN_STAINED_GLASS_PANE.get(),
 			ItemTypes.RED_STAINED_GLASS_PANE.get(),
@@ -49,7 +49,6 @@ public class ToastCommand extends ImmediateCommand {
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private final String effectName = "toast";
-	private final String displayName = "Annoying Pop-Ups";
 
 	public ToastCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -72,7 +71,7 @@ public class ToastCommand extends ImmediateCommand {
 						.asViewable()
 						.orElseThrow(() -> new IllegalStateException("Could not create custom inventory"));
 				InventoryMenu menu = inv.asMenu();
-				menu.setTitle(TITLE);
+				menu.setTitle(POPUP_TITLE);
 				menu.setReadOnly(true);
 				sync(() -> menu.open(player));
 

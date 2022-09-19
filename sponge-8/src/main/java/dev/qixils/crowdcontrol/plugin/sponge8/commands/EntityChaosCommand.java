@@ -27,7 +27,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCA
 public class EntityChaosCommand extends ImmediateCommand {
 	private final EntityType<Player> PLAYER = EntityTypes.PLAYER.get();
 	private final Predicate<Entity> IS_NOT_PLAYER = entity -> !entity.type().equals(PLAYER);
-	private final String displayName = "Entity Chaos";
 	private final String effectName = "entity_chaos";
 
 	public EntityChaosCommand(SpongeCrowdControlPlugin plugin) {

@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.Keys;
@@ -25,14 +26,14 @@ import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.GA
 public class GameModeCommand extends TimedCommand {
 	private final Duration duration;
 	private final GameMode gamemode;
-	private final String displayName;
+	private final Component displayName;
 	private final String effectName;
 
 	public GameModeCommand(SpongeCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
 		super(plugin);
 		this.duration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = plugin.getTextUtil().asPlain(gamemode);
+		this.displayName = gamemode.asComponent(); // TODO: figure out if this is the right lang key
 		this.effectName = gamemode.key(RegistryTypes.GAME_MODE).value() + "_mode";
 	}
 

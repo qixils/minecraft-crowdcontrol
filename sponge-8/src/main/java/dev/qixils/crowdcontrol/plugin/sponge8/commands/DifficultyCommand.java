@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.registry.RegistryTypes;
@@ -22,13 +23,13 @@ import java.util.List;
 public class DifficultyCommand extends ImmediateCommand {
 	private final Difficulty difficulty;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public DifficultyCommand(SpongeCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
 		this.effectName = "difficulty_" + difficulty.key(RegistryTypes.DIFFICULTY).value();
-		this.displayName = plugin.getTextUtil().asPlain(difficulty) + " Mode";
+		this.displayName = Component.translatable("cc.effect.difficulty.name", difficulty);
 	}
 
 	@NotNull

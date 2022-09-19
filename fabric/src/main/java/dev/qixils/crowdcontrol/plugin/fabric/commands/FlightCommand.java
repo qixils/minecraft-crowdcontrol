@@ -22,7 +22,6 @@ import java.util.List;
 @EventListener
 public class FlightCommand extends TimedCommand {
 	private final String effectName = "flight";
-	private final String displayName = "Enable Flight";
 	private final Duration duration = Duration.ofSeconds(15);
 
 	public FlightCommand(@NotNull FabricCrowdControlPlugin plugin) {

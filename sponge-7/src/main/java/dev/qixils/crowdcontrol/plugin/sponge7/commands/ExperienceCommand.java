@@ -16,13 +16,11 @@ import java.util.Optional;
 @Getter
 public class ExperienceCommand extends ImmediateCommand {
 	private final String effectName;
-	private final String displayName;
 	private final int amount;
 
-	public ExperienceCommand(SpongeCrowdControlPlugin plugin, String effectName, String displayName, int amount) {
+	public ExperienceCommand(SpongeCrowdControlPlugin plugin, String effectName, int amount) {
 		super(plugin);
 		this.effectName = effectName;
-		this.displayName = displayName;
 		assert amount != 0;
 		this.amount = amount;
 	}

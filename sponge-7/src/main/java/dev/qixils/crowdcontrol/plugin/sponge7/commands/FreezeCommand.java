@@ -23,7 +23,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DUR
 @Getter
 public final class FreezeCommand extends TimedCommand {
 	private final String effectName = "freeze";
-	private final String displayName = "Freeze";
 
 	public FreezeCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

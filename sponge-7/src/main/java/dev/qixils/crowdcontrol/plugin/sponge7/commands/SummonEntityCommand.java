@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
@@ -30,13 +31,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
@@ -46,13 +41,13 @@ public class SummonEntityCommand extends ImmediateCommand {
 	private final Map<EquipmentType, List<ItemType>> armor;
 	protected final EntityType entityType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "entity_" + SpongeTextUtil.csIdOf(entityType);
-		this.displayName = "Summon " + SpongeTextUtil.getFixedName(entityType);
+		this.displayName = Component.translatable("cc.effect.summon_entity.name", SpongeTextUtil.getFixedName(entityType));
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentType, List<ItemType>> armor = new HashMap<>(4);

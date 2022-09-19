@@ -12,13 +12,13 @@ public class ObtainItemCondition implements SuccessCondition {
 	private final ItemType item;
 	private final Component component;
 
-	public ObtainItemCondition(int rewardLuck, String displayText, ItemType item) {
+	public ObtainItemCondition(int rewardLuck, String key, ItemType item) {
 		this.rewardLuck = rewardLuck;
 		this.item = item;
-		component = Component.text("Obtain ").append(Component.text(displayText)
-				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(item.getTranslation().getId())
-								.color(NamedTextColor.GREEN))));
+		this.component = Component.translatable(
+				"cc.effect.do_or_die.condition.obtain." + key,
+				Component.translatable(item.getTranslation().getId(), NamedTextColor.GREEN)
+		);
 	}
 
 	@Override

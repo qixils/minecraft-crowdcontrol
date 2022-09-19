@@ -9,16 +9,11 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
@@ -26,12 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
@@ -42,14 +32,14 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 	protected final EntityType<E> entityType;
 	protected final boolean isMonster;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public SummonEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.isMonster = entityType.getCategory() == MobCategory.MONSTER;
 		this.effectName = "entity_" + Registry.ENTITY_TYPE.getKey(entityType).getPath();
-		this.displayName = "Summon " + plugin.getTextUtil().asPlain(entityType.getDescription());
+		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getDescription());
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
@@ -117,7 +107,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
 		entity.setPos(player.position());
-		entity.setCustomName(Component.literal(viewer));
+		entity.setCustomName(net.minecraft.network.chat.Component.literal(viewer));
 		entity.setCustomNameVisible(true);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);

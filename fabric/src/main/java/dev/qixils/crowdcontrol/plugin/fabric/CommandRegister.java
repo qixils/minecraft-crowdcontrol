@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
-import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,9 +20,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, FabricCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
@@ -57,47 +53,39 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new SwapCommand(plugin),
 				new DinnerboneCommand(plugin),
 				new ClutterCommand(plugin),
-				new LootboxCommand(plugin, "Open Lootbox", 0),
-				new LootboxCommand(plugin, "Open Lucky Lootbox", 5),
-				new LootboxCommand(plugin, "Open Very Lucky Lootbox", 10),
+				new LootboxCommand(plugin, 0),
+				new LootboxCommand(plugin, 5),
+				new LootboxCommand(plugin, 10),
 				new TeleportCommand(plugin),
 				new ToastCommand(plugin),
-				FreezeCommand.createDefault(plugin),
-				new FreezeCommand(plugin, "camera_lock", "Camera Lock", Location::withRotationOf), // (cur, prev) -> cur.withRotationOf(prev)
+				FreezeCommand.feet(plugin),
+				FreezeCommand.camera(plugin),
+				FreezeCommand.skyCamera(plugin),
+				FreezeCommand.groundCamera(plugin),
 				new FlowerCommand(plugin),
-				new MoveCommand(plugin, 0, 1, 0, "Up"),
-				new MoveCommand(plugin, 0, -2, 0, "Down"),
-				// begin: deprecated effects
-				new MoveCommand(plugin, 2, 0.2, 0, "xplus", "East"),
-				new MoveCommand(plugin, -2, 0.2, 0, "xminus", "West"),
-				new MoveCommand(plugin, 0, 0.2, 2, "zplus", "South"),
-				new MoveCommand(plugin, 0, 0.2, -2, "zminus", "North"),
-				// end: deprecated effects
 				new FlingCommand(plugin),
 				new TorchCommand(plugin, true),
 				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
 				new DigCommand(plugin),
 				new TimeCommand(plugin),
-				ItemDurabilityCommand.damage(plugin),
-				ItemDurabilityCommand.repair(plugin),
+				new ItemDurabilityCommand.Repair(plugin),
+				new ItemDurabilityCommand.Damage(plugin),
 				new RemoveEnchantsCommand(plugin),
 				new HatCommand(plugin),
 				new RespawnCommand(plugin),
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
 				new BucketClutchCommand(plugin),
-				new FeedCommand(plugin, "feed", "Feed Players", 40),
-				new FeedCommand(plugin, "feed_1", "Feed Players (1 Bar)", 2),
-				new FeedCommand(plugin, "starve", "Starve Players", Integer.MIN_VALUE),
-				new FeedCommand(plugin, "starve_1", "Remove One Hunger Bar", -2),
+				new FeedCommand(plugin, "feed", 40),
+				new FeedCommand(plugin, "feed_1", 2),
+				new FeedCommand(plugin, "starve", Integer.MIN_VALUE),
+				new FeedCommand(plugin, "starve_1", -2),
 				new ResetExpProgressCommand(plugin),
-				new ExperienceCommand(plugin, "xp_plus1", "Give One XP Level", 1),
-				new ExperienceCommand(plugin, "xp_sub1", "Take One XP Level", -1),
+				new ExperienceCommand(plugin, "xp_plus1", 1),
+				new ExperienceCommand(plugin, "xp_sub1", -1),
 				new DisableJumpingCommand(plugin),
 				new EntityChaosCommand(plugin),
-				new FreezeCommand(plugin, "camera_lock_to_sky", "Camera Lock to Sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90)),
-				new FreezeCommand(plugin, "camera_lock_to_ground", "Camera Lock to Ground", (cur, prev) -> cur.withRotation(prev.yaw(), 90)),
 				new FlightCommand(plugin),
 				new KeepInventoryCommand(plugin, true),
 				new KeepInventoryCommand(plugin, false),
@@ -105,11 +93,15 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new PlantTreeCommand(plugin),
 //				TODO new DoOrDieCommand(plugin),
 				new ExplodeCommand(plugin),
-				new SetTimeCommand(plugin, "Set Time to Day", "time_day", DAY),
-				new SetTimeCommand(plugin, "Set Time to Night", "time_night", NIGHT),
+				SetTimeCommand.day(plugin),
+				SetTimeCommand.night(plugin),
 				WeatherCommand.clear(plugin),
 				WeatherCommand.downfall(plugin),
-				WeatherCommand.storm(plugin)
+				WeatherCommand.storm(plugin),
+				GravityCommand.zero(plugin),
+				GravityCommand.low(plugin),
+				GravityCommand.high(plugin),
+				GravityCommand.maximum(plugin)
 
 				// TODO location commands from paper
 		));

@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common.command;
 
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -19,7 +20,8 @@ public interface TimedCommand<P> extends VoidCommand<P> {
 	@NotNull Duration getDuration();
 
 	@Override
-	default @NotNull String getProcessedDisplayName() {
-		return getDisplayName() + " (" + getDuration().getSeconds() + "s)";
+	default @NotNull Component getProcessedDisplayName() {
+		// TODO: make duration color less saturated?
+		return getDisplayName().append(Component.text(" (" + getDuration().getSeconds() + "s)"));
 	}
 }
