@@ -17,11 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.common.AbstractPlugin<P, S> {
 
@@ -130,7 +126,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		Path configPath = configFile.toPath();
 		if (!configFile.exists()) {
 			// read the default config
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("default.conf");
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("assets/crowd-control/default.conf");
 			if (inputStream == null)
 				throw new IllegalStateException("Could not find default config file; please report to qixils");
 			// copy the default config to the config path

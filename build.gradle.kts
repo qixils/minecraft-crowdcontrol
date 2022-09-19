@@ -66,7 +66,4 @@ subprojects {
             }
         }
     }
-
-    // TODO: auto-copy default config into appropriate resource paths
-    //   (i.e. /config.yml for Paper, /assets/crowd-control/default.conf for Sponge 7, etc.)
 }
