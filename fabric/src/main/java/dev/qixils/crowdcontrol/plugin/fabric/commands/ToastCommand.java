@@ -20,6 +20,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,11 +29,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Getter
@@ -141,6 +138,11 @@ public final class ToastCommand extends ImmediateCommand {
 		public void removed(@NotNull Player player) {
 			super.removed(player);
 			OPEN_INVENTORIES.remove(player.getUUID());
+		}
+
+		@Override
+		public void clicked(int slotIndex, int buttonIndex, @NotNull ClickType clickType, @NotNull Player player) {
+			// todo: check paper source code for what fake packets need to be sent to correct the client
 		}
 	}
 }
