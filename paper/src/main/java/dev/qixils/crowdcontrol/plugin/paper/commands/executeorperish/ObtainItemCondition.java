@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 @Getter
-public class ObtainItemCondition implements SuccessCondition {
+public final class ObtainItemCondition implements SuccessCondition {
 	private final int rewardLuck;
 	private final Material item;
 	private final Component component;

@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -399,7 +400,7 @@ public class CommandConstants {
 	 * @return title to display
 	 */
 	@NotNull
-	public static Title doOrDieSuccess(@NotNull Component rewardItem) {
+	public static Title doOrDieSuccess(@NotNull ComponentLike rewardItem) {
 		return Title.title(
 				Component.translatable("cc.effect.do_or_die.title").color(NamedTextColor.GREEN),
 				Component.translatable("cc.effect.do_or_die.subtitle", SUCCESS_SUBTITLE_COLOR, rewardItem),

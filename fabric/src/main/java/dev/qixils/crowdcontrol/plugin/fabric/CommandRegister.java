@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
+import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
@@ -91,7 +92,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new KeepInventoryCommand(plugin, false),
 				new ClearInventoryCommand(plugin),
 				new PlantTreeCommand(plugin),
-//				TODO new DoOrDieCommand(plugin),
+				new DoOrDieCommand(plugin),
 				new ExplodeCommand(plugin),
 				SetTimeCommand.day(plugin),
 				SetTimeCommand.night(plugin),

@@ -11,7 +11,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 @Getter
-public class StandOnBlockCondition implements SuccessCondition {
+public final class StandOnBlockCondition implements SuccessCondition {
 	private final int rewardLuck;
 	private final Set<Material> blocks;
 	private final Component component;
