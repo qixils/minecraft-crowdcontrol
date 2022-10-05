@@ -79,6 +79,6 @@ public class StructureCommand extends NearbyLocationCommand<StructureType> {
 
 	@Override
 	protected @NotNull Component nameOf(@NotNull StructureType searchType) {
-		return Component.text(TextUtil.titleCase(searchType.getName())); // TODO: i18n (need to refactor entire class)
+		return Component.text(TextUtil.titleCase(searchType.getName())); // TODO: i18n (need to manually translate)
 	}
 }
