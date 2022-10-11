@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.common;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command.Builder;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
@@ -220,15 +219,17 @@ public interface Plugin<P, S> {
 		if (isAdminRequired())
 			account = account.permission(mapper::isAdmin);
 
-		// username arg
-		CommandArgument<S, String> usernameArg = StringArgument.<S>newBuilder("username")
-				.single().asRequired().manager(manager).build();
-		ArgumentDescription usernameDesc = ArgumentDescription.of("The username of the Twitch account to link");
-
 		// link command
 		manager.command(account.literal("link")
 				.meta(CommandMeta.DESCRIPTION, "Link a Twitch account to your Minecraft account")
-				.argument(usernameArg, usernameDesc)
+				.argument(
+						StringArgument.<S>newBuilder("username")
+								.single()
+								.asRequired()
+								.manager(manager)
+								.build(),
+						ArgumentDescription.of("The username of the Twitch account to link")
+				)
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
@@ -250,7 +251,20 @@ public interface Plugin<P, S> {
 		// unlink command
 		manager.command(account.literal("unlink")
 				.meta(CommandMeta.DESCRIPTION, "Unlink a Twitch account from your Minecraft account")
-				.argument(usernameArg.copy(), usernameDesc)
+				.argument(
+						StringArgument.<S>newBuilder("username")
+								.single()
+								.asRequired()
+								.manager(manager)
+								.withSuggestionsProvider((ctx, input) -> mapper.getUniqueId(ctx.getSender())
+										.map(uuid -> getPlayerManager()
+												.getLinkedAccounts(uuid).stream()
+												.filter(name -> name.startsWith(input.toLowerCase(Locale.ENGLISH)))
+												.collect(Collectors.toList()))
+										.orElse(Collections.emptyList()))
+								.build(),
+						ArgumentDescription.of("The username of the Twitch account to unlink")
+				)
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();

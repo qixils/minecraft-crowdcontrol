@@ -36,6 +36,7 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
 	@Override
 	public @NotNull Collection<String> getLinkedAccounts(@NotNull UUID uuid) {
+		// TODO: optimize
 		return Multimaps.invertFrom(twitchToUserMap, HashMultimap.create(twitchToUserMap.size(), 1)).get(uuid);
 	}
 }
