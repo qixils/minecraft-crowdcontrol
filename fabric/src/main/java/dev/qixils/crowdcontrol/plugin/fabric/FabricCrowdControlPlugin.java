@@ -45,6 +45,7 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 //  - Fix global effects being unavailable to the host
 //  - Add config option for default Twitch channel
 //  - Add a GUI config library
+//  - Test behavior of mod when running client-side in multiplayer
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
