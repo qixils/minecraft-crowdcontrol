@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.ServerRecipeBook;
 import net.minecraft.world.Container;
@@ -88,7 +89,6 @@ public final class ToastCommand extends ImmediateCommand {
 			book.addRecipes(recipes, player);
 
 			// pop-up inventory
-			// TODO: block players from interacting with the inventory
 			Container container = new SimpleContainer(INVENTORY_SIZE);
 			ToastInventory toastInv = new ToastInventory(container);
 			toastInv.tick();
@@ -144,7 +144,11 @@ public final class ToastCommand extends ImmediateCommand {
 
 		@Override
 		public void clicked(int slotIndex, int buttonIndex, @NotNull ClickType clickType, @NotNull Player player) {
-			// todo: check paper source code for what fake packets need to be sent to correct the client
+			if (!(player instanceof ServerPlayer sPlayer))
+				return;
+			sPlayer.containerMenu.sendAllDataToRemote();
+			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, sPlayer.inventoryMenu.incrementStateId(), sPlayer.containerMenu.getCarried()));
+			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(sPlayer.containerMenu.containerId, sPlayer.inventoryMenu.incrementStateId(), slotIndex, sPlayer.containerMenu.getSlot(slotIndex).getItem()));
 		}
 	}
 }
