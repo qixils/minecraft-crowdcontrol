@@ -36,7 +36,7 @@ public class PotionCommand extends ImmediateCommand {
 
 		Component displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
 		if (!isMinimal)
-			displayName = displayName.append(Component.text(" (" + POTION_SECONDS + ")"));
+			displayName = displayName.append(Component.text(" (" + POTION_SECONDS + "s)"));
 		this.displayName = displayName;
 	}
 

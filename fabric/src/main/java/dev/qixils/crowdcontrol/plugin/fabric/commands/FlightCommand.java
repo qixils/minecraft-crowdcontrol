@@ -53,7 +53,7 @@ public class FlightCommand extends TimedCommand {
 						response.type(ResultType.SUCCESS).message("SUCCESS");
 						sync(() -> {
 							abilities.mayfly = true;
-							abilities.flying = true;
+							abilities.flying = true; // TODO: this doesn't seem to be working; might need to send some packets
 							player.onUpdateAbilities();
 						});
 					}

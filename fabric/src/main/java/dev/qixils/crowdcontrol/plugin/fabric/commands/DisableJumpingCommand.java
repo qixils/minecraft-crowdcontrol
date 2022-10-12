@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+// TODO: this only works client-side
+
 @Getter
 @EventListener
 public class DisableJumpingCommand extends TimedCommand {

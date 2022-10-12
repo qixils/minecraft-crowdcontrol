@@ -78,6 +78,6 @@ public class GravityCommand extends TimedCommand {
 
 	@NotNull
 	public static GravityCommand maximum(SpongeCrowdControlPlugin plugin) {
-		return new GravityCommand(plugin, "maximum_gravity", 128);
+		return new GravityCommand(plugin, "maximum_gravity", 179);
 	}
 }

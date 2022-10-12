@@ -236,7 +236,7 @@ public class LootboxCommand extends ImmediateCommand {
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
 				ItemStack itemStack = createRandomItem(luck);
 				List<Component> lore = getLore(itemStack);
-				lore.add(plugin.adventure().toNative(buildLootboxLore(request)));
+				lore.add(plugin.adventure().toNative(buildLootboxLore(request))); // TODO: this is displaying the raw translatable key
 				setLore(itemStack, lore);
 				container.setItem(slot, itemStack);
 			}

@@ -2,7 +2,9 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.Command;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.LivingEntityData;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.OriginalDisplayName;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -14,7 +16,10 @@ import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.StreamSupport;
 
@@ -45,16 +50,17 @@ public class DinnerboneCommand extends Command {
 			}
 			successFuture.complete(!entities.isEmpty());
 			entities.forEach(entity -> {
-				LivingEntityData data = (LivingEntityData) entity;
-				final @Nullable Component oldName = data.originalDisplayName().orElse(null);
+				OriginalDisplayName nameData = Components.ORIGINAL_DISPLAY_NAME.get(entity);
+				ViewerMob viewerData = Components.VIEWER_MOB.get(entity);
+				final @Nullable Component oldName = nameData.getValue();
 				final @Nullable Component currentName = entity.getCustomName();
 				if (Objects.equals(currentName, DINNERBONE_COMPONENT)) {
 					entity.setCustomName(oldName);
-					data.originalDisplayName(Optional.empty());
-					if (data.viewerSpawned())
+					nameData.setValue(null);
+					if (viewerData.isViewerSpawned())
 						entity.setCustomNameVisible(true);
 				} else {
-					data.originalDisplayName(Optional.ofNullable(currentName));
+					nameData.setValue(currentName);
 					entity.setCustomName(DINNERBONE_COMPONENT.copy());
 					entity.setCustomNameVisible(false);
 				}

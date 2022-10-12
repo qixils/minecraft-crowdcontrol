@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
@@ -36,6 +37,7 @@ import java.util.stream.Stream;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
 
 @Getter
+@EventListener
 public final class ToastCommand extends ImmediateCommand {
 	private static final Item[] MATERIALS = new Item[]{
 			Items.BROWN_STAINED_GLASS_PANE,
@@ -100,6 +102,7 @@ public final class ToastCommand extends ImmediateCommand {
 
 	@Listener
 	private void onTick(@NotNull Tick tick) {
+		// TODO: this isn't working
 		OPEN_INVENTORIES.values().forEach(ToastInventory::tick);
 	}
 

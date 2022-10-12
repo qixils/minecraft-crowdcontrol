@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
+// TODO: first tick or two displays the timer as "31" instead of "30"
+
 @Getter
 @EventListener
 public class DoOrDieCommand extends VoidCommand {

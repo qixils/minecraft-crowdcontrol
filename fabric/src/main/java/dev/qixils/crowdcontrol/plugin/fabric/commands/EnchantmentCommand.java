@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.Map.Entry;
 
+// TODO: curses are broken
+
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
 	protected final Enchantment enchantment;
@@ -33,7 +35,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		this.effectName = "enchant_" + Registry.ENCHANTMENT.getKey(enchantment).getPath();
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
-				enchantment.getFullname(enchantment.getMaxLevel()).copy().withStyle(Style.EMPTY)
+				enchantment.getFullname(enchantment.getMaxLevel()).copy().withStyle(Style.EMPTY) // TODO: withStyle is not working (text is still colored)
 		);
 	}
 

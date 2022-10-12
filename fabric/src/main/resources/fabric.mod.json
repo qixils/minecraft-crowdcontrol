@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "fabric-platform",
+  "id": "crowd-control",
   "version": "${version}",
   "name": "Crowd Control",
   "description": "Allows viewers to interact with your Minecraft world",
@@ -20,6 +20,9 @@
     ],
     "main": [
       "dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin"
+    ],
+    "cardinal-components": [
+      "dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components"
     ]
   },
   "mixins": [
@@ -29,5 +32,12 @@
     "fabricloader": ">=0.13.3",
     "fabric": "*",
     "minecraft": "1.19.0"
+  },
+  "custom": {
+    "cardinal-components": [
+      "crowd-control:viewer-mob",
+      "crowd-control:original-display-name",
+      "crowd-control:game-type-effect"
+    ]
   }
 }

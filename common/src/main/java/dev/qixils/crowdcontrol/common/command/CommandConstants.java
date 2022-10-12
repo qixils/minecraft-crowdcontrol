@@ -135,7 +135,8 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
 			Key.key(MINECRAFT_NAMESPACE, "lightning_rod"),
 			Key.key(MINECRAFT_NAMESPACE, "bedrock"),
-			Key.key(MINECRAFT_NAMESPACE, "water")
+			Key.key(MINECRAFT_NAMESPACE, "water"),
+			Key.key(MINECRAFT_NAMESPACE, "sculk_catalyst")
 	);
 	/**
 	 * Collection of blocks to be used in the Place Falling Block command.
@@ -214,7 +215,8 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "iron_sword"),
 			Key.key(MINECRAFT_NAMESPACE, "diamond_sword"),
 			Key.key(MINECRAFT_NAMESPACE, "netherite_sword"),
-			Key.key(MINECRAFT_NAMESPACE, "cooked_porkchop")
+			Key.key(MINECRAFT_NAMESPACE, "cooked_porkchop"),
+			Key.key(MINECRAFT_NAMESPACE, "recovery_compass")
 	);
 	/**
 	 * Collection of entities that are safe to summon into the world.
@@ -559,7 +561,7 @@ public class CommandConstants {
 	public static double @NotNull [] randomFlingVector() {
 		return new double[]{
 				randomFlingHoriz(),
-				RandomUtil.nextDouble(.2, 1.75),
+				RandomUtil.nextDouble(.4, 1.5),
 				randomFlingHoriz()
 		};
 	}

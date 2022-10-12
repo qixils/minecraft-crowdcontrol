@@ -130,7 +130,7 @@ public interface Command<P> {
 				return;
 			} else if (!isGlobalCommandUsable(players, request)) {
 				request.buildResponse()
-						.type(ResultType.FAILURE)
+						.type(ResultType.UNAVAILABLE)
 						.message("Global effects cannot be used on the targeted streamer")
 						.send();
 				return;

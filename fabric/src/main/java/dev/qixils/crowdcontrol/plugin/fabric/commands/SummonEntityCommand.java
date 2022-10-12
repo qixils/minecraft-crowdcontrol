@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.LivingEntityData;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -112,7 +112,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
 		if (entity instanceof LivingEntity)
-			((LivingEntityData) entity).viewerSpawned(true);
+			Components.VIEWER_MOB.get(entity).setViewerSpawned();
 		// TODO: random loot table data
 
 		// add random armor to armor stands

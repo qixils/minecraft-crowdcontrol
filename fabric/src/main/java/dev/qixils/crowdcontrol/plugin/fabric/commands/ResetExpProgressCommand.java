@@ -22,7 +22,7 @@ public class ResetExpProgressCommand extends ImmediateCommand {
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("No players have XP");
 		for (ServerPlayer player : players) {
-			if (player.totalExperience > 0 || player.experienceProgress > 0 || player.experienceLevel > 0) {
+			if (player.totalExperience > 0 || player.experienceProgress > 0 || player.experienceLevel > 0) { // TODO: this doesn't seem to be working
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> {
 					player.setExperiencePoints(0);

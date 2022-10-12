@@ -34,7 +34,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				new MaxHealthCommand<>(plugin, 4), // used in hype trains only
 				new DamageCommand<>(plugin, "kill", Integer.MAX_VALUE),
 				new DamageCommand<>(plugin, 2f),
-				new DamageCommand<>(plugin, -2f),
+				new DamageCommand<>(plugin, -2f), // TODO: this is broken on fabric
 				new DamageCommand<>(plugin, "full_heal", Integer.MIN_VALUE)
 		));
 	}

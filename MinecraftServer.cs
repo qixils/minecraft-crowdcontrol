@@ -5,10 +5,14 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using ConnectorLib;
 using ConnectorLib.JSON;
+using ConnectorLib.SimpleTCP;
 using CrowdControl.Common;
 using Newtonsoft.Json;
 using ConnectorType = CrowdControl.Common.ConnectorType;
 using Log = CrowdControl.Common.Log;
+
+// TODO: auto-hiding is broken? doesn't seem to work in SDK or as a CCPAK
+// TODO: suggest to Jaku a configurable folder sort order (namely by price)
 
 namespace CrowdControl.Games.Packs
 {
@@ -47,11 +51,8 @@ namespace CrowdControl.Games.Packs
             // miscellaneous
             new Effect("Miscellaneous", "miscellaneous", ItemKind.Folder),
             new Effect("Annoy Players", "toast", "miscellaneous") { Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound" },
-            new Effect("Damage Held Item", "damage_item", "miscellaneous") { Price = 100, Description = "Halves the durability of the held item" },
-            new Effect("Delete Held Item", "delete_item", "miscellaneous") { Price = 200, Description = "Deletes whatever item the streamer is currently holding" },
             new Effect("Dig Hole", "dig", "miscellaneous") { Price = 250, Description = "Digs a small hole underneath the streamer" },
             new Effect("Do-or-Die", "do_or_die", "miscellaneous") { Price = 500, Description = "Gives the streamer a task to complete within 30 seconds or else they die" },
-            new Effect("Drop Held Item", "drop_item", "miscellaneous") { Price = 25, Description = "Makes the streamer drop their held item" },
             new Effect("Eat Chorus Fruit", "chorus_fruit", "miscellaneous") { Price = 75, Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit" },
             new Effect("Explode", "explode", "miscellaneous") { Price = 750, Description = "Spawns a TNT-like explosion at the streamer's feet" },
             new Effect("Fling Randomly", "fling", "miscellaneous") { Price = 200, Description = "Flings the streamer in a totally random direction" },
@@ -62,11 +63,8 @@ namespace CrowdControl.Games.Packs
             new Effect("Place Torches", "lit", "miscellaneous") { Price = 100, Description = "Places torches on every nearby block" },
             new Effect("Plant Tree", "plant_tree", "miscellaneous") { Price = 200, Description = "Plant a tree on top of the streamer" },
             new Effect("Remove Torches", "dim", "miscellaneous") { Price = 200, Description = "Removes all nearby torches" },
-            new Effect("Repair Held Item", "repair_item", "miscellaneous") { Price = 100, Description = "Fully repairs a damaged item" },
             new Effect("Replace Nearby Blocks with Gravel", "gravel_hell", "miscellaneous") { Price = 300, Description = "Replaces nearby stone-like blocks with gravel" },
             new Effect("Respawn Player", "respawn", "miscellaneous") { Price = 500, Description = "Sends the streamer to their spawn point" },
-            new GlobalEffect("Set Time to Day", "time_day", "miscellaneous") { Price = 50, Description = "Jumps the clock ahead to daytime" },
-            new GlobalEffect("Set Time to Night", "time_night", "miscellaneous") { Price = 50, Description = "Jumps the clock ahead to nighttime" },
             new Effect("Spawn Ore Veins", "vein", "miscellaneous") { Price = 100, Description = "Places random ore veins (ore lava) near the streamer" },
             new Effect("Spooky Sound Effect", "sfx", "miscellaneous") { Price = 50, Description = "Plays a random spooky sound effect" },
             new Effect("Swap Locations", "swap", "miscellaneous") { Price = 1000, Description = "Swaps the locations of all players participating in a multiplayer Crowd Control session" },
@@ -74,7 +72,11 @@ namespace CrowdControl.Games.Packs
             new Effect("Teleport to a Random Biome", "biome", "miscellaneous") { Price = 1000, Description = "Teleports players to a random nearby biome" },
             new Effect("Teleport All Entities To Players", "entity_chaos", "miscellaneous") { Price = 2000, Description = "Teleports every loaded mob on the server to the targeted streamers in an even split. Depending on the server configuration, this may only teleport nearby mobs." },
             new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous") { Price = 400, Description = "Teleports players 30 blocks up and gives them a water bucket" },
-            new GlobalEffect("Zip Time", "zip", "miscellaneous") { Price = 30, Description = "Adds several minutes to the in-game time" },
+            // time commands
+            new Effect("Time", "time", ItemKind.Folder),
+            new GlobalEffect("Set Time to Day", "time_day", "time") { Price = 50, Description = "Jumps the clock ahead to daytime" },
+            new GlobalEffect("Set Time to Night", "time_night", "time") { Price = 50, Description = "Jumps the clock ahead to nighttime" },
+            new GlobalEffect("Zip Time", "zip", "time") { Price = 30, Description = "Adds several minutes to the in-game time" },
             // health commands
             new Effect("Health", "health", ItemKind.Folder),
             new Effect("-1 Max Health", "max_health_sub1", "health") { Price = 100, Description = "Subtracts half a heart from the streamer's max health" },
@@ -92,9 +94,9 @@ namespace CrowdControl.Games.Packs
             new Effect("Starve Player", "starve", "food") { Price = 500, Description = "Drains the players' hunger bar" },
             // experience
             new Effect("Experience", "experience", ItemKind.Folder),
-            new Effect("Give One XP Level", "xp_plus1", "miscellaneous") { Price = 75, Description = "Adds one level of experience" },
-            new Effect("Reset Experience", "reset_exp_progress", "miscellaneous") { Price = 1000, Description = "Clears all of the streamer's XP" },
-            new Effect("Take One XP Level", "xp_sub1", "miscellaneous") { Price = 500, Description = "Removes one level of experience" },
+            new Effect("Give One XP Level", "xp_plus1", "experience") { Price = 75, Description = "Adds one level of experience" },
+            new Effect("Reset Experience", "reset_exp_progress", "experience") { Price = 1000, Description = "Clears all of the streamer's XP" },
+            new Effect("Take One XP Level", "xp_sub1", "experience") { Price = 500, Description = "Removes one level of experience" },
             // gravity commands
             new Effect("Gravity", "gravity", ItemKind.Folder),
             new Effect("High Gravity", "high_gravity", "gravity") { Price = 100, Description = "Increases the streamer's gravity" },
@@ -112,9 +114,13 @@ namespace CrowdControl.Games.Packs
             new Effect("Inventory", "inventory", ItemKind.Folder),
             new Effect("Clear Inventory", "clear_inventory", "inventory") { Price = 1000, Description = "Wipes every item from the streamer's inventory" },
             new Effect("Clutter Inventory", "clutter", "inventory") { Price = 50, Description = "Shuffles around items in the streamer's inventory" },
+            new Effect("Damage Held Item", "damage_item", "inventory") { Price = 100, Description = "Halves the durability of the held item" },
+            new Effect("Delete Held Item", "delete_item", "inventory") { Price = 200, Description = "Deletes whatever item the streamer is currently holding" },
             new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory") { Price = 200, Description = "Disallows the streamer from keeping their inventory upon death" },
+            new Effect("Drop Held Item", "drop_item", "miscellaneous") { Price = 25, Description = "Makes the streamer drop their held item" },
             new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory") { Price = 100, Description = "Allows the streamer to keep their inventory upon death" },
             new Effect("Put Held Item on Head", "hat", "inventory") { Price = 25, Description = "Moves the item in the streamer's hand to their head" },
+            new Effect("Repair Held Item", "repair_item", "miscellaneous") { Price = 100, Description = "Fully repairs a damaged item" },
             // set gamemode for 30 seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
             new Effect("Adventure Mode (15s)", "adventure_mode", "change_gamemode") { Price = 200, Description = "Temporarily sets the streamer to Adventure mode, rendering them unable to place or break blocks" },
@@ -436,7 +442,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Elytra", "take_elytra", "take_item") { Price = 1000 },
             new Effect("Eye of Ender", "take_ender_eye", "take_item") { Price = 300 },
             new Effect("End Portal Frame", "take_end_portal_frame", "take_item") { Price = 600 },
-            new Effect("Recovery Compass", "take_recovery_compass", "give_item") { Price = 1250 },
+            new Effect("Recovery Compass", "take_recovery_compass", "take_item") { Price = 1250 },
             new Effect("Trident", "take_trident", "take_item") { Price = 1000 },
 
             new Effect("Food", "take_food", ItemKind.Folder, "take_item"),

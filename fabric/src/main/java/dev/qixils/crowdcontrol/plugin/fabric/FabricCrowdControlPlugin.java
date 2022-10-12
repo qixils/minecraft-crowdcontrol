@@ -34,14 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -52,8 +45,6 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 //  - Fix global effects being unavailable to the host
 //  - Add config option for default Twitch channel
 //  - Add a GUI config library
-//  - Entity data accessors aren't persistent
-//    - I thought this was a minor issue at first but this is definitely important for single player (namely the game mode effect)
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
