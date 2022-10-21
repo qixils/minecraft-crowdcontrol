@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl;
 
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.JumpStatus;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +23,7 @@ public class JumpStatusImpl implements JumpStatus {
 	@Override
 	public void setProhibited(boolean prohibited) {
 		this.prohibited = prohibited;
+		Components.JUMP_STATUS.sync(provider);
 	}
 
 	@Override
