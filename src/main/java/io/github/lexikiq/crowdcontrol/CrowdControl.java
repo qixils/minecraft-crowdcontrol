@@ -12,8 +12,13 @@ import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
 import com.google.common.collect.ImmutableList;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -162,21 +167,21 @@ public final class CrowdControl extends JavaPlugin {
         command.setCooldown();
 
         // display when command is usable
-        if (command.getCooldownSeconds() > 0) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    getServer().broadcastMessage(String.format(
-                            "%s%s%s%s%s has refreshed.",
-                            CMD_COLOR,
-                            ChatColor.ITALIC,
-                            PREFIX + command.getCommand().toLowerCase(Locale.ENGLISH),
-                            ChatColor.RESET,
-                            ChatColor.ITALIC
-                    ));
-                }
-            }.runTaskLaterAsynchronously(this, 20L*command.getCooldownSeconds());
-        }
+//        if (command.getCooldownSeconds() > 0) {
+//            new BukkitRunnable() {
+//                @Override
+//                public void run() {
+//                    getServer().broadcastMessage(String.format(
+//                            "%s%s%s%s%s has refreshed.",
+//                            CMD_COLOR,
+//                            ChatColor.ITALIC,
+//                            PREFIX + command.getCommand().toLowerCase(Locale.ENGLISH),
+//                            ChatColor.RESET,
+//                            ChatColor.ITALIC
+//                    ));
+//                }
+//            }.runTaskLaterAsynchronously(this, 20L*command.getCooldownSeconds());
+//        }
 
         // display when command group is usable
         if (cooldownType != null) {

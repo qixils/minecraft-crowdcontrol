@@ -19,7 +19,7 @@ public class GravelCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return (int) (60*7.5);
+        return 60;
     }
 
     @Override

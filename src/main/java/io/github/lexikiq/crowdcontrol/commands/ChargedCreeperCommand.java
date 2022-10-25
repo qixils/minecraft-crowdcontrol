@@ -25,7 +25,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*30;
+        return 30;
     }
 
     @Override

@@ -19,7 +19,7 @@ public class EnchantmentCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*10;
+        return 10;
     }
 
     @Override

@@ -26,7 +26,7 @@ public class MoveCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60;
+        return 5;
     }
 
     @Override

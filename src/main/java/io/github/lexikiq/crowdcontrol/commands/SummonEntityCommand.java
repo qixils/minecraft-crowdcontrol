@@ -30,7 +30,7 @@ public class SummonEntityCommand extends ChatCommand {
 
     @Override
     public int getCooldownSeconds() {
-        return 60*15;
+        return 15;
     }
 
     @Override

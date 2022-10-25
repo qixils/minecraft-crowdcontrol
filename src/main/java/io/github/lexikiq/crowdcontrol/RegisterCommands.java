@@ -90,7 +90,10 @@ public class RegisterCommands {
             EntityType.SALMON,
             EntityType.RAVAGER,
             EntityType.RABBIT,
-            EntityType.ARMOR_STAND
+            EntityType.ARMOR_STAND,
+            EntityType.FROG,
+            EntityType.AXOLOTL,
+            EntityType.GOAT
     );
 
     public static final Set<Material> SET_BLOCKS = ImmutableSet.of(
@@ -116,7 +119,6 @@ public class RegisterCommands {
                 new ChargedCreeperCommand(plugin),
                 new GiveItem(plugin),
                 new TakeItem(plugin),
-                new SwapCommand(plugin),
                 new DinnerboneCommand(plugin),
                 new ClutterCommand(plugin),
                 new LootboxCommand(plugin),
