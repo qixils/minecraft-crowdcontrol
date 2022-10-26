@@ -31,7 +31,7 @@ public class KyoriTranslator {
 		translator.defaultLocale(Locale.US);
 
 		// find locale path
-		URL url = KyoriTranslator.class.getResource("/i18n/");
+		URL url = KyoriTranslator.class.getResource("/i18n");
 		File dir = getFileFromURL(url);
 		if (dir == null)
 			throw new IllegalStateException("Could not load language files (directory does not exist)");
