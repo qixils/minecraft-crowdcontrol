@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 @Getter
-public final class CraftItemCondition extends AbstractListeningCondition {
+public final class CraftItemCondition extends AbstractBooleanListeningCondition {
 	private final Material item;
 	private final Component component;
 
