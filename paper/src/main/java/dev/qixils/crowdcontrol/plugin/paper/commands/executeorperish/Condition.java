@@ -87,9 +87,6 @@ public enum Condition {
 	CRAFT_QUARTZ(new CraftItemCondition(0, "generic", Material.QUARTZ_BLOCK, ConditionFlags.NETHER)),
 	CRAFT_GOLD_INGOT(new CraftItemCondition(0, "generic", Material.GOLD_INGOT, ConditionFlags.NETHER)),
 	CRAFT_GLOWSTONE(new CraftItemCondition(0, "generic_block", Material.GLOWSTONE, ConditionFlags.NETHER)),
-
-	//// end-only ////
-	OBTAIN_IRON_BARS(new ObtainItemCondition(0, "generic_alt", Material.IRON_BARS, ConditionFlags.THE_END)),
 	;
 
 	private static final @NotNull List<SuccessCondition> CONDITIONS;
