@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +28,11 @@ public class DoOrDieCommand extends VoidCommand {
 
 	public DoOrDieCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
+		for (Condition condition : Condition.values()) {
+			if (condition.getCondition() instanceof Listener listener) {
+				Bukkit.getPluginManager().registerEvents(listener, plugin);
+			}
+		}
 	}
 
 	@Override
@@ -38,27 +44,14 @@ public class DoOrDieCommand extends VoidCommand {
 					List<Player> players = plugin.getPlayers(request);
 					List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
 					Collections.shuffle(conditions, random);
-					SuccessCondition condition = null;
-					while (condition == null && !conditions.isEmpty()) {
-						SuccessCondition next = conditions.remove(0);
-						boolean isPassing = false;
-						for (Player player : players) {
-							if (next.hasSucceeded(player)) {
-								isPassing = true;
-								break;
-							}
-						}
-						if (!isPassing)
-							condition = next;
-					}
-
-					if (condition == null)
-						throw new IllegalStateException("Could not find a condition that is not already being met by all targets");
-
-					final SuccessCondition finalCondition = condition;
+					SuccessCondition condition = conditions.stream()
+							.filter(cond -> cond.canApply(players))
+							.findAny()
+							.orElseThrow(() -> new IllegalStateException("Could not find a condition that can be applied to all targets"));
 					Component subtitle = condition.getComponent();
 
 					Set<UUID> notCompleted = players.stream().map(Player::getUniqueId).collect(Collectors.toSet());
+					players.forEach(condition::track);
 					int startedAt = Bukkit.getCurrentTick();
 
 					AtomicInteger pastValue = new AtomicInteger(0);
@@ -71,13 +64,14 @@ public class DoOrDieCommand extends VoidCommand {
 							Player player = Bukkit.getPlayer(uuid);
 							if (player == null) continue;
 
-							if (finalCondition.hasSucceeded(player)) {
-								ItemStack reward = LootboxCommand.createRandomItem(finalCondition.getRewardLuck());
+							if (condition.hasSucceeded(player)) {
+								ItemStack reward = LootboxCommand.createRandomItem(condition.getRewardLuck());
 								player.showTitle(doOrDieSuccess(reward.getType()));
 								notCompleted.remove(uuid);
 								player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), player);
 								sync(() -> GiveItemCommand.giveItemTo(player, reward));
 							} else if (isTimeUp) {
+								condition.reset(player);
 								player.showTitle(DO_OR_DIE_FAILURE);
 								player.setHealth(0);
 							} else {

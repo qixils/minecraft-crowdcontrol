@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface SuccessCondition {
-	Component getComponent(); // TODO i18n
+	Component getComponent();
 
 	boolean hasSucceeded(ServerPlayer player);
 

@@ -11,6 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 public enum Condition {
+	// stand on...
 	STAND_ON_DIRT(new StandOnBlockCondition(0, "generic", Material.DIRT)),
 	STAND_ON_STONE(new StandOnBlockCondition(0, "generic", Material.STONE)),
 	STAND_ON_COBBLESTONE(new StandOnBlockCondition(0, "generic", Material.COBBLESTONE)),
@@ -61,9 +62,12 @@ public enum Condition {
 			Material.STRIPPED_CRIMSON_HYPHAE,
 			Material.STRIPPED_WARPED_HYPHAE
 	)),
-	OBTAIN_STONE_HOE(new ObtainItemCondition(1, "generic", Material.STONE_HOE)),
-	OBTAIN_WOODEN_HOE(new ObtainItemCondition(0, "generic", Material.WOODEN_HOE)),
+	// obtain...
+	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(0, "generic", Material.WHEAT_SEEDS)),
 	OBTAIN_STONE(new ObtainItemCondition(3, "generic_block", Material.STONE)),
+	// craft...
+	CRAFT_STONE_HOE(new CraftItemCondition(1, "generic", Material.STONE_HOE)),
+	CRAFT_WOODEN_HOE(new CraftItemCondition(0, "generic", Material.WOODEN_HOE)),
 	;
 
 	private static final List<SuccessCondition> CONDITIONS;
