@@ -5,11 +5,12 @@ import lombok.Data;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.util.Collections.singletonList;
@@ -25,15 +26,24 @@ public final class ConditionFlags implements Predicate<Player> {
 	@Builder.Default
 	private final @NotNull List<World.Environment> allowedDimensions = Collections.emptyList();
 	@Builder.Default
-	private final @NotNull Collection<Material> requiredItems = Collections.emptyList();
+	private final @NotNull Map<Material, Integer> requiredItems = Collections.emptyMap();
 
 	@Override
 	public boolean test(@NotNull Player player) {
 		if (!allowedDimensions.isEmpty() && !allowedDimensions.contains(player.getWorld().getEnvironment()))
 			return false;
-		for (Material material : requiredItems) {
-			// TODO: does this check armor & offhand (and does it matter if it doesn't?)
-			if (!player.getInventory().contains(material))
+		for (Map.Entry<Material, Integer> entry : requiredItems.entrySet()) {
+			Material item = entry.getKey();
+			int required = entry.getValue();
+			int count = 0;
+			for (ItemStack stack : player.getInventory().getContents()) {
+				if (stack != null && stack.getType() == item) {
+					count += stack.getAmount();
+					if (count >= required)
+						break;
+				}
+			}
+			if (count < required)
 				return false;
 		}
 		return true;

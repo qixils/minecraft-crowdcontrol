@@ -50,12 +50,11 @@ public enum Condition {
 
 	//// overworld-only ////
 	// stand on...
-	STAND_ON_DIRT(new StandOnBlockCondition(0, "generic", Material.DIRT, ConditionFlags.OVERWORLD)),
-	STAND_ON_STONE(new StandOnBlockCondition(0, "generic", Material.STONE, ConditionFlags.OVERWORLD)),
-	STAND_ON_SAND(new StandOnBlockCondition(1, "generic", Material.SAND, ConditionFlags.OVERWORLD)),
-	STAND_ON_A_BED(new StandOnBlockCondition(3, "bed",
+	STAND_ON_DIRT(new StandOnBlockCondition(0, "generic", ConditionFlags.OVERWORLD, Material.DIRT)),
+	STAND_ON_STONE(new StandOnBlockCondition(0, "generic", ConditionFlags.OVERWORLD, Material.STONE)),
+	STAND_ON_SAND(new StandOnBlockCondition(1, "generic", ConditionFlags.OVERWORLD, Material.SAND)),
+	STAND_ON_A_BED(new StandOnBlockCondition(3, "bed", ConditionFlags.OVERWORLD,
 			Material.WHITE_BED,
-			ConditionFlags.OVERWORLD, // hi
 			Material.ORANGE_BED,
 			Material.MAGENTA_BED,
 			Material.LIGHT_BLUE_BED,
@@ -73,16 +72,16 @@ public enum Condition {
 			Material.BLACK_BED
 	)),
 	// obtain...
-	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(0, "generic_alt", Material.WHEAT_SEEDS, ConditionFlags.OVERWORLD)),
+	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(0, "generic_alt", ConditionFlags.OVERWORLD, Material.WHEAT_SEEDS)),
 	// craft...
 	CRAFT_SANDSTONE(new CraftItemCondition(0, "generic_block", Material.SANDSTONE, ConditionFlags.OVERWORLD)),
 
 	//// nether-only ////
 	// stand on...
-	STAND_ON_FIRE(new StandOnBlockCondition(0, "generic", Material.FIRE, ConditionFlags.NETHER)),
+	STAND_ON_FIRE(new StandOnBlockCondition(0, "generic", ConditionFlags.NETHER, Material.FIRE)),
 	// obtain...
-	OBTAIN_NETHER_BRICK(new ObtainItemCondition(3, "generic", Material.NETHER_BRICK, ConditionFlags.NETHER)),
-	OBTAIN_OBSIDIAN(new ObtainItemCondition(2, "generic_alt", Material.OBSIDIAN, ConditionFlags.NETHER)),
+	OBTAIN_NETHER_BRICK(new ObtainItemCondition(3, "generic", ConditionFlags.NETHER, Material.NETHER_BRICK)),
+	OBTAIN_OBSIDIAN(new ObtainItemCondition(2, "generic_alt", ConditionFlags.NETHER, Material.OBSIDIAN)),
 	// craft...
 	CRAFT_QUARTZ(new CraftItemCondition(0, "generic", Material.QUARTZ_BLOCK, ConditionFlags.NETHER)),
 	CRAFT_GOLD_INGOT(new CraftItemCondition(0, "generic", Material.GOLD_INGOT, ConditionFlags.NETHER)),

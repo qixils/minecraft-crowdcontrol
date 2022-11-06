@@ -11,6 +11,7 @@
     "PlayerListMixin",
     "PlayerMixin",
     "RecipeBookAccessor",
+    "ResultSlotMixin",
     "ServerPlayerMixin",
     "TickMixin"
   ],

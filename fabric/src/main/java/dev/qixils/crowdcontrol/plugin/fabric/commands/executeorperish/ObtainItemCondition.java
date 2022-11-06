@@ -6,17 +6,20 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
-public final class ObtainItemCondition implements SuccessCondition {
-	private final int rewardLuck;
-	private final Item item;
+public final class ObtainItemCondition extends AbstractCondition {
 	private final ItemStack stack;
 	private final Component component;
 
 	public ObtainItemCondition(int rewardLuck, String key, Item item) {
-		this.rewardLuck = rewardLuck;
-		this.item = item;
+		this(rewardLuck, key, null, item);
+	}
+
+	public ObtainItemCondition(int rewardLuck, String key, @Nullable ConditionFlags flags, Item item) {
+		super(rewardLuck, flags);
 		this.stack = new ItemStack(item);
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.obtain." + key,
@@ -25,7 +28,7 @@ public final class ObtainItemCondition implements SuccessCondition {
 	}
 
 	@Override
-	public boolean hasSucceeded(ServerPlayer player) {
+	public boolean hasSucceeded(@NotNull ServerPlayer player) {
 		return player.getInventory().contains(stack);
 	}
 }

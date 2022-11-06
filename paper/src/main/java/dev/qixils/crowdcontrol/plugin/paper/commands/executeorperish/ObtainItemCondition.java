@@ -15,10 +15,10 @@ public final class ObtainItemCondition extends AbstractCondition {
 	private final Component component;
 
 	public ObtainItemCondition(int rewardLuck, String key, Material item) {
-		this(rewardLuck, key, item, null);
+		this(rewardLuck, key, null, item);
 	}
 
-	public ObtainItemCondition(int rewardLuck, String key, Material item, @Nullable ConditionFlags flags) {
+	public ObtainItemCondition(int rewardLuck, String key, @Nullable ConditionFlags flags, Material item) {
 		super(rewardLuck, flags);
 		this.item = item;
 		this.component = Component.translatable(

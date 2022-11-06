@@ -28,8 +28,8 @@ public class DoOrDieCommand extends VoidCommand {
 
 	public DoOrDieCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
-		for (Condition condition : Condition.values()) {
-			if (condition.getCondition() instanceof Listener listener) {
+		for (SuccessCondition condition : Condition.items()) {
+			if (condition instanceof Listener listener) {
 				Bukkit.getPluginManager().registerEvents(listener, plugin);
 			}
 		}

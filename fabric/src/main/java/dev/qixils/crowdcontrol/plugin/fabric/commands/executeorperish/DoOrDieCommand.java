@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
-// TODO: first tick or two displays the timer as "31" instead of "30"
-
 @Getter
 @EventListener
 public class DoOrDieCommand extends VoidCommand {
@@ -35,6 +33,11 @@ public class DoOrDieCommand extends VoidCommand {
 
 	public DoOrDieCommand(@NotNull FabricCrowdControlPlugin plugin) {
 		super(plugin);
+		for (SuccessCondition condition : Condition.items()) {
+			if (condition.getClass().isAnnotationPresent(EventListener.class)) {
+				plugin.getEventManager().registerListeners(condition);
+			}
+		}
 	}
 
 	@Listener
@@ -58,22 +61,11 @@ public class DoOrDieCommand extends VoidCommand {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
 					Collections.shuffle(conditions, random);
-					SuccessCondition condition = null;
-					while (condition == null && !conditions.isEmpty()) {
-						SuccessCondition next = conditions.remove(0);
-						boolean isPassing = false;
-						for (ServerPlayer player : players) {
-							if (next.hasSucceeded(player)) {
-								isPassing = true;
-								break;
-							}
-						}
-						if (!isPassing)
-							condition = next;
-					}
-
-					if (condition == null)
-						throw new IllegalStateException("Could not find a condition that is not already being met by all targets");
+					SuccessCondition condition = conditions.stream()
+							.filter(cond -> cond.canApply(players))
+							.findAny()
+							.orElseThrow(() -> new IllegalStateException("Could not find a condition that can be applied to all targets"));
+					players.forEach(condition::track);
 
 					Task task = new Task(
 							plugin,
@@ -102,7 +94,7 @@ public class DoOrDieCommand extends VoidCommand {
 
 		public int ticksElapsed(@Nullable Tick event) {
 			int tick = event == null ? plugin.server().getTickCount() : event.tickCount();
-			return tick - startedAt;
+			return Math.max(tick - startedAt, 1);
 		}
 
 		public boolean run(@Nullable Tick event) {
@@ -122,6 +114,7 @@ public class DoOrDieCommand extends VoidCommand {
 					player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());
 					sync(() -> GiveItemCommand.giveItemTo(player, reward));
 				} else if (isTimeUp) {
+					condition.reset(player);
 					player.showTitle(DO_OR_DIE_FAILURE);
 					player.setHealth(0);
 				} else {

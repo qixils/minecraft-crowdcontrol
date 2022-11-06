@@ -18,10 +18,10 @@ public final class StandOnBlockCondition extends AbstractCondition {
 	private final Component component;
 
 	public StandOnBlockCondition(int rewardLuck, String key, Material displayItem, Material... otherItems) {
-		this(rewardLuck, key, displayItem, null, otherItems);
+		this(rewardLuck, key, null, displayItem, otherItems);
 	}
 
-	public StandOnBlockCondition(int rewardLuck, String key, Material displayItem, @Nullable ConditionFlags flags, Material... otherItems) {
+	public StandOnBlockCondition(int rewardLuck, String key, @Nullable ConditionFlags flags, Material displayItem, Material... otherItems) {
 		super(rewardLuck, flags);
 		this.blocks = EnumSet.of(displayItem, otherItems);
 		this.component = Component.translatable(
