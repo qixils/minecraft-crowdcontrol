@@ -25,7 +25,7 @@ public final class CameraLockToGroundCommand extends TimedCommand {
 		super(plugin);
 	}
 
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -35,7 +35,7 @@ public final class CameraLockToGroundCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {

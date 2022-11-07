@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common.command;
 
+import dev.qixils.crowdcontrol.socket.Request;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,15 +14,24 @@ import java.time.Duration;
 public interface TimedCommand<P> extends VoidCommand<P> {
 
 	/**
+	 * Gets the default value for how long the effects of this command will last.
+	 *
+	 * @return default duration of effects
+	 */
+	@NotNull Duration getDefaultDuration();
+
+	/**
 	 * Gets how long the effects of this command will last.
 	 *
 	 * @return duration of effects
 	 */
-	@NotNull Duration getDuration();
+	default @NotNull Duration getDuration(@NotNull Request request) {
+		return getDefaultDuration(); // TODO
+	}
 
 	@Override
-	default @NotNull Component getProcessedDisplayName() {
+	default @NotNull Component getProcessedDisplayName(@NotNull Request request) {
 		// TODO: make duration color less saturated?
-		return getDisplayName().append(Component.text(" (" + getDuration().getSeconds() + "s)"));
+		return getDisplayName().append(Component.text(" (" + getDuration(request).getSeconds() + "s)"));
 	}
 }

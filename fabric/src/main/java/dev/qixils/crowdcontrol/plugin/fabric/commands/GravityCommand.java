@@ -19,7 +19,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SEC
 
 @Getter
 public class GravityCommand extends TimedCommand {
-	private final Duration duration = Duration.ofSeconds(POTION_SECONDS);
+	private final Duration defaultDuration = Duration.ofSeconds(POTION_SECONDS);
 	private final String effectName;
 	private final int level;
 
@@ -33,7 +33,7 @@ public class GravityCommand extends TimedCommand {
 	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
 		new TimedEffect.Builder()
 				.request(request)
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()

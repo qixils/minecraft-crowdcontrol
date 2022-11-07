@@ -26,7 +26,7 @@ public class CameraLockToGroundCommand extends TimedCommand {
 		super(plugin);
 	}
 
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -36,7 +36,7 @@ public class CameraLockToGroundCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					task.set(plugin.getSyncScheduler().submit(Task.builder()

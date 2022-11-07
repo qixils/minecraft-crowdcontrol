@@ -33,7 +33,7 @@ public final class FreezeCommand extends TimedCommand {
 		this.modifier = modifier;
 	}
 
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -42,7 +42,7 @@ public final class FreezeCommand extends TimedCommand {
 		AtomicReference<Map<UUID, FreezeData>> atomic = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = getPlugin().getPlayers(request);
 					Map<UUID, FreezeData> locations = new HashMap<>();

@@ -24,14 +24,14 @@ import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.GA
 
 @Getter
 public class GameModeCommand extends TimedCommand {
-	private final Duration duration;
+	private final Duration defaultDuration;
 	private final GameMode gamemode;
 	private final Component displayName;
 	private final String effectName;
 
 	public GameModeCommand(SpongeCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
 		super(plugin);
-		this.duration = Duration.ofSeconds(seconds);
+		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
 		this.displayName = gamemode.asComponent(); // TODO: figure out if this is the right lang key
 		this.effectName = gamemode.key(RegistryTypes.GAME_MODE).value() + "_mode";
@@ -44,7 +44,7 @@ public class GameModeCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);

@@ -20,7 +20,7 @@ import java.util.List;
 @Getter
 public class FlightCommand extends TimedCommand implements Listener {
 	private final String effectName = "flight";
-	private final Duration duration = Duration.ofSeconds(15);
+	private final Duration defaultDuration = Duration.ofSeconds(15);
 
 	public FlightCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -31,7 +31,7 @@ public class FlightCommand extends TimedCommand implements Listener {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()

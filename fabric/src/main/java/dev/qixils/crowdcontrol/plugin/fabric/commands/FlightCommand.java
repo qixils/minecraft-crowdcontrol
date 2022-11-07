@@ -22,7 +22,7 @@ import java.util.List;
 @EventListener
 public class FlightCommand extends TimedCommand {
 	private final String effectName = "flight";
-	private final Duration duration = Duration.ofSeconds(15);
+	private final Duration defaultDuration = Duration.ofSeconds(15);
 
 	public FlightCommand(@NotNull FabricCrowdControlPlugin plugin) {
 		super(plugin);
@@ -33,7 +33,7 @@ public class FlightCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()

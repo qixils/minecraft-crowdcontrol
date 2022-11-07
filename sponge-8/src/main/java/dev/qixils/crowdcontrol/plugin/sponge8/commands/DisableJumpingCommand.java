@@ -36,7 +36,7 @@ public class DisableJumpingCommand extends TimedCommand {
 	}
 
 	@Override
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return CommandConstants.DISABLE_JUMPING_DURATION;
 	}
 

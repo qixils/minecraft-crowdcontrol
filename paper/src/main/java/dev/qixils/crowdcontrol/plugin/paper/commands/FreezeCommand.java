@@ -28,7 +28,7 @@ public final class FreezeCommand extends TimedCommand {
 		super(plugin);
 	}
 
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -38,7 +38,7 @@ public final class FreezeCommand extends TimedCommand {
 
 		new TimedEffect.Builder()
 				.request(request)
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Map<UUID, Location> locations = new HashMap<>(players.size());

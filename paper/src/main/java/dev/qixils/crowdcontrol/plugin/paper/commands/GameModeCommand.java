@@ -24,7 +24,7 @@ import java.util.Locale;
 
 @Getter
 public class GameModeCommand extends TimedCommand {
-	private final Duration duration;
+	private final Duration defaultDuration;
 	private final GameMode gamemode;
 	private final Component displayName;
 	private final String effectName;
@@ -33,7 +33,7 @@ public class GameModeCommand extends TimedCommand {
 	public GameModeCommand(PaperCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
 		super(plugin);
 		this.gamemodeKey = getGamemodeKey(plugin);
-		this.duration = Duration.ofSeconds(seconds);
+		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
 		this.displayName = Component.translatable(gamemode);
 		this.effectName = gamemode.name().toLowerCase(Locale.ENGLISH) + "_mode";
@@ -59,7 +59,7 @@ public class GameModeCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> curPlayers = plugin.getPlayers(request);
 					players.addAll(curPlayers);

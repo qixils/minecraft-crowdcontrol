@@ -82,7 +82,7 @@ public interface Command<P> {
 	 * Gets the effect's raw display name. This is used when sending a chat message to streamers
 	 * informing them of the activation of an effect.
 	 *
-	 * <p>Further processing may take place in the {@link #getProcessedDisplayName()} method.</p>
+	 * <p>Further processing may take place in the {@link #getProcessedDisplayName(Request)} method.</p>
 	 *
 	 * @return display name
 	 */
@@ -101,7 +101,7 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	default Component getProcessedDisplayName() {
+	default Component getProcessedDisplayName(@NotNull Request request) {
 		return getDisplayName();
 	}
 
@@ -301,7 +301,7 @@ public interface Command<P> {
 		Audience.audience(audiences).sendMessage(Component.translatable(
 				"cc.effect.used",
 				Component.text(request.getViewer(), Plugin.USER_COLOR),
-				getProcessedDisplayName().colorIfAbsent(Plugin.CMD_COLOR)
+				getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
 		));
 	}
 

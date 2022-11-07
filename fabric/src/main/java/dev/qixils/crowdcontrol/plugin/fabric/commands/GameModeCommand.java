@@ -21,14 +21,14 @@ import java.util.List;
 
 @Getter
 public class GameModeCommand extends TimedCommand {
-	private final Duration duration;
+	private final Duration defaultDuration;
 	private final GameType gamemode;
 	private final Component displayName;
 	private final String effectName;
 
 	public GameModeCommand(FabricCrowdControlPlugin plugin, GameType gamemode, long seconds) {
 		super(plugin);
-		this.duration = Duration.ofSeconds(seconds);
+		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
 		this.displayName = gamemode.getLongDisplayName().asComponent();
 		this.effectName = gamemode.getName() + "_mode";
@@ -41,7 +41,7 @@ public class GameModeCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);

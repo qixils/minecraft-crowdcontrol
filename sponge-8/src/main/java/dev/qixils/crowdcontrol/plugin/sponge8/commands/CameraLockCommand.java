@@ -30,7 +30,7 @@ public final class CameraLockCommand extends TimedCommand {
 		super(plugin);
 	}
 
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -41,7 +41,7 @@ public final class CameraLockCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					Map<UUID, Vector3d> rotations = new HashMap<>(players.size());
