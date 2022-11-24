@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Getter
 @EventListener
-public class FlightCommand extends TimedCommand {
+public class FlightCommand extends TimedVoidCommand {
 	private final String effectName = "flight";
 	private final Duration defaultDuration = Duration.ofSeconds(15);
 

@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -18,7 +18,7 @@ import java.time.Duration;
 import java.util.List;
 
 @Getter
-public class FlightCommand extends TimedCommand implements Listener {
+public class FlightCommand extends TimedVoidCommand implements Listener {
 	private final String effectName = "flight";
 	private final Duration defaultDuration = Duration.ofSeconds(15);
 

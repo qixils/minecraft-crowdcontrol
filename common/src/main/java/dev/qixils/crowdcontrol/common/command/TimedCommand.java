@@ -12,7 +12,7 @@ import java.time.Duration;
  *
  * @param <P> class used to represent online players
  */
-public interface TimedCommand<P> extends VoidCommand<P> {
+public interface TimedCommand<P> extends Command<P> {
 
 	/**
 	 * Gets the default value for how long the effects of this command will last.
@@ -32,7 +32,11 @@ public interface TimedCommand<P> extends VoidCommand<P> {
 
 	@Override
 	default @NotNull Component getProcessedDisplayName(@NotNull Request request) {
-		// TODO: make duration color less saturated?
-		return getDisplayName().append(Component.text(" (" + getDuration(request).getSeconds() + "s)"));
+		Component displayName = getDisplayName();
+		Duration duration = getDuration(request);
+		if (!duration.isZero())
+			// TODO: make duration color less saturated?
+			displayName = displayName.append(Component.text(" (" + duration.getSeconds() + "s)"));
+		return displayName;
 	}
 }

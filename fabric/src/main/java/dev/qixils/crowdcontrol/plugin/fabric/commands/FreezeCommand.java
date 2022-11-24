@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.function.BiFunction;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class FreezeCommand extends TimedCommand {
+public final class FreezeCommand extends TimedVoidCommand {
 	public static final Map<UUID, FreezeData> DATA = new HashMap<>();
 
 	private final String effectName;

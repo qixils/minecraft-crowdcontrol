@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge7.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -16,11 +16,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
 
 @Getter
-public class GravityCommand extends TimedCommand {
-	private final Duration defaultDuration = Duration.ofSeconds(POTION_SECONDS);
+public class GravityCommand extends TimedVoidCommand {
+	private final Duration defaultDuration = POTION_DURATION;
 	private final String effectName;
 	private final int level;
 
@@ -47,7 +47,7 @@ public class GravityCommand extends TimedCommand {
 						sync(() -> {
 							effects.add(PotionEffect.builder()
 									.potionType(PotionEffectTypes.LEVITATION)
-									.duration(POTION_SECONDS * 20)
+									.duration((int) getDuration(request).getSeconds() * 20)
 									.amplifier(level)
 									.ambience(true)
 									.particles(true)

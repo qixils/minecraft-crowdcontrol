@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class CameraLockToSkyCommand extends TimedCommand {
+public final class CameraLockToSkyCommand extends TimedVoidCommand {
 	private final String effectName = "camera_lock_to_sky";
 
 	public CameraLockToSkyCommand(PaperCrowdControlPlugin plugin) {

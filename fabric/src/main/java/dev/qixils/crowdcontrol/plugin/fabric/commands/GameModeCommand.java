@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class GameModeCommand extends TimedCommand {
+public class GameModeCommand extends TimedVoidCommand {
 	private final Duration defaultDuration;
 	private final GameType gamemode;
 	private final Component displayName;

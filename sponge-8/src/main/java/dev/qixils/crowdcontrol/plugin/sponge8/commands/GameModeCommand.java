@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge8.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -23,7 +23,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.GAME_MODE_EFFECT;
 
 @Getter
-public class GameModeCommand extends TimedCommand {
+public class GameModeCommand extends TimedVoidCommand {
 	private final Duration defaultDuration;
 	private final GameMode gamemode;
 	private final Component displayName;

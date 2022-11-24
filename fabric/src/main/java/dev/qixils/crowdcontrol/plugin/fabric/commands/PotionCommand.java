@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.TimedImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -15,31 +15,36 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
 
 @Getter
-public class PotionCommand extends ImmediateCommand {
-	private static final int TICKS = 20 * POTION_SECONDS;
-	private final MobEffect potionEffectType;
-	private final int duration;
-	private final String effectName;
-	private final Component displayName;
+public class PotionCommand extends TimedImmediateCommand {
+	private final @NotNull MobEffect potionEffectType;
+	private final boolean isMinimal;
+	private final @NotNull String effectName;
+	private final @NotNull Component displayName;
 
 	@SuppressWarnings("ConstantConditions")
-	public PotionCommand(FabricCrowdControlPlugin plugin, MobEffect potionEffectType) {
+	public PotionCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull MobEffect potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
 		this.effectName = "potion_" + Registry.MOB_EFFECT.getKey(potionEffectType).getPath();
+		this.isMinimal = potionEffectType.isInstantenous();
+		this.displayName = Component.translatable("cc.effect.potion.name", potionEffectType.getDisplayName());
+	}
 
-		boolean isMinimal = potionEffectType.isInstantenous();
-		this.duration = isMinimal ? 1 : TICKS;
+	public @NotNull Duration getDefaultDuration() {
+		return POTION_DURATION;
+	}
 
-		Component displayName = Component.translatable("cc.effect.potion.name", potionEffectType.getDisplayName());
-		if (!isMinimal)
-			displayName = displayName.append(Component.text(" (" + POTION_SECONDS + "s)"));
-		this.displayName = displayName;
+	@Override
+	public @NotNull Duration getDuration(@NotNull Request request) {
+		if (isMinimal)
+			return Duration.ZERO;
+		return super.getDuration(request);
 	}
 
 	@NotNull
@@ -52,16 +57,18 @@ public class PotionCommand extends ImmediateCommand {
 					.message("Cannot apply jump boost while Disable Jump is active");
 		}
 
+		int durationTicks = isMinimal ? 1 : (int) getDuration(request).getSeconds() * 20;
+
 		sync(() -> {
 			for (ServerPlayer player : players) {
-				MobEffectInstance effect = new MobEffectInstance(potionEffectType, duration);
+				MobEffectInstance effect = new MobEffectInstance(potionEffectType, durationTicks);
 				MobEffectInstance existingEffect = player.getEffect(potionEffectType);
 				if (existingEffect == null) {
 					plugin.getSLF4JLogger().debug("Adding new effect");
 					player.addEffect(effect);
 				} else {
 					plugin.getSLF4JLogger().debug("Updating existing effect");
-					int newDuration = Math.max(existingEffect.getDuration(), duration);
+					int newDuration = Math.max(existingEffect.getDuration(), durationTicks);
 					int newAmplifier = existingEffect.getAmplifier() + 1;
 					if (potionEffectType == MobEffects.LEVITATION && newAmplifier > 127)
 						newAmplifier -= 1;

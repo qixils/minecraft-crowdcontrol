@@ -307,6 +307,7 @@ namespace CrowdControl.Games.Packs
             new GlobalEffect("Normal Mode", "difficulty_normal", "difficulty") { Price = 200 },
             new GlobalEffect("Hard Mode", "difficulty_hard", "difficulty") { Price = 400 },
             // applies potion effects to every player
+            // TODO: remove Duration variables from instantaneous potions
             new Effect("Apply Potion", "apply_potion_effect", ItemKind.Folder),
             new Effect("Absorption", "potion_absorption", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants extra health that cannot be regenerated" },
             new Effect("Bad Omen", "potion_bad_omen", "apply_potion_effect") { Price = 500, Duration = 20, Description = "Causes a village raid when a player possessing this effect is inside of a village" },

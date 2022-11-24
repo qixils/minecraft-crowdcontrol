@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge8.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class FreezeCommand extends TimedCommand {
+public final class FreezeCommand extends TimedVoidCommand {
 	private final String effectName = "freeze";
 
 	public FreezeCommand(SpongeCrowdControlPlugin plugin) {

@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Getter
 @EventListener
-public class DisableJumpingCommand extends TimedCommand {
+public class DisableJumpingCommand extends TimedVoidCommand {
 	private final String effectName = "disable_jumping";
 
 	public DisableJumpingCommand(FabricCrowdControlPlugin plugin) {

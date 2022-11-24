@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge8.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class CameraLockCommand extends TimedCommand {
+public final class CameraLockCommand extends TimedVoidCommand {
 	private final String effectName = "camera_lock";
 
 	public CameraLockCommand(SpongeCrowdControlPlugin plugin) {

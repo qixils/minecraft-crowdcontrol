@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.TimedImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -13,31 +13,25 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
 
 @Getter
-public class PotionCommand extends ImmediateCommand {
-	private static final int MAX_DURATION = 20 * POTION_SECONDS;
-	private final PotionEffectType potionEffectType;
-	private final int duration;
-	private final String effectName;
-	private final Component displayName;
+public class PotionCommand extends TimedImmediateCommand {
+	private final @NotNull PotionEffectType potionEffectType;
+	private final boolean isMinimal;
+	private final @NotNull String effectName;
+	private final @NotNull Component displayName;
 
 	public PotionCommand(PaperCrowdControlPlugin plugin, PotionEffectType potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
 		this.effectName = "potion_" + nameOf(potionEffectType);
-
-		boolean isMinimal = potionEffectType.isInstant();
-		this.duration = isMinimal ? 1 : MAX_DURATION;
-
-		Component displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
-		if (!isMinimal)
-			displayName = displayName.append(Component.text(" (" + POTION_SECONDS + "s)"));
-		this.displayName = displayName;
+		this.isMinimal = potionEffectType.isInstant();
+		this.displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
 	}
 
 	private static String nameOf(PotionEffectType type) {
@@ -56,6 +50,17 @@ public class PotionCommand extends ImmediateCommand {
 		};
 	}
 
+	public @NotNull Duration getDefaultDuration() {
+		return POTION_DURATION;
+	}
+
+	@Override
+	public @NotNull Duration getDuration(@NotNull Request request) {
+		if (isMinimal)
+			return Duration.ZERO;
+		return super.getDuration(request);
+	}
+
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (potionEffectType == PotionEffectType.JUMP
@@ -65,6 +70,8 @@ public class PotionCommand extends ImmediateCommand {
 					.message("Cannot apply jump boost while Disable Jump is active");
 		}
 
+		int durationTicks = isMinimal ? 1 : (int) getDuration(request).getSeconds() * 20;
+
 		sync(() -> {
 			for (Player player : players) {
 				boolean overridden = false;
@@ -72,7 +79,7 @@ public class PotionCommand extends ImmediateCommand {
 					if (existingEffect.getType().equals(potionEffectType)) {
 						overridden = true;
 						player.removePotionEffect(potionEffectType);
-						int newDuration = Math.max(duration, existingEffect.getDuration());
+						int newDuration = Math.max(durationTicks, existingEffect.getDuration());
 						int newAmplifier = existingEffect.getAmplifier() + 1;
 						if (potionEffectType == PotionEffectType.LEVITATION && newAmplifier > 127)
 							newAmplifier -= 1; // don't mess with gravity effects
@@ -82,7 +89,7 @@ public class PotionCommand extends ImmediateCommand {
 					}
 				}
 				if (!overridden)
-					player.addPotionEffect(potionEffectType.createEffect(duration, 0));
+					player.addPotionEffect(potionEffectType.createEffect(durationTicks, 0));
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge7.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Getter
 @EventListener
-public class FlightCommand extends TimedCommand {
+public class FlightCommand extends TimedVoidCommand {
 	private final String effectName = "flight";
 	private final Duration defaultDuration = Duration.ofSeconds(15);
 

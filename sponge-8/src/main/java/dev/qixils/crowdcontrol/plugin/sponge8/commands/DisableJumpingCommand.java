@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge8.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge8.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -27,7 +27,7 @@ import java.util.*;
 
 @Getter
 @EventListener
-public class DisableJumpingCommand extends TimedCommand {
+public class DisableJumpingCommand extends TimedVoidCommand {
 	private final Map<UUID, Long> jumpsBlockedAt = new HashMap<>(1);
 	private final String effectName = "disable_jumping";
 

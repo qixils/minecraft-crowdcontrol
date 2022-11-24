@@ -166,6 +166,10 @@ public class CommandConstants {
 	 */
 	public static final int POTION_SECONDS = 20;
 	/**
+	 * How long potion effects given by the potion command should last as a {@link Duration}.
+	 */
+	public static final @NotNull Duration POTION_DURATION = Duration.ofSeconds(POTION_SECONDS);
+	/**
 	 * The time in ticks that represents the start of the day.
 	 */
 	public static final long DAY = 1000;
