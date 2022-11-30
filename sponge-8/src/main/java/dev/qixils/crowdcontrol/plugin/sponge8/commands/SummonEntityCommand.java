@@ -92,7 +92,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 				if (!isHost(player))
 					continue;
 
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 
@@ -103,7 +103,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 				if (isHost(player))
 					continue;
 
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 		});
@@ -111,10 +111,10 @@ public class SummonEntityCommand extends ImmediateCommand {
 	}
 
 	@Blocking
-	protected Entity spawnEntity(String viewer, ServerPlayer player) {
+	protected Entity spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
 		Entity entity = player.world().createEntity(entityType, player.position());
 		// set variables
-		entity.offer(Keys.CUSTOM_NAME, Component.text(viewer));
+		entity.offer(Keys.CUSTOM_NAME, viewer);
 		entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.IS_TAMED, true);
 		entity.offer(Keys.TAMER, player.uniqueId());

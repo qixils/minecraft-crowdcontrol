@@ -99,7 +99,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 					break;
 				if (!isHost(player))
 					continue;
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 
@@ -109,16 +109,16 @@ public class SummonEntityCommand extends ImmediateCommand {
 					break;
 				if (isHost(player))
 					continue;
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 
-	protected Entity spawnEntity(String viewer, Player player) {
+	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
 		Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
-		entity.setCustomName(viewer);
+		entity.customName(viewer);
 		entity.setCustomNameVisible(true);
 
 		if (entity instanceof Tameable tameable)

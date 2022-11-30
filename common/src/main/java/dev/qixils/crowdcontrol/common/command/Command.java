@@ -298,13 +298,9 @@ public interface Command<P> {
 			audiences.add(audience);
 		}
 
-		Component viewer = plugin.getHideNames().isHideChat()
-				? Component.translatable("cc.effect.viewer")
-				: Component.text(request.getViewer());
-
 		Audience.audience(audiences).sendMessage(Component.translatable(
 				"cc.effect.used",
-				viewer.colorIfAbsent(Plugin.USER_COLOR),
+				plugin.getViewerComponent(request, true).color(Plugin.USER_COLOR),
 				getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
 		));
 	}

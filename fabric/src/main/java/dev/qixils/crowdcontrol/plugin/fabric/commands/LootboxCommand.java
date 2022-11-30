@@ -236,7 +236,7 @@ public class LootboxCommand extends ImmediateCommand {
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
 				ItemStack itemStack = createRandomItem(luck);
 				List<Component> lore = getLore(itemStack);
-				lore.add(plugin.adventure().toNative(buildLootboxLore(request))); // TODO: this is displaying the raw translatable key
+				lore.add(plugin.adventure().toNative(buildLootboxLore(plugin, request))); // TODO: this is displaying the raw translatable key
 				setLore(itemStack, lore);
 				container.setItem(slot, itemStack);
 			}
@@ -245,7 +245,7 @@ public class LootboxCommand extends ImmediateCommand {
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
 			sync(() -> player.openMenu(
 					new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container),
-							plugin.adventure().toNative(buildLootboxTitle(request)))
+							plugin.adventure().toNative(buildLootboxTitle(plugin, request)))
 			));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

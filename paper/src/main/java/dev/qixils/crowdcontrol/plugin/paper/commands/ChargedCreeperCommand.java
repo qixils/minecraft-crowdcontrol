@@ -3,11 +3,13 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
@@ -18,7 +20,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 	}
 
 	@Override
-	protected Entity spawnEntity(String viewer, Player player) {
+	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
 		Creeper creeper = (Creeper) super.spawnEntity(viewer, player);
 		creeper.setPowered(true);
 		Location pos = creeper.getLocation();

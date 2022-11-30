@@ -4,6 +4,8 @@ import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
@@ -18,7 +20,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 	}
 
 	@Override
-	protected Entity spawnEntity(String viewer, Player player) {
+	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
 		Entity creeper = super.spawnEntity(viewer, player);
 		creeper.offer(Keys.CREEPER_CHARGED, true);
 		Vector3d pos = player.getTransform().getPosition();

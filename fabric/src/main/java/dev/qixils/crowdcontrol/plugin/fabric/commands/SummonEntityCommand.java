@@ -83,7 +83,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 					break;
 				if (!isHost(player))
 					continue;
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 
@@ -93,7 +93,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 					break;
 				if (isHost(player))
 					continue;
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 		});
@@ -101,13 +101,13 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 	}
 
 	@Blocking
-	protected E spawnEntity(String viewer, ServerPlayer player) {
+	protected E spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
 		E entity = entityType.create(player.level);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
 		entity.setPos(player.position());
-		entity.setCustomName(net.minecraft.network.chat.Component.literal(viewer));
+		entity.setCustomName(plugin.adventure().toNative(viewer));
 		entity.setCustomNameVisible(true);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);

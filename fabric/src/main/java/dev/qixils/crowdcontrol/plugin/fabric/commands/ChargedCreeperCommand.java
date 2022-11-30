@@ -4,11 +4,13 @@ import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.mixin.CreeperAccessor;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Blocking;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
@@ -20,7 +22,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 
 	@Override
 	@Blocking
-	protected Creeper spawnEntity(String viewer, ServerPlayer player) {
+	protected Creeper spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
 		Creeper creeper = super.spawnEntity(viewer, player);
 		creeper.getEntityData().set(CreeperAccessor.getIsPoweredAccessor(), true);
 		Vec3 pos = creeper.position();

@@ -796,4 +796,31 @@ public interface Plugin<P, S> {
 	 */
 	@NotNull
 	HideNames getHideNames();
+
+	/**
+	 * Gets the viewer who triggered an effect as a component.
+	 *
+	 * @param request the effect request
+	 * @param chat    whether the returned component will be used in chat
+	 * @return the viewer as a component
+	 */
+	@NotNull
+	default Component getViewerComponent(@NotNull Request request, boolean chat) {
+		return getViewerComponent(getHideNames(), request, chat);
+	}
+
+	/**
+	 * Gets the viewer who triggered an effect as a component.
+	 *
+	 * @param hidesNames the {@link HideNames} config
+	 * @param request    the effect request
+	 * @param chat       whether the returned component will be used in chat
+	 */
+	@NotNull
+	static Component getViewerComponent(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
+		if ((!chat && hidesNames.isHideOther()) || (chat && hidesNames.isHideChat()))
+			return Component.translatable("cc.effect.viewer");
+		else
+			return Component.text(request.getViewer());
+	}
 }

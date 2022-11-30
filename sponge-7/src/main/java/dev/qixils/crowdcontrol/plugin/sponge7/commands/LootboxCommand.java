@@ -175,7 +175,7 @@ public class LootboxCommand extends ImmediateCommand {
 		for (Player player : players) {
 			Inventory lootbox = Inventory.builder()
 					.of(ARCHETYPE)
-					.property(new InventoryTitle(spongeSerializer.serialize(buildLootboxTitle(request))))
+					.property(new InventoryTitle(spongeSerializer.serialize(buildLootboxTitle(plugin, request))))
 					.build(plugin);
 
 			// add items
@@ -184,7 +184,7 @@ public class LootboxCommand extends ImmediateCommand {
 				ItemStack itemStack = createRandomItem(luck);
 				itemStack.offer(
 						Keys.ITEM_LORE,
-						Collections.singletonList(spongeSerializer.serialize(buildLootboxLore(request)))
+						Collections.singletonList(spongeSerializer.serialize(buildLootboxLore(plugin, request)))
 				);
 
 				// the custom inventory does not implement anything sensible so enjoy this hack

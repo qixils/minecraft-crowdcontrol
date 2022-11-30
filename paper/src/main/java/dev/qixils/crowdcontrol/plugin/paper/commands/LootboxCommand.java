@@ -203,12 +203,12 @@ public class LootboxCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		for (Player player : players) {
-			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(request));
+			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(plugin, request));
 			for (int slot : lootboxItemSlots(luck)) {
 				// create item
 				ItemStack randomItem = createRandomItem(luck);
 				ItemMeta itemMeta = randomItem.getItemMeta();
-				itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(request)));
+				itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(plugin, request)));
 				randomItem.setItemMeta(itemMeta);
 				lootbox.setItem(slot, randomItem);
 			}

@@ -472,26 +472,28 @@ public class CommandConstants {
 	/**
 	 * Builds the title for a lootbox inventory.
 	 *
+	 * @param plugin  the plugin instance
 	 * @param request request that caused the execution of the lootbox command
 	 * @return text component for the inventory title
 	 */
-	public static Component buildLootboxTitle(Request request) {
+	public static Component buildLootboxTitle(@NotNull Plugin<?, ?> plugin, @NotNull Request request) {
 		return Component.translatable(
 				"cc.effect.lootbox.title",
-				Component.text(request.getViewer(), Plugin.USER_COLOR)
+				plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR)
 		);
 	}
 
 	/**
 	 * Builds the lore for the item awarded by a lootbox.
 	 *
+	 * @param plugin  the plugin instance
 	 * @param request request that caused the execution of the lootbox command
 	 * @return text component for the item's lore
 	 */
-	public static Component buildLootboxLore(Request request) {
+	public static Component buildLootboxLore(@NotNull Plugin<?, ?> plugin, @NotNull Request request) {
 		return Component.translatable(
 				"cc.effect.lootbox.lore",
-				Component.text(request.getViewer(), Plugin.USER_COLOR, TextDecoration.ITALIC)
+				plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR).decorate(TextDecoration.ITALIC)
 		);
 	}
 

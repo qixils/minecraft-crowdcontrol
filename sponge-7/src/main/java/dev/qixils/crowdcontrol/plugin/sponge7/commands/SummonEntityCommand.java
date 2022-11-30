@@ -27,7 +27,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.HeldEquipmentType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
 
@@ -96,7 +95,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 					break;
 				if (!isHost(player))
 					continue;
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 
@@ -106,7 +105,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 					break;
 				if (isHost(player))
 					continue;
-				spawnEntity(request.getViewer(), player);
+				spawnEntity(plugin.getViewerComponent(request, false), player);
 				victims++;
 			}
 		});
@@ -114,10 +113,10 @@ public class SummonEntityCommand extends ImmediateCommand {
 	}
 
 	@Blocking
-	protected Entity spawnEntity(String viewer, Player player) {
+	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
 		Entity entity = player.getLocation().createEntity(entityType);
 		// set variables
-		entity.offer(Keys.DISPLAY_NAME, Text.of(viewer));
+		entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(viewer));
 		entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);

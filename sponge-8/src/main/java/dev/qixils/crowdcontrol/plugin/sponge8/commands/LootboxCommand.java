@@ -239,7 +239,7 @@ public class LootboxCommand extends ImmediateCommand {
 				ItemStack itemStack = createRandomItem(luck);
 				itemStack.offer(
 						Keys.LORE,
-						Collections.singletonList(buildLootboxLore(request))
+						Collections.singletonList(buildLootboxLore(plugin, request))
 				);
 
 				inventory.slot(slot)
@@ -249,7 +249,7 @@ public class LootboxCommand extends ImmediateCommand {
 
 			// sound & open
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
-			sync(() -> player.openInventory(inventory, buildLootboxTitle(request)));
+			sync(() -> player.openInventory(inventory, buildLootboxTitle(plugin, request)));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
