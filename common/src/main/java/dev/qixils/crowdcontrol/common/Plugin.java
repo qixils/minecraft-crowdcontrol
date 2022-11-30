@@ -788,4 +788,12 @@ public interface Plugin<P, S> {
 	 */
 	@NotNull
 	CCPlayer getPlayer(@NotNull P player);
+
+	/**
+	 * Gets the {@link HideNames} config.
+	 *
+	 * @return hide names config
+	 */
+	@NotNull
+	HideNames getHideNames();
 }

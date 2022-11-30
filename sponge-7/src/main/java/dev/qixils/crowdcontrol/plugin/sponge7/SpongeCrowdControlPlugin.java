@@ -8,18 +8,11 @@ import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.AbstractPlugin;
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableGameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableOriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedDataBuilder;
+import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.*;
 import dev.qixils.crowdcontrol.plugin.sponge7.mc.SpongePlayer;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import lombok.Getter;
@@ -75,15 +68,7 @@ import org.spongepowered.api.world.World;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
@@ -322,6 +307,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		global = config.getNode("global").getBoolean(false);
 		announce = config.getNode("announce").getBoolean(true);
 		adminRequired = config.getNode("admin-required").getBoolean(false);
+		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString("none"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)

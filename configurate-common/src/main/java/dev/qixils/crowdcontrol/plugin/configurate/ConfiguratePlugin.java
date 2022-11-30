@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.configurate;
 
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
@@ -73,6 +74,8 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 
 		global = config.node("global").getBoolean(false);
 		announce = config.node("announce").getBoolean(true);
+		adminRequired = config.node("admin-required").getBoolean(false);
+		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString("none"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)

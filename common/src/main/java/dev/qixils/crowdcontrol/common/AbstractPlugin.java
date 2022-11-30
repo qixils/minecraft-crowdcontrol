@@ -36,6 +36,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	@Getter
 	protected boolean adminRequired = false;
 	@Getter @NotNull
+	protected HideNames hideNames = HideNames.NONE;
+	@Getter @NotNull
 	protected Collection<String> hosts = Collections.emptyList();
 	@Getter @NotNull
 	protected LimitConfig limitConfig = new LimitConfig();

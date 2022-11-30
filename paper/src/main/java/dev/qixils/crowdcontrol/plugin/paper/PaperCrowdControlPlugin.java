@@ -4,6 +4,7 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.Command;
@@ -33,15 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -82,6 +75,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private boolean isServer = true;
 	@Getter
 	private boolean global = false;
+	@Getter @NotNull
+	private HideNames hideNames = HideNames.NONE;
 	@Getter
 	private Collection<String> hosts = Collections.emptyList();
 	private boolean announce = true;
@@ -158,6 +153,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		announce = config.getBoolean("announce", true);
 		adminRequired = config.getBoolean("admin-required", false);
 		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
+		hideNames = HideNames.fromConfigCode(config.getString("hide-names", "none"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
