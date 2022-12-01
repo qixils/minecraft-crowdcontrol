@@ -2,6 +2,7 @@
 // (these imports are required by CC)
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using ConnectorLib;
 using ConnectorLib.JSON;
@@ -9,6 +10,7 @@ using ConnectorLib.SimpleTCP;
 using CrowdControl.Common;
 using Newtonsoft.Json;
 using ConnectorType = CrowdControl.Common.ConnectorType;
+using EffectStatus = CrowdControl.Common.EffectStatus;
 using Log = CrowdControl.Common.Log;
 
 // TODO: auto-hiding is broken? doesn't seem to work in SDK or as a CCPAK
@@ -33,6 +35,7 @@ namespace CrowdControl.Games.Packs
         public ClientEffect(string name, string code, ItemKind kind, string auto) : base(name, code, kind, auto) { }
     }
 
+    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
     {
         // default port: 58731
@@ -79,24 +82,24 @@ namespace CrowdControl.Games.Packs
             new GlobalEffect("Zip Time", "zip", "time") { Price = 30, Description = "Adds several minutes to the in-game time" },
             // health commands
             new Effect("Health", "health", ItemKind.Folder),
-            new Effect("-1 Max Health", "max_health_sub1", "health") { Price = 100, Description = "Subtracts half a heart from the streamer's max health" },
-            new Effect("+1 Max Health", "max_health_plus1", "health") { Price = 50, Description = "Adds half a heart to the streamer's max health" },
-            new Effect("Damage Player (1 Heart)", "damage_1", "health") { Price = 25, Description = "Removes a single heart of health from the streamer (unless it would kill them)" },
-            new Effect("Heal Player", "full_heal", "health") { Price = 50, Description = "Resets the streamer's health to full" },
-            new Effect("Heal Player (1 Heart)", "heal_1", "health") { Price = 10, Description = "Increases the streamer's health by a single bar" },
+            new Effect("Take Max Health", "max_health_sub", new[]{"halfhealth10"}, "health") { Price = 100, Description = "Subtracts from the streamer's max health" },
+            new Effect("Give Max Health", "max_health_plus", new[]{"halfhealth10"}, "health") { Price = 50, Description = "Adds to the streamer's max health" },
+            new Effect("Damage Player", "damage", new[]{"health10"}, "health") { Price = 25, Description = "Removes health from the streamer (unless it would kill them)" },
+            new Effect("Heal Player", "heal", new[]{"health10"}, "health") { Price = 10, Description = "Increases the streamer's health" },
+            new Effect("Heal Player to Full", "full_heal", "health") { Price = 50, Description = "Resets the streamer's health to full" },
             new Effect("Halve Health", "half_health", "health") { Price = 300, Description = "Sets the player's health to 50% of what they currently have" },
             new Effect("Kill Player", "kill", "health") { Price = 1500, Description = "Immediately kills the streamer on the spot" },
             // food commands
             new Effect("Food", "food", ItemKind.Folder),
-            new Effect("Feed Player", "feed", "food") { Price = 15, Description = "Replenishes the hunger bar" },
-            new Effect("Feed Player (1 Bar)", "feed_1", "food") { Price = 2, Description = "Replenishes a single bar of hunger" },
-            new Effect("Remove One Hunger Bar", "starve_1", "food") { Price = 50, Description = "Removes a single bar of food" },
-            new Effect("Starve Player", "starve", "food") { Price = 500, Description = "Drains the players' hunger bar" },
+            new Effect("Feed Player to Full", "full_feed", "food") { Price = 15, Description = "Replenishes the hunger bar" },
+            new Effect("Feed Player", "feed", new[]{"food10"}, "food") { Price = 2, Description = "Replenishes some hunger" },
+            new Effect("Remove Food", "starve", new[]{"food10"}, "food") { Price = 5, Description = "Removes some food" },
+            new Effect("Starve Player", "full_starve", "food") { Price = 100, Description = "Drains the players' hunger bar" },
             // experience
             new Effect("Experience", "experience", ItemKind.Folder),
-            new Effect("Give One XP Level", "xp_plus1", "experience") { Price = 75, Description = "Adds one level of experience" },
+            new Effect("Give XP", "xp_plus", new[]{"xp100"}, "experience") { Price = 50, Description = "Adds one level of experience" },
+            new Effect("Take XP", "xp_sub", new[]{"xp100"}, "experience") { Price = 200, Description = "Removes one level of experience" },
             new Effect("Reset Experience", "reset_exp_progress", "experience") { Price = 1000, Description = "Clears all of the streamer's XP" },
-            new Effect("Take One XP Level", "xp_sub1", "experience") { Price = 500, Description = "Removes one level of experience" },
             // gravity commands
             new Effect("Gravity", "gravity", ItemKind.Folder),
             new Effect("High Gravity", "high_gravity", "gravity") { Price = 100, Duration = 20, Description = "Increases the streamer's gravity" },
@@ -121,7 +124,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory") { Price = 100, Description = "Allows the streamer to keep their inventory upon death" },
             new Effect("Put Held Item on Head", "hat", "inventory") { Price = 25, Description = "Moves the item in the streamer's hand to their head" },
             new Effect("Repair Held Item", "repair_item", "miscellaneous") { Price = 100, Description = "Fully repairs a damaged item" },
-            // set gamemode for 30 seconds
+            // set gamemode for x seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
             new Effect("Adventure Mode", "adventure_mode", "change_gamemode") { Price = 200, Duration = 15, Description = "Temporarily sets the streamer to Adventure mode, rendering them unable to place or break blocks" },
             new Effect("Creative Mode", "creative_mode", "change_gamemode") { Price = 150, Duration = 15, Description = "Temporarily sets the streamer to Creative mode, allowing them to fly and spawn in items" },
@@ -404,22 +407,22 @@ namespace CrowdControl.Games.Packs
             // gives 1 item
             new Effect("Give an Item", "give_item", ItemKind.Folder),
             new Effect("Elytra", "give_elytra", "give_item") { Price = 500 },
-            new Effect("Eye of Ender", "give_ender_eye", "give_item") { Price = 100 },
-            new Effect("End Portal Frame", "give_end_portal_frame", "give_item") { Price = 300 },
-            new Effect("Recovery Compass", "give_recovery_compass", "give_item") { Price = 700 },
+            new Effect("Eye of Ender", "give_ender_eye", new[]{"items64"}, "give_item") { Price = 100 },
+            new Effect("End Portal Frame", "give_end_portal_frame", new[]{"items64"}, "give_item") { Price = 300 },
+            new Effect("Recovery Compass", "give_recovery_compass", new[]{"items64"}, "give_item") { Price = 700 },
             new Effect("Trident", "give_trident", "give_item") { Price = 500 },
 
             new Effect("Food", "give_food", ItemKind.Folder, "give_item"),
-            new Effect("Cooked Porkchop", "give_cooked_porkchop", "give_food") { Price = 20 },
-            new Effect("Golden Apple", "give_golden_apple", "give_food") { Price = 200 },
-            new Effect("Enchanted Golden Apple", "give_enchanted_golden_apple", "give_food") { Price = 300 },
+            new Effect("Cooked Porkchop", "give_cooked_porkchop", new[]{"items64"}, "give_food") { Price = 20 },
+            new Effect("Golden Apple", "give_golden_apple", new[]{"items64"}, "give_food") { Price = 200 },
+            new Effect("Enchanted Golden Apple", "give_enchanted_golden_apple", new[]{"items64"}, "give_food") { Price = 300 },
 
             new Effect("Minerals", "give_minerals", ItemKind.Folder, "give_item"),
-            new Effect("Coal", "give_coal", "give_minerals") { Price = 20 },
-            new Effect("Iron Ingot", "give_iron_ingot", "give_minerals") { Price = 300 },
-            new Effect("Gold Ingot", "give_gold_ingot", "give_minerals") { Price = 300 },
-            new Effect("Netherite Ingot", "give_netherite_ingot", "give_minerals") { Price = 300 },
-            new Effect("Diamond", "give_diamond", "give_minerals") { Price = 300 },
+            new Effect("Coal", "give_coal", new[]{"items64"}, "give_minerals") { Price = 20 },
+            new Effect("Iron Ingot", "give_iron_ingot", new[]{"items64"}, "give_minerals") { Price = 300 },
+            new Effect("Gold Ingot", "give_gold_ingot", new[]{"items64"}, "give_minerals") { Price = 300 },
+            new Effect("Netherite Ingot", "give_netherite_ingot", new[]{"items64"}, "give_minerals") { Price = 300 },
+            new Effect("Diamond", "give_diamond", new[]{"items64"}, "give_minerals") { Price = 300 },
 
             new Effect("Tools", "give_tools", ItemKind.Folder, "give_item"),
             new Effect("Wooden Pickaxe", "give_wooden_pickaxe", "give_tools") { Price = 25 },
@@ -440,22 +443,22 @@ namespace CrowdControl.Games.Packs
             // takes 1 item
             new Effect("Take an Item", "take_item", ItemKind.Folder),
             new Effect("Elytra", "take_elytra", "take_item") { Price = 1000 },
-            new Effect("Eye of Ender", "take_ender_eye", "take_item") { Price = 300 },
-            new Effect("End Portal Frame", "take_end_portal_frame", "take_item") { Price = 600 },
-            new Effect("Recovery Compass", "take_recovery_compass", "take_item") { Price = 1250 },
+            new Effect("Eye of Ender", "take_ender_eye", new[]{"items64"}, "take_item") { Price = 300 },
+            new Effect("End Portal Frame", "take_end_portal_frame", new[]{"items64"}, "take_item") { Price = 600 },
+            new Effect("Recovery Compass", "take_recovery_compass", new[]{"items64"}, "take_item") { Price = 1250 },
             new Effect("Trident", "take_trident", "take_item") { Price = 1000 },
 
             new Effect("Food", "take_food", ItemKind.Folder, "take_item"),
-            new Effect("Cooked Porkchop", "take_cooked_porkchop", "take_food") { Price = 50 },
-            new Effect("Golden Apple", "take_golden_apple", "take_food") { Price = 500 },
-            new Effect("Enchanted Golden Apple", "take_enchanted_golden_apple", "take_food") { Price = 600 },
+            new Effect("Cooked Porkchop", "take_cooked_porkchop", new[]{"items64"}, "take_food") { Price = 50 },
+            new Effect("Golden Apple", "take_golden_apple", new[]{"items64"}, "take_food") { Price = 500 },
+            new Effect("Enchanted Golden Apple", "take_enchanted_golden_apple", new[]{"items64"}, "take_food") { Price = 600 },
 
             new Effect("Minerals", "take_minerals", ItemKind.Folder, "take_item"),
-            new Effect("Coal", "take_coal", "take_minerals") { Price = 50 },
-            new Effect("Iron Ingot", "take_iron_ingot", "take_minerals") { Price = 200 },
-            new Effect("Gold Ingot", "take_gold_ingot", "take_minerals") { Price = 200 },
-            new Effect("Netherite Ingot", "take_netherite_ingot", "take_minerals") { Price = 700 },
-            new Effect("Diamond", "take_diamond", "take_minerals") { Price = 500 },
+            new Effect("Coal", "take_coal", new[]{"items64"}, "take_minerals") { Price = 50 },
+            new Effect("Iron Ingot", "take_iron_ingot", new[]{"items64"}, "take_minerals") { Price = 200 },
+            new Effect("Gold Ingot", "take_gold_ingot", new[]{"items64"}, "take_minerals") { Price = 200 },
+            new Effect("Netherite Ingot", "take_netherite_ingot", new[]{"items64"}, "take_minerals") { Price = 700 },
+            new Effect("Diamond", "take_diamond", new[]{"items64"}, "take_minerals") { Price = 500 },
 
             new Effect("Tools", "take_tools", ItemKind.Folder, "take_item"),
             new Effect("Wooden Pickaxe", "take_wooden_pickaxe", "take_tools") { Price = 50 },
@@ -474,28 +477,34 @@ namespace CrowdControl.Games.Packs
             new Effect("Netherite Sword", "take_netherite_sword", "take_weapons") { Price = 750 },
         };
 
+        // Slider Ranges
+        public override List<ItemType> ItemTypes => new()
+        {
+            new ItemType("Items", "items64", ItemType.Subtype.Slider, "{\"min\":1,\"max\":64}"),
+            new ItemType("Half-Hearts", "halfhealth10", ItemType.Subtype.Slider, "{\"min\":1,\"max\":10}"),
+            new ItemType("Hearts", "health10", ItemType.Subtype.Slider, "{\"min\":1,\"max\":10}"),
+            new ItemType("Food Points", "food10", ItemType.Subtype.Slider, "{\"min\":1,\"max\":10}"),
+            new ItemType("XP Levels", "xp100", ItemType.Subtype.Slider, "{\"min\":1,\"max\":100}")
+        };
+
         private static readonly Regex UnavailableEffectPattern = new(@"^.+ \[effect: ([a-zA-Z0-9_])\]$", RegexOptions.Compiled);
 
         public override List<Effect> Effects => AllEffects;
 
-        public override SimpleTCPClientConnector? Connector
+        public override SimpleTCPClientConnector Connector
         {
             get => base.Connector;
             set
             {
-                if (value != null)
-                {
-                    value.MessageParsed += OnMessageParsed;
-                }
+                value.MessageParsed += OnMessageParsed;
                 base.Connector = value;
             }
         }
 
         private void OnMessageParsed(ISimpleTCPConnector<Request, Response, ISimpleTCPContext.NullContext> sender, Response response, ISimpleTCPContext.NullContext context)
         {
-            Log.Debug("Parsing incoming message #" + response.id
-                                                   + " of type " + response.type
-                                                   + " with message \"" + response.message + "\"");
+            Log.Debug(
+                $"Parsing incoming message #{response.id} of type {response.type} with message \"{response.message}\"");
             if (response.message == null)
             {
                 Log.Debug("Message has no message attribute; exiting");
@@ -522,7 +531,7 @@ namespace CrowdControl.Games.Packs
                     OnMenuStatusPacket(response, EffectStatus.MenuVisible);
                 }
             }
-            else if (response.status == EffectResult.Unavailable)
+            else if (response.status == ConnectorLib.JSON.EffectStatus.Unavailable)
             {
                 Log.Debug("Effect is unavailable");
                 // a requested effect was unavailable; it should be hidden from the menu
@@ -570,7 +579,7 @@ namespace CrowdControl.Games.Packs
             AllEffects.FindAll(effect => effectsList.Contains(effect.Code)).ForEach(effect =>
             {
                 ReportStatus(effect, status);
-                Log.Message("Updated visibility of " + effect.Code + " to " + status);
+                Log.Message($"Updated visibility of {effect.Code} to {status}");
             });
         }
 
@@ -579,14 +588,14 @@ namespace CrowdControl.Games.Packs
             var match = UnavailableEffectPattern.Match(response.message);
             if (!match.Success)
             {
-                Log.Error("Unavailable effect pattern match failed on \"" + response.message + "\"");
+                Log.Error($"Unavailable effect pattern match failed on \"{response.message}\"");
                 return;
             }
             var effectCode = match.Groups[0].Value;
             var effect = AllEffects.Find(e => e.Code == effectCode);
             if (effect == null)
             {
-                Log.Error("Could not find unavailable effect \"" + effect + "\" in known effect list");
+                Log.Error($"Could not find unavailable effect \"{effect}\" in known effect list");
                 return;
             }
             HideEffect(effect);
@@ -594,7 +603,7 @@ namespace CrowdControl.Games.Packs
 
         private void HideEffect(Effect effect)
         {
-            Log.Message("Permanently hiding effect " + effect.Code);
+            Log.Message($"Permanently hiding effect {effect.Code}");
             ReportStatus(effect, EffectStatus.MenuHidden);
         }
     }
