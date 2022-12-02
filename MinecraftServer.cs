@@ -83,7 +83,7 @@ namespace CrowdControl.Games.Packs
             // health commands
             new Effect("Health", "health", ItemKind.Folder),
             new Effect("Take Max Health", "max_health_sub", new[]{"halfhealth10"}, "health") { Price = 100, Description = "Subtracts from the streamer's max health" },
-            new Effect("Give Max Health", "max_health_plus", new[]{"halfhealth10"}, "health") { Price = 50, Description = "Adds to the streamer's max health" },
+            new Effect("Give Max Health", "max_health_add", new[]{"halfhealth10"}, "health") { Price = 50, Description = "Adds to the streamer's max health" },
             new Effect("Damage Player", "damage", new[]{"health10"}, "health") { Price = 25, Description = "Removes health from the streamer (unless it would kill them)" },
             new Effect("Heal Player", "heal", new[]{"health10"}, "health") { Price = 10, Description = "Increases the streamer's health" },
             new Effect("Heal Player to Full", "full_heal", "health") { Price = 50, Description = "Resets the streamer's health to full" },
@@ -97,7 +97,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Starve Player", "full_starve", "food") { Price = 100, Description = "Drains the players' hunger bar" },
             // experience
             new Effect("Experience", "experience", ItemKind.Folder),
-            new Effect("Give XP", "xp_plus", new[]{"xp100"}, "experience") { Price = 50, Description = "Adds one level of experience" },
+            new Effect("Give XP", "xp_add", new[]{"xp100"}, "experience") { Price = 50, Description = "Adds one level of experience" },
             new Effect("Take XP", "xp_sub", new[]{"xp100"}, "experience") { Price = 200, Description = "Removes one level of experience" },
             new Effect("Reset Experience", "reset_exp_progress", "experience") { Price = 1000, Description = "Clears all of the streamer's XP" },
             // gravity commands

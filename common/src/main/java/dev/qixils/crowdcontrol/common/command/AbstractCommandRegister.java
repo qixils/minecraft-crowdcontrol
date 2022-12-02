@@ -27,8 +27,8 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	protected void createCommands(List<Command<PLAYER>> commands) {
 		commands.addAll(Arrays.asList(
 				new HalfHealthCommand<>(plugin),
-				new MaxHealthCommand<>(plugin, -1),
-				new MaxHealthCommand<>(plugin, 1),
+				new MaxHealthSubCommand<>(plugin),
+				new MaxHealthAddCommand<>(plugin),
 				new MaxHealthCommand<>(plugin, 4), // used in hype trains only
 				new KillCommand<>(plugin),
 				new DamageCommand<>(plugin),
