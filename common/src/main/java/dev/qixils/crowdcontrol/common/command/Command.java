@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +75,7 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	default Component getDefaultDisplayName() {
+	default TranslatableComponent getDefaultDisplayName() {
 		return Component.translatable("cc.effect." + getEffectName() + ".name");
 	}
 

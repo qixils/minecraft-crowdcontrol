@@ -14,8 +14,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
-public class DamageCommand<P> implements ImmediateCommand<P> {
-	private final @NotNull String effectName = "damage";
+public class HealCommand<P> implements ImmediateCommand<P> {
+	private final @NotNull String effectName = "heal";
 	private final @NotNull Plugin<P, ?> plugin;
 
 	@Override
@@ -26,37 +26,23 @@ public class DamageCommand<P> implements ImmediateCommand<P> {
 		return getDefaultDisplayName().args(Component.text(amount));
 	}
 
+	@NotNull
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
 		if (request.getParameters() == null)
 			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
-		boolean success = false;
+		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("All players are at maximum health");
 		double amount = (double) request.getParameters()[0];
-
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
 			double oldHealth = player.health();
 			double maxHealth = player.maxHealth();
-			if (amount >= maxHealth) {
-				success = true;
-				sync(player::kill);
-			} else {
-				double newHealth = Math.max(1, oldHealth - amount);
-				double appliedDamage = oldHealth - newHealth;
-				if (appliedDamage > 0) {
-					success = true;
-					sync(() -> player.damage(appliedDamage));
-				}
+			double newHealth = Math.max(0, Math.min(maxHealth, oldHealth - amount));
+			if (newHealth != oldHealth) { // TODO: should this also fail if the heal was not 100% utilized?
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+				sync(() -> player.health(newHealth));
 			}
 		}
-
-		if (success)
-			return request.buildResponse()
-					.type(Response.ResultType.SUCCESS);
-		else
-			return request.buildResponse()
-					.type(Response.ResultType.RETRY)
-					.message("Players would have been killed by this command");
+		return result;
 	}
 }
-

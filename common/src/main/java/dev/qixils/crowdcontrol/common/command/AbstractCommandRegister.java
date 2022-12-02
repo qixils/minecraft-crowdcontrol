@@ -1,9 +1,7 @@
 package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.command.impl.DamageCommand;
-import dev.qixils.crowdcontrol.common.command.impl.HalfHealthCommand;
-import dev.qixils.crowdcontrol.common.command.impl.MaxHealthCommand;
+import dev.qixils.crowdcontrol.common.command.impl.*;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,10 +30,10 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				new MaxHealthCommand<>(plugin, -1),
 				new MaxHealthCommand<>(plugin, 1),
 				new MaxHealthCommand<>(plugin, 4), // used in hype trains only
-				new DamageCommand<>(plugin, "kill", Integer.MAX_VALUE),
-				new DamageCommand<>(plugin, 2f),
-				new DamageCommand<>(plugin, -2f), // TODO: this is broken on fabric
-				new DamageCommand<>(plugin, "full_heal", Integer.MIN_VALUE)
+				new KillCommand<>(plugin),
+				new DamageCommand<>(plugin),
+				new FullHealCommand<>(plugin),
+				new HealCommand<>(plugin) // TODO: this might be broken on fabric
 		));
 	}
 
