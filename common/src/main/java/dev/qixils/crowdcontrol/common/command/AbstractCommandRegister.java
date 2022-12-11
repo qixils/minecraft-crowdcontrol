@@ -2,6 +2,9 @@ package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.impl.HalfHealthCommand;
+import dev.qixils.crowdcontrol.common.command.impl.exp.ExpAddCommand;
+import dev.qixils.crowdcontrol.common.command.impl.exp.ExpSubCommand;
+import dev.qixils.crowdcontrol.common.command.impl.exp.ResetExpCommand;
 import dev.qixils.crowdcontrol.common.command.impl.food.FoodAddCommand;
 import dev.qixils.crowdcontrol.common.command.impl.food.FoodSubCommand;
 import dev.qixils.crowdcontrol.common.command.impl.food.FullFeedCommand;
@@ -48,7 +51,10 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				new FoodAddCommand<>(plugin),
 				new FoodSubCommand<>(plugin),
 				new FullFeedCommand<>(plugin),
-				new FullStarveCommand<>(plugin)
+				new FullStarveCommand<>(plugin),
+				new ExpAddCommand<>(plugin),
+				new ExpSubCommand<>(plugin),
+				new ResetExpCommand<>(plugin)
 		));
 	}
 

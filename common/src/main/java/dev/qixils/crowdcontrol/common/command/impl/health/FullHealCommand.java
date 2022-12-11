@@ -20,7 +20,7 @@ public class FullHealCommand<P> implements ImmediateCommand<P> {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("All players are at maximum health");
+		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("All players are at maximum health");
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
 			double maxHealth = player.maxHealth();

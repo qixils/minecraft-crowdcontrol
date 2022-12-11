@@ -22,17 +22,27 @@ public class SpongePlayer extends SpongeLivingEntity implements CCPlayer {
 	}
 
 	@Override
-	public double saturation() {
-		return entity().saturation().get();
-	}
-
-	@Override
 	public void foodLevel(int foodLevel) {
 		entity().offer(Keys.FOOD_LEVEL, foodLevel);
 	}
 
 	@Override
+	public double saturation() {
+		return entity().saturation().get();
+	}
+
+	@Override
 	public void saturation(double saturation) {
 		entity().offer(Keys.SATURATION, saturation);
+	}
+
+	@Override
+	public int xpLevel() {
+		return entity().get(Keys.EXPERIENCE_LEVEL).orElse(0);
+	}
+
+	@Override
+	public void xpLevel(int xpLevel) {
+		entity().offer(Keys.EXPERIENCE_LEVEL, xpLevel);
 	}
 }

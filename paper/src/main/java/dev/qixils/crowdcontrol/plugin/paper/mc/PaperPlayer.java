@@ -21,17 +21,32 @@ public class PaperPlayer extends PaperLivingEntity implements CCPlayer {
 	}
 
 	@Override
-	public double saturation() {
-		return entity().getSaturation();
-	}
-
-	@Override
 	public void foodLevel(int foodLevel) {
 		entity().setFoodLevel(foodLevel);
 	}
 
 	@Override
+	public double saturation() {
+		return entity().getSaturation();
+	}
+
+	@Override
 	public void saturation(double saturation) {
 		entity().setSaturation((float) saturation);
+	}
+
+	@Override
+	public int xpLevel() {
+		return entity().getLevel();
+	}
+
+	@Override
+	public void xpLevel(int xpLevel) {
+		entity().setLevel(xpLevel);
+	}
+
+	@Override
+	public void addXpLevel(int xpLevel) {
+		entity().giveExpLevels(xpLevel);
 	}
 }
