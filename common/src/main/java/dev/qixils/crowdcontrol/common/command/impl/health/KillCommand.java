@@ -1,4 +1,4 @@
-package dev.qixils.crowdcontrol.common.command.impl;
+package dev.qixils.crowdcontrol.common.command.impl.health;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.ImmediateCommand;

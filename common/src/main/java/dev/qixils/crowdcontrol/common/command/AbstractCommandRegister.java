@@ -1,7 +1,18 @@
 package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.command.impl.*;
+import dev.qixils.crowdcontrol.common.command.impl.HalfHealthCommand;
+import dev.qixils.crowdcontrol.common.command.impl.food.FoodAddCommand;
+import dev.qixils.crowdcontrol.common.command.impl.food.FoodSubCommand;
+import dev.qixils.crowdcontrol.common.command.impl.food.FullFeedCommand;
+import dev.qixils.crowdcontrol.common.command.impl.food.FullStarveCommand;
+import dev.qixils.crowdcontrol.common.command.impl.health.DamageCommand;
+import dev.qixils.crowdcontrol.common.command.impl.health.FullHealCommand;
+import dev.qixils.crowdcontrol.common.command.impl.health.HealCommand;
+import dev.qixils.crowdcontrol.common.command.impl.health.KillCommand;
+import dev.qixils.crowdcontrol.common.command.impl.maxhealth.MaxHealthAddCommand;
+import dev.qixils.crowdcontrol.common.command.impl.maxhealth.MaxHealthCommand;
+import dev.qixils.crowdcontrol.common.command.impl.maxhealth.MaxHealthSubCommand;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +44,11 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				new KillCommand<>(plugin),
 				new DamageCommand<>(plugin),
 				new FullHealCommand<>(plugin),
-				new HealCommand<>(plugin) // TODO: this might be broken on fabric
+				new HealCommand<>(plugin), // TODO: this might be broken on fabric
+				new FoodAddCommand<>(plugin),
+				new FoodSubCommand<>(plugin),
+				new FullFeedCommand<>(plugin),
+				new FullStarveCommand<>(plugin)
 		));
 	}
 

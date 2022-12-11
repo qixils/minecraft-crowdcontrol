@@ -14,4 +14,24 @@ public class FabricPlayer extends FabricLivingEntity implements CCPlayer {
 	public @NotNull ServerPlayer entity() {
 		return (ServerPlayer) super.entity();
 	}
+
+	@Override
+	public int foodLevel() {
+		return entity().getFoodData().getFoodLevel();
+	}
+
+	@Override
+	public double saturation() {
+		return entity().getFoodData().getSaturationLevel();
+	}
+
+	@Override
+	public void foodLevel(int foodLevel) {
+		entity().getFoodData().setFoodLevel(foodLevel);
+	}
+
+	@Override
+	public void saturation(double saturation) {
+		entity().getFoodData().setSaturation((float) saturation);
+	}
 }

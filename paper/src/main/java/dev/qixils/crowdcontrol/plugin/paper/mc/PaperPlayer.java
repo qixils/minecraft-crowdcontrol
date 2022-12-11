@@ -14,4 +14,24 @@ public class PaperPlayer extends PaperLivingEntity implements CCPlayer {
 	public @NotNull Player entity() {
 		return (Player) super.entity();
 	}
+
+	@Override
+	public int foodLevel() {
+		return entity().getFoodLevel();
+	}
+
+	@Override
+	public double saturation() {
+		return entity().getSaturation();
+	}
+
+	@Override
+	public void foodLevel(int foodLevel) {
+		entity().setFoodLevel(foodLevel);
+	}
+
+	@Override
+	public void saturation(double saturation) {
+		entity().setSaturation((float) saturation);
+	}
 }

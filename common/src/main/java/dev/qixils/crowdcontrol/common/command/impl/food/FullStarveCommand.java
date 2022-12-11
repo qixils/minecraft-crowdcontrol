@@ -1,4 +1,4 @@
-package dev.qixils.crowdcontrol.common.command.impl;
+package dev.qixils.crowdcontrol.common.command.impl.food;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.ImmediateCommand;
@@ -11,24 +11,27 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Getter
-public class FullHealCommand<P> implements ImmediateCommand<P> {
-	private final @NotNull String effectName = "full_heal";
+@RequiredArgsConstructor
+public class FullStarveCommand<P> implements ImmediateCommand<P> {
+	private final @NotNull String effectName = "full_starve";
 	private final @NotNull Plugin<P, ?> plugin;
 
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("All players are at maximum health");
+		Response.Builder resp = request.buildResponse().type(Response.ResultType.RETRY).message("Player's hunger is already empty");
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
-			double maxHealth = player.maxHealth();
-			if (player.health() < maxHealth) {
-				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.health(maxHealth));
+
+			if (player.foodLevel() > 0) {
+				sync(() -> {
+					player.foodLevel(0);
+					player.saturation(0);
+				});
+				resp.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 		}
-		return result;
+		return resp;
 	}
 }
