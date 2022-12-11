@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -16,6 +17,14 @@ import java.util.List;
 public class FoodAddCommand<P> implements ImmediateCommand<P> {
 	private final @NotNull String effectName = "feed";
 	private final @NotNull Plugin<P, ?> plugin;
+
+	@Override
+	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
+		if (request.getParameters() == null)
+			return getDefaultDisplayName();
+		int amount = (int) request.getParameters()[0];
+		return getDefaultDisplayName().args(Component.text(amount));
+	}
 
 	@NotNull
 	@Override
