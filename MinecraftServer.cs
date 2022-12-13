@@ -108,8 +108,8 @@ namespace CrowdControl.Games.Packs
             new Effect("Zero Gravity", "zero_gravity", "gravity") { Price = 75, Duration = 20, Description = "Disables the streamer's gravity" },
             // freeze-type commands
             new Effect("Freezing", "freezing", ItemKind.Folder),
-            new Effect("Freeze Feet", "freeze", "freezing") { Price = 100, Duration = 10, Description = "Temporarily prohibits movement" },
-            new Effect("Freeze Camera", "camera_lock", "freezing") { Price = 100, Duration = 10, Description = "Temporarily freeze the streamer's camera" },
+            new Effect("Can't Move", "freeze", "freezing") { Price = 100, Duration = 10, Description = "Temporarily prohibits movement" },
+            new Effect("Lock Camera", "camera_lock", "freezing") { Price = 100, Duration = 10, Description = "Temporarily freeze the streamer's camera" },
             new Effect("Lock Camera To Ground", "camera_lock_to_ground", "freezing") { Price = 150, Duration = 10, Description = "Temporarily locks the streamer's camera to the ground" },
             new Effect("Lock Camera To Sky", "camera_lock_to_sky", "freezing") { Price = 150, Duration = 10, Description = "Temporarily locks the streamer's camera to the sky" },
             new Effect("Disable Jumping", "disable_jumping", "freezing") { Price = 50, Duration = 10, Description = "Temporarily prevents the streamer from jumping" },
