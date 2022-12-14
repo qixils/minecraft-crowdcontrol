@@ -25,9 +25,9 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 <!--        <maven.compiler.release>${java.version}</maven.compiler.release>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <adventure.version>4.11.0</adventure.version>
-        <cloud.version>1.7.1</cloud.version>
-        <crowdcontrol.version>3.4.1</crowdcontrol.version>
+        <adventure.version>4.12.0</adventure.version>
+        <cloud.version>1.8.0</cloud.version>
+        <crowdcontrol.version>3.5.1</crowdcontrol.version>
     </properties>
 
     <pluginRepositories>
