@@ -5,7 +5,7 @@ The following steps detail how to manually set up a Minecraft 1.17.1 server with
 1. Download and
    install [the latest version of Java](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).
    Java 16 or later is required.
-2. Download the latest version of [Paper 1.17.1](https://papermc.io/downloads#Paper-1.17). Spigot is
+2. Download the latest version of [Paper 1.17.1](https://papermc.io/legacy). Spigot is
    not supported.
 3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the
    "root folder."

@@ -10,7 +10,7 @@ The following steps are for streamers connecting to a local server, i.e. the Cro
 setup.
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the **Game Selection** tab, select **Minecraft (Sponge 7) (PC)**.
+2. In the **Game Selection** tab, select **Minecraft (Sponge) 1.12.2 (PC)**.
 3. Click **Start**. A pop-up menu will appear prompting you for information required to connect to
    the server. In the host field, enter `localhost`. In the password field, enter the default
    password `crowdcontrol` or a custom password if you set one.

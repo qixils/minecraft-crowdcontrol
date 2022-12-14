@@ -1,11 +1,11 @@
-## Paper 1.18 Manual Installation
+## Paper 1.19 Manual Installation
 
-The following steps detail how to manually set up a Minecraft 1.18.2 server with Crowd Control.
+The following steps detail how to manually set up a Minecraft 1.19.3 server with Crowd Control.
 
 1. Download and
    install [the latest version of Java](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).
    Java 17 or later is required.
-2. Download the latest version of [Paper 1.18.2](https://papermc.io/legacy). Spigot is not
+2. Download the latest version of [Paper 1.19.3](https://papermc.io/downloads). Spigot is not
    supported.
 3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the
    "root folder."
