@@ -56,6 +56,6 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 				.build().queue();
 	}
 
-	// client-side jump cancelling is handled in PlayerMixin
-	// TODO: server-side jump cancelling
+	// jump cancelling is handled in PlayerMixin
+	// TODO: is resetting handled successfully for offline players?
 }
