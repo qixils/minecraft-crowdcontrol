@@ -95,9 +95,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				GravityCommand.zero(plugin),
 				GravityCommand.low(plugin),
 				GravityCommand.high(plugin),
-				GravityCommand.maximum(plugin)
-
-				// TODO location commands from paper
+				GravityCommand.maximum(plugin),
+				new BiomeCommand(plugin)
+				// TODO: structure command from paper
 		));
 
 		// entity commands

@@ -12,6 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEARCH_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEARCH_STEP;
+
 @Getter
 public class BiomeCommand extends NearbyLocationCommand<Biome> {
 	private static final Map<Environment, List<Biome>> BIOMES;
@@ -39,6 +42,7 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 					"JUNGLE",
 					"DEEP_OCEAN",
 					"STONE_SHORE",
+					"STONY_SHORE",
 					"SNOWY_BEACH",
 					"SNOWY_PLAINS",
 					"BIRCH_FOREST",
@@ -69,8 +73,8 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 					"SNOWY_TAIGA_MOUNTAINS",
 					"GIANT_SPRUCE_TAIGA",
 					"BAMBOO_JUNGLE",
-					"DRIPSTONE_CAVES",
-					"LUSH_CAVES",
+					//"DRIPSTONE_CAVES",
+					//"LUSH_CAVES",
 					"ERODED_BADLANDS",
 					// 1.18 biomes (mostly. i think.)
 					"FROZEN_PEAKS",
@@ -89,8 +93,9 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 					"WINDSWEPT_SAVANNA",
 					"WOODED_BADLANDS",
 					// 1.19 biomes
-					"MANGROVE_SWAMP",
-					"DEEP_DARK"
+					"MANGROVE_SWAMP"
+					//"DEEP_DARK"
+					// TODO: cave biomes
 			),
 			Environment.NETHER, List.of(
 					"NETHER_WASTES",
@@ -133,7 +138,7 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 
 	@Override
 	protected @Nullable Location search(@NotNull Location origin, @NotNull Biome searchType) {
-		return origin.getWorld().locateNearestBiome(origin, searchType, 1000, 30);
+		return origin.getWorld().locateNearestBiome(origin, searchType, BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP);
 	}
 
 	@Override

@@ -381,6 +381,15 @@ public class CommandConstants {
 	 * The minimum health that a player must have to be able to apply the Half Health effect.
 	 */
 	public static final double HALVE_HEALTH_MIN_HEALTH = 6; // 3 hearts
+	/**
+	 * The maximum search radius for locating biomes.
+	 */
+	public static final int BIOME_SEARCH_RADIUS = 1024;
+	/**
+	 * The step size for locating biomes.
+	 * A value of 1 will search every block, while a value of 32 will search every 32 blocks.
+	 */
+	public static final int BIOME_SEARCH_STEP = 32;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");
