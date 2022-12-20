@@ -23,6 +23,10 @@ public abstract class ResultSlotMixin extends Slot {
 	@Final
 	private CraftingContainer craftSlots;
 
+	@Shadow
+	@Final
+	private Player player;
+
 	// dummy constructor
 	public ResultSlotMixin(Container inventory, int index, int x, int y) {
 		super(inventory, index, x, y);
@@ -30,9 +34,19 @@ public abstract class ResultSlotMixin extends Slot {
 
 	@Inject(method = "onTake", at = @At("HEAD"))
 	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
-		if (player.level.isClientSide) // TODO: is this needed? does it break singleplayer?
+		if (player.level.isClientSide)
 			return;
 		CraftingRecipe recipe = player.level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
+
+	@Inject(method = "onQuickCraft", at = @At("HEAD"))
+	public void onQuickCraft(ItemStack result, int i, CallbackInfo ci) {
+		if (player.level.isClientSide)
+			return;
+		CraftingRecipe recipe = player.level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level).orElse(null);
+		new Craft(player, recipe, result).fire();
+	}
+
+	// onSwapCraft doesn't seem necessary
 }
