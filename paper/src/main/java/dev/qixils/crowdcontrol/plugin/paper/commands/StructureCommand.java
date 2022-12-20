@@ -13,6 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.STRUCTURE_SEARCH_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.STRUCTURE_SEARCH_UNEXPLORED;
+
 @Getter
 public class StructureCommand extends NearbyLocationCommand<StructureType> {
 	private static final Map<Environment, List<StructureType>> STRUCTURES;
@@ -32,6 +35,7 @@ public class StructureCommand extends NearbyLocationCommand<StructureType> {
 					"shipwreck",
 					"pillager_outpost",
 					"ruined_portal"
+					// todo cave teleportation (deep dark)
 			),
 			Environment.NETHER, List.of(
 					"fortress",
@@ -69,7 +73,7 @@ public class StructureCommand extends NearbyLocationCommand<StructureType> {
 
 	@Override
 	protected @Nullable Location search(@NotNull Location origin, @NotNull StructureType searchType) {
-		return origin.getWorld().locateNearestStructure(origin, searchType, 100, false);
+		return origin.getWorld().locateNearestStructure(origin, searchType, STRUCTURE_SEARCH_RADIUS, STRUCTURE_SEARCH_UNEXPLORED);
 	}
 
 	@Override

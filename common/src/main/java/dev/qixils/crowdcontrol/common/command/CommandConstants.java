@@ -390,6 +390,14 @@ public class CommandConstants {
 	 * A value of 1 will search every block, while a value of 32 will search every 32 blocks.
 	 */
 	public static final int BIOME_SEARCH_STEP = 32;
+	/**
+	 * The maximum search radius in chunks for locating structures.
+	 */
+	public static final int STRUCTURE_SEARCH_RADIUS = 128;
+	/**
+	 * Whether to search only for unexplored structures.
+	 */
+	public static final boolean STRUCTURE_SEARCH_UNEXPLORED = false;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");
