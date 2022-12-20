@@ -57,7 +57,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Dig Hole", "dig", "miscellaneous") { Price = 250, Description = "Digs a small hole underneath the streamer" },
             new Effect("Do-or-Die", "do_or_die", "miscellaneous") { Price = 500, Description = "Gives the streamer a task to complete within 30 seconds or else they die" },
             new Effect("Eat Chorus Fruit", "chorus_fruit", "miscellaneous") { Price = 75, Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit" },
-            new Effect("Explode", "explode", "miscellaneous") { Price = 750, Description = "Spawns a TNT-like explosion at the streamer's feet" },
+            // disabled because this is killing anyone in the air: new Effect("Explode", "explode", "miscellaneous") { Price = 750, Description = "Spawns a TNT-like explosion at the streamer's feet" },
             new Effect("Fling Randomly", "fling", "miscellaneous") { Price = 200, Description = "Flings the streamer in a totally random direction" },
             new Effect("Flip Mobs Upside-Down", "dinnerbone", "miscellaneous") { Price = 25, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone" },
             new Effect("Open Lootbox", "lootbox", "miscellaneous") { Price = 100, Description = "Gifts a completely random item with varying enchants and modifiers" },

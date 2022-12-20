@@ -101,8 +101,7 @@ public final class ToastCommand extends ImmediateCommand {
 	}
 
 	@Listener
-	private void onTick(@NotNull Tick tick) {
-		// TODO: this isn't working
+	public void onTick(@NotNull Tick tick) {
 		OPEN_INVENTORIES.values().forEach(ToastInventory::tick);
 	}
 
@@ -124,6 +123,7 @@ public final class ToastCommand extends ImmediateCommand {
 
 	private record ToastMenuProvider(@NotNull Container container) implements MenuProvider {
 		@Override
+		@NotNull
 		public Component getDisplayName() {
 			return TITLE;
 		}
