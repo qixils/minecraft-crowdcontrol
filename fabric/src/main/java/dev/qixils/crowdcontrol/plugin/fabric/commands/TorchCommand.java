@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 
 @Getter
 public class TorchCommand extends ImmediateCommand {
-	// TODO: this is placing some torches on air (seems like the block face is not getting set)
 	protected static final Direction[] BLOCK_FACES = new Direction[]{
 			Direction.DOWN,
 			Direction.EAST,
@@ -74,32 +73,21 @@ public class TorchCommand extends ImmediateCommand {
 	protected void placeTorch(Location location) {
 		Direction placeFace = null;
 		for (Direction blockFace : BLOCK_FACES) {
-			boolean facingDown = blockFace == Direction.DOWN;
-			if (!facingDown && placeFace != null) {
-				continue;
-			}
-			BlockState target = location.relative(facingDown
+			BlockState target = location.relative(blockFace == Direction.DOWN
 					? blockFace
 					: blockFace.getOpposite()
 			).block();
 			if (BlockFinder.isSolid(target)) {
 				placeFace = blockFace;
-				// down takes priority
-				if (facingDown) {
-					break;
-				}
+				break;
 			}
 		}
-		if (placeFace == null) {
+		if (placeFace == null)
 			return;
-		}
 
-		BlockState setBlock = Blocks.TORCH.defaultBlockState();
-		if (placeFace != Direction.DOWN) {
-			setBlock = Blocks.WALL_TORCH.defaultBlockState();
-			setBlock.setValue(WallTorchBlock.FACING, placeFace);
-		}
-
+		BlockState setBlock = placeFace == Direction.DOWN
+				? Blocks.TORCH.defaultBlockState()
+				: Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, placeFace);
 		location.block(setBlock);
 	}
 }
