@@ -26,17 +26,15 @@ public class SetTimeCommand extends ImmediateCommand {
 		this.time = time;
 	}
 
+	@SuppressWarnings("UnnecessaryContinue")
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		for (World world : plugin.getGame().getServer().getWorlds()) {
 			WorldProperties properties = world.getProperties();
 			long setTime = properties.getWorldTime();
-			while ((setTime % 24000) != time)
-				// I could be awesome and use the prefix add operator in the while condition and use
-				// an empty body but then IntelliJ would yell at me and I don't like being yelled at
-				// :(
-				setTime++;
+			while ((setTime++ % 24000) != time)
+				continue;
 			final long finalSetTime = setTime;
 			sync(() -> world.getProperties().setWorldTime(finalSetTime));
 		}

@@ -28,12 +28,16 @@ public class SetTimeCommand extends ImmediateCommand {
 		this.time = time;
 	}
 
+	@SuppressWarnings("UnnecessaryContinue")
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		for (ServerLevel level : plugin.server().getAllLevels()) {
-			// TODO: this resets the day to 0
-			sync(() -> level.setDayTime(time));
+			long setTime = level.getDayTime();
+			while ((setTime++ % 24000) != time)
+				continue;
+			final long finalSetTime = setTime;
+			sync(() -> level.setDayTime(finalSetTime));
 		}
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
