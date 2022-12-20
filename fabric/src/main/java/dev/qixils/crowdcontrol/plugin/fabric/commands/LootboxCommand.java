@@ -11,11 +11,11 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
+import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
 import static net.minecraft.world.entity.EquipmentSlot.MAINHAND;
 import static net.minecraft.world.entity.EquipmentSlot.OFFHAND;
 
@@ -206,17 +207,17 @@ public class LootboxCommand extends ImmediateCommand {
 	}
 
 	// lore getter
-	private static List<Component> getLore(ItemStack itemStack) {
+	private static List<net.kyori.adventure.text.Component> getLore(ItemStack itemStack) {
 		final CompoundTag displayTag = itemStack.getTag();
 		if (displayTag == null || !displayTag.contains("display"))
 			return new ArrayList<>();
 		final CompoundTag displayCompound = displayTag.getCompound("display");
 		final ListTag list = displayCompound.getList("Lore", 8);
-		return list.isEmpty() ? new ArrayList<>() : list.stream().map(tag -> Component.Serializer.fromJson(tag.getAsString())).collect(Collectors.toList());
+		return list.isEmpty() ? new ArrayList<>() : list.stream().map(tag -> gson().deserialize(tag.getAsString())).collect(Collectors.toList());
 	}
 
 	// lore setter
-	private static void setLore(ItemStack itemStack, List<Component> lore) {
+	private static void setLore(ItemStack itemStack, List<net.kyori.adventure.text.Component> lore) {
 		if (lore.isEmpty()) {
 			final CompoundTag tag = itemStack.getTag();
 			if (tag != null && tag.contains("display"))
@@ -224,7 +225,7 @@ public class LootboxCommand extends ImmediateCommand {
 			return;
 		}
 		final ListTag list = new ListTag();
-		lore.forEach(component -> list.add(StringTag.valueOf(Component.Serializer.toJson(component))));
+		lore.forEach(component -> list.add(StringTag.valueOf(gson().serialize(component))));
 		itemStack.getOrCreateTagElement("display").put("Lore", list);
 	}
 
@@ -236,7 +237,7 @@ public class LootboxCommand extends ImmediateCommand {
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
 				ItemStack itemStack = createRandomItem(luck);
 				List<Component> lore = getLore(itemStack);
-				lore.add(plugin.adventure().toNative(buildLootboxLore(plugin, request))); // TODO: this is displaying the raw translatable key
+				lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), player));
 				setLore(itemStack, lore);
 				container.setItem(slot, itemStack);
 			}
