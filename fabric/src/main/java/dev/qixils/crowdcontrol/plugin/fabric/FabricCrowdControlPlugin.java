@@ -21,7 +21,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -35,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -68,7 +68,8 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	protected FabricServerAudiences adventure;
 	@NotNull
 	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
-	private final ExecutorService syncExecutor = Util.bootstrapExecutor();
+	@NotNull
+	private Executor syncExecutor = Runnable::run;
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowd-control");
@@ -189,6 +190,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		if (server == null) {
 			this.server = null;
 			this.adventure = null;
+			this.syncExecutor = Runnable::run;
 			if (this.crowdControl != null) {
 				this.crowdControl.shutdown("Server is shutting down");
 				this.crowdControl = null;
@@ -196,6 +198,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		} else {
 			this.server = server;
 			this.adventure = FabricServerAudiences.of(server);
+			this.syncExecutor = server;
 			this.textUtil = new MojmapTextUtil(this);
 			this.configLoader = createConfigLoader(server.getFile("config"));
 			initCrowdControl();
