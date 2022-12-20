@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +32,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 	public EnchantmentCommand(FabricCrowdControlPlugin plugin, Enchantment enchantment) {
 		super(plugin);
 		this.enchantment = enchantment;
-		this.effectName = "enchant_" + Registry.ENCHANTMENT.getKey(enchantment).getPath();
+		this.effectName = "enchant_" + BuiltInRegistries.ENCHANTMENT.getKey(enchantment).getPath();
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
 				enchantment.getFullname(enchantment.getMaxLevel()).copy().withStyle(Style.EMPTY) // TODO: withStyle is not working (text is still colored)
@@ -73,7 +73,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 			if (slot == null)
 				continue;
 			// remove existing enchant
-			ResourceLocation tag = Registry.ENCHANTMENT.getKey(enchantment);
+			ResourceLocation tag = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
 			ItemStack item = getItem(inv, slot);
 			int curLevel = getEnchantmentLevel(item, enchantment);
 			item.getEnchantmentTags().removeIf(ench ->

@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
-import com.mojang.math.Vector3d;
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -12,6 +11,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Contract;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 import javax.annotation.CheckReturnValue;
 
@@ -38,12 +39,16 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 		return new BlockPos(x, y, z);
 	}
 
-	public Vec3 vec() {
+	public Vec3 vec3() {
 		return new Vec3(x, y, z);
 	}
 
-	public Vector3d vector() {
+	public Vector3d vector3d() {
 		return new Vector3d(x, y, z);
+	}
+
+	public Vector3f vector3f() {
+		return new Vector3f((float) x, (float) y, (float) z);
 	}
 
 	public void teleportHere(ServerPlayer player) {
@@ -101,7 +106,7 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	}
 
 	public <T extends ParticleOptions> ParticleEffectBuilder<T> buildParticleEffect(T options) {
-		return new ParticleEffectBuilder<>(options).level(level).position(vector());
+		return new ParticleEffectBuilder<>(options).level(level).position(vector3d());
 	}
 
 	public Location relative(Direction direction) {

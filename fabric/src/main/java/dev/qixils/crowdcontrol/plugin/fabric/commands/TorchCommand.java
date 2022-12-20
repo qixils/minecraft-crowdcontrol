@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -40,7 +40,7 @@ public class TorchCommand extends ImmediateCommand {
 		super(plugin);
 		this.placeTorches = placeTorches;
 		this.effectName = placeTorches ? "lit" : "dim";
-		this.torches = new TypedTag<>(CommandConstants.TORCHES, Registry.BLOCK);
+		this.torches = new TypedTag<>(CommandConstants.TORCHES, BuiltInRegistries.BLOCK);
 	}
 
 	@Override

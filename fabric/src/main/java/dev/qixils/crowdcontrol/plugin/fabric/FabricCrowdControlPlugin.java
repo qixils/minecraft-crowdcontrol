@@ -23,7 +23,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -78,7 +78,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(this);
 	private final FabricServerCommandManager<CommandSourceStack> commandManager
-			= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>newBuilder()
+			= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>builder()
 			.withAsynchronousParsing()
 			.withExecutor(getAsyncExecutor())
 			.build()
@@ -92,7 +92,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	public FabricCrowdControlPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
-		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
+		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
 		getEventManager().register(Leave.class, leave -> ccPlayers.remove(leave.player().getUUID()));

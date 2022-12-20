@@ -4,20 +4,18 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.data.worldgen.Structures;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.STRUCTURE_SEARCH_RADIUS;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.STRUCTURE_SEARCH_UNEXPLORED;
@@ -59,7 +57,7 @@ public class StructureCommand extends NearbyLocationCommand<StructureCommand.Str
 
 	@Override
 	protected @Nullable Location search(@NotNull Location origin, @NotNull StructureGroup searchType) {
-		var pair = origin.level().getChunkSource().getGenerator().findNearestMapStructure(origin.level(), searchType.structures, origin.pos(), STRUCTURE_SEARCH_RADIUS, STRUCTURE_SEARCH_UNEXPLORED);
+		var pair = origin.level().getChunkSource().getGenerator().findNearestMapStructure(origin.level(), searchType.getStructures(origin.level()), origin.pos(), STRUCTURE_SEARCH_RADIUS, STRUCTURE_SEARCH_UNEXPLORED);
 		if (pair == null)
 			return null;
 		return new Location(origin.level(), pair.getFirst());
@@ -76,45 +74,50 @@ public class StructureCommand extends NearbyLocationCommand<StructureCommand.Str
 	}
 
 	enum StructureGroup {
-		PILLAGER_OUTPOST(Structures.PILLAGER_OUTPOST),
-		MINESHAFT(Structures.MINESHAFT, Structures.MINESHAFT_MESA),
-		WOODLAND_MANSION(Structures.WOODLAND_MANSION),
-		JUNGLE_TEMPLE(Structures.JUNGLE_TEMPLE),
-		DESERT_PYRAMID(Structures.DESERT_PYRAMID),
-		IGLOO(Structures.IGLOO),
-		SHIPWRECK(Structures.SHIPWRECK, Structures.SHIPWRECK_BEACHED),
-		SWAMP_HUT(Structures.SWAMP_HUT),
-		STRONGHOLD(Structures.STRONGHOLD),
-		OCEAN_MONUMENT(Structures.OCEAN_MONUMENT),
-		OCEAN_RUIN(Structures.OCEAN_RUIN_COLD, Structures.OCEAN_RUIN_WARM),
-		NETHER_FORTRESS("Fortress", Structures.FORTRESS),
-		NETHER_FOSSIL(Structures.NETHER_FOSSIL),
-		END_CITY(Structures.END_CITY),
-		BURIED_TREASURE(Structures.BURIED_TREASURE),
-		BASTION_REMNANT(Structures.BASTION_REMNANT),
-		VILLAGE(Structures.VILLAGE_PLAINS, Structures.VILLAGE_SAVANNA, Structures.VILLAGE_SNOWY, Structures.VILLAGE_TAIGA, Structures.VILLAGE_DESERT),
-		RUINED_PORTAL(Structures.RUINED_PORTAL_STANDARD, Structures.RUINED_PORTAL_DESERT, Structures.RUINED_PORTAL_JUNGLE, Structures.RUINED_PORTAL_SWAMP, Structures.RUINED_PORTAL_MOUNTAIN, Structures.RUINED_PORTAL_OCEAN),
-		RUINED_PORTAL_NETHER("Ruined Portal", Structures.RUINED_PORTAL_NETHER),
-		ANCIENT_CITY(Structures.ANCIENT_CITY),
+		PILLAGER_OUTPOST(BuiltinStructures.PILLAGER_OUTPOST),
+		MINESHAFT(BuiltinStructures.MINESHAFT, BuiltinStructures.MINESHAFT_MESA),
+		WOODLAND_MANSION(BuiltinStructures.WOODLAND_MANSION),
+		JUNGLE_TEMPLE(BuiltinStructures.JUNGLE_TEMPLE),
+		DESERT_PYRAMID(BuiltinStructures.DESERT_PYRAMID),
+		IGLOO(BuiltinStructures.IGLOO),
+		SHIPWRECK(BuiltinStructures.SHIPWRECK, BuiltinStructures.SHIPWRECK_BEACHED),
+		SWAMP_HUT(BuiltinStructures.SWAMP_HUT),
+		STRONGHOLD(BuiltinStructures.STRONGHOLD),
+		OCEAN_MONUMENT(BuiltinStructures.OCEAN_MONUMENT),
+		OCEAN_RUIN(BuiltinStructures.OCEAN_RUIN_COLD, BuiltinStructures.OCEAN_RUIN_WARM),
+		NETHER_FORTRESS("Fortress", BuiltinStructures.FORTRESS),
+		NETHER_FOSSIL(BuiltinStructures.NETHER_FOSSIL),
+		END_CITY(BuiltinStructures.END_CITY),
+		BURIED_TREASURE(BuiltinStructures.BURIED_TREASURE),
+		BASTION_REMNANT(BuiltinStructures.BASTION_REMNANT),
+		VILLAGE(BuiltinStructures.VILLAGE_PLAINS, BuiltinStructures.VILLAGE_SAVANNA, BuiltinStructures.VILLAGE_SNOWY, BuiltinStructures.VILLAGE_TAIGA, BuiltinStructures.VILLAGE_DESERT),
+		RUINED_PORTAL(BuiltinStructures.RUINED_PORTAL_STANDARD, BuiltinStructures.RUINED_PORTAL_DESERT, BuiltinStructures.RUINED_PORTAL_JUNGLE, BuiltinStructures.RUINED_PORTAL_SWAMP, BuiltinStructures.RUINED_PORTAL_MOUNTAIN, BuiltinStructures.RUINED_PORTAL_OCEAN),
+		RUINED_PORTAL_NETHER("Ruined Portal", BuiltinStructures.RUINED_PORTAL_NETHER),
+		ANCIENT_CITY(BuiltinStructures.ANCIENT_CITY),
 		;
 		private final Component name;
-		private final HolderSet<Structure> structures;
+		private final ResourceKey<Structure>[] structures;
 
 		@SafeVarargs
-		StructureGroup(String name, Holder<Structure>... structures) {
+		StructureGroup(String name, ResourceKey<Structure>... structures) {
 			this(Component.text(name), structures);
 		}
 
 		@SafeVarargs
-		StructureGroup(Component name, Holder<Structure>... structures) {
+		StructureGroup(Component name, ResourceKey<Structure>... structures) {
 			this.name = name;
-			this.structures = HolderSet.direct(structures);
+			this.structures = structures;
 		}
 
 		@SafeVarargs
-		StructureGroup(Holder<Structure>... structures) {
+		StructureGroup(ResourceKey<Structure>... structures) {
 			this.name = Component.text(WordUtils.capitalizeFully(name().replace('_', ' ')));
-			this.structures = HolderSet.direct(structures);
+			this.structures = structures;
+		}
+
+		HolderSet<Structure> getStructures(ServerLevel level) {
+			var registry = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+			return HolderSet.direct(Arrays.stream(structures).map(registry::get).flatMap(Optional::stream).toList());
 		}
 	}
 }

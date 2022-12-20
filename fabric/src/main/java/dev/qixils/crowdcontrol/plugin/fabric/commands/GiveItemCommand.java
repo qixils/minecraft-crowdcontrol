@@ -7,7 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -27,7 +27,7 @@ public class GiveItemCommand extends ImmediateCommand {
 	public GiveItemCommand(FabricCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "give_" + Registry.ITEM.getKey(item).getPath();
+		this.effectName = "give_" + BuiltInRegistries.ITEM.getKey(item).getPath();
 		this.displayName = Component.translatable("cc.effect.give_item.name", item.getName(new ItemStack(item)));
 	}
 
@@ -47,7 +47,7 @@ public class GiveItemCommand extends ImmediateCommand {
 		ItemStack itemStack = new ItemStack(item);
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxRecipients = config.getItemLimit(Registry.ITEM.getKey(item).getPath());
+		int maxRecipients = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
 
 		sync(() -> {
 			int recipients = 0;

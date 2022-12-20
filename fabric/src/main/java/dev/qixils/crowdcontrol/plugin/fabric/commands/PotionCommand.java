@@ -8,7 +8,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -31,7 +31,7 @@ public class PotionCommand extends TimedImmediateCommand {
 	public PotionCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull MobEffect potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		this.effectName = "potion_" + Registry.MOB_EFFECT.getKey(potionEffectType).getPath();
+		this.effectName = "potion_" + BuiltInRegistries.MOB_EFFECT.getKey(potionEffectType).getPath();
 		this.isMinimal = potionEffectType.isInstantenous();
 		this.displayName = Component.translatable("cc.effect.potion.name", potionEffectType.getDisplayName());
 	}

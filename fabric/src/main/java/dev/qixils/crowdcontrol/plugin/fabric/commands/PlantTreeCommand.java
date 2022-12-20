@@ -9,7 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -35,7 +35,7 @@ public class PlantTreeCommand extends Command {
 	}
 
 	private static List<ConfiguredFeature<?, ?>> getTreesFor(Level level) {
-		return level.registryAccess().registry(Registry.CONFIGURED_FEATURE_REGISTRY)
+		return level.registryAccess().registry(Registries.CONFIGURED_FEATURE)
 				.orElseThrow(() -> new IllegalStateException("No configured feature registry"))
 				.stream()
 				.filter(feature -> {

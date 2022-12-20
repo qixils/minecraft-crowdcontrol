@@ -8,7 +8,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class GravelCommand extends ImmediateCommand {
 			locations.addAll(BlockFinder.builder()
 					.origin(player)
 					.locationValidator(loc ->
-							CommonTags.STONES_EXCEPT_GRAVEL.contains(Registry.BLOCK.getKey(loc.block().getBlock()).toString()))
+							CommonTags.STONES_EXCEPT_GRAVEL.contains(BuiltInRegistries.BLOCK.getKey(loc.block().getBlock()).toString()))
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());

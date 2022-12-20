@@ -9,7 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +28,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	public TakeItemCommand(FabricCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "take_" + Registry.ITEM.getKey(item).getPath();
+		this.effectName = "take_" + BuiltInRegistries.ITEM.getKey(item).getPath();
 		this.displayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
 	}
 
@@ -51,7 +51,7 @@ public class TakeItemCommand extends ImmediateCommand {
 				.message("Item could not be found in target inventories");
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(Registry.ITEM.getKey(item).getPath());
+		int maxVictims = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
 		int victims = 0;
 
 		// first pass (hosts)

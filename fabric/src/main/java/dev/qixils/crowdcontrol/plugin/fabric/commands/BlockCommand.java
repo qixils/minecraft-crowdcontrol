@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,7 +29,7 @@ public class BlockCommand extends ImmediateCommand {
 		this(
 				plugin,
 				blockType,
-				"block_" + Registry.BLOCK.getKey(blockType).getPath(),
+				"block_" + BuiltInRegistries.BLOCK.getKey(blockType).getPath(),
 				Component.translatable("cc.effect.block.name", blockType.getName())
 		);
 	}

@@ -7,7 +7,7 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffect;
@@ -36,10 +36,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, Registry.ENTITY_TYPE).getAll());
-			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, Registry.BLOCK);
-			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, Registry.BLOCK);
-			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, Registry.ITEM);
+			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, BuiltInRegistries.ENTITY_TYPE).getAll());
+			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, BuiltInRegistries.BLOCK);
+			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, BuiltInRegistries.BLOCK);
+			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, BuiltInRegistries.ITEM);
 		}
 	}
 
@@ -111,7 +111,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			commands.add(new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		for (MobEffect potion : Registry.MOB_EFFECT)
+		for (MobEffect potion : BuiltInRegistries.MOB_EFFECT)
 			commands.add(new PotionCommand(plugin, potion));
 
 		// block sets
@@ -122,7 +122,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			commands.add(new FallingBlockCommand(plugin, block));
 
 		// enchantments
-		for (Enchantment enchantment : Registry.ENCHANTMENT)
+		for (Enchantment enchantment : BuiltInRegistries.ENCHANTMENT)
 			commands.add(new EnchantmentCommand(plugin, enchantment));
 
 		// give/take items

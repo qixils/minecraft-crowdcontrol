@@ -9,7 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
@@ -31,7 +31,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	public RemoveEntityCommand(FabricCrowdControlPlugin plugin, EntityType<?> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + Registry.ENTITY_TYPE.getKey(entityType).getPath();
+		this.effectName = "remove_entity_" + BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType.getDescription());
 	}
 
@@ -53,7 +53,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 				.message("No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(Registry.ENTITY_TYPE.getKey(entityType).getPath());
+		int maxVictims = config.getItemLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
 		int victims = 0;
 
 		// first pass (hosts)

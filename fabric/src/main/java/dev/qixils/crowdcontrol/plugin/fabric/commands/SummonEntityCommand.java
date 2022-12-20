@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
@@ -38,12 +38,12 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		super(plugin);
 		this.entityType = entityType;
 		this.isMonster = entityType.getCategory() == MobCategory.MONSTER;
-		this.effectName = "entity_" + Registry.ENTITY_TYPE.getKey(entityType).getPath();
+		this.effectName = "entity_" + BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getDescription());
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
-		for (Item item : Registry.ITEM) {
+		for (Item item : BuiltInRegistries.ITEM) {
 			if (item instanceof ArmorItem armorItem) {
 				EquipmentSlot slot = armorItem.getSlot();
 				if (slot.getType() != EquipmentSlot.Type.ARMOR)
@@ -72,7 +72,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		}
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(Registry.ENTITY_TYPE.getKey(entityType).getPath());
+		int maxVictims = config.getItemLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
 
 		sync(() -> {
 			int victims = 0;
