@@ -45,6 +45,8 @@ public class GravityCommand extends TimedVoidCommand {
 						sync(() -> player.addEffect(new MobEffectInstance(MobEffects.LEVITATION, (int) getDuration(request).getSeconds() * 20, level, true, true, false)));
 						response.type(Response.ResultType.SUCCESS).message("SUCCESS");
 					}
+					if (response.type() == Response.ResultType.SUCCESS)
+						playerAnnounce(players, request);
 					return response;
 				})
 				.build().queue();

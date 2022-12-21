@@ -58,6 +58,8 @@ public class GravityCommand extends TimedVoidCommand {
 						});
 						response.type(Response.ResultType.SUCCESS).message("SUCCESS");
 					}
+					if (response.type() == Response.ResultType.SUCCESS)
+						playerAnnounce(players, request);
 					return response;
 				})
 				.build().queue();

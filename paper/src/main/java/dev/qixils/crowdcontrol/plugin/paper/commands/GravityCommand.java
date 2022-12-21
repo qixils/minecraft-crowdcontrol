@@ -44,6 +44,8 @@ public class GravityCommand extends TimedVoidCommand {
 						sync(() -> player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) getDuration(request).getSeconds() * 20, level, true, true, false)));
 						response.type(Response.ResultType.SUCCESS).message("SUCCESS");
 					}
+					if (response.type() == Response.ResultType.SUCCESS)
+						playerAnnounce(players, request);
 					return response;
 				})
 				.build().queue();
