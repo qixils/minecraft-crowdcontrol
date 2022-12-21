@@ -22,7 +22,7 @@ public class MaxHealthAddCommand<P> implements ImmediateCommand<P> {
 	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
-		return getDefaultDisplayName().args(Component.text((int) request.getParameters()[0]));
+		return getDefaultDisplayName().args(Component.text((int) (double) request.getParameters()[0]));
 	}
 
 	@NotNull

@@ -22,7 +22,7 @@ public class ExpSubCommand<P> implements ImmediateCommand<P> {
 	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
-		int amount = (int) request.getParameters()[0];
+		int amount = (int) (double) request.getParameters()[0];
 		return getDefaultDisplayName().args(Component.text(amount));
 	}
 
@@ -32,7 +32,7 @@ public class ExpSubCommand<P> implements ImmediateCommand<P> {
 		if (request.getParameters() == null)
 			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
 		Response.Builder resp = request.buildResponse().type(Response.ResultType.RETRY).message("Player does not have enough XP levels");
-		int amount = (int) request.getParameters()[0];
+		int amount = (int) (double) request.getParameters()[0];
 
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);

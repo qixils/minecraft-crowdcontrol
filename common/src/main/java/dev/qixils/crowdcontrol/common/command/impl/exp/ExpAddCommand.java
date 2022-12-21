@@ -21,7 +21,7 @@ public class ExpAddCommand<P> implements ImmediateCommand<P> {
 	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
-		int amount = (int) request.getParameters()[0];
+		int amount = (int) (double) request.getParameters()[0];
 		return getDefaultDisplayName().args(Component.text(amount));
 	}
 
@@ -30,7 +30,7 @@ public class ExpAddCommand<P> implements ImmediateCommand<P> {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
 		if (request.getParameters() == null)
 			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
-		int amount = (int) request.getParameters()[0];
+		int amount = (int) (double) request.getParameters()[0];
 		sync(() -> players.stream().map(plugin::getPlayer).forEach(player -> player.addXpLevel(amount)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS).message("SUCCESS");
 	}

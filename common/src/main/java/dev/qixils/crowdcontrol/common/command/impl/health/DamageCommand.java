@@ -22,7 +22,7 @@ public class DamageCommand<P> implements ImmediateCommand<P> {
 	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
-		int amount = (int) request.getParameters()[0];
+		int amount = (int) (double) request.getParameters()[0];
 		return getDefaultDisplayName().args(Component.text(amount));
 	}
 

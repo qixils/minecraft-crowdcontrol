@@ -15,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
 import java.util.*;
@@ -299,11 +300,15 @@ public interface Command<P> {
 			audiences.add(audience);
 		}
 
-		Audience.audience(audiences).sendMessage(Component.translatable(
-				"cc.effect.used",
-				plugin.getViewerComponent(request, true).color(Plugin.USER_COLOR),
-				getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
-		));
+		try {
+			Audience.audience(audiences).sendMessage(Component.translatable(
+					"cc.effect.used",
+					plugin.getViewerComponent(request, true).color(Plugin.USER_COLOR),
+					getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
+			));
+		} catch (Exception e) {
+			LoggerFactory.getLogger(Command.class).warn("Failed to announce effect", e);
+		}
 	}
 
 	/**
