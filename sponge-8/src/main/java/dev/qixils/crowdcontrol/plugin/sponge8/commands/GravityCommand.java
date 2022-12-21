@@ -35,6 +35,7 @@ public class GravityCommand extends TimedVoidCommand {
 	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
 		new TimedEffect.Builder()
 				.request(request)
+				.effectGroup("gravity")
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
