@@ -10,8 +10,6 @@ import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -87,16 +85,12 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@MonotonicNonNull
 	private HoconConfigurationLoader configLoader;
-	@NotNull
-	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
 	public FabricCrowdControlPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
 		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
-		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
-		getEventManager().register(Leave.class, leave -> ccPlayers.remove(leave.player().getUUID()));
 		getEventManager().registerListeners(softLockResolver);
 	}
 
@@ -108,14 +102,8 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
-	public void onPlayerJoin(ServerPlayer player) {
-		super.onPlayerJoin(player);
-		ccPlayers.put(player.getUUID(), new FabricPlayer(player));
-	}
-
-	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayer player) {
-		return ccPlayers.computeIfAbsent(player.getUUID(), uuid -> new FabricPlayer(player));
+		return new FabricPlayer(player);
 	}
 
 	/**

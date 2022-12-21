@@ -21,9 +21,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 	@Contract(value = "_ -> param1", mutates = "param1")
 	private @NotNull List<@NotNull ServerPlayer> filter(@NotNull List<ServerPlayer> players) {
 		players.removeIf(player -> player == null
-						|| player.isRemoved()
 						|| player.isDeadOrDying()
-						|| player.getHealth() <= 0
 						|| (player.isSpectator() && Components.GAME_TYPE_EFFECT.get(player).getValue() == null)
 		);
 		return players;

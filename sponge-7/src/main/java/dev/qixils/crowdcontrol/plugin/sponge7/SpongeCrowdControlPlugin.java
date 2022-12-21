@@ -97,8 +97,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Accessors(fluent = true)
 	private final EntityMapper<Player> playerMapper = new CommandSourceMapper<>(this);
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
-	@NotNull
-	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
@@ -357,7 +355,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		initCrowdControl();
 		commandManager = new SpongeCommandManager<>(
 				pluginContainer,
-				AsynchronousCommandExecutionCoordinator.<CommandSource>newBuilder()
+				AsynchronousCommandExecutionCoordinator.<CommandSource>builder()
 						.withAsynchronousParsing().withExecutor(asyncExecutor).build(),
 				Function.identity(),
 				Function.identity()
@@ -376,20 +374,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Listener
 	public void onConnection(ClientConnectionEvent.Join event) {
 		onPlayerJoin(event.getTargetEntity());
-		ccPlayers.put(event.getTargetEntity().getUniqueId(), new SpongePlayer(event.getTargetEntity()));
 		Platform platform = game.getPlatform();
 		if ((platform.getType().isClient() || platform.getExecutionType().isClient()) && clientHost == null) {
 			clientHost = event.getTargetEntity().getUniqueId().toString();
 		}
 	}
 
-	@Listener
-	public void onDisconnect(ClientConnectionEvent.Disconnect event) {
-		ccPlayers.remove(event.getTargetEntity().getUniqueId());
-	}
-
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
-		return ccPlayers.computeIfAbsent(player.getUniqueId(), uuid -> new SpongePlayer(player));
+		return new SpongePlayer(player);
 	}
 }

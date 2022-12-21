@@ -58,12 +58,7 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Plugin("crowd-control")
@@ -260,6 +255,6 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayer player) {
-		return ccPlayers.computeIfAbsent(player.uniqueId(), uuid -> new SpongePlayer(player));
+		return new SpongePlayer(player);
 	}
 }

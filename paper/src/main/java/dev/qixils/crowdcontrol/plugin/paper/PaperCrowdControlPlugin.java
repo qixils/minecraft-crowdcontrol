@@ -26,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -89,8 +88,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Getter @NotNull
 	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-	@NotNull
-	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
 
 	@Override
 	public void onLoad() {
@@ -174,7 +171,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 		try {
 			commandManager = new PaperCommandManager<>(this,
-					AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder()
+					AsynchronousCommandExecutionCoordinator.<CommandSender>builder()
 							.withAsynchronousParsing().build(),
 					Function.identity(),
 					Function.identity()
@@ -244,17 +241,11 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		onPlayerJoin(event.getPlayer());
-		ccPlayers.put(event.getPlayer().getUniqueId(), new PaperPlayer(event.getPlayer()));
-	}
-
-	@EventHandler
-	public void onLeave(PlayerQuitEvent event) {
-		ccPlayers.remove(event.getPlayer().getUniqueId());
 	}
 
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
-		return ccPlayers.computeIfAbsent(player.getUniqueId(), uuid -> new PaperPlayer(player));
+		return new PaperPlayer(player);
 	}
 
 	// boilerplate stuff for the data container storage
