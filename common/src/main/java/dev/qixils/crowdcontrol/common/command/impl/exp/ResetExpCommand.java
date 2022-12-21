@@ -20,13 +20,10 @@ public class ResetExpCommand<P> implements ImmediateCommand<P> {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
-		if (request.getParameters() == null)
-			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
 		Response.Builder resp = request.buildResponse().type(Response.ResultType.RETRY).message("Player does not have any XP levels");
-
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
-			if (player.xpLevel() >= 0) {
+			if (player.xpLevel() > 0) {
 				sync(() -> player.xpLevel(0));
 				resp.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
