@@ -3,10 +3,13 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,11 +29,13 @@ public final class FreezeCommand extends TimedVoidCommand {
 
 	private final String effectName;
 	private final LocationModifier modifier;
+	private final MovementStatus.Type freezeType;
 
-	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier) {
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatus.Type freezeType) {
 		super(plugin);
 		this.effectName = effectName;
 		this.modifier = modifier;
+		this.freezeType = freezeType;
 	}
 
 	public @NotNull Duration getDefaultDuration() {
@@ -46,13 +51,25 @@ public final class FreezeCommand extends TimedVoidCommand {
 				.startCallback($ -> {
 					List<ServerPlayer> players = getPlugin().getPlayers(request);
 					Map<UUID, FreezeData> locations = new HashMap<>();
-					players.forEach(player -> locations.put(player.getUUID(), new FreezeData(modifier, new Location(player))));
+					players.forEach(player -> {
+						locations.put(player.getUUID(), new FreezeData(modifier, new Location(player)));
+						Components.MOVEMENT_STATUS.get(player).setProhibited(freezeType, true);
+					});
 					atomic.set(locations);
 					DATA.putAll(locations);
 					playerAnnounce(players, request);
 					return null;
 				})
-				.completionCallback($ -> atomic.get().forEach(DATA::remove))
+				.completionCallback($ -> atomic.get().forEach((uuid, data) -> {
+					DATA.remove(uuid, data);
+					MinecraftServer server = getPlugin().getServer();
+					if (server == null)
+						return;
+					ServerPlayer player = server.getPlayerList().getPlayer(uuid);
+					if (player == null)
+						return;
+					Components.MOVEMENT_STATUS.get(player).setProhibited(freezeType, false);
+				}))
 				.build().queue();
 	}
 
@@ -73,18 +90,18 @@ public final class FreezeCommand extends TimedVoidCommand {
 	}
 
 	public static FreezeCommand feet(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "freeze", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation));
+		return new FreezeCommand(plugin, "freeze", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation), MovementStatus.Type.WALK);
 	}
 
 	public static FreezeCommand camera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock", Location::withRotationOf); // (cur, prev) -> cur.withRotationOf(prev)
+		return new FreezeCommand(plugin, "camera_lock", Location::withRotationOf, MovementStatus.Type.LOOK); // (cur, prev) -> cur.withRotationOf(prev)
 	}
 
 	public static FreezeCommand skyCamera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock_to_sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90));
+		return new FreezeCommand(plugin, "camera_lock_to_sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90), MovementStatus.Type.LOOK);
 	}
 
 	public static FreezeCommand groundCamera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock_to_ground", (cur, prev) -> cur.withRotation(prev.yaw(), 90));
+		return new FreezeCommand(plugin, "camera_lock_to_ground", (cur, prev) -> cur.withRotation(prev.yaw(), 90), MovementStatus.Type.LOOK);
 	}
 }

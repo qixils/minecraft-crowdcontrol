@@ -58,5 +58,4 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 	}
 
 	// jump cancelling is handled in PlayerMixin
-	// TODO: is resetting handled successfully for offline players?
 }
