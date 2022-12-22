@@ -38,7 +38,7 @@
       "crowd-control:viewer-mob",
       "crowd-control:original-display-name",
       "crowd-control:game-type-effect",
-      "crowd-control:jump-status"
+      "crowd-control:movement-status"
     ]
   }
 }

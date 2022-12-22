@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -25,7 +26,7 @@ public abstract class PlayerMixin extends LivingEntity {
 
 	@Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
 	public void jumpFromGround(CallbackInfo ci) {
-		if (Components.JUMP_STATUS.get(this).isProhibited()) {
+		if (Components.MOVEMENT_STATUS.get(this).isProhibited(MovementStatus.Type.JUMP)) {
 			ci.cancel();
 			if (!this.level.isClientSide) {
 				//noinspection DataFlowIssue

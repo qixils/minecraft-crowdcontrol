@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -44,14 +45,14 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 								.message("No players online");
 
 					for (Player player : players.get())
-						Components.JUMP_STATUS.get(player).setProhibited(true);
+						Components.MOVEMENT_STATUS.get(player).setProhibited(MovementStatus.Type.JUMP, true);
 					playerAnnounce(players.get(), request);
 
 					return null; // success
 				})
 				.completionCallback($ -> {
 					for (Player player : players.get())
-						Components.JUMP_STATUS.get(player).setProhibited(false);
+						Components.MOVEMENT_STATUS.get(player).setProhibited(MovementStatus.Type.JUMP, false);
 				})
 				.build().queue();
 	}
