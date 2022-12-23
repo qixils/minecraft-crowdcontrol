@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity {
@@ -54,12 +53,5 @@ public abstract class PlayerMixin extends LivingEntity {
 	)
 	private boolean experienceKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {
 		return keepInventoryRedirect(gameRules, key);
-	}
-
-	@Inject(method = "isImmobile", at = @At("HEAD"), cancellable = true)
-	public void isImmobile(CallbackInfoReturnable<Boolean> cir) {
-		if (Components.MOVEMENT_STATUS.get(this).isProhibited(MovementStatus.Type.WALK)) {
-			cir.setReturnValue(true);
-		}
 	}
 }

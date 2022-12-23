@@ -74,6 +74,10 @@ public class CommandConstants {
 	 */
 	public static final long DISABLE_JUMPING_TICKS = DISABLE_JUMPING_DURATION.getSeconds() * 20;
 	/**
+	 * The amount of time to invert controls for.
+	 */
+	public static final @NotNull Duration INVERT_CONTROLS_DURATION = Duration.ofSeconds(15);
+	/**
 	 * The radius to search for valid locations to place flowers for the Flower Command.
 	 */
 	public static final int FLOWER_RADIUS = 10;

@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using ConnectorType = CrowdControl.Common.ConnectorType;
 using EffectStatus = CrowdControl.Common.EffectStatus;
 using Log = CrowdControl.Common.Log;
+using LogLevel = CrowdControl.Common.LogLevel;
 
 // TODO: auto-hiding is broken? doesn't seem to work in SDK or as a CCPAK
 // TODO: suggest to Jaku a configurable folder sort order (namely by price)
@@ -60,6 +61,8 @@ namespace CrowdControl.Games.Packs
             // disabled because this is killing anyone in the air: new Effect("Explode", "explode", "miscellaneous") { Price = 750, Description = "Spawns a TNT-like explosion at the streamer's feet" },
             new Effect("Fling Randomly", "fling", "miscellaneous") { Price = 200, Description = "Flings the streamer in a totally random direction" },
             new Effect("Flip Mobs Upside-Down", "dinnerbone", "miscellaneous") { Price = 25, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone" },
+            new ClientEffect("Invert Controls", "invert_wasd", "miscellaneous") { Price = 200, Duration = 15, Description = "Temporarily inverts WASD movement" },
+            new ClientEffect("Invert Camera", "invert_look", "miscellaneous") { Price = 200, Duration = 15, Description = "Temporarily inverts mouse movement" },
             new Effect("Open Lootbox", "lootbox", "miscellaneous") { Price = 100, Description = "Gifts a completely random item with varying enchants and modifiers" },
             new Effect("Open Lucky Lootbox", "lootbox_5", "miscellaneous") { Price = 500, Description = "Gifts two random items with higher odds of having beneficial enchantments and modifiers" },
             new Effect("Place Flowers", "flowers", "miscellaneous") { Price = 25, Description = "Randomly places flowers nearby" },
@@ -487,7 +490,7 @@ namespace CrowdControl.Games.Packs
             new ItemType("XP Levels", "xp100", ItemType.Subtype.Slider, "{\"min\":1,\"max\":100}")
         };
 
-        private static readonly Regex UnavailableEffectPattern = new(@"^.+ \[effect: ([a-zA-Z0-9_])\]$", RegexOptions.Compiled);
+        private static readonly Regex UnavailableEffectPattern = new(@"^.+ \[effect: ([a-zA-Z0-9_]+)\]$", RegexOptions.Compiled);
 
         public override List<Effect> Effects => AllEffects;
 
@@ -496,12 +499,12 @@ namespace CrowdControl.Games.Packs
             get => base.Connector;
             set
             {
-                value.MessageParsed += OnMessageParsed;
+                value.MessageParsed += InterceptMessageParsed;
                 base.Connector = value;
             }
         }
 
-        private void OnMessageParsed(ISimpleTCPConnector<Request, Response, ISimpleTCPContext.NullContext> sender, Response response, ISimpleTCPContext.NullContext context)
+        private void InterceptMessageParsed(ISimpleTCPConnector<Request, Response, ISimpleTCPContext> sender, Response response, ISimpleTCPContext context)
         {
             Log.Debug(
                 $"Parsing incoming message #{response.id} of type {response.type} with message \"{response.message}\"");
@@ -511,25 +514,11 @@ namespace CrowdControl.Games.Packs
                 return;
             }
 
-            if (response.id == 0)
+            if (response.id == 0 && response.message.StartsWith("_mc_cc_server_status_"))
             {
-                Log.Debug("Message is ID #0");
-                if (response.message.StartsWith("_mc_cc_server_status_"))
-                {
-                    Log.Debug("Message is server status packet");
-                    // incoming packet contains info about supported effects
-                    OnServerStatusPacket(response);
-                }
-                else if (response.message.StartsWith("_mc_cc_hide_effects_:"))
-                {
-                    Log.Debug("Message is hide effects packet");
-                    OnMenuStatusPacket(response, EffectStatus.MenuHidden);
-                }
-                else if (response.message.StartsWith("_mc_cc_show_effects_:"))
-                {
-                    Log.Debug("Message is show effects packet");
-                    OnMenuStatusPacket(response, EffectStatus.MenuVisible);
-                }
+                Log.Debug("Message is server status packet");
+                // incoming packet contains info about supported effects
+                OnServerStatusPacket(response);
             }
             else if (response.status == ConnectorLib.JSON.EffectStatus.Unavailable)
             {
@@ -556,31 +545,23 @@ namespace CrowdControl.Games.Packs
             // hide global effects if they are not usable
             if (!status.GlobalEffects)
             {
-                // does the folder actually get hidden? if so, do its contents also get hidden from search?
+                Log.Message("Hiding global effects");
                 AllEffects.FindAll(effect => effect is GlobalEffect).ForEach(HideEffect);
             }
             // hide client effects if running on a server
             if (!status.ClientEffects)
             {
+                Log.Message("Hiding client effects");
                 AllEffects.FindAll(effect => effect is ClientEffect).ForEach(HideEffect);
             }
 
             // hide effects that are unsupported by the platform
+            Log.Message("Hiding unsupported effects");
             var registeredEffectsList = new List<string>(status.RegisteredEffects).ConvertAll(input => input.ToLower());
             AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !registeredEffectsList.Contains(effect.Code.ToLower()))
                 .ForEach(HideEffect);
-            
-            Log.Debug("Finished hiding effects");
-        }
 
-        private void OnMenuStatusPacket(Response response, EffectStatus status)
-        {
-            var effectsList = new List<string>(response.message.Split(':')[1].Split(','));
-            AllEffects.FindAll(effect => effectsList.Contains(effect.Code)).ForEach(effect =>
-            {
-                ReportStatus(effect, status);
-                Log.Message($"Updated visibility of {effect.Code} to {status}");
-            });
+            Log.Message("Finished hiding effects");
         }
 
         private void OnUnavailablePacket(Response response)

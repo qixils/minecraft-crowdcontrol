@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -92,6 +93,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().registerListeners(softLockResolver);
+		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
 	}
 
 	@Override

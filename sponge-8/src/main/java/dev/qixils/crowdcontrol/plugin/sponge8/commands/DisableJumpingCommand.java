@@ -43,7 +43,7 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 	@Override
 	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
 		new TimedEffect.Builder().request(request)
-				.duration(CommandConstants.DISABLE_JUMPING_DURATION)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					if (players.isEmpty())

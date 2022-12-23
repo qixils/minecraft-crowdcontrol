@@ -17,6 +17,7 @@
     "TickMixin"
   ],
   "client": [
+    "KeyboardInputMixin"
   ],
   "injectors": {
     "defaultRequire": 1
