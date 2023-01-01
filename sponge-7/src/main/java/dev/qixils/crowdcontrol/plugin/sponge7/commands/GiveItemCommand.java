@@ -43,7 +43,7 @@ public class GiveItemCommand extends ImmediateCommand {
 		super(plugin);
 		this.item = item.createSnapshot();
 		this.effectName = effectName;
-		this.defaultDisplayName = getDefaultDisplayName();
+		this.defaultDisplayName = super.getDefaultDisplayName();
 	}
 
 	@Override

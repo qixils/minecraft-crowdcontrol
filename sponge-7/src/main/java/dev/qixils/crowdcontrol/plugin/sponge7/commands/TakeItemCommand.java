@@ -47,7 +47,7 @@ public class TakeItemCommand extends ImmediateCommand {
 			this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", Component.translatable(item.getTranslation().getId()));
 		} else {
 			this.effectName = "take_enchanted_golden_apple";
-			this.defaultDisplayName = getDefaultDisplayName();
+			this.defaultDisplayName = super.getDefaultDisplayName();
 		}
 	}
 
