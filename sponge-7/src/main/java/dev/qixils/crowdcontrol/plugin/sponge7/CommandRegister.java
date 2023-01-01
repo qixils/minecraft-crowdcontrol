@@ -14,7 +14,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.GoldenApples;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -26,16 +25,13 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
 
 public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
-	private Set<EntityType> safeEntities;
 	private MappedKeyedTag<BlockType> setBlocks;
 	private MappedKeyedTag<BlockType> setFallingBlocks;
 	private MappedKeyedTag<ItemType> giveTakeItems;
@@ -47,12 +43,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, plugin.getRegistry(), EntityType.class).getAll());
-			safeEntities.add(EntityTypes.MUSHROOM_COW);
-			safeEntities.add(EntityTypes.IRON_GOLEM);
-			safeEntities.add(EntityTypes.PRIMED_TNT);
-			safeEntities.add(EntityTypes.PIG_ZOMBIE);
-			safeEntities.add(EntityTypes.ILLUSION_ILLAGER);
 			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, plugin.getRegistry(), BlockType.class);
 			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, plugin.getRegistry(), BlockType.class);
 			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, plugin.getRegistry(), ItemType.class);
@@ -122,7 +112,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 		));
 
 		// entity commands
-		for (EntityType entity : safeEntities) {
+		for (EntityType entity : plugin.getRegistry().getAllOf(EntityType.class)) {
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}

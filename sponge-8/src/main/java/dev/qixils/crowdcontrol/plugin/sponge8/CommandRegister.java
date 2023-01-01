@@ -8,23 +8,19 @@ import dev.qixils.crowdcontrol.plugin.sponge8.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.TypedTag;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, SpongeCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
-	private Set<EntityType<?>> safeEntities;
 	private MappedKeyedTag<BlockType> setBlocks;
 	private MappedKeyedTag<BlockType> setFallingBlocks;
 	private MappedKeyedTag<ItemType> giveTakeItems;
@@ -36,7 +32,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, plugin, RegistryTypes.ENTITY_TYPE).getAll());
 			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, plugin, RegistryTypes.BLOCK_TYPE);
 			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, plugin, RegistryTypes.BLOCK_TYPE);
 			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, plugin, RegistryTypes.ITEM_TYPE);
@@ -98,10 +93,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 		));
 
 		// entity commands
-		for (EntityType<?> entity : safeEntities) {
+		plugin.getGame().registry(RegistryTypes.ENTITY_TYPE).stream().forEach(entity -> {
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
-		}
+		});
 
 		// register difficulty commands
 		plugin.getGame().registry(RegistryTypes.DIFFICULTY).stream().forEach(

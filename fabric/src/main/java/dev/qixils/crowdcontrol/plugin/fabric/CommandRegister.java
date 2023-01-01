@@ -18,13 +18,10 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, FabricCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
-	private Set<EntityType<?>> safeEntities;
 	private MappedKeyedTag<Block> setBlocks;
 	private MappedKeyedTag<Block> setFallingBlocks;
 	private MappedKeyedTag<Item> giveTakeItems;
@@ -36,7 +33,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			safeEntities = new HashSet<>(new TypedTag<>(CommandConstants.SAFE_ENTITIES, BuiltInRegistries.ENTITY_TYPE).getAll());
 			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, BuiltInRegistries.BLOCK);
 			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, BuiltInRegistries.BLOCK);
 			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, BuiltInRegistries.ITEM);
@@ -103,7 +99,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 		));
 
 		// entity commands
-		for (EntityType<?> entity : safeEntities) {
+		for (EntityType<?> entity : BuiltInRegistries.ENTITY_TYPE) {
 			commands.add(new SummonEntityCommand<>(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}
@@ -136,8 +132,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 		// gamemode commands
 		for (GameType gameType : GameType.values()) {
 			if (gameType == GameType.SURVIVAL) continue;
-			commands.add(new GameModeCommand(plugin, gameType,
-					gameType == GameType.SPECTATOR ? 8L : 15L));
+			commands.add(new GameModeCommand(plugin, gameType, gameType == GameType.SPECTATOR ? 8L : 15L));
 		}
 	}
 

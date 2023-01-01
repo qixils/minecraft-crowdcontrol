@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.paper.utils.MaterialTag;
@@ -19,25 +18,11 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
 
 public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdControlPlugin> {
-	@SuppressWarnings("deprecation") // Bukkit is dumb
-	private static final MappedKeyedTag<EntityType> SAFE_ENTITIES =
-			new MappedKeyedTag<>(CommandConstants.SAFE_ENTITIES, key -> {
-				EntityType entity = EntityType.fromName(key.value());
-				if (entity == null) {
-					try {
-						entity = EntityType.valueOf(key.value().toUpperCase(Locale.ENGLISH));
-					} catch (IllegalArgumentException e) {
-						return null;
-					}
-				}
-				return entity;
-			});
 	private static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
 	private static final MaterialTag SET_FALLING_BLOCKS = new MaterialTag(CommandConstants.SET_FALLING_BLOCKS);
 	private static final MaterialTag GIVE_TAKE_ITEMS = new MaterialTag(CommandConstants.GIVE_TAKE_ITEMS);
@@ -103,7 +88,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		));
 
 		// entity commands
-		for (EntityType entity : SAFE_ENTITIES) {
+		for (EntityType entity : EntityType.values()) {
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}

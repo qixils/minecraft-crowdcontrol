@@ -46,7 +46,7 @@ public class GameModeCommand extends TimedVoidCommand {
 					List<ServerPlayer> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);
 					players.addAll(curPlayers);
-					playerAnnounce(players, request);
+					playerAnnounce(players, request); // TODO: this is sending twice for spectator mode
 					return null;
 				})
 				.completionCallback($ -> setGameMode(null, players, GameType.SURVIVAL))

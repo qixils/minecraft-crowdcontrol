@@ -51,6 +51,8 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse();
 
+		// TODO: hide/show effects
+
 		if (isGlobalCommandUsable(players, request)) {
 			if (globalKeepInventory == enable) {
 				return resp.type(ResultType.FAILURE).message("Keep Inventory is already " + (enable ? "enabled" : "disabled"));
