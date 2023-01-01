@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,35 +18,65 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class TakeItemCommand extends ImmediateCommand {
 	private final Item item;
 	private final String effectName;
-	private final Component displayName;
+	private final TranslatableComponent defaultDisplayName;
 
 	public TakeItemCommand(FabricCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "take_" + BuiltInRegistries.ITEM.getKey(item).getPath();
-		this.displayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
+		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
 	}
 
-	private boolean takeItemFrom(Player player) {
+	@Override
+	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
+		if (request.getParameters() == null)
+			return getDefaultDisplayName();
+		int amount = (int) (double) request.getParameters()[0];
+		TranslatableComponent displayName = getDefaultDisplayName();
+		List<Component> args = new ArrayList<>(displayName.args());
+		args.add(Component.text(amount));
+		return displayName.args(args);
+	}
+
+	private boolean takeItemFrom(Player player, int amount) {
 		Inventory inventory = player.getInventory();
+		// simulate
+		int toTake = 0;
 		for (ItemStack itemStack : InventoryUtil.viewAllItems(inventory)) {
 			if (itemStack.isEmpty()) continue;
 			if (itemStack.getItem() != this.item) continue;
-			itemStack.setCount(itemStack.getCount() - 1);
-			return true;
+			toTake += itemStack.getCount();
+			if (toTake >= amount) break;
 		}
-		return false;
+		// do
+		if (toTake < amount) return false;
+		toTake = amount;
+		for (ItemStack itemStack : InventoryUtil.viewAllItems(inventory)) {
+			if (itemStack.isEmpty()) continue;
+			if (itemStack.getItem() != this.item) continue;
+			int take = Math.min(toTake, itemStack.getCount());
+			itemStack.shrink(take);
+			toTake -= take;
+			if (toTake == 0) break;
+		}
+		return true;
 	}
 
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		if (request.getParameters() == null)
+			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
+
+		int amount = (int) (double) request.getParameters()[0];
+
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");
@@ -60,7 +91,7 @@ public class TakeItemCommand extends ImmediateCommand {
 				break;
 			if (!isHost(player))
 				continue;
-			if (takeItemFrom(player))
+			if (takeItemFrom(player, amount))
 				victims++;
 		}
 
@@ -70,7 +101,7 @@ public class TakeItemCommand extends ImmediateCommand {
 				break;
 			if (isHost(player))
 				continue;
-			if (takeItemFrom(player))
+			if (takeItemFrom(player, amount))
 				victims++;
 		}
 

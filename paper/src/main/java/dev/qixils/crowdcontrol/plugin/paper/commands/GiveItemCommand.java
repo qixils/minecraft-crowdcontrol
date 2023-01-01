@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -38,7 +39,10 @@ public class GiveItemCommand extends ImmediateCommand {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
 		int amount = (int) (double) request.getParameters()[0];
-		return getDefaultDisplayName().args(Component.text(amount));
+		TranslatableComponent displayName = getDefaultDisplayName();
+		List<Component> args = new ArrayList<>(displayName.args());
+		args.add(Component.text(amount));
+		return displayName.args(args);
 	}
 
 	@Blocking

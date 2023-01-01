@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.key.Keys;
@@ -22,6 +23,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +35,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	private final @NotNull ItemType item;
 	private final @Nullable GoldenApple goldenAppleType;
 	private final @NotNull String effectName;
-	private final @NotNull Component displayName;
+	private final @NotNull TranslatableComponent defaultDisplayName;
 
 	public TakeItemCommand(@NotNull SpongeCrowdControlPlugin plugin, @NotNull ItemType item, @Nullable GoldenApple goldenAppleType) {
 		super(plugin);
@@ -42,10 +44,10 @@ public class TakeItemCommand extends ImmediateCommand {
 
 		if (goldenAppleType == null || goldenAppleType.equals(GoldenApples.GOLDEN_APPLE)) {
 			this.effectName = "take_" + SpongeTextUtil.valueOf(item);
-			this.displayName = Component.translatable("cc.effect.take_item.name", Component.translatable(item.getTranslation().getId()));
+			this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", Component.translatable(item.getTranslation().getId()));
 		} else {
 			this.effectName = "take_enchanted_golden_apple";
-			this.displayName = getDefaultDisplayName();
+			this.defaultDisplayName = getDefaultDisplayName();
 		}
 	}
 
@@ -53,31 +55,57 @@ public class TakeItemCommand extends ImmediateCommand {
 		this(plugin, item, item.equals(ItemTypes.GOLDEN_APPLE) ? GoldenApples.GOLDEN_APPLE : null);
 	}
 
-	private boolean takeItemFrom(Player player) {
+	@Override
+	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
+		if (request.getParameters() == null)
+			return getDefaultDisplayName();
+		int amount = (int) (double) request.getParameters()[0];
+		TranslatableComponent displayName = getDefaultDisplayName();
+		List<Component> args = new ArrayList<>(displayName.args());
+		args.add(Component.text(amount));
+		return displayName.args(args);
+	}
+
+	private boolean takeItemFrom(Player player, int amount) {
 		CarriedInventory<? extends Carrier> inventory = player.getInventory();
+		// simulate
+		int toTake = 0;
 		for (Inventory invSlot : inventory.slots()) {
 			Optional<ItemStack> optionalStack = invSlot.peek();
-			if (!optionalStack.isPresent())
-				continue;
-
+			if (!optionalStack.isPresent()) continue;
 			ItemStack stack = optionalStack.get();
-			if (!stack.getType().equals(item))
-				continue;
-			if (goldenAppleType != null && !stack.get(Keys.GOLDEN_APPLE_TYPE).map(goldenAppleType::equals).orElse(false))
-				continue;
-
+			if (!stack.getType().equals(item)) continue;
+			if (goldenAppleType != null && !stack.get(Keys.GOLDEN_APPLE_TYPE).map(goldenAppleType::equals).orElse(false)) continue;
+			toTake += stack.getQuantity();
+		}
+		// do
+		if (toTake < amount) return false;
+		toTake = amount;
+		for (Inventory invSlot : inventory.slots()) {
+			Optional<ItemStack> optionalStack = invSlot.peek();
+			if (!optionalStack.isPresent()) continue;
+			ItemStack stack = optionalStack.get();
+			if (!stack.getType().equals(item)) continue;
+			if (goldenAppleType != null && !stack.get(Keys.GOLDEN_APPLE_TYPE).map(goldenAppleType::equals).orElse(false)) continue;
+			int take = Math.min(toTake, stack.getQuantity());
+			toTake -= take;
 			sync(() -> {
-				stack.setQuantity(stack.getQuantity() - 1);
+				stack.setQuantity(stack.getQuantity() - take);
 				invSlot.set(stack);
 			});
-			return true;
+			if (toTake == 0) break;
 		}
-		return false;
+		return true;
 	}
 
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (request.getParameters() == null)
+			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
+
+		int amount = (int) (double) request.getParameters()[0];
+
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");
@@ -92,7 +120,7 @@ public class TakeItemCommand extends ImmediateCommand {
 				break;
 			if (!isHost(player))
 				continue;
-			if (takeItemFrom(player))
+			if (takeItemFrom(player, amount))
 				victims++;
 		}
 
@@ -102,7 +130,7 @@ public class TakeItemCommand extends ImmediateCommand {
 				break;
 			if (isHost(player))
 				continue;
-			if (takeItemFrom(player))
+			if (takeItemFrom(player, amount))
 				victims++;
 		}
 
