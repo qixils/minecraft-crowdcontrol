@@ -97,6 +97,8 @@ public final class FreezeCommand extends TimedVoidCommand {
 		return new FreezeCommand(plugin, "camera_lock", Location::withRotationOf, MovementStatus.Type.LOOK); // (cur, prev) -> cur.withRotationOf(prev)
 	}
 
+	// TODO: allow clients to look left and right when sky/ground lock is enabled
+
 	public static FreezeCommand skyCamera(FabricCrowdControlPlugin plugin) {
 		return new FreezeCommand(plugin, "camera_lock_to_sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90), MovementStatus.Type.LOOK);
 	}

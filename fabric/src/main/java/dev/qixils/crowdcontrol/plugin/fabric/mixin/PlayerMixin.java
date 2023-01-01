@@ -26,9 +26,12 @@ public abstract class PlayerMixin extends LivingEntity {
 
 	@Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
 	public void jumpFromGround(CallbackInfo ci) {
-		if (Components.MOVEMENT_STATUS.get(this).isProhibited(MovementStatus.Type.JUMP)) {
+		MovementStatus status = Components.MOVEMENT_STATUS.get(this);
+		boolean canJump = status.isProhibited(MovementStatus.Type.JUMP);
+		boolean canWalk = status.isProhibited(MovementStatus.Type.WALK);
+		if (!canJump || !canWalk) {
 			ci.cancel();
-			if (!this.level.isClientSide) {
+			if (!this.level.isClientSide /* not necessary for clients */ && canWalk /* avoids teleporting twice */) {
 				//noinspection DataFlowIssue
 				((ServerPlayer) (Object) this).connection.teleport(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
 			}

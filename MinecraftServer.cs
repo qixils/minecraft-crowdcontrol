@@ -14,8 +14,6 @@ using EffectStatus = CrowdControl.Common.EffectStatus;
 using Log = CrowdControl.Common.Log;
 using LogLevel = CrowdControl.Common.LogLevel;
 
-// TODO: suggest to Jaku a configurable folder sort order (namely by price)
-
 namespace CrowdControl.Games.Packs
 {
     [Serializable]
@@ -122,10 +120,10 @@ namespace CrowdControl.Games.Packs
             new Effect("Damage Held Item", "damage_item", "inventory") { Price = 100, Description = "Halves the durability of the held item" },
             new Effect("Delete Held Item", "delete_item", "inventory") { Price = 200, Description = "Deletes whatever item the streamer is currently holding" },
             new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory") { Price = 200, Description = "Disallows the streamer from keeping their inventory upon death" },
-            new Effect("Drop Held Item", "drop_item", "miscellaneous") { Price = 25, Description = "Makes the streamer drop their held item" },
+            new Effect("Drop Held Item", "drop_item", "inventory") { Price = 25, Description = "Makes the streamer drop their held item" },
             new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory") { Price = 100, Description = "Allows the streamer to keep their inventory upon death" },
             new Effect("Put Held Item on Head", "hat", "inventory") { Price = 25, Description = "Moves the item in the streamer's hand to their head" },
-            new Effect("Repair Held Item", "repair_item", "miscellaneous") { Price = 100, Description = "Fully repairs a damaged item" },
+            new Effect("Repair Held Item", "repair_item", "inventory") { Price = 100, Description = "Fully repairs a damaged item" },
             // set gamemode for x seconds
             new Effect("Change Gamemode", "change_gamemode", ItemKind.Folder),
             new Effect("Adventure Mode", "adventure_mode", "change_gamemode") { Price = 200, Duration = 15, Description = "Temporarily sets the streamer to Adventure mode, rendering them unable to place or break blocks" },
