@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInventoryRedirect;
 
-@SuppressWarnings("resource")
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin {
 

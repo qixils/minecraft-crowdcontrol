@@ -144,5 +144,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 	@Override
 	protected void onFirstRegistry() {
 		plugin.getEventManager().registerListeners(new GameModeCommand.Manager());
+		plugin.getEventManager().registerListeners(new MovementStatusCommand.Manager());
 	}
 }

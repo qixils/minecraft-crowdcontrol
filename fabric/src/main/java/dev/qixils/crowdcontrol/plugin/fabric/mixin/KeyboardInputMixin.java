@@ -31,10 +31,10 @@ public abstract class KeyboardInputMixin extends Input {
 		Optional<LocalPlayer> player = FabricPlatformClient.get().player();
 		if (player.isEmpty())
 			return key.isDown();
-		MovementStatus status = Components.MOVEMENT_STATUS.get(player.get());
-		if (status.isProhibited(type))
+		MovementStatus.Value status = Components.MOVEMENT_STATUS.get(player.get()).get(type);
+		if (status == MovementStatus.Value.DENIED)
 			return false;
-		if (status.isInverted(type) && inverse != null)
+		if (status == MovementStatus.Value.INVERTED && inverse != null)
 			return inverse.isDown();
 		return key.isDown();
 	}
@@ -43,6 +43,7 @@ public abstract class KeyboardInputMixin extends Input {
 		return handleIsDown(key, inverse, MovementStatus.Type.WALK);
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private boolean handleIsDown(@NotNull KeyMapping key, MovementStatus.@NotNull Type type) {
 		return handleIsDown(key, null, type);
 	}

@@ -45,6 +45,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					Map<UUID, ServerLocation> locations = new HashMap<>(players.size());
 					players.forEach(player -> locations.put(player.uniqueId(), player.serverLocation()));
+					// TODO: smoother freeze (stop mid-air jitter by telling client it's flying?)
 					task.set(plugin.getSyncScheduler().submit(Task.builder()
 							.delay(Ticks.of(1))
 							.interval(Ticks.of(1))

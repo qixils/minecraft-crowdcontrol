@@ -28,14 +28,30 @@ public final class FreezeCommand extends TimedVoidCommand {
 	public static final Map<UUID, FreezeData> DATA = new HashMap<>();
 
 	private final String effectName;
+	private final String effectGroup;
 	private final LocationModifier modifier;
 	private final MovementStatus.Type freezeType;
+	private final MovementStatus.Value freezeValue;
 
-	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatus.Type freezeType) {
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, LocationModifier modifier, MovementStatus.Type freezeType, MovementStatus.Value freezeValue) {
 		super(plugin);
 		this.effectName = effectName;
+		this.effectGroup = effectGroup;
 		this.modifier = modifier;
 		this.freezeType = freezeType;
+		this.freezeValue = freezeValue;
+	}
+
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatus.Type freezeType, MovementStatus.Value freezeValue) {
+		this(plugin, effectName, effectName, modifier, freezeType, freezeValue);
+	}
+
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, LocationModifier modifier, MovementStatus.Type freezeType) {
+		this(plugin, effectName, effectGroup, modifier, freezeType, MovementStatus.Value.DENIED);
+	}
+
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatus.Type freezeType) {
+		this(plugin, effectName, effectName, modifier, freezeType);
 	}
 
 	public @NotNull Duration getDefaultDuration() {
@@ -47,13 +63,14 @@ public final class FreezeCommand extends TimedVoidCommand {
 		AtomicReference<Map<UUID, FreezeData>> atomic = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
+				.effectGroup("freeze") // TODO: support freezing walk & look at the same time
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = getPlugin().getPlayers(request);
 					Map<UUID, FreezeData> locations = new HashMap<>();
 					players.forEach(player -> {
 						locations.put(player.getUUID(), new FreezeData(modifier, new Location(player)));
-						Components.MOVEMENT_STATUS.get(player).setProhibited(freezeType, true);
+						Components.MOVEMENT_STATUS.get(player).set(freezeType, freezeValue);
 					});
 					atomic.set(locations);
 					DATA.putAll(locations);
@@ -68,7 +85,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 					ServerPlayer player = server.getPlayerList().getPlayer(uuid);
 					if (player == null)
 						return;
-					Components.MOVEMENT_STATUS.get(player).setProhibited(freezeType, false);
+					Components.MOVEMENT_STATUS.get(player).set(freezeType, MovementStatus.Value.ALLOWED);
 				}))
 				.build().queue();
 	}
@@ -90,20 +107,19 @@ public final class FreezeCommand extends TimedVoidCommand {
 	}
 
 	public static FreezeCommand feet(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "freeze", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation), MovementStatus.Type.WALK);
+		// TODO: smoother client-side freeze (stop mid-air jitter)
+		return new FreezeCommand(plugin, "freeze", "walk", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation), MovementStatus.Type.WALK);
 	}
 
 	public static FreezeCommand camera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock", Location::withRotationOf, MovementStatus.Type.LOOK); // (cur, prev) -> cur.withRotationOf(prev)
+		return new FreezeCommand(plugin, "camera_lock", "look", Location::withRotationOf, MovementStatus.Type.LOOK); // (cur, prev) -> cur.withRotationOf(prev)
 	}
 
-	// TODO: allow clients to look left and right when sky/ground lock is enabled
-
 	public static FreezeCommand skyCamera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock_to_sky", (cur, prev) -> cur.withRotation(prev.yaw(), -90), MovementStatus.Type.LOOK);
+		return new FreezeCommand(plugin, "camera_lock_to_sky", "look", (cur, prev) -> cur.withRotation(cur.yaw(), -90), MovementStatus.Type.LOOK, MovementStatus.Value.PARTIAL);
 	}
 
 	public static FreezeCommand groundCamera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock_to_ground", (cur, prev) -> cur.withRotation(prev.yaw(), 90), MovementStatus.Type.LOOK);
+		return new FreezeCommand(plugin, "camera_lock_to_ground", "look", (cur, prev) -> cur.withRotation(cur.yaw(), 90), MovementStatus.Type.LOOK, MovementStatus.Value.PARTIAL);
 	}
 }

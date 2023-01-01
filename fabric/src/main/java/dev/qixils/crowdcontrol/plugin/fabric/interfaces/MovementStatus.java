@@ -7,14 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-// TODO: is resetting handled successfully for offline players?
-
 public interface MovementStatus extends AutoSyncedComponent, PlayerComponent<MovementStatus> {
-	boolean isProhibited(@NotNull Type type);
-	void setProhibited(@NotNull Type type, boolean prohibited);
-
-	boolean isInverted(@NotNull Type type);
-	void setInverted(@NotNull Type type, boolean inverted);
+	@NotNull
+	Value get(@NotNull Type type);
+	void set(@NotNull Type type, @NotNull Value value);
+	void rawSet(@NotNull Type type, @NotNull Value value);
+	void sync();
 
 	@RequiredArgsConstructor
 	enum Type {
@@ -25,5 +23,12 @@ public interface MovementStatus extends AutoSyncedComponent, PlayerComponent<Mov
 
 		@Getter @Accessors(fluent = true)
 		private final boolean canInvert;
+	}
+
+	enum Value {
+		ALLOWED,
+		PARTIAL, // not supported by all types
+		INVERTED, // not supported by all types
+		DENIED
 	}
 }

@@ -9,58 +9,40 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.EnumSet;
+import java.util.EnumMap;
 import java.util.Locale;
 
 public class MovementStatusImpl implements MovementStatus {
 	private static final Logger logger = LoggerFactory.getLogger("MovementStatus");
 	private final @NotNull Player provider;
-	private final @NotNull EnumSet<Type> prohibited = EnumSet.noneOf(Type.class);
-	private final @NotNull EnumSet<Type> inverted = EnumSet.noneOf(Type.class);
+	private final @NotNull EnumMap<Type, Value> prohibited = new EnumMap<>(Type.class);
 
 	public MovementStatusImpl(@NotNull Player provider) {
 		this.provider = provider;
 	}
 
-	private void sync() {
+	public void sync() {
 		Components.MOVEMENT_STATUS.sync(provider);
 	}
 
 	@Override
-	public boolean isProhibited(@NotNull Type type) {
-		return prohibited.contains(type);
+	public @NotNull Value get(@NotNull Type type) {
+		return prohibited.getOrDefault(type, Value.ALLOWED);
 	}
 
 	@Override
-	public boolean isInverted(@NotNull Type type) {
-		return inverted.contains(type);
-	}
-
-	private void rawSetProhibited(@NotNull Type type, boolean prohibited) {
-		if (prohibited)
-			this.prohibited.add(type);
+	public void rawSet(@NotNull Type type, @NotNull Value value) {
+		if (value == Value.ALLOWED)
+			prohibited.remove(type);
+		else if (value == Value.INVERTED && !type.canInvert())
+			logger.warn("Attempted to set inverted value for type {} which cannot be inverted", type);
 		else
-			this.prohibited.remove(type);
-	}
-
-	private void rawSetInverted(@NotNull Type type, boolean inverted) {
-		if (inverted)
-			this.inverted.add(type);
-		else
-			this.inverted.remove(type);
+			prohibited.put(type, value);
 	}
 
 	@Override
-	public void setProhibited(@NotNull Type type, boolean prohibited) {
-		rawSetProhibited(type, prohibited);
-		sync();
-	}
-
-	@Override
-	public void setInverted(@NotNull Type type, boolean inverted) {
-		if (!type.canInvert())
-			throw new IllegalArgumentException("Type " + type + " cannot be inverted");
-		rawSetInverted(type, inverted);
+	public void set(@NotNull Type type, @NotNull Value value) {
+		rawSet(type, value);
 		sync();
 	}
 
@@ -70,26 +52,20 @@ public class MovementStatusImpl implements MovementStatus {
 
 	@Override
 	public void writeToNbt(@NotNull CompoundTag tag) {
-		for (Type type : Type.values()) {
-			String key = getTypeKey(type);
-			tag.putBoolean(key + "-prohibited", isProhibited(type));
-			if (type.canInvert())
-				tag.putBoolean(key + "-inverted", isInverted(type));
-		}
+		for (Type type : Type.values())
+			tag.putString(getTypeKey(type), get(type).name());
 	}
 
 	@Override
 	public void readFromNbt(@NotNull CompoundTag tag) {
 		for (Type type : Type.values()) {
 			String key = getTypeKey(type);
-			if (tag.contains(key + "-prohibited"))
-				rawSetProhibited(type, tag.getBoolean(key + "-prohibited"));
-			if (tag.contains(key + "-inverted")) {
-				if (!type.canInvert())
-					logger.warn("Type {} cannot be inverted, but {}-inverted is set to {} for {}",
-							type, key, tag.getBoolean(key + "-inverted"), provider.getStringUUID());
-				else
-					rawSetInverted(type, tag.getBoolean(key + "-inverted"));
+			if (tag.contains(key)) {
+				try {
+					rawSet(type, Value.valueOf(tag.getString(key)));
+				} catch (Exception e) {
+					logger.info("Invalid value for movement status type {}: {}", type, tag.getString(key));
+				}
 			}
 		}
 	}
