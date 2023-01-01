@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
@@ -28,13 +29,21 @@ import java.util.List;
 public class GiveItemCommand extends ImmediateCommand {
 	private final ItemType item;
 	private final String effectName;
-	private final Component displayName;
+	private final TranslatableComponent defaultDisplayName;
 
 	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemType item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "give_" + item.key(RegistryTypes.ITEM_TYPE).value();
-		this.displayName = Component.translatable("cc.effect.give_item.name", item);
+		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", item);
+	}
+
+	@Override
+	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
+		if (request.getParameters() == null)
+			return getDefaultDisplayName();
+		int amount = (int) (double) request.getParameters()[0];
+		return getDefaultDisplayName().args(Component.text(amount));
 	}
 
 	@Blocking
@@ -58,7 +67,11 @@ public class GiveItemCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		ItemStack itemStack = ItemStack.of(item);
+		if (request.getParameters() == null)
+			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
+
+		int amount = (int) (double) request.getParameters()[0];
+		ItemStack itemStack = ItemStack.of(item, amount);
 
 		LimitConfig config = getPlugin().getLimitConfig();
 		int maxRecipients = config.getItemLimit(item.key(RegistryTypes.ITEM_TYPE).value());

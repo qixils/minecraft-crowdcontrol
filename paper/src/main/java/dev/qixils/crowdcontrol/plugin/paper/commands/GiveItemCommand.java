@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -23,13 +24,21 @@ import java.util.List;
 public class GiveItemCommand extends ImmediateCommand {
 	private final Material item;
 	private final String effectName;
-	private final Component displayName;
+	private final TranslatableComponent defaultDisplayName;
 
 	public GiveItemCommand(PaperCrowdControlPlugin plugin, Material item) {
 		super(plugin);
 		this.item = item;
 		this.effectName = "give_" + item.name();
-		this.displayName = Component.translatable("cc.effect.give_item.name", Component.translatable(new ItemStack(item)));
+		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", Component.translatable(new ItemStack(item)));
+	}
+
+	@Override
+	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
+		if (request.getParameters() == null)
+			return getDefaultDisplayName();
+		int amount = (int) (double) request.getParameters()[0];
+		return getDefaultDisplayName().args(Component.text(amount));
 	}
 
 	@Blocking
@@ -46,7 +55,12 @@ public class GiveItemCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		ItemStack itemStack = new ItemStack(item);
+		if (request.getParameters() == null)
+			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
+
+		int amount = (int) (double) request.getParameters()[0];
+		ItemStack itemStack = new ItemStack(item, amount);
+
 		sync(() -> {
 			LimitConfig config = getPlugin().getLimitConfig();
 			int recipients = 0;
