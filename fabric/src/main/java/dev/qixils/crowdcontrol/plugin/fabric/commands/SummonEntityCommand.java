@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
@@ -107,7 +108,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
 		entity.setPos(player.position());
-		entity.setCustomName(plugin.adventure().toNative(viewer));
+		entity.setCustomName(FabricAudiences.nonWrappingSerializer().serialize(plugin.adventure().renderer().render(viewer, player)));
 		entity.setCustomNameVisible(true);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
