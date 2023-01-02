@@ -49,7 +49,7 @@ public class MovementStatusCommand extends TimedVoidCommand {
 		AtomicReference<List<ServerPlayer>> players = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
-				.effectGroup("freeze") // TODO: support freezing walk & look at the same time
+				.effectGroup(effectGroup)
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					players.set(plugin.getPlayers(request));

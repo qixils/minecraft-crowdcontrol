@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
 import java.util.UUID;
 
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInventoryRedirect;
@@ -32,9 +33,14 @@ public class ServerPlayerMixin {
 		if (!FreezeCommand.DATA.containsKey(uuid))
 			return;
 
-		FreezeData data = FreezeCommand.DATA.get(uuid);
+		List<FreezeData> data = FreezeCommand.DATA.get(uuid);
+		if (data.isEmpty())
+			return;
+
 		Location cur = new Location(thiss);
-		Location dest = data.getDestination(cur);
+		Location dest = cur;
+		for (FreezeData datum : data)
+			dest = datum.getDestination(dest);
 
 		if (!cur.level().equals(dest.level()))
 			return;
@@ -42,7 +48,8 @@ public class ServerPlayerMixin {
 		if (!cur.equals(dest))
 			dest.teleportHere(thiss);
 
-		data.previousLocation = dest;
+		for (FreezeData datum : data)
+			datum.previousLocation = dest;
 	}
 
 	@Redirect(

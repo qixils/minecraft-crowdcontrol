@@ -14,10 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
@@ -25,7 +22,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DUR
 
 @Getter
 public final class FreezeCommand extends TimedVoidCommand {
-	public static final Map<UUID, FreezeData> DATA = new HashMap<>();
+	public static final Map<UUID, List<FreezeData>> DATA = new HashMap<>();
 
 	private final String effectName;
 	private final String effectGroup;
@@ -63,7 +60,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 		AtomicReference<Map<UUID, FreezeData>> atomic = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
-				.effectGroup("freeze") // TODO: support freezing walk & look at the same time
+				.effectGroup(effectGroup)
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = getPlugin().getPlayers(request);
@@ -73,12 +70,12 @@ public final class FreezeCommand extends TimedVoidCommand {
 						Components.MOVEMENT_STATUS.get(player).set(freezeType, freezeValue);
 					});
 					atomic.set(locations);
-					DATA.putAll(locations);
+					locations.forEach((uuid, data) -> DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data));
 					playerAnnounce(players, request);
 					return null;
 				})
 				.completionCallback($ -> atomic.get().forEach((uuid, data) -> {
-					DATA.remove(uuid, data);
+					DATA.get(uuid).remove(data);
 					MinecraftServer server = getPlugin().getServer();
 					if (server == null)
 						return;
