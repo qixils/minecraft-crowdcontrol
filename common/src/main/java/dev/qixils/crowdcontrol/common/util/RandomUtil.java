@@ -28,15 +28,15 @@ public class RandomUtil {
 	 */
 	@UnknownNullability
 	public static <T> T randomElementFrom(@NotNull Collection<@Nullable T> from) throws IllegalArgumentException {
+		if (from instanceof List<?>)
+			return randomElementFrom((List<T>) from);
 		if (from.isEmpty())
 			throw new IllegalArgumentException("Collection may not be empty");
 		int index = RNG.nextInt(from.size());
 		int iteration = 0;
 		for (T object : from) {
-			if (iteration == index) {
+			if (iteration++ == index)
 				return object;
-			}
-			++iteration;
 		}
 		throw new IllegalStateException("Could not find a random object. Was the collection updated?");
 	}
@@ -51,7 +51,7 @@ public class RandomUtil {
 	 * @throws IllegalArgumentException if the list is empty
 	 */
 	@UnknownNullability
-	public static <T> T randomElementFrom(@NotNull List<T> from) throws IllegalArgumentException {
+	public static <T> T randomElementFrom(@NotNull List<@Nullable T> from) throws IllegalArgumentException {
 		if (from.isEmpty())
 			throw new IllegalArgumentException("List may not be empty");
 		return from.get(RNG.nextInt(from.size()));

@@ -12,16 +12,21 @@ import lombok.Getter;
 import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -35,6 +40,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 	protected final boolean isMonster;
 	private final String effectName;
 	private final Component displayName;
+	private @Nullable List<ResourceLocation> lootTables = null;
 
 	public SummonEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
@@ -58,6 +64,13 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		for (Map.Entry<EquipmentSlot, List<Item>> entry : new HashSet<>(armor.entrySet()))
 			armor.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
 		this.armor = Collections.unmodifiableMap(armor);
+	}
+
+	@NotNull
+	private List<ResourceLocation> getLootTables(MinecraftServer server) {
+		if (lootTables != null)
+			return lootTables;
+		return lootTables = server.getLootTables().getIds().stream().filter(location -> location.getPath().startsWith("chests/")).toList();
 	}
 
 	@NotNull
@@ -104,6 +117,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 
 	@Blocking
 	protected E spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
+		ServerLevel level = player.getLevel();
 		E entity = entityType.create(player.level);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
@@ -117,7 +131,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
 		if (entity instanceof Boat boat)
 			boat.setVariant(RandomUtil.randomElementFrom(Boat.Type.class));
-		// TODO: random loot table data
+		if (entity instanceof ContainerEntity container)
+			container.setLootTable(RandomUtil.randomElementFrom(getLootTables(level.getServer())));
 
 		// add random armor to armor stands
 		if (entity instanceof ArmorStand) {
@@ -142,7 +157,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		}
 
 		// spawn entity
-		player.level.addFreshEntity(entity);
+		level.addFreshEntity(entity);
 		return entity;
 	}
 }
