@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -114,6 +115,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			tamable.tame(player);
 		if (entity instanceof LivingEntity)
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
+		if (entity instanceof Boat boat)
+			boat.setVariant(RandomUtil.randomElementFrom(Boat.Type.class));
 		// TODO: random loot table data
 
 		// add random armor to armor stands

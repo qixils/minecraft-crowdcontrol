@@ -4,12 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -76,6 +71,23 @@ public class RandomUtil {
 		if (from.length == 0)
 			throw new IllegalArgumentException("Array may not be empty");
 		return from[RNG.nextInt(from.length)];
+	}
+
+	/**
+	 * Picks a random item from the provided enum.
+	 * The returned value is non-null.
+	 *
+	 * @param from enum class
+	 * @param <T>  type of enum
+	 * @return randomly selected enum constant
+	 * @throws IllegalArgumentException if the class is not an enum
+	 */
+	@NotNull
+	public static <T extends Enum<T>> T randomElementFrom(@NotNull Class<T> from) {
+		T[] constants = from.getEnumConstants();
+		if (constants == null)
+			throw new IllegalArgumentException("Class is not an enum");
+		return randomElementFrom(constants);
 	}
 
 	/**
