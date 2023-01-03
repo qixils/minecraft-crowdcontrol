@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.type.MooshroomTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityCategories;
 import org.spongepowered.api.entity.EntityType;
@@ -30,8 +31,7 @@ import org.spongepowered.api.world.difficulty.Difficulties;
 
 import java.util.*;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
@@ -118,6 +118,14 @@ public class SummonEntityCommand extends ImmediateCommand {
 		entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.IS_TAMED, true);
 		entity.offer(Keys.TAMER, player.uniqueId());
+		entity.offer(Keys.BOAT_TYPE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.BOAT_TYPE)));
+		entity.offer(Keys.CAT_TYPE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.CAT_TYPE)));
+		entity.offer(Keys.DYE_COLOR, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.DYE_COLOR)));
+		if (RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
+			entity.offer(Keys.MOOSHROOM_TYPE, MooshroomTypes.BROWN.get());
+		entity.offer(Keys.HORSE_COLOR, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.HORSE_COLOR)));
+		entity.offer(Keys.HORSE_STYLE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.HORSE_STYLE)));
+		entity.offer(Keys.PARROT_TYPE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.PARROT_TYPE)));
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
 		// API8: loot table data | TODO: still no API for it; may need to open an issue
 

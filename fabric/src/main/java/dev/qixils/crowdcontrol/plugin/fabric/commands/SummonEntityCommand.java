@@ -5,11 +5,11 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
+import dev.qixils.crowdcontrol.plugin.fabric.mixin.HorseAccessor;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -18,10 +18,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.animal.MushroomCow;
+import net.minecraft.world.entity.animal.Parrot;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.horse.Markings;
+import net.minecraft.world.entity.animal.horse.Variant;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
@@ -30,8 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
@@ -123,7 +130,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
 		entity.setPos(player.position());
-		entity.setCustomName(FabricAudiences.nonWrappingSerializer().serialize(plugin.adventure().renderer().render(viewer, player)));
+		entity.setCustomName(plugin.adventure().toNative(viewer));
 		entity.setCustomNameVisible(true);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
@@ -131,6 +138,16 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
 		if (entity instanceof Boat boat)
 			boat.setVariant(RandomUtil.randomElementFrom(Boat.Type.class));
+		if (entity instanceof Cat cat)
+			cat.setVariant(RandomUtil.randomElementFrom(BuiltInRegistries.CAT_VARIANT));
+		if (entity instanceof Wolf wolf)
+			wolf.setCollarColor(RandomUtil.randomElementFrom(DyeColor.class));
+		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
+			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
+		if (entity instanceof Horse)
+			((HorseAccessor) entity).invokeSetVariantAndMarkings(RandomUtil.randomElementFrom(Variant.class), RandomUtil.randomElementFrom(Markings.class));
+		if (entity instanceof Parrot parrot)
+			parrot.setVariant(RandomUtil.randomElementFrom(Parrot.Variant.class));
 		if (entity instanceof ContainerEntity container)
 			container.setLootTable(RandomUtil.randomElementFrom(getLootTables(level.getServer())));
 

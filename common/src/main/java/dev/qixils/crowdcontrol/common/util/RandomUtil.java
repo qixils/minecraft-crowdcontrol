@@ -6,6 +6,7 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Utility class for randomness.
@@ -88,6 +89,51 @@ public class RandomUtil {
 		if (constants == null)
 			throw new IllegalArgumentException("Class is not an enum");
 		return randomElementFrom(constants);
+	}
+
+	/**
+	 * Picks a random item from the provided iterator.
+	 * The returned value is non-null assuming the iterator consists of non-null items.
+	 *
+	 * @param from iterator of items
+	 * @param <T>  type of item
+	 * @return randomly selected item
+	 * @throws IllegalArgumentException if the iterator is empty
+	 */
+	@UnknownNullability
+	public static <T> T randomElementFrom(@NotNull Iterator<@Nullable T> from) throws IllegalArgumentException {
+		List<T> list = new ArrayList<>();
+		while (from.hasNext())
+			list.add(from.next());
+		return randomElementFrom(list);
+	}
+
+	/**
+	 * Picks a random item from the provided iterable.
+	 * The returned value is non-null assuming the iterable consists of non-null items.
+	 *
+	 * @param from iterable of items
+	 * @param <T>  type of item
+	 * @return randomly selected item
+	 * @throws IllegalArgumentException if the iterable is empty
+	 */
+	@UnknownNullability
+	public static <T> T randomElementFrom(@NotNull Iterable<@Nullable T> from) throws IllegalArgumentException {
+		return randomElementFrom(from.iterator());
+	}
+
+	/**
+	 * Picks a random item from the provided stream.
+	 * The returned value is non-null assuming the stream consists of non-null items.
+	 *
+	 * @param from stream of items
+	 * @param <T>  type of item
+	 * @return randomly selected item
+	 * @throws IllegalArgumentException if the stream is empty
+	 */
+	@UnknownNullability
+	public static <T> T randomElementFrom(@NotNull Stream<@Nullable T> from) throws IllegalArgumentException {
+		return randomElementFrom(from.iterator());
 	}
 
 	/**

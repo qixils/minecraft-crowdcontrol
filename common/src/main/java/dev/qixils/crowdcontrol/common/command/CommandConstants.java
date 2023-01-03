@@ -314,6 +314,10 @@ public class CommandConstants {
 	 * Whether to search only for unexplored structures.
 	 */
 	public static final boolean STRUCTURE_SEARCH_UNEXPLORED = false;
+	/**
+	 * The chance of a summoned mushroom cow being brown as a percentage from 0 to 1.
+	 */
+	public static final double MUSHROOM_COW_BROWN_CHANCE = 0.01;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");

@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.*;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -119,6 +120,12 @@ public class SummonEntityCommand extends ImmediateCommand {
 		entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(viewer));
 		entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
+		entity.offer(Keys.TREE_TYPE, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(TreeType.class)));
+		entity.offer(Keys.OCELOT_TYPE, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(OcelotType.class)));
+		entity.offer(Keys.DYE_COLOR, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(DyeColor.class)));
+		entity.offer(Keys.HORSE_COLOR, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(HorseColor.class)));
+		entity.offer(Keys.HORSE_STYLE, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(HorseStyle.class)));
+		entity.offer(Keys.PARROT_VARIANT, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(ParrotVariant.class)));
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
 
 		// add random armor to armor stands

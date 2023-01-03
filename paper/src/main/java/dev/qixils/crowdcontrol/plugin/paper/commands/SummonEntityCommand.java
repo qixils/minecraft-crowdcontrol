@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import io.papermc.paper.entity.CollarColorable;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -20,8 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
@@ -120,10 +120,22 @@ public class SummonEntityCommand extends ImmediateCommand {
 		Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
 		entity.customName(viewer);
 		entity.setCustomNameVisible(true);
-
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
-
+		if (entity instanceof Boat boat)
+			boat.setBoatType(RandomUtil.randomElementFrom(Boat.Type.class));
+		if (entity instanceof Cat cat)
+			cat.setCatType(RandomUtil.randomElementFrom(Cat.Type.class));
+		if (entity instanceof CollarColorable colorable)
+			colorable.setCollarColor(RandomUtil.randomElementFrom(DyeColor.class));
+		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
+			mooshroom.setVariant(MushroomCow.Variant.BROWN);
+		if (entity instanceof Horse horse) {
+			horse.setColor(RandomUtil.randomElementFrom(Horse.Color.class));
+			horse.setStyle(RandomUtil.randomElementFrom(Horse.Style.class));
+		}
+		if (entity instanceof Parrot parrot)
+			parrot.setVariant(RandomUtil.randomElementFrom(Parrot.Variant.class));
 		if (entity instanceof LootableInventory lootable)
 			lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
 

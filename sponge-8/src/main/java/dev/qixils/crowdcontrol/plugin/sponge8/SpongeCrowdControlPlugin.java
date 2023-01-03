@@ -137,8 +137,12 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		return isMatter(block, MatterTypes.LIQUID.get());
 	}
 
+	public <T> Iterator<T> registryIterator(RegistryType<T> registryType) {
+		return game.registry(registryType).stream().iterator();
+	}
+
 	public <T> Iterable<T> registryIterable(RegistryType<T> registryType) {
-		return () -> game.registry(registryType).stream().iterator();
+		return () -> registryIterator(registryType);
 	}
 
 	@Override
