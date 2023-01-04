@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -22,11 +22,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
+	private static final Set<Material> BLOCKS;
+	private static final Map<Rabbit.Type, Integer> RABBIT_VARIANTS = Map.of(
+			Rabbit.Type.BLACK, 16,
+			Rabbit.Type.BROWN, 16,
+			Rabbit.Type.GOLD, 16,
+			Rabbit.Type.SALT_AND_PEPPER, 16,
+			Rabbit.Type.WHITE, 16,
+			Rabbit.Type.BLACK_AND_WHITE, 16,
+			Rabbit.Type.THE_KILLER_BUNNY, 1
+	);
 
 	static {
 		// --- equipment --- //
@@ -54,6 +66,14 @@ public class SummonEntityCommand extends ImmediateCommand {
 				lootTables.add(lootTable);
 		}
 		CHEST_LOOT_TABLES = Collections.unmodifiableSet(lootTables);
+
+		// --- blocks --- //
+		EnumSet<Material> blocks = EnumSet.noneOf(Material.class);
+		for (Material material : Material.values()) {
+			if (material.isBlock())
+				blocks.add(material);
+		}
+		BLOCKS = Collections.unmodifiableSet(blocks);
 	}
 
 	protected final EntityType entityType;
@@ -123,21 +143,35 @@ public class SummonEntityCommand extends ImmediateCommand {
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
 		if (entity instanceof Boat boat)
-			boat.setBoatType(RandomUtil.randomElementFrom(Boat.Type.class));
-		if (entity instanceof Cat cat)
-			cat.setCatType(RandomUtil.randomElementFrom(Cat.Type.class));
+			boat.setBoatType(randomElementFrom(Boat.Type.class));
 		if (entity instanceof CollarColorable colorable)
-			colorable.setCollarColor(RandomUtil.randomElementFrom(DyeColor.class));
-		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
+			colorable.setCollarColor(randomElementFrom(DyeColor.class));
+		if (entity instanceof MushroomCow mooshroom && RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.Variant.BROWN);
-		if (entity instanceof Horse horse) {
-			horse.setColor(RandomUtil.randomElementFrom(Horse.Color.class));
-			horse.setStyle(RandomUtil.randomElementFrom(Horse.Style.class));
-		}
-		if (entity instanceof Parrot parrot)
-			parrot.setVariant(RandomUtil.randomElementFrom(Parrot.Variant.class));
+		if (entity instanceof Horse horse && RNG.nextBoolean())
+			horse.getInventory().setArmor(new ItemStack(randomElementFrom(MaterialTags.HORSE_ARMORS.getValues())));
+		if (entity instanceof Llama llama && RNG.nextBoolean())
+			llama.getInventory().setDecor(new ItemStack(randomElementFrom(Tag.WOOL_CARPETS.getValues())));
+		if (entity instanceof Sheep sheep)
+			sheep.setColor(randomElementFrom(DyeColor.class));
+		if (entity instanceof Steerable steerable)
+			steerable.setSaddle(RNG.nextBoolean());
+		if (entity instanceof Enderman enderman)
+			enderman.setCarriedBlock(randomElementFrom(BLOCKS).createBlockData());
+		if (entity instanceof ChestedHorse horse)
+			horse.setCarryingChest(RNG.nextBoolean());
+		if (entity instanceof Frog frog)
+			frog.setVariant(randomElementFrom(Frog.Variant.class));
+		if (entity instanceof Axolotl axolotl)
+			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
+		if (entity instanceof Rabbit rabbit)
+			rabbit.setRabbitType(randomElementFrom(Rabbit.Type.class));
+		if (entity instanceof Villager villager)
+			villager.setVillagerType(randomElementFrom(Villager.Type.class));
+		if (entity instanceof ZombieVillager villager)
+			villager.setVillagerType(randomElementFrom(Villager.Type.class));
 		if (entity instanceof LootableInventory lootable)
-			lootable.setLootTable(RandomUtil.randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
+			lootable.setLootTable(randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
 
 		if (entity instanceof ArmorStand) {
 			// could add some chaos (GH#64) here eventually
@@ -153,7 +187,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 					if (random.nextInt(odds) > 0)
 						continue;
 					odds += ENTITY_ARMOR_INC;
-					ItemStack item = new ItemStack(RandomUtil.randomElementFrom(ARMOR.get(slot)));
+					ItemStack item = new ItemStack(randomElementFrom(ARMOR.get(slot)));
 					LootboxCommand.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
 					equipment.setItem(slot, item, true);
 				}

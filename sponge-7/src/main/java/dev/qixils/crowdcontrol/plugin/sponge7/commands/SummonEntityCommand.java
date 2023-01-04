@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -13,7 +12,10 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.*;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.RabbitType;
+import org.spongepowered.api.data.type.RabbitTypes;
+import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -35,6 +37,7 @@ import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
@@ -42,6 +45,19 @@ public class SummonEntityCommand extends ImmediateCommand {
 	protected final EntityType entityType;
 	private final String effectName;
 	private final Component displayName;
+	private static final Map<RabbitType, Integer> RABBIT_VARIANTS;
+
+	static {
+		Map<RabbitType, Integer> variants = new HashMap<>();
+		variants.put(RabbitTypes.BLACK, 16);
+		variants.put(RabbitTypes.BLACK_AND_WHITE, 16);
+		variants.put(RabbitTypes.BROWN, 16);
+		variants.put(RabbitTypes.GOLD, 16);
+		variants.put(RabbitTypes.SALT_AND_PEPPER, 16);
+		variants.put(RabbitTypes.WHITE, 16);
+		variants.put(RabbitTypes.KILLER, 1);
+		RABBIT_VARIANTS = Collections.unmodifiableMap(variants);
+	}
 
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
@@ -120,12 +136,13 @@ public class SummonEntityCommand extends ImmediateCommand {
 		entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(viewer));
 		entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
-		entity.offer(Keys.TREE_TYPE, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(TreeType.class)));
-		entity.offer(Keys.OCELOT_TYPE, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(OcelotType.class)));
-		entity.offer(Keys.DYE_COLOR, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(DyeColor.class)));
-		entity.offer(Keys.HORSE_COLOR, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(HorseColor.class)));
-		entity.offer(Keys.HORSE_STYLE, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(HorseStyle.class)));
-		entity.offer(Keys.PARROT_VARIANT, RandomUtil.randomElementFrom(plugin.getRegistry().getAllOf(ParrotVariant.class)));
+		entity.offer(Keys.TREE_TYPE, randomElementFrom(plugin.getRegistry().getAllOf(TreeType.class)));
+		entity.offer(Keys.DYE_COLOR, randomElementFrom(plugin.getRegistry().getAllOf(DyeColor.class)));
+		// brown mooshroom cows are not in 1.12.2
+		// TODO horse armor, chest, saddle?
+		entity.offer(Keys.PIG_SADDLE, RNG.nextBoolean());
+		// enderman held block API is unavailable in API v7
+		entity.offer(Keys.RABBIT_TYPE, weightedRandom(RABBIT_VARIANTS));
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
 
 		// add random armor to armor stands
@@ -142,7 +159,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 				if (random.nextInt(odds) > 0)
 					continue;
 				odds += ENTITY_ARMOR_INC;
-				ItemStack item = ItemStack.of(RandomUtil.randomElementFrom(armor.get(type)));
+				ItemStack item = ItemStack.of(randomElementFrom(armor.get(type)));
 				plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
 				((ArmorEquipable) entity).equip(type, item);

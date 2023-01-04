@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 	private final String effectName = "entity_charged_creeper";
+	private final Component displayName = getDefaultDisplayName();
 
 	public ChargedCreeperCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin, EntityType.CREEPER);

@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
-import dev.qixils.crowdcontrol.plugin.fabric.mixin.HorseAccessor;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -18,14 +17,17 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.Cat;
 import net.minecraft.world.entity.animal.MushroomCow;
-import net.minecraft.world.entity.animal.Parrot;
+import net.minecraft.world.entity.animal.Rabbit;
+import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.animal.Wolf;
-import net.minecraft.world.entity.animal.horse.Horse;
-import net.minecraft.world.entity.animal.horse.Markings;
-import net.minecraft.world.entity.animal.horse.Variant;
+import net.minecraft.world.entity.animal.axolotl.Axolotl;
+import net.minecraft.world.entity.animal.frog.Frog;
+import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.npc.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.ArmorItem;
@@ -39,6 +41,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.weightedRandom;
 
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
@@ -48,6 +52,16 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 	private final String effectName;
 	private final Component displayName;
 	private @Nullable List<ResourceLocation> lootTables = null;
+	private final Map<EntityType<?>, List<Item>> horseArmor = new HashMap<>();
+	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
+			Rabbit.Variant.BLACK, 16,
+			Rabbit.Variant.BROWN, 16,
+			Rabbit.Variant.GOLD, 16,
+			Rabbit.Variant.SALT, 16,
+			Rabbit.Variant.WHITE, 16,
+			Rabbit.Variant.WHITE_SPLOTCHED, 16,
+			Rabbit.Variant.EVIL, 1
+	);
 
 	public SummonEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
@@ -132,30 +146,49 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		entity.setPos(player.position());
 		entity.setCustomName(plugin.adventure().toNative(viewer));
 		entity.setCustomNameVisible(true);
+		if (entity instanceof Mob mob)
+			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
 		if (entity instanceof LivingEntity)
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
 		if (entity instanceof Boat boat)
-			boat.setVariant(RandomUtil.randomElementFrom(Boat.Type.class));
-		if (entity instanceof Cat cat)
-			cat.setVariant(RandomUtil.randomElementFrom(BuiltInRegistries.CAT_VARIANT));
+			boat.setVariant(randomElementFrom(Boat.Type.class));
 		if (entity instanceof Wolf wolf)
-			wolf.setCollarColor(RandomUtil.randomElementFrom(DyeColor.class));
+			wolf.setCollarColor(randomElementFrom(DyeColor.class));
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
-		if (entity instanceof Horse)
-			((HorseAccessor) entity).invokeSetVariantAndMarkings(RandomUtil.randomElementFrom(Variant.class), RandomUtil.randomElementFrom(Markings.class));
-		if (entity instanceof Parrot parrot)
-			parrot.setVariant(RandomUtil.randomElementFrom(Parrot.Variant.class));
+		if (entity instanceof AbstractHorse horse) {
+			if (horse.canWearArmor() && RandomUtil.RNG.nextBoolean()) {
+				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream().filter(item -> horse.isArmor(new ItemStack(item))).toList());
+				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
+			}
+			horse.setOwnerUUID(player.getUUID());
+			horse.setTamed(true);
+		}
+		if (entity instanceof Sheep sheep) // TODO: jeb
+			sheep.setColor(randomElementFrom(DyeColor.class));
+		if (entity instanceof Saddleable saddleable && RandomUtil.RNG.nextBoolean())
+			saddleable.equipSaddle(null);
+		if (entity instanceof EnderMan enderman)
+			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
+		if (entity instanceof AbstractChestedHorse chested)
+			chested.setChest(RandomUtil.RNG.nextBoolean());
+		if (entity instanceof Frog frog)
+			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT));
+		if (entity instanceof Axolotl axolotl)
+			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
+		if (entity instanceof Rabbit rabbit)
+			rabbit.setVariant(weightedRandom(RABBIT_VARIANTS));
+		if (entity instanceof VillagerDataHolder villager)
+			villager.setVariant(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE));
 		if (entity instanceof ContainerEntity container)
-			container.setLootTable(RandomUtil.randomElementFrom(getLootTables(level.getServer())));
+			container.setLootTable(randomElementFrom(getLootTables(level.getServer())));
 
 		// add random armor to armor stands
 		if (entity instanceof ArmorStand) {
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
-			//             (not that this is in API v7 afaik)
 			List<EquipmentSlot> slots = new ArrayList<>(armor.keySet());
 			Collections.shuffle(slots, random);
 			// begins as a 1 in 4 chance to add a random item but becomes less likely each time
@@ -165,7 +198,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 				if (random.nextInt(odds) > 0)
 					continue;
 				odds += ENTITY_ARMOR_INC;
-				ItemStack item = new ItemStack(RandomUtil.randomElementFrom(armor.get(type)));
+				ItemStack item = new ItemStack(randomElementFrom(armor.get(type)));
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);

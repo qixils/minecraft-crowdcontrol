@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -13,6 +12,8 @@ import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.MooshroomTypes;
+import org.spongepowered.api.data.type.RabbitType;
+import org.spongepowered.api.data.type.RabbitTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityCategories;
 import org.spongepowered.api.entity.EntityType;
@@ -32,6 +33,7 @@ import org.spongepowered.api.world.difficulty.Difficulties;
 import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
@@ -40,6 +42,19 @@ public class SummonEntityCommand extends ImmediateCommand {
 	protected final boolean isMonster;
 	private final String effectName;
 	private final Component displayName;
+	private static final Map<RabbitType, Integer> RABBIT_VARIANTS;
+
+	static {
+		Map<RabbitType, Integer> variants = new HashMap<>();
+		variants.put(RabbitTypes.BLACK.get(), 16);
+		variants.put(RabbitTypes.BLACK_AND_WHITE.get(), 16);
+		variants.put(RabbitTypes.BROWN.get(), 16);
+		variants.put(RabbitTypes.GOLD.get(), 16);
+		variants.put(RabbitTypes.SALT_AND_PEPPER.get(), 16);
+		variants.put(RabbitTypes.WHITE.get(), 16);
+		variants.put(RabbitTypes.KILLER.get(), 1);
+		RABBIT_VARIANTS = Collections.unmodifiableMap(variants);
+	}
 
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<?> entityType) {
 		super(plugin);
@@ -118,14 +133,16 @@ public class SummonEntityCommand extends ImmediateCommand {
 		entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.IS_TAMED, true);
 		entity.offer(Keys.TAMER, player.uniqueId());
-		entity.offer(Keys.BOAT_TYPE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.BOAT_TYPE)));
-		entity.offer(Keys.CAT_TYPE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.CAT_TYPE)));
-		entity.offer(Keys.DYE_COLOR, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.DYE_COLOR)));
-		if (RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
+		entity.offer(Keys.BOAT_TYPE, randomElementFrom(plugin.registryIterator(RegistryTypes.BOAT_TYPE)));
+		entity.offer(Keys.DYE_COLOR, randomElementFrom(plugin.registryIterator(RegistryTypes.DYE_COLOR)));
+		if (RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			entity.offer(Keys.MOOSHROOM_TYPE, MooshroomTypes.BROWN.get());
-		entity.offer(Keys.HORSE_COLOR, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.HORSE_COLOR)));
-		entity.offer(Keys.HORSE_STYLE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.HORSE_STYLE)));
-		entity.offer(Keys.PARROT_TYPE, RandomUtil.randomElementFrom(plugin.registryIterator(RegistryTypes.PARROT_TYPE)));
+		entity.offer(Keys.IS_SADDLED, RNG.nextBoolean());
+		entity.offer(Keys.HAS_CHEST, RNG.nextBoolean());
+		// TODO horse armor
+		// enderman held block API is unavailable in API v8 | todo: open issue?
+		entity.offer(Keys.RABBIT_TYPE, weightedRandom(RABBIT_VARIANTS));
+		entity.offer(Keys.VILLAGER_TYPE, randomElementFrom(plugin.registryIterator(RegistryTypes.VILLAGER_TYPE)));
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
 		// API8: loot table data | TODO: still no API for it; may need to open an issue
 
@@ -143,7 +160,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 				if (random.nextInt(odds) > 0)
 					continue;
 				odds += ENTITY_ARMOR_INC;
-				ItemStack item = ItemStack.of(RandomUtil.randomElementFrom(armor.get(type)));
+				ItemStack item = ItemStack.of(randomElementFrom(armor.get(type)));
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
