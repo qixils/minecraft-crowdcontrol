@@ -67,7 +67,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		super(plugin);
 		this.entityType = entityType;
 		this.isMonster = entityType.getCategory() == MobCategory.MONSTER;
-		this.effectName = "entity_" + BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
+		this.effectName = "entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getDescription());
 
 		// pre-compute the map of valid armor pieces

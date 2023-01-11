@@ -32,7 +32,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 	public EnchantmentCommand(FabricCrowdControlPlugin plugin, Enchantment enchantment) {
 		super(plugin);
 		this.enchantment = enchantment;
-		this.effectName = "enchant_" + BuiltInRegistries.ENCHANTMENT.getKey(enchantment).getPath();
+		this.effectName = "enchant_" + csIdOf(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), "Enchantment has no registry name"));
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
 				enchantment.getFullname(enchantment.getMaxLevel()).copy().withStyle(Style.EMPTY) // TODO: withStyle is not working (text is still colored)

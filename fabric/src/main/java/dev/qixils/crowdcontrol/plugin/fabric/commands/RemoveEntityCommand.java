@@ -31,7 +31,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	public RemoveEntityCommand(FabricCrowdControlPlugin plugin, EntityType<?> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
+		this.effectName = "remove_entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType.getDescription());
 	}
 
