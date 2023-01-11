@@ -12,7 +12,7 @@ with Crowd Control.
 4. Navigate to the folder you created in your file explorer and create a new folder inside it
    called `mods`.
 5. Download the latest recommended build of
-   [SpongeForge 1.12.2](https://www.spongepowered.org/downloads/spongevanilla?minecraft=1.12.2&offset=0)
+   [SpongeForge 1.12.2](https://www.spongepowered.org/downloads/spongeforge?minecraft=1.12.2&offset=0)
    for API v7 and place it in the `mods` folder.
 6. Download
    the [latest Sponge plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
