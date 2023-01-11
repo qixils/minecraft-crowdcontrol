@@ -116,7 +116,7 @@ public class DoOrDieCommand extends VoidCommand {
 				} else if (isTimeUp) {
 					condition.reset(player);
 					player.showTitle(DO_OR_DIE_FAILURE);
-					player.setHealth(0);
+					player.kill();
 				} else {
 					Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
 					player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
