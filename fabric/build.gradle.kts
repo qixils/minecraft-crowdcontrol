@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 val minecraftVersion: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
@@ -7,6 +9,11 @@ val cardinalComponentsVersion: String by project
 
 // inherit resources from common module
 sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
+
+// shading configuration
+val shade: Configuration by configurations.creating {
+    configurations.implementation.get().extendsFrom(this)
+}
 
 plugins {
     id("fabric-loom")
@@ -24,15 +31,28 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":configurate-common"))
+    shade(project(":configurate-common"))
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
-    modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
-    modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
+    modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
+    modImplementation("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")
+    modImplementation("cloud.commandframework:cloud-fabric:$cloudVersion")
+    modApi("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")
+    modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")
+}
+
+tasks.withType<ShadowJar> {
+    // manually exclude some misc. dependencies
+    configurations = listOf(project.configurations.modImplementation.get(), project.configurations.modApi.get(), shade)
+    exclude("net/fabricmc/")
+    exclude("fabric-*-v*")
+    exclude("client-fabric-*-v*")
+    exclude("LICENSE-fabric-*")
+
+    dependencies {
+        exclude(dependency("net.fabricmc::"))
+    }
 }
 
 tasks.withType<ProcessResources> {

@@ -14,6 +14,7 @@ public final class EventManager {
 	private final Multimap<Class<Event>, Consumer<Event>> listeners = HashMultimap.create();
 
 	public <E extends Event> void register(Class<E> eventClass, Consumer<E> listener) {
+		//noinspection unchecked
 		listeners.put((Class<Event>) eventClass, (Consumer<Event>) listener);
 	}
 

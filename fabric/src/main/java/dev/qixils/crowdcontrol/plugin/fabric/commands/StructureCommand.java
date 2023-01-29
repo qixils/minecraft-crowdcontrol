@@ -111,6 +111,7 @@ public class StructureCommand extends NearbyLocationCommand<StructureCommand.Str
 
 		@SafeVarargs
 		StructureGroup(ResourceKey<Structure>... structures) {
+			//noinspection deprecation
 			this.name = Component.text(WordUtils.capitalizeFully(name().replace('_', ' ')));
 			this.structures = structures;
 		}
