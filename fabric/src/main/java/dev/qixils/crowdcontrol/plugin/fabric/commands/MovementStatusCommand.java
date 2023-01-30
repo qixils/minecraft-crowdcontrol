@@ -1,6 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.util.ComparableUtil;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
@@ -46,28 +48,31 @@ public class MovementStatusCommand extends TimedVoidCommand {
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
-		AtomicReference<List<ServerPlayer>> players = new AtomicReference<>();
+		AtomicReference<List<ServerPlayer>> atomicPlayers = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup(effectGroup)
 				.duration(getDuration(request))
 				.startCallback($ -> {
-					players.set(plugin.getPlayers(request));
-					if (players.get().isEmpty())
+					SemVer minVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
+					List<ServerPlayer> players = plugin.getPlayers(request).stream()
+									.filter(player -> plugin.getClientVersion(player).orElse(SemVer.ZERO).isAtLeast(minVersion))
+									.toList();
+					atomicPlayers.set(players);
+
+					if (players.isEmpty())
 						return request.buildResponse()
 								.type(Response.ResultType.FAILURE)
-								.message("No players online");
+								.message("No targetable players online");
 
-					// TODO: handle client-side
-
-					for (Player player : players.get())
+					for (Player player : players)
 						Components.MOVEMENT_STATUS.get(player).set(type, value);
-					playerAnnounce(players.get(), request);
+					playerAnnounce(players, request);
 
 					return null; // success
 				})
 				.completionCallback($ -> {
-					for (Player player : players.get())
+					for (Player player : atomicPlayers.get())
 						Components.MOVEMENT_STATUS.get(player).set(type, MovementStatus.Value.ALLOWED);
 				})
 				.build().queue();

@@ -2,6 +2,8 @@ package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
+import dev.qixils.crowdcontrol.common.util.SemVer;
+import dev.qixils.crowdcontrol.common.util.Versioned;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -15,20 +17,28 @@ public interface MovementStatus extends AutoSyncedComponent, PlayerComponent<Mov
 	void sync();
 
 	@RequiredArgsConstructor
-	enum Type {
-		JUMP(false),
-		WALK(true),
-		LOOK(true),
+	@Getter
+	@Accessors(fluent = true)
+	enum Type implements Versioned {
+		JUMP(false, new SemVer(3, 3, 0)),
+		WALK(true, new SemVer(3, 3, 0)),
+		LOOK(true, new SemVer(3, 3, 0)),
 		;
 
-		@Getter @Accessors(fluent = true)
 		private final boolean canInvert;
+		private final SemVer addedIn;
 	}
 
-	enum Value {
-		ALLOWED,
-		PARTIAL, // not supported by all types
-		INVERTED, // not supported by all types
-		DENIED
+	@RequiredArgsConstructor
+	@Getter
+	@Accessors(fluent = true)
+	enum Value implements Versioned {
+		ALLOWED(new SemVer(3, 3, 0)),
+		PARTIAL(new SemVer(3, 3, 0)), // not supported by all types
+		INVERTED(new SemVer(3, 3, 0)), // not supported by all types
+		DENIED(new SemVer(3, 3, 0)),
+		;
+
+		private final SemVer addedIn;
 	}
 }

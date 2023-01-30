@@ -75,7 +75,7 @@ loom {
 }
 
 tasks.remapJar {
-    nestedJars.from(project(":configurate-common").tasks.named("shadowJar"))
+    nestedJars.from(project(":configurate-common").tasks.named("shadowJar")) // TODO: rename jar
     // set name of output file to CrowdControl-XYZ-VERSION.jar | TODO: reduce code repetition
     val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
     archiveBaseName.set("CrowdControl-$titleCaseName")

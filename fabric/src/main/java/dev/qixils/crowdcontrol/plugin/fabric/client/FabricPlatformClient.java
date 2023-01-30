@@ -1,12 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +44,11 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		FabricCrowdControlPlugin.CLIENT_INITIALIZED = true;
 		ClientLifecycleEvents.CLIENT_STARTED.register(this::setClient);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
+		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.VERSION_REQUEST_ID, (client, handler, inputBuf, responseSender) -> {
+			FriendlyByteBuf buf = PacketByteBufs.create();
+			buf.writeUtf(SemVer.MOD_STRING, 16);
+			responseSender.sendPacket(FabricCrowdControlPlugin.VERSION_RESPONSE_ID, buf);
+		});
 	}
 
 	private void setClient(@Nullable Minecraft client) {

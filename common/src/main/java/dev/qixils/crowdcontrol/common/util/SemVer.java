@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.common.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.util.Objects;
@@ -9,17 +10,25 @@ import java.util.Scanner;
 /**
  * Represents a semantic version.
  */
-public final class SemVer {
+public final class SemVer implements Comparable<SemVer> {
 
 	/**
 	 * The current version of the Minecraft mod.
 	 */
+	@NotNull
 	public static final SemVer MOD;
 
 	/**
 	 * The current version of the Minecraft mod as a string.
 	 */
+	@NotNull
 	public static final String MOD_STRING;
+
+	/**
+	 * A blank semantic version.
+	 */
+	@NotNull
+	public static final SemVer ZERO = new SemVer(0, 0, 0);
 
 	static {
 		// load version from resources (mccc-version.txt)
@@ -109,11 +118,41 @@ public final class SemVer {
 	 * @return whether this version is greater than or equal to the given version
 	 */
 	public boolean isAtLeast(@NotNull SemVer other) {
-		return major > other.major || (major == other.major && minor > other.minor) || (major == other.major && minor == other.minor && patch >= other.patch);
+		return compareTo(other) >= 0;
+	}
+
+	/**
+	 * Returns whether this version is less than or equal to the given version.
+	 *
+	 * @param other other version
+	 * @return whether this version is less than or equal to the given version
+	 */
+	public boolean isAtMost(@NotNull SemVer other) {
+		return compareTo(other) <= 0;
+	}
+
+	/**
+	 * Returns whether this version is greater than the given version.
+	 *
+	 * @param other other version
+	 * @return whether this version is greater than the given version
+	 */
+	public boolean isGreaterThan(@NotNull SemVer other) {
+		return compareTo(other) > 0;
+	}
+
+	/**
+	 * Returns whether this version is less than the given version.
+	 *
+	 * @param other other version
+	 * @return whether this version is less than the given version
+	 */
+	public boolean isLessThan(@NotNull SemVer other) {
+		return compareTo(other) < 0;
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		SemVer other = (SemVer) o;
@@ -123,5 +162,14 @@ public final class SemVer {
 	@Override
 	public int hashCode() {
 		return Objects.hash(major, minor, patch);
+	}
+
+	@Override
+	public int compareTo(@NotNull SemVer o) {
+		if (major != o.major)
+			return major - o.major;
+		if (minor != o.minor)
+			return minor - o.minor;
+		return patch - o.patch;
 	}
 }

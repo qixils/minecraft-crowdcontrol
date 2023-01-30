@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -19,6 +20,8 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.client.player.LocalPlayer;
@@ -58,6 +61,9 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
+	// packet stuff
+	public static ResourceLocation VERSION_REQUEST_ID = new ResourceLocation("crowd-control", "version-request");
+	public static ResourceLocation VERSION_RESPONSE_ID = new ResourceLocation("crowd-control", "version-response");
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -97,6 +103,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		instance = this;
 		getEventManager().registerListeners(softLockResolver);
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
+		getEventManager().register(Leave.class, leave -> onPlayerLeave(leave.player()));
 	}
 
 	@Override
@@ -104,6 +111,8 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		registerChatCommands();
 		ServerLifecycleEvents.SERVER_STARTING.register(this::setServer);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
+		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender)
+				-> clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(16))));
 	}
 
 	@Override
@@ -205,12 +214,28 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	//@Override
 	public @NotNull Optional<SemVer> getClientVersion(@NotNull ServerPlayer player) {
-		return Optional.ofNullable(clientVersions.get(player.getUUID())).or(() -> {
-			if (!CLIENT_AVAILABLE) return Optional.empty();
-			Optional<LocalPlayer> clientPlayer = FabricPlatformClient.get().player();
-			if (clientPlayer.isEmpty()) return Optional.empty();
-			if (!clientPlayer.get().getUUID().equals(player.getUUID())) return Optional.empty();
-			return Optional.of(SemVer.MOD);
-		});
+		return Optional.ofNullable(clientVersions.get(player.getUUID()));
+	}
+
+	@Override
+	public void onPlayerJoin(ServerPlayer player) {
+		super.onPlayerJoin(player);
+		// put client version
+		if (CLIENT_AVAILABLE) {
+			FabricPlatformClient.get().player()
+					.map(LocalPlayer::getUUID)
+					.filter(uuid -> uuid.equals(player.getUUID()))
+					.ifPresent(uuid -> clientVersions.put(uuid, SemVer.MOD));
+		}
+		// request client version if not available
+		if (!clientVersions.containsKey(player.getUUID())) {
+			ServerPlayNetworking.send(player, VERSION_REQUEST_ID, PacketByteBufs.empty());
+		}
+	}
+
+	//@Override
+	public void onPlayerLeave(ServerPlayer player) {
+		//super.onPlayerLeave(player);
+		clientVersions.remove(player.getUUID());
 	}
 }
