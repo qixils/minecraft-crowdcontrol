@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
@@ -20,6 +21,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -84,6 +86,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			.build()
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
+	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	@MonotonicNonNull
 	private HoconConfigurationLoader configLoader;
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
@@ -198,5 +201,16 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Override
 	public @NotNull Audience getConsole() {
 		return adventure().console();
+	}
+
+	//@Override
+	public @NotNull Optional<SemVer> getClientVersion(@NotNull ServerPlayer player) {
+		return Optional.ofNullable(clientVersions.get(player.getUUID())).or(() -> {
+			if (!CLIENT_AVAILABLE) return Optional.empty();
+			Optional<LocalPlayer> clientPlayer = FabricPlatformClient.get().player();
+			if (clientPlayer.isEmpty()) return Optional.empty();
+			if (!clientPlayer.get().getUUID().equals(player.getUUID())) return Optional.empty();
+			return Optional.of(SemVer.MOD);
+		});
 	}
 }

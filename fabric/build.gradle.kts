@@ -1,19 +1,31 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
+val crowdControlVersion: String by project
 val minecraftVersion: String by project
+val parchmentVersion: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
 val cloudVersion: String by project
 val adventurePlatformFabricVersion: String by project
 val cardinalComponentsVersion: String by project
 
-// shading configuration
-val shade: Configuration by configurations.creating {
-    configurations.implementation.get().extendsFrom(this)
-}
-
 plugins {
     id("fabric-loom")
+}
+
+// util to recursively include a project and all its dependencies
+// TODO: it might be possible to get loom to directly include a shaded jar of a project
+fun DependencyHandlerScope.includeRecursive(project: ProjectDependency): ProjectDependency {
+    include(project)
+    includeRecursive(project.dependencyProject.configurations.api.get())
+    includeRecursive(project.dependencyProject.configurations.implementation.get())
+    return project
+}
+fun DependencyHandlerScope.includeRecursive(configuration: Configuration) {
+    configuration.dependencies.forEach {
+        when (it) {
+            is ProjectDependency -> includeRecursive(it)
+            else -> include(it)
+        }
+    }
 }
 
 repositories {
@@ -25,31 +37,28 @@ repositories {
         name = "Ladysnake Mods"
         url = uri("https://ladysnake.jfrog.io/artifactory/mods")
     }
+    maven {
+        name = "Parchment"
+        url = uri("https://maven.parchmentmc.org")
+    }
 }
 
 dependencies {
-    shade(project(":configurate-common"))
+    implementation(includeRecursive(project(":configurate-common")))
     minecraft("com.mojang:minecraft:$minecraftVersion")
-    mappings(loom.officialMojangMappings())
+    mappings(loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-$minecraftVersion:$parchmentVersion@zip")
+    })
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")
-    modImplementation("cloud.commandframework:cloud-fabric:$cloudVersion")
-    modApi("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")
-    modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")
-}
+    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
+    modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
+    modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
 
-tasks.withType<ShadowJar> {
-    // manually exclude some misc. dependencies
-    configurations = listOf(project.configurations.modImplementation.get(), project.configurations.modApi.get(), shade)
-    exclude("net/fabricmc/")
-    exclude("fabric-*-v*")
-    exclude("client-fabric-*-v*")
-    exclude("LICENSE-fabric-*")
-
-    dependencies {
-        exclude(dependency("net.fabricmc::"))
-    }
+    // misc includes
+    include("dev.qixils.crowdcontrol:crowd-control-pojos:$crowdControlVersion")
 }
 
 tasks.processResources {
@@ -76,4 +85,19 @@ java {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
 //    withSourcesJar()
+}
+
+// configure loom
+
+loom {
+    mixin {
+        defaultRefmapName.set("crowd-control-refmap.json")
+    }
+}
+
+// set name of the built jar | TODO: reduce code repetition from main build.gradle.kts
+tasks.remapJar {
+    val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
+    archiveBaseName.set("CrowdControl-$titleCaseName")
+    archiveClassifier.set("")
 }
