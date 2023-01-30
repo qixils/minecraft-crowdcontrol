@@ -7,9 +7,6 @@ val cloudVersion: String by project
 val adventurePlatformFabricVersion: String by project
 val cardinalComponentsVersion: String by project
 
-// inherit resources from common module
-sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
-
 // shading configuration
 val shade: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
@@ -55,7 +52,7 @@ tasks.withType<ShadowJar> {
     }
 }
 
-tasks.withType<ProcessResources> {
+tasks.processResources {
     inputs.property("version", project.version)
     filteringCharset = "UTF-8"
 

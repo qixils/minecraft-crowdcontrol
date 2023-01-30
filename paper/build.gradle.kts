@@ -4,9 +4,6 @@ val paperMinecraftVersion: String by project
 val mcVersionSplit = paperMinecraftVersion.split(".")
 description = "Minecraft Crowd Control: Paper"
 
-// inherit resources from common module
-sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
-
 plugins {
     id("xyz.jpenilla.run-paper") // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") // Generates plugin.yml

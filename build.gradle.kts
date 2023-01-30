@@ -45,6 +45,10 @@ subprojects {
     }
 
     if (project.name.endsWith("-platform")) {
+        // inherit resources from common module
+        // (i don't think this is the proper way to do this, this is very silly)
+        sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
+
         tasks {
             // TODO: disable output of non-shaded jars? or make their file names more obvious?
             // TODO: exclude kotlin directory in output jar? (i don't think it's used but gotta double check)

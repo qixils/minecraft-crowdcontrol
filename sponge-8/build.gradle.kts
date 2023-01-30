@@ -2,9 +2,6 @@ val cloudVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 8"
 
-// inherit resources from common module
-sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
-
 plugins {
     id("org.spongepowered.gradle.plugin")
 }
