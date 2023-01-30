@@ -4,14 +4,8 @@ val parchmentVersion: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
 val cloudVersion: String by project
-val adventureVersion: String by project
 val adventurePlatformFabricVersion: String by project
 val cardinalComponentsVersion: String by project
-
-// shading configuration
-val shade: Configuration by configurations.creating {
-    configurations.implementation.get().extendsFrom(this)
-}
 
 plugins {
     id("fabric-loom")
@@ -33,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    shade(project(":configurate-common"))
+    implementation(project(":configurate-common"))
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings(loom.layered {
         officialMojangMappings()
@@ -45,9 +39,6 @@ dependencies {
     modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
     modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
     modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
-
-    // misc includes
-    include("net.kyori:adventure-api:$adventureVersion")
 }
 
 tasks.processResources {
@@ -83,22 +74,8 @@ loom {
     }
 }
 
-// configure shadowJar
-tasks.shadowJar {
-    configurations = listOf(shade)
-    archiveBaseName.set("shadow-CrowdControl")
-    archiveVersion.set("")
-    exclude("net/kyori/adventure/")
-
-    dependencies {
-        exclude("net.kyori:adventure-api:")
-    }
-}
-
 tasks.remapJar {
-    // configure remapJar to use output of shadowJar
-    dependsOn(tasks.shadowJar)
-    inputFile.set(project.buildDir.resolve("libs/shadow-CrowdControl.jar"))
+    nestedJars.from(project(":configurate-common").tasks.named("shadowJar"))
     // set name of output file to CrowdControl-XYZ-VERSION.jar
     val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
     archiveBaseName.set("CrowdControl-$titleCaseName")

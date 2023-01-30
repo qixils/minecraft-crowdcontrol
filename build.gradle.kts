@@ -21,7 +21,12 @@ subprojects {
     apply {
         plugin("java-library")
         plugin("io.freefair.lombok")
-        plugin("com.github.johnrengelman.shadow")
+    }
+
+    if (project.name != "fabric-platform") {
+        apply {
+            plugin("com.github.johnrengelman.shadow")
+        }
     }
 
     repositories {
@@ -47,10 +52,17 @@ subprojects {
     if (project.name.endsWith("-platform")) {
         // inherit resources from common module
         sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
+    }
 
+    if (project.name.endsWith("-platform") && project.name != "fabric-platform") {
         tasks {
             // TODO: disable output of non-shaded jars? or make their file names more obvious?
             // TODO: exclude kotlin directory in output jar? (i don't think it's used but gotta double check)
+
+            build {
+                dependsOn(shadowJar)
+            }
+
             shadowJar {
                 minimize() // minimize jar
                 // exclude Java >8 META-INF files
@@ -61,14 +73,6 @@ subprojects {
                 val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
                 archiveBaseName.set("CrowdControl-$titleCaseName")
                 archiveClassifier.set("")
-            }
-        }
-
-        if (project.name != "fabric-platform") {
-            tasks {
-                build {
-                    dependsOn(shadowJar)
-                }
             }
         }
     }

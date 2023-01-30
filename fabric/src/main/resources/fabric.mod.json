@@ -8,8 +8,10 @@
     "qixils"
   ],
   "contact": {
-    "website": "https://github.com/qixils/minecraft-crowdcontrol",
-    "repo": "https://github.com/qixils/minecraft-crowdcontrol.git"
+    "homepage": "https://github.com/qixils/minecraft-crowdcontrol",
+    "sources": "https://github.com/qixils/minecraft-crowdcontrol.git",
+    "issues": "https://github.com/qixils/minecraft-crowdcontrol/issues",
+    "discord": "https://discord.gg/warpworld"
   },
   "license": "MIT",
   "icon": "assets/crowd-control/icon.png",

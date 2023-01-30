@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "crowd-control-parent",
+  "version": "${version}",
+  "name": "Crowd Control",
+  "description": "Library for the Crowd Control mod",
+  "authors": [
+    "qixils"
+  ],
+  "contact": {
+    "homepage": "https://github.com/qixils/minecraft-crowdcontrol",
+    "sources": "https://github.com/qixils/minecraft-crowdcontrol.git",
+    "issues": "https://github.com/qixils/minecraft-crowdcontrol/issues",
+    "discord": "https://discord.gg/warpworld"
+  },
+  "license": "MIT",
+  "icon": "assets/crowd-control/icon.png",
+  "environment": "server",
+  "custom": {
+    "fabric-loom:generated": true
+  }
+}
