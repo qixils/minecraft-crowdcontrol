@@ -39,7 +39,7 @@ public class KyoriTranslator {
 			String[] segments = file.split("_", 2);
 			if (segments.length <= 1)
 				continue;
-			if (!segments[0].equals("CrowdControl"))
+			if (!segments[0].equals("i18n/CrowdControl"))
 				continue;
 			if (!segments[1].endsWith(".properties"))
 				continue;
