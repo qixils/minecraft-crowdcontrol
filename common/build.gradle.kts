@@ -1,6 +1,7 @@
 val crowdControlVersion: String by project
 val adventureVersion: String by project
 val cloudVersion: String by project
+val reflectionsVersion: String by project
 
 dependencies {
     api("com.google.guava:guava:31.1-jre")
@@ -10,6 +11,7 @@ dependencies {
     api("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
     api("cloud.commandframework:cloud-core:$cloudVersion")
     api("cloud.commandframework:cloud-minecraft-extras:$cloudVersion")
+    implementation("org.reflections:reflections:$reflectionsVersion")
 }
 
 description = "Minecraft Crowd Control: Common"

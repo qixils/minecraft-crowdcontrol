@@ -4,28 +4,17 @@ val parchmentVersion: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
 val cloudVersion: String by project
+val adventureVersion: String by project
 val adventurePlatformFabricVersion: String by project
 val cardinalComponentsVersion: String by project
 
-plugins {
-    id("fabric-loom")
+// shading configuration
+val shade: Configuration by configurations.creating {
+    configurations.implementation.get().extendsFrom(this)
 }
 
-// util to recursively include a project and all its dependencies
-// TODO: it might be possible to get loom to directly include a shaded jar of a project
-fun DependencyHandlerScope.includeRecursive(project: ProjectDependency): ProjectDependency {
-    include(project)
-    includeRecursive(project.dependencyProject.configurations.api.get())
-    includeRecursive(project.dependencyProject.configurations.implementation.get())
-    return project
-}
-fun DependencyHandlerScope.includeRecursive(configuration: Configuration) {
-    configuration.dependencies.forEach {
-        when (it) {
-            is ProjectDependency -> includeRecursive(it)
-            else -> include(it)
-        }
-    }
+plugins {
+    id("fabric-loom")
 }
 
 repositories {
@@ -44,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation(includeRecursive(project(":configurate-common")))
+    shade(project(":configurate-common"))
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings(loom.layered {
         officialMojangMappings()
@@ -58,7 +47,7 @@ dependencies {
     modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
 
     // misc includes
-    include("dev.qixils.crowdcontrol:crowd-control-pojos:$crowdControlVersion")
+    include("net.kyori:adventure-api:$adventureVersion")
 }
 
 tasks.processResources {
@@ -88,15 +77,29 @@ java {
 }
 
 // configure loom
-
 loom {
     mixin {
         defaultRefmapName.set("crowd-control-refmap.json")
     }
 }
 
-// set name of the built jar | TODO: reduce code repetition from main build.gradle.kts
+// configure shadowJar
+tasks.shadowJar {
+    configurations = listOf(shade)
+    archiveBaseName.set("shadow-CrowdControl")
+    archiveVersion.set("")
+    exclude("net/kyori/adventure/")
+
+    dependencies {
+        exclude("net.kyori:adventure-api:")
+    }
+}
+
 tasks.remapJar {
+    // configure remapJar to use output of shadowJar
+    dependsOn(tasks.shadowJar)
+    inputFile.set(project.buildDir.resolve("libs/shadow-CrowdControl.jar"))
+    // set name of output file to CrowdControl-XYZ-VERSION.jar
     val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
     archiveBaseName.set("CrowdControl-$titleCaseName")
     archiveClassifier.set("")

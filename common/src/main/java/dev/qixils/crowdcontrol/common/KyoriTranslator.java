@@ -5,15 +5,15 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
 import net.kyori.adventure.util.UTF8ResourceBundleControl;
-import org.jetbrains.annotations.Nullable;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 
 public class KyoriTranslator {
 	private KyoriTranslator() {
@@ -30,20 +30,13 @@ public class KyoriTranslator {
 		TranslationRegistry translator = TranslationRegistry.create(Key.key("crowd-control", "translations"));
 		translator.defaultLocale(Locale.US);
 
-		// find locale path
-		URL url = KyoriTranslator.class.getResource("/i18n"); // not working in prod; use quasicolon as reference to fix
-		File dir = getFileFromURL(url);
-		if (dir == null)
-			throw new IllegalStateException("Could not load language files (directory does not exist)");
-		File[] files = dir.listFiles();
-		if (files == null)
-			throw new IllegalStateException("Could not load language files (path is not a directory)");
-
-		// register locales
-		for (File file : files) {
-			String name = file.getName();
-			logger.debug("Processing " + name);
-			String[] segments = name.split("_", 2);
+		// load locales
+		Reflections reflections = new Reflections(new ConfigurationBuilder()
+				.addScanners(Scanners.Resources)
+				.forPackage("i18n"));
+		for (String file : reflections.getResources(Pattern.compile(".+\\.properties"))) {
+			logger.debug("Processing " + file);
+			String[] segments = file.split("_", 2);
 			if (segments.length <= 1)
 				continue;
 			if (!segments[0].equals("CrowdControl"))
@@ -62,20 +55,5 @@ public class KyoriTranslator {
 		// register translator
 		GlobalTranslator.translator().addSource(translator);
 		logger.info("Registered translator");
-	}
-
-	private static @Nullable File getFileFromURL(@Nullable URL url) {
-		if (url == null)
-			return null;
-
-		File file;
-		try {
-			file = new File(url.toURI());
-		} catch (URISyntaxException e) {
-			file = new File(url.getPath());
-		}
-		if (!file.exists())
-			return null;
-		return file;
 	}
 }

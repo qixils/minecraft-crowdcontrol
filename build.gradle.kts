@@ -21,12 +21,7 @@ subprojects {
     apply {
         plugin("java-library")
         plugin("io.freefair.lombok")
-    }
-
-    if (project.name != "fabric-platform") {
-        apply {
-            plugin("com.github.johnrengelman.shadow")
-        }
+        plugin("com.github.johnrengelman.shadow")
     }
 
     repositories {
@@ -51,29 +46,28 @@ subprojects {
 
     if (project.name.endsWith("-platform")) {
         // inherit resources from common module
-        // (i don't think this is the proper way to do this, this is very silly)
-        // (ok maybe now it's necessary for fabric)
         sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
+
+        tasks {
+            // TODO: disable output of non-shaded jars? or make their file names more obvious?
+            // TODO: exclude kotlin directory in output jar? (i don't think it's used but gotta double check)
+            shadowJar {
+                minimize() // minimize jar
+                // exclude Java >8 META-INF files
+                if (java.targetCompatibility.isJava8) {
+                    exclude("META-INF/versions/")
+                }
+                // set name of output file to CrowdControl-XYZ-VERSION.jar
+                val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
+                archiveBaseName.set("CrowdControl-$titleCaseName")
+                archiveClassifier.set("")
+            }
+        }
 
         if (project.name != "fabric-platform") {
             tasks {
-                // TODO: disable output of non-shaded jars? or make their file names more obvious?
-                // TODO: exclude kotlin directory in output jar? (i don't think it's used but gotta double check)
-
                 build {
                     dependsOn(shadowJar)
-                }
-
-                shadowJar {
-                    minimize() // minimize jar
-                    // exclude Java >8 META-INF files
-                    if (java.targetCompatibility.isJava8) {
-                        exclude("META-INF/versions/")
-                    }
-                    // set name of output file to CrowdControl-XYZ-VERSION.jar
-                    val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
-                    archiveBaseName.set("CrowdControl-$titleCaseName")
-                    archiveClassifier.set("")
                 }
             }
         }
