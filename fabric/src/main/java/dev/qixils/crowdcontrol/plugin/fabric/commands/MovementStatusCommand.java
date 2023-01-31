@@ -54,10 +54,11 @@ public class MovementStatusCommand extends TimedVoidCommand {
 				.effectGroup(effectGroup)
 				.duration(getDuration(request))
 				.startCallback($ -> {
-					SemVer minVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
-					List<ServerPlayer> players = plugin.getPlayers(request).stream()
-									.filter(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isAtLeast(minVersion))
-									.toList();
+					List<ServerPlayer> players = plugin.getPlayers(request);
+					if (clientOnly) {
+						SemVer minVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
+						players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
+					}
 					atomicPlayers.set(players);
 
 					if (players.isEmpty())
