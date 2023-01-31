@@ -9,6 +9,9 @@ ij_formatter_off_tag = @formatter:off
 ij_formatter_on_tag = @formatter:on
 ij_formatter_tags_enabled = true
 
+[*.md]
+max_line_length = 100
+
 [*.cs]
 
 # CA1416: Validate platform compatibility

@@ -25,10 +25,10 @@ work or you require a dedicated server for other streamers to join, then follow 
 |:-----------------------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:---------------------------------------------------------------------------------:|
 | 1.12.2 / Sponge (Forge) | [Sponge 7: One-Click Setup](guides/sponge_7_one_click.md) | [Sponge 7: Joining a Server](guides/sponge_7_joining_a_server.md) | [SpongeForge 7: Manual Installation](guides/spongeforge_7_manual_installation.md) |
 | 1.16.5 / Sponge (Forge) |                       Coming Soon!                        |                           Coming Soon!                            |                                   Coming Soon!                                    |
-|     1.17.1 / Paper      |    [Paper: One-Click Setup](guides/paper_one_click.md)    |    [Paper: Joining a Server](guides/paper_joining_a_server.md)    |    [Paper 1.17: Manual Installation](guides/paper_1.17_manual_installation.md)    |
-|     1.18.2 / Paper      |                       Coming Soon!                        |    [Paper: Joining a Server](guides/paper_joining_a_server.md)    |    [Paper 1.18: Manual Installation](guides/paper_1.18_manual_installation.md)    |
-|     1.18.2 (Fabric)     |                       Coming Soon!                        |                           Coming Soon!                            |                                   Coming Soon!                                    |
-|     1.18.2 (Forge)      |                       Coming Soon!                        |                           Coming Soon!                            |                                   Coming Soon!                                    |
+|     1.17.1 / Paper      |                    No longer supported                    |    [Paper: Joining a Server](guides/paper_joining_a_server.md)    |    [Paper 1.17: Manual Installation](guides/paper_1.17_manual_installation.md)    |
+|     1.18.2 / Paper      |                    No longer supported                    |    [Paper: Joining a Server](guides/paper_joining_a_server.md)    |    [Paper 1.18: Manual Installation](guides/paper_1.18_manual_installation.md)    |
+|     1.19.3 / Fabric     |                       Coming Soon!                        |                           Coming Soon!                            |                                   Coming Soon!                                    |
+|     1.19.3 / Paper      |    [Paper: One-Click Setup](guides/paper_one_click.md)    |    [Paper: Joining a Server](guides/paper_joining_a_server.md)    |    [Paper 1.19: Manual Installation](guides/paper_1.19_manual_installation.md)    |
 
 By default, all servers support Vanilla clients. This means that players connecting to your server
 will **not** need to install any sort of mod or software except for the Crowd Control desktop
