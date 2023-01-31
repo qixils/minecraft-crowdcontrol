@@ -614,7 +614,7 @@ public interface Plugin<P, S> {
 			return;
 		Response response = manager.buildResponse(0)
 				.packetType(PacketType.EFFECT_STATUS)
-				.effect(effect)
+				.effect(effect.toLowerCase(Locale.ENGLISH))
 				.type(status)
 				.build();
 		response.send();

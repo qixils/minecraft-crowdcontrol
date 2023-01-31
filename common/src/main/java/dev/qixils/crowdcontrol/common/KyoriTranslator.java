@@ -35,6 +35,7 @@ public class KyoriTranslator {
 				.addScanners(Scanners.Resources)
 				.forPackage("i18n"));
 		for (String file : reflections.getResources(Pattern.compile(".+\\.properties"))) {
+			// TODO: broken on sponge 8 and probably others aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 			logger.debug("Processing " + file);
 			String[] segments = file.split("_", 2);
 			if (segments.length <= 1)

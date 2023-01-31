@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Getter
 public class GameModeCommand extends TimedVoidCommand {
@@ -36,7 +35,7 @@ public class GameModeCommand extends TimedVoidCommand {
 		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
 		this.displayName = Component.translatable(gamemode);
-		this.effectName = gamemode.name().toLowerCase(Locale.ENGLISH) + "_mode";
+		this.effectName = gamemode.name() + "_mode";
 	}
 
 	private static NamespacedKey getGamemodeKey(Plugin plugin) {

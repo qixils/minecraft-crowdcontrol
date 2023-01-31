@@ -22,10 +22,14 @@ public class DifficultyCommand extends ImmediateCommand {
 	private final String effectName;
 	private final Component displayName;
 
+	private static String effectNameOf(Difficulty difficulty) {
+		return "difficulty_" + difficulty.getKey();
+	}
+
 	public DifficultyCommand(FabricCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
-		this.effectName = "difficulty_" + difficulty.getKey();
+		this.effectName = effectNameOf(difficulty);
 		this.displayName = Component.translatable("cc.effect.difficulty.name", difficulty.getDisplayName());
 	}
 
@@ -40,6 +44,9 @@ public class DifficultyCommand extends ImmediateCommand {
 			return response;
 		if (plugin.server().getWorldData().getDifficulty() == difficulty)
 			return response;
+
+		for (Difficulty dif : Difficulty.values())
+			plugin.updateEffectStatus(null, effectNameOf(dif), dif == difficulty ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 
 		sync(() -> plugin.server().setDifficulty(difficulty, true));
 		return response.type(ResultType.SUCCESS).message("SUCCESS");

@@ -25,10 +25,14 @@ public class DifficultyCommand extends ImmediateCommand {
 	private final String effectName;
 	private final Component displayName;
 
+	private static String effectNameOf(Difficulty difficulty) {
+		return "difficulty_" + difficulty.key(RegistryTypes.DIFFICULTY).value();
+	}
+
 	public DifficultyCommand(SpongeCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
-		this.effectName = "difficulty_" + difficulty.key(RegistryTypes.DIFFICULTY).value();
+		this.effectName = effectNameOf(difficulty);
 		this.displayName = Component.translatable("cc.effect.difficulty.name", difficulty);
 	}
 
@@ -44,6 +48,8 @@ public class DifficultyCommand extends ImmediateCommand {
 			if (!properties.difficulty().equals(difficulty)) {
 				response.type(ResultType.SUCCESS).message("SUCCESS");
 				properties.setDifficulty(difficulty);
+				for (Difficulty dif : plugin.registryIterable(RegistryTypes.DIFFICULTY))
+					plugin.updateEffectStatus(null, effectNameOf(dif), dif == difficulty ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 			}
 		}
 

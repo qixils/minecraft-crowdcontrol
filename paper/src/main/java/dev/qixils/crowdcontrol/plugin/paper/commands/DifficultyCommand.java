@@ -22,10 +22,14 @@ public class DifficultyCommand extends ImmediateCommand {
 	private final String effectName;
 	private final Component displayName;
 
+	private static String effectNameOf(Difficulty difficulty) {
+		return "difficulty_" + difficulty.name();
+	}
+
 	public DifficultyCommand(PaperCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
-		this.effectName = "difficulty_" + difficulty.name();
+		this.effectName = effectNameOf(difficulty);
 		this.displayName = Component.translatable("cc.effect.difficulty.name", Component.translatable(difficulty));
 	}
 
@@ -39,9 +43,11 @@ public class DifficultyCommand extends ImmediateCommand {
 			}
 		}
 
-		if (success)
+		if (success) {
+			for (Difficulty dif : Difficulty.values())
+				plugin.updateEffectStatus(null, effectNameOf(dif), dif == difficulty ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 			return request.buildResponse().type(ResultType.SUCCESS);
-		else
+		} else
 			return request.buildResponse().type(ResultType.FAILURE).message("World is already on that difficulty");
 	}
 }
