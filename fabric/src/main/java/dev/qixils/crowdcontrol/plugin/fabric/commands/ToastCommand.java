@@ -151,7 +151,8 @@ public final class ToastCommand extends ImmediateCommand {
 				return;
 			sPlayer.containerMenu.sendAllDataToRemote();
 			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, sPlayer.inventoryMenu.incrementStateId(), sPlayer.containerMenu.getCarried()));
-			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(sPlayer.containerMenu.containerId, sPlayer.inventoryMenu.incrementStateId(), slotIndex, sPlayer.containerMenu.getSlot(slotIndex).getItem()));
+			if (slotIndex >= 0 && slotIndex < sPlayer.containerMenu.slots.size())
+				sPlayer.connection.send(new ClientboundContainerSetSlotPacket(sPlayer.containerMenu.containerId, sPlayer.inventoryMenu.incrementStateId(), slotIndex, sPlayer.containerMenu.getSlot(slotIndex).getItem()));
 		}
 	}
 }
