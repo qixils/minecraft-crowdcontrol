@@ -3,11 +3,10 @@ package dev.qixils.crowdcontrol.common;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import dev.qixils.crowdcontrol.socket.Request;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Abstraction layer for {@link PlayerManager} which implements platform-agnostic methods.
@@ -30,8 +29,13 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 	}
 
 	@Override
-	public @NotNull Collection<UUID> getLinkedPlayers(@NotNull String twitchUsername) {
-		return twitchToUserMap.get(twitchUsername.toLowerCase(Locale.ENGLISH));
+	public @NotNull Collection<UUID> getLinkedPlayers(@NotNull Request.Target target) {
+		Set<UUID> uuids = new HashSet<>();
+		if (target.getName() != null)
+			uuids.addAll(twitchToUserMap.get(target.getName().toLowerCase(Locale.ENGLISH)));
+		if (target.getLogin() != null)
+			uuids.addAll(twitchToUserMap.get(target.getLogin().toLowerCase(Locale.ENGLISH)));
+		return uuids;
 	}
 
 	@Override

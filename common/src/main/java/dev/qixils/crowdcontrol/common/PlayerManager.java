@@ -71,12 +71,12 @@ public interface PlayerManager<P> {
 	Collection<@NotNull String> getLinkedAccounts(@NotNull UUID uuid);
 
 	/**
-	 * Returns the Minecraft accounts linked to a Twitch account.
+	 * Returns the Minecraft accounts linked to a Target.
 	 *
-	 * @param twitchUsername the Twitch username
+	 * @param target the target
 	 * @return a collection of Minecraft accounts
 	 */
 	@CheckReturnValue
 	@NotNull
-	Collection<@NotNull UUID> getLinkedPlayers(@NotNull String twitchUsername);
+	Collection<@NotNull UUID> getLinkedPlayers(Request.@NotNull Target target);
 }

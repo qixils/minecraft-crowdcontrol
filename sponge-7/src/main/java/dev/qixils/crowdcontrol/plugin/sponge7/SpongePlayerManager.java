@@ -45,7 +45,7 @@ public class SpongePlayerManager extends AbstractPlayerManager<Player> {
 		Server server = plugin.getGame().getServer();
 		List<Player> players = new ArrayList<>(request.getTargets().length);
 		for (Target target : request.getTargets()) {
-			for (UUID uuid : getLinkedPlayers(target.getName()))
+			for (UUID uuid : getLinkedPlayers(target))
 				players.add(server.getPlayer(uuid).orElse(null));
 		}
 

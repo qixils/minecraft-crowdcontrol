@@ -45,7 +45,7 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 
 		List<Player> players = new ArrayList<>(request.getTargets().length);
 		for (Target target : request.getTargets()) {
-			for (UUID uuid : getLinkedPlayers(target.getName()))
+			for (UUID uuid : getLinkedPlayers(target))
 				players.add(Bukkit.getPlayer(uuid));
 		}
 

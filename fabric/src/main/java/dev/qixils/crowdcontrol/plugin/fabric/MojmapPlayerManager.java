@@ -39,7 +39,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 
 		List<ServerPlayer> players = new ArrayList<>(request.getTargets().length);
 		for (Target target : request.getTargets()) {
-			for (UUID uuid : getLinkedPlayers(target.getName()))
+			for (UUID uuid : getLinkedPlayers(target))
 				// null values are filtered out later
 				players.add(plugin.server().getPlayerList().getPlayer(uuid));
 		}
