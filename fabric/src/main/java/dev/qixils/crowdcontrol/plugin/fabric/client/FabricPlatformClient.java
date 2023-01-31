@@ -13,11 +13,14 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 public final class FabricPlatformClient implements ClientModInitializer {
+	private final Logger logger = LoggerFactory.getLogger(FabricPlatformClient.class);
 	private static @Nullable FabricPlatformClient INSTANCE = null;
 	private Minecraft client = null;
 
@@ -45,6 +48,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STARTED.register(this::setClient);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
 		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.VERSION_REQUEST_ID, (client, handler, inputBuf, responseSender) -> {
+			logger.debug("Received version request from server!");
 			FriendlyByteBuf buf = PacketByteBufs.create();
 			buf.writeUtf(SemVer.MOD_STRING, 16);
 			responseSender.sendPacket(FabricCrowdControlPlugin.VERSION_RESPONSE_ID, buf);

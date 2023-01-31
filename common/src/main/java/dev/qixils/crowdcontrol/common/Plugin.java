@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -550,7 +551,6 @@ public interface Plugin<P, S> {
 	 * @param service the service to send the packet to
 	 * @param message the message to send
 	 */
-	@SuppressWarnings("UnstableApiUsage") // I developed this damn API and I will use it as I please
 	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String message) {
 		if (service == null)
 			service = getCrowdControl();
@@ -560,14 +560,19 @@ public interface Plugin<P, S> {
 		}
 		final @NotNull SocketManager finalService = service;
 		getScheduledExecutor().schedule(() -> {
-			getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
-			Response response = finalService.buildResponse(0)
-					.packetType(PacketType.EFFECT_RESULT)
-					.type(ResultType.SUCCESS)
-					.message(message)
-					.build();
-			getSLF4JLogger().debug("final packet: {}", response.toJSON());
-			response.send();
+			try {
+				getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
+				Response response = finalService.buildResponse(0)
+						.packetType(PacketType.EFFECT_STATUS)
+						.type(ResultType.NOT_VISIBLE)
+						.effect("embedded_message")
+						.message(message)
+						.build();
+				getSLF4JLogger().debug("final packet: {}", response.toJSON());
+				response.send();
+			} catch (Exception e) {
+				getSLF4JLogger().error("Failed to send embedded message packet", e);
+			}
 		}, 1, TimeUnit.SECONDS);
 	}
 
@@ -588,9 +593,42 @@ public interface Plugin<P, S> {
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
 		service.addConnectListener(connectingService -> sendEmbeddedMessagePacket(connectingService, "_mc_cc_server_status_" + new ServerStatus(
 				globalEffectsUsable(),
-				supportsClientOnly(),
+				getModdedPlayerCount() > 0,
 				commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
 		).toJSON()));
+	}
+
+	/**
+	 * Updates the status of an effect.
+	 *
+	 * @param manager socket manager or null to use {@link #getCrowdControl()}
+	 * @param effect  the effect to update
+	 * @param status  the new status
+	 */
+	default void updateEffectStatus(@Nullable SocketManager manager, @NotNull String effect, Response.@NotNull ResultType status) {
+		if (!status.isStatus())
+			throw new IllegalArgumentException("status must be a status type (not a result type)");
+		if (manager == null)
+			manager = getCrowdControl();
+		if (manager == null)
+			return;
+		Response response = manager.buildResponse(0)
+				.packetType(PacketType.EFFECT_STATUS)
+				.effect(effect)
+				.type(status)
+				.build();
+		response.send();
+	}
+
+	/**
+	 * Updates the status of an effect.
+	 *
+	 * @param manager socket manager or null to use {@link #getCrowdControl()}
+	 * @param effect  the effect to update
+	 * @param status  the new status
+	 */
+	default void updateEffectStatus(@Nullable SocketManager manager, @NotNull Command<?> effect, Response.@NotNull ResultType status) {
+		updateEffectStatus(manager, effect.getEffectName(), status);
 	}
 
 	/**
@@ -601,14 +639,7 @@ public interface Plugin<P, S> {
 	 * @param visible   effects' new visibility
 	 */
 	default void updateEffectIdVisibility(@Nullable SocketManager service, @NotNull Collection<String> effectIds, boolean visible) {
-		StringBuilder message = new StringBuilder("_mc_cc_");
-		if (visible)
-			message.append("show");
-		else
-			message.append("hide");
-		message.append("_effects_:");
-		message.append(String.join(",", effectIds));
-		sendEmbeddedMessagePacket(service, message.toString());
+		effectIds.forEach(effectId -> updateEffectStatus(service, effectId, visible ? Response.ResultType.VISIBLE : Response.ResultType.NOT_VISIBLE));
 	}
 
 	/**
@@ -714,6 +745,22 @@ public interface Plugin<P, S> {
 	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
 
 	/**
+	 * Updates the visibility of client effects.
+	 *
+	 * @param service the service to send the packets to
+	 */
+	default void updateClientEffectVisibility(@Nullable SocketManager service) {
+		if (service == null)
+			return;
+		boolean visible = getModdedPlayerCount() > 0;
+		for (Command<?> effect : commandRegister().getCommands()) {
+			if (!effect.isClientOnly())
+				continue;
+			updateEffectVisibility(service, effect, visible);
+		}
+	}
+
+	/**
 	 * Renders messages to a player. This should be called by an event handler that listens for
 	 * players joining the server.
 	 *
@@ -729,7 +776,9 @@ public interface Plugin<P, S> {
 			audience.sendMessage(JOIN_MESSAGE_2);
 		if (!globalEffectsUsable())
 			audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
-		if (getCrowdControl() == null) {
+		CrowdControl cc = getCrowdControl();
+		updateClientEffectVisibility(cc);
+		if (cc == null) {
 			if (mapper.isAdmin(player)) {
 				if (isServer() && getPassword() == null)
 					audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
@@ -738,6 +787,16 @@ public interface Plugin<P, S> {
 			} else
 				audience.sendMessage(NO_CC_USER_ERROR);
 		}
+	}
+
+	/**
+	 * Handles various behavior related to the departure of a player. This should be called by an
+	 * event handler that listens for players leaving the server.
+	 *
+	 * @param player player that left
+	 */
+	default void onPlayerLeave(P player) {
+		updateClientEffectVisibility(getCrowdControl());
 	}
 
 	/**
@@ -822,5 +881,25 @@ public interface Plugin<P, S> {
 			return Component.translatable("cc.effect.viewer");
 		else
 			return Component.text(request.getViewer());
+	}
+
+	/**
+	 * Returns the version of the mod that the provided player is using.
+	 * May be empty if the player is not using the mod locally.
+	 *
+	 * @param player the player to check
+	 * @return the version of the mod that the player is using
+	 */
+	default @NotNull Optional<SemVer> getModVersion(@NotNull P player) {
+		return Optional.empty();
+	}
+
+	/**
+	 * Returns the number of players that are currently using the mod.
+	 *
+	 * @return the number of players that are currently using the mod
+	 */
+	default int getModdedPlayerCount() {
+		return 0;
 	}
 }

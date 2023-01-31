@@ -30,20 +30,20 @@ public class MovementStatusCommand extends TimedVoidCommand {
 	private final Duration defaultDuration;
 	private final MovementStatus.Type type;
 	private final MovementStatus.Value value;
-	private final boolean clientSide;
+	private final boolean clientOnly;
 
-	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientSide) {
+	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientOnly) {
 		super(plugin);
 		this.effectName = effectName;
 		this.effectGroup = effectGroup;
 		this.defaultDuration = defaultDuration;
 		this.type = type;
 		this.value = value;
-		this.clientSide = clientSide;
+		this.clientOnly = clientOnly;
 	}
 
-	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientSide) {
-		this(plugin, effectName, effectName, defaultDuration, type, value, clientSide);
+	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientOnly) {
+		this(plugin, effectName, effectName, defaultDuration, type, value, clientOnly);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class MovementStatusCommand extends TimedVoidCommand {
 				.startCallback($ -> {
 					SemVer minVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
 					List<ServerPlayer> players = plugin.getPlayers(request).stream()
-									.filter(player -> plugin.getClientVersion(player).orElse(SemVer.ZERO).isAtLeast(minVersion))
+									.filter(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isAtLeast(minVersion))
 									.toList();
 					atomicPlayers.set(players);
 

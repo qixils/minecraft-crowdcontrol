@@ -141,7 +141,7 @@ public interface Command<P> {
 		}
 
 		// disallow execution of client commands
-		if (getClass().isAnnotationPresent(ClientOnly.class)) {
+		if (isClientOnly()) {
 			if (!getPlugin().supportsClientOnly()) {
 				request.buildResponse()
 						.type(ResultType.UNAVAILABLE)
@@ -175,8 +175,7 @@ public interface Command<P> {
 	/**
 	 * Whether a {@link ClientOnly} effect with the provided arguments would be able to successfully
 	 * execute. For example, this will return false if {@link Plugin#supportsClientOnly()} returns
-	 * {@code false}, if the client is unavailable, or if the client user does not match the
-	 * targeted player.
+	 * {@code false} or if no connected players have the client mod installed.
 	 *
 	 * @param players list of players targeted by the effect
 	 * @param request request that triggered this effect
@@ -210,7 +209,7 @@ public interface Command<P> {
 		for (Target target : request.getTargets()) {
 			if (hosts.contains(target.getId()))
 				return true;
-			if (hosts.contains(target.getName().toLowerCase(Locale.ENGLISH)))
+			if (target.getName() != null && hosts.contains(target.getName().toLowerCase(Locale.ENGLISH)))
 				return true;
 		}
 
@@ -328,5 +327,14 @@ public interface Command<P> {
 	 */
 	default void async(@NotNull Runnable runnable) {
 		getPlugin().getAsyncExecutor().execute(runnable);
+	}
+
+	/**
+	 * Whether this command can only be applied to players with the mod installed locally.
+	 *
+	 * @return whether this effect is client-side
+	 */
+	default boolean isClientOnly() {
+		return getClass().isAnnotationPresent(ClientOnly.class);
 	}
 }

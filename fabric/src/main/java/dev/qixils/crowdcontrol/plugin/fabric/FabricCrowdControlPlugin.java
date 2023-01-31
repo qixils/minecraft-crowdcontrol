@@ -111,8 +111,11 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		registerChatCommands();
 		ServerLifecycleEvents.SERVER_STARTING.register(this::setServer);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
-		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender)
-				-> clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(16))));
+		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender) -> {
+			getSLF4JLogger().debug("Received version response from client!");
+			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(16)));
+			updateClientEffectVisibility(crowdControl);
+		});
 	}
 
 	@Override
@@ -142,14 +145,8 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	public boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request) {
-		if (!CLIENT_INITIALIZED)
-			return false;
 		final List<ServerPlayer> players = validateNotNullElseGet(possiblePlayers, () -> getPlayers(request));
-		if (players.size() != 1)
-			return false;
-		return FabricPlatformClient.get().player()
-				.map(player -> player.getUUID().equals(players.get(0).getUUID()))
-				.orElse(false);
+		return players.stream().anyMatch(player -> clientVersions.containsKey(player.getUUID()));
 	}
 
 	@Override
@@ -212,14 +209,18 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		return adventure().console();
 	}
 
-	//@Override
-	public @NotNull Optional<SemVer> getClientVersion(@NotNull ServerPlayer player) {
+	@Override
+	public @NotNull Optional<SemVer> getModVersion(@NotNull ServerPlayer player) {
 		return Optional.ofNullable(clientVersions.get(player.getUUID()));
 	}
 
 	@Override
+	public int getModdedPlayerCount() {
+		return clientVersions.size();
+	}
+
+	@Override
 	public void onPlayerJoin(ServerPlayer player) {
-		super.onPlayerJoin(player);
 		// put client version
 		if (CLIENT_AVAILABLE) {
 			FabricPlatformClient.get().player()
@@ -229,13 +230,16 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		}
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
+			getSLF4JLogger().debug("Sending version request to " + player.getUUID());
 			ServerPlayNetworking.send(player, VERSION_REQUEST_ID, PacketByteBufs.empty());
 		}
+		// super
+		super.onPlayerJoin(player);
 	}
 
-	//@Override
+	@Override
 	public void onPlayerLeave(ServerPlayer player) {
-		//super.onPlayerLeave(player);
 		clientVersions.remove(player.getUUID());
+		super.onPlayerLeave(player);
 	}
 }
