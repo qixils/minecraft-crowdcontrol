@@ -3,10 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.common.EntityMapper;
-import dev.qixils.crowdcontrol.common.HideNames;
-import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
@@ -49,7 +46,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final Executor asyncExecutor = runnable -> Bukkit.getScheduler().runTaskAsynchronously(this, runnable);
 	@Getter
 	@Accessors(fluent = true)
-	private final EntityMapper<Player> playerMapper = new PlayerMapper<>(this);
+	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper<>(this);
 	@Getter
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);

@@ -6,10 +6,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.common.AbstractPlugin;
-import dev.qixils.crowdcontrol.common.EntityMapper;
-import dev.qixils.crowdcontrol.common.HideNames;
-import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.*;
@@ -95,7 +92,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSource> commandSenderMapper = new CommandSourceMapper<>(this);
 	@Accessors(fluent = true)
-	private final EntityMapper<Player> playerMapper = new CommandSourceMapper<>(this);
+	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper<>(this);
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;

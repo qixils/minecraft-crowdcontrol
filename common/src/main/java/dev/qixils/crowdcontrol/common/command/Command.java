@@ -240,7 +240,7 @@ public interface Command<P> {
 		if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
 			return true;
 
-		return hosts.contains(plugin.getUsername(player).toLowerCase(Locale.ENGLISH));
+		return hosts.contains(plugin.playerMapper().getUsername(player).toLowerCase(Locale.ENGLISH));
 	}
 
 	/**

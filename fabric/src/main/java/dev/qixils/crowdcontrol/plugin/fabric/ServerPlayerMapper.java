@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
-import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor
-public class PlayerEntityMapper implements EntityMapper<ServerPlayer> {
+public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	protected final FabricCrowdControlPlugin plugin;
 
 	@Override
@@ -28,6 +28,11 @@ public class PlayerEntityMapper implements EntityMapper<ServerPlayer> {
 	@Override
 	public boolean isAdmin(@NotNull ServerPlayer entity) {
 		if (entity.hasPermissions(3)) return true;
-		return EntityMapper.super.isAdmin(entity);
+		return PlayerEntityMapper.super.isAdmin(entity);
+	}
+
+	@Override
+	public @NotNull String getUsername(@NotNull ServerPlayer player) {
+		return player.getGameProfile().getName();
 	}
 }

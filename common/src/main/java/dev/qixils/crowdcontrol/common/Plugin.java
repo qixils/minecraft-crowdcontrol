@@ -18,7 +18,6 @@ import dev.qixils.crowdcontrol.socket.Response.PacketType;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -224,7 +223,7 @@ public interface Plugin<P, S> {
 		manager.command(account.literal("link")
 				.meta(CommandMeta.DESCRIPTION, "Link a Twitch account to your Minecraft account")
 				.argument(
-						StringArgument.<S>newBuilder("username")
+						StringArgument.<S>builder("username")
 								.single()
 								.asRequired()
 								.manager(manager)
@@ -253,7 +252,7 @@ public interface Plugin<P, S> {
 		manager.command(account.literal("unlink")
 				.meta(CommandMeta.DESCRIPTION, "Unlink a Twitch account from your Minecraft account")
 				.argument(
-						StringArgument.<S>newBuilder("username")
+						StringArgument.<S>builder("username")
 								.single()
 								.asRequired()
 								.manager(manager)
@@ -339,7 +338,7 @@ public interface Plugin<P, S> {
 		manager.command(manager.commandBuilder("password")
 				.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
 				.permission(mapper::isAdmin)
-				.argument(StringArgument.<S>newBuilder("password").greedy().asRequired())
+				.argument(StringArgument.<S>builder("password").greedy().asRequired())
 				.handler(commandContext -> {
 					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (!isServer()) {
@@ -372,7 +371,7 @@ public interface Plugin<P, S> {
 	 *
 	 * @return player entity mapper
 	 */
-	EntityMapper<P> playerMapper();
+	PlayerEntityMapper<P> playerMapper();
 
 	/**
 	 * Gets the {@link EntityMapper} for this implementation's command sender object.
@@ -478,19 +477,6 @@ public interface Plugin<P, S> {
 	 */
 	@CheckReturnValue
 	boolean isAdminRequired();
-
-	/**
-	 * Fetches the username of a player.
-	 *
-	 * @param player the player to fetch the username of
-	 * @return the username of the player
-	 */
-	@CheckReturnValue
-	default @NotNull String getUsername(@NotNull P player) {
-		// TODO: this should be moved to the EntityMapper
-		return playerMapper().asAudience(player).get(Identity.NAME).orElseThrow(() ->
-				new UnsupportedOperationException("Player object does not support Identity.NAME"));
-	}
 
 	/**
 	 * Whether to announce the execution of effects in chat.

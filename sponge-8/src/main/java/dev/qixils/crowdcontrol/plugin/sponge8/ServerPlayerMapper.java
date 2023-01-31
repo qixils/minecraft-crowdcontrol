@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8;
 
-import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor
-class ServerPlayerMapper implements EntityMapper<ServerPlayer> {
+class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	protected final SpongeCrowdControlPlugin plugin;
 
 	@Override
@@ -29,6 +29,11 @@ class ServerPlayerMapper implements EntityMapper<ServerPlayer> {
 	@Override
 	public boolean isAdmin(@NotNull ServerPlayer entity) {
 		if (entity.hasPermission(Plugin.ADMIN_PERMISSION)) return true;
-		return EntityMapper.super.isAdmin(entity);
+		return PlayerEntityMapper.super.isAdmin(entity);
+	}
+
+	@Override
+	public @NotNull String getUsername(@NotNull ServerPlayer player) {
+		return player.name();
 	}
 }

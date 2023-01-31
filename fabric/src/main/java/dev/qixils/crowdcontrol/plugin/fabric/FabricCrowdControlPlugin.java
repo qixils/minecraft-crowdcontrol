@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
@@ -82,7 +83,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowd-control");
 	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)
-	private final EntityMapper<ServerPlayer> playerMapper = new PlayerEntityMapper(this);
+	private final PlayerEntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(this);
 	private final FabricServerCommandManager<CommandSourceStack> commandManager

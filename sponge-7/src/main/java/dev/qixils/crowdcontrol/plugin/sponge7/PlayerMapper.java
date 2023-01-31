@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7;
 
+import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
@@ -7,7 +8,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.Optional;
 import java.util.UUID;
 
-class PlayerMapper<E extends Player> extends CommandSourceMapper<E> {
+class PlayerMapper<E extends Player> extends CommandSourceMapper<E> implements PlayerEntityMapper<E> {
 	public PlayerMapper(@NotNull SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -20,5 +21,10 @@ class PlayerMapper<E extends Player> extends CommandSourceMapper<E> {
 	@Override
 	public @NotNull Optional<UUID> getUniqueId(@NotNull E entity) {
 		return Optional.of(entity.getUniqueId());
+	}
+
+	@Override
+	public @NotNull String getUsername(@NotNull E player) {
+		return player.getName();
 	}
 }
