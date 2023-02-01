@@ -36,11 +36,12 @@ abstract class NearbyLocationCommand<S> extends Command {
 		World world = origin.getWorld();
 		Location location = new Location(world, origin.getX(), world.getLogicalHeight() - 1, origin.getZ(), origin.getYaw(), origin.getPitch());
 		while (true) {
-			if (location.getBlockY() < world.getMinHeight())
+			Block block = location.getBlock();
+			if (location.getBlockY() < (world.getMinHeight() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (location.getBlock().getType() == Material.AIR)
+			else if (!block.isBuildable() && !block.isLiquid() && !block.isSolid()) // roughly equal to the fabric checks. perhaps a little redundant.
 				air += 1;
-			else if (air > 1)
+			else if (air >= 1)
 				break;
 			else
 				air = 0;
@@ -66,11 +67,6 @@ abstract class NearbyLocationCommand<S> extends Command {
 
 		// place player on top of the block
 		location.add(0.5, 1, 0.5);
-
-		// ensure block is not outside normal world bounds
-		int blockY = location.getBlockY();
-		if (blockY <= (location.getWorld().getMinHeight() + 1))
-			return null;
 
 		// successfully found a safe location !
 		return location;

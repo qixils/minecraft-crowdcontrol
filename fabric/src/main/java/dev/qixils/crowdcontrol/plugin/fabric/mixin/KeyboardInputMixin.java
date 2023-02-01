@@ -72,10 +72,11 @@ public abstract class KeyboardInputMixin extends Input {
 		return handleIsDown(keyMapping, options.keyLeft);
 	}
 
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 4))
-	public boolean isJumpDown(KeyMapping keyMapping) {
-		return handleIsDown(keyMapping, MovementStatus.Type.JUMP);
-	}
+	// commented out because it interferes with non-jump actions like swimming
+//	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 4))
+//	public boolean isJumpDown(KeyMapping keyMapping) {
+//		return handleIsDown(keyMapping, MovementStatus.Type.JUMP);
+//	}
 
 	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 5))
 	public boolean isSprintDown(KeyMapping keyMapping) {

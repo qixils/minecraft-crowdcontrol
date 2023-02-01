@@ -162,8 +162,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	}
 
 	public @NotNull SpongeAudiences adventure() {
-		if (audiences == null)
-			throw new IllegalStateException("Tried to access adventure before plugin loaded");
 		return audiences;
 	}
 
@@ -373,7 +371,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		onPlayerJoin(event.getTargetEntity());
 		Platform platform = game.getPlatform();
 		if ((platform.getType().isClient() || platform.getExecutionType().isClient()) && clientHost == null) {
-			clientHost = event.getTargetEntity().getUniqueId().toString();
+			clientHost = event.getTargetEntity().getUniqueId().toString().toLowerCase(Locale.ENGLISH);
 		}
 	}
 

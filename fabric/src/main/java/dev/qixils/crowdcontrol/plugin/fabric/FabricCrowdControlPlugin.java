@@ -47,10 +47,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
 
 // TODO:
-//  - Fix global effects being unavailable to the host
-//  - Add config option for default Twitch channel
 //  - Add a GUI config library
-//  - Test behavior of mod when running client-side in multiplayer
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
@@ -115,7 +112,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender) -> {
 			getSLF4JLogger().debug("Received version response from client!");
 			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(16)));
-			updateClientEffectVisibility(crowdControl);
+			updateConditionalEffectVisibility(crowdControl);
 		});
 	}
 
@@ -161,7 +158,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		if (CLIENT_AVAILABLE) {
 			FabricPlatformClient.get()
 					.player()
-					.map(player -> player.getUUID().toString())
+					.map(player -> player.getUUID().toString().toLowerCase(Locale.ENGLISH))
 					.ifPresent(hosts::add);
 		}
 		return hosts;

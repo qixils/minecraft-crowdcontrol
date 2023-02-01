@@ -35,14 +35,14 @@ abstract class NearbyLocationCommand<S> extends Command {
 
 		int air = 0;
 		final ServerLevel world = origin.level();
-		// TODO: should this be logical height or build height?
 		Location location = new Location(world, origin.x(), world.getLogicalHeight() - 1, origin.z(), origin.yaw(), origin.pitch());
 		while (true) {
-			if (Mth.floor(location.y()) < world.getMinBuildHeight())
+			BlockState block = location.block();
+			if (location.y() < (world.getMinBuildHeight() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (Blocks.AIR.equals(location.block().getBlock()))
+			else if (block.getBlock().isPossibleToRespawnInThis() && !block.getMaterial().blocksMotion())
 				air += 1;
-			else if (air > 1)
+			else if (air >= 1)
 				break;
 			else
 				air = 0;
@@ -68,11 +68,6 @@ abstract class NearbyLocationCommand<S> extends Command {
 
 		// place player on top of the block
 		location = location.add(0.5, 1, 0.5);
-
-		// ensure block is not outside normal world bounds
-		int blockY = Mth.floor(location.y());
-		if (blockY <= (location.level().getMinBuildHeight() + 1))
-			return null;
 
 		// successfully found a safe location !
 		return location;
@@ -105,9 +100,14 @@ abstract class NearbyLocationCommand<S> extends Command {
 				for (S searchType : searchTypes) {
 					if (searchType.equals(currentType))
 						continue;
-					Location destination = safeLocation(search(location, searchType));
-					if (destination == null)
+					Location target = search(location, searchType);
+					if (target == null)
 						continue;
+					Location destination = safeLocation(target);
+					if (destination == null) {
+						plugin.getSLF4JLogger().debug("Skipping {} because it is not safe", searchType);
+						continue;
+					}
 					// TODO: feature parity issue -- this length check uses only X/Z while other platforms use X/Y/Z. former is probably preferable.
 					if (Mth.lengthSquared(destination.x() - location.x(), destination.z() - location.z()) <= 2500) // 50 blocks
 						continue;

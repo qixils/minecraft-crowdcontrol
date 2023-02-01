@@ -249,7 +249,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		Platform platform = game.platform();
 		if ((platform.type().isClient() || platform.executionType().isClient() || game.isClientAvailable())
 				&& clientHost == null) {
-			clientHost = event.player().uniqueId().toString();
+			clientHost = event.player().uniqueId().toString().toLowerCase(Locale.ENGLISH);
 		}
 	}
 

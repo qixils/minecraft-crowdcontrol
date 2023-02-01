@@ -8,8 +8,6 @@ public interface SuccessCondition {
 
 	boolean hasSucceeded(Player player);
 
-	// TODO: boolean hasSucceeded(Event event);
-
 	default int getRewardLuck() {
 		return 0;
 	}

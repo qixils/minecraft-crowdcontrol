@@ -42,7 +42,10 @@ public class BlockCommand extends ImmediateCommand {
 
 	@Nullable
 	protected Location<?, ?> getLocation(ServerPlayer player) {
-		return player.location();
+		Location<?, ?> location = player.location();
+		if (!BlockFinder.isReplaceable(location.block()))
+			return null;
+		return location;
 	}
 
 	@NotNull
@@ -52,8 +55,6 @@ public class BlockCommand extends ImmediateCommand {
 				.type(ResultType.RETRY)
 				.message("No available locations to set blocks");
 		for (ServerPlayer player : players) {
-			if (!BlockFinder.isReplaceable(player.location().block()))
-				continue;
 			Location<?, ?> location = getLocation(player);
 			if (location == null)
 				continue;

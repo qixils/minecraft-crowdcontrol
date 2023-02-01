@@ -1,11 +1,11 @@
-package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
+package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
-import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 public final class JumpingJacksCondition extends AbstractListeningCondition<Integer> {
@@ -22,13 +22,14 @@ public final class JumpingJacksCondition extends AbstractListeningCondition<Inte
 		);
 	}
 
-	@EventHandler
-	public void onJump(@NotNull PlayerJumpEvent event) {
-		computeStatus(event.getPlayer(), i -> i + 1);
+	@Listener
+	public void onJump(@NotNull Jump event) {
+		if (event.player() instanceof ServerPlayer player)
+			computeStatus(player, i -> i + 1);
 	}
 
 	@Override
-	public boolean hasSucceeded(@NotNull Player player) {
+	public boolean hasSucceeded(@NotNull ServerPlayer player) {
 		return getStatus(player) >= goal;
 	}
 }

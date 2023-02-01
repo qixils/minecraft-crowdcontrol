@@ -65,6 +65,8 @@ public class EnchantmentCommand extends ImmediateCommand {
 				int curLevel = getCurrentLevel(item);
 				if (enchantmentType.maximumLevel() == enchantmentType.minimumLevel() && curLevel == enchantmentType.maximumLevel())
 					continue;
+				if (curLevel == 255)
+					continue;
 				levelMap.put(slot, curLevel);
 			}
 			Slot slot = levelMap.entrySet().stream()

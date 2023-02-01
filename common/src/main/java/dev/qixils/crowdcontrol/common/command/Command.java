@@ -123,21 +123,20 @@ public interface Command<P> {
 			throw new NoApplicableTarget();
 
 		// disallow execution of global commands
-		if (getClass().isAnnotationPresent(Global.class)) {
+		if (isGlobal()) {
 			if (!plugin.globalEffectsUsable()) {
 				request.buildResponse()
-						.type(ResultType.UNAVAILABLE)
+						.type(ResultType.FAILURE)
 						.message("Global effects are disabled")
 						.send();
 				return;
 			} else if (!isGlobalCommandUsable(players, request)) {
 				request.buildResponse()
-						.type(ResultType.UNAVAILABLE)
+						.type(ResultType.FAILURE)
 						.message("Global effects cannot be used on the targeted streamer")
 						.send();
 				return;
 			}
-
 		}
 
 		// disallow execution of client commands
@@ -231,16 +230,7 @@ public interface Command<P> {
 	 * @return whether the player is a server host
 	 */
 	default boolean isHost(@NotNull P player) {
-		Plugin<P, ?> plugin = getPlugin();
-		Collection<String> hosts = plugin.getHosts();
-		if (hosts.isEmpty())
-			return false;
-
-		String uuidStr = plugin.playerMapper().getUniqueId(player).toString().toLowerCase(Locale.ENGLISH);
-		if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
-			return true;
-
-		return hosts.contains(plugin.playerMapper().getUsername(player).toLowerCase(Locale.ENGLISH));
+		return getPlugin().isHost(player);
 	}
 
 	/**
@@ -336,5 +326,15 @@ public interface Command<P> {
 	 */
 	default boolean isClientOnly() {
 		return getClass().isAnnotationPresent(ClientOnly.class);
+	}
+
+	/**
+	 * Whether this command can only be run when global effects are enabled
+	 * or the targeted players includes a server host.
+	 *
+	 * @return whether this effect is global
+	 */
+	default boolean isGlobal() {
+		return getClass().isAnnotationPresent(Global.class);
 	}
 }

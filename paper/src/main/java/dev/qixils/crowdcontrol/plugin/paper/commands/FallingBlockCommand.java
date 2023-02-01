@@ -33,7 +33,7 @@ public class FallingBlockCommand extends BlockCommand {
 		));
 		// the below for loop does not use <= because the main execute method performs its own
 		// checks
-		for (int y = playerLoc.getBlockY(); y < destination.getBlockY(); y++) {
+		for (int y = playerLoc.getBlockY()+1; y < destination.getBlockY(); y++) {
 			Block block = world.getBlockAt(destination.getBlockX(), y, destination.getBlockZ());
 			if (!block.isPassable()) {
 				return null;

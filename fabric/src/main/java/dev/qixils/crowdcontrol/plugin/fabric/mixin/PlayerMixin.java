@@ -1,9 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,16 +24,10 @@ public abstract class PlayerMixin extends LivingEntity {
 
 	@Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
 	public void jumpFromGround(CallbackInfo ci) {
-		MovementStatus status = Components.MOVEMENT_STATUS.get(this);
-		boolean cantJump = status.get(MovementStatus.Type.JUMP) == MovementStatus.Value.DENIED;
-		boolean cantWalk = status.get(MovementStatus.Type.WALK) == MovementStatus.Value.DENIED;
-		if (cantJump || cantWalk) {
+		Jump event = new Jump((Player) (Object) this, this.level.isClientSide);
+		event.fire();
+		if (event.cancelled())
 			ci.cancel();
-			if (!this.level.isClientSide /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {
-				//noinspection DataFlowIssue
-				((ServerPlayer) (Object) this).connection.teleport(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
-			}
-		}
 	}
 
 	private boolean keepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {

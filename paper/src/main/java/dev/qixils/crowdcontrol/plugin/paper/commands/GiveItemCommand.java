@@ -39,7 +39,7 @@ public class GiveItemCommand extends ImmediateCommand {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
 		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName();
+		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.give_item_x.name");
 		List<Component> args = new ArrayList<>(displayName.args());
 		args.add(Component.text(amount));
 		return displayName.args(args);

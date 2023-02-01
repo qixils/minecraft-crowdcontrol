@@ -79,7 +79,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Time", "time", ItemKind.Folder),
             new GlobalEffect("Set Time to Day", "time_day", "time") { Price = 50, Description = "Jumps the clock ahead to daytime" },
             new GlobalEffect("Set Time to Night", "time_night", "time") { Price = 50, Description = "Jumps the clock ahead to nighttime" },
-            new GlobalEffect("Zip Time", "zip", "time") { Price = 30, Description = "Adds several minutes to the in-game time" },
+            // disabled because i think the above commands are just better: new GlobalEffect("Zip Time", "zip", "time") { Price = 30, Description = "Adds several minutes to the in-game time" },
             // health commands
             new Effect("Health", "health", ItemKind.Folder),
             new Effect("Take Max Health", "max_health_sub", new[]{"halfhealth10"}, "health") { Price = 100, Description = "Subtracts from the streamer's max health" },
@@ -316,7 +316,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Blindness", "potion_blindness", "apply_potion_effect") { Price = 75, Duration = 20, Description = "Temporarily reduces a player's range of vision and disables their sprinting" },
             new Effect("Conduit Power", "potion_conduit_power", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants water breathing, night vision, and haste when underwater" },
             new Effect("Darkness", "potion_darkness", "apply_potion_effect") { Price = 75, Duration = 20, Description = "Temporarily reduces a player's range of vision" },
-            new Effect("Dolphins Grace", "potion_dolphins_grace", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Increases swimming speed" },
+            new Effect("Dolphin's Grace", "potion_dolphins_grace", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Increases swimming speed" },
             new Effect("Fire Resistance", "potion_fire_resistance", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants invincibility from fire and lava damage" },
             new Effect("Glowing", "potion_glowing", "apply_potion_effect") { Price = 25, Duration = 20, Description = "Gives the player a glowing white outline that can be seen through walls" },
             new Effect("Haste", "potion_haste", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Increases mining speed" },

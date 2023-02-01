@@ -42,7 +42,7 @@ public final class RemoveEntityCommand extends Command {
 	public @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
 		sync(() -> {
-			Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE)
+			Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY)
 					.message("No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
 
 			LimitConfig config = plugin.getLimitConfig();

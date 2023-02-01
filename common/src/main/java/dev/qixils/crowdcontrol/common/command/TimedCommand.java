@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common.command;
 
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import net.kyori.adventure.text.Component;
@@ -35,8 +36,7 @@ public interface TimedCommand<P> extends Command<P> {
 		Component displayName = getDisplayName();
 		Duration duration = getDuration(request);
 		if (!duration.isZero())
-			// TODO: make duration color less saturated?
-			displayName = displayName.append(Component.text(" (" + duration.getSeconds() + "s)"));
+			displayName = displayName.append(Component.text(" (" + duration.getSeconds() + "s)", Plugin.DIM_CMD_COLOR));
 		return displayName;
 	}
 }

@@ -39,7 +39,7 @@ public class TakeItemCommand extends ImmediateCommand {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
 		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName();
+		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.take_item_x.name");
 		List<Component> args = new ArrayList<>(displayName.args());
 		args.add(Component.text(amount));
 		return displayName.args(args);
@@ -72,11 +72,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (request.getParameters() == null)
-			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
-
-		int amount = (int) (double) request.getParameters()[0];
-
+		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");

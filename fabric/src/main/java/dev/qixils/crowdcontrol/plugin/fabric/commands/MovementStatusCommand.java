@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
@@ -98,6 +99,20 @@ public class MovementStatusCommand extends TimedVoidCommand {
 			for (MovementStatus.Type type : MovementStatus.Type.values())
 				data.rawSet(type, MovementStatus.Value.ALLOWED);
 			data.sync();
+		}
+
+		@Listener
+		public void onJump(Jump event) {
+			Player player = event.player();
+			MovementStatus status = Components.MOVEMENT_STATUS.get(player);
+			boolean cantJump = status.get(MovementStatus.Type.JUMP) == MovementStatus.Value.DENIED;
+			boolean cantWalk = status.get(MovementStatus.Type.WALK) == MovementStatus.Value.DENIED;
+			if (cantJump || cantWalk) {
+				event.cancel();
+				if (!event.isClientSide() && player instanceof ServerPlayer sPlayer /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {
+					sPlayer.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+				}
+			}
 		}
 	}
 }

@@ -88,7 +88,7 @@ public enum Condition {
 	CRAFT_GLOWSTONE(new CraftItemCondition(0, "generic_block", Items.GLOWSTONE, ConditionFlags.NETHER)),
 
 	//// miscellaneous ////
-	// TODO: JUMP(new JumpingJacksCondition(49)),
+	JUMP(new JumpingJacksCondition(49)),
 	;
 
 	private static final List<SuccessCondition> CONDITIONS;

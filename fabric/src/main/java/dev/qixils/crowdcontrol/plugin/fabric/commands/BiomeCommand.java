@@ -96,6 +96,8 @@ public class BiomeCommand extends NearbyLocationCommand<ResourceKey<Biome>> {
 
 	@Override
 	protected @Nullable Location search(@NotNull Location origin, @NotNull ResourceKey<Biome> searchType) {
+//		BlockPos pos = origin.pos();
+//		var pair = origin.level().getChunkSource().getGenerator().getBiomeSource().findBiomeHorizontal(pos.getX(), pos.getY(), pos.getZ(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP, biome -> biome.is(searchType), origin.level().getRandom(), true, origin.level().getChunkSource().randomState().sampler());
 		var pair = origin.level().findClosestBiome3d(biome -> biome.is(searchType), origin.pos(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP, BIOME_SEARCH_STEP);
 		if (pair == null)
 			return null;

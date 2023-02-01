@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Respondable;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -46,12 +47,18 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get(), Sound.Emitter.self());
 	}
 
+	private void updateEffectVisibility(Respondable respondable) {
+		async(() -> {
+			plugin.updateEffectStatus(respondable, effectName, ResultType.NOT_SELECTABLE);
+			plugin.updateEffectStatus(respondable, "keep_inventory_" + (!enable ? "on" : "off"), ResultType.SELECTABLE);
+			plugin.updateEffectStatus(respondable, "clear_inventory", enable ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+		});
+	}
+
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse();
-
-		// TODO: hide/show effects
 
 		if (isGlobalCommandUsable(players, request)) {
 			if (globalKeepInventory == enable) {
@@ -59,6 +66,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 			}
 			globalKeepInventory = enable;
 			alert(players);
+			updateEffectVisibility(plugin.getCrowdControl());
 			return resp.type(ResultType.SUCCESS);
 		}
 
@@ -69,12 +77,14 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		if (enable) {
 			if (keepingInventory.addAll(uuids)) {
 				alert(players);
+				updateEffectVisibility(request);
 				return resp.type(ResultType.SUCCESS);
 			} else
 				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory enabled");
 		} else {
 			if (keepingInventory.removeAll(uuids)) {
 				alert(players);
+				updateEffectVisibility(request);
 				return resp.type(ResultType.SUCCESS);
 			} else
 				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory disabled");

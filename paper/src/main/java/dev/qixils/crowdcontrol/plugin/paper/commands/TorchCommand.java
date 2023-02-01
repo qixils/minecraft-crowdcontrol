@@ -48,7 +48,7 @@ public class TorchCommand extends ImmediateCommand {
 				.shuffleLocations(false)
 				.build().getAll()));
 		if (nearbyBlocks.isEmpty())
-			return request.buildResponse().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
+			return request.buildResponse().type(Response.ResultType.RETRY).message("No available blocks to place/remove");
 
 		sync(() -> {
 			for (Location location : nearbyBlocks) {

@@ -47,7 +47,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				new KillCommand<>(plugin),
 				new DamageCommand<>(plugin),
 				new FullHealCommand<>(plugin),
-				new HealCommand<>(plugin), // TODO: this might be broken on fabric
+				new HealCommand<>(plugin),
 				new FoodAddCommand<>(plugin),
 				new FoodSubCommand<>(plugin),
 				new FullFeedCommand<>(plugin),

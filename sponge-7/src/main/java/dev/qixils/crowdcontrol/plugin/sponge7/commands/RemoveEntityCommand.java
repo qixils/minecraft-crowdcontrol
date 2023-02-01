@@ -54,7 +54,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Builder result = request.buildResponse().type(ResultType.FAILURE)
+		Builder result = request.buildResponse().type(ResultType.RETRY)
 				.message("No " + entityType.getTranslation().get() + "s found nearby to remove");
 
 		LimitConfig config = getPlugin().getLimitConfig();

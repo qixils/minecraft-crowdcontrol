@@ -13,6 +13,7 @@ import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Respondable;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.PacketType;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -57,6 +58,11 @@ public interface Plugin<P, S> {
 	 * Text color to use for command names.
 	 */
 	TextColor CMD_COLOR = TextColor.color(0xb15be3);
+
+	/**
+	 * A less saturated version of {@link #CMD_COLOR}.
+	 */
+	TextColor DIM_CMD_COLOR = TextColor.color(0xA982C2);
 
 	/**
 	 * The color used for displaying error messages on join.
@@ -443,7 +449,7 @@ public interface Plugin<P, S> {
 	 * @return true if global effects could execute
 	 */
 	default boolean globalEffectsUsable() {
-		return isGlobal() || !getHosts().isEmpty();
+		return isGlobal() || (!getHosts().isEmpty() && getAllPlayers().stream().anyMatch(this::isHost));
 	}
 
 	/**
@@ -468,6 +474,29 @@ public interface Plugin<P, S> {
 	 */
 	@CheckReturnValue
 	@NotNull Collection<String> getHosts();
+
+	/**
+	 * Whether the specified player is known to be a server host.
+	 *
+	 * @param player player to check
+	 * @return whether the player is a server host
+	 */
+	default boolean isHost(@NotNull P player) {
+		Collection<String> hosts = getHosts();
+		if (hosts.isEmpty())
+			return false;
+
+		PlayerEntityMapper<P> mapper = playerMapper();
+		String uuidStr = mapper.getUniqueId(player).toString().toLowerCase(Locale.ENGLISH);
+		if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
+			return true;
+		if (hosts.contains(mapper.getUsername(player).toLowerCase(Locale.ENGLISH)))
+			return true;
+
+		PlayerManager<P> manager = getPlayerManager();
+		Optional<UUID> uuid = mapper.getUniqueId(player);
+		return uuid.isPresent() && manager.getLinkedAccounts(uuid.get()).stream().anyMatch(hosts::contains);
+	}
 
 	/**
 	 * Determines whether a player must be an {@link EntityMapper#isAdmin(Object) admin} to use the
@@ -548,7 +577,7 @@ public interface Plugin<P, S> {
 		getScheduledExecutor().schedule(() -> {
 			try {
 				getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
-				Response response = finalService.buildResponse(0)
+				Response response = finalService.buildResponse()
 						.packetType(PacketType.EFFECT_STATUS)
 						.type(ResultType.NOT_VISIBLE)
 						.effect("embedded_message")
@@ -587,18 +616,16 @@ public interface Plugin<P, S> {
 	/**
 	 * Updates the status of an effect.
 	 *
-	 * @param manager socket manager or null to use {@link #getCrowdControl()}
-	 * @param effect  the effect to update
-	 * @param status  the new status
+	 * @param respondable an object that can be responded to
+	 * @param effect      the effect to update
+	 * @param status      the new status
 	 */
-	default void updateEffectStatus(@Nullable SocketManager manager, @NotNull String effect, Response.@NotNull ResultType status) {
+	default void updateEffectStatus(@Nullable Respondable respondable, @NotNull String effect, Response.@NotNull ResultType status) {
 		if (!status.isStatus())
 			throw new IllegalArgumentException("status must be a status type (not a result type)");
-		if (manager == null)
-			manager = getCrowdControl();
-		if (manager == null)
+		if (respondable == null)
 			return;
-		Response response = manager.buildResponse(0)
+		Response response = respondable.buildResponse()
 				.packetType(PacketType.EFFECT_STATUS)
 				.effect(effect.toLowerCase(Locale.ENGLISH))
 				.type(status)
@@ -609,56 +636,56 @@ public interface Plugin<P, S> {
 	/**
 	 * Updates the status of an effect.
 	 *
-	 * @param manager socket manager or null to use {@link #getCrowdControl()}
-	 * @param effect  the effect to update
-	 * @param status  the new status
+	 * @param respondable an object that can be responded to
+	 * @param effect      the effect to update
+	 * @param status      the new status
 	 */
-	default void updateEffectStatus(@Nullable SocketManager manager, @NotNull Command<?> effect, Response.@NotNull ResultType status) {
-		updateEffectStatus(manager, effect.getEffectName(), status);
+	default void updateEffectStatus(Respondable respondable, @NotNull Command<?> effect, Response.@NotNull ResultType status) {
+		updateEffectStatus(respondable, effect.getEffectName(), status);
 	}
 
 	/**
 	 * Updates the visibility of a collection of {@link Command effect} IDs.
 	 *
-	 * @param service   the service to send the packet to
-	 * @param effectIds IDs of the effect to update
-	 * @param visible   effects' new visibility
+	 * @param respondable an object that can be responded to
+	 * @param effectIds   IDs of the effect to update
+	 * @param visible     effects' new visibility
 	 */
-	default void updateEffectIdVisibility(@Nullable SocketManager service, @NotNull Collection<String> effectIds, boolean visible) {
-		effectIds.forEach(effectId -> updateEffectStatus(service, effectId, visible ? Response.ResultType.VISIBLE : Response.ResultType.NOT_VISIBLE));
+	default void updateEffectIdVisibility(Respondable respondable, @NotNull Collection<String> effectIds, boolean visible) {
+		effectIds.forEach(effectId -> updateEffectStatus(respondable, effectId, visible ? Response.ResultType.VISIBLE : Response.ResultType.NOT_VISIBLE));
 	}
 
 	/**
 	 * Updates the visibility of an {@link Command effect} ID.
 	 *
-	 * @param service  the service to send the packet to
-	 * @param effectId ID of the effect to update
-	 * @param visible  effect's new visibility
+	 * @param respondable an object that can be responded to
+	 * @param effectId    ID of the effect to update
+	 * @param visible     effect's new visibility
 	 */
-	default void updateEffectIdVisibility(@Nullable SocketManager service, @NotNull String effectId, boolean visible) {
-		updateEffectIdVisibility(service, Collections.singletonList(effectId), visible);
+	default void updateEffectIdVisibility(Respondable respondable, @NotNull String effectId, boolean visible) {
+		updateEffectIdVisibility(respondable, Collections.singletonList(effectId), visible);
 	}
 
 	/**
 	 * Updates the visibility of a collection of {@link Command effects}.
 	 *
-	 * @param service the service to send the packet to
-	 * @param effects the effect to update
-	 * @param visible effects' new visibility
+	 * @param respondable an object that can be responded to
+	 * @param effects     the effect to update
+	 * @param visible     effects' new visibility
 	 */
-	default void updateEffectVisibility(@Nullable SocketManager service, @NotNull Collection<Command<?>> effects, boolean visible) {
-		updateEffectIdVisibility(service, effects.stream().map(Command::getEffectName).collect(Collectors.toList()), visible);
+	default void updateEffectVisibility(Respondable respondable, @NotNull Collection<Command<?>> effects, boolean visible) {
+		updateEffectIdVisibility(respondable, effects.stream().map(Command::getEffectName).collect(Collectors.toList()), visible);
 	}
 
 	/**
 	 * Updates the visibility of an {@link Command effect}.
 	 *
-	 * @param service the service to send the packet to
-	 * @param effect  the effect to update
-	 * @param visible effect's new visibility
+	 * @param respondable an object that can be responded to
+	 * @param effect      the effect to update
+	 * @param visible     effect's new visibility
 	 */
-	default void updateEffectVisibility(@Nullable SocketManager service, @NotNull Command<?> effect, boolean visible) {
-		updateEffectVisibility(service, Collections.singletonList(effect), visible);
+	default void updateEffectVisibility(Respondable respondable, @NotNull Command<?> effect, boolean visible) {
+		updateEffectVisibility(respondable, Collections.singletonList(effect), visible);
 	}
 
 	/**
@@ -731,18 +758,20 @@ public interface Plugin<P, S> {
 	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
 
 	/**
-	 * Updates the visibility of client effects.
+	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
 	 *
 	 * @param service the service to send the packets to
 	 */
-	default void updateClientEffectVisibility(@Nullable SocketManager service) {
+	default void updateConditionalEffectVisibility(@Nullable SocketManager service) {
 		if (service == null)
 			return;
-		boolean visible = getModdedPlayerCount() > 0;
+		boolean clientVisible = getModdedPlayerCount() > 0;
+		boolean globalVisible = globalEffectsUsable();
 		for (Command<?> effect : commandRegister().getCommands()) {
-			if (!effect.isClientOnly())
-				continue;
-			updateEffectVisibility(service, effect, visible);
+			if (effect.isClientOnly())
+				updateEffectVisibility(service, effect, clientVisible);
+			if (effect.isGlobal())
+				updateEffectVisibility(service, effect, globalVisible);
 		}
 	}
 
@@ -763,7 +792,7 @@ public interface Plugin<P, S> {
 		if (!globalEffectsUsable())
 			audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
 		CrowdControl cc = getCrowdControl();
-		updateClientEffectVisibility(cc);
+		updateConditionalEffectVisibility(cc);
 		if (cc == null) {
 			if (mapper.isAdmin(player)) {
 				if (isServer() && getPassword() == null)
@@ -782,7 +811,7 @@ public interface Plugin<P, S> {
 	 * @param player player that left
 	 */
 	default void onPlayerLeave(P player) {
-		updateClientEffectVisibility(getCrowdControl());
+		updateConditionalEffectVisibility(getCrowdControl());
 	}
 
 	/**

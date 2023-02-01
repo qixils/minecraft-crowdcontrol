@@ -50,12 +50,13 @@ public class EnchantmentCommand extends ImmediateCommand {
 				// C) supports the requested enchantment
 				// D) would actually benefit from upgrading this enchantment if applicable
 				//    (i.e. this prevents Silk Touch from being "upgraded" to level 2)
-				if (item != null
-						&& !item.getType().isEmpty()
+				// E) is not absolutely maxed out on this enchantment (i.e. level 255)
+				if (!item.getType().isEmpty()
 						&& enchantment.canEnchantItem(item)
 						&& (
 						enchantment.getMaxLevel() != enchantment.getStartLevel()
 								|| item.getEnchantmentLevel(enchantment) != enchantment.getMaxLevel()
+						&& item.getEnchantmentLevel(enchantment) != 255
 				)
 				) {
 					levelMap.put(slot, item.getEnchantmentLevel(enchantment));
@@ -68,7 +69,6 @@ public class EnchantmentCommand extends ImmediateCommand {
 				continue;
 			// add enchant
 			ItemStack item = inv.getItem(slot);
-			assert item != null : "Selected item has disappeared from the player's inventory";
 			int curLevel = item.getEnchantmentLevel(enchantment);
 			if (curLevel >= level)
 				level = curLevel + 1;

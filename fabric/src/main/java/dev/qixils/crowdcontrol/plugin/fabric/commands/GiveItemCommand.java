@@ -38,7 +38,7 @@ public class GiveItemCommand extends ImmediateCommand {
 		if (request.getParameters() == null)
 			return getDefaultDisplayName();
 		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName();
+		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.give_item_x.name");
 		List<Component> args = new ArrayList<>(displayName.args());
 		args.add(Component.text(amount));
 		return displayName.args(args);
@@ -57,10 +57,7 @@ public class GiveItemCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (request.getParameters() == null)
-			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
-
-		int amount = (int) (double) request.getParameters()[0];
+		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
 		ItemStack itemStack = new ItemStack(item, amount);
 
 		LimitConfig config = getPlugin().getLimitConfig();
@@ -83,7 +80,7 @@ public class GiveItemCommand extends ImmediateCommand {
 			for (ServerPlayer player : players) {
 				if (maxRecipients > 0 && recipients >= maxRecipients)
 					break;
-				if (isHost(player))
+				if (config.hostsBypass() && isHost(player))
 					continue;
 				giveItemTo(player, itemStack);
 				recipients++;

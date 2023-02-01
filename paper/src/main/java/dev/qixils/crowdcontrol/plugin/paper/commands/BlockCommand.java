@@ -39,7 +39,10 @@ public class BlockCommand extends ImmediateCommand {
 
 	@Nullable
 	protected Location getLocation(Player player) {
-		return player.getLocation();
+		Location location = player.getLocation();
+		if (!location.getBlock().isReplaceable())
+			return null;
+		return location;
 	}
 
 	@Override
@@ -48,8 +51,6 @@ public class BlockCommand extends ImmediateCommand {
 				.type(Response.ResultType.RETRY)
 				.message("No available locations to set blocks");
 		for (Player player : players) {
-			if (!player.getLocation().getBlock().isReplaceable())
-				continue;
 			Location location = getLocation(player);
 			if (location == null)
 				continue;

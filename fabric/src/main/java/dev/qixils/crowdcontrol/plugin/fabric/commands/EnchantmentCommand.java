@@ -21,8 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.Map.Entry;
 
-// TODO: curses are broken
-
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
 	protected final Enchantment enchantment;
@@ -35,7 +33,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		this.effectName = "enchant_" + csIdOf(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), "Enchantment has no registry name"));
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
-				enchantment.getFullname(enchantment.getMaxLevel()).copy().withStyle(Style.EMPTY) // TODO: withStyle is not working (text is still colored)
+				enchantment.getFullname(enchantment.getMaxLevel()).copy().setStyle(Style.EMPTY)
 		);
 	}
 
@@ -57,11 +55,13 @@ public class EnchantmentCommand extends ImmediateCommand {
 				// C) supports the requested enchantment
 				// D) would actually benefit from upgrading this enchantment if applicable
 				//    (i.e. this prevents Silk Touch from being "upgraded" to level 2)
+				// E) is not absolutely maxed out on this enchantment (i.e. level 255)
 				if (!item.isEmpty()
 						&& enchantment.canEnchant(item)
 						&& (
 						enchantment.getMaxLevel() != enchantment.getMinLevel()
 								|| getEnchantmentLevel(item, enchantment) != enchantment.getMaxLevel()
+						&& getEnchantmentLevel(item, enchantment) != 255
 				)
 				) {
 					levelMap.put(slot, getEnchantmentLevel(item, enchantment));

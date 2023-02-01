@@ -30,25 +30,22 @@ public class RespawnCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		// todo this is teleporting players to 0 0 0
+		// todo: test if this is still teleporting players to 0 0 0
 		//   maybe RESPAWN_LOCATIONS is broken
 		//   need to add some debugging to find out
 		sync(() -> {
 			for (ServerPlayer player : players) {
-				if (player.respawn())
-					continue;
+				RespawnLocation location = null;
 				Optional<Map<ResourceKey, RespawnLocation>> optionalData = player.get(Keys.RESPAWN_LOCATIONS);
-				if (!optionalData.isPresent()) {
-					player.setLocation(getDefaultSpawn());
-					continue;
-				}
-				Map<ResourceKey, RespawnLocation> data = optionalData.get();
-				RespawnLocation location = data.get(player.world().key());
-				if ((location == null || !location.asLocation().isPresent()) && !data.isEmpty()) {
-					for (RespawnLocation curLocation : data.values()) {
-						if (curLocation.asLocation().isPresent()) {
-							location = curLocation;
-							break;
+				if (optionalData.isPresent()) {
+					Map<ResourceKey, RespawnLocation> data = optionalData.get();
+					location = data.get(player.world().key());
+					if ((location == null || !location.asLocation().isPresent()) && !data.isEmpty()) {
+						for (RespawnLocation curLocation : data.values()) {
+							if (curLocation.asLocation().isPresent()) {
+								location = curLocation;
+								break;
+							}
 						}
 					}
 				}
@@ -59,16 +56,14 @@ public class RespawnCommand extends ImmediateCommand {
 					asLocation = location.asLocation().get();
 				}
 				player.setLocation(plugin.getGame().server().teleportHelper().findSafeLocation(asLocation)
-						.orElseGet(asLocation::asHighestLocation));
+						.orElseGet(() -> asLocation.world().worldType().equals(WorldTypes.OVERWORLD.get()) ? asLocation.asHighestLocation() : asLocation));
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 
 	private ServerLocation getDefaultSpawn() {
-		// TODO i cannot find a new version of #getSpawnLocation for the life of me and this impl
-		//   will not work for the nether (edit: there should be a new util method for nether-
-		//   compatible asHighestLocation but i forget where and i sleepy)
+		// TODO i cannot find a new version of #getSpawnLocation for the life of me
 		return getDefaultWorld().location(0, 0, 0).asHighestLocation();
 	}
 
