@@ -534,7 +534,7 @@ namespace CrowdControl.Games.Packs
                 Log.Error($"Unavailable effect pattern match failed on \"{response.message}\"");
                 return;
             }
-            var effectCode = match.Groups[0].Value;
+            var effectCode = match.Groups[1].Value;
             var effect = AllEffects.Find(e => e.Code == effectCode);
             if (effect == null)
             {
