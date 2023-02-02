@@ -23,10 +23,11 @@ public class SpongeTextUtil extends TextUtilImpl {
 	 * @return its CS file ID
 	 */
 	@NotNull
-	public static String csIdOf(Key type) {
-		String value = type.value();
-		if (!type.namespace().equals(MINECRAFT_NAMESPACE))
-			return type.namespace() + "_" + type.value();
+	public static String csIdOf(Keyed type) {
+		Key key = type.key();
+		String value = key.value();
+		if (!key.namespace().equals(MINECRAFT_NAMESPACE))
+			return key.value();
 
 		switch (value) {
 			case "lightning_bolt":
@@ -48,16 +49,5 @@ public class SpongeTextUtil extends TextUtilImpl {
 			default:
 				return value;
 		}
-	}
-
-	/**
-	 * Returns the ID of an object according to the C# file.
-	 *
-	 * @param type typed object
-	 * @return its CS file ID
-	 */
-	@NotNull
-	public static String csIdOf(Keyed type) {
-		return csIdOf(type.key());
 	}
 }

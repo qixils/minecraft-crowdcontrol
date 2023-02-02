@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.utils;
 
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.Translatable;
 import org.jetbrains.annotations.NotNull;
@@ -32,11 +33,13 @@ public class SpongeTextUtil extends TextUtilImpl {
 	}
 
 	@NotNull
+	public static Key asKey(CatalogType type) {
+		return Key.key(type.getId());
+	}
+
+	@NotNull
 	public static String valueOf(CatalogType type) {
-		String id = type.getId();
-		if (!id.startsWith("minecraft:"))
-			return id;
-		return id.replaceFirst("minecraft:", "");
+		return asKey(type).value();
 	}
 
 	/**
@@ -47,9 +50,10 @@ public class SpongeTextUtil extends TextUtilImpl {
 	 */
 	@NotNull
 	public static String csIdOf(CatalogType type) {
-		String value = valueOf(type);
+		Key key = asKey(type);
+		String value = key.value();
 
-		if (!type.getId().startsWith("minecraft:"))
+		if (!key.namespace().equals(Key.MINECRAFT_NAMESPACE))
 			return value;
 
 		switch (value) {

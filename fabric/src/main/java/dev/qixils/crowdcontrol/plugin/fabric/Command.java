@@ -28,7 +28,7 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 
 	protected static String csIdOf(ResourceLocation id) {
 		if (!id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
-			return id.getNamespace() + "_" + id.getPath();
+			return id.getPath();
 		String path = id.getPath();
 		return switch (path) {
 			case "lightning_bolt" -> "lightning";
