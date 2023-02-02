@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.mc;
 
 import dev.qixils.crowdcontrol.common.mc.CCLivingEntity;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 
@@ -25,7 +26,7 @@ public class SpongeLivingEntity extends SpongeEntity implements CCLivingEntity {
 
 	@Override
 	public void health(double health) {
-		entity().health().set(health);
+		entity().offer(Keys.HEALTH, health);
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class SpongeLivingEntity extends SpongeEntity implements CCLivingEntity {
 
 	@Override
 	public void maxHealthOffset(double newOffset) {
-		entity().maxHealth().set(BASE_MAX_HEALTH + newOffset);
+		entity().offer(Keys.MAX_HEALTH, BASE_MAX_HEALTH + newOffset);
 	}
 
 	@Override

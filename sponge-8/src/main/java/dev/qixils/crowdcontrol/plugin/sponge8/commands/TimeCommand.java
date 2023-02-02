@@ -25,6 +25,7 @@ public class TimeCommand extends ImmediateCommand {
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		sync(() -> plugin.getGame().server().worldManager().worlds().forEach(world -> {
+			// TODO: it seems impossible to set the world time in Sponge 8, only the day time. should PR, looks easy
 			ServerWorldProperties properties = world.properties();
 			properties.setDayTime(properties.dayTime().add(0, 12, 0));
 		}));
