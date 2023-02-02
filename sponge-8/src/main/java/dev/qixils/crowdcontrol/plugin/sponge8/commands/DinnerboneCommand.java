@@ -51,7 +51,10 @@ public class DinnerboneCommand extends Command {
 						.orElseGet(Component::empty);
 				Component currentName = entity.getOrElse(Keys.CUSTOM_NAME, Component.empty());
 				if (currentName.equals(DINNERBONE_COMPONENT)) {
-					entity.offer(Keys.CUSTOM_NAME, oldName);
+					if (oldName.equals(Component.empty()))
+						entity.remove(Keys.CUSTOM_NAME);
+					else
+						entity.offer(Keys.CUSTOM_NAME, oldName);
 					entity.remove(SpongeCrowdControlPlugin.ORIGINAL_DISPLAY_NAME);
 					if (entity.getOrElse(VIEWER_SPAWNED, false))
 						entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);

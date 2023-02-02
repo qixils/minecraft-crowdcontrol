@@ -47,7 +47,10 @@ public class DinnerboneCommand extends Command {
 				Text oldName = entity.get(OriginalDisplayNameData.class).map(data -> data.originalDisplayName().get()).orElse(Text.EMPTY);
 				Text currentName = entity.getOrElse(Keys.DISPLAY_NAME, Text.EMPTY);
 				if (currentName.equals(Text.of(DINNERBONE_NAME))) {
-					entity.offer(Keys.DISPLAY_NAME, oldName);
+					if (oldName.isEmpty())
+						entity.remove(Keys.DISPLAY_NAME);
+					else
+						entity.offer(Keys.DISPLAY_NAME, oldName);
 					entity.remove(OriginalDisplayNameData.class);
 					if (entity.getOrElse(VIEWER_SPAWNED, false))
 						entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
