@@ -21,9 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Platform;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.config.DefaultConfig;
@@ -41,7 +41,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
@@ -83,9 +82,6 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
 	private final HoconConfigurationLoader configLoader;
-	@NotNull
-	private final Map<UUID, CCPlayer> ccPlayers = new HashMap<>();
-	private String clientHost = null;
 	private Scheduler syncScheduler;
 	private Scheduler asyncScheduler;
 	private TaskExecutorService syncExecutor;
@@ -111,6 +107,8 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		}));
 		// register chat commands
 		registerChatCommands();
+		// register event listeners
+		game.eventManager().registerListeners(pluginContainer, softLockResolver);
 	}
 
 	public static void spawnPlayerParticles(Entity entity, ParticleEffect particle) {
@@ -159,11 +157,18 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Override
 	public @NotNull Collection<String> getHosts() {
 		Collection<String> confHosts = super.getHosts();
-		if (clientHost == null)
+		if (!Sponge.isClientAvailable()) {
+			getSLF4JLogger().debug("No client available, using only config hosts");
 			return confHosts;
+		}
+		getSLF4JLogger().debug("Adding client host to config hosts");
 		Set<String> hosts = new HashSet<>(confHosts.size() + 1);
 		hosts.addAll(confHosts);
-		hosts.add(clientHost);
+		Sponge.client().player().ifPresent(player -> {
+			String host = player.uniqueId().toString().toLowerCase(Locale.ENGLISH);
+			getSLF4JLogger().debug("Adding client host {}", host);
+			hosts.add(host);
+		});
 		return hosts;
 	}
 
@@ -238,24 +243,8 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Listener
-	public void onLoad(LoadedGameEvent event) {
-		game.eventManager().registerListeners(pluginContainer, softLockResolver);
-	}
-
-	@Listener
 	public void onConnection(ServerSideConnectionEvent.Join event) {
 		onPlayerJoin(event.player());
-		ccPlayers.put(event.player().uniqueId(), new SpongePlayer(event.player()));
-		Platform platform = game.platform();
-		if ((platform.type().isClient() || platform.executionType().isClient() || game.isClientAvailable())
-				&& clientHost == null) {
-			clientHost = event.player().uniqueId().toString().toLowerCase(Locale.ENGLISH);
-		}
-	}
-
-	@Listener
-	public void onDisconnect(ServerSideConnectionEvent.Disconnect event) {
-		ccPlayers.remove(event.player().uniqueId());
 	}
 
 	@Override

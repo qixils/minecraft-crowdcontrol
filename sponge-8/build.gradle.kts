@@ -1,4 +1,5 @@
 val cloudVersion: String by project
+val logbackVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 8"
 
@@ -9,6 +10,7 @@ plugins {
 dependencies {
     implementation(project(":configurate-common"))
     implementation("cloud.commandframework:cloud-sponge:1.8.0-SNAPSHOT") // TODO: use cloudVersion variable
+    implementation("ch.qos.logback:logback-classic:$logbackVersion") // Sponge's version of log4j is too old to support slf4j 2.0
     compileOnly("org.spongepowered:spongeapi:8.1.0")
 }
 

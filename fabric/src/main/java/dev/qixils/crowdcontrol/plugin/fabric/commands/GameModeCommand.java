@@ -46,7 +46,7 @@ public class GameModeCommand extends TimedVoidCommand {
 					List<ServerPlayer> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);
 					players.addAll(curPlayers);
-					playerAnnounce(players, request); // TODO: sometimes duplicates, i think after death
+					playerAnnounce(players, request); // sometimes duplicates after death but I think this is exclusive to the dev environment
 					return null;
 				})
 				.completionCallback($ -> setGameMode(null, players, GameType.SURVIVAL))

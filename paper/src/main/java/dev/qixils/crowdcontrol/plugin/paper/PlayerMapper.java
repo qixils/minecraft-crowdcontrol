@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
-class PlayerMapper<E extends Player> extends CommandSenderMapper<E> implements PlayerEntityMapper<E> {
+class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMapper<Player> {
 	public PlayerMapper(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -18,7 +18,12 @@ class PlayerMapper<E extends Player> extends CommandSenderMapper<E> implements P
 	}
 
 	@Override
-	public @NotNull String getUsername(@NotNull E player) {
+	public @NotNull String getUsername(@NotNull Player player) {
 		return player.getName();
+	}
+
+	@Override
+	public @NotNull Optional<Player> getPlayer(@NotNull UUID uuid) {
+		return Optional.ofNullable(plugin.getServer().getPlayer(uuid));
 	}
 }

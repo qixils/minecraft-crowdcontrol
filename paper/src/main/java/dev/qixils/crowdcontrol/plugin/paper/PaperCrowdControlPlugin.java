@@ -46,7 +46,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final Executor asyncExecutor = runnable -> Bukkit.getScheduler().runTaskAsynchronously(this, runnable);
 	@Getter
 	@Accessors(fluent = true)
-	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper<>(this);
+	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
 	@Getter
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);

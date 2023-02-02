@@ -16,23 +16,6 @@ using LogLevel = CrowdControl.Common.LogLevel;
 
 namespace CrowdControl.Games.Packs
 {
-    [Serializable]
-    public record ServerStatus(bool GlobalEffects, bool ClientEffects, string[] RegisteredEffects);
-
-    public sealed class GlobalEffect : Effect
-    {
-        public GlobalEffect(string name, string code, string parent) : base(name, code, parent) { }
-        public GlobalEffect(string name, string code, ItemKind kind) : base(name, code, kind) { }
-        public GlobalEffect(string name, string code, ItemKind kind, string auto) : base(name, code, kind, auto) { }
-    }
-
-    public sealed class ClientEffect : Effect
-    {
-        public ClientEffect(string name, string code, string parent) : base(name, code, parent) { }
-        public ClientEffect(string name, string code, ItemKind kind) : base(name, code, kind) { }
-        public ClientEffect(string name, string code, ItemKind kind, string auto) : base(name, code, kind, auto) { }
-    }
-
     [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
     {
@@ -58,8 +41,8 @@ namespace CrowdControl.Games.Packs
             // disabled because this is killing anyone in the air: new Effect("Explode", "explode", "miscellaneous") { Price = 750, Description = "Spawns a TNT-like explosion at the streamer's feet" },
             new Effect("Fling Randomly", "fling", "miscellaneous") { Price = 200, Description = "Flings the streamer in a totally random direction" },
             new Effect("Flip Mobs Upside-Down", "dinnerbone", "miscellaneous") { Price = 25, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone" },
-            new ClientEffect("Invert Camera", "invert_look", "miscellaneous") { Price = 200, Duration = 15, Description = "Temporarily inverts mouse movement" },
-            new ClientEffect("Invert Controls", "invert_wasd", "miscellaneous") { Price = 200, Duration = 15, Description = "Temporarily inverts WASD movement" },
+            new Effect("Invert Camera", "invert_look", "miscellaneous") { Price = 200, Duration = 15, Description = "Temporarily inverts mouse movement" },
+            new Effect("Invert Controls", "invert_wasd", "miscellaneous") { Price = 200, Duration = 15, Description = "Temporarily inverts WASD movement" },
             new Effect("Open Lootbox", "lootbox", "miscellaneous") { Price = 100, Description = "Gifts a completely random item with varying enchants and modifiers" },
             new Effect("Open Lucky Lootbox", "lootbox_5", "miscellaneous") { Price = 500, Description = "Gifts two random items with higher odds of having beneficial enchantments and modifiers" },
             new Effect("Place Flowers", "flowers", "miscellaneous") { Price = 25, Description = "Randomly places flowers nearby" },
@@ -77,8 +60,8 @@ namespace CrowdControl.Games.Packs
             new Effect("Water Bucket Clutch", "bucket_clutch", "miscellaneous") { Price = 400, Description = "Teleports players 30 blocks up and gives them a water bucket" },
             // time commands
             new Effect("Time", "time", ItemKind.Folder),
-            new GlobalEffect("Set Time to Day", "time_day", "time") { Price = 50, Description = "Jumps the clock ahead to daytime" },
-            new GlobalEffect("Set Time to Night", "time_night", "time") { Price = 50, Description = "Jumps the clock ahead to nighttime" },
+            new Effect("Set Time to Day", "time_day", "time") { Price = 50, Description = "Jumps the clock ahead to daytime" },
+            new Effect("Set Time to Night", "time_night", "time") { Price = 50, Description = "Jumps the clock ahead to nighttime" },
             // disabled because i think the above commands are just better: new GlobalEffect("Zip Time", "zip", "time") { Price = 30, Description = "Adds several minutes to the in-game time" },
             // health commands
             new Effect("Health", "health", ItemKind.Folder),
@@ -304,11 +287,11 @@ namespace CrowdControl.Games.Packs
             new Effect("Zombie Villager", "remove_entity_zombie_villager", "remove_entity") { Price = 150 },
             new Effect("Zombified Piglin", "remove_entity_zombified_piglin", "remove_entity") { Price = 150 },
             // sets the server difficulty (affects how much damage mobs deal)
-            new GlobalEffect("Set Difficulty", "difficulty", ItemKind.Folder),
-            new GlobalEffect("Peaceful Mode", "difficulty_peaceful", "difficulty") { Price = 100, Description = "Removes all hostile mobs and prevents new ones spawning" },
-            new GlobalEffect("Easy Mode", "difficulty_easy", "difficulty") { Price = 100 },
-            new GlobalEffect("Normal Mode", "difficulty_normal", "difficulty") { Price = 200 },
-            new GlobalEffect("Hard Mode", "difficulty_hard", "difficulty") { Price = 400 },
+            new Effect("Set Difficulty", "difficulty", ItemKind.Folder),
+            new Effect("Peaceful Mode", "difficulty_peaceful", "difficulty") { Price = 100, Description = "Removes all hostile mobs and prevents new ones spawning" },
+            new Effect("Easy Mode", "difficulty_easy", "difficulty") { Price = 100 },
+            new Effect("Normal Mode", "difficulty_normal", "difficulty") { Price = 200 },
+            new Effect("Hard Mode", "difficulty_hard", "difficulty") { Price = 400 },
             // applies potion effects to every player
             new Effect("Apply Potion", "apply_potion_effect", ItemKind.Folder),
             new Effect("Absorption", "potion_absorption", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants extra health that cannot be regenerated" },
@@ -355,10 +338,10 @@ namespace CrowdControl.Games.Packs
             new Effect("Red Sand", "falling_block_red_sand", "place_falling_block") { Price = 25, Description = "Drops a red sand block on the streamer" },
             new Effect("Sand", "falling_block_sand", "place_falling_block") { Price = 25, Description = "Drops a sand block on the streamer" },
             // sets the server weather
-            new GlobalEffect("Set Weather", "weather", ItemKind.Folder),
-            new GlobalEffect("Clear Weather", "clear", "weather") { Price = 25, Description = "Makes the weather sunny to allow rays of fire to shine down on hostile mobs" },
-            new GlobalEffect("Rainy Weather", "downfall", "weather") { Price = 50, Description = "Makes the weather rainy which prevents hostile mobs from burning in the daylight" },
-            new GlobalEffect("Stormy Weather", "thunder_storm", "weather") { Price = 75, Description = "Starts a thunderstorm with sporadic lightning strikes. Combine with placing a lightning rod to perform some electrocution!" },
+            new Effect("Set Weather", "weather", ItemKind.Folder),
+            new Effect("Clear Weather", "clear", "weather") { Price = 25, Description = "Makes the weather sunny to allow rays of fire to shine down on hostile mobs" },
+            new Effect("Rainy Weather", "downfall", "weather") { Price = 50, Description = "Makes the weather rainy which prevents hostile mobs from burning in the daylight" },
+            new Effect("Stormy Weather", "thunder_storm", "weather") { Price = 75, Description = "Starts a thunderstorm with sporadic lightning strikes. Combine with placing a lightning rod to perform some electrocution!" },
             // apply enchants
             new Effect("Enchantments", "enchantments", ItemKind.Folder),
             new Effect("Remove Enchantments", "remove_enchants", "enchantments") { Price = 200, Description = "Removes all enchants from the held item" },
@@ -503,8 +486,7 @@ namespace CrowdControl.Games.Packs
 
         private void InterceptMessageParsed(ISimpleTCPConnector<Request, Response, ISimpleTCPContext> sender, Response response, ISimpleTCPContext context)
         {
-            Log.Debug(
-                $"Parsing incoming message #{response.id} of type {response.type} with message \"{response.message}\"");
+            Log.Debug($"Parsing incoming message #{response.id} of type {response.type} with message \"{response.message}\"");
             if (response.message == null)
             {
                 Log.Debug("Message has no message attribute; exiting");
@@ -529,35 +511,18 @@ namespace CrowdControl.Games.Packs
         {
             // load packet data
             var payload = response.message.Replace("_mc_cc_server_status_", "");
-            var status = JsonConvert.DeserializeObject<ServerStatus>(payload);
-            if (status == null)
+            var registeredEffects = JsonConvert.DeserializeObject<string[]>(payload);
+            if (registeredEffects == null)
             {
-                Log.Error("Message payload could not be converted to ServerStatus object");
+                Log.Error("Message payload could not be parsed");
                 return;
-            }
-
-            // reset all effects back to visible first
-            AllEffects.ForEach(effect => ReportStatus(effect, EffectStatus.MenuVisible));
-
-            // hide global effects if they are not usable
-            if (!status.GlobalEffects)
-            {
-                Log.Message("Hiding global effects");
-                AllEffects.FindAll(effect => effect is GlobalEffect).ForEach(HideEffect);
-            }
-            // hide client effects if running on a server
-            if (!status.ClientEffects)
-            {
-                Log.Message("Hiding client effects");
-                AllEffects.FindAll(effect => effect is ClientEffect).ForEach(HideEffect);
             }
 
             // hide effects that are unsupported by the platform
             Log.Message("Hiding unsupported effects");
-            var registeredEffectsList = new List<string>(status.RegisteredEffects).ConvertAll(input => input.ToLower());
+            var registeredEffectsList = new List<string>(registeredEffects).ConvertAll(input => input.ToLower());
             AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !registeredEffectsList.Contains(effect.Code.ToLower()))
-                .ForEach(HideEffect);
-
+                .ForEach(HideEffect); // TODO: hide parent folders if all children are hidden
             Log.Message("Finished hiding effects");
         }
 
@@ -581,7 +546,7 @@ namespace CrowdControl.Games.Packs
 
         private void HideEffect(Effect effect)
         {
-            Log.Message($"Permanently hiding effect {effect.Code}");
+            Log.Message($"Hiding effect {effect.Code}");
             ReportStatus(effect, EffectStatus.MenuHidden);
         }
     }

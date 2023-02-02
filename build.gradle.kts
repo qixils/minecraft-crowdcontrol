@@ -64,7 +64,7 @@ subprojects {
             }
 
             shadowJar {
-                minimize() // minimize jar
+//                minimize() // minimize jar
                 // exclude Java >8 META-INF files
                 if (java.targetCompatibility.isJava8) {
                     exclude("META-INF/versions/")

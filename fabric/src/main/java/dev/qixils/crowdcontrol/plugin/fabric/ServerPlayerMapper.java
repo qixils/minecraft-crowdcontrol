@@ -35,4 +35,9 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	public @NotNull String getUsername(@NotNull ServerPlayer player) {
 		return player.getGameProfile().getName();
 	}
+
+	@Override
+	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull UUID uuid) {
+		return Optional.ofNullable(plugin.getServer()).map(server -> server.getPlayerList().getPlayer(uuid));
+	}
 }

@@ -6,6 +6,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import com.google.gson.Gson;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
@@ -208,7 +209,12 @@ public interface Plugin<P, S> {
 	 * Registers the plugin's basic chat commands.
 	 */
 	default void registerChatCommands() {
-		KyoriTranslator.initialize();
+		try {
+			KyoriTranslator.initialize(getClass().getClassLoader(), Plugin.class.getClassLoader());
+		} catch (Exception e) {
+			System.out.println("Failed to initialize i18n");
+			e.printStackTrace();
+		}
 
 		CommandManager<S> manager = getCommandManager();
 		if (manager == null)
@@ -483,19 +489,32 @@ public interface Plugin<P, S> {
 	 */
 	default boolean isHost(@NotNull P player) {
 		Collection<String> hosts = getHosts();
+		getSLF4JLogger().debug("Checking if {} matches a host known in {}", playerMapper().getUsername(player), hosts);
 		if (hosts.isEmpty())
 			return false;
 
 		PlayerEntityMapper<P> mapper = playerMapper();
-		String uuidStr = mapper.getUniqueId(player).toString().toLowerCase(Locale.ENGLISH);
-		if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
-			return true;
-		if (hosts.contains(mapper.getUsername(player).toLowerCase(Locale.ENGLISH)))
+		Optional<UUID> uuid = mapper.getUniqueId(player);
+		if (uuid.isPresent()) {
+			String uuidStr = uuid.get().toString().toLowerCase(Locale.ENGLISH);
+			getSLF4JLogger().debug("Checking for UUID {}", uuidStr);
+			if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
+				return true;
+		}
+
+		String username = mapper.getUsername(player).toLowerCase(Locale.ENGLISH);
+		getSLF4JLogger().debug("Checking for username {}", username);
+		if (hosts.contains(username))
 			return true;
 
-		PlayerManager<P> manager = getPlayerManager();
-		Optional<UUID> uuid = mapper.getUniqueId(player);
-		return uuid.isPresent() && manager.getLinkedAccounts(uuid.get()).stream().anyMatch(hosts::contains);
+		if (uuid.isPresent()) {
+			getSLF4JLogger().debug("Checking accounts linked to player");
+			PlayerManager<P> manager = getPlayerManager();
+			return manager.getLinkedAccounts(uuid.get()).stream().anyMatch(hosts::contains);
+		}
+
+		getSLF4JLogger().debug("No matches found");
+		return false;
 	}
 
 	/**
@@ -606,11 +625,11 @@ public interface Plugin<P, S> {
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
-		service.addConnectListener(connectingService -> sendEmbeddedMessagePacket(connectingService, "_mc_cc_server_status_" + new ServerStatus(
-				globalEffectsUsable(),
-				getModdedPlayerCount() > 0,
-				commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList())
-		).toJSON()));
+		String message = "_mc_cc_server_status_" + new Gson().toJson(commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList()));
+		service.addConnectListener(connectingService -> {
+			sendEmbeddedMessagePacket(connectingService, message);
+			updateConditionalEffectVisibility(connectingService);
+		});
 	}
 
 	/**
@@ -625,6 +644,7 @@ public interface Plugin<P, S> {
 			throw new IllegalArgumentException("status must be a status type (not a result type)");
 		if (respondable == null)
 			return;
+		getSLF4JLogger().debug("Updating status of effect {} to {}", effect, status);
 		Response response = respondable.buildResponse()
 				.packetType(PacketType.EFFECT_STATUS)
 				.effect(effect.toLowerCase(Locale.ENGLISH))
@@ -767,6 +787,7 @@ public interface Plugin<P, S> {
 			return;
 		boolean clientVisible = getModdedPlayerCount() > 0;
 		boolean globalVisible = globalEffectsUsable();
+		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
 		for (Command<?> effect : commandRegister().getCommands()) {
 			if (effect.isClientOnly())
 				updateEffectVisibility(service, effect, clientVisible);
@@ -779,29 +800,43 @@ public interface Plugin<P, S> {
 	 * Renders messages to a player. This should be called by an event handler that listens for
 	 * players joining the server.
 	 *
-	 * @param player player to send messages to
+	 * @param joiningPlayer player to send messages to
 	 */
-	default void onPlayerJoin(P player) {
-		EntityMapper<P> mapper = playerMapper();
-		Audience audience = mapper.asAudience(player);
-		audience.sendMessage(JOIN_MESSAGE_1);
-		//noinspection OptionalGetWithoutIsPresent
-		if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.getUniqueId(player).get()).size() == 0
-				&& (!isAdminRequired() || playerMapper().isAdmin(player)))
-			audience.sendMessage(JOIN_MESSAGE_2);
-		if (!globalEffectsUsable())
-			audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
-		CrowdControl cc = getCrowdControl();
-		updateConditionalEffectVisibility(cc);
-		if (cc == null) {
-			if (mapper.isAdmin(player)) {
-				if (isServer() && getPassword() == null)
-					audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
-				else
-					audience.sendMessage(NO_CC_UNKNOWN_ERROR);
-			} else
-				audience.sendMessage(NO_CC_USER_ERROR);
+	default void onPlayerJoin(P joiningPlayer) {
+		PlayerEntityMapper<P> mapper = playerMapper();
+		UUID uuid = mapper.getUniqueId(joiningPlayer).orElse(null);
+		if (uuid == null) {
+			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
+			return;
 		}
+		getScheduledExecutor().schedule(() -> {
+			// ensure player is still online
+			Optional<P> optPlayer = mapper.getPlayer(uuid);
+			if (!optPlayer.isPresent())
+				return;
+			P player = optPlayer.get();
+			// send messages
+			Audience audience = mapper.asAudience(player);
+			audience.sendMessage(JOIN_MESSAGE_1);
+			//noinspection OptionalGetWithoutIsPresent
+			if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.getUniqueId(player).get()).size() == 0
+					&& (!isAdminRequired() || playerMapper().isAdmin(player)))
+				audience.sendMessage(JOIN_MESSAGE_2);
+			if (!globalEffectsUsable())
+				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
+			CrowdControl cc = getCrowdControl();
+			if (cc == null) {
+				if (mapper.isAdmin(player)) {
+					if (isServer() && getPassword() == null)
+						audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
+					else
+						audience.sendMessage(NO_CC_UNKNOWN_ERROR);
+				} else
+					audience.sendMessage(NO_CC_USER_ERROR);
+			}
+			// update conditional effects
+			updateConditionalEffectVisibility(cc);
+		}, 1, TimeUnit.SECONDS);
 	}
 
 	/**

@@ -92,7 +92,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSource> commandSenderMapper = new CommandSourceMapper<>(this);
 	@Accessors(fluent = true)
-	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper<>(this);
+	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
