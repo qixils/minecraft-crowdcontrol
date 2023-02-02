@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class HatCommand extends ImmediateCommand {
 					continue;
 				response.type(ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> {
-					player.setHead(hand);
+					player.equipment().set(EquipmentTypes.HEAD, hand);
 					player.setItemInHand(handType, head);
 				});
 				break;

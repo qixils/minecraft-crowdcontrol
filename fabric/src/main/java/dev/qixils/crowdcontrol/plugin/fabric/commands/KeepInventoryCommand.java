@@ -47,7 +47,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get(), Sound.Emitter.self());
 	}
 
-	private void updateEffectVisibility(Respondable respondable) {
+	private void updateEffectVisibility(Respondable respondable) { // TODO: add to other impls (and check like difficulty too ig?)
 		async(() -> {
 			plugin.updateEffectStatus(respondable, effectName, ResultType.NOT_SELECTABLE);
 			plugin.updateEffectStatus(respondable, "keep_inventory_" + (!enable ? "on" : "off"), ResultType.SELECTABLE);

@@ -47,6 +47,7 @@ public class ClutterCommand extends ImmediateCommand {
 
 	private static Slot unwrap(@Nullable Slot slot, Vector2i pos) {
 		if (slot == null)
+			// TODO: this is being thrown, maybe breaking changes in API
 			throw new IndexOutOfBoundsException("Slot " + pos.x() + "," + pos.y() + " is out of bounds");
 		return slot;
 	}
