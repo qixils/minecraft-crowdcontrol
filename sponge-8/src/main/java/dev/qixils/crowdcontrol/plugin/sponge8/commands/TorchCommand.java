@@ -67,6 +67,7 @@ public class TorchCommand extends ImmediateCommand {
 					location.setBlockType(BlockTypes.AIR.get());
 			}
 		});
+		// TODO: this can technically return success even if no blocks were placed. probably on all platforms but kinda minor
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 

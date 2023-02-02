@@ -30,9 +30,6 @@ public class RespawnCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		// todo: test if this is still teleporting players to 0 0 0
-		//   maybe RESPAWN_LOCATIONS is broken
-		//   need to add some debugging to find out
 		sync(() -> {
 			for (ServerPlayer player : players) {
 				RespawnLocation location = null;
