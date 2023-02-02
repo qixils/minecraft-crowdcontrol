@@ -34,6 +34,7 @@ import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
+import static dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil.csIdOf;
 
 @Getter
 public class SummonEntityCommand extends ImmediateCommand {
@@ -60,7 +61,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 		super(plugin);
 		this.entityType = entityType;
 		this.isMonster = entityType.category().equals(EntityCategories.MONSTER.get());
-		this.effectName = "entity_" + entityType.key(RegistryTypes.ENTITY_TYPE).value();
+		this.effectName = "entity_" + csIdOf(entityType.key(RegistryTypes.ENTITY_TYPE));
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType);
 
 		// pre-compute the map of valid armor pieces

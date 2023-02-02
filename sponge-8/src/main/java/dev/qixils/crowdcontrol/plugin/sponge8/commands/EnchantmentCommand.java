@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.Slot;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -21,6 +20,8 @@ import org.spongepowered.api.registry.RegistryTypes;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil.csIdOf;
+
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
 	private final Component displayName;
@@ -32,7 +33,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		super(plugin);
 		this.enchantmentType = enchantmentType;
 		this.maxLevel = enchantmentType.maximumLevel();
-		this.effectName = "enchant_" + SpongeTextUtil.csIdOf(enchantmentType.key(RegistryTypes.ENCHANTMENT_TYPE));
+		this.effectName = "enchant_" + csIdOf(enchantmentType.key(RegistryTypes.ENCHANTMENT_TYPE));
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
 				((TranslatableComponent) enchantmentType.asComponent()).args(Component.text(enchantmentType.maximumLevel()))

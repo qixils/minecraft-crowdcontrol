@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
+import static dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil.csIdOf;
 
 @Getter
 public class RemoveEntityCommand extends ImmediateCommand {
@@ -29,7 +30,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<?> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + entityType.key(RegistryTypes.ENTITY_TYPE).value();
+		this.effectName = "remove_entity_" + csIdOf(entityType.key(RegistryTypes.ENTITY_TYPE));
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType);
 	}
 

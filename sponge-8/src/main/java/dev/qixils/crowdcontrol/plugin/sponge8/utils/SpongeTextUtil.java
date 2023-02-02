@@ -26,9 +26,19 @@ public class SpongeTextUtil extends TextUtilImpl {
 	public static String csIdOf(Key type) {
 		String value = type.value();
 		if (!type.namespace().equals(MINECRAFT_NAMESPACE))
-			return value;
+			return type.namespace() + "_" + type.value();
 
 		switch (value) {
+			case "lightning_bolt":
+				return "lightning";
+			case "chest_minecart":
+				return "minecart_chest";
+			case "mooshroom":
+				return "mushroom_cow";
+			case "tnt":
+				return "primed_tnt";
+			case "snow_golem":
+				return "snowman";
 			case "binding_curse":
 				return "curse_of_binding";
 			case "vanishing_curse":
