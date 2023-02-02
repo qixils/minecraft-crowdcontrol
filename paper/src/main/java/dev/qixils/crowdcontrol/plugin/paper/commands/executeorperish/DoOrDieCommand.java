@@ -84,7 +84,7 @@ public class DoOrDieCommand extends VoidCommand {
 
 						if (isTimeUp)
 							task.cancel();
-					}, 0, 2);
+					}, 1, 2);
 
 					announce(players, request);
 					return null;

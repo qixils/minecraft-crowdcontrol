@@ -69,6 +69,7 @@ public class DoOrDieCommand extends VoidCommand {
 
 					AtomicInteger pastValue = new AtomicInteger(0);
 					plugin.getSyncScheduler().submit(Task.builder()
+							.delay(Ticks.of(1))
 							.interval(Ticks.of(2))
 							.execute(task -> {
 								long ticksElapsed = server.runningTimeTicks().ticks() - startedAt;

@@ -67,6 +67,7 @@ public class DoOrDieCommand extends VoidCommand {
 
 					AtomicInteger pastValue = new AtomicInteger(0);
 					Task.builder()
+							.delayTicks(1)
 							.intervalTicks(2)
 							.execute(task -> {
 								int ticksElapsed = server.getRunningTimeTicks() - startedAt;
