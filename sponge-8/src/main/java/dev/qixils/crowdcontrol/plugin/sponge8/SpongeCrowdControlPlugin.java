@@ -38,7 +38,6 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
@@ -67,7 +66,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	// keys
 	public static Key<Value<String>> ORIGINAL_DISPLAY_NAME; // TODO: report inability to serialize components
 	public static Key<Value<Boolean>> VIEWER_SPAWNED;
-	public static Key<Value<GameMode>> GAME_MODE_EFFECT;
+	public static Key<Value<ResourceKey>> GAME_MODE_EFFECT;
 	// "real" variables
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Logger logger = LoggerFactory.getLogger("crowd-control");
@@ -188,7 +187,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 				.key(ResourceKey.of(pluginContainer, "viewer_spawned"))
 				.build();
 		GAME_MODE_EFFECT = Key.builder()
-				.elementType(GameMode.class)
+				.elementType(ResourceKey.class)
 				.key(ResourceKey.of(pluginContainer, "game_mode_effect"))
 				.build();
 

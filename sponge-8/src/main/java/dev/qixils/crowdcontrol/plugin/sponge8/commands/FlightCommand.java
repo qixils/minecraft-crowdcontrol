@@ -65,6 +65,7 @@ public class FlightCommand extends TimedVoidCommand {
 					sync(() -> players.forEach(player -> {
 						player.offer(Keys.CAN_FLY, false);
 						player.offer(Keys.IS_FLYING, false);
+						// TODO mini fling up
 					}));
 				})
 				.build().queue();

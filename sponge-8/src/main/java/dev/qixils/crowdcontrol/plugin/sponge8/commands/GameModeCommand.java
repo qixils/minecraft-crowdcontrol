@@ -33,7 +33,7 @@ public class GameModeCommand extends TimedVoidCommand {
 		super(plugin);
 		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = gamemode.asComponent(); // TODO: figure out if this is the right lang key
+		this.displayName = gamemode.asComponent();
 		this.effectName = gamemode.key(RegistryTypes.GAME_MODE).value() + "_mode";
 	}
 
@@ -66,7 +66,7 @@ public class GameModeCommand extends TimedVoidCommand {
 			if (request == null)
 				player.remove(GAME_MODE_EFFECT);
 			else
-				player.offer(GAME_MODE_EFFECT, gamemode);
+				player.offer(GAME_MODE_EFFECT, gamemode.key(RegistryTypes.GAME_MODE));
 		}));
 	}
 
