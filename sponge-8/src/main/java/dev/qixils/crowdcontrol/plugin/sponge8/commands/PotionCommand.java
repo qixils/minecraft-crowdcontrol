@@ -85,7 +85,11 @@ public class PotionCommand extends TimedImmediateCommand {
 							newAmplifier -= 1; // don't mess with gravity effects
 
 						effects.set(i, PotionEffect.builder()
-								.from(existingEffect)
+								//.from(existingEffect) | broken in API 8 and 9, begin workaround
+								.potionType(existingEffect.type())
+								.ambient(existingEffect.isAmbient())
+								.showParticles(existingEffect.showsParticles())
+								//.showIcon(existingEffect.showIcon()) | broken in API 8 and 9, end workaround
 								.duration(Ticks.of(newDuration))
 								.amplifier(newAmplifier)
 								.build());
