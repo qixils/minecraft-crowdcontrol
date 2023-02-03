@@ -5,6 +5,7 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
 import net.kyori.adventure.util.UTF8ResourceBundleControl;
+import net.kyori.examination.Examinable;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
@@ -36,12 +37,25 @@ public class KyoriTranslator {
 	private static final Logger logger = LoggerFactory.getLogger(KyoriTranslator.class);
 	private static volatile boolean initialized = false;
 
+	private static int countRegisteredLocales(TranslationRegistry translator) {
+		Set<Locale> locales = new HashSet<>();
+		if (!(translator instanceof Examinable))
+			return -1;
+		// TODO figure out how to use Examiner
+		return -1;//locales.size();
+	}
+
 	private static void register(Locale locale, TranslationRegistry translator, @Nullable ClassLoader classLoader) {
 		if (classLoader == null)
 			classLoader = KyoriTranslator.class.getClassLoader();
 		ResourceBundle bundle = ResourceBundle.getBundle("i18n.CrowdControl", locale, classLoader, UTF8ResourceBundleControl.get());
+		int registeredLocales = countRegisteredLocales(translator);
 		translator.registerAll(locale, bundle, false);
-		logger.info("Registered locale " + locale);
+
+		if (registeredLocales > -1 && registeredLocales == countRegisteredLocales(translator))
+			logger.warn("Failed to register locale " + locale);
+		else
+			logger.info("Registered locale " + locale);
 	}
 
 	private static void register(String file, TranslationRegistry translator, @Nullable ClassLoader classLoader) {
@@ -144,6 +158,8 @@ public class KyoriTranslator {
 			for (ClassLoader classLoader : classLoaders) {
 				try {
 					List<String> files = getResourceFiles(directory, classLoader);
+					if (files.isEmpty())
+						throw new IllegalStateException("Could not load language files (directory does not exist)");
 					for (String file : files)
 						register(file, translator, classLoader);
 					return true;
@@ -164,12 +180,15 @@ public class KyoriTranslator {
 					if (dir == null)
 						throw new IllegalStateException("Could not load language files (directory does not exist)");
 					try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-						for (Path file : stream)
-							register(file.getFileName().toString(), translator, classLoader);
+						Iterator<Path> iterator = stream.iterator();
+						if (!iterator.hasNext())
+							throw new IllegalStateException("Could not load language files (directory is empty)");
+						while (iterator.hasNext())
+							register(iterator.next().getFileName().toString(), translator, classLoader);
 					}
 					return true;
-				} catch (Exception ignored) {
-					// logger.debug("Could not load language files");
+				} catch (Exception e) {
+					logger.debug("Could not load language files", e);
 				}
 			}
 		}
@@ -190,9 +209,9 @@ public class KyoriTranslator {
 		List<String> directories = Arrays.asList("/i18n/", "i18n/");
 		List<ClassLoader> classLoaders = new ArrayList<>(secondaryClassLoaders.length + 3);
 		classLoaders.add(KyoriTranslator.class.getClassLoader());
-		classLoaders.add(ClassLoader.getSystemClassLoader());
-		classLoaders.add(Thread.currentThread().getContextClassLoader());
 		classLoaders.addAll(Arrays.asList(secondaryClassLoaders));
+		classLoaders.add(Thread.currentThread().getContextClassLoader());
+		classLoaders.add(ClassLoader.getSystemClassLoader());
 
 		// load locales
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
