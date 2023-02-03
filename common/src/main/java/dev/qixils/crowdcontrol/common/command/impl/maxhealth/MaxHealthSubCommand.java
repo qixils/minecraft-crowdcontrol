@@ -42,7 +42,7 @@ public class MaxHealthSubCommand<P> implements ImmediateCommand<P> {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
 			double current = player.maxHealthOffset();
 			double newVal = Math.max(-MIN_MAX_HEALTH, current - amount);
-			if ((current - newVal) == -amount) {
+			if ((current - newVal) == amount) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				player.maxHealthOffset(newVal);
 			}
