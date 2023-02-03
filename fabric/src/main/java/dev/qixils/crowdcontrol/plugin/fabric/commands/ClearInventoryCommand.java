@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.InventoryUtil;
@@ -14,7 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@SuppressWarnings("ReferenceToMixin")
+import static dev.qixils.crowdcontrol.plugin.fabric.commands.KeepInventoryCommand.globalKeepInventory;
+
 @Getter
 public class ClearInventoryCommand extends ImmediateCommand {
 	private final String effectName = "clear_inventory";
@@ -48,5 +50,12 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			sync(inv::clearContent);
 		}
 		return resp;
+	}
+
+	@Override
+	public TriState isSelectable() {
+		if (!plugin.isGlobal())
+			return TriState.TRUE;
+		return globalKeepInventory ? TriState.FALSE : TriState.TRUE;
 	}
 }

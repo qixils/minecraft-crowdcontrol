@@ -8,6 +8,7 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import com.google.gson.Gson;
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
@@ -778,6 +779,24 @@ public interface Plugin<P, S> {
 	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
 
 	/**
+	 * Utility function to determine the most restrictive of the provided statuses.
+	 *
+	 * @param statuses statuses to compare
+	 * @return the most restrictive status
+	 */
+	@NotNull
+	static ResultType getMostRestrictiveStatus(ResultType... statuses) {
+		ResultType mostRestrictive = ResultType.VISIBLE;
+		for (ResultType status : statuses) {
+			if (status == ResultType.NOT_VISIBLE)
+				return status;
+			if (status == ResultType.NOT_SELECTABLE)
+				mostRestrictive = status;
+		}
+		return mostRestrictive;
+	}
+
+	/**
 	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
 	 *
 	 * @param service the service to send the packets to
@@ -792,8 +811,12 @@ public interface Plugin<P, S> {
 		for (Command<?> effect : commandRegister().getCommands()) {
 			if (effect.isClientOnly())
 				updateEffectVisibility(service, effect, clientVisible);
-			if (effect.isGlobal())
+			else if (effect.isGlobal())
 				updateEffectVisibility(service, effect, globalVisible);
+
+			TriState selectable = effect.isSelectable();
+			if (selectable != TriState.UNKNOWN)
+				updateEffectStatus(service, effect, selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE);
 		}
 	}
 

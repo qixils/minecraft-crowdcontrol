@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common.command;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.ClientOnly;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.Global;
@@ -336,5 +337,14 @@ public interface Command<P> {
 	 */
 	default boolean isGlobal() {
 		return getClass().isAnnotationPresent(Global.class);
+	}
+
+	/**
+	 * Whether this command should currently be selectable in the overlay.
+	 *
+	 * @return whether this effect is selectable
+	 */
+	default TriState isSelectable() {
+		return TriState.UNKNOWN;
 	}
 }

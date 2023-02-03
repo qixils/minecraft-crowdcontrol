@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -24,7 +25,7 @@ import static dev.qixils.crowdcontrol.common.util.sound.Sounds.LOSE_INVENTORY_AL
 @Getter
 public class KeepInventoryCommand extends ImmediateCommand {
 	private static final Set<UUID> keepingInventory = Collections.synchronizedSet(new HashSet<>(1));
-	private static boolean globalKeepInventory = false;
+	public static boolean globalKeepInventory = false;
 	private final boolean enable;
 	private final String effectName;
 
@@ -78,18 +79,27 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		if (enable) {
 			if (keepingInventory.addAll(uuids)) {
 				alert(players);
-				updateEffectVisibility(request);
+				//updateEffectVisibility(request);
 				return resp.type(ResultType.SUCCESS);
 			} else
 				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory enabled");
 		} else {
 			if (keepingInventory.removeAll(uuids)) {
 				alert(players);
-				updateEffectVisibility(request);
+				//updateEffectVisibility(request);
 				return resp.type(ResultType.SUCCESS);
 			} else
 				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory disabled");
 		}
+	}
+
+	@Override
+	public TriState isSelectable() {
+		if (!plugin.isGlobal())
+			return TriState.TRUE;
+		if (globalKeepInventory == enable)
+			return TriState.FALSE;
+		return TriState.TRUE;
 	}
 
 	// management of this command is handled by mixins

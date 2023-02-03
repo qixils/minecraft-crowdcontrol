@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -11,6 +12,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import static dev.qixils.crowdcontrol.plugin.paper.commands.KeepInventoryCommand.globalKeepInventory;
 
 @Getter
 public class ClearInventoryCommand extends ImmediateCommand {
@@ -36,5 +39,12 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			sync(inv::clear);
 		}
 		return resp;
+	}
+
+	@Override
+	public TriState isSelectable() {
+		if (!plugin.isGlobal())
+			return TriState.TRUE;
+		return globalKeepInventory ? TriState.FALSE : TriState.TRUE;
 	}
 }

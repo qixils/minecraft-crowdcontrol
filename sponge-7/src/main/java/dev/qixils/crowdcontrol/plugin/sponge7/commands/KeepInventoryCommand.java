@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -30,7 +31,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	private static final Set<UUID> keepingInventory = Collections.synchronizedSet(new HashSet<>(1));
 	private final boolean enable;
 	private final String effectName;
-	private static boolean globalKeepInventory = false;
+	public static boolean globalKeepInventory = false;
 
 	public KeepInventoryCommand(SpongeCrowdControlPlugin plugin, boolean enable) {
 		super(plugin);
@@ -87,18 +88,27 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		if (enable) {
 			if (keepingInventory.addAll(uuids)) {
 				alert(players);
-				updateEffectVisibility(request);
+				//updateEffectVisibility(request);
 				return resp.type(ResultType.SUCCESS);
 			} else
 				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory enabled");
 		} else {
 			if (keepingInventory.removeAll(uuids)) {
 				alert(players);
-				updateEffectVisibility(request);
+				//updateEffectVisibility(request);
 				return resp.type(ResultType.SUCCESS);
 			} else
 				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory disabled");
 		}
+	}
+
+	@Override
+	public TriState isSelectable() {
+		if (!plugin.isGlobal())
+			return TriState.TRUE;
+		if (globalKeepInventory == enable)
+			return TriState.FALSE;
+		return TriState.TRUE;
 	}
 
 	public static final class Manager {

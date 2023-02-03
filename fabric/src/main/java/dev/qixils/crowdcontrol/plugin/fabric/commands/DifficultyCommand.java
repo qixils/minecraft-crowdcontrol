@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
@@ -36,14 +37,12 @@ public class DifficultyCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Builder response = request.buildResponse()
-				.type(ResultType.FAILURE)
-				.message("Server difficulty is locked or already set to " + displayName);
+		Builder response = request.buildResponse().type(ResultType.SUCCESS);
 
 		if (plugin.server().getWorldData().isDifficultyLocked())
-			return response;
+			return response.type(ResultType.UNAVAILABLE).message("Server difficulty is locked");
 		if (plugin.server().getWorldData().getDifficulty() == difficulty)
-			return response;
+			return response.type(ResultType.FAILURE).message("Server difficulty is already set to " + displayName);
 
 		async(() -> {
 			for (Difficulty dif : Difficulty.values())
@@ -51,6 +50,15 @@ public class DifficultyCommand extends ImmediateCommand {
 		});
 
 		sync(() -> plugin.server().setDifficulty(difficulty, true));
-		return response.type(ResultType.SUCCESS).message("SUCCESS");
+		return response;
+	}
+
+	@Override
+	public TriState isSelectable() {
+		if (plugin.server().getWorldData().isDifficultyLocked())
+			return TriState.FALSE;
+		if (plugin.server().getWorldData().getDifficulty() == difficulty)
+			return TriState.FALSE;
+		return TriState.TRUE;
 	}
 }
