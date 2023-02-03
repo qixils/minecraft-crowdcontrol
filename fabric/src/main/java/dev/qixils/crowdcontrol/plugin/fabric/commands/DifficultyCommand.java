@@ -47,7 +47,7 @@ public class DifficultyCommand extends ImmediateCommand {
 
 		async(() -> {
 			for (Difficulty dif : Difficulty.values())
-				plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif == difficulty ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+				plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 		});
 
 		sync(() -> plugin.server().setDifficulty(difficulty, true));

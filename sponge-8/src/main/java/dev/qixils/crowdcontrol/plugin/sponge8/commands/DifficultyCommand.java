@@ -50,7 +50,7 @@ public class DifficultyCommand extends ImmediateCommand {
 				properties.setDifficulty(difficulty);
 				async(() -> {
 					for (Difficulty dif : plugin.registryIterable(RegistryTypes.DIFFICULTY))
-						plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif == difficulty ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+						plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 				});
 			}
 		}
