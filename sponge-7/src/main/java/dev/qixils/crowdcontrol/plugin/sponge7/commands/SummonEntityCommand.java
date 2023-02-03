@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
@@ -133,7 +134,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
 		Entity entity = player.getLocation().createEntity(entityType);
 		// set variables
-		entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(viewer));
+		entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(GlobalTranslator.render(viewer, player.getLocale())));
 		entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
 		entity.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
 		entity.offer(Keys.TREE_TYPE, randomElementFrom(plugin.getRegistry().getAllOf(TreeType.class)));

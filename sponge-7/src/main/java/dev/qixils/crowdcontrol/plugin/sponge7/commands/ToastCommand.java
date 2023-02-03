@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColor;
@@ -21,7 +22,6 @@ import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -52,7 +52,6 @@ public class ToastCommand extends ImmediateCommand {
 			DyeColors.BLACK
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
-	private final Text title = spongeSerializer.serialize(POPUP_TITLE);
 	private final String effectName = "toast";
 
 	public ToastCommand(SpongeCrowdControlPlugin plugin) {
@@ -71,7 +70,7 @@ public class ToastCommand extends ImmediateCommand {
 				Inventory inv = Inventory.builder()
 						.of(InventoryArchetypes.CHEST)
 						.listener(ClickInventoryEvent.class, event -> event.setCancelled(true))
-						.property(new InventoryTitle(title))
+						.property(new InventoryTitle(spongeSerializer.serialize(GlobalTranslator.render(POPUP_TITLE, player.getLocale()))))
 						.build(plugin);
 				sync(() -> player.openInventory(inv));
 
