@@ -12,6 +12,7 @@ import net.kyori.adventure.sound.Sound;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -47,7 +48,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get(), Sound.Emitter.self());
 	}
 
-	private void updateEffectVisibility(Respondable respondable) { // TODO: add to other impls (and check like difficulty too ig?)
+	private void updateEffectVisibility(@Nullable Respondable respondable) {
 		async(() -> {
 			plugin.updateEffectStatus(respondable, effectName, ResultType.NOT_SELECTABLE);
 			plugin.updateEffectStatus(respondable, "keep_inventory_" + (!enable ? "on" : "off"), ResultType.SELECTABLE);
