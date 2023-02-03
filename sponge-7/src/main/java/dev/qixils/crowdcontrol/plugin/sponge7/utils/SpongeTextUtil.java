@@ -59,8 +59,6 @@ public class SpongeTextUtil extends TextUtilImpl {
 		switch (value) {
 			case "villager_golem":
 				return "iron_golem";
-			case "web":
-				return "cobweb";
 			case "mooshroom":
 				return "mushroom_cow";
 			case "tnt":

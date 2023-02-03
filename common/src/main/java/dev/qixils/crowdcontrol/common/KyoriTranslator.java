@@ -218,7 +218,7 @@ public class KyoriTranslator {
 				.addClassLoaders(classLoaders.toArray(new ClassLoader[0]))
 				.addScanners(Scanners.Resources)
 				.forPackage("i18n"));
-		Set<String> resources = reflections.getResources(Pattern.compile("i18n/.+\\.properties"));
+		Set<String> resources = reflections.getResources(Pattern.compile("i18n/.+\\.properties")); // TODO: test on fabric, make sure i didn't break it
 
 		// try one of a million redundancies to load locales
 		// (this is probably over the top and i'm sure a lot of them aren't necessary and will never be used but. uh. oh well lol)

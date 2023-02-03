@@ -29,12 +29,20 @@ public class BlockCommand extends ImmediateCommand {
 		this(
 				plugin,
 				blockType,
-				"block_" + SpongeTextUtil.csIdOf(blockType),
+				"block_" + SpongeTextUtil.valueOf(blockType)
+		);
+	}
+
+	public BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName) {
+		this(
+				plugin,
+				blockType,
+				effectName,
 				Component.translatable("cc.effect.block.name", Component.translatable(blockType.getId()))
 		);
 	}
 
-	protected BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName, Component displayName) {
+	public BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName, Component displayName) {
 		super(plugin);
 		this.blockType = blockType;
 		this.effectName = effectName;

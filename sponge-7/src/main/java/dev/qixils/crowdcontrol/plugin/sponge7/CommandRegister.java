@@ -25,6 +25,7 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
@@ -112,7 +113,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 		));
 
 		// entity commands
-		for (EntityType entity : plugin.getRegistry().getAllOf(EntityType.class)) {
+		for (EntityType entity : new HashSet<>(plugin.getRegistry().getAllOf(EntityType.class))) { // for whatever reason there are some duplicated entities
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}
@@ -132,7 +133,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 			commands.add(new BlockCommand(plugin, block));
 		}
 		// cobweb is named differently in 1.12.2 & I'm not refactoring KeyedTag to support fallbacks
-		commands.add(new BlockCommand(plugin, BlockTypes.WEB));
+		commands.add(new BlockCommand(plugin, BlockTypes.WEB, "block_cobweb"));
 
 		for (BlockType block : setFallingBlocks) {
 			commands.add(new FallingBlockCommand(plugin, block));
