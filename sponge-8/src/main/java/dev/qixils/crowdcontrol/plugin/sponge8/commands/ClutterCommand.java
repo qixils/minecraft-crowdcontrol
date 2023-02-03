@@ -31,8 +31,8 @@ public class ClutterCommand extends ImmediateCommand {
 		int rows = inventory.rows();
 		int columns = inventory.columns();
 		List<Vector2i> allSlots = new ArrayList<>(rows * columns);
-		for (int x = 0; x < rows; x++) {
-			for (int y = 0; y < columns; y++) {
+		for (int x = 0; x < columns; x++) {
+			for (int y = 0; y < rows; y++) {
 				allSlots.add(Vector2i.from(x, y));
 			}
 		}
@@ -47,7 +47,6 @@ public class ClutterCommand extends ImmediateCommand {
 
 	private static Slot unwrap(@Nullable Slot slot, Vector2i pos) {
 		if (slot == null)
-			// TODO: this is being thrown, maybe breaking changes in API
 			throw new IndexOutOfBoundsException("Slot " + pos.x() + "," + pos.y() + " is out of bounds");
 		return slot;
 	}
@@ -79,7 +78,7 @@ public class ClutterCommand extends ImmediateCommand {
 					GridInventory gridInventory = inventory.asGrid();
 					Set<Vector2i> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
 
-					Vector2i heldItemSlot = Vector2i.from(3, inventory.hotbar().selectedSlotIndex());
+					Vector2i heldItemSlot = Vector2i.from(inventory.hotbar().selectedSlotIndex(), 3);
 					swappedSlots.add(heldItemSlot);
 					Vector2i swapItemWith = uniqueSlot(gridInventory, swappedSlots);
 					swappedSlots.add(swapItemWith);
