@@ -788,6 +788,7 @@ public interface Plugin<P, S> {
 		boolean clientVisible = getModdedPlayerCount() > 0;
 		boolean globalVisible = globalEffectsUsable();
 		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
+		updateEffectStatus(service, "swap", getAllPlayers().size() <= 1 ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 		for (Command<?> effect : commandRegister().getCommands()) {
 			if (effect.isClientOnly())
 				updateEffectVisibility(service, effect, clientVisible);
