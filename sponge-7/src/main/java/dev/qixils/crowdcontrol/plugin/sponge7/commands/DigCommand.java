@@ -36,14 +36,16 @@ public class DigCommand extends ImmediateCommand {
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 				for (int y = depth; y < 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
-						locations.add(playerLocation.add(x, y, z));
+						Location<World> block = playerLocation.add(x, y, z);
+						if (!block.getBlockType().equals(BlockTypes.AIR))
+							locations.add(block);
 					}
 				}
 			}
 		}
 
 		if (locations.isEmpty())
-			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any earthly blocks");
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any blocks");
 
 		sync(() -> {
 			for (Location<World> location : locations)

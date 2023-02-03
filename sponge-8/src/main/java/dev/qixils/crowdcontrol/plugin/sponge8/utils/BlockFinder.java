@@ -1,11 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.utils;
 
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
+import dev.qixils.crowdcontrol.common.util.CommonTags;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3i;
@@ -37,6 +39,10 @@ public final class BlockFinder extends AbstractBlockFinder<ServerLocation, Vecto
 
 	public static boolean isReplaceable(BlockState block) {
 		return isProperty(block, Keys.IS_REPLACEABLE, false);
+	}
+
+	public static boolean isAir(BlockState block) {
+		return CommonTags.AIR.contains(block.type().key(RegistryTypes.BLOCK_TYPE));
 	}
 
 	public static BlockFinderBuilder builder() {

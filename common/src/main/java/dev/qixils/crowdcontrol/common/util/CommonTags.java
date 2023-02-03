@@ -61,6 +61,15 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "gravel")
 	);
 
+	/**
+	 * Air blocks.
+	 */
+	public static final KeyedTag AIR = new KeyedTag(
+			Key.key(MINECRAFT_NAMESPACE, "air"),
+			Key.key(MINECRAFT_NAMESPACE, "cave_air"),
+			Key.key(MINECRAFT_NAMESPACE, "void_air")
+	);
+
 	private CommonTags() {
 		throw new IllegalStateException("Utility class");
 	}

@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -36,7 +37,9 @@ public class DigCommand extends ImmediateCommand {
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 				for (int y = depth; y < 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
-						locations.add(playerLocation.add(x, y, z));
+						ServerLocation block = playerLocation.add(x, y, z);
+						if (!BlockFinder.isAir(block.block()))
+							locations.add(block);
 					}
 				}
 			}

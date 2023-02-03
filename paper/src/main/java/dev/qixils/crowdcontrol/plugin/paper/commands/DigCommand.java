@@ -34,14 +34,16 @@ public class DigCommand extends ImmediateCommand {
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 				for (int y = depth; y < 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
-						blocks.add(playerLocation.clone().add(x, y, z));
+						Location block = playerLocation.clone().add(x, y, z);
+						if (!block.getBlock().isEmpty())
+							blocks.add(block);
 					}
 				}
 			}
 		}
 
 		if (blocks.isEmpty())
-			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any earthly blocks");
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any blocks");
 
 		sync(() -> {
 			for (Location location : blocks)
