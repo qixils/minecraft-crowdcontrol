@@ -100,7 +100,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 
 	@Override
 	public TriState isSelectable() {
-		if (!plugin.isGlobal())
+		if (!plugin.globalEffectsUsable())
 			return TriState.TRUE;
 		if (globalKeepInventory == enable)
 			return TriState.FALSE;
