@@ -29,6 +29,7 @@ public class RespawnCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		// TODO: this is always going to the world spawn, not the player's bed spawn
 		sync(() -> {
 			for (Player player : players) {
 				if (player.respawnPlayer())
