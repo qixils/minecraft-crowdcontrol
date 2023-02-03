@@ -20,7 +20,7 @@ public enum Condition {
 	STAND_ON_A_PLANK(new StandOnBlockCondition(0, "plank", BlockTypes.PLANKS)),
 	OBTAIN_STONE_HOE(new ObtainItemCondition(1, "generic", ItemTypes.STONE_HOE)),
 	OBTAIN_WOODEN_HOE(new ObtainItemCondition(0, "generic", ItemTypes.WOODEN_HOE)),
-	OBTAIN_STONE(new ObtainItemCondition(3, "generic_block", ItemTypes.STONE)),
+	OBTAIN_STONE(new ObtainItemCondition(3, "generic_block", ItemTypes.STONE, BlockTypes.STONE)),
 	;
 
 	private static final List<SuccessCondition> CONDITIONS;
