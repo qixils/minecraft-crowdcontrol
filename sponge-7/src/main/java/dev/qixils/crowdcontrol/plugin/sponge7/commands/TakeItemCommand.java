@@ -101,10 +101,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (request.getParameters() == null)
-			return request.buildResponse().type(Response.ResultType.UNAVAILABLE).message("CC is improperly configured and failing to send parameters");
-
-		int amount = (int) (double) request.getParameters()[0];
+		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
 
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
