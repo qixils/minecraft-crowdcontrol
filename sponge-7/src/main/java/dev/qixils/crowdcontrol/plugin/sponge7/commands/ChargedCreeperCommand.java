@@ -14,6 +14,7 @@ import org.spongepowered.api.entity.living.player.Player;
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
 	private final String effectName = "entity_charged_creeper";
+	private final Component displayName = getDefaultDisplayName();
 
 	public ChargedCreeperCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin, EntityTypes.CREEPER);
