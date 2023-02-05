@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
@@ -12,6 +13,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -35,21 +37,30 @@ public class DifficultyCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		boolean success = false;
-		for (World world : plugin.getServer().getWorlds()) {
-			if (world.getDifficulty() != difficulty) {
-				success = true;
-				world.setDifficulty(difficulty);
-			}
-		}
+		if (difficulty.equals(getCurrentDifficulty()))
+			return request.buildResponse().type(ResultType.FAILURE).message("Server difficulty is already on " + plugin.getTextUtil().asPlain(displayName));
+		sync(() -> plugin.getServer().getWorlds().forEach(world -> world.setDifficulty(difficulty)));
+		async(() -> {
+			for (Difficulty dif : Difficulty.values())
+				plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+		});
+		return request.buildResponse().type(ResultType.SUCCESS);
+	}
 
-		if (success) {
-			async(() -> {
-				for (Difficulty dif : Difficulty.values())
-					plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
-			});
-			return request.buildResponse().type(ResultType.SUCCESS);
-		} else
-			return request.buildResponse().type(ResultType.FAILURE).message("World is already on that difficulty");
+	@Nullable
+	private Difficulty getCurrentDifficulty() {
+		Difficulty difficulty = null;
+		for (World world : plugin.getServer().getWorlds()) {
+			if (difficulty == null)
+				difficulty = world.getDifficulty();
+			else if (!difficulty.equals(world.getDifficulty()))
+				return null;
+		}
+		return difficulty;
+	}
+
+	@Override
+	public TriState isSelectable() {
+		return difficulty.equals(getCurrentDifficulty()) ? TriState.FALSE : TriState.TRUE;
 	}
 }
