@@ -20,7 +20,7 @@ public class FallingBlockCommand extends BlockCommand {
 				plugin,
 				blockType,
 				"falling_block_" + SpongeTextUtil.valueOf(blockType),
-				Component.translatable("cc.effect.falling_block.name", Component.translatable(blockType.getId()))
+				Component.translatable("cc.effect.falling_block.name", Component.translatable(blockType.getTranslation().getId()))
 		);
 	}
 
