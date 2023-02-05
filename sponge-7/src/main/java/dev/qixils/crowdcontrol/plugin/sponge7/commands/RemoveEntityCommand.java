@@ -30,7 +30,7 @@ public class RemoveEntityCommand extends ImmediateCommand {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + SpongeTextUtil.csIdOf(entityType);
-		this.displayName = Component.translatable("cc.effect.remove_entity.name", Component.translatable(entityType.getTranslation().getId()));
+		this.displayName = Component.translatable("cc.effect.remove_entity.name", SpongeTextUtil.getFixedName(entityType));
 	}
 
 	private boolean removeEntityFrom(Player player) {

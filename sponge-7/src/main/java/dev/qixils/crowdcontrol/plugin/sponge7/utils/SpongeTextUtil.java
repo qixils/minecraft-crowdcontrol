@@ -21,6 +21,8 @@ public class SpongeTextUtil extends TextUtilImpl {
 			return Component.translatable("cc.entity.furnace_minecart.name");
 		if (translatable.equals(EntityTypes.TNT_MINECART))
 			return Component.translatable("cc.entity.tnt_minecart.name");
+		if (translatable.equals(EntityTypes.RIDEABLE_MINECART))
+			return Component.translatable("cc.entity.rideable_minecart.name");
 		if (translatable.equals(EntityTypes.LIGHTNING))
 			return Component.translatable("cc.entity.lightning.name");
 		return Component.translatable(translatable.getTranslation().getId());
