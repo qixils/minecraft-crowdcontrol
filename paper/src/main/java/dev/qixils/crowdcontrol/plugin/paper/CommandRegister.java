@@ -89,6 +89,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 
 		// entity commands
 		for (EntityType entity : EntityType.values()) {
+			if (entity == EntityType.UNKNOWN) continue;
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}
@@ -104,8 +105,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// block sets
-		for (Material SET_BLOCK : SET_BLOCKS) {
-			commands.add(new BlockCommand(plugin, SET_BLOCK));
+		for (Material block : SET_BLOCKS) {
+			commands.add(new BlockCommand(plugin, block));
 		}
 
 		for (Material block : SET_FALLING_BLOCKS) {
@@ -117,7 +118,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			try {
 				commands.add(new EnchantmentCommand(plugin, enchantment));
 			} catch (AbstractMethodError ignored) {
-				// ignore enchants that do not implement the Adventure/Paper API
+				plugin.getSLF4JLogger().warn("Enchantment " + enchantment.key() + " does not implement the Adventure/Paper API. Ignoring.");
 			}
 		}
 
