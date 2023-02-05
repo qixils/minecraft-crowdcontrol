@@ -19,6 +19,8 @@ import org.spongepowered.api.world.World;
 
 import java.util.List;
 
+import static net.kyori.adventure.text.Component.translatable;
+
 @Getter
 public class BlockCommand extends ImmediateCommand {
 	private final BlockType blockType;
@@ -38,7 +40,7 @@ public class BlockCommand extends ImmediateCommand {
 				plugin,
 				blockType,
 				effectName,
-				Component.translatable("cc.effect.block.name", Component.translatable(blockType.getId()))
+				translatable("cc.effect.block.name", translatable(blockType.getTranslation().getId()))
 		);
 	}
 
