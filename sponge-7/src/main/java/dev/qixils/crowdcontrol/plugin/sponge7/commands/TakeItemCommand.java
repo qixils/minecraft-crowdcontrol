@@ -42,13 +42,16 @@ public class TakeItemCommand extends ImmediateCommand {
 		this.goldenAppleType = goldenAppleType;
 		this.item = item;
 
+		Component arg;
 		if (goldenAppleType == null || goldenAppleType.equals(GoldenApples.GOLDEN_APPLE)) {
 			this.effectName = "take_" + SpongeTextUtil.valueOf(item);
-			this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", Component.translatable(item.getTranslation().getId()));
+			arg = Component.translatable(item.getTranslation().getId());
 		} else {
 			this.effectName = "take_enchanted_golden_apple";
-			this.defaultDisplayName = super.getDefaultDisplayName();
+			arg = Component.translatable("cc.item.enchanted_golden_apple.name");
 		}
+
+		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", arg);
 	}
 
 	public TakeItemCommand(@NotNull SpongeCrowdControlPlugin plugin, @NotNull ItemType item) {

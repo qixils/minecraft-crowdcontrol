@@ -39,11 +39,11 @@ public class GiveItemCommand extends ImmediateCommand {
 		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", Component.translatable(item.getTranslation().getId()));
 	}
 
-	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemStack item, String effectName) {
+	public GiveItemCommand(SpongeCrowdControlPlugin plugin, ItemStack item, String effectName, Component arg) {
 		super(plugin);
 		this.item = item.createSnapshot();
 		this.effectName = effectName;
-		this.defaultDisplayName = super.getDefaultDisplayName();
+		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", arg);
 	}
 
 	@Override

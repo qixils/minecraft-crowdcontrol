@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.TypedTag;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -103,7 +104,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 						.quantity(1)
 						.add(Keys.GOLDEN_APPLE_TYPE, GoldenApples.ENCHANTED_GOLDEN_APPLE)
 						.build(),
-						"give_enchanted_golden_apple"
+						"give_enchanted_golden_apple",
+						Component.translatable("cc.item.enchanted_golden_apple.name")
 				),
 				new TakeItemCommand(plugin, ItemTypes.GOLDEN_APPLE, GoldenApples.ENCHANTED_GOLDEN_APPLE),
 				GravityCommand.zero(plugin),

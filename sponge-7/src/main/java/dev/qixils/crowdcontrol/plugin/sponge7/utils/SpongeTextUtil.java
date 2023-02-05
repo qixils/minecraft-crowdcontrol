@@ -81,6 +81,10 @@ public class SpongeTextUtil extends TextUtilImpl {
 				return "minecart_hopper";
 			case "tnt_minecart":
 				return "minecart_tnt";
+			case "binding_curse":
+				return "curse_of_binding";
+			case "vanishing_curse":
+				return "curse_of_vanishing";
 			default:
 				return value;
 		}
