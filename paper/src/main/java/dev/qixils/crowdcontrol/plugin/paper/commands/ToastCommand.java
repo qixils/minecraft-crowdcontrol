@@ -64,7 +64,7 @@ public class ToastCommand extends ImmediateCommand implements Listener {
 				player.discoverRecipes(recipes);
 
 				// actual pop-up
-				Inventory inv = Bukkit.getServer().createInventory(player, INVENTORY_SIZE, POPUP_TITLE);
+				Inventory inv = Bukkit.getServer().createInventory(player, INVENTORY_SIZE, plugin.renderForPlayer(POPUP_TITLE, player));
 				openInventories.put(player.getUniqueId(), inv);
 				sync(() -> player.openInventory(inv));
 

@@ -11,7 +11,6 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -176,7 +175,7 @@ public class LootboxCommand extends ImmediateCommand {
 		for (Player player : players) {
 			Inventory lootbox = Inventory.builder()
 					.of(ARCHETYPE)
-					.property(new InventoryTitle(spongeSerializer.serialize(GlobalTranslator.render(buildLootboxTitle(plugin, request), player.getLocale()))))
+					.property(new InventoryTitle(spongeSerializer.serialize(plugin.renderForPlayer(buildLootboxTitle(plugin, request), player))))
 					.build(plugin);
 
 			// add items
@@ -185,7 +184,7 @@ public class LootboxCommand extends ImmediateCommand {
 				ItemStack itemStack = createRandomItem(luck);
 				itemStack.offer(
 						Keys.ITEM_LORE,
-						Collections.singletonList(spongeSerializer.serialize(GlobalTranslator.render(buildLootboxLore(plugin, request), player.getLocale())))
+						Collections.singletonList(spongeSerializer.serialize(plugin.renderForPlayer(buildLootboxLore(plugin, request), player)))
 				);
 
 				// the custom inventory does not implement anything sensible so enjoy this hack

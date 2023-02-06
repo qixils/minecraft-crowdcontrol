@@ -22,8 +22,8 @@ class CommandSourceMapper<E extends CommandSource> implements EntityMapper<E> {
 	@NotNull
 	public Audience asAudience(@NotNull CommandSource source) {
 		if (source instanceof Player)
-			return plugin.adventure().player((Player) source);
-		return plugin.adventure().receiver(source);
+			return plugin.translator().player(((Player) source).getUniqueId());
+		return plugin.translator().wrap(plugin.adventure().receiver(source));
 	}
 
 	@Override

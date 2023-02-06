@@ -1,5 +1,6 @@
 val crowdControlVersion: String by project
 val adventureVersion: String by project
+val adventurePlatformVersion: String by project
 val cloudVersion: String by project
 val reflectionsVersion: String by project
 
@@ -7,6 +8,8 @@ dependencies {
     api("com.google.guava:guava:31.1-jre")
     api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
     api("net.kyori:adventure-api:$adventureVersion")
+    api("net.kyori:adventure-platform-api:$adventurePlatformVersion")
+    api("net.kyori:adventure-text-minimessage:$adventureVersion")
     api("net.kyori:adventure-text-serializer-plain:$adventureVersion")
     api("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
     api("cloud.commandframework:cloud-core:$cloudVersion")

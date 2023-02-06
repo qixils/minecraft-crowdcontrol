@@ -5,6 +5,7 @@ import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMa
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull Player entity) {
-		return plugin.adventure().player(entity);
+		return plugin.translator().player(entity.getUniqueId());
 	}
 
 	@Override
@@ -31,5 +32,10 @@ class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMa
 	@Override
 	public @NotNull Optional<Player> getPlayer(@NotNull UUID uuid) {
 		return plugin.getGame().getServer().getPlayer(uuid);
+	}
+
+	@Override
+	public @NotNull Optional<Locale> getLocale(@NotNull Player entity) {
+		return Optional.of(entity.getLocale());
 	}
 }

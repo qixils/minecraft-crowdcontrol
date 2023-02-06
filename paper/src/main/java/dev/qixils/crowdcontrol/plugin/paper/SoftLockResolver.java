@@ -4,11 +4,7 @@ import dev.qixils.crowdcontrol.common.SoftLockObserver;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.EnderDragonPart;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -60,7 +56,7 @@ public class SoftLockResolver extends SoftLockObserver<Player> implements Listen
 		// reset spawn point
 //		player.setBedSpawnLocation(null);
 		// inform player
-		player.sendMessage(ALERT);
+		plugin.translator().wrap(player).sendMessage(ALERT);
 	}
 
 	@EventHandler

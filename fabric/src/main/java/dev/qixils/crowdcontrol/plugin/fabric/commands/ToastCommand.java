@@ -59,12 +59,10 @@ public final class ToastCommand extends ImmediateCommand {
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private static final Map<UUID, ToastInventory> OPEN_INVENTORIES = new HashMap<>();
-	private static Component TITLE;
 	private final String effectName = "toast";
 
 	public ToastCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);
-		TITLE = plugin.adventure().toNative(POPUP_TITLE);
 	}
 
 	@Override
@@ -94,7 +92,7 @@ public final class ToastCommand extends ImmediateCommand {
 			Container container = new SimpleContainer(INVENTORY_SIZE);
 			ToastInventory toastInv = new ToastInventory(container);
 			toastInv.tick();
-			player.openMenu(new ToastMenuProvider(container));
+			player.openMenu(new ToastMenuProvider(container, plugin.adventure().toNative(plugin.renderForPlayer(POPUP_TITLE, player))));
 			OPEN_INVENTORIES.put(player.getUUID(), toastInv);
 		}));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
@@ -121,11 +119,11 @@ public final class ToastCommand extends ImmediateCommand {
 		}
 	}
 
-	private record ToastMenuProvider(@NotNull Container container) implements MenuProvider {
+	private record ToastMenuProvider(@NotNull Container container, @NotNull Component displayName) implements MenuProvider {
 		@Override
 		@NotNull
 		public Component getDisplayName() {
-			return TITLE;
+			return displayName;
 		}
 
 		@Override

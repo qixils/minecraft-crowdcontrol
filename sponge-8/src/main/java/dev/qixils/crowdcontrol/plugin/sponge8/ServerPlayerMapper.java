@@ -8,6 +8,7 @@ import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull ServerPlayer entity) {
-		return entity;
+		return plugin.translator().wrap(entity);
 	}
 
 	@Override
@@ -40,5 +41,10 @@ class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	@Override
 	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull UUID uuid) {
 		return plugin.getGame().server().player(uuid);
+	}
+
+	@Override
+	public @NotNull Optional<Locale> getLocale(@NotNull ServerPlayer entity) {
+		return Optional.of(entity.locale());
 	}
 }

@@ -8,7 +8,6 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColor;
@@ -70,7 +69,7 @@ public class ToastCommand extends ImmediateCommand {
 				Inventory inv = Inventory.builder()
 						.of(InventoryArchetypes.CHEST)
 						.listener(ClickInventoryEvent.class, event -> event.setCancelled(true))
-						.property(new InventoryTitle(spongeSerializer.serialize(GlobalTranslator.render(POPUP_TITLE, player.getLocale()))))
+						.property(new InventoryTitle(spongeSerializer.serialize(plugin.renderForPlayer(POPUP_TITLE, player))))
 						.build(plugin);
 				sync(() -> player.openInventory(inv));
 

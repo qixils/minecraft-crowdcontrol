@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
@@ -77,25 +78,26 @@ public class DoOrDieCommand extends VoidCommand {
 								for (UUID uuid : notCompleted) {
 									Player player = server.getPlayer(uuid).orElse(null);
 									if (player == null) continue;
+									Audience audience = plugin.asAudience(player);
 
 									if (finalCondition.hasSucceeded(player)) {
 										ItemStack item = plugin.commandRegister()
 												.getCommandByName("lootbox", LootboxCommand.class)
 												.createRandomItem(finalCondition.getRewardLuck());
-										plugin.asAudience(player).showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
+										audience.showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
 										notCompleted.remove(uuid);
 										Vector3d pos = player.getPosition();
-										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
+										audience.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
 										GiveItemCommand.giveItemTo(plugin, player, item.createSnapshot());
 									} else if (isTimeUp) {
-										plugin.asAudience(player).showTitle(DO_OR_DIE_FAILURE);
+										audience.showTitle(DO_OR_DIE_FAILURE);
 										player.offer(Keys.HEALTH, 0d);
 									} else {
 										Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-										plugin.asAudience(player).showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+										audience.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
 										if (isNewValue) {
 											Vector3d pos = player.getPosition();
-											plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_TICK.get(), pos.getX(), pos.getY(), pos.getZ());
+											audience.playSound(Sounds.DO_OR_DIE_TICK.get(), pos.getX(), pos.getY(), pos.getZ());
 										}
 									}
 								}

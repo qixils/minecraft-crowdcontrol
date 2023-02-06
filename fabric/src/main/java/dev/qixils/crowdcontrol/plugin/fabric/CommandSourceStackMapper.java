@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 public class CommandSourceStackMapper implements EntityMapper<CommandSourceStack> {
-	private final FabricCrowdControlPlugin plugin;
+	protected final FabricCrowdControlPlugin plugin;
 
 	protected CommandSourceStackMapper(FabricCrowdControlPlugin plugin) {
 		this.plugin = plugin;
@@ -21,7 +21,7 @@ public class CommandSourceStackMapper implements EntityMapper<CommandSourceStack
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull CommandSourceStack entity) {
-		return getPlugin().adventure().audience(entity);
+		return plugin.translator().wrap(entity);
 	}
 
 	@Override

@@ -34,7 +34,10 @@ public interface EntityMapper<E> {
 	@NotNull
 	default Audience asAudience(@NotNull E entity) {
 		if (entity instanceof Audience)
-			return (Audience) entity;
+			return getPlugin().translator().wrap((Audience) entity);
+		Optional<Audience> audience = getUniqueId(entity).map(id -> getPlugin().translator().player(id));
+		if (audience.isPresent())
+			return audience.get();
 		throw new UnsupportedOperationException("#asAudience is unsupported");
 	}
 
@@ -79,5 +82,16 @@ public interface EntityMapper<E> {
 				.anyMatch(host -> host.toLowerCase(Locale.ENGLISH)
 						.replace("-", "")
 						.equals(uuid));
+	}
+
+	/**
+	 * Fetches the locale of an entity.
+	 *
+	 * @param entity the entity to fetch the locale of
+	 * @return the locale of the entity
+	 */
+	@CheckReturnValue
+	default @NotNull Optional<Locale> getLocale(@NotNull E entity) {
+		return asAudience(entity).get(Identity.LOCALE);
 	}
 }

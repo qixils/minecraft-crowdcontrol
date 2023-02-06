@@ -71,7 +71,7 @@ public class ToastCommand extends ImmediateCommand {
 						.asViewable()
 						.orElseThrow(() -> new IllegalStateException("Could not create custom inventory"));
 				InventoryMenu menu = inv.asMenu();
-				menu.setTitle(POPUP_TITLE);
+				menu.setTitle(plugin.renderForPlayer(POPUP_TITLE, player));
 				menu.setReadOnly(true);
 				sync(() -> menu.open(player));
 

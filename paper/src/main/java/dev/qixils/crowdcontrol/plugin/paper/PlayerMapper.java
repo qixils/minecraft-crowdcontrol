@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,5 +26,10 @@ class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMa
 	@Override
 	public @NotNull Optional<Player> getPlayer(@NotNull UUID uuid) {
 		return Optional.ofNullable(plugin.getServer().getPlayer(uuid));
+	}
+
+	@Override
+	public @NotNull Optional<Locale> getLocale(@NotNull Player entity) {
+		return Optional.of(entity.locale());
 	}
 }

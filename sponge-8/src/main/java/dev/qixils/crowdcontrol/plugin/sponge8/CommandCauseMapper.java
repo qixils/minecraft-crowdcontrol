@@ -20,7 +20,7 @@ class CommandCauseMapper implements EntityMapper<CommandCause> {
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull CommandCause entity) {
-		return entity.audience();
+		return plugin.translator().wrap(entity.audience());
 	}
 
 	@Override

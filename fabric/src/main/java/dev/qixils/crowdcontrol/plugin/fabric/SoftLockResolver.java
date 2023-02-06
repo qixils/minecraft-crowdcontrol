@@ -72,7 +72,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 //		player.setRespawnPosition(Level.OVERWORLD, null, 0, false, false);
 
 		// alert player
-		player.sendMessage(ALERT);
+		plugin.translator().wrap(player).sendMessage(ALERT);
 	}
 
 	@Listener

@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.KyoriTranslator;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
@@ -78,6 +79,8 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper(this);
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
+	@Accessors(fluent = true)
+	private final KyoriTranslator translator = new KyoriTranslator(new NativeAudienceProvider(), getClass().getClassLoader(), dev.qixils.crowdcontrol.common.Plugin.class.getClassLoader());
 	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
 	private final HoconConfigurationLoader configLoader;
