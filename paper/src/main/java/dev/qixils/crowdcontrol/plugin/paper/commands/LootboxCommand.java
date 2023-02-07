@@ -178,12 +178,9 @@ public class LootboxCommand extends ImmediateCommand {
 					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
 				}
 				// create & add attribute
-				if (target == EquipmentSlot.HAND || target == EquipmentSlot.OFF_HAND) {
-					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.HAND));
-					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.OFF_HAND));
-				} else {
-					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, target));
-				}
+				itemMeta.addAttributeModifier(attribute, createModifier(name, amount, target));
+				if (target == EquipmentSlot.HAND)
+					itemMeta.addAttributeModifier(attribute, createModifier(name + "_offhand", amount, EquipmentSlot.OFF_HAND));
 			}
 		}
 

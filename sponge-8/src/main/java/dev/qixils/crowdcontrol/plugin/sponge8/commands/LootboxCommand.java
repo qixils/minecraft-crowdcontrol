@@ -208,11 +208,16 @@ public class LootboxCommand extends ImmediateCommand {
 						.operation(AttributeOperations.MULTIPLY_TOTAL)
 						.build();
 				EquipmentType equipmentType = itemStack.get(Keys.EQUIPMENT_TYPE).orElse(MAIN_HAND);
-				if (equipmentType.equals(MAIN_HAND) || equipmentType.equals(OFF_HAND)) {
-					itemStack.addAttributeModifier(attribute, attributeModifier, MAIN_HAND);
-					itemStack.addAttributeModifier(attribute, attributeModifier, OFF_HAND);
-				} else
-					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentType);
+				itemStack.addAttributeModifier(attribute, attributeModifier, equipmentType);
+				if (equipmentType.equals(MAIN_HAND)) {
+					AttributeModifier offHandAttributeModifier = AttributeModifier.builder()
+							.name(name + "_offhand")
+							.randomId()
+							.amount(amount)
+							.operation(AttributeOperations.MULTIPLY_TOTAL)
+							.build();
+					itemStack.addAttributeModifier(attribute, offHandAttributeModifier, OFF_HAND);
+				}
 			}
 		}
 	}

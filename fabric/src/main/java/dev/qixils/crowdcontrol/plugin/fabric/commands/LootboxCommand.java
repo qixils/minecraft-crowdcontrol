@@ -185,7 +185,7 @@ public class LootboxCommand extends ImmediateCommand {
 			// add custom attributes
 			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
-			for (int i = 0; i < attributeList.size() && i < attributes; ++i) {
+			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
 				Attribute attribute = attributeList.get(i);
 				String name = "lootbox_" + Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(attribute)).getPath();
 				// determine percent amount for the modifier
@@ -194,9 +194,10 @@ public class LootboxCommand extends ImmediateCommand {
 					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
 				}
 				// create & add attribute
-				AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name, amount, Operation.ADDITION);
-				for (EquipmentSlot type : equipmentSlots)
-					itemStack.addAttributeModifier(attribute, attributeModifier, type);
+				for (int k = 0; k < equipmentSlots.length; k++) {
+					AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name + "_" + k, amount, Operation.ADDITION);
+					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentSlots[k]);
+				}
 			}
 			// add default attributes
 			for (EquipmentSlot type : equipmentSlots) {
