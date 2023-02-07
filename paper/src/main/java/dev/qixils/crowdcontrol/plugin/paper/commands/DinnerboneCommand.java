@@ -49,8 +49,10 @@ public class DinnerboneCommand extends Command {
 				PersistentDataContainer data = entity.getPersistentDataContainer();
 				Component currentName = entity.customName();
 				if (DINNERBONE_COMPONENT.equals(currentName)) {
-					entity.customName(data.get(key, COMPONENT_TYPE));
-					entity.setCustomNameVisible(true);
+					Component savedName = data.get(key, COMPONENT_TYPE);
+					entity.customName(savedName);
+					if (savedName != null)
+						entity.setCustomNameVisible(true);
 					data.remove(key);
 				} else {
 					if (currentName != null)
