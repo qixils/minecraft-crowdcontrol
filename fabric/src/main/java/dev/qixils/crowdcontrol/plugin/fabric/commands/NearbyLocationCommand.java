@@ -114,10 +114,10 @@ abstract class NearbyLocationCommand<S> extends Command {
 					if (!world.getWorldBorder().isWithinBounds(destination.x(), destination.z()))
 						continue;
 					player.teleportTo(destination.x(), destination.y(), destination.z());
-					player.sendActionBar(Component.translatable(
+					player.sendActionBar(plugin.renderForPlayer(Component.translatable(
 							"cc.effect.nearby_location.output",
 							nameOf(searchType).color(NamedTextColor.YELLOW)
-					));
+					), player));
 					response.type(ResultType.SUCCESS).message("SUCCESS"); // technically this could still fail; unlikely tho.
 					break;
 				}
