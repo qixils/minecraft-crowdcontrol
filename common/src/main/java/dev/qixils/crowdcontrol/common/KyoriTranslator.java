@@ -77,7 +77,8 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 				.addClassLoaders(classLoaders.toArray(new ClassLoader[0]))
 				.addScanners(Scanners.Resources)
 				.forPackage("i18n"));
-		Set<String> resources = reflections.getResources(Pattern.compile("i18n/CrowdControl_.+\\.properties")); // TODO: test on fabric, make sure i didn't break it
+		Set<String> resources = new HashSet<>(reflections.getResources(Pattern.compile(".+\\.properties")));
+		resources.removeIf(s -> !s.startsWith("i18n/CrowdControl_") && !s.startsWith("/i18n/CrowdControl_"));
 
 		// try one of a million redundancies to load locales
 		// (this is probably over the top and i'm sure a lot of them aren't necessary and will never be used but. uh. oh well lol)
