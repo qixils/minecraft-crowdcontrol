@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+// TODO: prevent placing fire on non flammable blocks
+
 @Getter
 public class BlockCommand extends ImmediateCommand {
 	protected final Material material;
