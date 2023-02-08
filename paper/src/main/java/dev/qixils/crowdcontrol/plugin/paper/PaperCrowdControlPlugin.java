@@ -18,6 +18,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +27,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -143,6 +145,18 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		this.crowdControl = crowdControl;
 	}
 
+	@Contract("null -> null; !null -> !null")
+	private static Map<String, Integer> parseLimitConfigSection(@Nullable ConfigurationSection section) {
+		if (section == null)
+			return null;
+		Set<String> keys = section.getKeys(false);
+		Map<String, Integer> map = new HashMap<>(keys.size());
+		for (String key : keys) {
+			map.put(key, section.getInt(key));
+		}
+		return map;
+	}
+
 	@SneakyThrows
 	@Override
 	public void onEnable() {
@@ -159,10 +173,17 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		}
 
 		// limit config
-		boolean hostsBypass = config.getBoolean("limits.hosts-bypass", true);
-		Map<String, Integer> itemLimits = config.getObject("limits.items", Map.class);
-		Map<String, Integer> entityLimits = config.getObject("limits.entities", Map.class);
-		limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		ConfigurationSection limitSection = config.getConfigurationSection("limits");
+		if (limitSection == null) {
+			getSLF4JLogger().info("No limit config found, using defaults");
+			limitConfig = new LimitConfig();
+		} else {
+			getSLF4JLogger().info("Loading limit config");
+			boolean hostsBypass = limitSection.getBoolean("hosts-bypass", true);
+			Map<String, Integer> itemLimits = parseLimitConfigSection(limitSection.getConfigurationSection("items"));
+			Map<String, Integer> entityLimits = parseLimitConfigSection(limitSection.getConfigurationSection("entities"));
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		}
 
 		initCrowdControl();
 

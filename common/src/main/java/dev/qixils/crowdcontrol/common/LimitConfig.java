@@ -40,6 +40,7 @@ public final class LimitConfig {
 	 * Constructs an empty limit configuration.
 	 */
 	public LimitConfig() {
+		// TODO: better defaults
 		this(true, null, null);
 	}
 
@@ -70,5 +71,16 @@ public final class LimitConfig {
 	 */
 	public int getEntityLimit(@NotNull String entity) {
 		return entityLimits.getOrDefault(entity, entityDefaultLimit);
+	}
+
+	@Override
+	public String toString() {
+		return "LimitConfig{" +
+				"hostsBypass=" + hostsBypass +
+				", itemLimits=" + itemLimits +
+				", itemDefaultLimit=" + itemDefaultLimit +
+				", entityLimits=" + entityLimits +
+				", entityDefaultLimit=" + entityDefaultLimit +
+				'}';
 	}
 }
