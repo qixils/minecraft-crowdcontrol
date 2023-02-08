@@ -7,16 +7,21 @@ plugins {
     id("org.spongepowered.gradle.plugin")
 }
 
-//repositories {
+repositories {
 //    maven {
 //        name = "Sponge"
 //        url = uri("https://repo.spongepowered.org/")
 //    }
-//}
+
+    maven {
+        name = "Jitpack"
+        url = uri("https://jitpack.io")
+    }
+}
 
 dependencies {
     implementation(project(":configurate-common"))
-    implementation("cloud.commandframework:cloud-sponge:1.8.0-SNAPSHOT") // TODO: use cloudVersion variable
+    implementation("com.github.qixils:cloud:feature~sponge-SNAPSHOT") // TODO: use cloudVersion variable
     implementation("ch.qos.logback:logback-classic:$logbackVersion") // Sponge's version of log4j is too old to support slf4j 2.0
     compileOnly("org.spongepowered:spongeapi:8.1.0")
     //compileOnly("org.spongepowered:sponge:1.16.5-8.0.0-SNAPSHOT:dev")
