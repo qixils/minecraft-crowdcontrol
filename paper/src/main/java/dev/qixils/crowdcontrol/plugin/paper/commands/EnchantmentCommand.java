@@ -29,7 +29,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		super(plugin);
 		this.enchantment = enchantment;
 		this.effectName = "enchant_" + plugin.getTextUtil().translate(enchantment).replace(' ', '_');
-		this.displayName = Component.translatable("cc.effect.enchant.name", enchantment.displayName(enchantment.getMaxLevel()));
+		this.displayName = Component.translatable("cc.effect.enchant.name", enchantment.displayName(enchantment.getMaxLevel()).color(null));
 	}
 
 	@Override
