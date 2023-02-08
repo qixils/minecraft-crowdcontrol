@@ -27,11 +27,13 @@ public class ClearInventoryCommand extends ImmediateCommand {
 	@NotNull
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse()
-				.type(ResultType.FAILURE)
+				.type(ResultType.RETRY)
 				.message("All inventories are already empty or protected");
 		for (Player player : players) {
-			if (KeepInventoryCommand.isKeepingInventory(player))
+			if (KeepInventoryCommand.isKeepingInventory(player)) {
+				resp.type(ResultType.FAILURE);
 				continue;
+			}
 			PlayerInventory inv = player.getInventory();
 			if (inv.isEmpty())
 				continue;

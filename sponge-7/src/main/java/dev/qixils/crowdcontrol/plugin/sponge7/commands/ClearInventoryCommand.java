@@ -30,7 +30,10 @@ public class ClearInventoryCommand extends ImmediateCommand {
 				.type(ResultType.RETRY)
 				.message("All inventories are already empty or protected");
 		for (Player player : players) {
-			if (KeepInventoryCommand.isKeepingInventory(player)) continue;
+			if (KeepInventoryCommand.isKeepingInventory(player)) {
+				resp.type(ResultType.FAILURE);
+				continue;
+			}
 			CarriedInventory<?> inv = player.getInventory();
 			if (inv.size() == 0) continue;
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
