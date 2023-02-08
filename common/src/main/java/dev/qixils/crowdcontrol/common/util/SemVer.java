@@ -42,6 +42,22 @@ public final class SemVer implements Comparable<SemVer> {
 	private final int major;
 	private final int minor;
 	private final int patch;
+	private final boolean isSnapshot;
+
+	/**
+	 * Creates a new semantic version.
+	 *
+	 * @param major major version
+	 * @param minor minor version
+	 * @param patch patch version
+	 * @param isSnapshot whether this is a snapshot version
+	 */
+	public SemVer(int major, int minor, int patch, boolean isSnapshot) {
+		this.major = major;
+		this.minor = minor;
+		this.patch = patch;
+		this.isSnapshot = isSnapshot;
+	}
 
 	/**
 	 * Creates a new semantic version.
@@ -51,9 +67,7 @@ public final class SemVer implements Comparable<SemVer> {
 	 * @param patch patch version
 	 */
 	public SemVer(int major, int minor, int patch) {
-		this.major = major;
-		this.minor = minor;
-		this.patch = patch;
+		this(major, minor, patch, false);
 	}
 
 	/**
@@ -68,7 +82,19 @@ public final class SemVer implements Comparable<SemVer> {
 		try {
 			major = Integer.parseInt(parts[0]);
 			minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
-			patch = parts.length > 2 ? Integer.parseInt(parts[2].substring(0, parts[2].indexOf('-'))) : 0;
+			if (parts.length > 2) {
+				int dashIndex = parts[2].indexOf('-');
+				if (dashIndex == -1) {
+					patch = Integer.parseInt(parts[2]);
+					isSnapshot = false;
+				} else {
+					patch = Integer.parseInt(parts[2].substring(0, dashIndex));
+					isSnapshot = true;
+				}
+			} else {
+				patch = 0;
+				isSnapshot = false;
+			}
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid version string: " + version);
 		}
@@ -102,13 +128,30 @@ public final class SemVer implements Comparable<SemVer> {
 	}
 
 	/**
+	 * Returns whether this is a snapshot version.
+	 *
+	 * @return whether this is a snapshot version
+	 */
+	public boolean isSnapshot() {
+		return isSnapshot;
+	}
+
+	/**
 	 * Returns the version as a string.
 	 *
 	 * @return version string
 	 */
 	@Override
 	public String toString() {
-		return major + "." + minor + "." + patch;
+		StringBuilder builder = new StringBuilder()
+				.append(major)
+				.append('.')
+				.append(minor)
+				.append('.')
+				.append(patch);
+		if (isSnapshot)
+			builder.append("-SNAPSHOT");
+		return builder.toString();
 	}
 
 	/**
@@ -156,12 +199,12 @@ public final class SemVer implements Comparable<SemVer> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		SemVer other = (SemVer) o;
-		return major == other.major && minor == other.minor && patch == other.patch;
+		return major == other.major && minor == other.minor && patch == other.patch && isSnapshot == other.isSnapshot;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(major, minor, patch);
+		return Objects.hash(major, minor, patch, isSnapshot);
 	}
 
 	@Override
@@ -171,5 +214,6 @@ public final class SemVer implements Comparable<SemVer> {
 		if (minor != o.minor)
 			return minor - o.minor;
 		return patch - o.patch;
+		// snapshot versions are not very important
 	}
 }

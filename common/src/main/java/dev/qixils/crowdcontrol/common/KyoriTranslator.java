@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.platform.AudienceProvider;
@@ -96,6 +97,12 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 			logger.info("Manually loading locales");
 			for (Locale locale : LOCALES)
 				register(locale, null);
+		}
+
+		// register translator to global translator in production to mask any non-wrapped audiences
+		if (!SemVer.MOD.isSnapshot()) {
+			logger.info("Registering translator to global translator");
+			GlobalTranslator.translator().addSource(translator);
 		}
 	}
 
