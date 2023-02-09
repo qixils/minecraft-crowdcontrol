@@ -89,7 +89,7 @@ public final class SemVer implements Comparable<SemVer> {
 					isSnapshot = false;
 				} else {
 					patch = Integer.parseInt(parts[2].substring(0, dashIndex));
-					isSnapshot = Objects.equals(parts[2].substring(dashIndex + 1), "SNAPSHOT");
+					isSnapshot = parts[2].substring(dashIndex + 1).equals("SNAPSHOT");
 				}
 			} else {
 				patch = 0;
@@ -199,12 +199,12 @@ public final class SemVer implements Comparable<SemVer> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		SemVer other = (SemVer) o;
-		return major == other.major && minor == other.minor && patch == other.patch && isSnapshot == other.isSnapshot;
+		return major == other.major && minor == other.minor && patch == other.patch/* && isSnapshot == other.isSnapshot*/;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(major, minor, patch, isSnapshot);
+		return Objects.hash(major, minor, patch/*, isSnapshot*/);
 	}
 
 	@Override
@@ -214,6 +214,5 @@ public final class SemVer implements Comparable<SemVer> {
 		if (minor != o.minor)
 			return minor - o.minor;
 		return patch - o.patch;
-		// snapshot versions are not very important
 	}
 }
