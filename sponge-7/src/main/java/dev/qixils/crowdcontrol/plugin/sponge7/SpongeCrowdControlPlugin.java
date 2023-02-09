@@ -6,20 +6,15 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.common.AbstractPlugin;
-import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableGameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableOriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ImmutableViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedData;
-import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.ViewerSpawnedDataBuilder;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
+import dev.qixils.crowdcontrol.common.*;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.*;
+import dev.qixils.crowdcontrol.plugin.sponge7.mc.SpongePlayer;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 import net.kyori.adventure.text.serializer.spongeapi.SpongeComponentSerializer;
@@ -70,12 +65,7 @@ import org.spongepowered.api.world.World;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
@@ -83,7 +73,7 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 @Plugin(
 		id = "crowd-control",
 		name = "Crowd Control",
-		version = "3.2.0",
+		version = "3.3.0",
 		description = "Allows viewers to interact with your Minecraft world",
 		url = "https://github.com/qixils/minecraft-crowdcontrol",
 		authors = {"qixils"}
@@ -96,9 +86,16 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	public static Key<Value<GameMode>> GAME_MODE_EFFECT = DummyObjectProvider.createExtendedFor(Key.class, "GAME_MODE_EFFECT");
 	// "real" variables
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
-	private final CommandRegister register = new CommandRegister(this);
-	private final Sponge7TextUtil textUtil = new Sponge7TextUtil();
-	private final SpongePlayerMapper playerMapper = new SpongePlayerMapper(this);
+	@Accessors(fluent = true)
+	private final CommandRegister commandRegister = new CommandRegister(this);
+	private final SpongeTextUtil textUtil = new SpongeTextUtil();
+	@Accessors(fluent = true)
+	private final EntityMapper<CommandSource> commandSenderMapper = new CommandSourceMapper<>(this);
+	@Accessors(fluent = true)
+	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
+	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
+	@Accessors(fluent = true)
+	private final KyoriTranslator translator = new KyoriTranslator(this::adventure, getClass().getClassLoader(), dev.qixils.crowdcontrol.common.Plugin.class.getClassLoader());
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
@@ -167,31 +164,27 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	}
 
 	public @NotNull SpongeAudiences adventure() {
-		//noinspection ConstantConditions
-		if (audiences == null)
-			throw new IllegalStateException("Tried to access adventure before plugin loaded");
 		return audiences;
 	}
 
 	@Override
+	public @NotNull Audience getConsole() {
+		return adventure().console();
+	}
+
 	@NotNull
 	public Audience asAudience(@NotNull CommandSource source) {
-		if (source instanceof Player)
-			return adventure().player((Player) source);
-		return adventure().receiver(source);
+		return commandSenderMapper().asAudience(source);
+	}
+
+	@NotNull
+	public Audience asAudience(@NotNull Player player) {
+		return playerMapper().asAudience(player);
 	}
 
 	@NotNull
 	public Audience asAudience(@NotNull World world) {
-		return adventure().world(net.kyori.adventure.key.Key.key(MINECRAFT_NAMESPACE, world.getName()));
-	}
-
-	@Override
-	public boolean isAdmin(@NotNull CommandSource commandSource) {
-		if (commandSource.hasPermission(ADMIN_PERMISSION)) return true;
-		String uuid = getUUID(commandSource).map(id -> id.toString().toLowerCase(Locale.US).replace("-", "")).orElse(null);
-		if (uuid == null) return false;
-		return getHosts().stream().anyMatch(host -> host.toLowerCase(Locale.ENGLISH).replace("-", "").equals(uuid));
+		return translator().world(net.kyori.adventure.key.Key.key(MINECRAFT_NAMESPACE, world.getName()));
 	}
 
 	@Override
@@ -225,7 +218,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		}
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Listener
 	public void onKeyRegistration(GameRegistryEvent.Register<Key<?>> event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
@@ -286,11 +278,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 				.build();
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void initCrowdControl() {
-		CommandConstants.SOUND_VALIDATOR = key -> registry.getType(SoundType.class, key.asString()).isPresent();
-
 		ConfigurationNode config;
 		try {
 			config = configLoader.load();
@@ -304,9 +293,21 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			throw new RuntimeException("Could not parse 'hosts' config variable", e);
 		}
 
+		// limit config
+		boolean hostsBypass = config.getNode("limits", "hosts-bypass").getBoolean(true);
+		TypeToken<Map<String, Integer>> typeToken = new TypeToken<Map<String, Integer>>() {};
+		try {
+			Map<String, Integer> itemLimits = config.getNode("limits", "items").getValue(typeToken);
+			Map<String, Integer> entityLimits = config.getNode("limits", "entities").getValue(typeToken);
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		} catch (ObjectMappingException e) {
+			getSLF4JLogger().warn("Could not parse limits config", e);
+		}
+
 		global = config.getNode("global").getBoolean(false);
 		announce = config.getNode("announce").getBoolean(true);
 		adminRequired = config.getNode("admin-required").getBoolean(false);
+		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString("none"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
@@ -338,12 +339,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			crowdControl = CrowdControl.client().port(port).ip(ip).build();
 		}
 
-		register.register();
+		commandRegister.register();
+		postInitCrowdControl(crowdControl);
 	}
 
 	@SneakyThrows(IOException.class)
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
+		CommandConstants.SOUND_VALIDATOR = key -> registry.getType(SoundType.class, key.asString()).isPresent();
 		game.getEventManager().registerListeners(this, softLockResolver);
 		spongeSerializer = SpongeComponentSerializer.get();
 		scheduler = game.getScheduler();
@@ -354,7 +357,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		initCrowdControl();
 		commandManager = new SpongeCommandManager<>(
 				pluginContainer,
-				AsynchronousCommandExecutionCoordinator.<CommandSource>newBuilder()
+				AsynchronousCommandExecutionCoordinator.<CommandSource>builder()
 						.withAsynchronousParsing().withExecutor(asyncExecutor).build(),
 				Function.identity(),
 				Function.identity()
@@ -372,10 +375,15 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	@Listener
 	public void onConnection(ClientConnectionEvent.Join event) {
-		onPlayerJoin(event.getTargetEntity());
 		Platform platform = game.getPlatform();
 		if ((platform.getType().isClient() || platform.getExecutionType().isClient()) && clientHost == null) {
-			clientHost = event.getTargetEntity().getUniqueId().toString();
+			clientHost = event.getTargetEntity().getUniqueId().toString().toLowerCase(Locale.ENGLISH);
 		}
+		onPlayerJoin(event.getTargetEntity());
+	}
+
+	@Override
+	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
+		return new SpongePlayer(player);
 	}
 }

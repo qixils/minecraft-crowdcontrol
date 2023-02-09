@@ -19,7 +19,6 @@ import java.util.Set;
 @Getter
 public class GravelCommand extends ImmediateCommand {
 	private final String effectName = "gravel_hell";
-	private final String displayName = "Replace Area With Gravel";
 
 	public GravelCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

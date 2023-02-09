@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -21,7 +20,6 @@ import java.util.List;
 @Getter
 public class TeleportCommand extends ImmediateCommand {
 	private final String effectName = "chorus_fruit";
-	private final String displayName = "Eat Chorus Fruit";
 
 	public TeleportCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -45,7 +43,7 @@ public class TeleportCommand extends ImmediateCommand {
 			final Location<World> destination = tempDest.add(.5, 0, .5);
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			sync(() -> {
-				player.setLocation(destination.getBlockRelative(Direction.NONE));
+				player.setLocation(destination);
 				SpongeCrowdControlPlugin.spawnPlayerParticles(
 						player,
 						ParticleEffect.builder()

@@ -11,3 +11,9 @@ ij_formatter_tags_enabled = true
 
 [*.md]
 max_line_length = 100
+
+[*.cs]
+
+# CA1416: Validate platform compatibility
+# noinspection EditorConfigKeyCorrectness
+dotnet_diagnostic.CA1416.severity = none

@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -20,15 +21,16 @@ import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
+
 @Getter
+@EventListener
 public class ToastCommand extends ImmediateCommand {
-	private static final Text TITLE = Text.of("Pop-Up");
 	private static final ItemType ITEM = ItemTypes.STAINED_GLASS_PANE;
 	private static final DyeColor[] COLORS = new DyeColor[]{
 			DyeColors.BROWN,
@@ -50,7 +52,6 @@ public class ToastCommand extends ImmediateCommand {
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private final String effectName = "toast";
-	private final String displayName = "Annoying Pop-Ups";
 
 	public ToastCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -68,7 +69,7 @@ public class ToastCommand extends ImmediateCommand {
 				Inventory inv = Inventory.builder()
 						.of(InventoryArchetypes.CHEST)
 						.listener(ClickInventoryEvent.class, event -> event.setCancelled(true))
-						.property(new InventoryTitle(TITLE))
+						.property(new InventoryTitle(spongeSerializer.serialize(plugin.renderForPlayer(POPUP_TITLE, player))))
 						.build(plugin);
 				sync(() -> player.openInventory(inv));
 
@@ -99,10 +100,5 @@ public class ToastCommand extends ImmediateCommand {
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
-	}
-
-	@Override
-	public boolean isEventListener() {
-		return true;
 	}
 }

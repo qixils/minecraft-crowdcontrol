@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 public class SoundCommand extends ImmediateCommand {
 	private final String effectName = "sfx";
-	private final String displayName = "Spooky Sound Effect";
 
 	public SoundCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

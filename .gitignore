@@ -29,8 +29,8 @@ out/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
 *~
+*.hprof
 
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
@@ -112,3 +112,20 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# Visual Studio 2022
+/.vs/
+/bin/
+/obj/
+
+# VS Project Files (these don't meaningfully help external developers)
+MinecraftServer.csproj
+MinecraftServer.sln
+
+# Compiled Crowd Control package
+*.ccpak
+
+# Gradle
+.gradle/
+buildSrc/
+build/

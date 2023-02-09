@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -12,10 +13,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.plugin.paper.commands.KeepInventoryCommand.globalKeepInventory;
+
 @Getter
 public class ClearInventoryCommand extends ImmediateCommand {
 	private final String effectName = "clear_inventory";
-	private final String displayName = "Clear Inventory";
 
 	public ClearInventoryCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -25,11 +27,13 @@ public class ClearInventoryCommand extends ImmediateCommand {
 	@NotNull
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse()
-				.type(ResultType.FAILURE)
+				.type(ResultType.RETRY)
 				.message("All inventories are already empty or protected");
 		for (Player player : players) {
-			if (KeepInventoryCommand.isKeepingInventory(player))
+			if (KeepInventoryCommand.isKeepingInventory(player)) {
+				resp.type(ResultType.FAILURE);
 				continue;
+			}
 			PlayerInventory inv = player.getInventory();
 			if (inv.isEmpty())
 				continue;
@@ -37,5 +41,12 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			sync(inv::clear);
 		}
 		return resp;
+	}
+
+	@Override
+	public TriState isSelectable() {
+		if (!plugin.isGlobal())
+			return TriState.TRUE;
+		return globalKeepInventory ? TriState.FALSE : TriState.TRUE;
 	}
 }

@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -22,13 +23,13 @@ import java.util.Map.Entry;
 public class EnchantmentCommand extends ImmediateCommand {
 	protected final Enchantment enchantment;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public EnchantmentCommand(PaperCrowdControlPlugin plugin, Enchantment enchantment) {
 		super(plugin);
 		this.enchantment = enchantment;
 		this.effectName = "enchant_" + plugin.getTextUtil().translate(enchantment).replace(' ', '_');
-		this.displayName = "Apply " + plugin.getTextUtil().asPlain(enchantment.displayName(enchantment.getMaxLevel()));
+		this.displayName = Component.translatable("cc.effect.enchant.name", enchantment.displayName(enchantment.getMaxLevel()).color(null));
 	}
 
 	@Override
@@ -49,12 +50,13 @@ public class EnchantmentCommand extends ImmediateCommand {
 				// C) supports the requested enchantment
 				// D) would actually benefit from upgrading this enchantment if applicable
 				//    (i.e. this prevents Silk Touch from being "upgraded" to level 2)
-				if (item != null
-						&& !item.getType().isEmpty()
+				// E) is not absolutely maxed out on this enchantment (i.e. level 255)
+				if (!item.getType().isEmpty()
 						&& enchantment.canEnchantItem(item)
 						&& (
 						enchantment.getMaxLevel() != enchantment.getStartLevel()
 								|| item.getEnchantmentLevel(enchantment) != enchantment.getMaxLevel()
+						&& item.getEnchantmentLevel(enchantment) != 255
 				)
 				) {
 					levelMap.put(slot, item.getEnchantmentLevel(enchantment));
@@ -67,7 +69,6 @@ public class EnchantmentCommand extends ImmediateCommand {
 				continue;
 			// add enchant
 			ItemStack item = inv.getItem(slot);
-			assert item != null : "Selected item has disappeared from the player's inventory";
 			int curLevel = item.getEnchantmentLevel(enchantment);
 			if (curLevel >= level)
 				level = curLevel + 1;

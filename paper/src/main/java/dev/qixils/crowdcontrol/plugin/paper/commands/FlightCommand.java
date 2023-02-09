@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -18,10 +18,9 @@ import java.time.Duration;
 import java.util.List;
 
 @Getter
-public class FlightCommand extends TimedCommand implements Listener {
+public class FlightCommand extends TimedVoidCommand implements Listener {
 	private final String effectName = "flight";
-	private final String displayName = "Enable Flight";
-	private final Duration duration = Duration.ofSeconds(15);
+	private final Duration defaultDuration = Duration.ofSeconds(15);
 
 	public FlightCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -32,7 +31,7 @@ public class FlightCommand extends TimedCommand implements Listener {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
@@ -77,9 +76,7 @@ public class FlightCommand extends TimedCommand implements Listener {
 			return;
 		if (gamemode.equals(GameMode.SPECTATOR))
 			return;
-		if (!player.isFlying())
-			return;
-		if (!player.getAllowFlight())
+		if (!player.isFlying() && !player.getAllowFlight())
 			return;
 		player.setFlying(false);
 		player.setAllowFlight(false);

@@ -2,6 +2,47 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.0
+
+- Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16. Speedrun Minecraft
+  while your chat spawns dragons and creepers on you!
+- Created a Fabric implementation for 1.19.3. Play the latest modpacks alone or with your friends!
+- Created new client-side effects for Fabric: Inverted Controls & Inverted Mouse
+- The Minecraft servers have all been consolidated into one standard server to reduce confusion
+  during setup
+- Global effects like changing the server difficulty are now hidden from the streamer's effect menu
+  if the effects have not been enabled
+- Spawned entities now feature various random attributes, including random armor for armor stands
+- The missing effects for giving and taking enchanted golden apples on Sponge 7 have been added
+- Cursed enchantments are less likely to be applied to items awarded by Do-or-Die and lucky
+  lootboxes
+
+## 3.2.5
+
+Fixed a harmless error for Paper 1.19.3.
+
+## 3.2.4
+
+[java-crowd-control](https://github.com/qixils/java-crowd-control/releases) has been updated to
+[v3.5.1](https://github.com/qixils/java-crowd-control/releases/tag/v3.5.1) which introduces support
+for Unicode in viewer usernames.
+
+## 3.2.3
+
+- UUIDs listed in the `hosts` config option now count as Crowd Control administrators
+- A new config option called `admin-required` has been added which restricts usage of the `/account`
+  command to CC admins (defaults to `false`)
+- All the "Summon Minecart with XYZ" effects have been fixed
+- The plugin will now load even if errors are encountered while registering effects
+- [java-crowd-control](https://github.com/qixils/java-crowd-control/releases) has been updated to
+  [v3.4.0](https://github.com/qixils/java-crowd-control/releases/tag/v3.4.0) which accounts for
+  breaking changes introduced by an upcoming Crowd Control update
+- Fixed a harmless error for Paper 1.19.0
+
+## 3.2.2
+
+Added support for Paper 1.18.2.
+
 ## 3.2.5
 
 Fixed a harmless error for Paper 1.19.3.

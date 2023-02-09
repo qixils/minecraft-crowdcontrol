@@ -21,10 +21,17 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "dirt"),
 			Key.key(MINECRAFT_NAMESPACE, "gravel"),
 			Key.key(MINECRAFT_NAMESPACE, "netherrack"),
+			Key.key(MINECRAFT_NAMESPACE, "nether_bricks"),
+			Key.key(MINECRAFT_NAMESPACE, "nether_wart_block"),
+			Key.key(MINECRAFT_NAMESPACE, "warped_wart_block"),
+			Key.key(MINECRAFT_NAMESPACE, "warped_nylium"),
+			Key.key(MINECRAFT_NAMESPACE, "crimson_nylium"),
 			Key.key(MINECRAFT_NAMESPACE, "grass_block"),
 			Key.key(MINECRAFT_NAMESPACE, "grass"), // legacy (1.12.2)
 			Key.key(MINECRAFT_NAMESPACE, "sand"),
 			Key.key(MINECRAFT_NAMESPACE, "red_sand"),
+			Key.key(MINECRAFT_NAMESPACE, "soul_sand"),
+			Key.key(MINECRAFT_NAMESPACE, "soul_soil"),
 			Key.key(MINECRAFT_NAMESPACE, "sandstone"),
 			Key.key(MINECRAFT_NAMESPACE, "red_sandstone"),
 			Key.key(MINECRAFT_NAMESPACE, "terracotta"),
@@ -43,7 +50,8 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "purple_terracotta"),
 			Key.key(MINECRAFT_NAMESPACE, "red_terracotta"),
 			Key.key(MINECRAFT_NAMESPACE, "white_terracotta"),
-			Key.key(MINECRAFT_NAMESPACE, "yellow_terracotta")
+			Key.key(MINECRAFT_NAMESPACE, "yellow_terracotta"),
+			Key.key(MINECRAFT_NAMESPACE, "end_stone")
 	);
 
 	/**
@@ -51,6 +59,15 @@ public class CommonTags {
 	 */
 	public static final KeyedTag STONES_EXCEPT_GRAVEL = STONES.except(
 			Key.key(MINECRAFT_NAMESPACE, "gravel")
+	);
+
+	/**
+	 * Air blocks.
+	 */
+	public static final KeyedTag AIR = new KeyedTag(
+			Key.key(MINECRAFT_NAMESPACE, "air"),
+			Key.key(MINECRAFT_NAMESPACE, "cave_air"),
+			Key.key(MINECRAFT_NAMESPACE, "void_air")
 	);
 
 	private CommonTags() {

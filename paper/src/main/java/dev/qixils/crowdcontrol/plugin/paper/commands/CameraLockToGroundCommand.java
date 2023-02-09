@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -15,18 +15,17 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class CameraLockToGroundCommand extends TimedCommand {
+public final class CameraLockToGroundCommand extends TimedVoidCommand {
 	private final String effectName = "camera_lock_to_ground";
-	private final String displayName = "Camera Lock To Ground";
 
 	public CameraLockToGroundCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -36,7 +35,7 @@ public final class CameraLockToGroundCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {

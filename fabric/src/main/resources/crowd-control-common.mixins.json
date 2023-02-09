@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.qixils.crowdcontrol.plugin.fabric.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "CreeperAccessor",
+    "EntityMixin",
+    "HorseAccessor",
+    "InventoryAccessor",
+    "LivingEntityAccessor",
+    "LivingEntityMixin",
+    "PlayerListMixin",
+    "PlayerMixin",
+    "RecipeBookAccessor",
+    "ResultSlotMixin",
+    "ServerPlayerMixin",
+    "TickMixin"
+  ],
+  "client": [
+    "KeyboardInputMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

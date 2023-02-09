@@ -20,14 +20,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_NAME;
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_NAME;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
 import static dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin.VIEWER_SPAWNED;
 
 @Getter
 public class DinnerboneCommand extends Command {
 	private final String effectName = "dinnerbone";
-	private final String displayName = "Flip Mobs Upside-Down";
 
 	public DinnerboneCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -48,7 +47,10 @@ public class DinnerboneCommand extends Command {
 				Text oldName = entity.get(OriginalDisplayNameData.class).map(data -> data.originalDisplayName().get()).orElse(Text.EMPTY);
 				Text currentName = entity.getOrElse(Keys.DISPLAY_NAME, Text.EMPTY);
 				if (currentName.equals(Text.of(DINNERBONE_NAME))) {
-					entity.offer(Keys.DISPLAY_NAME, oldName);
+					if (oldName.isEmpty())
+						entity.remove(Keys.DISPLAY_NAME);
+					else
+						entity.offer(Keys.DISPLAY_NAME, oldName);
 					entity.remove(OriginalDisplayNameData.class);
 					if (entity.getOrElse(VIEWER_SPAWNED, false))
 						entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);

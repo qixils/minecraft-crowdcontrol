@@ -3,17 +3,26 @@ package dev.qixils.crowdcontrol.common;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command.Builder;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import com.google.gson.Gson;
 import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
+import dev.qixils.crowdcontrol.TriState;
+import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Respondable;
+import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.socket.Response.PacketType;
+import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import dev.qixils.crowdcontrol.socket.SocketManager;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,10 +31,11 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * The main class used by a Crowd Control implementation which defines numerous methods for
@@ -34,7 +44,12 @@ import java.util.UUID;
  * @param <P> class used to represent online players
  * @param <S> class used to represent command senders in Cloud Command Framework
  */
-public interface Plugin<P extends S, S> {
+public interface Plugin<P, S> {
+
+	/**
+	 * The color to use for basic messages rendered to players when joining the server.
+	 */
+	TextColor JOIN_MESSAGE_COLOR = TextColor.color(0xFCE9D4);
 
 	/**
 	 * Text color to use for usernames.
@@ -47,9 +62,30 @@ public interface Plugin<P extends S, S> {
 	TextColor CMD_COLOR = TextColor.color(0xb15be3);
 
 	/**
+	 * A less saturated version of {@link #CMD_COLOR}.
+	 */
+	TextColor DIM_CMD_COLOR = TextColor.color(0xA982C2);
+
+	/**
+	 * The color used for displaying error messages on join.
+	 */
+	TextColor _ERROR_COLOR = TextColor.color(0xF78080);
+
+	/**
 	 * The prefix to use in command output.
 	 */
 	String PREFIX = "CrowdControl";
+
+	/**
+	 * The prefix to use in command output as a {@link Component}.
+	 */
+	Component PREFIX_COMPONENT = Component.text()
+			.color(NamedTextColor.DARK_AQUA)
+			.append(Component.text('[', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+			.append(Component.text(PREFIX, NamedTextColor.YELLOW))
+			.append(Component.text(']', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+			.append(Component.space())
+			.build();
 
 	/**
 	 * The permission node required to use administrative commands.
@@ -62,68 +98,142 @@ public interface Plugin<P extends S, S> {
 	int DEFAULT_PORT = 58431;
 
 	/**
-	 * The first message to send to a player when they join the server.
+	 * Formats the provided text as an error message.
+	 *
+	 * @param text text to format
+	 * @return formatted text
 	 */
-	Component JOIN_MESSAGE_1 = new TextBuilder(TextColor.color(0xFCE9D4))
-			.rawNext("This server is running ")
-			.next("Crowd Control", TextColor.color(0xFAE100)) // picked a color from the CC logo/icon
-			.rawNext(", developed by ")
-			.next("qi", TextColor.color(0xFFC7B5))
-			.next("xi", TextColor.color(0xFFDECA))
-			.next("ls", TextColor.color(0xFFCEEA))
-			.next(".dev", TextColor.color(0xFFB7E5))
-			.rawNext(" in coordination with the ")
-			.next("crowdcontrol.live", TextColor.color(0xFAE100))
-			.rawNext(" team.")
-			.build();
+	static @NotNull Component error(@NotNull Component text) {
+		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
+			text = text.decoration(TextDecoration.BOLD, false);
+		return Component.translatable(
+				"cc.error.prefix.critical",
+				NamedTextColor.RED,
+				EnumSet.of(TextDecoration.BOLD),
+				text.colorIfAbsent(_ERROR_COLOR)
+		);
+	}
 
 	/**
-	 * The second message to send to a player when they join the server.
+	 * Formats the provided text as a warning message.
+	 *
+	 * @param text text to format
+	 * @return formatted text
 	 */
-	Component JOIN_MESSAGE_2 = new TextBuilder(TextColor.color(0xF1D4FC))
-			.rawNext("Please link your Twitch account using ")
-			.next("/account link <username>", NamedTextColor.GOLD)
-			.rawNext(". You can ")
-			.next("click here", TextDecoration.BOLD)
-			.rawNext(" to do so.")
-			.suggest("/account link ")
-			.hover(Component.text("Click here to link your Twitch account").asHoverEvent())
-			.build();
+	static @NotNull Component warning(@NotNull Component text) {
+		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
+			text = text.decoration(TextDecoration.BOLD, false);
+		return Component.translatable(
+				"cc.error.prefix.warning",
+				NamedTextColor.RED,
+				EnumSet.of(TextDecoration.BOLD),
+				text.colorIfAbsent(_ERROR_COLOR)
+		);
+	}
 
 	/**
-	 * The color used for displaying error messages on join.
+	 * Formats the provided text as a command output.
+	 *
+	 * @param text text to format
+	 * @return formatted text
 	 */
-	TextColor _ERROR_COLOR = TextColor.color(0xF78080);
+	static @NotNull Component output(@NotNull Component text) {
+		return PREFIX_COMPONENT.append(text);
+	}
+
+	/**
+	 * The message to send to a player when they join the server.
+	 */
+	Component JOIN_MESSAGE_1 = Component.translatable(
+			"cc.join.info",
+			JOIN_MESSAGE_COLOR,
+			Component.text("Crowd Control", TextColor.color(0xFAE100)),
+			Component.text("qi", TextColor.color(0xFFC7B5))
+					.append(Component.text("xi", TextColor.color(0xFFDECA)))
+					.append(Component.text("ls", TextColor.color(0xFFCEEA)))
+					.append(Component.text(".dev", TextColor.color(0xFFB7E5))),
+			Component.text("crowdcontrol.live", TextColor.color(0xFAE100))
+	);
+
+	/**
+	 * A warning message sent to players when they join the server if they have no Twitch account
+	 * linked.
+	 */
+	Component JOIN_MESSAGE_2 = Component.translatable(
+			"cc.join.link.text",
+			TextColor.color(0xF1D4FC),
+			Component.text("/account link <username>", NamedTextColor.GOLD)
+	)
+			.hoverEvent(Component.translatable("cc.join.link.hover"))
+			.clickEvent(ClickEvent.suggestCommand("/account link "));
+
+	/**
+	 * A warning message sent to players when they join the server if global effects are
+	 * completely unavailable.
+	 */
+	Component NO_GLOBAL_EFFECTS_MESSAGE = warning(Component.translatable(
+			"cc.error.no-global-effects",
+			Component.text("global", TextColor.color(0xF9AD9E)),
+			Component.text("true", TextColor.color(0xF9AD9E))
+	));
 
 	/**
 	 * Error message displayed to non-admins when the service is not enabled.
 	 */
-	Component NO_CC_USER_ERROR = new TextBuilder(_ERROR_COLOR)
-			.next("WARNING: ", NamedTextColor.RED)
-			.rawNext("The Crowd Control plugin has failed to load. Please ask a server administrator to the console logs and address the error.")
-			.build();
+	Component NO_CC_USER_ERROR = Component.translatable(
+			"cc.error.prefix.critical",
+			NamedTextColor.RED,
+			Component.translatable(
+					"cc.error.user-error",
+					_ERROR_COLOR
+			)
+	);
 
 	/**
 	 * Error message displayed to admins when the password is not set.
 	 */
-	Component NO_CC_OP_ERROR_NO_PASSWORD = new TextBuilder(_ERROR_COLOR)
-			.next("WARNING: ", NamedTextColor.RED)
-			.rawNext("The Crowd Control plugin has failed to load due to a password not being set. Please use ")
-			.next("/password <password>", NamedTextColor.GOLD)
-			.rawNext(" to set a password and ")
-			.next("/crowdcontrol reconnect", NamedTextColor.GOLD)
-			.next(" to properly load the plugin. And be careful not to show the password on stream!")
-			.suggest("/password ")
-			.hover(Component.text("Click here to set the password").asHoverEvent())
-			.build();
+	Component NO_CC_OP_ERROR_NO_PASSWORD = warning(Component.translatable(
+			"cc.error.no-password.text",
+			Component.text("/password <password>", NamedTextColor.GOLD),
+			Component.text("/crowdcontrol reconnect", NamedTextColor.GOLD)
+	)
+			.clickEvent(ClickEvent.suggestCommand("/password "))
+			.hoverEvent(Component.translatable("cc.error.no-password.hover"))
+	);
 
 	/**
 	 * Error message displayed to admins when the error is unknown.
 	 */
-	Component NO_CC_UNKNOWN_ERROR = new TextBuilder(_ERROR_COLOR)
-			.next("WARNING: ", NamedTextColor.RED)
-			.rawNext("The Crowd Control plugin has failed to load. Please review the console logs and resolve the error.")
-			.build();
+	Component NO_CC_UNKNOWN_ERROR = error(Component.translatable("cc.error.unknown"));
+
+	/**
+	 * Gets the instance of the {@link KyoriTranslator}.
+	 *
+	 * @return the translator
+	 */
+	@NotNull KyoriTranslator translator();
+
+	/**
+	 * Renders a component for the provided command sender using the {@link KyoriTranslator}.
+	 *
+	 * @param component the component to render
+	 * @param sender the command sender
+	 * @return the rendered component
+	 */
+	default @NotNull Component renderForSender(@NotNull Component component, @NotNull S sender) {
+		return translator().render(component, commandSenderMapper().getLocale(sender).orElseGet(Locale::getDefault));
+	}
+
+	/**
+	 * Renders a component for the provided player using the {@link KyoriTranslator}.
+	 *
+	 * @param component the component to render
+	 * @param player the player
+	 * @return the rendered component
+	 */
+	default @NotNull Component renderForPlayer(@NotNull Component component, @NotNull P player) {
+		return translator().render(component, playerMapper().getLocale(player).orElseGet(Locale::getDefault));
+	}
 
 	/**
 	 * Registers the plugin's basic chat commands.
@@ -132,6 +242,9 @@ public interface Plugin<P extends S, S> {
 		CommandManager<S> manager = getCommandManager();
 		if (manager == null)
 			throw new IllegalStateException("CommandManager is null");
+		EntityMapper<S> mapper = commandSenderMapper();
+
+		// TODO: support i18n in cloud command descriptions
 
 		//// Account Command ////
 
@@ -139,53 +252,71 @@ public interface Plugin<P extends S, S> {
 		Builder<S> account = manager.commandBuilder("account")
 				.meta(CommandMeta.DESCRIPTION, "Manage your connected Twitch account(s)");
 		if (isAdminRequired())
-			account = account.permission(ADMIN_PERMISSION);
-
-		// username arg
-		CommandArgument<S, String> usernameArg = StringArgument.<S>newBuilder("username")
-				.single().asRequired().manager(manager).build();
-		ArgumentDescription usernameDesc = ArgumentDescription.of("The username of the Twitch account to link");
+			account = account.permission(mapper::isAdmin);
 
 		// link command
 		manager.command(account.literal("link")
 				.meta(CommandMeta.DESCRIPTION, "Link a Twitch account to your Minecraft account")
-				.argument(usernameArg, usernameDesc)
-				.senderType(getPlayerClass())
+				.argument(
+						StringArgument.<S>builder("username")
+								.single()
+								.asRequired()
+								.manager(manager)
+								.build(),
+						ArgumentDescription.of("The username of the Twitch account to link")
+				)
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
-					Audience audience = asAudience(sender);
-					UUID uuid = getUUID(sender).orElseThrow(() ->
+					Audience audience = mapper.asAudience(sender);
+					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerMapper().linkPlayer(uuid, username))
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.next(username, NamedTextColor.AQUA)
-								.rawNext(" has been added to your linked Twitch accounts"));
+					if (getPlayerManager().linkPlayer(uuid, username))
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.link.output",
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 					else
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.color(NamedTextColor.RED)
-								.next("You have already linked the Twitch account ")
-								.next(username, NamedTextColor.AQUA));
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.link.error",
+								NamedTextColor.RED,
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 				}));
 		// unlink command
 		manager.command(account.literal("unlink")
 				.meta(CommandMeta.DESCRIPTION, "Unlink a Twitch account from your Minecraft account")
-				.argument(usernameArg.copy(), usernameDesc)
+				.argument(
+						StringArgument.<S>builder("username")
+								.single()
+								.asRequired()
+								.manager(manager)
+								.withSuggestionsProvider((ctx, input) -> mapper.getUniqueId(ctx.getSender())
+										.map(uuid -> getPlayerManager()
+												.getLinkedAccounts(uuid).stream()
+												.filter(name -> name.startsWith(input.toLowerCase(Locale.ENGLISH)))
+												.collect(Collectors.toList()))
+										.orElse(Collections.emptyList()))
+								.build(),
+						ArgumentDescription.of("The username of the Twitch account to unlink")
+				)
 				.handler(commandContext -> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
-					Audience audience = asAudience(sender);
-					UUID uuid = getUUID(sender).orElseThrow(() ->
+					Audience audience = mapper.asAudience(sender);
+					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerMapper().unlinkPlayer(uuid, username))
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.next(username, NamedTextColor.AQUA)
-								.rawNext(" has been removed from your linked Twitch accounts"));
+					if (getPlayerManager().unlinkPlayer(uuid, username))
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.unlink.output",
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 					else
-						audience.sendMessage(TextBuilder.fromPrefix(Plugin.PREFIX)
-								.color(NamedTextColor.RED)
-								.next("You do not have a Twitch account linked named ")
-								.next(username, NamedTextColor.AQUA));
+						audience.sendMessage(output(Component.translatable(
+								"cc.command.account.unlink.error",
+								NamedTextColor.RED,
+								Component.text(username, NamedTextColor.AQUA)
+						)));
 				}));
 
 		//// CrowdControl Command ////
@@ -193,116 +324,96 @@ public interface Plugin<P extends S, S> {
 		// base command
 		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
 				.meta(CommandMeta.DESCRIPTION, "Manage the Crowd Control socket")
-				.permission(this::isAdmin);
+				.permission(mapper::isAdmin);
 
 		// connect command
-		final Component serviceNotDisconnected = TextBuilder.fromPrefix(PREFIX,
-				"&cService is already running or attempting to establish a connection").build();
-		final Component serviceStarted = TextBuilder.fromPrefix(PREFIX,
-				"Service has been re-enabled and will be attempted in the background").build();
 		manager.command(ccCmd.literal("connect")
 				.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
 				.handler(commandContext -> {
-					Audience sender = asAudience(commandContext.getSender());
+					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (getCrowdControl() != null)
-						sender.sendMessage(serviceNotDisconnected);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.connect.error", NamedTextColor.RED)));
 					else {
 						initCrowdControl();
-						sender.sendMessage(serviceStarted);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.connect.output")));
 					}
 				}));
 		// disconnect command
-		final Component serviceNotRunning = TextBuilder.fromPrefix(PREFIX,
-				"&cService is already disconnected").build();
-		final Component serviceStopped = TextBuilder.fromPrefix(PREFIX,
-				"Service has been disabled").build();
 		manager.command(ccCmd.literal("disconnect")
 				.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
 				.handler(commandContext -> {
-					Audience sender = asAudience(commandContext.getSender());
+					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (getCrowdControl() == null)
-						sender.sendMessage(serviceNotRunning);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.disconnect.error", NamedTextColor.RED)));
 					else {
 						getCrowdControl().shutdown("Disconnected issued by server administrator");
 						updateCrowdControl(null);
-						sender.sendMessage(serviceStopped);
+						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.disconnect.output")));
 					}
 				}));
 		// reconnect command
-		final Component serviceReset = TextBuilder.fromPrefix(PREFIX,
-				"Service has been reset").build();
 		manager.command(ccCmd.literal("reconnect")
 				.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
 				.handler(commandContext -> {
-					Audience audience = asAudience(commandContext.getSender());
+					Audience audience = mapper.asAudience(commandContext.getSender());
 					CrowdControl cc = getCrowdControl();
 					if (cc != null)
 						cc.shutdown("Reconnect issued by server administrator");
 					initCrowdControl();
 
-					audience.sendMessage(serviceReset);
+					audience.sendMessage(output(Component.translatable("cc.command.crowdcontrol.reconnect.output")));
 				}));
 		// status command
-		final Component notRunning = TextBuilder.fromPrefix(PREFIX, "The service is not currently running").build();
-		final Component isRunning = TextBuilder.fromPrefix(PREFIX, "The service is currently running").build();
 		manager.command(ccCmd.literal("status")
 				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-				.handler(commandContext -> asAudience(commandContext.getSender()).sendMessage(
-						getCrowdControl() == null ? notRunning : isRunning)));
+				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(output(
+						Component.translatable("cc.command.crowdcontrol.status." + (getCrowdControl() != null))))));
 
 		//// Password Command ////
-		final Component passwordSuccessMessage = TextBuilder.fromPrefix(Plugin.PREFIX)
-				.rawNext("The password has been updated. Please use ")
-				.next("/crowdcontrol reconnect", NamedTextColor.YELLOW)
-				.rawNext(" or click here to apply this change.")
-				.suggest("/crowdcontrol reconnect")
-				.hover(new TextBuilder().rawNext("Click here to run ").next("/crowdcontrol reconnect", NamedTextColor.YELLOW))
-				.build();
-		final Component passwordFailureMessage = TextBuilder.fromPrefix(Plugin.PREFIX)
-				.next("This command can only be used when running in server mode.", NamedTextColor.RED)
-				.build();
 		manager.command(manager.commandBuilder("password")
 				.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
-				.permission(this::isAdmin)
-				.argument(StringArgument.<S>newBuilder("password").greedy().asRequired())
+				.permission(mapper::isAdmin)
+				.argument(StringArgument.<S>builder("password").greedy().asRequired())
 				.handler(commandContext -> {
-					Audience sender = asAudience(commandContext.getSender());
+					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (!isServer()) {
-						sender.sendMessage(passwordFailureMessage);
+						sender.sendMessage(output(Component.translatable("cc.command.password.error", NamedTextColor.RED)));
 						return;
 					}
 					String password = commandContext.get("password");
 					setPassword(password);
-					sender.sendMessage(passwordSuccessMessage);
+					sender.sendMessage(output(Component.translatable(
+							"cc.command.password.output",
+							Component.text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
+					)
+							.hoverEvent(Component.translatable(
+									"cc.command.password.output.hover",
+									Component.text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
+							))
+							.clickEvent(ClickEvent.runCommand("/crowdcontrol reconnect"))
+					));
 				})
 		);
 
-		new MinecraftExceptionHandler<S>().withDefaultHandlers()
-				.withDecorator(component -> TextBuilder.fromPrefix(PREFIX, component).color(NamedTextColor.RED).build())
-				.apply(manager, this::asAudience);
+		new MinecraftExceptionHandler<S>()
+				.withDefaultHandlers()
+				.withDecorator(component -> output(component).color(NamedTextColor.RED))
+				.apply(manager, mapper::asAudience);
 	}
 
 	/**
-	 * Converts the command sender object to an adventure {@link Audience}.
+	 * Gets the {@link EntityMapper} for this implementation's player object.
 	 *
-	 * @param source command sender
-	 * @return adventure audience
+	 * @return player entity mapper
 	 */
-	default Audience asAudience(@NotNull S source) {
-		if (source instanceof Audience)
-			return (Audience) source;
-		throw new UnsupportedOperationException("#asAudience is unsupported");
-	}
+	PlayerEntityMapper<P> playerMapper();
 
 	/**
-	 * Converts the command senders to an adventure {@link Audience}.
+	 * Gets the {@link EntityMapper} for this implementation's command sender object.
 	 *
-	 * @param source command sender
-	 * @return adventure audience
+	 * @return command sender mapper
 	 */
-	default Audience asAudience(@NotNull Collection<S> source) {
-		return source.stream().map(this::asAudience).collect(Audience.toAudience());
-	}
+	EntityMapper<S> commandSenderMapper();
 
 	/**
 	 * Gets the player class utilized by this implementation.
@@ -329,7 +440,7 @@ public interface Plugin<P extends S, S> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	PlayerMapper<P> getPlayerMapper();
+	PlayerManager<P> getPlayerManager();
 
 	/**
 	 * Fetches all online players that should be affected by the provided {@link Request}.
@@ -339,7 +450,7 @@ public interface Plugin<P extends S, S> {
 	 */
 	@CheckReturnValue
 	default @NotNull List<P> getPlayers(@NotNull Request request) {
-		return getPlayerMapper().getPlayers(request);
+		return getPlayerManager().getPlayers(request);
 	}
 
 	/**
@@ -350,7 +461,7 @@ public interface Plugin<P extends S, S> {
 	@CheckReturnValue
 	@NotNull
 	default List<@NotNull P> getAllPlayers() {
-		return getPlayerMapper().getAllPlayers();
+		return getPlayerManager().getAllPlayers();
 	}
 
 	/**
@@ -360,6 +471,15 @@ public interface Plugin<P extends S, S> {
 	 */
 	@CheckReturnValue
 	boolean isGlobal();
+
+	/**
+	 * Determines whether it's possible for global effects to execute.
+	 *
+	 * @return true if global effects could execute
+	 */
+	default boolean globalEffectsUsable() {
+		return isGlobal() || (!getHosts().isEmpty() && getAllPlayers().stream().anyMatch(this::isHost));
+	}
 
 	/**
 	 * Determines if a request should apply to all online players or only a select few.
@@ -385,36 +505,49 @@ public interface Plugin<P extends S, S> {
 	@NotNull Collection<String> getHosts();
 
 	/**
-	 * Determines whether a player must be an {@link #isAdmin(Object) admin} to use the
+	 * Whether the specified player is known to be a server host.
+	 *
+	 * @param player player to check
+	 * @return whether the player is a server host
+	 */
+	default boolean isHost(@NotNull P player) {
+		Collection<String> hosts = getHosts();
+		getSLF4JLogger().debug("Checking if {} matches a host known in {}", playerMapper().getUsername(player), hosts);
+		if (hosts.isEmpty())
+			return false;
+
+		PlayerEntityMapper<P> mapper = playerMapper();
+		Optional<UUID> uuid = mapper.getUniqueId(player);
+		if (uuid.isPresent()) {
+			String uuidStr = uuid.get().toString().toLowerCase(Locale.ENGLISH);
+			getSLF4JLogger().debug("Checking for UUID {}", uuidStr);
+			if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
+				return true;
+		}
+
+		String username = mapper.getUsername(player).toLowerCase(Locale.ENGLISH);
+		getSLF4JLogger().debug("Checking for username {}", username);
+		if (hosts.contains(username))
+			return true;
+
+		if (uuid.isPresent()) {
+			getSLF4JLogger().debug("Checking accounts linked to player");
+			PlayerManager<P> manager = getPlayerManager();
+			return manager.getLinkedAccounts(uuid.get()).stream().anyMatch(hosts::contains);
+		}
+
+		getSLF4JLogger().debug("No matches found");
+		return false;
+	}
+
+	/**
+	 * Determines whether a player must be an {@link EntityMapper#isAdmin(Object) admin} to use the
 	 * {@code /account} command.
 	 *
 	 * @return true if the player must be an admin to use the /account command
 	 */
 	@CheckReturnValue
 	boolean isAdminRequired();
-
-	/**
-	 * Fetches the username of a player.
-	 *
-	 * @param player the player to fetch the username of
-	 * @return the username of the player
-	 */
-	@CheckReturnValue
-	default @NotNull String getUsername(@NotNull P player) {
-		return asAudience(player).get(Identity.NAME).orElseThrow(() ->
-				new UnsupportedOperationException("Player object does not support Identity.NAME"));
-	}
-
-	/**
-	 * Fetches the UUID of an entity.
-	 *
-	 * @param entity the entity to fetch the UUID of
-	 * @return the UUID of the entity
-	 */
-	@CheckReturnValue
-	default @NotNull Optional<UUID> getUUID(@NotNull S entity) {
-		return asAudience(entity).get(Identity.UUID);
-	}
 
 	/**
 	 * Whether to announce the execution of effects in chat.
@@ -439,6 +572,23 @@ public interface Plugin<P extends S, S> {
 	void registerCommand(@NotNull String name, @NotNull Command<P> command);
 
 	/**
+	 * Returns the object that manages the registering of effects/commands.
+	 * Not to be confused with the {@link #getCommandManager() chat command manager}.
+	 *
+	 * @return command registry manager
+	 */
+	@NotNull
+	AbstractCommandRegister<P, ?> commandRegister();
+
+	/**
+	 * Gets the {@link ScheduledExecutorService} used by the plugin.
+	 *
+	 * @return the executor service
+	 */
+	@NotNull
+	ScheduledExecutorService getScheduledExecutor();
+
+	/**
 	 * Gets the {@link CrowdControl} instance.
 	 *
 	 * @return crowd control instance
@@ -451,6 +601,135 @@ public interface Plugin<P extends S, S> {
 	 * (Re)initializes the {@link CrowdControl} instance.
 	 */
 	void initCrowdControl();
+
+	/**
+	 * Sends a packet with an embedded message for the C# client.
+	 *
+	 * @param service the service to send the packet to
+	 * @param message the message to send
+	 */
+	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String message) {
+		if (service == null)
+			service = getCrowdControl();
+		if (service == null) {
+			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
+			return;
+		}
+		final @NotNull SocketManager finalService = service;
+		getScheduledExecutor().schedule(() -> {
+			try {
+				getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
+				Response response = finalService.buildResponse()
+						.packetType(PacketType.EFFECT_STATUS)
+						.type(ResultType.NOT_VISIBLE)
+						.effect("embedded_message")
+						.message(message)
+						.build();
+				getSLF4JLogger().debug("final packet: {}", response.toJSON());
+				response.send();
+			} catch (Exception e) {
+				getSLF4JLogger().error("Failed to send embedded message packet", e);
+			}
+		}, 1, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * Sends a packet with an embedded message for the C# client.
+	 *
+	 * @param message the message to send
+	 */
+	default void sendEmbeddedMessagePacket(@NotNull String message) {
+		sendEmbeddedMessagePacket(null, message);
+	}
+
+	/**
+	 * Performs actions that are reliant on the initialization of a {@link CrowdControl} instance.
+	 *
+	 * @param service the initialized {@link CrowdControl} instance
+	 */
+	default void postInitCrowdControl(@NotNull CrowdControl service) {
+		String message = "_mc_cc_server_status_" + new Gson().toJson(commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList()));
+		service.addConnectListener(connectingService -> {
+			sendEmbeddedMessagePacket(connectingService, message);
+			updateConditionalEffectVisibility(connectingService);
+		});
+	}
+
+	/**
+	 * Updates the status of an effect.
+	 *
+	 * @param respondable an object that can be responded to
+	 * @param effect      the effect to update
+	 * @param status      the new status
+	 */
+	default void updateEffectStatus(@Nullable Respondable respondable, @NotNull String effect, Response.@NotNull ResultType status) {
+		if (!status.isStatus())
+			throw new IllegalArgumentException("status must be a status type (not a result type)");
+		if (respondable == null)
+			return;
+		getSLF4JLogger().debug("Updating status of effect {} to {}", effect, status);
+		Response response = respondable.buildResponse()
+				.packetType(PacketType.EFFECT_STATUS)
+				.effect(effect.toLowerCase(Locale.ENGLISH))
+				.type(status)
+				.build();
+		response.send();
+	}
+
+	/**
+	 * Updates the status of an effect.
+	 *
+	 * @param respondable an object that can be responded to
+	 * @param effect      the effect to update
+	 * @param status      the new status
+	 */
+	default void updateEffectStatus(Respondable respondable, @NotNull Command<?> effect, Response.@NotNull ResultType status) {
+		updateEffectStatus(respondable, effect.getEffectName(), status);
+	}
+
+	/**
+	 * Updates the visibility of a collection of {@link Command effect} IDs.
+	 *
+	 * @param respondable an object that can be responded to
+	 * @param effectIds   IDs of the effect to update
+	 * @param visible     effects' new visibility
+	 */
+	default void updateEffectIdVisibility(Respondable respondable, @NotNull Collection<String> effectIds, boolean visible) {
+		effectIds.forEach(effectId -> updateEffectStatus(respondable, effectId, visible ? Response.ResultType.VISIBLE : Response.ResultType.NOT_VISIBLE));
+	}
+
+	/**
+	 * Updates the visibility of an {@link Command effect} ID.
+	 *
+	 * @param respondable an object that can be responded to
+	 * @param effectId    ID of the effect to update
+	 * @param visible     effect's new visibility
+	 */
+	default void updateEffectIdVisibility(Respondable respondable, @NotNull String effectId, boolean visible) {
+		updateEffectIdVisibility(respondable, Collections.singletonList(effectId), visible);
+	}
+
+	/**
+	 * Updates the visibility of a collection of {@link Command effects}.
+	 *
+	 * @param respondable an object that can be responded to
+	 * @param effects     the effect to update
+	 * @param visible     effects' new visibility
+	 */
+	default void updateEffectVisibility(Respondable respondable, @NotNull Collection<Command<?>> effects, boolean visible) {
+		updateEffectIdVisibility(respondable, effects.stream().map(Command::getEffectName).collect(Collectors.toList()), visible);
+	}
+
+	/**
+	 * Updates the visibility of an {@link Command effect}.
+	 *
+	 * @param respondable an object that can be responded to
+	 * @param effect      the effect to update
+	 * @param visible     effect's new visibility
+	 */
+	default void updateEffectVisibility(Respondable respondable, @NotNull Command<?> effect, boolean visible) {
+		updateEffectVisibility(respondable, Collections.singletonList(effect), visible);
+	}
 
 	/**
 	 * Updates the {@link CrowdControl} instance.
@@ -471,6 +750,15 @@ public interface Plugin<P extends S, S> {
 			cc.shutdown("Service is restarting");
 		updateCrowdControl(null);
 		initCrowdControl();
+	}
+
+	/**
+	 * Whether this plugin implementation supports {@link ClientOnly} effects.
+	 *
+	 * @return whether client effects are supported
+	 */
+	default boolean supportsClientOnly() {
+		return false;
 	}
 
 	/**
@@ -513,36 +801,80 @@ public interface Plugin<P extends S, S> {
 	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
 
 	/**
-	 * Determines if the provided object is an administrator. This is defined as the object having
-	 * the {@link #ADMIN_PERMISSION} permission node or being a Minecraft operator.
+	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
 	 *
-	 * @param commandSource the command source to check
-	 * @return true if the source is an administrator
+	 * @param service the service to send the packets to
 	 */
-	boolean isAdmin(@NotNull S commandSource);
+	default void updateConditionalEffectVisibility(@Nullable SocketManager service) {
+		if (service == null)
+			return;
+		boolean clientVisible = getModdedPlayerCount() > 0;
+		boolean globalVisible = globalEffectsUsable();
+		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
+		updateEffectStatus(service, "swap", getAllPlayers().size() <= 1 ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+		for (Command<?> effect : commandRegister().getCommands()) {
+			if (effect.isClientOnly())
+				updateEffectVisibility(service, effect, clientVisible);
+			else if (effect.isGlobal())
+				updateEffectVisibility(service, effect, globalVisible);
+
+			TriState selectable = effect.isSelectable();
+			if (selectable != TriState.UNKNOWN)
+				updateEffectStatus(service, effect, selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE);
+		}
+	}
 
 	/**
 	 * Renders messages to a player. This should be called by an event handler that listens for
 	 * players joining the server.
 	 *
-	 * @param player player to send messages to
+	 * @param joiningPlayer player to send messages to
 	 */
-	default void onPlayerJoin(P player) {
-		Audience audience = asAudience(player);
-		audience.sendMessage(JOIN_MESSAGE_1);
-		//noinspection OptionalGetWithoutIsPresent
-		if (!isGlobal() && isServer() && getPlayerMapper().getLinkedAccounts(getUUID(player).get()).size() == 0
-				&& (!isAdminRequired() || isAdmin(player)))
-			audience.sendMessage(JOIN_MESSAGE_2);
-		if (getCrowdControl() == null) {
-			if (isAdmin(player)) {
-				if (isServer() && getPassword() == null)
-					audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
-				else
-					audience.sendMessage(NO_CC_UNKNOWN_ERROR);
-			} else
-				audience.sendMessage(NO_CC_USER_ERROR);
+	default void onPlayerJoin(P joiningPlayer) {
+		PlayerEntityMapper<P> mapper = playerMapper();
+		UUID uuid = mapper.getUniqueId(joiningPlayer).orElse(null);
+		if (uuid == null) {
+			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
+			return;
 		}
+		getScheduledExecutor().schedule(() -> {
+			// ensure player is still online
+			Optional<P> optPlayer = mapper.getPlayer(uuid);
+			if (!optPlayer.isPresent())
+				return;
+			P player = optPlayer.get();
+			// send messages
+			Audience audience = mapper.asAudience(player);
+			audience.sendMessage(JOIN_MESSAGE_1);
+			//noinspection OptionalGetWithoutIsPresent
+			if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.getUniqueId(player).get()).size() == 0
+					&& (!isAdminRequired() || playerMapper().isAdmin(player)))
+				audience.sendMessage(JOIN_MESSAGE_2);
+			if (!globalEffectsUsable())
+				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
+			CrowdControl cc = getCrowdControl();
+			if (cc == null) {
+				if (mapper.isAdmin(player)) {
+					if (isServer() && getPassword() == null)
+						audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
+					else
+						audience.sendMessage(NO_CC_UNKNOWN_ERROR);
+				} else
+					audience.sendMessage(NO_CC_USER_ERROR);
+			}
+			// update conditional effects
+			updateConditionalEffectVisibility(cc);
+		}, 1, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * Handles various behavior related to the departure of a player. This should be called by an
+	 * event handler that listens for players leaving the server.
+	 *
+	 * @param player player that left
+	 */
+	default void onPlayerLeave(P player) {
+		updateConditionalEffectVisibility(getCrowdControl());
 	}
 
 	/**
@@ -552,4 +884,100 @@ public interface Plugin<P extends S, S> {
 	 */
 	@NotNull
 	Logger getSLF4JLogger();
+
+	/**
+	 * Gets the executor which runs code synchronously (i.e. on the server's main thread).
+	 *
+	 * @return synchronous executor
+	 */
+	@NotNull
+	Executor getSyncExecutor();
+
+	/**
+	 * Gets the executor which runs code asynchronously (i.e. off the server's main thread).
+	 *
+	 * @return asynchronous executor
+	 */
+	@NotNull
+	Executor getAsyncExecutor();
+
+	/**
+	 * Gets the plugin's {@link LimitConfig}.
+	 *
+	 * @return limit config parsed from the plugin's config file
+	 */
+	@NotNull
+	LimitConfig getLimitConfig();
+
+	/**
+	 * Gets the server's console {@link Audience}.
+	 *
+	 * @return console audience
+	 */
+	@NotNull
+	Audience getConsole();
+
+	/**
+	 * Gets the plugin's {@link CCPlayer wrapper} for a player.
+	 *
+	 * @param player player to get the wrapper for
+	 * @return wrapper for the player
+	 */
+	@NotNull
+	CCPlayer getPlayer(@NotNull P player);
+
+	/**
+	 * Gets the {@link HideNames} config.
+	 *
+	 * @return hide names config
+	 */
+	@NotNull
+	HideNames getHideNames();
+
+	/**
+	 * Gets the viewer who triggered an effect as a component.
+	 *
+	 * @param request the effect request
+	 * @param chat    whether the returned component will be used in chat
+	 * @return the viewer as a component
+	 */
+	@NotNull
+	default Component getViewerComponent(@NotNull Request request, boolean chat) {
+		return getViewerComponent(getHideNames(), request, chat);
+	}
+
+	/**
+	 * Gets the viewer who triggered an effect as a component.
+	 *
+	 * @param hidesNames the {@link HideNames} config
+	 * @param request    the effect request
+	 * @param chat       whether the returned component will be used in chat
+	 */
+	@NotNull
+	static Component getViewerComponent(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
+		if ((!chat && hidesNames.isHideOther()) || (chat && hidesNames.isHideChat()))
+			return Component.translatable("cc.effect.viewer");
+		else
+			return Component.text(request.getViewer());
+	}
+
+	/**
+	 * Returns the version of the mod that the provided player is using.
+	 * May be empty if the player is not using the mod locally.
+	 *
+	 * @param player the player to check
+	 * @return the version of the mod that the player is using
+	 */
+	default @NotNull Optional<SemVer> getModVersion(@NotNull P player) {
+		return Optional.empty();
+	}
+
+	/**
+	 * Returns the number of players that are currently using the mod.
+	 *
+	 * @return the number of players that are currently using the mod
+	 */
+	default int getModdedPlayerCount() {
+		return 0;
+	}
 }

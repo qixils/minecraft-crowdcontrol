@@ -3,19 +3,23 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
-import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
-import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.common.*;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
+import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,34 +27,40 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import javax.annotation.CheckReturnValue;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
+	@Getter
+	private final Executor syncExecutor = runnable -> Bukkit.getScheduler().runTask(this, runnable);
+	@Getter
+	private final Executor asyncExecutor = runnable -> Bukkit.getScheduler().runTaskAsynchronously(this, runnable);
+	@Getter
+	@Accessors(fluent = true)
+	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
+	@Getter
+	@Accessors(fluent = true)
+	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);
+	@Getter
+	@Accessors(fluent = true)
+	private final KyoriTranslator translator = new KyoriTranslator(new NativeAudienceProvider(), getClass().getClassLoader(), dev.qixils.crowdcontrol.common.Plugin.class.getClassLoader());
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
-	private final PaperPlayerMapper playerMapper = new PaperPlayerMapper(this);
+	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
 	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
 	@Getter
-	private final TextUtil textUtil = new TextUtil(Bukkit.getUnsafe().componentFlattener());
+	private final TextUtilImpl textUtil = new TextUtilImpl(Bukkit.getUnsafe().componentFlattener());
 	@Getter
 	private final Class<Player> playerClass = Player.class;
 	@Getter
@@ -60,18 +70,26 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	String manualPassword = null; // set via /password
 	@Getter
 	CrowdControl crowdControl = null;
-	List<Command> commands;
 	@Getter
 	private PaperCommandManager<CommandSender> commandManager;
 	@Getter
 	private boolean isServer = true;
 	@Getter
 	private boolean global = false;
+	@Getter @NotNull
+	private HideNames hideNames = HideNames.NONE;
 	@Getter
 	private Collection<String> hosts = Collections.emptyList();
 	private boolean announce = true;
 	@Getter
 	private boolean adminRequired = false;
+	@Getter
+	private LimitConfig limitConfig = new LimitConfig();
+	@Getter
+	@Accessors(fluent = true)
+	private final CommandRegister commandRegister = new CommandRegister(this);
+	@Getter @NotNull
+	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
 	@Override
 	public void onLoad() {
@@ -118,15 +136,25 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			crowdControl = CrowdControl.client().port(port).ip(ip).build();
 		}
 
-		if (commands == null)
-			commands = RegisterCommands.register(this);
-		else
-			RegisterCommands.register(this, commands);
+		commandRegister().register();
+		postInitCrowdControl(crowdControl);
 	}
 
 	@Override
 	public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
 		this.crowdControl = crowdControl;
+	}
+
+	@Contract("null -> null; !null -> !null")
+	private static Map<String, Integer> parseLimitConfigSection(@Nullable ConfigurationSection section) {
+		if (section == null)
+			return null;
+		Set<String> keys = section.getKeys(false);
+		Map<String, Integer> map = new HashMap<>(keys.size());
+		for (String key : keys) {
+			map.put(key, section.getInt(key));
+		}
+		return map;
 	}
 
 	@SneakyThrows
@@ -136,11 +164,25 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		announce = config.getBoolean("announce", true);
 		adminRequired = config.getBoolean("admin-required", false);
 		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
+		hideNames = HideNames.fromConfigCode(config.getString("hide-names", "none"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
 				loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
 			hosts = Collections.unmodifiableSet(loweredHosts);
+		}
+
+		// limit config
+		ConfigurationSection limitSection = config.getConfigurationSection("limits");
+		if (limitSection == null) {
+			getSLF4JLogger().info("No limit config found, using defaults");
+			limitConfig = new LimitConfig();
+		} else {
+			getSLF4JLogger().info("Loading limit config");
+			boolean hostsBypass = limitSection.getBoolean("hosts-bypass", true);
+			Map<String, Integer> itemLimits = parseLimitConfigSection(limitSection.getConfigurationSection("items"));
+			Map<String, Integer> entityLimits = parseLimitConfigSection(limitSection.getConfigurationSection("entities"));
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
 		}
 
 		initCrowdControl();
@@ -150,7 +192,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 		try {
 			commandManager = new PaperCommandManager<>(this,
-					AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder()
+					AsynchronousCommandExecutionCoordinator.<CommandSender>builder()
 							.withAsynchronousParsing().build(),
 					Function.identity(),
 					Function.identity()
@@ -178,27 +220,14 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			crowdControl.shutdown("Plugin is unloading (server may be shutting down)");
 			crowdControl = null;
 		}
-		commands = null;
 	}
 
 	public boolean announceEffects() {
 		return announce;
 	}
 
-	@CheckReturnValue
-	@NotNull
-	public List<@NotNull Player> getAllPlayers() {
-		return playerMapper.getAllPlayers();
-	}
-
-	@CheckReturnValue
-	@NotNull
-	public List<@NotNull Player> getPlayers(final @NotNull Request request) {
-		return playerMapper.getPlayers(request);
-	}
-
 	@Override
-	public void registerCommand(@NotNull String name, dev.qixils.crowdcontrol.common.@NotNull Command<Player> command) {
+	public void registerCommand(@NotNull String name, @NotNull Command<Player> command) {
 		name = name.toLowerCase(Locale.ENGLISH);
 		try {
 			crowdControl.registerHandler(name, command::executeAndNotify);
@@ -226,23 +255,18 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
-	public boolean isAdmin(@NotNull CommandSender commandSource) {
-		if (commandSource.hasPermission(ADMIN_PERMISSION) || commandSource.isOp()) return true;
-		String uuid = getUUID(commandSource).map(id -> id.toString().toLowerCase(Locale.US).replace("-", "")).orElse(null);
-		if (uuid == null) return false;
-		return getHosts().stream().anyMatch(host -> host.toLowerCase(Locale.ENGLISH).replace("-", "").equals(uuid));
-	}
-
-	@Override
-	public @NotNull Optional<UUID> getUUID(@NotNull CommandSender entity) {
-		if (entity instanceof Entity trueEntity)
-			return Optional.of(trueEntity.getUniqueId());
-		return Plugin.super.getUUID(entity);
+	public @NotNull Audience getConsole() {
+		return Bukkit.getConsoleSender();
 	}
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		onPlayerJoin(event.getPlayer());
+	}
+
+	@Override
+	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
+		return new PaperPlayer(player);
 	}
 
 	// boilerplate stuff for the data container storage

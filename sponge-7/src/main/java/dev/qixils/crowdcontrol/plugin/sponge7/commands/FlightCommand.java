@@ -1,8 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge7.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -19,10 +20,10 @@ import java.time.Duration;
 import java.util.List;
 
 @Getter
-public class FlightCommand extends TimedCommand {
+@EventListener
+public class FlightCommand extends TimedVoidCommand {
 	private final String effectName = "flight";
-	private final String displayName = "Enable Flight";
-	private final Duration duration = Duration.ofSeconds(15);
+	private final Duration defaultDuration = Duration.ofSeconds(15);
 
 	public FlightCommand(@NotNull SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -33,7 +34,7 @@ public class FlightCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
@@ -69,11 +70,6 @@ public class FlightCommand extends TimedCommand {
 				.build().queue();
 	}
 
-	@Override
-	public boolean isEventListener() {
-		return true;
-	}
-
 	@Listener
 	public void onJoin(ClientConnectionEvent.Join event) {
 		Player player = event.getTargetEntity();
@@ -83,9 +79,8 @@ public class FlightCommand extends TimedCommand {
 			return;
 		if (gameMode.equals(GameModes.SPECTATOR))
 			return;
-		if (!player.get(Keys.CAN_FLY).orElse(false))
-			return;
-		if (!player.get(Keys.IS_FLYING).orElse(false))
+		if (!player.get(Keys.CAN_FLY).orElse(false)
+				&& !player.get(Keys.IS_FLYING).orElse(false))
 			return;
 		player.offer(Keys.IS_FLYING, false);
 		player.offer(Keys.CAN_FLY, false);

@@ -110,8 +110,8 @@ public final class Sounds {
 			1.75f,
 			1f,
 			Key.key(MINECRAFT_NAMESPACE, "entity.creeper.primed"),
-			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.stare"),
-			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.scream"),
+			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.stare"), // 1.13+
+			Key.key(MINECRAFT_NAMESPACE, "entity.enderman.scream"), // 1.13+
 			Key.key(MINECRAFT_NAMESPACE, "entity.endermen.stare"), // 1.12.2
 			Key.key(MINECRAFT_NAMESPACE, "entity.endermen.scream"), // 1.12.2
 			Key.key(MINECRAFT_NAMESPACE, "entity.ender_dragon.growl"),

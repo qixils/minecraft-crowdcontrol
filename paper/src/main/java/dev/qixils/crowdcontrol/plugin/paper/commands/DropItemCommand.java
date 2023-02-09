@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 public class DropItemCommand extends ImmediateCommand {
 	private final String effectName = "drop_item";
-	private final String displayName = "Drop Held Item";
 
 	public DropItemCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

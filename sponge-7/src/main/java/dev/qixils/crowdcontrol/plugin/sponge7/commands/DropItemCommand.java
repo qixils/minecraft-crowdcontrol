@@ -28,7 +28,6 @@ import java.util.Random;
 public class DropItemCommand extends ImmediateCommand {
 	private static final double SIN_MULT_CONSTANT = 0.017453292d;
 	private final String effectName = "drop_item";
-	private final String displayName = "Drop Held Item";
 
 	public DropItemCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -44,8 +43,8 @@ public class DropItemCommand extends ImmediateCommand {
 		double f2 = MinecraftMath.cos(xRot * SIN_MULT_CONSTANT);
 		double f3 = MinecraftMath.sin(yRot * SIN_MULT_CONSTANT);
 		double f4 = MinecraftMath.cos(yRot * SIN_MULT_CONSTANT);
-		double f5 = rng.nextFloat() * 6.2831855d;
-		double f6 = 0.02d * RandomUtil.RNG.nextFloat();
+		double f5 = rng.nextDouble() * 6.2831855d;
+		double f6 = 0.02d * rng.nextDouble();
 
 		// these don't use the weird sine table for some reason
 		double x = (-f3 * f2 * 0.3d) + Math.cos(f5) * f6;
@@ -63,7 +62,6 @@ public class DropItemCommand extends ImmediateCommand {
 			if (itemStack.isEmpty())
 				continue;
 
-			// API8: drop item naturally if available
 			Vector3d rotation = asItemVector(player.getHeadRotation());
 
 			// spawn the entity

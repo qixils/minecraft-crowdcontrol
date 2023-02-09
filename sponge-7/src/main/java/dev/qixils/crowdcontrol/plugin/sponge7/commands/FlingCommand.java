@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,7 +15,6 @@ import java.util.List;
 
 @Getter
 public class FlingCommand extends ImmediateCommand {
-	private final @NotNull String displayName = "Fling Randomly";
 	private final @NotNull String effectName = "fling";
 
 	public FlingCommand(@NotNull SpongeCrowdControlPlugin plugin) {

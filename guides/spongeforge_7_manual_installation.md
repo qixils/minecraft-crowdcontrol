@@ -14,8 +14,8 @@ with Crowd Control.
 5. Download the latest recommended build of
    [SpongeForge 1.12.2](https://www.spongepowered.org/downloads/spongeforge?minecraft=1.12.2&offset=0)
    for API v7 and place it in the `mods` folder.
-6. Download
-   the [latest Sponge plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+6. Download the
+   [latest build of Crowd Control for Sponge 7](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
    and place it in the `mods` folder.
 7. Copy all the other Forge 1.12.2 mods or Sponge 7 plugins that you want to play with into the
    `mods` folder.
@@ -43,6 +43,3 @@ sure to provide your public IP address and the password used in the config file 
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This
 prevents unknown players from joining the server and potentially griefing your builds.
-
-You may also be interested in setting up [GeyserMC](https://geysermc.org/) to allow Bedrock edition
-users (i.e. console players) to play.

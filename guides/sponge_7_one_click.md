@@ -9,7 +9,7 @@ The following steps provide a quick setup for running a local game server.
    environment).
 4. Once setup is done, you can click the **Open Server Folder** button and copy any
    Forge 1.12.2 mods or Sponge 7 plugins you want to play with into the `mods` folder.
-5. Click the **Launch Server** to start the Minecraft server. You may optionally run
+5. Click the **Launch Server** button to start the Minecraft server. You may optionally run
    `/password <password>` to change the password required to connect to the server. By default, the
    password is set to `crowdcontrol`.
 6. Once the Minecraft server has started, click **Start** in the Crowd Control app to connect to the

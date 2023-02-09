@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -14,22 +15,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+// TODO: prevent placing fire on non flammable blocks
+
 @Getter
 public class BlockCommand extends ImmediateCommand {
 	protected final Material material;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public BlockCommand(PaperCrowdControlPlugin plugin, Material block) {
 		this(
 				plugin,
 				block,
 				"block_" + block.name(),
-				"Place " + plugin.getTextUtil().translate(block) + " Block"
+				Component.translatable("cc.effect.block.name", Component.translatable(block))
 		);
 	}
 
-	protected BlockCommand(PaperCrowdControlPlugin plugin, Material block, String effectName, String displayName) {
+	protected BlockCommand(PaperCrowdControlPlugin plugin, Material block, String effectName, Component displayName) {
 		super(plugin);
 		this.material = block;
 		this.effectName = effectName;
@@ -38,7 +41,10 @@ public class BlockCommand extends ImmediateCommand {
 
 	@Nullable
 	protected Location getLocation(Player player) {
-		return player.getLocation();
+		Location location = player.getLocation();
+		if (!location.getBlock().isReplaceable())
+			return null;
+		return location;
 	}
 
 	@Override
@@ -47,8 +53,6 @@ public class BlockCommand extends ImmediateCommand {
 				.type(Response.ResultType.RETRY)
 				.message("No available locations to set blocks");
 		for (Player player : players) {
-			if (!player.getLocation().getBlock().isReplaceable())
-				continue;
 			Location location = getLocation(player);
 			if (location == null)
 				continue;

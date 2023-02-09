@@ -14,13 +14,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DIG_RADIUS;
-import static dev.qixils.crowdcontrol.common.CommandConstants.getDigDepth;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DIG_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.getDigDepth;
 
 @Getter
 public class DigCommand extends ImmediateCommand {
 	private final String effectName = "dig";
-	private final String displayName = "Dig Hole";
 
 	public DigCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -35,14 +34,16 @@ public class DigCommand extends ImmediateCommand {
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 				for (int y = depth; y < 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
-						blocks.add(playerLocation.clone().add(x, y, z));
+						Location block = playerLocation.clone().add(x, y, z);
+						if (!block.getBlock().isEmpty())
+							blocks.add(block);
 					}
 				}
 			}
 		}
 
 		if (blocks.isEmpty())
-			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any earthly blocks");
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Streamer(s) not standing on any blocks");
 
 		sync(() -> {
 			for (Location location : blocks)

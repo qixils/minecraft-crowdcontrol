@@ -11,12 +11,16 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCAL_RADIUS;
 
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {
-	private final String displayName = "Entity Chaos";
+	private static final Predicate<Entity> IS_NOT_PLAYER = entity -> !entity.getType().equals(EntityTypes.PLAYER);
 	private final String effectName = "entity_chaos";
 
 	public EntityChaosCommand(SpongeCrowdControlPlugin plugin) {
@@ -26,19 +30,24 @@ public class EntityChaosCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (!isGlobalCommandUsable(players, request))
-			return globalCommandUnusable(request);
-
-		List<Entity> entities = new ArrayList<>(200);
-		for (World world : plugin.getGame().getServer().getWorlds()) {
-			entities.addAll(world.getEntities(entity -> !entity.getType().equals(EntityTypes.PLAYER)));
+		Set<Entity> entities = new HashSet<>(200);
+		if (isGlobalCommandUsable(players, request)) {
+			for (World world : plugin.getGame().getServer().getWorlds())
+				entities.addAll(world.getEntities(IS_NOT_PLAYER));
+		} else {
+			for (Player player : players) {
+				for (Entity entity : player.getNearbyEntities(CHAOS_LOCAL_RADIUS)) {
+					if (entity.getType().equals(EntityTypes.PLAYER)) continue;
+					entities.add(entity);
+				}
+			}
 		}
 
 		sync(() -> {
-			for (int i = 0; i < entities.size(); i++) {
-				Entity entity = entities.get(i);
+			int i = 0;
+			for (Entity entity : entities) {
 				entity.clearPassengers();
-				entity.setLocation(players.get(i % players.size()).getLocation());
+				entity.setLocation(players.get((i++) % players.size()).getLocation());
 			}
 		});
 

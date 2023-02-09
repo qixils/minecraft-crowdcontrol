@@ -16,7 +16,6 @@ import java.util.Optional;
 @Getter
 public class DeleteItemCommand extends ImmediateCommand {
 	private final String effectName = "delete_item";
-	private final String displayName = "Delete Held Item";
 
 	public DeleteItemCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

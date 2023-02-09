@@ -3,9 +3,10 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.EventListener;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge7.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -21,38 +22,27 @@ import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.World;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
-public class DisableJumpingCommand extends TimedCommand {
+@EventListener
+public class DisableJumpingCommand extends TimedVoidCommand {
 	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>(1);
 	private final String effectName = "disable_jumping";
-	private final String displayName = "Disable Jumping";
 
 	public DisableJumpingCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	@Override
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return CommandConstants.DISABLE_JUMPING_DURATION;
-	}
-
-	@Override
-	public boolean isEventListener() {
-		return true;
 	}
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
 		new TimedEffect.Builder().request(request)
-				.duration(CommandConstants.DISABLE_JUMPING_DURATION)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					if (players.isEmpty())
@@ -84,7 +74,6 @@ public class DisableJumpingCommand extends TimedCommand {
 			return;
 		}
 
-		// validate that this is a jump (improved in API8 maybe?)
 		if (!entity.getType().equals(EntityTypes.PLAYER))
 			return;
 		if (event.getToTransform().getPosition().getY() <= event.getFromTransform().getPosition().getY())

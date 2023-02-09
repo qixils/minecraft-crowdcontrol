@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A command which handles the {@link Response}(s) on its own.
  */
-public abstract class VoidCommand extends Command implements dev.qixils.crowdcontrol.common.VoidCommand<Player> {
+public abstract class VoidCommand extends Command implements dev.qixils.crowdcontrol.common.command.VoidCommand<Player> {
 	public VoidCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}

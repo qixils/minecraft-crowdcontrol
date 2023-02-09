@@ -25,7 +25,6 @@ import java.util.Optional;
 public class BucketClutchCommand extends ImmediateCommand {
 	private static final int OFFSET = 30;
 	private final String effectName = "bucket_clutch";
-	private final String displayName = "Water Bucket Clutch";
 
 	public BucketClutchCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

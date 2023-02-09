@@ -20,15 +20,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_COMPONENT;
-import static dev.qixils.crowdcontrol.common.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_COMPONENT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
 import static dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin.COMPONENT_TYPE;
 
 @Getter
 public class DinnerboneCommand extends Command {
 	private final NamespacedKey key;
 	private final String effectName = "dinnerbone";
-	private final String displayName = "Flip Mobs Upside-Down";
 
 	public DinnerboneCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -50,8 +49,10 @@ public class DinnerboneCommand extends Command {
 				PersistentDataContainer data = entity.getPersistentDataContainer();
 				Component currentName = entity.customName();
 				if (DINNERBONE_COMPONENT.equals(currentName)) {
-					entity.customName(data.get(key, COMPONENT_TYPE));
-					entity.setCustomNameVisible(true);
+					Component savedName = data.get(key, COMPONENT_TYPE);
+					entity.customName(savedName);
+					if (savedName != null)
+						entity.setCustomNameVisible(true);
 					data.remove(key);
 				} else {
 					if (currentName != null)

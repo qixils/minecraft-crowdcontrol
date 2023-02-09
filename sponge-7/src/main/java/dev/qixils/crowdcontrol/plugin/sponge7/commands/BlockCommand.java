@@ -3,11 +3,12 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.block.BlockState;
@@ -18,22 +19,32 @@ import org.spongepowered.api.world.World;
 
 import java.util.List;
 
+import static net.kyori.adventure.text.Component.translatable;
+
 @Getter
 public class BlockCommand extends ImmediateCommand {
 	private final BlockType blockType;
 	private final String effectName;
-	private final String displayName;
+	private final Component displayName;
 
 	public BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType) {
 		this(
 				plugin,
 				blockType,
-				"block_" + Sponge7TextUtil.csIdOf(blockType),
-				"Place " + blockType.getTranslation().get() + " Block"
+				"block_" + SpongeTextUtil.valueOf(blockType)
 		);
 	}
 
-	protected BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName, String displayName) {
+	public BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName) {
+		this(
+				plugin,
+				blockType,
+				effectName,
+				translatable("cc.effect.block.name", translatable(blockType.getTranslation().getId()))
+		);
+	}
+
+	public BlockCommand(SpongeCrowdControlPlugin plugin, BlockType blockType, String effectName, Component displayName) {
 		super(plugin);
 		this.blockType = blockType;
 		this.effectName = effectName;
@@ -42,7 +53,10 @@ public class BlockCommand extends ImmediateCommand {
 
 	@Nullable
 	protected Location<World> getLocation(Player player) {
-		return player.getLocation();
+		Location<World> location = player.getLocation();
+		if (!BlockFinder.isReplaceable(location.getBlock()))
+			return null;
+		return location;
 	}
 
 	@NotNull
@@ -52,8 +66,6 @@ public class BlockCommand extends ImmediateCommand {
 				.type(ResultType.RETRY)
 				.message("No available locations to set blocks");
 		for (Player player : players) {
-			if (!BlockFinder.isReplaceable(player.getLocation().getBlock()))
-				continue;
 			Location<World> location = getLocation(player);
 			if (location == null)
 				continue;

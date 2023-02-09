@@ -20,20 +20,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.VEIN_COUNT;
-import static dev.qixils.crowdcontrol.common.CommandConstants.VEIN_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_COUNT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIUS;
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
 	private final String effectName = "vein";
-	private final String displayName = "Spawn Ore Vein";
 
 	public VeinCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	// Gets a 2x2 chunk of blocks
-	@Contract(value = "null, _, _ -> fail; _, null, _ -> fail; _, _, null -> fail", mutates = "param1, param2")
+	@Contract(mutates = "param1, param2")
 	private static void addOreVein(List<Location> deepslateBlocks, List<Location> stoneBlocks, Location base) {
 		for (int x = 0; x <= 1; ++x) {
 			for (int y = 0; y <= 1; ++y) {
@@ -50,7 +49,7 @@ public class VeinCommand extends ImmediateCommand {
 		}
 	}
 
-	@Contract(value = "null -> fail", mutates = "param1")
+	@Contract(mutates = "param1")
 	private static void randomlyShrinkOreVein(List<Location> blockLocations) {
 		if (blockLocations.isEmpty()) return;
 		Collections.shuffle(blockLocations, random);

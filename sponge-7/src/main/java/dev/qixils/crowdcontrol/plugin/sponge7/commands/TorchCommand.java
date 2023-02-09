@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
@@ -15,7 +15,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -35,13 +34,11 @@ public class TorchCommand extends ImmediateCommand {
 	protected final TypedTag<BlockType> torches;
 	protected final boolean placeTorches;
 	protected final String effectName;
-	protected final String displayName;
 
 	public TorchCommand(SpongeCrowdControlPlugin plugin, boolean placeTorches) {
 		super(plugin);
 		this.placeTorches = placeTorches;
-		this.effectName = placeTorches ? "Lit" : "Dim";
-		this.displayName = (placeTorches ? "Place" : "Break") + " Torches";
+		this.effectName = placeTorches ? "lit" : "dim";
 		this.torches = new TypedTag<>(CommandConstants.TORCHES, plugin, BlockType.class);
 	}
 
@@ -60,14 +57,14 @@ public class TorchCommand extends ImmediateCommand {
 				.build().getAll()));
 
 		if (nearbyBlocks.isEmpty())
-			return request.buildResponse().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
+			return request.buildResponse().type(Response.ResultType.RETRY).message("No available blocks to place/remove");
 
 		sync(() -> {
 			for (Location<World> location : nearbyBlocks) {
 				if (placeTorches)
 					placeTorch(location);
 				else
-					location.setBlockType(BlockTypes.AIR, BlockChangeFlags.NONE);
+					location.setBlockType(BlockTypes.AIR); // TODO: light map is not updating, not sure if i can fix that
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
@@ -100,6 +97,6 @@ public class TorchCommand extends ImmediateCommand {
 		if (placeFace != Direction.DOWN)
 			setBlock.add(Keys.DIRECTION, placeFace);
 
-		location.setBlock(setBlock.build(), BlockChangeFlags.NONE);
+		location.setBlock(setBlock.build());
 	}
 }

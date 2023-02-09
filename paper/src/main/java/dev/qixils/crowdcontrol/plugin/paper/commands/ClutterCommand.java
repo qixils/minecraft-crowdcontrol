@@ -11,18 +11,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.CLUTTER_ITEMS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.CLUTTER_ITEMS;
 
 @Getter
 public class ClutterCommand extends ImmediateCommand {
 	private final String effectName = "clutter";
-	private final String displayName = "Clutter Inventory";
 
 	public ClutterCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);

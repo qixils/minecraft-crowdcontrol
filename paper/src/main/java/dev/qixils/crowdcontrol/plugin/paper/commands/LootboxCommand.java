@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.CommandConstants;
-import dev.qixils.crowdcontrol.common.CommandConstants.AttributeWeights;
-import dev.qixils.crowdcontrol.common.CommandConstants.EnchantmentWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.AttributeWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
@@ -22,18 +22,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.lootboxItemSlots;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.lootboxItemSlots;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
@@ -58,13 +54,11 @@ public class LootboxCommand extends ImmediateCommand {
 			Attribute.GENERIC_ATTACK_SPEED
 	);
 	private final String effectName;
-	private final String displayName;
 	private final int luck;
 
-	public LootboxCommand(PaperCrowdControlPlugin plugin, String displayName, int luck) {
+	public LootboxCommand(PaperCrowdControlPlugin plugin, int luck) {
 		super(plugin);
 
-		this.displayName = displayName;
 		this.luck = luck;
 
 		// set effect name to an ID like "lootbox_5" or just "lootbox" for luck level of 1
@@ -109,6 +103,20 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// create item stack
 		ItemStack itemStack = new ItemStack(item, quantity);
+		randomlyModifyItem(itemStack, luck);
+		return itemStack;
+	}
+
+	/**
+	 * Applies various random modifications to an item including enchantments, attributes, and
+	 * unbreaking.
+	 *
+	 * @param itemStack item to modify
+	 * @param luck      zero-indexed level of luck
+	 */
+	@Contract(mutates = "param1")
+	public static void randomlyModifyItem(ItemStack itemStack, int luck) {
+		Material item = itemStack.getType();
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
@@ -122,7 +130,9 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Enchantment> enchantmentList = Arrays.stream(EnchantmentWrapper.values())
 				.filter(enchantment -> enchantment.canEnchantItem(itemStack))
 				.collect(Collectors.toList());
-		// TODO: chance to remove curses with good luck
+		if (random.nextDouble() >= (.8d - (luck * .2d)))
+			enchantmentList.removeIf(Enchantment::isCursed);
+
 		// add enchantments
 		if (enchantments > 0 && !enchantmentList.isEmpty()) {
 			Collections.shuffle(enchantmentList, random);
@@ -168,18 +178,14 @@ public class LootboxCommand extends ImmediateCommand {
 					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
 				}
 				// create & add attribute
-				if (target == EquipmentSlot.HAND || target == EquipmentSlot.OFF_HAND) {
-					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.HAND));
-					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, EquipmentSlot.OFF_HAND));
-				} else {
-					itemMeta.addAttributeModifier(attribute, createModifier(name, amount, target));
-				}
+				itemMeta.addAttributeModifier(attribute, createModifier(name, amount, target));
+				if (target == EquipmentSlot.HAND)
+					itemMeta.addAttributeModifier(attribute, createModifier(name + "_offhand", amount, EquipmentSlot.OFF_HAND));
 			}
 		}
 
 		// finish up
 		itemStack.setItemMeta(itemMeta);
-		return itemStack;
 	}
 
 	@NotNull
@@ -194,12 +200,12 @@ public class LootboxCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		for (Player player : players) {
-			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(request));
+			Inventory lootbox = Bukkit.createInventory(null, 27, plugin.renderForPlayer(CommandConstants.buildLootboxTitle(plugin, request), player));
 			for (int slot : lootboxItemSlots(luck)) {
 				// create item
 				ItemStack randomItem = createRandomItem(luck);
 				ItemMeta itemMeta = randomItem.getItemMeta();
-				itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(request)));
+				itemMeta.lore(Collections.singletonList(plugin.renderForPlayer(CommandConstants.buildLootboxLore(plugin, request), player)));
 				randomItem.setItemMeta(itemMeta);
 				lootbox.setItem(slot, randomItem);
 			}

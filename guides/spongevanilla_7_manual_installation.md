@@ -11,8 +11,8 @@ with Crowd Control.
 3. Place the Sponge jar in a new, empty folder. This folder will hereafter be referred to as the
    "root folder".
 4. Create a new folder named `mods` inside the root folder.
-5. Download
-   the [latest Sponge plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+5. Download the
+   [latest build of Crowd Control for Sponge 7](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
    and place it in the `mods` folder.
 6. Copy all the other Sponge 7 plugins that you want to play with into the `mods` folder.
 7. Run the Minecraft server to initialize the plugin's configuration files. You will have to run it
@@ -39,6 +39,3 @@ sure to provide your public IP address and the password used in the config file 
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This
 prevents unknown players from joining the server and potentially griefing your builds.
-
-You may also be interested in setting up [GeyserMC](https://geysermc.org/) to allow Bedrock edition
-users (i.e. console players) to play.

@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.text.translation.Translatable;
 
 @Getter
 public class ObtainItemCondition implements SuccessCondition {
@@ -12,13 +13,17 @@ public class ObtainItemCondition implements SuccessCondition {
 	private final ItemType item;
 	private final Component component;
 
-	public ObtainItemCondition(int rewardLuck, String displayText, ItemType item) {
+	public ObtainItemCondition(int rewardLuck, String key, ItemType item) {
+		this(rewardLuck, key, item, item);
+	}
+
+	public ObtainItemCondition(int rewardLuck, String key, ItemType item, Translatable displayItem) {
 		this.rewardLuck = rewardLuck;
 		this.item = item;
-		component = Component.text("Obtain ").append(Component.text(displayText)
-				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(item.getTranslation().getId())
-								.color(NamedTextColor.GREEN))));
+		this.component = Component.translatable(
+				"cc.effect.do_or_die.condition.obtain." + key,
+				Component.translatable(displayItem.getTranslation().getId(), NamedTextColor.GREEN)
+		);
 	}
 
 	@Override

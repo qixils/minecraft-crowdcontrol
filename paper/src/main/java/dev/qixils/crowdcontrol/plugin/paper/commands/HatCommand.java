@@ -11,14 +11,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
+import static dev.qixils.crowdcontrol.plugin.paper.utils.ItemUtil.isSimilar;
 
 @Getter
 public class HatCommand extends ImmediateCommand {
 	private final String effectName = "hat";
-	private final String displayName = "Put Item on Head";
 
 	public HatCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -45,15 +45,5 @@ public class HatCommand extends ImmediateCommand {
 			inv.setItem(EquipmentSlot.HEAD, hand);
 		}
 		return response;
-	}
-
-	private boolean isSimilar(@Nullable ItemStack item1, @Nullable ItemStack item2) {
-		if (item1 == null && item2 == null)
-			return true;
-		if (item1 == null)
-			return false;
-		if (item2 == null)
-			return false;
-		return item1.isSimilar(item2);
 	}
 }

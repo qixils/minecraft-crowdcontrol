@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
@@ -18,20 +19,15 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class DoOrDieCommand extends VoidCommand {
 	private final String effectName = "do_or_die";
-	private final String displayName = "Do-or-Die";
 
 	public DoOrDieCommand(@NotNull SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -72,6 +68,7 @@ public class DoOrDieCommand extends VoidCommand {
 
 					AtomicInteger pastValue = new AtomicInteger(0);
 					Task.builder()
+							.delayTicks(1)
 							.intervalTicks(2)
 							.execute(task -> {
 								int ticksElapsed = server.getRunningTimeTicks() - startedAt;
@@ -81,23 +78,26 @@ public class DoOrDieCommand extends VoidCommand {
 								for (UUID uuid : notCompleted) {
 									Player player = server.getPlayer(uuid).orElse(null);
 									if (player == null) continue;
+									Audience audience = plugin.asAudience(player);
 
 									if (finalCondition.hasSucceeded(player)) {
-										ItemStack item = plugin.getRegister().getCommand(LootboxCommand.class).createRandomItem(finalCondition.getRewardLuck());
-										plugin.asAudience(player).showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
+										ItemStack item = plugin.commandRegister()
+												.getCommandByName("lootbox", LootboxCommand.class)
+												.createRandomItem(finalCondition.getRewardLuck());
+										audience.showTitle(doOrDieSuccess(Component.translatable(item.getTranslation().getId())));
 										notCompleted.remove(uuid);
 										Vector3d pos = player.getPosition();
-										plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
-										GiveItemCommand.giveItemTo(plugin, player, item);
+										audience.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), pos.getX(), pos.getY(), pos.getZ());
+										GiveItemCommand.giveItemTo(plugin, player, item.createSnapshot());
 									} else if (isTimeUp) {
-										plugin.asAudience(player).showTitle(DO_OR_DIE_FAILURE);
+										audience.showTitle(DO_OR_DIE_FAILURE);
 										player.offer(Keys.HEALTH, 0d);
 									} else {
 										Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-										plugin.asAudience(player).showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+										audience.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
 										if (isNewValue) {
 											Vector3d pos = player.getPosition();
-											plugin.asAudience(player).playSound(Sounds.DO_OR_DIE_TICK.get(), pos.getX(), pos.getY(), pos.getZ());
+											audience.playSound(Sounds.DO_OR_DIE_TICK.get(), pos.getX(), pos.getY(), pos.getZ());
 										}
 									}
 								}

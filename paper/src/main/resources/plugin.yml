@@ -1,8 +1,0 @@
-name: CrowdControl
-version: ${project.version}
-main: dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin
-api-version: 1.17
-prefix: crowd-control
-authors: [ qixils ]
-description: Allows viewers to interact with your Minecraft world
-website: https://github.com/qixils/minecraft-crowdcontrol

@@ -24,14 +24,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.VEIN_COUNT;
-import static dev.qixils.crowdcontrol.common.CommandConstants.VEIN_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_COUNT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIUS;
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
 	private final TypedTag<BlockType> stones;
 	private final String effectName = "vein";
-	private final String displayName = "Spawn Ore Vein";
 
 	public VeinCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);

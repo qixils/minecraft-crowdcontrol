@@ -2,9 +2,9 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.common.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -22,24 +22,23 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class DisableJumpingCommand extends TimedCommand implements Listener {
+public class DisableJumpingCommand extends TimedVoidCommand implements Listener {
 	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>();
 	private final String effectName = "disable_jumping";
-	private final String displayName = "Disable Jumping";
 
 	public DisableJumpingCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	@Override
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return CommandConstants.DISABLE_JUMPING_DURATION;
 	}
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
 		new TimedEffect.Builder().request(request)
-				.duration(CommandConstants.DISABLE_JUMPING_DURATION)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					if (players.isEmpty())

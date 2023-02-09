@@ -5,23 +5,30 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
-public class ObtainItemCondition implements SuccessCondition {
-	private final int rewardLuck;
+public final class ObtainItemCondition extends AbstractCondition {
 	private final Material item;
 	private final Component component;
 
-	public ObtainItemCondition(int rewardLuck, String displayText, Material item) {
-		this.rewardLuck = rewardLuck;
+	public ObtainItemCondition(int rewardLuck, String key, Material item) {
+		this(rewardLuck, key, null, item);
+	}
+
+	public ObtainItemCondition(int rewardLuck, String key, @Nullable ConditionFlags flags, Material item) {
+		super(rewardLuck, flags);
 		this.item = item;
-		component = Component.text("Obtain ").append(Component.text(displayText)
-				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(item).color(NamedTextColor.GREEN))));
+		this.component = Component.translatable(
+				"cc.effect.do_or_die.condition.obtain." + key,
+				Component.translatable(new ItemStack(item), NamedTextColor.GREEN)
+		);
 	}
 
 	@Override
-	public boolean hasSucceeded(Player player) {
+	public boolean hasSucceeded(@NotNull Player player) {
 		return player.getInventory().contains(item);
 	}
 }

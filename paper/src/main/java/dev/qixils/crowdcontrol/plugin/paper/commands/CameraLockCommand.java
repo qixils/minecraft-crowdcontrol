@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -18,18 +18,17 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class CameraLockCommand extends TimedCommand {
+public final class CameraLockCommand extends TimedVoidCommand {
 	private final String effectName = "camera_lock";
-	private final String displayName = "Camera Lock";
 
 	public CameraLockCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -40,7 +39,7 @@ public final class CameraLockCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("camera_lock")
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Map<UUID, Location> locations = new HashMap<>(players.size());

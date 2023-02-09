@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7;
 
 import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.SoftLockObserver;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.Entity;
@@ -24,7 +25,7 @@ public class SoftLockResolver extends SoftLockObserver<Player> {
 	}
 
 	@Override
-	public void onSoftLock(Player player) {
+	public void onSoftLock(@NotNull Player player) {
 		World world = player.getWorld();
 		Vector3d pos = player.getPosition();
 		// kill nearby monsters
@@ -54,7 +55,7 @@ public class SoftLockResolver extends SoftLockObserver<Player> {
 //			return map;
 //		});
 		// alert player
-		plugin.asAudience(player).sendMessage(ALERT);
+		plugin.playerMapper().asAudience(player).sendMessage(ALERT);
 	}
 
 	@Listener

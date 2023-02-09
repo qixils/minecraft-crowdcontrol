@@ -2,11 +2,12 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge7.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.Sponge7TextUtil;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.key.Keys;
@@ -21,18 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class GameModeCommand extends TimedCommand {
-	private final Duration duration;
+public class GameModeCommand extends TimedVoidCommand {
+	private final Duration defaultDuration;
 	private final GameMode gamemode;
-	private final String displayName;
+	private final Component displayName;
 	private final String effectName;
 
 	public GameModeCommand(SpongeCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
 		super(plugin);
-		this.duration = Duration.ofSeconds(seconds);
+		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = gamemode.getTranslation().get();
-		this.effectName = Sponge7TextUtil.valueOf(gamemode) + "_mode";
+		this.displayName = Component.translatable(gamemode.getTranslation().getId());
+		this.effectName = SpongeTextUtil.valueOf(gamemode) + "_mode";
 	}
 
 	@Override
@@ -42,7 +43,7 @@ public class GameModeCommand extends TimedCommand {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
-				.duration(duration)
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);
@@ -74,7 +75,7 @@ public class GameModeCommand extends TimedCommand {
 			Player player = event.getTargetEntity();
 			if (!player.get(GameModeEffectData.class).isPresent()) return;
 			player.remove(GameModeEffectData.class);
-			player.gameMode().set(GameModes.SURVIVAL);
+			player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
 		}
 	}
 

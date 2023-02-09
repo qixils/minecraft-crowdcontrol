@@ -14,12 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.explosionPower;
-import static dev.qixils.crowdcontrol.common.CommandConstants.shouldSpawnFire;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.explosionPower;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.shouldSpawnFire;
 
 @Getter
 public class ExplodeCommand extends Command {
-	private final String displayName = "Explode";
 	private final String effectName = "explode";
 
 	public ExplodeCommand(PaperCrowdControlPlugin plugin) {

@@ -30,13 +30,11 @@ public class TorchCommand extends ImmediateCommand {
 	};
 	protected final boolean placeTorches;
 	protected final String effectName;
-	protected final String displayName;
 
 	public TorchCommand(PaperCrowdControlPlugin plugin, boolean placeTorches) {
 		super(plugin);
 		this.placeTorches = placeTorches;
-		this.effectName = placeTorches ? "Lit" : "Dim";
-		this.displayName = (placeTorches ? "Place" : "Break") + " Torches";
+		this.effectName = placeTorches ? "lit" : "dim";
 	}
 
 	@Override
@@ -50,7 +48,7 @@ public class TorchCommand extends ImmediateCommand {
 				.shuffleLocations(false)
 				.build().getAll()));
 		if (nearbyBlocks.isEmpty())
-			return request.buildResponse().type(Response.ResultType.FAILURE).message("No available blocks to place/remove");
+			return request.buildResponse().type(Response.ResultType.RETRY).message("No available blocks to place/remove");
 
 		sync(() -> {
 			for (Location location : nearbyBlocks) {

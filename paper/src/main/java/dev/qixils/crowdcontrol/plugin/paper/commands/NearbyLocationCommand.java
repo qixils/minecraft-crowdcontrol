@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,11 +36,12 @@ abstract class NearbyLocationCommand<S> extends Command {
 		World world = origin.getWorld();
 		Location location = new Location(world, origin.getX(), world.getLogicalHeight() - 1, origin.getZ(), origin.getYaw(), origin.getPitch());
 		while (true) {
-			if (location.getBlockY() < world.getMinHeight())
+			Block block = location.getBlock();
+			if (location.getBlockY() < (world.getMinHeight() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (location.getBlock().getType() == Material.AIR)
+			else if (!block.isBuildable() && !block.isLiquid() && !block.isSolid()) // roughly equal to the fabric checks. perhaps a little redundant.
 				air += 1;
-			else if (air > 1)
+			else if (air >= 1)
 				break;
 			else
 				air = 0;
@@ -67,11 +68,6 @@ abstract class NearbyLocationCommand<S> extends Command {
 		// place player on top of the block
 		location.add(0.5, 1, 0.5);
 
-		// ensure block is not outside normal world bounds
-		int blockY = location.getBlockY();
-		if (blockY <= (location.getWorld().getMinHeight() + 1))
-			return null;
-
 		// successfully found a safe location !
 		return location;
 	}
@@ -82,8 +78,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 	@NotNull
 	protected abstract Collection<S> getSearchTypes(@NotNull Environment environment);
 
-	@NotNull
-	protected abstract String nameOf(@NotNull S searchType);
+	protected abstract @NotNull Component nameOf(@NotNull S searchType);
 
 	@Nullable
 	protected S currentType(@NotNull Location origin) {
@@ -107,18 +102,17 @@ abstract class NearbyLocationCommand<S> extends Command {
 					Location destination = safeLocation(search(location, searchType));
 					if (destination == null)
 						continue;
-					if (destination.distanceSquared(location) <= 1000) // ~32 blocks
+					if (destination.distanceSquared(location) <= 2500) // 50 blocks
+						continue;
+					if (!world.getWorldBorder().isInside(destination))
 						continue;
 					player.teleportAsync(destination).thenAccept(success -> {
 						if (!success)
 							return;
-						player.sendActionBar(new TextBuilder(
-								"You have been teleported to the nearest ",
-								NamedTextColor.WHITE
-						).next(
-								nameOf(searchType),
-								NamedTextColor.YELLOW
-						));
+						player.sendActionBar(plugin.renderForPlayer(Component.translatable(
+								"cc.effect.nearby_location.output",
+								nameOf(searchType).color(NamedTextColor.YELLOW)
+						), player));
 					});
 					response.type(ResultType.SUCCESS).message("SUCCESS"); // technically this could still fail; unlikely tho.
 					break;

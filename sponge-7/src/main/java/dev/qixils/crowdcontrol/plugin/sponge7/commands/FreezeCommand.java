@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.sponge7.TimedCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -18,19 +18,18 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static dev.qixils.crowdcontrol.common.CommandConstants.FREEZE_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class FreezeCommand extends TimedCommand {
+public final class FreezeCommand extends TimedVoidCommand {
 	private final String effectName = "freeze";
-	private final String displayName = "Freeze";
 
 	public FreezeCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	@Override
-	public @NotNull Duration getDuration() {
+	public @NotNull Duration getDefaultDuration() {
 		return FREEZE_DURATION;
 	}
 
@@ -40,12 +39,12 @@ public final class FreezeCommand extends TimedCommand {
 
 		new TimedEffect.Builder()
 				.request(request)
-				.effectGroup("gamemode")
-				.duration(getDuration())
+				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					Map<UUID, Location<World>> locations = new HashMap<>(players.size());
 					players.forEach(player -> locations.put(player.getUniqueId(), player.getLocation()));
+					// TODO: smoother freeze (stop mid-air jitter by telling client it's flying?)
 					task.set(Task.builder()
 							.delayTicks(1)
 							.intervalTicks(1)

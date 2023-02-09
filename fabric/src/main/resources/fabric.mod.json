@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "crowd-control",
+  "version": "${version}",
+  "name": "Crowd Control",
+  "description": "Allows viewers to interact with your Minecraft world",
+  "authors": [
+    "qixils"
+  ],
+  "contact": {
+    "homepage": "https://github.com/qixils/minecraft-crowdcontrol",
+    "sources": "https://github.com/qixils/minecraft-crowdcontrol.git",
+    "issues": "https://github.com/qixils/minecraft-crowdcontrol/issues",
+    "discord": "https://discord.gg/warpworld"
+  },
+  "license": "MIT",
+  "icon": "assets/crowd-control/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient"
+    ],
+    "main": [
+      "dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin"
+    ],
+    "cardinal-components": [
+      "dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components"
+    ]
+  },
+  "mixins": [
+    "crowd-control-common.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.13.3",
+    "fabric": "*",
+    "minecraft": "1.19.3"
+  },
+  "custom": {
+    "cardinal-components": [
+      "crowd-control:viewer-mob",
+      "crowd-control:original-display-name",
+      "crowd-control:game-type-effect",
+      "crowd-control:movement-status"
+    ]
+  }
+}

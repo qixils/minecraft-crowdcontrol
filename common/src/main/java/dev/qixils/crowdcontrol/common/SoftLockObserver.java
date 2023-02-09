@@ -1,40 +1,37 @@
 package dev.qixils.crowdcontrol.common;
 
-import dev.qixils.crowdcontrol.common.util.TextBuilder;
 import net.kyori.adventure.text.Component;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static dev.qixils.crowdcontrol.common.Plugin.output;
 
 /**
  * Detects and attempts to resolve players getting soft-locked (i.e. stuck in a death loop).
  *
  * @param <P> The implementation's player type.
  */
+@ParametersAreNonnullByDefault
 public abstract class SoftLockObserver<P> {
 	protected static final int SEARCH_HORIZ = 20;
 	protected static final int SEARCH_VERT = 8;
-	protected static final Component ALERT = TextBuilder.fromPrefix("CrowdControl")
-			.next("It looks like you have encountered a soft-lock. " +
-					"Safety precautions have been enacted in an attempt to free you from your death loop.").build();
+	protected static final Component ALERT = output(Component.translatable("cc.soft-lock.output"));
 
 	private final Map<UUID, DeathData> deathData = new HashMap<>();
 	/**
 	 * The plugin instance which provides player UUIDs.
 	 */
-	protected final Plugin<P, ? super P> plugin;
+	protected final Plugin<P, ?> plugin;
 
 	/**
 	 * Initializes the observer.
 	 *
 	 * @param plugin The plugin instance which provides player UUIDs.
 	 */
-	protected SoftLockObserver(Plugin<P, ? super P> plugin) {
+	protected SoftLockObserver(Plugin<P, ?> plugin) {
 		this.plugin = plugin;
 	}
 
@@ -51,7 +48,8 @@ public abstract class SoftLockObserver<P> {
 	 * @param player The player who died.
 	 */
 	protected void onDeath(P player) {
-		UUID uuid = plugin.getUUID(player).orElseThrow(() -> new IllegalArgumentException("Expected player to have a UUID"));
+		UUID uuid = plugin.playerMapper().getUniqueId(player)
+				.orElseThrow(() -> new IllegalArgumentException("Expected player to have a UUID"));
 		DeathData data = deathData.computeIfAbsent(uuid, $ -> new DeathData());
 		if (data.isSoftLocked()) {
 			onSoftLock(player);

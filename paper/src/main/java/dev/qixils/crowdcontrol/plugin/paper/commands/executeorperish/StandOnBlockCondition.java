@@ -6,33 +6,32 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.Set;
 
 @Getter
-public class StandOnBlockCondition implements SuccessCondition {
-	private final int rewardLuck;
+public final class StandOnBlockCondition extends AbstractCondition {
 	private final Set<Material> blocks;
 	private final Component component;
 
-	public StandOnBlockCondition(int rewardLuck, String displayText, Material displayItem, Material... otherItems) {
-		this.rewardLuck = rewardLuck;
+	public StandOnBlockCondition(int rewardLuck, String key, Material displayItem, Material... otherItems) {
+		this(rewardLuck, key, null, displayItem, otherItems);
+	}
+
+	public StandOnBlockCondition(int rewardLuck, String key, @Nullable ConditionFlags flags, Material displayItem, Material... otherItems) {
+		super(rewardLuck, flags);
 		this.blocks = EnumSet.of(displayItem, otherItems);
-		this.component = Component.text("Stand on ").append(Component.text(displayText)
-				.replaceText(builder -> builder.matchLiteral("%s").once()
-						.replacement(Component.translatable(displayItem).color(NamedTextColor.GREEN)))
+		this.component = Component.translatable(
+				"cc.effect.do_or_die.condition.stand." + key,
+				Component.translatable(displayItem, NamedTextColor.GREEN)
 		);
 	}
 
-	public StandOnBlockCondition(int rewardLuck, Component display, Material first, Material... other) {
-		this.rewardLuck = rewardLuck;
-		this.blocks = EnumSet.of(first, other);
-		this.component = Component.text("Stand on ").append(display);
-	}
-
 	@Override
-	public boolean hasSucceeded(Player player) {
+	public boolean hasSucceeded(@NotNull Player player) {
 		Location location = player.getLocation();
 		return blocks.contains(location.getBlock().getType())
 				|| blocks.contains(location.subtract(0, 1, 0).getBlock().getType());
