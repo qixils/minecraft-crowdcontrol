@@ -89,7 +89,7 @@ public final class SemVer implements Comparable<SemVer> {
 					isSnapshot = false;
 				} else {
 					patch = Integer.parseInt(parts[2].substring(0, dashIndex));
-					isSnapshot = true;
+					isSnapshot = Objects.equals(parts[2].substring(dashIndex + 1), "SNAPSHOT");
 				}
 			} else {
 				patch = 0;
