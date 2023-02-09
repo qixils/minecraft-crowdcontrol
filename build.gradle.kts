@@ -37,7 +37,6 @@ subprojects {
                 url = uri("https://files.minecraftforge.net/maven/")
             }
         }
-        mavenLocal() // TODO remove -- included to allow builds w/ 1.7.0-SNAPSHOT
     }
 
     java {
