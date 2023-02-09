@@ -12,5 +12,5 @@ dependencies {
     implementation(project(":base-common"))
     implementation("cloud.commandframework:cloud-sponge7:$cloudVersion")
     implementation("net.kyori:adventure-platform-spongeapi:$adventurePlatformVersion")
-    compileOnly("org.spongepowered:spongeapi:7.4.0")
+    compileOnly("org.spongepowered:spongeapi:9.0.0")
 }
