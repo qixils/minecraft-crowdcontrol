@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
@@ -95,7 +96,20 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				GravityCommand.high(plugin),
 				GravityCommand.maximum(plugin),
 				new BiomeCommand(plugin),
-				new StructureCommand(plugin)
+				new StructureCommand(plugin),
+				new ShaderCommand(plugin, "bumpy", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "green", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "ntsc", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "desaturate", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "flip", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "invert", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "blobs2", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "pencil", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "sobel", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "wobble", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "bits", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "spider", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "phosphor", new SemVer(3, 3, 0))
 		));
 
 		// entity commands

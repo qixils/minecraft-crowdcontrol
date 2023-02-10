@@ -461,6 +461,33 @@ namespace CrowdControl.Games.Packs
             new Effect("Iron Sword", "take_iron_sword", "take_weapons") { Price = 300 },
             new Effect("Diamond Sword", "take_diamond_sword", "take_weapons") { Price = 600 },
             new Effect("Netherite Sword", "take_netherite_sword", "take_weapons") { Price = 750 },
+
+            // shaders
+            new Effect("Screen Effects", "shaders", ItemKind.Folder),
+            new Effect("Bumpy", "shader_bumpy", "shaders") { Price = 100, Duration = 30, Description = "Adds a faint white outline to everything giving the impression of bumpy textures" },
+            new Effect("Creeper TV", "shader_green", "shaders") { Price = 100, Duration = 30, Description = "See the game through the eyes of a creeper... through a CRT" },
+            new Effect("CRT", "shader_ntsc", "shaders") { Price = 100, Duration = 30, Description = "Makes the game look like it's running on an old CRT TV" },
+            new Effect("Desaturate", "shader_desaturate", "shaders") { Price = 100, Duration = 30, Description = "Sucks the color out of the game" },
+            new Effect("Flip", "shader_flip", "shaders") { Price = 500, Duration = 30, Description = "Flips the screen upside-down" },
+            new Effect("Invert Colors", "shader_invert", "shaders") { Price = 100, Duration = 30, Description = "Inverts the game's colors to see the game through the eyes of an enderman" },
+            new Effect("Oil Painting", "shader_blobs2", "shaders") { Price = 100, Duration = 30, Description = "Makes the game look like a smeary oil painting" },
+            new Effect("Pencil Sketch", "shader_pencil", "shaders") { Price = 100, Duration = 30, Description = "Makes the game look like it was sketched with a pencil" },
+            new Effect("Prototype", "shader_sobel", "shaders") { Price = 100, Duration = 30, Description = "Makes the game only render edges of textures" },
+            new Effect("Psychedelic", "shader_wobble", "shaders") { Price = 100, Duration = 30, Description = "Makes the game rainbowy and wobbly" },
+            new Effect("Retro", "shader_bits", "shaders") { Price = 100, Duration = 30, Description = "Makes the game look like it's running on an NES" },
+            new Effect("Spider", "shader_spider", "shaders") { Price = 100, Duration = 30, Description = "See the game through the eight eyes of a spider" },
+            new Effect("Trail", "shader_phosphor", "shaders") { Price = 100, Duration = 30, Description = "Duplicates every frame to create a ghostly trail effect" },
+            //new Effect("Retro", "shader_notch", "shaders"), -- not as retro looking as "bits"
+            //new Effect("FXAA", "shader_fxaa", "shaders"), -- doesn't do much
+            //new Effect("Oil Painting", "shader_art", "shaders"), -- very very similar to blobs2 but with a slight white glow on everything
+            //new Effect("Color Convolve", "shader_color_convolve", "shaders"), -- vanilla but slightly more saturated
+            //new Effect("Deconverge", "shader_deconverge", "shaders"), -- kinda minor color channel offsets
+            //new Effect("Outline", "shader_outline", "shaders"), -- broken
+            //new Effect("Scan Pincushion", "shader_scan_pincushion", "shaders"), -- looks like NTSC but without the blur
+            //new Effect("Blur", "shader_blur", "shaders"), -- broken
+            //new Effect("Blobs", "shader_blobs", "shaders"), -- less extreme version of blobs2
+            //new Effect("Antialias", "shader_antialias", "shaders"), -- just makes the game look a bit smoother
+            //new Effect("Creeper", "shader_creeper", "shaders"), -- like green but without the CRT effect
         };
 
         // Slider Ranges
@@ -512,6 +539,7 @@ namespace CrowdControl.Games.Packs
 
         private void OnServerStatusPacket(Response response)
         {
+            // TODO: not working in CCPAK
             // load packet data
             var payload = response.message.Replace("_mc_cc_server_status_", "");
             var registeredEffects = JsonConvert.DeserializeObject<string[]>(payload);
@@ -525,7 +553,7 @@ namespace CrowdControl.Games.Packs
             Log.Message("Hiding unsupported effects");
             var registeredEffectsList = new List<string>(registeredEffects).ConvertAll(input => input.ToLower());
             AllEffects.FindAll(effect => effect.Kind == ItemKind.Effect && !registeredEffectsList.Contains(effect.Code.ToLower()))
-                .ForEach(HideEffect); // TODO: hide parent folders if all children are hidden
+                .ForEach(HideEffect);
             Log.Message("Finished hiding effects");
         }
 

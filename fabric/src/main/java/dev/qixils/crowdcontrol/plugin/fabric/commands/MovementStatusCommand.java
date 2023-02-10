@@ -32,6 +32,7 @@ public class MovementStatusCommand extends TimedVoidCommand {
 	private final MovementStatus.Type type;
 	private final MovementStatus.Value value;
 	private final boolean clientOnly;
+	private final SemVer minimumModVersion;
 
 	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientOnly) {
 		super(plugin);
@@ -41,6 +42,10 @@ public class MovementStatusCommand extends TimedVoidCommand {
 		this.type = type;
 		this.value = value;
 		this.clientOnly = clientOnly;
+		if (clientOnly)
+			this.minimumModVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
+		else
+			this.minimumModVersion = SemVer.ZERO;
 	}
 
 	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientOnly) {
@@ -56,10 +61,8 @@ public class MovementStatusCommand extends TimedVoidCommand {
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
-					if (clientOnly) {
-						SemVer minVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
-						players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
-					}
+					if (clientOnly)
+						players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minimumModVersion));
 					atomicPlayers.set(players);
 
 					if (players.isEmpty())

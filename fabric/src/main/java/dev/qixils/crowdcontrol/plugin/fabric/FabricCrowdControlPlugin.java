@@ -60,6 +60,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	// packet stuff
 	public static ResourceLocation VERSION_REQUEST_ID = new ResourceLocation("crowd-control", "version-request");
 	public static ResourceLocation VERSION_RESPONSE_ID = new ResourceLocation("crowd-control", "version-response");
+	public static ResourceLocation SHADER_ID = new ResourceLocation("crowd-control", "shader");
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();

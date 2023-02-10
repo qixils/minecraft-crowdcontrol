@@ -18,6 +18,8 @@
     "TickMixin"
   ],
   "client": [
+    "GameRendererAccessor",
+    "GameRendererMixin",
     "KeyboardInputMixin"
   ],
   "injectors": {

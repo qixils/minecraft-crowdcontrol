@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.ClientOnly;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -71,6 +72,18 @@ public interface Command<P> {
 	String getEffectName();
 
 	/**
+	 * The minimum version of the mod that clients must have to use this command.
+	 * A value of {@link SemVer#ZERO} indicates that no minimum version is required.
+	 *
+	 * @return minimum mod version
+	 */
+	@NotNull
+	@CheckReturnValue
+	default SemVer getMinimumModVersion() {
+		return SemVer.ZERO;
+	}
+
+	/**
 	 * Gets the default display name for this command.
 	 *
 	 * @return default display name
@@ -118,6 +131,11 @@ public interface Command<P> {
 		Plugin<P, ?> plugin = getPlugin();
 		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
 		List<P> players = plugin.getPlayers(request);
+
+		// remove players on older version of the mod
+		SemVer minVersion = getMinimumModVersion();
+		if (minVersion.isGreaterThan(SemVer.ZERO))
+			players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
 
 		// ensure targets are online / available
 		if (players.isEmpty())
@@ -326,7 +344,7 @@ public interface Command<P> {
 	 * @return whether this effect is client-side
 	 */
 	default boolean isClientOnly() {
-		return getClass().isAnnotationPresent(ClientOnly.class);
+		return getClass().isAnnotationPresent(ClientOnly.class) || getMinimumModVersion().isGreaterThan(SemVer.ZERO);
 	}
 
 	/**
