@@ -10,8 +10,8 @@ The following steps are for streamers who are connecting to another individual's
       same as the IP address that you connect to in Minecraft.
     - In the password field, you must enter a secret passphrase provided to you by the server
       administrator. The default password is `crowdcontrol`.
-4. (Optional) For the best experience, you should install the mod yourself using
-   [this guide](fabric_1.19_client_installation.md).
+4. (Optional) For the best experience, you should install the mod yourself using the
+   [**Client Installation**](fabric_1.19_client_installation.md) guide.
 5. Join the Minecraft server in your Minecraft 1.19.3 client using the same IP address that you
    entered into the host field.
 6. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
