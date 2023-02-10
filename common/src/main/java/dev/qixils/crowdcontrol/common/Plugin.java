@@ -237,6 +237,20 @@ public interface Plugin<P, S> {
 	}
 
 	/**
+	 * Gets the provided command sender as a player.
+	 *
+	 * @param sender the command sender
+	 * @return the player, or null if the sender is not a player
+	 */
+	default @Nullable P asPlayer(@NotNull S sender) {
+		try {
+			return getPlayerClass().cast(sender);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
 	 * Registers the plugin's basic chat commands.
 	 */
 	default void registerChatCommands() {
@@ -380,6 +394,49 @@ public interface Plugin<P, S> {
 				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
 				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(output(
 						Component.translatable("cc.command.crowdcontrol.status." + (getCrowdControl() != null))))));
+		// execute command
+		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
+			manager.command(ccCmd.literal("execute")
+					.meta(CommandMeta.DESCRIPTION, "Executes the effect with the given ID")
+					.permission(mapper::isAdmin)
+					.argument(
+							StringArgument.<S>builder("effect")
+									.single()
+									.asRequired()
+									.manager(manager)
+									.withSuggestionsProvider((ctx, input) -> {
+										List<Command<P>> effects = commandRegister().getCommands();
+										String lowerInput = input.toLowerCase(Locale.ENGLISH);
+										Set<String> suggestions = new LinkedHashSet<>();
+										for (Command<P> effect : effects) {
+											String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
+											if (effectName.startsWith(lowerInput))
+												suggestions.add(effectName);
+										}
+										for (Command<P> effect : effects) {
+											String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
+											if (effectName.contains(lowerInput))
+												suggestions.add(effectName);
+										}
+										return new ArrayList<>(suggestions);
+									})
+									.build(),
+							ArgumentDescription.of("The username of the Twitch account to unlink")
+					)
+					.handler(commandContext -> {
+						// TODO: allow targeting multiple players
+						S sender = commandContext.getSender();
+						Audience audience = mapper.asAudience(sender);
+						P player = asPlayer(sender);
+						if (player == null) {
+							audience.sendMessage(output(Component.translatable("cc.command.cast-error", NamedTextColor.RED)));
+							return;
+						}
+						Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
+						effect.execute(Collections.singletonList(player), new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build());
+					})
+			);
+		}
 
 		//// Password Command ////
 		manager.command(manager.commandBuilder("password")
