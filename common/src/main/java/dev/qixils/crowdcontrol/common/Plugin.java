@@ -292,12 +292,23 @@ public interface Plugin<P, S> {
 								.single()
 								.asRequired()
 								.manager(manager)
-								.withSuggestionsProvider((ctx, input) -> mapper.tryGetUniqueId(ctx.getSender())
-										.map(uuid -> getPlayerManager()
-												.getLinkedAccounts(uuid).stream()
-												.filter(name -> name.startsWith(input.toLowerCase(Locale.ENGLISH)))
-												.collect(Collectors.toList()))
-										.orElse(Collections.emptyList()))
+								.withSuggestionsProvider((ctx, input) -> {
+									Optional<UUID> uuid = mapper.tryGetUniqueId(ctx.getSender());
+									if (!uuid.isPresent()) return Collections.emptyList();
+									Collection<String> linkedAccounts = getPlayerManager().getLinkedAccounts(uuid.get());
+									if (linkedAccounts.isEmpty()) return Collections.emptyList();
+									String lowerInput = input.toLowerCase(Locale.ENGLISH);
+									Set<String> suggestions = new LinkedHashSet<>();
+									for (String acc : linkedAccounts) {
+										if (acc.startsWith(lowerInput))
+											suggestions.add(acc);
+									}
+									for (String acc : linkedAccounts) {
+										if (acc.contains(lowerInput))
+											suggestions.add(acc);
+									}
+									return new ArrayList<>(suggestions);
+								})
 								.build(),
 						ArgumentDescription.of("The username of the Twitch account to unlink")
 				)
