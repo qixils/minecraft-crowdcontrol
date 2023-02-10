@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.KeepInventoryCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Damage;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.mixin.LivingEntityAccessor;
 import net.minecraft.world.damagesource.DamageSource;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameRules.BooleanValue;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class EntityUtil {
 	private EntityUtil() {
@@ -32,10 +34,19 @@ public class EntityUtil {
 	}
 
 	public static void handleDie(LivingEntity entity, final DamageSource cause, final CallbackInfo ci) {
+		if (entity.level.isClientSide) return;
 		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
 		if (((LivingEntityAccessor) entity).getDead()) return;
 		Death event = new Death(entity, cause);
-		FabricCrowdControlPlugin.getInstance().getEventManager().fire(event);
+		event.fire(FabricCrowdControlPlugin.getInstance());
 		if (event.cancelled()) ci.cancel();
+	}
+
+	public static void handleDamage(final Entity entity, final DamageSource cause, final float amount, final CallbackInfoReturnable<Boolean> cir) {
+		if (entity.level.isClientSide) return;
+		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
+		Damage event = new Damage(entity, cause, amount);
+		event.fire(FabricCrowdControlPlugin.getInstance());
+		if (event.cancelled()) cir.setReturnValue(false);
 	}
 }

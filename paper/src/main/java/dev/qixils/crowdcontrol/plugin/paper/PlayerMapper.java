@@ -14,8 +14,13 @@ class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMa
 	}
 
 	@Override
-	public @NotNull Optional<UUID> getUniqueId(@NotNull Player entity) {
+	public @NotNull Optional<UUID> tryGetUniqueId(@NotNull Player entity) {
 		return Optional.of(entity.getUniqueId());
+	}
+
+	@Override
+	public @NotNull UUID getUniqueId(@NotNull Player entity) {
+		return entity.getUniqueId();
 	}
 
 	@Override

@@ -35,7 +35,7 @@ public interface EntityMapper<E> {
 	default Audience asAudience(@NotNull E entity) {
 		if (entity instanceof Audience)
 			return getPlugin().translator().wrap((Audience) entity);
-		Optional<Audience> audience = getUniqueId(entity).map(id -> getPlugin().translator().player(id));
+		Optional<Audience> audience = tryGetUniqueId(entity).map(id -> getPlugin().translator().player(id));
 		if (audience.isPresent())
 			return audience.get();
 		throw new UnsupportedOperationException("#asAudience is unsupported");
@@ -56,10 +56,10 @@ public interface EntityMapper<E> {
 	 * Fetches the unique ID of an entity.
 	 *
 	 * @param entity the entity to fetch the UUID of
-	 * @return the UUID of the entity
+	 * @return the UUID of the entity or empty if unavailable
 	 */
 	@CheckReturnValue
-	default @NotNull Optional<UUID> getUniqueId(@NotNull E entity) {
+	default @NotNull Optional<UUID> tryGetUniqueId(@NotNull E entity) {
 		return asAudience(entity).get(Identity.UUID);
 	}
 
@@ -71,7 +71,7 @@ public interface EntityMapper<E> {
 	 * @return true if the entity is an administrator
 	 */
 	default boolean isAdmin(@NotNull E entity) {
-		String uuid = getUniqueId(entity)
+		String uuid = tryGetUniqueId(entity)
 				.map(id -> id.toString()
 						.toLowerCase(Locale.US)
 						.replace("-", ""))

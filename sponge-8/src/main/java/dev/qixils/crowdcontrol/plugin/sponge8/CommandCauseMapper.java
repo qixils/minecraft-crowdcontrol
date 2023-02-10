@@ -24,11 +24,11 @@ class CommandCauseMapper implements EntityMapper<CommandCause> {
 	}
 
 	@Override
-	public @NotNull Optional<UUID> getUniqueId(@NotNull CommandCause entity) {
+	public @NotNull Optional<UUID> tryGetUniqueId(@NotNull CommandCause entity) {
 		Subject subject = entity.subject();
 		if (subject instanceof Identifiable)
 			return Optional.ofNullable(((Identifiable) subject).uniqueId());
-		return EntityMapper.super.getUniqueId(entity);
+		return EntityMapper.super.tryGetUniqueId(entity);
 	}
 
 	@Override

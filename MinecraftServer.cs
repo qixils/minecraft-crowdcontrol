@@ -32,6 +32,7 @@ namespace CrowdControl.Games.Packs
 
         private static readonly List<Effect> AllEffects = new()
         {
+            // TODO: refactor prices to match CC's
             // miscellaneous
             new Effect("Miscellaneous", "miscellaneous", ItemKind.Folder),
             new Effect("Annoy Players", "toast", "miscellaneous") { Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound" },
@@ -70,8 +71,10 @@ namespace CrowdControl.Games.Packs
             new Effect("Damage Player", "damage", new[]{"health10"}, "health") { Price = 25, Description = "Removes health from the streamer (unless it would kill them)" },
             new Effect("Heal Player", "heal", new[]{"health10"}, "health") { Price = 10, Description = "Increases the streamer's health" },
             new Effect("Heal Player to Full", "full_heal", "health") { Price = 50, Description = "Resets the streamer's health to full" },
-            new Effect("Halve Health", "half_health", "health") { Price = 300, Description = "Sets the player's health to 50% of what they currently have" },
+            new Effect("Halve Health", "half_health", "health") { Price = 300, Description = "Sets the streamer's health to 50% of what they currently have" },
             new Effect("Kill Player", "kill", "health") { Price = 1500, Description = "Immediately kills the streamer on the spot" },
+            new Effect("Invincible", "invincible", "health") { Price = 500, Description = "Temporarily makes the streamer immune to damage", Duration = 15 },
+            new Effect("One-Hit KO", "ohko", "health") { Price = 750, Description = "Temporarily makes any damage source kill the streamer in one hit", Duration = 15 },
             // food commands
             new Effect("Food", "food", ItemKind.Folder),
             new Effect("Feed Player to Full", "full_feed", "food") { Price = 15, Description = "Replenishes the hunger bar" },

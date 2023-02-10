@@ -49,7 +49,7 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 			"i18n/"
 	)
 			.collect(Collectors.toSet());
-	private static final Logger logger = LoggerFactory.getLogger(KyoriTranslator.class);
+	private static final Logger logger = LoggerFactory.getLogger("CC-KyoriTranslator");
 	private final TranslationRegistry translator;
 	private final List<ClassLoader> classLoaders;
 	private final Supplier<AudienceProvider> wrappedProvider;

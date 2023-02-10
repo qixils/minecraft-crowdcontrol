@@ -23,10 +23,10 @@ class CommandSenderMapper<E extends CommandSender> implements EntityMapper<E> {
 	}
 
 	@Override
-	public @NotNull Optional<UUID> getUniqueId(@NotNull E entity) {
+	public @NotNull Optional<UUID> tryGetUniqueId(@NotNull E entity) {
 		if (entity instanceof Entity)
 			return Optional.of(((Entity) entity).getUniqueId());
-		return EntityMapper.super.getUniqueId(entity);
+		return EntityMapper.super.tryGetUniqueId(entity);
 	}
 
 	@Override

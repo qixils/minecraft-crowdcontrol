@@ -21,8 +21,13 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	}
 
 	@Override
-	public @NotNull Optional<UUID> getUniqueId(@NotNull ServerPlayer entity) {
+	public @NotNull Optional<UUID> tryGetUniqueId(@NotNull ServerPlayer entity) {
 		return Optional.of(entity.getUUID());
+	}
+
+	@Override
+	public @NotNull UUID getUniqueId(@NotNull ServerPlayer entity) {
+		return entity.getUUID();
 	}
 
 	@Override

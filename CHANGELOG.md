@@ -7,13 +7,18 @@ A list of all changes made to the software in reverse chronological order.
 - Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16. Speedrun Minecraft
   while your chat spawns dragons and creepers on you!
 - Created a Fabric implementation for 1.19.3. Play the latest modpacks alone or with your friends!
-- Created new client-side effects for Fabric: Inverted Controls & Inverted Mouse
-- The Minecraft servers have all been consolidated into one standard server to reduce confusion
-  during setup
+- Added new timed effect: Invincible
+- Added new timed effect: One-Hit KO
+- Added new client-side effect for Fabric: Inverted Controls
+- Added new client-side effect for Fabric: Inverted Mouse
+- The missing effects for giving and taking enchanted golden apples on Sponge 7 have been added
+- Add support for mods which backport features from newer versions of the game
+  (i.e. if a mod adds bees to 1.12.2, the "Summon Bee" effect will become available)
 - Global effects like changing the server difficulty are now hidden from the streamer's effect menu
   if the effects have not been enabled
+- When global effects are available, various commands will be grayed out when they cannot be used
+  (i.e. enable/disable keep inventory, set difficulty, etc.)
 - Spawned entities now feature various random attributes, including random armor for armor stands
-- The missing effects for giving and taking enchanted golden apples on Sponge 7 have been added
 - Cursed enchantments are less likely to be applied to items awarded by Do-or-Die and lucky
   lootboxes
 

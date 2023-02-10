@@ -175,5 +175,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 	protected void onFirstRegistry() {
 		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
 		plugin.getGame().getEventManager().registerListeners(plugin, new GameModeCommand.Manager());
+		plugin.getGame().getEventManager().registerListeners(plugin, new HealthModifierManager());
 	}
 }

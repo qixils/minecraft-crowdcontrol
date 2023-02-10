@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +23,7 @@ import java.util.UUID;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInventoryRedirect;
 
 @Mixin(ServerPlayer.class)
-public class ServerPlayerMixin {
+public abstract class ServerPlayerMixin {
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	void onTick(CallbackInfo ci) {
@@ -61,7 +62,12 @@ public class ServerPlayerMixin {
 	}
 
 	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
-	private void callDeathEvent(final DamageSource cause, final CallbackInfo ci) {
-		EntityUtil.handleDie((LivingEntity) (Object) this, cause, ci);
+	private void callDeathEvent(final DamageSource source, final CallbackInfo ci) {
+		EntityUtil.handleDie((LivingEntity) (Object) this, source, ci);
+	}
+
+	@Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+	private void callDamageEvent(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
+		EntityUtil.handleDamage((Entity) (Object) this, source, amount, cir);
 	}
 }

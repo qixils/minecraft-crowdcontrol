@@ -145,5 +145,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 	protected void onFirstRegistry() {
 		plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), new KeepInventoryCommand.Manager());
 		plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), new GameModeCommand.Manager());
+		plugin.getGame().eventManager().registerListeners(plugin.getPluginContainer(), new HealthModifierManager());
 	}
 }

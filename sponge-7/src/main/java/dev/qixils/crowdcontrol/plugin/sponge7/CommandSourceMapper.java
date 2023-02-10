@@ -27,7 +27,7 @@ class CommandSourceMapper<E extends CommandSource> implements EntityMapper<E> {
 	}
 
 	@Override
-	public @NotNull Optional<UUID> getUniqueId(@NotNull E entity) {
+	public @NotNull Optional<UUID> tryGetUniqueId(@NotNull E entity) {
 		if (entity instanceof Identifiable)
 			return Optional.of(((Identifiable) entity).getUniqueId());
 		return Optional.empty();

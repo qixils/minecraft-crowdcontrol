@@ -145,5 +145,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 	protected void onFirstRegistry() {
 		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
 		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(plugin), plugin);
+		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), plugin);
 	}
 }

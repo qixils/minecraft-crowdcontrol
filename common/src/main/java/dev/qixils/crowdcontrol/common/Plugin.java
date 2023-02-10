@@ -269,7 +269,7 @@ public interface Plugin<P, S> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
 					Audience audience = mapper.asAudience(sender);
-					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
+					UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerManager().linkPlayer(uuid, username))
 						audience.sendMessage(output(Component.translatable(
@@ -291,7 +291,7 @@ public interface Plugin<P, S> {
 								.single()
 								.asRequired()
 								.manager(manager)
-								.withSuggestionsProvider((ctx, input) -> mapper.getUniqueId(ctx.getSender())
+								.withSuggestionsProvider((ctx, input) -> mapper.tryGetUniqueId(ctx.getSender())
 										.map(uuid -> getPlayerManager()
 												.getLinkedAccounts(uuid).stream()
 												.filter(name -> name.startsWith(input.toLowerCase(Locale.ENGLISH)))
@@ -304,7 +304,7 @@ public interface Plugin<P, S> {
 					String username = commandContext.get("username");
 					S sender = commandContext.getSender();
 					Audience audience = mapper.asAudience(sender);
-					UUID uuid = mapper.getUniqueId(sender).orElseThrow(() ->
+					UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerManager().unlinkPlayer(uuid, username))
 						audience.sendMessage(output(Component.translatable(
@@ -517,7 +517,7 @@ public interface Plugin<P, S> {
 			return false;
 
 		PlayerEntityMapper<P> mapper = playerMapper();
-		Optional<UUID> uuid = mapper.getUniqueId(player);
+		Optional<UUID> uuid = mapper.tryGetUniqueId(player);
 		if (uuid.isPresent()) {
 			String uuidStr = uuid.get().toString().toLowerCase(Locale.ENGLISH);
 			getSLF4JLogger().debug("Checking for UUID {}", uuidStr);
@@ -832,7 +832,7 @@ public interface Plugin<P, S> {
 	 */
 	default void onPlayerJoin(P joiningPlayer) {
 		PlayerEntityMapper<P> mapper = playerMapper();
-		UUID uuid = mapper.getUniqueId(joiningPlayer).orElse(null);
+		UUID uuid = mapper.tryGetUniqueId(joiningPlayer).orElse(null);
 		if (uuid == null) {
 			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
@@ -847,7 +847,7 @@ public interface Plugin<P, S> {
 			Audience audience = mapper.asAudience(player);
 			audience.sendMessage(JOIN_MESSAGE_1);
 			//noinspection OptionalGetWithoutIsPresent
-			if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.getUniqueId(player).get()).size() == 0
+			if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.tryGetUniqueId(player).get()).size() == 0
 					&& (!isAdminRequired() || playerMapper().isAdmin(player)))
 				audience.sendMessage(JOIN_MESSAGE_2);
 			if (!globalEffectsUsable())

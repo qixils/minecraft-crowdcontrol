@@ -175,10 +175,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		// limit config
 		ConfigurationSection limitSection = config.getConfigurationSection("limits");
 		if (limitSection == null) {
-			getSLF4JLogger().info("No limit config found, using defaults");
+			getSLF4JLogger().debug("No limit config found, using defaults");
 			limitConfig = new LimitConfig();
 		} else {
-			getSLF4JLogger().info("Loading limit config");
+			getSLF4JLogger().debug("Loading limit config");
 			boolean hostsBypass = limitSection.getBoolean("hosts-bypass", true);
 			Map<String, Integer> itemLimits = parseLimitConfigSection(limitSection.getConfigurationSection("items"));
 			Map<String, Integer> entityLimits = parseLimitConfigSection(limitSection.getConfigurationSection("entities"));

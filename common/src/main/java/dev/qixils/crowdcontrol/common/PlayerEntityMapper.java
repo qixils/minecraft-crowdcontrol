@@ -35,4 +35,16 @@ public interface PlayerEntityMapper<P> extends EntityMapper<P> {
 	 */
 	@CheckReturnValue
 	@NotNull Optional<P> getPlayer(@NotNull UUID uuid);
+
+	/**
+	 * Fetches the unique ID of an entity.
+	 *
+	 * @param entity the entity to fetch the UUID of
+	 * @return the UUID of the entity
+	 */
+	@CheckReturnValue
+	default @NotNull UUID getUniqueId(@NotNull P entity) {
+		return tryGetUniqueId(entity).orElseThrow(() ->
+				new UnsupportedOperationException("Player object does not support UUID"));
+	}
 }
