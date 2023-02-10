@@ -147,6 +147,7 @@ public interface Plugin<P, S> {
 	Component JOIN_MESSAGE_1 = Component.translatable(
 			"cc.join.info",
 			JOIN_MESSAGE_COLOR,
+			// TODO: move these args back into the i18n file
 			Component.text("Crowd Control", TextColor.color(0xFAE100)),
 			Component.text("qi", TextColor.color(0xFFC7B5))
 					.append(Component.text("xi", TextColor.color(0xFFDECA)))

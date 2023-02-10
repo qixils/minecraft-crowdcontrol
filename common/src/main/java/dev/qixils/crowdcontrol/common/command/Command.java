@@ -163,7 +163,7 @@ public interface Command<P> {
 			if (!getPlugin().supportsClientOnly()) {
 				request.buildResponse()
 						.type(ResultType.UNAVAILABLE)
-						.message("Client-side effects are not supported by this streamer's setup")
+						.message("Client-side effects are not supported by this setup")
 						.send();
 				return;
 			} else if (!isClientAvailable(players, request)) {

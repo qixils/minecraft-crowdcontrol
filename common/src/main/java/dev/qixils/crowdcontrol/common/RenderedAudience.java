@@ -113,21 +113,8 @@ public interface RenderedAudience<C> extends ForwardingAudience.Single {
 	}
 
 	static @NotNull RenderedAudience<Locale> translated(Audience audience, ComponentRenderer<Locale> translator) {
-		return new RenderedAudience<Locale>() {
-			@Override
-			public @NotNull Audience audience() {
-				return audience;
-			}
-
-			@Override
-			public @NotNull ComponentRenderer<Locale> renderer() {
-				return translator;
-			}
-
-			@Override
-			public @NotNull Locale context() {
-				return audience.getOrDefault(Identity.LOCALE, Locale.getDefault());
-			}
-		};
+		if (audience instanceof LocaleRenderedAudience)
+			return (LocaleRenderedAudience) audience;
+		return new LocaleRenderedAudience(audience, translator);
 	}
 }
