@@ -462,7 +462,7 @@ namespace CrowdControl.Games.Packs
             // shaders
             new Effect("Screen Effects", "shaders", ItemKind.Folder),
             new Effect("Bumpy", "shader_bumpy", "shaders") { Price = 50, Duration = 30, Description = "Adds a faint white outline to everything giving the impression of bumpy textures" },
-            new Effect("Creeper TV", "shader_green", "shaders") { Price = 200, Duration = 30, Description = "See the game through the eyes of a creeper... through a CRT" },
+            new Effect("Creeper TV", "shader_green", "shaders") { Price = 300, Duration = 30, Description = "See the game through the eyes of a creeper... through a CRT" },
             new Effect("CRT", "shader_ntsc", "shaders") { Price = 100, Duration = 30, Description = "Makes the game look like it's running on an old CRT TV" },
             new Effect("Desaturate", "shader_desaturate", "shaders") { Price = 50, Duration = 30, Description = "Sucks the color out of the game" },
             new Effect("Flip", "shader_flip", "shaders") { Price = 500, Duration = 30, Description = "Flips the screen upside-down" },
