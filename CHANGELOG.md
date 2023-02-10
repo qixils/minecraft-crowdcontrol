@@ -9,18 +9,36 @@ A list of all changes made to the software in reverse chronological order.
 - Created a Fabric implementation for 1.19.3. Play the latest modpacks alone or with your friends!
 - Added new timed effect: Invincible
 - Added new timed effect: One-Hit KO
-- Added new client-side effect for Fabric: Inverted Controls
-- Added new client-side effect for Fabric: Inverted Mouse
-- The missing effects for giving and taking enchanted golden apples on Sponge 7 have been added
+- Added new timed effects for modifying gravity
+- Added new client-side effects for Fabric: Inverted Controls & Inverted Mouse
+- Added new client-side effects for Fabric: Screen Effects
+- Added the missing effects for giving and taking enchanted golden apples on Sponge 7
+- "Teleport All Entities to Player" now acts as "Teleport Nearby Entities to Player" when not
+  running as a global effect
+- Added new conditions to Do-or-Die for crafting and jumping
+- Added new items to give and take, blocks to place, etc.
+- Added new entity summons for Minecraft 1.19
+- Replaced the individual Fling effects with just one general Fling Randomly effect
 - Add support for mods which backport features from newer versions of the game
   (i.e. if a mod adds bees to 1.12.2, the "Summon Bee" effect will become available)
 - Global effects like changing the server difficulty are now hidden from the streamer's effect menu
   if the effects have not been enabled
 - When global effects are available, various commands will be grayed out when they cannot be used
   (i.e. enable/disable keep inventory, set difficulty, etc.)
+- Added a warning in chat for when global effects are unavailable
+- Global effects can now always be used on the host of a singleplayer world
 - Spawned entities now feature various random attributes, including random armor for armor stands
 - Cursed enchantments are less likely to be applied to items awarded by Do-or-Die and lucky
   lootboxes
+- Potion effects now render as a timed effect on the Crowd Control overlay
+- Added support for Crowd Control 2.0 (customizable effect durations, non-Twitch streamer targets,
+  etc.)
+- Added sliders to various effects (give/take health/hunger/items/etc.)
+- Added a config option to hide viewer names in-game
+- Added a set of config options for limiting how many items or entities can be summoned at once
+- Added support for localization of the mod's messages (currently only English US is supported)
+- Effect messages are now displayed to spectators and the server console
+- Lots of minor bug fixes and improvements
 
 ## 3.2.5
 
