@@ -297,7 +297,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Apply Potion", "apply_potion_effect", ItemKind.Folder),
             new Effect("Absorption", "potion_absorption", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants extra health that cannot be regenerated" },
             new Effect("Bad Omen", "potion_bad_omen", "apply_potion_effect") { Price = 400, Duration = 120, Description = "Causes a village raid when a player possessing this effect is inside of a village" },
-            new Effect("Blindness", "potion_blindness", "apply_potion_effect") { Price = 75, Duration = 20, Description = "Temporarily reduces a player's range of vision and disables their sprinting" },
+            new Effect("Blindness", "potion_blindness", "apply_potion_effect") { Price = 100, Duration = 20, Description = "Temporarily reduces a player's range of vision and disables their sprinting" },
             new Effect("Conduit Power", "potion_conduit_power", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants water breathing, night vision, and haste when underwater" },
             new Effect("Darkness", "potion_darkness", "apply_potion_effect") { Price = 75, Duration = 20, Description = "Temporarily reduces a player's range of vision" },
             new Effect("Dolphin's Grace", "potion_dolphins_grace", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Increases swimming speed" },
@@ -462,7 +462,7 @@ namespace CrowdControl.Games.Packs
             // shaders
             new Effect("Screen Effects", "shaders", ItemKind.Folder),
             new Effect("Bumpy", "shader_bumpy", "shaders") { Price = 50, Duration = 30, Description = "Adds a faint white outline to everything giving the impression of bumpy textures" },
-            new Effect("Creeper TV", "shader_green", "shaders") { Price = 300, Duration = 30, Description = "See the game through the eyes of a creeper... through a CRT" },
+            new Effect("Creeper TV", "shader_green", "shaders") { Price = 250, Duration = 30, Description = "See the game through the eyes of a creeper... through a CRT" },
             new Effect("CRT", "shader_ntsc", "shaders") { Price = 100, Duration = 30, Description = "Makes the game look like it's running on an old CRT TV" },
             new Effect("Desaturate", "shader_desaturate", "shaders") { Price = 50, Duration = 30, Description = "Sucks the color out of the game" },
             new Effect("Flip", "shader_flip", "shaders") { Price = 500, Duration = 30, Description = "Flips the screen upside-down" },
