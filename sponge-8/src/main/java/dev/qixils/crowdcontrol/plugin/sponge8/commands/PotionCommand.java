@@ -84,15 +84,18 @@ public class PotionCommand extends TimedImmediateCommand {
 						if (potionEffectType.equals(PotionEffectTypes.LEVITATION.get()) && newAmplifier > 127)
 							newAmplifier -= 1; // don't mess with gravity effects
 
-						effects.set(i, PotionEffect.builder()
-								//.from(existingEffect) | broken in API 8 and 9, begin workaround
-								.potionType(existingEffect.type())
-								.ambient(existingEffect.isAmbient())
-								.showParticles(existingEffect.showsParticles())
-								//.showIcon(existingEffect.showIcon()) | broken in API 8 and 9, end workaround
-								.duration(Ticks.of(newDuration))
-								.amplifier(newAmplifier)
-								.build());
+						PotionEffect.Builder newEffect = PotionEffect.builder();
+						try {
+							newEffect.from(existingEffect);
+						} catch (AbstractMethodError ignored) {
+							newEffect.potionType(existingEffect.type())
+									.ambient(existingEffect.isAmbient())
+									.showParticles(existingEffect.showsParticles())
+									.duration(Ticks.of(newDuration))
+									.amplifier(newAmplifier);
+							// showIcon is not set because it's what causes the AbstractMethodError in the first place
+						}
+						effects.set(i, newEffect.build());
 						break;
 					}
 				}
