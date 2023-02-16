@@ -1,6 +1,6 @@
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "6.6.1" apply false
+    id("io.freefair.lombok") version "6.6.2" apply false
     id("com.github.johnrengelman.shadow") version "7.1.2" apply true
     id("fabric-loom") version "1.1-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.0.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
