@@ -120,6 +120,9 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 	 */
 	@CheckReturnValue
 	protected HoconConfigurationLoader createConfigLoader(@NotNull File configDirectory) throws IllegalStateException {
+		if (configDirectory.getName().equals("crowd-control.conf"))
+			configDirectory = configDirectory.getParentFile();
+
 		if (!configDirectory.exists()) {
 			//noinspection ResultOfMethodCallIgnored
 			configDirectory.mkdir();
