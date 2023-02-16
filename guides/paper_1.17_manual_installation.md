@@ -2,16 +2,18 @@
 
 The following steps detail how to manually set up a Minecraft 1.17.1 server with Crowd Control.
 
-1. Download and
-   install [the latest version of Java](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).
+> **Note:** Crowd Control is no longer being updated for Paper 1.17.1. Please use the
+> [latest version of the game](paper_1.19_manual_installation.md) instead.
+
+1. Download and install [the latest version of Java](https://adoptium.net/).
    Java 16 or later is required.
-2. Download the latest version of [Paper 1.17.1](https://papermc.io/legacy). Spigot is
-   not supported.
+2. Download the latest version of [Paper 1.17.1](https://papermc.io/legacy). Spigot is not
+   supported.
 3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the
    "root folder."
 4. Create a new folder named `plugins` inside the root folder.
-5. Download
-   the [latest Paper plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+5. Download the
+   [Paper plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/tag/v3.2.5)
    and place it in the `plugins` folder.
 6. Run the Minecraft server to initialize the plugin's configuration files. You will have to run it
    twice, as the first will prompt you to accept Minecraft's End User License Agreement by editing

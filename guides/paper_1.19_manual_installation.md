@@ -2,8 +2,7 @@
 
 The following steps detail how to manually set up a Minecraft 1.19.3 server with Crowd Control.
 
-1. Download and
-   install [the latest version of Java](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).
+1. Download and install [the latest version of Java](https://adoptium.net/).
    Java 17 or later is required.
 2. Download the latest version of [Paper 1.19.3](https://papermc.io/downloads). Spigot is not
    supported.
