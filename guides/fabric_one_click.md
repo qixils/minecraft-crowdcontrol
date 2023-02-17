@@ -8,7 +8,7 @@ The following steps provide a quick setup for running a local game server.
    launcher.
 4. Once setup is done, you can click the **Open Profile Folder** button and copy any Fabric 1.19.3
    mods you want to play with into the `mods` folder.
-5. Open the Minecraft Launcher, select the `Crowd Control 1.19` profile, press Play, and open a
+5. Open the Minecraft Launcher, select the `fabric-loader` profile, press Play, and open a
    singleplayer world.
 6. Run the command `/account link <your twitch username>` to ensure you receive effects that viewers
    purchase for you. Example: `/account link jaku`
