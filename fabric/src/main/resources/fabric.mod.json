@@ -28,7 +28,7 @@
     ]
   },
   "mixins": [
-    "crowd-control-common.mixins.json"
+    "crowd-control.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.13.3",

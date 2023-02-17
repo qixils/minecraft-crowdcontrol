@@ -241,4 +241,9 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		clientVersions.remove(player.getUUID());
 		super.onPlayerLeave(player);
 	}
+
+	@Override
+	public @Nullable ServerPlayer asPlayer(@NotNull CommandSourceStack sender) {
+		return sender.getPlayer();
+	}
 }

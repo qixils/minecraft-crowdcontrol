@@ -29,7 +29,7 @@ public class ShaderCommand extends TimedImmediateCommand {
 
 	public ShaderCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull String shader, @NotNull SemVer minimumModVersion) {
 		super(plugin);
-		this.effectName = "shader_" + shader;
+		this.effectName = "shader_" + shader.replaceFirst("^cc_", "");
 		this.minimumModVersion = minimumModVersion;
 		this.shader = shader;
 	}

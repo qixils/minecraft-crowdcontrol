@@ -433,7 +433,9 @@ public interface Plugin<P, S> {
 							return;
 						}
 						Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
-						effect.execute(Collections.singletonList(player), new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build());
+						@SuppressWarnings("ArraysAsListWithZeroOrOneArgument") // need mutable list
+						List<P> players = Arrays.asList(player);
+						effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build());
 					})
 			);
 		}

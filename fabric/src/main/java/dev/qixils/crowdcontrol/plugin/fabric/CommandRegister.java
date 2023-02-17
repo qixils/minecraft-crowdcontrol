@@ -106,7 +106,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new ShaderCommand(plugin, "blobs2", new SemVer(3, 3, 0)),
 				new ShaderCommand(plugin, "pencil", new SemVer(3, 3, 0)),
 				new ShaderCommand(plugin, "sobel", new SemVer(3, 3, 0)),
-				new ShaderCommand(plugin, "wobble", new SemVer(3, 3, 0)),
+				new ShaderCommand(plugin, "cc_wobble", new SemVer(3, 3, 0)),
 				new ShaderCommand(plugin, "bits", new SemVer(3, 3, 0)),
 				new ShaderCommand(plugin, "spider", new SemVer(3, 3, 0)),
 				new ShaderCommand(plugin, "phosphor", new SemVer(3, 3, 0))
