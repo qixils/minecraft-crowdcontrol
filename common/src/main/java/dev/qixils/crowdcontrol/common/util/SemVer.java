@@ -43,6 +43,24 @@ public final class SemVer implements Comparable<SemVer> {
 	private final int minor;
 	private final int patch;
 	private final boolean isSnapshot;
+	private final boolean isRelease;
+
+	/**
+	 * Creates a new semantic version.
+	 *
+	 * @param major major version
+	 * @param minor minor version
+	 * @param patch patch version
+	 * @param isSnapshot whether this is a snapshot version
+	 * @param isRelease whether this is a release version
+	 */
+	public SemVer(int major, int minor, int patch, boolean isSnapshot, boolean isRelease) {
+		this.major = major;
+		this.minor = minor;
+		this.patch = patch;
+		this.isSnapshot = isSnapshot;
+		this.isRelease = isRelease;
+	}
 
 	/**
 	 * Creates a new semantic version.
@@ -53,10 +71,7 @@ public final class SemVer implements Comparable<SemVer> {
 	 * @param isSnapshot whether this is a snapshot version
 	 */
 	public SemVer(int major, int minor, int patch, boolean isSnapshot) {
-		this.major = major;
-		this.minor = minor;
-		this.patch = patch;
-		this.isSnapshot = isSnapshot;
+		this(major, minor, patch, isSnapshot, !isSnapshot);
 	}
 
 	/**
@@ -67,7 +82,7 @@ public final class SemVer implements Comparable<SemVer> {
 	 * @param patch patch version
 	 */
 	public SemVer(int major, int minor, int patch) {
-		this(major, minor, patch, false);
+		this(major, minor, patch, false, true);
 	}
 
 	/**
@@ -76,8 +91,8 @@ public final class SemVer implements Comparable<SemVer> {
 	 * @param version version string
 	 */
 	public SemVer(@NotNull String version) {
-		String[] parts = version.split("\\.");
-		if (parts.length < 1 || parts.length > 3)
+		String[] parts = version.split("\\.", 3);
+		if (parts.length < 1)
 			throw new IllegalArgumentException("Invalid version string: " + version);
 		try {
 			major = Integer.parseInt(parts[0]);
@@ -87,13 +102,16 @@ public final class SemVer implements Comparable<SemVer> {
 				if (dashIndex == -1) {
 					patch = Integer.parseInt(parts[2]);
 					isSnapshot = false;
+					isRelease = true;
 				} else {
 					patch = Integer.parseInt(parts[2].substring(0, dashIndex));
 					isSnapshot = parts[2].substring(dashIndex + 1).equals("SNAPSHOT");
+					isRelease = false;
 				}
 			} else {
 				patch = 0;
 				isSnapshot = false;
+				isRelease = true;
 			}
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid version string: " + version);
@@ -129,11 +147,23 @@ public final class SemVer implements Comparable<SemVer> {
 
 	/**
 	 * Returns whether this is a snapshot version.
+	 * <p>
+	 * Note that this specifically refers to versions suffixed with {@code -SNAPSHOT}.
+	 * To determine more generally if this is not a release version, use {@link #isRelease()}.
 	 *
 	 * @return whether this is a snapshot version
 	 */
 	public boolean isSnapshot() {
 		return isSnapshot;
+	}
+
+	/**
+	 * Returns whether this is a release version.
+	 *
+	 * @return whether this is a release version
+	 */
+	public boolean isRelease() {
+		return isRelease;
 	}
 
 	/**
