@@ -21,6 +21,10 @@ will be interested in the guides listed under **Automatic Setup**. If you requir
 for other streamers to join, then follow the steps for **Dedicated Server** and send your players
 the guide for **Joining an External Server**.
 
+Not sure which mod loader to choose between Fabric and Paper? If you're running a server for a large
+multi-streamer event, then the highly-performant **Paper** is likely the way to go. Otherwise, we
+would recommend **Fabric** as it has the most features and is the easiest to use. 
+
 | MC Version / Mod Loader |                      Automatic Setup                      |                    Joining an External Server                     |                               Dedicated Server                                |                              Client Installation                              |
 |:-----------------------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------:|:-----------------------------------------------------------------------------:|
 |     1.12.2 / Forge      | [Sponge 7: One-Click Setup](guides/sponge_7_one_click.md) | [Sponge 7: Joining a Server](guides/sponge_7_joining_a_server.md) | [SpongeForge 7: Manual Installation](guides/sponge_7_manual_installation.md)  |                                Not recommended                                |
