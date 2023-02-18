@@ -28,9 +28,11 @@ To use Crowd Control on a single player world:
 3. Enter `localhost` as the host and `crowdcontrol` as the password.
 4. In Minecraft, run the command `/account link <your twitch username>` to ensure you receive
    effects that viewers purchase for you. Example: `/account link jaku`
-5. If you experience rubber-banding/laggy movement, open the file
-   `%AppData%\.minecraft\config\sponge\global.conf` and set `moved-wrongly` to `false`,
-   then restart your game.
+5. If you experience rubber-banding/laggy movement:
+   - Navigate to `%AppData%\.minecraft\config\sponge`
+   - Open `global.conf` and set `moved-wrongly` to `false`
+   - Open `sponge.conf` and set `movement-checks` to `true`
+   - Restart your game
 
 To use Crowd Control on an external server, see the
 [**Joining a Server**](sponge_8_joining_a_server.md) guide.
