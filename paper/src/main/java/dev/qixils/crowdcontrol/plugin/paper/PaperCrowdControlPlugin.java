@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -42,6 +44,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
+	private final Logger logger = LoggerFactory.getLogger("CrowdControl");
 	@Getter
 	private final Executor syncExecutor = runnable -> Bukkit.getScheduler().runTask(this, runnable);
 	@Getter
@@ -58,9 +61,11 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
-	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
 	@Getter
-	private final TextUtilImpl textUtil = new TextUtilImpl(Bukkit.getUnsafe().componentFlattener());
+	@Accessors(fluent = true)
+	private final BukkitAudiences adventure = BukkitAudiences.create(this);
+	@Getter
+	private final TextUtilImpl textUtil = new TextUtilImpl(adventure.flattener());
 	@Getter
 	private final Class<Player> playerClass = Player.class;
 	@Getter
@@ -211,7 +216,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 	@Override
 	public @NotNull Logger getSLF4JLogger() {
-		return super.getSLF4JLogger();
+		return logger;
 	}
 
 	@Override
@@ -256,7 +261,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 	@Override
 	public @NotNull Audience getConsole() {
-		return Bukkit.getConsoleSender();
+		return adventure().console();
 	}
 
 	@EventHandler

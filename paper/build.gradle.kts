@@ -1,5 +1,6 @@
 val cloudVersion: String by project
 val paperMinecraftVersion: String by project
+val adventurePlatformVersion: String by project
 
 val mcVersionSplit = paperMinecraftVersion.split(".")
 description = "Minecraft Crowd Control: Paper"
@@ -10,13 +11,14 @@ plugins {
 }
 
 repositories {
-    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
 }
 
 dependencies {
     implementation(project(":base-common"))
     implementation("cloud.commandframework:cloud-paper:${cloudVersion}")
-    compileOnly("io.papermc.paper:paper-api:$paperMinecraftVersion-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:$paperMinecraftVersion-R0.1-SNAPSHOT")
+    implementation("net.kyori:adventure-platform-bukkit:$adventurePlatformVersion")
 }
 
 // Java 17 boilerplate

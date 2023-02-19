@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
+import net.kyori.adventure.translation.Translator;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +36,6 @@ class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMa
 
 	@Override
 	public @NotNull Optional<Locale> getLocale(@NotNull Player entity) {
-		return Optional.of(entity.locale());
+		return Optional.ofNullable(Translator.parseLocale(entity.getLocale()));
 	}
 }

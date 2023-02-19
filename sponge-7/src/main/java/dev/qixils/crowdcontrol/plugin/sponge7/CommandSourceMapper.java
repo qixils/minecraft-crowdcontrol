@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Identifiable;
 
 import java.util.Optional;
@@ -21,8 +20,6 @@ class CommandSourceMapper<E extends CommandSource> implements EntityMapper<E> {
 	@Override
 	@NotNull
 	public Audience asAudience(@NotNull CommandSource source) {
-		if (source instanceof Player)
-			return plugin.translator().player(((Player) source).getUniqueId());
 		return plugin.translator().wrap(plugin.adventure().receiver(source));
 	}
 
