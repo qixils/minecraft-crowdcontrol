@@ -105,7 +105,7 @@ public final class SemVer implements Comparable<SemVer> {
 					isRelease = true;
 				} else {
 					patch = Integer.parseInt(parts[2].substring(0, dashIndex));
-					isSnapshot = parts[2].substring(dashIndex + 1).equals("SNAPSHOT");
+					isSnapshot = parts[2].substring(dashIndex + 1).endsWith("SNAPSHOT");
 					isRelease = false;
 				}
 			} else {
