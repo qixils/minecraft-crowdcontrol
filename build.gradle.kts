@@ -51,7 +51,7 @@ subprojects {
             // TODO: disable output of non-shaded jars? or make their file names more obvious?
             // TODO: exclude kotlin directory in output jar? (i don't think it's used but gotta double check)
             shadowJar {
-//                minimize() // minimize jar
+                minimize()
                 // exclude Java >8 META-INF files
                 if (java.targetCompatibility.isJava8) {
                     exclude("META-INF/versions/")
