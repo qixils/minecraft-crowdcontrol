@@ -12,6 +12,8 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -31,8 +33,13 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.type(ResultType.RETRY)
 				.message("Targets not holding a durable item");
 
+		// create list of random equipment slots
+		List<EquipmentSlot> slots = Arrays.asList(EquipmentSlot.values());
+		Collections.shuffle(slots);
+
+		// loop through all players and all slots, and apply the durability change
 		for (ServerPlayer player : players) {
-			for (EquipmentSlot slot : EquipmentSlot.values()) {
+			for (EquipmentSlot slot : slots) {
 				ItemStack item = player.getItemBySlot(slot);
 				if (item.isEmpty())
 					continue;

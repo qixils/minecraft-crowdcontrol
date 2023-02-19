@@ -15,6 +15,8 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -34,11 +36,17 @@ public class ItemDamageCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Player(s) not holding a damaged item");
+
+		// create list of random equipment slots
+		List<EquipmentSlot> slots = Arrays.asList(EquipmentSlot.values());
+		Collections.shuffle(slots);
+
+		// loop through all players and all slots, and apply the durability change
 		for (Player player : players) {
 			PlayerInventory inv = player.getInventory();
-			for (EquipmentSlot slot : EquipmentSlot.values()) {
+			for (EquipmentSlot slot : slots) {
 				ItemStack item = inv.getItem(slot);
-				if (item == null || item.getType().isEmpty() || item.getAmount() == 0)
+				if (item.getType().isEmpty() || item.getAmount() == 0)
 					continue;
 				ItemMeta meta = item.getItemMeta();
 				// only allowing items with damage because apparently "instanceof Damageable" isn't good enough

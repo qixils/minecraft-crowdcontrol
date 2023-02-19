@@ -15,6 +15,8 @@ import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +37,13 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.type(ResultType.RETRY)
 				.message("Targets not holding a durable item");
 
+		// create list of random equipment slots
+		List<Slot> slots = Arrays.asList(Slot.values());
+		Collections.shuffle(slots);
+
+		// loop through all players and all slots, and apply the durability change
 		for (Player player : players) {
-			for (Slot slot : Slot.values()) {
+			for (Slot slot : slots) {
 				Optional<ItemStack> optionalItem = slot.getItem(player);
 				if (!optionalItem.isPresent())
 					continue;
