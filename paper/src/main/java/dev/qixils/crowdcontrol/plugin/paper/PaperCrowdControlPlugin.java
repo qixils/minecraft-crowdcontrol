@@ -201,7 +201,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 				commandManager.registerBrigadier();
 				commandManager.registerAsynchronousCompletions();
 			} catch (Exception exception) {
-				getSLF4JLogger().error("The command manager was unable to fully initialize. Please report this error to the developer.", exception);
+				getSLF4JLogger().warn("Chat command manager partially failed to initialize, ignoring.");
 			}
 			registerChatCommands();
 		} catch (Exception exception) {

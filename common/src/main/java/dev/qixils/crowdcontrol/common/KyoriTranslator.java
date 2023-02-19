@@ -63,7 +63,7 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 		logger.info("Registering translator");
 
 		// create translator
-		translator = TranslationRegistry.create(Key.key("crowd-control", "translations"));
+		translator = TranslationRegistry.create(Key.key("crowdcontrol", "translations"));
 		translator.defaultLocale(Objects.requireNonNull(Translator.parseLocale("en_US")));
 
 		// create class loaders list
