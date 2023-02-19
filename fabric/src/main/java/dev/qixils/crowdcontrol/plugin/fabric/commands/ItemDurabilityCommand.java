@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ITEM_DAMAGE_PERCENTAGE;
+
 @Getter
 public abstract class ItemDurabilityCommand extends ImmediateCommand {
 	private final String effectName;
@@ -45,7 +47,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 					continue;
 				int curDamage = item.getDamageValue();
 				int maxDamage = item.getMaxDamage();
-				int newDamage = modifyDurability(curDamage, maxDamage);
+				int newDamage = Math.min(maxDamage, Math.max(0, modifyDurability(curDamage, maxDamage)));
 
 				if (!CommandConstants.canApplyDamage(curDamage, newDamage, maxDamage))
 					continue;
@@ -81,7 +83,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 
 		@Override
 		protected int modifyDurability(int curDamage, int maxDamage) {
-			return (maxDamage + curDamage) / 2;
+			return curDamage + (maxDamage / ITEM_DAMAGE_PERCENTAGE);
 		}
 	}
 }

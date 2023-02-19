@@ -184,7 +184,16 @@ public class CommandConstants {
 	/**
 	 * The minimum amount of durability allowed to be set by the Damage Item command.
 	 */
-	private static final int MIN_ITEM_DAMAGE = 15;
+	private static final int MIN_ITEM_DAMAGE_VALUE = 15;
+	/**
+	 * The percentage of durability to take from an item when using the Damage Item command as a denominator
+	 * (i.e. {@code durability - (maxDurability / DAMAGE_ITEM_PERCENTAGE)}).
+	 */
+	public static final int ITEM_DAMAGE_PERCENTAGE = 4;
+	/**
+	 * The minimum percentage of durability allowed to be set by the Damage Item command as a denominator.
+	 */
+	public static final int MIN_ITEM_DAMAGE_PERCENTAGE = 5;
 	/**
 	 * Radius to search for entities when executing Entity Chaos with global effects disabled.
 	 */
@@ -382,7 +391,9 @@ public class CommandConstants {
 	public static boolean canApplyDurability(int oldDurability, int newDurability, int maxDurability) {
 		if (oldDurability == newDurability)
 			return false;
-		int min = Math.min(maxDurability, Math.max(MIN_ITEM_DAMAGE, maxDurability / 100));
+		if (maxDurability == newDurability)
+			return true;
+		int min = Math.max(MIN_ITEM_DAMAGE_VALUE, maxDurability / MIN_ITEM_DAMAGE_PERCENTAGE);
 		return newDurability >= min;
 	}
 

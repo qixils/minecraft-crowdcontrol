@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ITEM_DAMAGE_PERCENTAGE;
+
 @Getter
 public class ItemDamageCommand extends ImmediateCommand {
 	private final BiFunction<Integer, Material, Integer> handleItem;
@@ -29,7 +31,7 @@ public class ItemDamageCommand extends ImmediateCommand {
 		super(plugin);
 		handleItem = repair
 				? (damage, type) -> 0
-				: (damage, type) -> (type.getMaxDurability() + damage) / 2;
+				: (damage, type) -> damage + (type.getMaxDurability() / ITEM_DAMAGE_PERCENTAGE);
 		effectName = (repair ? "repair" : "damage") + "_item";
 	}
 
@@ -49,8 +51,7 @@ public class ItemDamageCommand extends ImmediateCommand {
 				if (item.getType().isEmpty() || item.getAmount() == 0)
 					continue;
 				ItemMeta meta = item.getItemMeta();
-				// only allowing items with damage because apparently "instanceof Damageable" isn't good enough
-				if (meta instanceof Damageable damageable && damageable.hasDamage()) {
+				if (meta instanceof Damageable damageable && item.getType().getMaxDurability() > 1) {
 					Material type = item.getType();
 					int curDamage = damageable.getDamage();
 					int newDamage = handleItem.apply(damageable.getDamage(), type);
