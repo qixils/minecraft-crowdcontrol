@@ -112,7 +112,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
 		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender) -> {
 			getSLF4JLogger().debug("Received version response from client!");
-			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(16)));
+			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(32)));
 			updateConditionalEffectVisibility(crowdControl);
 		});
 	}
