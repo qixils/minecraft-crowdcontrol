@@ -31,6 +31,9 @@ A list of all changes made to the software in reverse chronological order.
 - Cursed enchantments are less likely to be applied to items awarded by Do-or-Die and lucky
   lootboxes
 - Potion effects now render as a timed effect on the Crowd Control overlay
+- Repair/Damage Item effects now randomly pick from armor items as well as held items
+- Damage Item now takes a fixed 20% of the item's max durability instead of 50% of its remaining
+  durability
 - Added support for Crowd Control 2.0 (customizable effect durations, non-Twitch streamer targets,
   etc.)
 - Added sliders to various effects (give/take health/hunger/items/etc.)
