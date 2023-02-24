@@ -27,7 +27,7 @@ public class FallingBlockCommand extends BlockCommand {
 	protected Location getLocation(ServerPlayer player) {
 		Location playerLoc = new Location(player);
 		ServerLevel world = player.getLevel();
-		BlockPos position = new BlockPos(
+		BlockPos position = BlockPos.containing(
 				playerLoc.x(),
 				Math.min(
 						playerLoc.y() + FALLING_BLOCK_FALL_DISTANCE,
