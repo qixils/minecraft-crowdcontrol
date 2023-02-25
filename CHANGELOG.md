@@ -12,6 +12,8 @@ A list of all changes made to the software in reverse chronological order.
 - Added new timed effects for modifying gravity
 - Added new client-side effects for Fabric: Inverted Controls & Inverted Mouse
 - Added new client-side effects for Fabric: Screen Effects
+- Added new effect: Delete Random Item (a variant of Delete Held Item which picks randomly from the
+  entire inventory)
 - Added the missing effects for giving and taking enchanted golden apples on Sponge 7
 - "Teleport All Entities to Player" now acts as "Teleport Nearby Entities to Player" when not
   running as a global effect
