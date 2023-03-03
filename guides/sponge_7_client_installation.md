@@ -2,7 +2,7 @@
 
 The following steps detail how to manually install Crowd Control for Minecraft SpongeForge 1.12.2.
 
-> **Warning**
+> **Warning**  
 > Client installation is not recommended at this time as Sponge 7 has some issues that cause
 > crashing when run on the client. For this reason, we instead recommend using a local server with
 > all of your mods copied to it. The easiest way to do this is through the
