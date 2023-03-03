@@ -2,11 +2,13 @@
 
 The following steps detail how to manually install Crowd Control for Minecraft SpongeForge 1.12.2.
 
-> **Note:** Client installation is not recommended at this time as Sponge 7 has some issues that
-> cause crashing when run on the client. For this reason, we instead recommend using a local server
-> with all of your mods copied to it. The easiest way to do this is through the
-> [One-Click Server Setup](sponge_7_one_click.md), although you may also
-> [set up a server manually](sponge_7_manual_installation.md).
+> **Warning**
+> 
+> Client installation is not recommended at this time as Sponge 7 has some issues that cause
+> crashing when run on the client. For this reason, we instead recommend using a local server with
+> all of your mods copied to it. The easiest way to do this is through the
+> [One-Click Server Setup](sponge_7_one_click.md), although you may also set up a server
+> [manually](sponge_7_manual_installation.md).
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
 2. In the Game Selection tab, select **Minecraft (Sponge) 1.12 (PC)**.
