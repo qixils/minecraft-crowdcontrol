@@ -104,7 +104,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Clutter Inventory", "clutter", "inventory") { Price = 50, Description = "Shuffles around items in the streamer's inventory" },
             new Effect("Damage Item", "damage_item", "inventory") { Price = 100, Description = "Takes 25% of the durability of a held or worn item" },
             new Effect("Delete Held Item", "delete_item", "inventory") { Price = 200, Description = "Deletes whatever item the streamer is currently holding" },
-            new Effect("Delete Random Item", "delete_item", "inventory") { Price = 150, Description = "Deletes a random item from the streamer's inventory" },
+            new Effect("Delete Random Item", "delete_random_item", "inventory") { Price = 150, Description = "Deletes a random item from the streamer's inventory" },
             new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory") { Price = 300, Description = "Disallows the streamer from keeping their inventory upon death" },
             new Effect("Drop Held Item", "drop_item", "inventory") { Price = 25, Description = "Makes the streamer drop their held item" },
             new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory") { Price = 100, Description = "Allows the streamer to keep their inventory upon death" },
