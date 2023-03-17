@@ -31,9 +31,9 @@
     "crowd-control.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.13.3",
+    "fabricloader": "*",
     "fabric": "*",
-    "minecraft": "1.19.3"
+    "minecraft": "${minecraftVersion}"
   },
   "custom": {
     "cardinal-components": [
