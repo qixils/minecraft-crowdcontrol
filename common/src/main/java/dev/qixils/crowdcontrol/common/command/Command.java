@@ -365,4 +365,13 @@ public interface Command<P> {
 	default TriState isSelectable() {
 		return TriState.UNKNOWN;
 	}
+
+	/**
+	 * Whether this command should currently be visible in the overlay.
+	 *
+	 * @return whether this effect is visible
+	 */
+	default TriState isVisible() {
+		return TriState.UNKNOWN;
+	}
 }

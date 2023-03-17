@@ -116,7 +116,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 		// entity commands
 		for (EntityType<?> entity : BuiltInRegistries.ENTITY_TYPE) {
 			commands.add(new SummonEntityCommand<>(plugin, entity));
-			commands.add(new RemoveEntityCommand(plugin, entity));
+			commands.add(new RemoveEntityCommand<>(plugin, entity));
 		}
 
 		// register difficulty commands

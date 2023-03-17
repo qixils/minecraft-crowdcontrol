@@ -862,10 +862,21 @@ public interface Plugin<P, S> {
 		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
 		updateEffectStatus(service, "swap", getAllPlayers().size() <= 1 ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 		for (Command<?> effect : commandRegister().getCommands()) {
-			if (effect.isClientOnly())
-				updateEffectVisibility(service, effect, clientVisible);
-			else if (effect.isGlobal())
-				updateEffectVisibility(service, effect, globalVisible);
+			TriState visibility = effect.isVisible();
+			if (effect.isClientOnly()) {
+				if (!clientVisible)
+					visibility = TriState.FALSE;
+				else if (visibility == TriState.UNKNOWN)
+					visibility = TriState.TRUE;
+			}
+			else if (effect.isGlobal()) {
+				if (!globalVisible)
+					visibility = TriState.FALSE;
+				else if (visibility == TriState.UNKNOWN)
+					visibility = TriState.TRUE;
+			}
+			if (visibility != TriState.UNKNOWN)
+				updateEffectVisibility(service, effect, visibility.getPrimitiveBoolean());
 
 			TriState selectable = effect.isSelectable();
 			if (selectable != TriState.UNKNOWN)

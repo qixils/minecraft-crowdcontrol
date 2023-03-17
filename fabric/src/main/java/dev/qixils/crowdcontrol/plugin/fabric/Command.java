@@ -1,10 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.flag.FeatureElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,5 +44,15 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 			case "sweeping" -> "sweeping_edge";
 			default -> path;
 		};
+	}
+
+	@SuppressWarnings("ConstantValue") // overworld can indeed be null early in initialization
+	@Override
+	public TriState isVisible() {
+		if (this instanceof FeatureElement element) {
+			ServerLevel overworld = plugin.server().overworld();
+			return TriState.fromBoolean(overworld != null && element.isEnabled(overworld.enabledFeatures()));
+		}
+		return TriState.UNKNOWN; // avoid sending any packet
 	}
 }

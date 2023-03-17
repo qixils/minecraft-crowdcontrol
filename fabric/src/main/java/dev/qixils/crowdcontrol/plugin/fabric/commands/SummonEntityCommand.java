@@ -45,7 +45,7 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.weightedRandom;
 
 @Getter
-public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
+public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
 	private final Map<EquipmentSlot, List<Item>> armor;
 	protected final EntityType<E> entityType;
 	protected final boolean isMonster;
@@ -103,6 +103,11 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 					return request.buildResponse()
 							.type(ResultType.FAILURE)
 							.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+				}
+				if (!isEnabled(player.getLevel().enabledFeatures())) {
+					return request.buildResponse()
+							.type(ResultType.UNAVAILABLE)
+							.message("Mob is not available in this version of Minecraft");
 				}
 			}
 		}
