@@ -109,10 +109,10 @@ abstract class NearbyLocationCommand<S> extends Command {
 					player.teleportAsync(destination).thenAccept(success -> {
 						if (!success)
 							return;
-						player.sendActionBar(plugin.renderForPlayer(Component.translatable(
+						player.sendActionBar(Component.translatable(
 								"cc.effect.nearby_location.output",
 								nameOf(searchType).color(NamedTextColor.YELLOW)
-						), player));
+						));
 					});
 					response.type(ResultType.SUCCESS).message("SUCCESS"); // technically this could still fail; unlikely tho.
 					break;
