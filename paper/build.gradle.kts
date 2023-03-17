@@ -42,7 +42,7 @@ bukkit {
     version = project.version.toString()
     main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
     apiVersion = mcVersionSplit[0] + "." + mcVersionSplit[1]
-    prefix = "crowd-control"
+    prefix = "crowdcontrol"
     authors = listOf("qixils")
     description = "Allows viewers to interact with your Minecraft world"
     website = "https://github.com/qixils/minecraft-crowdcontrol"

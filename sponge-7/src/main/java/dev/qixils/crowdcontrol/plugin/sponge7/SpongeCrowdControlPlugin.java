@@ -64,6 +64,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
@@ -71,7 +72,7 @@ import java.util.function.Function;
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
 @Plugin(
-		id = "crowd-control",
+		id = "crowdcontrol",
 		name = "Crowd Control",
 		version = "3.3.0",
 		description = "Allows viewers to interact with your Minecraft world",
@@ -322,7 +323,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			else {
 				password = config.getNode("password").getString("crowdcontrol");
 				if (password == null || password.isEmpty()) {
-					logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowd-control.conf or set a temporary password using the /password command.");
+					logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
 					return;
 				}
 			}
@@ -331,7 +332,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			getLogger().info("Running Crowd Control in legacy client mode");
 			String ip = config.getNode("ip").getString("127.0.0.1");
 			if (ip == null || ip.isEmpty()) {
-				logger.error("No IP address has been set in the plugin's config file. Please set one by editing config/crowd-control.conf");
+				logger.error("No IP address has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf");
 				return;
 			}
 			crowdControl = CrowdControl.client().port(port).ip(ip).build();
@@ -348,7 +349,16 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		game.getEventManager().registerListeners(this, softLockResolver);
 		spongeSerializer = SpongeComponentSerializer.get();
 		scheduler = game.getScheduler();
-		defaultConfig.copyToFile(configPath, false, true);
+		Path oldConfigPath = configPath.getParent().resolve("crowd-control.conf");
+		if (Files.exists(oldConfigPath)) {
+			try {
+				Files.move(oldConfigPath, configPath);
+			} catch (Exception e) {
+				logger.warn("Could not move old config file to new location", e);
+			}
+		} else {
+			defaultConfig.copyToFile(configPath, false, true);
+		}
 		configLoader = HoconConfigurationLoader.builder()
 				.setPath(configPath)
 				.build();

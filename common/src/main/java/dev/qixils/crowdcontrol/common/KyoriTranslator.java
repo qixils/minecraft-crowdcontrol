@@ -50,7 +50,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	private static KyoriTranslator instance;
 	private final TranslationRegistry translator;
 	private final List<ClassLoader> classLoaders;
-	private final Key name = Key.key("crowd-control", "translations");
+	private final Key name = Key.key("crowdcontrol", "translations");
 
 	private KyoriTranslator(ClassLoader... secondaryClassLoaders) {
 		logger.info("Registering translator");

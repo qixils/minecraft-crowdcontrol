@@ -60,7 +60,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Getter
-@Plugin("crowd-control")
+@Plugin("crowdcontrol")
 @ParametersAreNonnullByDefault
 public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandCause> {
 	// keys
@@ -69,7 +69,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	public static Key<Value<ResourceKey>> GAME_MODE_EFFECT;
 	// "real" variables
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
-	private final Logger logger = LoggerFactory.getLogger("crowd-control");
+	private final Logger logger = LoggerFactory.getLogger("CrowdControl");
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	private final SpongeTextUtil textUtil = new SpongeTextUtil();
@@ -95,7 +95,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 		this.game = injector.getInstance(Game.class);
 		this.pluginContainer = injector.getInstance(PluginContainer.class);
-		this.configLoader = createConfigLoader(configPath.toFile());
+		this.configLoader = createConfigLoader(configPath);
 
 		// create child injector with cloud module
 		final Injector childInjector = injector.createChildInjector(
