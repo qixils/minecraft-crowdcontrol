@@ -260,19 +260,14 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	}
 
 	@Override
-	public @NotNull Component translate(final @NotNull TranslatableComponent component, final @NotNull Locale context) {
-		return this.renderTranslatable(component, context);
-	}
-
-	@Override
-	protected @NotNull Component renderTranslatable(@NotNull TranslatableComponent component, @NotNull Locale context) {
+	public @Nullable Component translate(final @NotNull TranslatableComponent component, final @NotNull Locale context) {
 		if (!component.key().startsWith("cc."))
-			return GlobalTranslator.renderer().render(component, context);
+			return null;
 
-		final @Nullable MessageFormat format = translator.translate(component.key(), context);
+		final @Nullable MessageFormat format = translate(component.key(), context);
 		if (format == null) {
-			// we don't have a translation for this component, default to super
-			return super.renderTranslatable(component, context);
+			// we don't have a translation for this component
+			return null;
 		}
 
 		final List<Component> args = component.args();
