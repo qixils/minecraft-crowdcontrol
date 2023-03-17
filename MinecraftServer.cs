@@ -104,6 +104,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Clutter Inventory", "clutter", "inventory") { Price = 50, Description = "Shuffles around items in the streamer's inventory" },
             new Effect("Damage Item", "damage_item", "inventory") { Price = 100, Description = "Takes 25% of the durability of a held or worn item" },
             new Effect("Delete Held Item", "delete_item", "inventory") { Price = 200, Description = "Deletes whatever item the streamer is currently holding" },
+            new Effect("Delete Random Item", "delete_item", "inventory") { Price = 150, Description = "Deletes a random item from the streamer's inventory" },
             new Effect("Disable Keep Inventory", "keep_inventory_off", "inventory") { Price = 300, Description = "Disallows the streamer from keeping their inventory upon death" },
             new Effect("Drop Held Item", "drop_item", "inventory") { Price = 25, Description = "Makes the streamer drop their held item" },
             new Effect("Enable Keep Inventory", "keep_inventory_on", "inventory") { Price = 100, Description = "Allows the streamer to keep their inventory upon death" },
@@ -125,6 +126,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Blaze", "entity_blaze", "summon_entity") { Price = 300 },
             new Effect("Boat", "entity_boat", "summon_entity") { Price = 50 },
             new Effect("Boat with Chest", "entity_chest_boat", "summon_entity") { Price = 150 },
+            new Effect("Camel", "entity_camel", "summon_entity") { Price = 100 },
             new Effect("Cat", "entity_cat", "summon_entity") { Price = 100 },
             new Effect("Cave Spider", "entity_cave_spider", "summon_entity") { Price = 300 },
             new Effect("Charged Creeper", "entity_charged_creeper", "summon_entity") { Price = 750 },
@@ -179,6 +181,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Skeleton", "entity_skeleton", "summon_entity") { Price = 300 },
             new Effect("Skeleton Horse", "entity_skeleton_horse", "summon_entity") { Price = 100 },
             new Effect("Slime", "entity_slime", "summon_entity") { Price = 300 },
+            new Effect("Sniffer", "entity_sniffer", "summon_entity") { Price = 100 },
             new Effect("Snow Golem", "entity_snowman", "summon_entity") { Price = 100 },
             new Effect("Spider", "entity_spider", "summon_entity") { Price = 300 },
             new Effect("Squid", "entity_squid", "summon_entity") { Price = 100 },
@@ -212,6 +215,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Blaze", "remove_entity_blaze", "remove_entity") { Price = 150 },
             new Effect("Boat", "remove_entity_boat", "remove_entity") { Price = 150 },
             new Effect("Boat with Chest", "remove_entity_chest_boat", "remove_entity") { Price = 150 },
+            new Effect("Camel", "remove_entity_camel", "remove_entity") { Price = 150 },
             new Effect("Cat", "remove_entity_cat", "remove_entity") { Price = 150 },
             new Effect("Cave Spider", "remove_entity_cave_spider", "remove_entity") { Price = 150 },
             new Effect("Chicken", "remove_entity_chicken", "remove_entity") { Price = 150 },
@@ -264,6 +268,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Skeleton", "remove_entity_skeleton", "remove_entity") { Price = 150 },
             new Effect("Skeleton Horse", "remove_entity_skeleton_horse", "remove_entity") { Price = 150 },
             new Effect("Slime", "remove_entity_slime", "remove_entity") { Price = 150 },
+            new Effect("Sniffer", "remove_entity_sniffer", "remove_entity") { Price = 150 },
             new Effect("Snow Golem", "remove_entity_snowman", "remove_entity") { Price = 100 },
             new Effect("Spider", "remove_entity_spider", "remove_entity") { Price = 150 },
             new Effect("Squid", "remove_entity_squid", "remove_entity") { Price = 150 },
@@ -385,7 +390,7 @@ namespace CrowdControl.Games.Packs
             new Effect("Apply Thorns III", "enchant_thorns", "enchantments") { Price = 50, Description = "Deals damage to attackers when hit" },
             new Effect("Apply Unbreaking III", "enchant_unbreaking", "enchantments") { Price = 50, Description = "Lessens the speed at which items break" },
 
-            // TODO: add goat horns to give/remove items?
+            // TODO: add goat horns to give/remove items? or maybe just add it as a sound effect to Annoying Popup? idk
 
             // gives 1 item
             new Effect("Give an Item", "give_item", ItemKind.Folder),
