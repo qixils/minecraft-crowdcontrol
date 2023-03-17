@@ -86,6 +86,16 @@ public final class SemVer implements Comparable<SemVer> {
 	}
 
 	/**
+	 * Creates a new semantic version.
+	 *
+	 * @param major major version
+	 * @param minor minor version
+	 */
+	public SemVer(int major, int minor) {
+		this(major, minor, 0, false, true);
+	}
+
+	/**
 	 * Creates a new semantic version from a string.
 	 *
 	 * @param version version string
