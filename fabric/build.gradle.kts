@@ -54,12 +54,10 @@ dependencies {
 
 tasks.processResources {
     inputs.property("version", project.version)
-    inputs.property("minecraftVersion", minecraftVersion)
     filteringCharset = "UTF-8"
 
     filesMatching("fabric.mod.json") {
         expand("version" to project.version)
-        expand("minecraftVersion" to minecraftVersion)
     }
 }
 

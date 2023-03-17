@@ -33,7 +33,7 @@
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
-    "minecraft": "${minecraftVersion}"
+    "minecraft": "1.19.4"
   },
   "custom": {
     "cardinal-components": [
