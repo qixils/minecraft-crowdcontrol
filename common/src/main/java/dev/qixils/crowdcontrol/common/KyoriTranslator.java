@@ -261,20 +261,28 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 
 	@Override
 	public @Nullable Component translate(final @NotNull TranslatableComponent component, final @NotNull Locale context) {
-		if (!component.key().startsWith("cc."))
-			return null;
+		if (translate(component.key(), context) == null) return null;
+		return renderTranslatable(component, context);
+	}
 
+	@Override
+	public @Nullable MessageFormat translate(@NotNull String key, @NotNull Locale locale) {
+		logger.debug("Plainly translating " + key + " for " + locale);
+		return translator.translate(key, locale);
+	}
+
+	@Override
+	protected @NotNull Component renderTranslatable(@NotNull TranslatableComponent component, @NotNull Locale context) {
+		logger.debug("Richly translating " + component.key() + " for " + context);
+		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method
+		// instead it will just like waste a bunch of method calls to the internal translator but that's fine
 		final @Nullable MessageFormat format = translate(component.key(), context);
-		if (format == null) {
-			// we don't have a translation for this component
-			return null;
-		}
-
-		final List<Component> args = component.args();
+		if (format == null) return GlobalTranslator.renderer().render(component, context);
 
 		final TextComponent.Builder builder = Component.text(); // mostly just a dummy for appending children
 		this.mergeStyle(component, builder, context);
 
+		final List<Component> args = component.args();
 		if (args.isEmpty()) {
 			// no arguments makes this render very simple
 			builder.append(miniMessage().deserialize(format.format(null, new StringBuffer(), null).toString()));
@@ -287,16 +295,10 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		return this.optionallyRenderChildrenAppendAndBuild(component.children(), builder, context);
 	}
 
-	@Override
-	public @Nullable MessageFormat translate(@NotNull String key, @NotNull Locale locale) {
-		return translator.translate(key, locale);
-	}
-
-	@NotNull
-	public static KyoriTranslator getInstance(ClassLoader... secondaryClassLoaders) {
+	public static void initialize(ClassLoader... secondaryClassLoaders) {
 		if (instance == null)
 			instance = new KyoriTranslator(secondaryClassLoaders);
-		return instance;
+		//return instance;
 	}
 
 	// TODO: override ComponentFlattener?

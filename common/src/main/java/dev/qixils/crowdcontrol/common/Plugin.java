@@ -226,7 +226,7 @@ public interface Plugin<P, S> {
 	 */
 	default void registerChatCommands() {
 		try {
-			KyoriTranslator.getInstance(Plugin.class.getClassLoader(), getClass().getClassLoader());
+			KyoriTranslator.initialize(Plugin.class.getClassLoader(), getClass().getClassLoader());
 		} catch (Exception e) {
 			System.out.println("Failed to initialize i18n");
 			e.printStackTrace();
