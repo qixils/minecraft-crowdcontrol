@@ -2,7 +2,9 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
-import dev.qixils.crowdcontrol.common.*;
+import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
@@ -90,8 +92,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
-	@Accessors(fluent = true)
-	private final KyoriTranslator translator = new KyoriTranslator(this::adventure, getClass().getClassLoader(), Plugin.class.getClassLoader());
 	@MonotonicNonNull
 	private HoconConfigurationLoader configLoader;
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;

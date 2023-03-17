@@ -21,7 +21,7 @@ public class CommandSourceStackMapper implements EntityMapper<CommandSourceStack
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull CommandSourceStack entity) {
-		return plugin.translator().wrap(entity);
+		return plugin.adventure().audience(entity);
 	}
 
 	@Override

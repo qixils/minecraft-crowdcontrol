@@ -17,7 +17,7 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull ServerPlayer entity) {
-		return plugin.translator().wrap(entity);
+		return entity;
 	}
 
 	@Override

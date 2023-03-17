@@ -19,7 +19,7 @@ class CommandSenderMapper<E extends CommandSender> implements EntityMapper<E> {
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull E entity) {
-		return plugin.translator().wrap(entity);
+		return entity;
 	}
 
 	@Override

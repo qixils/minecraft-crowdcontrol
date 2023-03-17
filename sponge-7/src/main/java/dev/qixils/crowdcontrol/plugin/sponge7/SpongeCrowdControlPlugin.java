@@ -94,8 +94,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
 	private final SpongePlayerManager playerManager = new SpongePlayerManager(this);
-	@Accessors(fluent = true)
-	private final KyoriTranslator translator = new KyoriTranslator(this::adventure, getClass().getClassLoader(), dev.qixils.crowdcontrol.common.Plugin.class.getClassLoader());
 	private SpongeCommandManager<CommandSource> commandManager;
 	private ConfigurationLoader<CommentedConfigurationNode> configLoader;
 	private Scheduler scheduler;
@@ -184,7 +182,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	@NotNull
 	public Audience asAudience(@NotNull World world) {
-		return translator().world(net.kyori.adventure.key.Key.key(MINECRAFT_NAMESPACE, world.getName()));
+		return adventure().world(net.kyori.adventure.key.Key.key(MINECRAFT_NAMESPACE, world.getName()));
 	}
 
 	@Override
