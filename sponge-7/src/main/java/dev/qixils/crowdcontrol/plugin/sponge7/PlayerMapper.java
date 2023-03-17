@@ -16,7 +16,7 @@ class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMa
 
 	@Override
 	public @NotNull Audience asAudience(@NotNull Player entity) {
-		return plugin.translator().player(entity.getUniqueId());
+		return plugin.adventure().player(entity);
 	}
 
 	@Override

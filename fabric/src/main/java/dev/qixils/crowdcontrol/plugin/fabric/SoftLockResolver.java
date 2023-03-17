@@ -60,7 +60,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 			for (int y = -SEARCH_VERT; y <= SEARCH_VERT; y++) {
 				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
 					ServerLevel level = player.getLevel();
-					BlockPos pos = new BlockPos(player.position().add(x, y, z));
+					BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
 					BlockState block = level.getBlockState(pos);
 					if (dangerousBlocks.contains(block.getBlock()))
 						level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -72,7 +72,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 //		player.setRespawnPosition(Level.OVERWORLD, null, 0, false, false);
 
 		// alert player
-		plugin.translator().wrap(player).sendMessage(ALERT);
+		player.sendMessage(ALERT);
 	}
 
 	@Listener

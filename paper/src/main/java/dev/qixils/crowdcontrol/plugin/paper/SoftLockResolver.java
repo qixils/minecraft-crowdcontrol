@@ -56,7 +56,7 @@ public class SoftLockResolver extends SoftLockObserver<Player> implements Listen
 		// reset spawn point
 //		player.setBedSpawnLocation(null);
 		// inform player
-		plugin.translator().wrap(player).sendMessage(ALERT);
+		player.sendMessage(ALERT);
 	}
 
 	@EventHandler

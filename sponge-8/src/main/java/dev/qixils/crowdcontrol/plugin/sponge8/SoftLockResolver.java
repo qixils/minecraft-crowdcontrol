@@ -72,7 +72,7 @@ public class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 //			return map;
 //		});
 		// alert player
-		plugin.translator().wrap(player).sendMessage(ALERT);
+		player.sendMessage(ALERT);
 	}
 
 	@Listener

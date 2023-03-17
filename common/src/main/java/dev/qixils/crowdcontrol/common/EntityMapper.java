@@ -34,10 +34,7 @@ public interface EntityMapper<E> {
 	@NotNull
 	default Audience asAudience(@NotNull E entity) {
 		if (entity instanceof Audience)
-			return getPlugin().translator().wrap((Audience) entity);
-		Optional<Audience> audience = tryGetUniqueId(entity).map(id -> getPlugin().translator().player(id));
-		if (audience.isPresent())
-			return audience.get();
+			return (Audience) entity;
 		throw new UnsupportedOperationException("#asAudience is unsupported");
 	}
 

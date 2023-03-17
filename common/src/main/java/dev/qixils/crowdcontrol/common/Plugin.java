@@ -208,35 +208,6 @@ public interface Plugin<P, S> {
 	Component NO_CC_UNKNOWN_ERROR = error(Component.translatable("cc.error.unknown"));
 
 	/**
-	 * Gets the instance of the {@link KyoriTranslator}.
-	 *
-	 * @return the translator
-	 */
-	@NotNull KyoriTranslator translator();
-
-	/**
-	 * Renders a component for the provided command sender using the {@link KyoriTranslator}.
-	 *
-	 * @param component the component to render
-	 * @param sender the command sender
-	 * @return the rendered component
-	 */
-	default @NotNull Component renderForSender(@NotNull Component component, @NotNull S sender) {
-		return translator().render(component, commandSenderMapper().getLocale(sender).orElseGet(Locale::getDefault));
-	}
-
-	/**
-	 * Renders a component for the provided player using the {@link KyoriTranslator}.
-	 *
-	 * @param component the component to render
-	 * @param player the player
-	 * @return the rendered component
-	 */
-	default @NotNull Component renderForPlayer(@NotNull Component component, @NotNull P player) {
-		return translator().render(component, playerMapper().getLocale(player).orElseGet(Locale::getDefault));
-	}
-
-	/**
 	 * Gets the provided command sender as a player.
 	 *
 	 * @param sender the command sender
@@ -254,6 +225,13 @@ public interface Plugin<P, S> {
 	 * Registers the plugin's basic chat commands.
 	 */
 	default void registerChatCommands() {
+		try {
+			KyoriTranslator.getInstance(Plugin.class.getClassLoader(), getClass().getClassLoader());
+		} catch (Exception e) {
+			System.out.println("Failed to initialize i18n");
+			e.printStackTrace();
+		}
+
 		CommandManager<S> manager = getCommandManager();
 		if (manager == null)
 			throw new IllegalStateException("CommandManager is null");

@@ -8,7 +8,6 @@ import dev.qixils.crowdcontrol.plugin.sponge8.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -80,24 +79,23 @@ public class DoOrDieCommand extends VoidCommand {
 								for (UUID uuid : notCompleted) {
 									ServerPlayer player = server.player(uuid).orElse(null);
 									if (player == null) continue;
-									Audience audience = plugin.translator().wrap(player);
 
 									if (finalCondition.hasSucceeded(player)) {
 										ItemStack item = plugin.commandRegister()
 												.getCommandByName("lootbox", LootboxCommand.class)
 												.createRandomItem(finalCondition.getRewardLuck());
-										audience.showTitle(doOrDieSuccess(item.type()));
+										player.showTitle(doOrDieSuccess(item.type()));
 										notCompleted.remove(uuid);
-										audience.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());
+										player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());
 										GiveItemCommand.giveItemTo(plugin, player, item);
 									} else if (isTimeUp) {
-										audience.showTitle(DO_OR_DIE_FAILURE);
+										player.showTitle(DO_OR_DIE_FAILURE);
 										player.offer(Keys.HEALTH, 0d);
 									} else {
 										Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-										audience.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+										player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
 										if (isNewValue)
-											audience.playSound(Sounds.DO_OR_DIE_TICK.get(), Sound.Emitter.self());
+											player.playSound(Sounds.DO_OR_DIE_TICK.get(), Sound.Emitter.self());
 									}
 								}
 

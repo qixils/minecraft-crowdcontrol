@@ -309,7 +309,7 @@ public interface Command<P> {
 		}
 
 		try {
-			plugin.translator().wrap(Audience.audience(audiences)).sendMessage(Component.translatable(
+			Audience.audience(audiences).sendMessage(Component.translatable(
 					"cc.effect.used",
 					plugin.getViewerComponent(request, true).color(Plugin.USER_COLOR),
 					getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)

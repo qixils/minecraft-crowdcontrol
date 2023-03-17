@@ -52,9 +52,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);
-	@Getter
-	@Accessors(fluent = true)
-	private final KyoriTranslator translator = new KyoriTranslator(new NativeAudienceProvider(), getClass().getClassLoader(), dev.qixils.crowdcontrol.common.Plugin.class.getClassLoader());
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);

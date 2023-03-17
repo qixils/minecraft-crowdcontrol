@@ -74,7 +74,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand {
 		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
 		for (Item item : BuiltInRegistries.ITEM) {
 			if (item instanceof ArmorItem armorItem) {
-				EquipmentSlot slot = armorItem.getSlot();
+				EquipmentSlot slot = armorItem.getEquipmentSlot();
 				if (slot.getType() != EquipmentSlot.Type.ARMOR)
 					continue;
 				armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(armorItem);
