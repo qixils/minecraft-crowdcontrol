@@ -97,18 +97,16 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (isMonster) {
-			for (ServerPlayer player : players) {
-				if (player.getLevel().getDifficulty() == Difficulty.PEACEFUL) {
-					return request.buildResponse()
-							.type(ResultType.FAILURE)
-							.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
-				}
-				if (!isEnabled(player.getLevel().enabledFeatures())) {
-					return request.buildResponse()
-							.type(ResultType.UNAVAILABLE)
-							.message("Mob is not available in this version of Minecraft");
-				}
+		for (ServerPlayer player : players) {
+			if (isMonster && player.getLevel().getDifficulty() == Difficulty.PEACEFUL) {
+				return request.buildResponse()
+						.type(ResultType.FAILURE)
+						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+			}
+			if (!isEnabled(player.getLevel().enabledFeatures())) {
+				return request.buildResponse()
+						.type(ResultType.UNAVAILABLE)
+						.message("Mob is not available in this version of Minecraft");
 			}
 		}
 
