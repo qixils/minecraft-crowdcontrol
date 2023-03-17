@@ -34,7 +34,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 
 	@Override
 	public @NotNull List<@NotNull ServerPlayer> getPlayers(@NotNull Request request) {
-		if (plugin.isGlobal())
+		if (plugin.isGlobal(request))
 			return getAllPlayers();
 
 		List<ServerPlayer> players = new ArrayList<>(request.getTargets().length);
