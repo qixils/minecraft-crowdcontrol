@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -205,7 +206,7 @@ public class LootboxCommand extends ImmediateCommand {
 				// create item
 				ItemStack randomItem = createRandomItem(luck);
 				ItemMeta itemMeta = randomItem.getItemMeta();
-				itemMeta.lore(Collections.singletonList(CommandConstants.buildLootboxLore(plugin, request)));
+				itemMeta.lore(Collections.singletonList(GlobalTranslator.render(CommandConstants.buildLootboxLore(plugin, request), player.locale())));
 				randomItem.setItemMeta(itemMeta);
 				lootbox.setItem(slot, randomItem);
 			}
