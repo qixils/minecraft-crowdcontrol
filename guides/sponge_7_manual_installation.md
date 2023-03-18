@@ -33,7 +33,7 @@ with Crowd Control.
       Notepad or `nano` and then run the server command again.
 9. Once you shut down the server using `/stop`, you can edit the plugin's configuration file. A
    password must be set to use the plugin.
-    - The config file is located at `<root>/config/crowd-control.conf`.
+    - The config file is located at `<root>/config/crowdcontrol.conf`.
     - Be sure to enter a password into the `password` field.
 10. Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and
     its Crowd Control server.

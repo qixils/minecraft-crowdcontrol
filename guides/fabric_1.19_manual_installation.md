@@ -26,7 +26,7 @@ with Crowd Control.
    files. You will have to run it twice, as the first will prompt you to accept Minecraft's End User
    License Agreement.
 10. To change the plugin's configuration file, you must first shut down the server by typing `stop`
-    in the server window. The config file is located at `<root>/config/crowd-control.conf`.
+    in the server window. The config file is located at `<root>/config/crowdcontrol.conf`.
 11. Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and
     the Crowd Control server.
 
