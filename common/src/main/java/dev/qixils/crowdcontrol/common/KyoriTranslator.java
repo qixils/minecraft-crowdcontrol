@@ -1,14 +1,12 @@
 package dev.qixils.crowdcontrol.common;
 
-import dev.qixils.crowdcontrol.common.util.SemVer;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.platform.AudienceProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.renderer.TranslatableComponentRenderer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
@@ -30,14 +28,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
-public final class KyoriTranslator extends AbstractComponentRenderer<Locale> implements WrappedAudienceProvider {
+public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements Translator {
 	private static final Set<Locale> LOCALES = Stream.of(
 			"en_US"
 	)
@@ -50,20 +47,16 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 	)
 			.collect(Collectors.toSet());
 	private static final Logger logger = LoggerFactory.getLogger("CC-KyoriTranslator");
+	private static KyoriTranslator instance;
 	private final TranslationRegistry translator;
 	private final List<ClassLoader> classLoaders;
-	private final Supplier<AudienceProvider> wrappedProvider;
+	private final Key name = Key.key("crowdcontrol", "translations");
 
-	public KyoriTranslator(AudienceProvider wrappedProvider, ClassLoader... secondaryClassLoaders) {
-		this(() -> wrappedProvider, secondaryClassLoaders);
-	}
-
-	public KyoriTranslator(Supplier<AudienceProvider> wrappedProvider, ClassLoader... secondaryClassLoaders) {
-		this.wrappedProvider = wrappedProvider;
+	private KyoriTranslator(ClassLoader... secondaryClassLoaders) {
 		logger.info("Registering translator");
 
 		// create translator
-		translator = TranslationRegistry.create(Key.key("crowd-control", "translations"));
+		translator = TranslationRegistry.create(name);
 		translator.defaultLocale(Objects.requireNonNull(Translator.parseLocale("en_US")));
 
 		// create class loaders list
@@ -99,11 +92,8 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 				register(locale, null);
 		}
 
-		// register translator to global translator in production to mask any non-wrapped audiences
-		if (!SemVer.MOD.isSnapshot()) {
-			logger.info("Registering translator to global translator");
-			GlobalTranslator.translator().addSource(translator);
-		}
+		logger.info("Registering translator to global translator");
+		GlobalTranslator.translator().addSource(this);
 	}
 
 	private int countRegisteredLocales() {
@@ -112,6 +102,11 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 			return -1;
 		// TODO figure out how to use Examiner
 		return -1;//locales.size();
+	}
+
+	@Override
+	public @NotNull Key name() {
+		return name;
 	}
 
 	private void register(Locale locale, @Nullable ClassLoader classLoader) {
@@ -265,21 +260,29 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 	}
 
 	@Override
-	protected @NotNull Component renderTranslatable(final @NotNull TranslatableComponent component, final @NotNull Locale context) {
-		if (!component.key().startsWith("cc."))
-			return GlobalTranslator.renderer().render(component, context);
+	public @Nullable Component translate(final @NotNull TranslatableComponent component, final @NotNull Locale context) {
+		if (translate(component.key(), context) == null) return null;
+		return renderTranslatable(component, context);
+	}
 
-		final @Nullable MessageFormat format = translator.translate(component.key(), context);
-		if (format == null) {
-			// we don't have a translation for this component, default to super
-			return super.renderTranslatable(component, context);
-		}
+	@Override
+	public @Nullable MessageFormat translate(@NotNull String key, @NotNull Locale locale) {
+		logger.debug("Plainly translating " + key + " for " + locale);
+		return translator.translate(key, locale);
+	}
 
-		final List<Component> args = component.args();
+	@Override
+	protected @NotNull Component renderTranslatable(@NotNull TranslatableComponent component, @NotNull Locale context) {
+		logger.debug("Richly translating " + component.key() + " for " + context);
+		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method
+		// instead it will just like waste a bunch of method calls to the internal translator but that's fine
+		final @Nullable MessageFormat format = translate(component.key(), context);
+		if (format == null) return GlobalTranslator.renderer().render(component, context);
 
 		final TextComponent.Builder builder = Component.text(); // mostly just a dummy for appending children
 		this.mergeStyle(component, builder, context);
 
+		final List<Component> args = component.args();
 		if (args.isEmpty()) {
 			// no arguments makes this render very simple
 			builder.append(miniMessage().deserialize(format.format(null, new StringBuffer(), null).toString()));
@@ -292,14 +295,10 @@ public final class KyoriTranslator extends AbstractComponentRenderer<Locale> imp
 		return this.optionallyRenderChildrenAppendAndBuild(component.children(), builder, context);
 	}
 
-	@Override
-	public @NotNull Audience wrap(final @NotNull Audience audience) {
-		return RenderedAudience.translated(audience, this);
-	}
-
-	@Override
-	public @NotNull AudienceProvider provider() {
-		return wrappedProvider.get();
+	public static void initialize(ClassLoader... secondaryClassLoaders) {
+		if (instance == null)
+			instance = new KyoriTranslator(secondaryClassLoaders);
+		//return instance;
 	}
 
 	// TODO: override ComponentFlattener?

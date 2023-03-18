@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "crowd-control",
+  "id": "crowdcontrol",
   "version": "${version}",
   "name": "Crowd Control",
   "description": "Allows viewers to interact with your Minecraft world",
@@ -14,7 +14,7 @@
     "discord": "https://discord.gg/warpworld"
   },
   "license": "MIT",
-  "icon": "assets/crowd-control/icon.png",
+  "icon": "assets/crowdcontrol/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -28,19 +28,19 @@
     ]
   },
   "mixins": [
-    "crowd-control.mixins.json"
+    "crowdcontrol.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.13.3",
+    "fabricloader": "*",
     "fabric": "*",
-    "minecraft": "1.19.3"
+    "minecraft": "1.19.4"
   },
   "custom": {
     "cardinal-components": [
-      "crowd-control:viewer-mob",
-      "crowd-control:original-display-name",
-      "crowd-control:game-type-effect",
-      "crowd-control:movement-status"
+      "crowdcontrol:viewer-mob",
+      "crowdcontrol:original-display-name",
+      "crowdcontrol:game-type-effect",
+      "crowdcontrol:movement-status"
     ]
   }
 }

@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -18,15 +18,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTables;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
 
 @Getter
-public class SummonEntityCommand extends ImmediateCommand {
+public class SummonEntityCommand extends Command {
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
 	private static final Set<Material> BLOCKS;
@@ -99,41 +101,51 @@ public class SummonEntityCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	public @NotNull CompletableFuture<Response.@Nullable Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (entityType.getEntityClass() != null && Monster.class.isAssignableFrom(entityType.getEntityClass())) {
 			for (World world : Bukkit.getWorlds()) {
 				if (world.getDifficulty() == Difficulty.PEACEFUL)
-					return request.buildResponse().type(Response.ResultType.FAILURE).message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+					return CompletableFuture.completedFuture(request.buildResponse()
+							.type(Response.ResultType.FAILURE)
+							.message("Hostile mobs cannot be spawned while on Peaceful difficulty"));
 			}
 		}
 
+		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
 		LimitConfig config = plugin.getLimitConfig();
 		int maxVictims = config.getEntityLimit(entityType.getKey().getKey());
 
 		sync(() -> {
-			int victims = 0;
+			try {
+				int victims = 0;
 
-			// first pass (hosts)
-			for (Player player : players) {
-				if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
-					break;
-				if (!isHost(player))
-					continue;
-				spawnEntity(plugin.getViewerComponent(request, false), player);
-				victims++;
-			}
+				// first pass (hosts)
+				for (Player player : players) {
+					if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
+						break;
+					if (!isHost(player))
+						continue;
+					spawnEntity(plugin.getViewerComponent(request, false), player);
+					victims++;
+				}
 
-			// second pass (guests)
-			for (Player player : players) {
-				if (maxVictims > 0 && victims >= maxVictims)
-					break;
-				if (isHost(player))
-					continue;
-				spawnEntity(plugin.getViewerComponent(request, false), player);
-				victims++;
+				// second pass (guests)
+				for (Player player : players) {
+					if (maxVictims > 0 && victims >= maxVictims)
+						break;
+					if (isHost(player))
+						continue;
+					spawnEntity(plugin.getViewerComponent(request, false), player);
+					victims++;
+				}
+			} catch (Exception e) {
+				future.complete(request.buildResponse()
+						.type(Response.ResultType.UNAVAILABLE)
+						.message("Failed to spawn entity; likely not supported by this version of Minecraft"));
 			}
+			future.complete(request.buildResponse().type(Response.ResultType.SUCCESS));
 		});
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		return future;
 	}
 
 	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {

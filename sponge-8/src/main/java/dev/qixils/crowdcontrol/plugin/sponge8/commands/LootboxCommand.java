@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -244,7 +245,7 @@ public class LootboxCommand extends ImmediateCommand {
 				ItemStack itemStack = createRandomItem(luck);
 				itemStack.offer(
 						Keys.LORE,
-						Collections.singletonList(plugin.renderForPlayer(buildLootboxLore(plugin, request), player))
+						Collections.singletonList(GlobalTranslator.render(buildLootboxLore(plugin, request), player.locale()))
 				);
 
 				inventory.slot(slot)
@@ -254,7 +255,7 @@ public class LootboxCommand extends ImmediateCommand {
 
 			// sound & open
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
-			sync(() -> player.openInventory(inventory, plugin.renderForPlayer(buildLootboxTitle(plugin, request), player)));
+			sync(() -> player.openInventory(inventory, buildLootboxTitle(plugin, request)));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}

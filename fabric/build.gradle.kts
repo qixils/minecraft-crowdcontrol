@@ -8,6 +8,8 @@ val adventureVersion: String by project
 val adventurePlatformFabricVersion: String by project
 val cardinalComponentsVersion: String by project
 
+val isMinecraftRelease = Regex("^\\d+\\.\\d+\\.\\d+$").matches(minecraftVersion)
+
 // shading configuration
 val shade: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
@@ -37,7 +39,7 @@ dependencies {
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-$minecraftVersion:$parchmentVersion@zip")
+        //parchment("org.parchmentmc.data:parchment-$minecraftVersion:$parchmentVersion@zip")
     })
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")

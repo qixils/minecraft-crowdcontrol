@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public final class EventManager {
-	private static final Logger LOGGER = LoggerFactory.getLogger("crowd-control-event-manager");
+	private static final Logger LOGGER = LoggerFactory.getLogger("crowdcontrol-event-manager");
 	private final Multimap<Class<Event>, Consumer<Event>> listeners = HashMultimap.create();
 
 	public <E extends Event> void register(Class<E> eventClass, Consumer<E> listener) {

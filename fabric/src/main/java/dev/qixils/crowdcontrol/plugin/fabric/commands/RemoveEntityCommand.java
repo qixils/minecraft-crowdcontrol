@@ -23,12 +23,12 @@ import java.util.stream.StreamSupport;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
 
 @Getter
-public class RemoveEntityCommand extends ImmediateCommand {
-	protected final EntityType<?> entityType;
+public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
+	protected final EntityType<E> entityType;
 	private final String effectName;
 	private final Component displayName;
 
-	public RemoveEntityCommand(FabricCrowdControlPlugin plugin, EntityType<?> entityType) {
+	public RemoveEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
@@ -49,6 +49,14 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		for (ServerPlayer player : players) {
+			if (!isEnabled(player.getLevel().enabledFeatures())) {
+				return request.buildResponse()
+						.type(ResultType.UNAVAILABLE)
+						.message("Mob is not available in this version of Minecraft");
+			}
+		}
+
 		Builder result = request.buildResponse().type(ResultType.RETRY)
 				.message("No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
 

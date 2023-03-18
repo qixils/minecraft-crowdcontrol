@@ -6,12 +6,14 @@ A list of all changes made to the software in reverse chronological order.
 
 - Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16. Speedrun Minecraft
   while your chat spawns dragons and creepers on you!
-- Created a Fabric implementation for 1.19.3. Play the latest modpacks alone or with your friends!
+- Created a Fabric implementation for 1.19.4. Play the latest modpacks alone or with your friends!
 - Added new timed effect: Invincible
 - Added new timed effect: One-Hit KO
 - Added new timed effects for modifying gravity
 - Added new client-side effects for Fabric: Inverted Controls & Inverted Mouse
 - Added new client-side effects for Fabric: Screen Effects
+- Added new effect: Delete Random Item (a variant of Delete Held Item which picks randomly from the
+  entire inventory)
 - Added the missing effects for giving and taking enchanted golden apples on Sponge 7
 - "Teleport All Entities to Player" now acts as "Teleport Nearby Entities to Player" when not
   running as a global effect
@@ -31,6 +33,9 @@ A list of all changes made to the software in reverse chronological order.
 - Cursed enchantments are less likely to be applied to items awarded by Do-or-Die and lucky
   lootboxes
 - Potion effects now render as a timed effect on the Crowd Control overlay
+- Repair/Damage Item effects now randomly pick from armor items as well as held items
+- Damage Item now takes a fixed 20% of the item's max durability instead of 50% of its remaining
+  durability
 - Added support for Crowd Control 2.0 (customizable effect durations, non-Twitch streamer targets,
   etc.)
 - Added sliders to various effects (give/take health/hunger/items/etc.)

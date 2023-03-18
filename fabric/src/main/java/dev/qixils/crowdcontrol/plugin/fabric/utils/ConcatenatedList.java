@@ -2,11 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -145,18 +141,22 @@ public final class ConcatenatedList<E> extends AbstractList<E> {
 
 	@Override
 	public E get(int index) {
-		int i = 0;
 		for (List<E> list : lists) {
-			if (index < i + list.size())
-				return list.get(index - i);
-			i += list.size();
+			if (index < list.size())
+				return list.get(index);
+			index -= list.size();
 		}
 		throw new IndexOutOfBoundsException();
 	}
 
 	@Override
 	public E set(int index, E element) {
-		throw new UnsupportedOperationException();
+		for (List<E> list : lists) {
+			if (index < list.size())
+				return list.set(index, element);
+			index -= list.size();
+		}
+		throw new IndexOutOfBoundsException();
 	}
 
 	@Override

@@ -13,7 +13,6 @@ import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
 
 import javax.annotation.CheckReturnValue;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -92,7 +91,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			else {
 				password = config.node("password").getString("crowdcontrol");
 				if (password == null || password.isEmpty()) {
-					getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowd-control.conf or set a temporary password using the /password command.");
+					getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
 					return;
 				}
 			}
@@ -101,7 +100,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			getSLF4JLogger().info("Running Crowd Control in legacy client mode");
 			String ip = config.node("ip").getString("127.0.0.1");
 			if (ip == null || ip.isEmpty()) {
-				getSLF4JLogger().error("No IP address has been set in the plugin's config file. Please set one by editing config/crowd-control.conf");
+				getSLF4JLogger().error("No IP address has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf");
 				return;
 			}
 			crowdControl = CrowdControl.client().port(port).ip(ip).build();
@@ -119,22 +118,34 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 	 * @throws IllegalStateException copying the default config file failed
 	 */
 	@CheckReturnValue
-	protected HoconConfigurationLoader createConfigLoader(@NotNull File configDirectory) throws IllegalStateException {
-		if (configDirectory.getName().equals("crowd-control.conf"))
-			configDirectory = configDirectory.getParentFile();
+	protected HoconConfigurationLoader createConfigLoader(@NotNull Path configDirectory) throws IllegalStateException {
+		if (configDirectory.getFileName().toString().equals("crowdcontrol.conf"))
+			configDirectory = configDirectory.getParent();
 
-		if (!configDirectory.exists()) {
-			//noinspection ResultOfMethodCallIgnored
-			configDirectory.mkdir();
+		if (!Files.exists(configDirectory)) {
+			try {
+				Files.createDirectories(configDirectory);
+			} catch (Exception e) {
+				throw new IllegalStateException("Could not create config directory", e);
+			}
 		}
 
-		File configFile = new File(configDirectory, "crowd-control.conf");
-		Path configPath = configFile.toPath();
-		if (!configFile.exists()) {
+		// move old config
+		Path configPath = configDirectory.resolve("crowdcontrol.conf");
+		Path oldConfigPath = configDirectory.resolve("crowd-control.conf");
+		if (Files.exists(oldConfigPath)) {
+			try {
+				Files.move(oldConfigPath, configPath);
+			} catch (Exception e) {
+				getSLF4JLogger().warn("Could not move old config file to new location", e);
+			}
+		}
+
+		if (!Files.exists(configPath)) {
 			// read the default config
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("assets/crowd-control/default.conf");
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("assets/crowdcontrol/default.conf");
 			if (inputStream == null)
-				throw new IllegalStateException("Could not find default config file; please report to qixils");
+				throw new IllegalStateException("Could not find default config file");
 			// copy the default config to the config path
 			try {
 				Files.copy(inputStream, configPath);
@@ -143,6 +154,6 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			}
 		}
 
-		return HoconConfigurationLoader.builder().file(configFile).build();
+		return HoconConfigurationLoader.builder().path(configPath).build();
 	}
 }

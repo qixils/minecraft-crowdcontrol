@@ -57,7 +57,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.VERSION_REQUEST_ID, (client, handler, inputBuf, responseSender) -> {
 			logger.debug("Received version request from server!");
 			FriendlyByteBuf buf = PacketByteBufs.create();
-			buf.writeUtf(SemVer.MOD_STRING, 16);
+			buf.writeUtf(SemVer.MOD_STRING, 32);
 			responseSender.sendPacket(FabricCrowdControlPlugin.VERSION_RESPONSE_ID, buf);
 		});
 		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.SHADER_ID, (client, handler, inputBuf, responseSender) -> {

@@ -109,13 +109,14 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new ShaderCommand(plugin, "cc_wobble", new SemVer(3, 3, 0)),
 				new ShaderCommand(plugin, "bits", new SemVer(3, 3, 0)),
 				new ShaderCommand(plugin, "spider", new SemVer(3, 3, 0)),
-				new ShaderCommand(plugin, "phosphor", new SemVer(3, 3, 0))
+				new ShaderCommand(plugin, "phosphor", new SemVer(3, 3, 0)),
+				new DeleteRandomItemCommand(plugin)
 		));
 
 		// entity commands
 		for (EntityType<?> entity : BuiltInRegistries.ENTITY_TYPE) {
 			commands.add(new SummonEntityCommand<>(plugin, entity));
-			commands.add(new RemoveEntityCommand(plugin, entity));
+			commands.add(new RemoveEntityCommand<>(plugin, entity));
 		}
 
 		// register difficulty commands

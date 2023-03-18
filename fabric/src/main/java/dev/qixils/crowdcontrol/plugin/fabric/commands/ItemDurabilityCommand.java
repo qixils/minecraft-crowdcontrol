@@ -12,7 +12,11 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ITEM_DAMAGE_PERCENTAGE;
 
 @Getter
 public abstract class ItemDurabilityCommand extends ImmediateCommand {
@@ -31,14 +35,19 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				.type(ResultType.RETRY)
 				.message("Targets not holding a durable item");
 
+		// create list of random equipment slots
+		List<EquipmentSlot> slots = Arrays.asList(EquipmentSlot.values());
+		Collections.shuffle(slots);
+
+		// loop through all players and all slots, and apply the durability change
 		for (ServerPlayer player : players) {
-			for (EquipmentSlot slot : EquipmentSlot.values()) {
+			for (EquipmentSlot slot : slots) {
 				ItemStack item = player.getItemBySlot(slot);
 				if (item.isEmpty())
 					continue;
 				int curDamage = item.getDamageValue();
 				int maxDamage = item.getMaxDamage();
-				int newDamage = modifyDurability(curDamage, maxDamage);
+				int newDamage = Math.min(maxDamage, Math.max(0, modifyDurability(curDamage, maxDamage)));
 
 				if (!CommandConstants.canApplyDamage(curDamage, newDamage, maxDamage))
 					continue;
@@ -74,7 +83,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 
 		@Override
 		protected int modifyDurability(int curDamage, int maxDamage) {
-			return (maxDamage + curDamage) / 2;
+			return curDamage + (maxDamage / ITEM_DAMAGE_PERCENTAGE);
 		}
 	}
 }

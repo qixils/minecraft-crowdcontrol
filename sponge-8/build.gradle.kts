@@ -34,7 +34,7 @@ sponge {
         version("1.0")
     }
     license("Mozilla Public License Version 2.0")
-    plugin("crowd-control") {
+    plugin("crowdcontrol") {
         displayName("Crowd Control")
         version(project.version.toString())
         entrypoint("dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin")

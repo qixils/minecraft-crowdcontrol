@@ -52,9 +52,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);
-	@Getter
-	@Accessors(fluent = true)
-	private final KyoriTranslator translator = new KyoriTranslator(new NativeAudienceProvider(), getClass().getClassLoader(), dev.qixils.crowdcontrol.common.Plugin.class.getClassLoader());
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
@@ -201,7 +198,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 				commandManager.registerBrigadier();
 				commandManager.registerAsynchronousCompletions();
 			} catch (Exception exception) {
-				getSLF4JLogger().error("The command manager was unable to fully initialize. Please report this error to the developer.", exception);
+				getSLF4JLogger().warn("Chat command manager partially failed to initialize, ignoring.");
 			}
 			registerChatCommands();
 		} catch (Exception exception) {

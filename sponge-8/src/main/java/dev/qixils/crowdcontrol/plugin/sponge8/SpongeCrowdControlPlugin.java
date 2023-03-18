@@ -7,7 +7,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import dev.qixils.crowdcontrol.common.EntityMapper;
-import dev.qixils.crowdcontrol.common.KyoriTranslator;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
@@ -61,7 +60,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Getter
-@Plugin("crowd-control")
+@Plugin("crowdcontrol")
 @ParametersAreNonnullByDefault
 public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandCause> {
 	// keys
@@ -70,7 +69,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	public static Key<Value<ResourceKey>> GAME_MODE_EFFECT;
 	// "real" variables
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
-	private final Logger logger = LoggerFactory.getLogger("crowd-control");
+	private final Logger logger = LoggerFactory.getLogger("CrowdControl");
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	private final SpongeTextUtil textUtil = new SpongeTextUtil();
@@ -79,8 +78,6 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper(this);
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
-	@Accessors(fluent = true)
-	private final KyoriTranslator translator = new KyoriTranslator(new NativeAudienceProvider(), getClass().getClassLoader(), dev.qixils.crowdcontrol.common.Plugin.class.getClassLoader());
 	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
 	private final HoconConfigurationLoader configLoader;
@@ -98,7 +95,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 		this.game = injector.getInstance(Game.class);
 		this.pluginContainer = injector.getInstance(PluginContainer.class);
-		this.configLoader = createConfigLoader(configPath.toFile());
+		this.configLoader = createConfigLoader(configPath);
 
 		// create child injector with cloud module
 		final Injector childInjector = injector.createChildInjector(

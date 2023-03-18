@@ -36,7 +36,7 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	}
 
 	public BlockPos pos() {
-		return new BlockPos(x, y, z);
+		return BlockPos.containing(x, y, z);
 	}
 
 	public Vec3 vec3() {

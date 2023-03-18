@@ -8,7 +8,6 @@ import dev.qixils.crowdcontrol.plugin.paper.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.paper.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
@@ -64,23 +63,22 @@ public class DoOrDieCommand extends VoidCommand {
 						for (UUID uuid : notCompleted) {
 							Player player = Bukkit.getPlayer(uuid);
 							if (player == null) continue;
-							Audience audience = plugin.translator().wrap(player);
 
 							if (condition.hasSucceeded(player)) {
 								ItemStack reward = LootboxCommand.createRandomItem(condition.getRewardLuck());
-								audience.showTitle(doOrDieSuccess(reward.getType()));
+								player.showTitle(doOrDieSuccess(reward.getType()));
 								notCompleted.remove(uuid);
-								audience.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), player);
+								player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), player);
 								sync(() -> GiveItemCommand.giveItemTo(player, reward));
 							} else if (isTimeUp) {
 								condition.reset(player);
-								audience.showTitle(DO_OR_DIE_FAILURE);
+								player.showTitle(DO_OR_DIE_FAILURE);
 								player.setHealth(0);
 							} else {
 								Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-								audience.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+								player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
 								if (isNewValue)
-									audience.playSound(Sounds.DO_OR_DIE_TICK.get(), player);
+									player.playSound(Sounds.DO_OR_DIE_TICK.get(), player);
 							}
 						}
 

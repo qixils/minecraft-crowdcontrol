@@ -2,7 +2,9 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
-import dev.qixils.crowdcontrol.common.*;
+import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
@@ -58,9 +60,9 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
 	// packet stuff
-	public static ResourceLocation VERSION_REQUEST_ID = new ResourceLocation("crowd-control", "version-request");
-	public static ResourceLocation VERSION_RESPONSE_ID = new ResourceLocation("crowd-control", "version-response");
-	public static ResourceLocation SHADER_ID = new ResourceLocation("crowd-control", "shader");
+	public static ResourceLocation VERSION_REQUEST_ID = new ResourceLocation("crowdcontrol", "version-request");
+	public static ResourceLocation VERSION_RESPONSE_ID = new ResourceLocation("crowdcontrol", "version-response");
+	public static ResourceLocation SHADER_ID = new ResourceLocation("crowdcontrol", "shader");
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -76,7 +78,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private Executor syncExecutor = Runnable::run;
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
-	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowd-control");
+	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowdcontrol");
 	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
@@ -90,8 +92,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
-	@Accessors(fluent = true)
-	private final KyoriTranslator translator = new KyoriTranslator(this::adventure, getClass().getClassLoader(), Plugin.class.getClassLoader());
 	@MonotonicNonNull
 	private HoconConfigurationLoader configLoader;
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
@@ -112,7 +112,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
 		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender) -> {
 			getSLF4JLogger().debug("Received version response from client!");
-			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(16)));
+			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(32)));
 			updateConditionalEffectVisibility(crowdControl);
 		});
 	}
@@ -198,7 +198,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			this.adventure = FabricServerAudiences.of(server);
 			this.syncExecutor = server;
 			this.textUtil = new MojmapTextUtil(this);
-			this.configLoader = createConfigLoader(server.getFile("config"));
+			this.configLoader = createConfigLoader(server.getFile("config").toPath());
 			initCrowdControl();
 		}
 	}

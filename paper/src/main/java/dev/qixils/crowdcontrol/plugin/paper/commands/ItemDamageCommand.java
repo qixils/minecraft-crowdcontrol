@@ -15,8 +15,12 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
+
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ITEM_DAMAGE_PERCENTAGE;
 
 @Getter
 public class ItemDamageCommand extends ImmediateCommand {
@@ -27,22 +31,27 @@ public class ItemDamageCommand extends ImmediateCommand {
 		super(plugin);
 		handleItem = repair
 				? (damage, type) -> 0
-				: (damage, type) -> (type.getMaxDurability() + damage) / 2;
+				: (damage, type) -> damage + (type.getMaxDurability() / ITEM_DAMAGE_PERCENTAGE);
 		effectName = (repair ? "repair" : "damage") + "_item";
 	}
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Player(s) not holding a damaged item");
+
+		// create list of random equipment slots
+		List<EquipmentSlot> slots = Arrays.asList(EquipmentSlot.values());
+		Collections.shuffle(slots);
+
+		// loop through all players and all slots, and apply the durability change
 		for (Player player : players) {
 			PlayerInventory inv = player.getInventory();
-			for (EquipmentSlot slot : EquipmentSlot.values()) {
+			for (EquipmentSlot slot : slots) {
 				ItemStack item = inv.getItem(slot);
-				if (item == null || item.getType().isEmpty() || item.getAmount() == 0)
+				if (item.getType().isEmpty() || item.getAmount() == 0)
 					continue;
 				ItemMeta meta = item.getItemMeta();
-				// only allowing items with damage because apparently "instanceof Damageable" isn't good enough
-				if (meta instanceof Damageable damageable && damageable.hasDamage()) {
+				if (meta instanceof Damageable damageable && item.getType().getMaxDurability() > 1) {
 					Material type = item.getType();
 					int curDamage = damageable.getDamage();
 					int newDamage = handleItem.apply(damageable.getDamage(), type);

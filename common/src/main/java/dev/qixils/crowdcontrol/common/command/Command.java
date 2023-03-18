@@ -309,7 +309,7 @@ public interface Command<P> {
 		}
 
 		try {
-			plugin.translator().wrap(Audience.audience(audiences)).sendMessage(Component.translatable(
+			Audience.audience(audiences).sendMessage(Component.translatable(
 					"cc.effect.used",
 					plugin.getViewerComponent(request, true).color(Plugin.USER_COLOR),
 					getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
@@ -363,6 +363,15 @@ public interface Command<P> {
 	 * @return whether this effect is selectable
 	 */
 	default TriState isSelectable() {
+		return TriState.UNKNOWN;
+	}
+
+	/**
+	 * Whether this command should currently be visible in the overlay.
+	 *
+	 * @return whether this effect is visible
+	 */
+	default TriState isVisible() {
 		return TriState.UNKNOWN;
 	}
 }

@@ -208,35 +208,6 @@ public interface Plugin<P, S> {
 	Component NO_CC_UNKNOWN_ERROR = error(Component.translatable("cc.error.unknown"));
 
 	/**
-	 * Gets the instance of the {@link KyoriTranslator}.
-	 *
-	 * @return the translator
-	 */
-	@NotNull KyoriTranslator translator();
-
-	/**
-	 * Renders a component for the provided command sender using the {@link KyoriTranslator}.
-	 *
-	 * @param component the component to render
-	 * @param sender the command sender
-	 * @return the rendered component
-	 */
-	default @NotNull Component renderForSender(@NotNull Component component, @NotNull S sender) {
-		return translator().render(component, commandSenderMapper().getLocale(sender).orElseGet(Locale::getDefault));
-	}
-
-	/**
-	 * Renders a component for the provided player using the {@link KyoriTranslator}.
-	 *
-	 * @param component the component to render
-	 * @param player the player
-	 * @return the rendered component
-	 */
-	default @NotNull Component renderForPlayer(@NotNull Component component, @NotNull P player) {
-		return translator().render(component, playerMapper().getLocale(player).orElseGet(Locale::getDefault));
-	}
-
-	/**
 	 * Gets the provided command sender as a player.
 	 *
 	 * @param sender the command sender
@@ -254,6 +225,13 @@ public interface Plugin<P, S> {
 	 * Registers the plugin's basic chat commands.
 	 */
 	default void registerChatCommands() {
+		try {
+			KyoriTranslator.initialize(Plugin.class.getClassLoader(), getClass().getClassLoader());
+		} catch (Exception e) {
+			System.out.println("Failed to initialize i18n");
+			e.printStackTrace();
+		}
+
 		CommandManager<S> manager = getCommandManager();
 		if (manager == null)
 			throw new IllegalStateException("CommandManager is null");
@@ -884,10 +862,21 @@ public interface Plugin<P, S> {
 		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
 		updateEffectStatus(service, "swap", getAllPlayers().size() <= 1 ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 		for (Command<?> effect : commandRegister().getCommands()) {
-			if (effect.isClientOnly())
-				updateEffectVisibility(service, effect, clientVisible);
-			else if (effect.isGlobal())
-				updateEffectVisibility(service, effect, globalVisible);
+			TriState visibility = effect.isVisible();
+			if (effect.isClientOnly()) {
+				if (!clientVisible)
+					visibility = TriState.FALSE;
+				else if (visibility == TriState.UNKNOWN)
+					visibility = TriState.TRUE;
+			}
+			else if (effect.isGlobal()) {
+				if (!globalVisible)
+					visibility = TriState.FALSE;
+				else if (visibility == TriState.UNKNOWN)
+					visibility = TriState.TRUE;
+			}
+			if (visibility != TriState.UNKNOWN)
+				updateEffectVisibility(service, effect, visibility.getPrimitiveBoolean());
 
 			TriState selectable = effect.isSelectable();
 			if (selectable != TriState.UNKNOWN)
