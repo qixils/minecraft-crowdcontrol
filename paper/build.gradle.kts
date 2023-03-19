@@ -51,6 +51,7 @@ bukkit {
 
 // configure runServer task
 tasks {
+    // TODO: test more versions
     runServer {
         minecraftVersion(minecraftVersion)
     }
