@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -154,16 +155,31 @@ public class SummonEntityCommand extends Command {
 		entity.setCustomNameVisible(true);
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
-		if (entity instanceof Boat boat)
-			boat.setBoatType(randomElementFrom(Boat.Type.class));
+		if (entity instanceof Boat boat) {
+			// try 1.19 Boat.Type API
+			try {
+				Class<?> boatTypeClass = Class.forName("org.bukkit.entity.Boat$Type");
+				boatTypeClass.getMethod("setBoatType", boatTypeClass).invoke(boat, randomElementFrom(boatTypeClass.getEnumConstants()));
+			} catch (Exception e) {
+				boat.setWoodType(randomElementFrom(TreeSpecies.class));
+			}
+		}
 		if (entity instanceof CollarColorable colorable)
 			colorable.setCollarColor(randomElementFrom(DyeColor.class));
 		if (entity instanceof MushroomCow mooshroom && RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.Variant.BROWN);
 		if (entity instanceof Horse horse && RNG.nextBoolean())
 			horse.getInventory().setArmor(new ItemStack(randomElementFrom(MaterialTags.HORSE_ARMORS.getValues())));
-		if (entity instanceof Llama llama && RNG.nextBoolean())
-			llama.getInventory().setDecor(new ItemStack(randomElementFrom(Tag.WOOL_CARPETS.getValues())));
+		if (entity instanceof Llama llama && RNG.nextBoolean()) {
+			Tag<Material> carpetTag;
+			try {
+				//noinspection unchecked,JavaReflectionMemberAccess
+				carpetTag = (Tag<Material>) Tag.class.getField("WOOL_CARPETS").get(null);
+			} catch (Exception e) {
+				carpetTag = Tag.CARPETS;
+			}
+			llama.getInventory().setDecor(new ItemStack(randomElementFrom(carpetTag.getValues())));
+		}
 		if (entity instanceof Sheep sheep)
 			sheep.setColor(randomElementFrom(DyeColor.class));
 		if (entity instanceof Steerable steerable)
@@ -172,8 +188,15 @@ public class SummonEntityCommand extends Command {
 			enderman.setCarriedBlock(randomElementFrom(BLOCKS).createBlockData());
 		if (entity instanceof ChestedHorse horse)
 			horse.setCarryingChest(RNG.nextBoolean());
-		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(Frog.Variant.class));
+		try {
+			Class<?> frogClass = Class.forName("org.bukkit.entity.Frog");
+			Class<?> frogVariantClass = Class.forName("org.bukkit.entity.Frog$Variant");
+			if (frogClass.isAssignableFrom(entity.getClass())) {
+				Method setVariant = frogClass.getMethod("setVariant", frogVariantClass);
+				setVariant.invoke(entity, randomElementFrom(frogVariantClass.getEnumConstants()));
+			}
+		} catch (Exception ignored) {
+		}
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
 		if (entity instanceof Rabbit rabbit)
