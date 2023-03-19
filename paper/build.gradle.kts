@@ -1,7 +1,7 @@
 val cloudVersion: String by project
-val paperMinecraftVersion: String by project
+val minecraftVersion: String by project
 
-val mcVersionSplit = paperMinecraftVersion.split(".")
+val mcVersionSplit = minecraftVersion.split(".")
 description = "Minecraft Crowd Control: Paper"
 
 plugins {
@@ -16,7 +16,7 @@ repositories {
 dependencies {
     implementation(project(":base-common"))
     implementation("cloud.commandframework:cloud-paper:${cloudVersion}")
-    compileOnly("io.papermc.paper:paper-api:$paperMinecraftVersion-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
 // Java 17 boilerplate
@@ -52,6 +52,6 @@ bukkit {
 // configure runServer task
 tasks {
     runServer {
-        minecraftVersion(paperMinecraftVersion)
+        minecraftVersion(minecraftVersion)
     }
 }
