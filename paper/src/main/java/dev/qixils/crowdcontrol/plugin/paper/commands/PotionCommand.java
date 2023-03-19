@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -35,7 +36,9 @@ public class PotionCommand extends TimedImmediateCommand {
 		this.isMinimal = potionEffectType.isInstant();
 		Component potionName = ReflectionUtil.<String>invokeMethod(potionEffectType, "translationKey")
 				.<Component>map(Component::translatable)
-				.orElse(Component.text(TextUtil.titleCase(potionEffectType.getName()))); // TODO: better fallback
+				.or(() -> ReflectionUtil.<NamespacedKey>invokeMethod(potionEffectType, "getKey")
+						.<Component>map(key -> Component.translatable(TextUtil.translationKey("effect", key))))
+				.orElse(Component.text(TextUtil.titleCase(potionEffectType.getName()))); // TODO: i can do a better fallback than this but it'll be annoying
 		this.displayName = Component.translatable("cc.effect.potion.name", potionName);
 	}
 

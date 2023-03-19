@@ -152,7 +152,7 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 	protected @NotNull Component nameOf(@NotNull Biome searchType) {
 		return ReflectionUtil.<String>invokeMethod(searchType, "translationKey")
 				.<Component>map(Component::translatable)
-				.orElse(Component.text(TextUtil.titleCase(searchType))); // TODO: better fallback
+				.orElse(Component.translatable(TextUtil.translationKey("biome", searchType.getKey())));
 	}
 
 	@Override

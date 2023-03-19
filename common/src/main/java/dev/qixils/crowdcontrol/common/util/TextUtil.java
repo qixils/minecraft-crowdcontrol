@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common.util;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
@@ -95,5 +96,17 @@ public interface TextUtil {
 	static String titleCase(@Nullable Enum<?> enm) {
 		if (enm == null) return null;
 		return titleCase(enm.name());
+	}
+
+	/**
+	 * Creates a translation key.
+	 *
+	 * @param prefix prefix
+	 * @param key key
+	 * @return translation key
+	 */
+	@NotNull
+	static String translationKey(@NotNull String prefix, @NotNull Key key) {
+		return prefix + '.' + key.namespace() + '.' + key.value();
 	}
 }
