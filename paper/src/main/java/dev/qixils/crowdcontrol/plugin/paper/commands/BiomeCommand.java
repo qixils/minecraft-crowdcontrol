@@ -2,9 +2,9 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.translation.Translatable;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
@@ -148,12 +148,11 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 		return BIOMES.get(environment);
 	}
 
-	@SuppressWarnings("ConstantValue")
 	@Override
 	protected @NotNull Component nameOf(@NotNull Biome searchType) {
-		if ((Object) searchType instanceof Translatable translatable)
-			return Component.translatable(translatable);
-		return Component.text(TextUtil.titleCase(searchType));
+		return ReflectionUtil.<String>invokeMethod(searchType, "translationKey")
+				.<Component>map(Component::translatable)
+				.orElse(Component.text(TextUtil.titleCase(searchType)));
 	}
 
 	@Override
