@@ -1,4 +1,4 @@
-# Minecraft Crowd Control
+# Minecraft Crowd Control [![GitHub Version](https://img.shields.io/github/v/release/qixils/minecraft-crowdcontrol?label=Release&logo=github)](https://github.com/qixils/minecraft-crowdcontrol/releases/latest) [![Modrinth Version](https://img.shields.io/modrinth/v/6XhH9LqD?label=Modrinth&logo=modrinth)](https://modrinth.com/mod/crowdcontrol)
 
 Minecraft Crowd Control is a Minecraft mod for various platforms that allows your livestream
 viewers to interact with your game using bits, channel points, donations to charity, and more.
