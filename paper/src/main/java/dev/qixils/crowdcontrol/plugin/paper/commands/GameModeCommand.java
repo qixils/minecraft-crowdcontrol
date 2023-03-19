@@ -38,7 +38,7 @@ public class GameModeCommand extends TimedVoidCommand {
 		this.gamemode = gamemode;
 		this.displayName = ReflectionUtil.<String>invokeMethod(gamemode, "translationKey")
 				.<Component>map(Component::translatable)
-				.orElse(Component.text(TextUtil.titleCase(gamemode)));
+				.orElse(Component.text(TextUtil.titleCase(gamemode) + " Mode")); // TODO: better fallback
 		this.effectName = gamemode.name() + "_mode";
 	}
 

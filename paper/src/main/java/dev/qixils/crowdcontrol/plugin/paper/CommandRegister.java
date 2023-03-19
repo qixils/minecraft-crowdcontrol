@@ -120,7 +120,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			try {
 				commands.add(new EnchantmentCommand(plugin, enchantment));
 			} catch (AbstractMethodError ignored) {
-				plugin.getSLF4JLogger().warn("Enchantment " + enchantment.key() + " does not implement the Adventure/Paper API. Ignoring.");
+				plugin.getSLF4JLogger().warn("Enchantment " + enchantment.getKey() + " does not implement the Adventure/Paper API. Ignoring.");
 			}
 		}
 

@@ -1,8 +1,10 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.TimedImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -31,7 +33,10 @@ public class PotionCommand extends TimedImmediateCommand {
 		this.potionEffectType = potionEffectType;
 		this.effectName = "potion_" + nameOf(potionEffectType);
 		this.isMinimal = potionEffectType.isInstant();
-		this.displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
+		Component potionName = ReflectionUtil.<String>invokeMethod(potionEffectType, "translationKey")
+				.<Component>map(Component::translatable)
+				.orElse(Component.text(TextUtil.titleCase(potionEffectType.getName()))); // TODO: better fallback
+		this.displayName = Component.translatable("cc.effect.potion.name", potionName);
 	}
 
 	private static String nameOf(PotionEffectType type) {
