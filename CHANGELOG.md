@@ -43,7 +43,6 @@ A list of all changes made to the software in reverse chronological order.
 - Added a set of config options for limiting how many items or entities can be summoned at once
 - Added support for localization of the mod's messages (currently only English US is supported)
 - Effect messages are now displayed to spectators and the server console
-- Reduced mod file sizes on all platforms but especially for Sponge 8+
 - Lots of minor bug fixes and improvements
 
 ## 3.2.5
