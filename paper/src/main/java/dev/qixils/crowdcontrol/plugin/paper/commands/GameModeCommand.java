@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Getter
 public class GameModeCommand extends TimedVoidCommand {
@@ -36,9 +34,7 @@ public class GameModeCommand extends TimedVoidCommand {
 		this.gamemodeKey = getGamemodeKey(plugin);
 		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = ReflectionUtil.<String>invokeMethod(gamemode, "translationKey")
-				.<Component>map(Component::translatable)
-				.orElse(Component.translatable("gameMode." + gamemode.name().toLowerCase(Locale.ENGLISH)));
+		this.displayName = Component.translatable(gamemode);
 		this.effectName = gamemode.name() + "_mode";
 	}
 

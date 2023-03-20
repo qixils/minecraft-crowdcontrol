@@ -70,7 +70,7 @@ public interface EntityMapper<E> {
 	default boolean isAdmin(@NotNull E entity) {
 		String uuid = tryGetUniqueId(entity)
 				.map(id -> id.toString()
-						.toLowerCase(Locale.ENGLISH)
+						.toLowerCase(Locale.US)
 						.replace("-", ""))
 				.orElse(null);
 		if (uuid == null) return false;

@@ -1,8 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -150,9 +148,7 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 
 	@Override
 	protected @NotNull Component nameOf(@NotNull Biome searchType) {
-		return ReflectionUtil.<String>invokeMethod(searchType, "translationKey")
-				.<Component>map(Component::translatable)
-				.orElse(Component.translatable(TextUtil.translationKey("biome", searchType.getKey())));
+		return Component.translatable(searchType);
 	}
 
 	@Override

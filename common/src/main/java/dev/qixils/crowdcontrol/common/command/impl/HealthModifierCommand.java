@@ -23,7 +23,7 @@ public class HealthModifierCommand<P> implements TimedCommand<P>, VoidCommand<P>
 	public HealthModifierCommand(@NotNull Plugin<P, ?> plugin, @NotNull Modifier type) {
 		this.plugin = plugin;
 		this.type = type;
-		this.effectName = type.name().toLowerCase(Locale.ENGLISH);
+		this.effectName = type.name().toLowerCase(Locale.US);
 	}
 
 	@Override

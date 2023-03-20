@@ -5,9 +5,9 @@ import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import io.papermc.paper.entity.CollarColorable;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -154,22 +154,16 @@ public class SummonEntityCommand extends Command {
 		entity.setCustomNameVisible(true);
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
-		if (entity instanceof Boat boat) {
-			boolean boatTypeSet = ReflectionUtil.getClazz("org.bukkit.entity.Boat$Type")
-					.map(boatTypeClass -> ReflectionUtil.invokeVoidMethod(entity, "setBoatType", randomElementFrom(boatTypeClass.getEnumConstants())))
-					.orElse(false);
-			if (!boatTypeSet)
-				boat.setWoodType(randomElementFrom(TreeSpecies.class));
-		}
-		ReflectionUtil.invokeVoidMethod(entity, "setCollarColor", randomElementFrom(DyeColor.class));
+		if (entity instanceof Boat boat)
+			boat.setBoatType(randomElementFrom(Boat.Type.class));
+		if (entity instanceof CollarColorable colorable)
+			colorable.setCollarColor(randomElementFrom(DyeColor.class));
 		if (entity instanceof MushroomCow mooshroom && RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.Variant.BROWN);
 		if (entity instanceof Horse horse && RNG.nextBoolean())
 			horse.getInventory().setArmor(new ItemStack(randomElementFrom(MaterialTags.HORSE_ARMORS.getValues())));
-		if (entity instanceof Llama llama && RNG.nextBoolean()) {
-			Tag<Material> carpetTag = ReflectionUtil.<Tag<Material>>getFieldValue(null, Tag.class, "WOOL_CARPETS").orElse(Tag.CARPETS);
-			llama.getInventory().setDecor(new ItemStack(randomElementFrom(carpetTag.getValues())));
-		}
+		if (entity instanceof Llama llama && RNG.nextBoolean())
+			llama.getInventory().setDecor(new ItemStack(randomElementFrom(Tag.WOOL_CARPETS.getValues())));
 		if (entity instanceof Sheep sheep)
 			sheep.setColor(randomElementFrom(DyeColor.class));
 		if (entity instanceof Steerable steerable)
@@ -178,8 +172,8 @@ public class SummonEntityCommand extends Command {
 			enderman.setCarriedBlock(randomElementFrom(BLOCKS).createBlockData());
 		if (entity instanceof ChestedHorse horse)
 			horse.setCarryingChest(RNG.nextBoolean());
-		ReflectionUtil.getClazz("org.bukkit.entity.Frog$Variant").ifPresent(variantClass ->
-				ReflectionUtil.invokeVoidMethod(entity, "setVariant", randomElementFrom(variantClass.getEnumConstants())));
+		if (entity instanceof Frog frog)
+			frog.setVariant(randomElementFrom(Frog.Variant.class));
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
 		if (entity instanceof Rabbit rabbit)

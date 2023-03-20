@@ -1,16 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
-import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.TimedImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -34,12 +31,7 @@ public class PotionCommand extends TimedImmediateCommand {
 		this.potionEffectType = potionEffectType;
 		this.effectName = "potion_" + nameOf(potionEffectType);
 		this.isMinimal = potionEffectType.isInstant();
-		Component potionName = ReflectionUtil.<String>invokeMethod(potionEffectType, "translationKey")
-				.<Component>map(Component::translatable)
-				.or(() -> ReflectionUtil.<NamespacedKey>invokeMethod(potionEffectType, "getKey")
-						.<Component>map(key -> Component.translatable(TextUtil.translationKey("effect", key))))
-				.orElse(Component.text(TextUtil.titleCase(potionEffectType.getName()))); // TODO: i can do a better fallback than this but it'll be annoying
-		this.displayName = Component.translatable("cc.effect.potion.name", potionName);
+		this.displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
 	}
 
 	private static String nameOf(PotionEffectType type) {
