@@ -9,12 +9,12 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Entity.RemovalReason;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.entity.EntityType;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -31,15 +31,15 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 	public RemoveEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
-		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType.getDescription());
+		this.effectName = "remove_entity_" + csIdOf(Registries.ENTITY_TYPE.getId(entityType));
+		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType.getName());
 	}
 
-	private boolean removeEntityFrom(ServerPlayer player) {
-		Vec3 playerPosition = player.position();
-		List<Entity> entities = StreamSupport.stream(player.getLevel().getAllEntities().spliterator(), false)
-				.filter(entity -> entity.getType() == entityType && entity.distanceToSqr(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
-				.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
+	private boolean removeEntityFrom(ServerPlayerEntity player) {
+		Vec3d playerPosition = player.getPos();
+		List<Entity> entities = StreamSupport.stream(player.getWorld().iterateEntities().spliterator(), false)
+				.filter(entity -> entity.getType() == entityType && entity.squaredDistanceTo(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
+				.sorted((entity1, entity2) -> (int) (entity1.squaredDistanceTo(playerPosition) - entity2.squaredDistanceTo(playerPosition))).toList();
 		if (entities.isEmpty())
 			return false;
 		entities.get(0).remove(RemovalReason.KILLED);
@@ -48,9 +48,9 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		for (ServerPlayer player : players) {
-			if (!isEnabled(player.getLevel().enabledFeatures())) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
+		for (ServerPlayerEntity player : players) {
+			if (!isEnabled(player.getWorld().getEnabledFeatures())) {
 				return request.buildResponse()
 						.type(ResultType.UNAVAILABLE)
 						.message("Mob is not available in this version of Minecraft");
@@ -58,14 +58,14 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 		}
 
 		Builder result = request.buildResponse().type(ResultType.RETRY)
-				.message("No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
+				.message("No " + plugin.getTextUtil().asPlain(entityType.getName()) + "s found nearby to remove");
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+		int maxVictims = config.getItemLimit(Registries.ENTITY_TYPE.getId(entityType).getPath());
 		int victims = 0;
 
 		// first pass (hosts)
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
 				break;
 			if (!isHost(player))
@@ -75,7 +75,7 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 		}
 
 		// second pass (guests)
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			if (maxVictims > 0 && victims >= maxVictims)
 				break;
 			if (isHost(player))

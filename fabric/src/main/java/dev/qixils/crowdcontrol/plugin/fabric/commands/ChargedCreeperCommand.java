@@ -5,15 +5,15 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.mixin.CreeperAccessor;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.CreeperEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
+public class ChargedCreeperCommand extends SummonEntityCommand<CreeperEntity> {
 	private final String effectName = "entity_charged_creeper";
 	private final Component displayName = getDefaultDisplayName();
 
@@ -23,15 +23,15 @@ public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 
 	@Override
 	@Blocking
-	protected Creeper spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
-		Creeper creeper = super.spawnEntity(viewer, player);
-		creeper.getEntityData().set(CreeperAccessor.getIsPoweredAccessor(), true);
-		Vec3 pos = creeper.position();
-		plugin.adventure().world(creeper.getLevel().dimension().location()).playSound(
+	protected CreeperEntity spawnEntity(@NotNull Component viewer, @NotNull ServerPlayerEntity player) {
+		CreeperEntity creeper = super.spawnEntity(viewer, player);
+		creeper.getDataTracker().set(CreeperAccessor.getIsPoweredAccessor(), true);
+		Vec3d pos = creeper.getPos();
+		plugin.adventure().world(creeper.world.getRegistryKey().getValue()).playSound(
 				Sounds.LIGHTNING_STRIKE.get(),
-				pos.x(),
-				pos.y(),
-				pos.z()
+				pos.getX(),
+				pos.getY(),
+				pos.getZ()
 		);
 		return creeper;
 	}

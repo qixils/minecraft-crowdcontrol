@@ -3,17 +3,17 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 import dev.qixils.crowdcontrol.common.SoftLockObserver;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity.RemovalReason;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.entity.ai.TargetPredicate;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.Monster;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,17 +21,17 @@ import java.util.Collection;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
-public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
+public final class SoftLockResolver extends SoftLockObserver<ServerPlayerEntity> {
 
 	private final @NotNull Collection<Block> dangerousBlocks = List.of(
 			Blocks.LAVA,
 			Blocks.FIRE,
 			Blocks.WITHER_ROSE
 	);
-	private final @NotNull TargetingConditions conditions = TargetingConditions.forNonCombat()
-			.ignoreLineOfSight()
-			.ignoreInvisibilityTesting()
-			.range(SEARCH_HORIZ);
+	private final @NotNull TargetPredicate conditions = TargetPredicate.createNonAttackable()
+			.ignoreVisibility()
+			.ignoreDistanceScalingFactor()
+			.setBaseMaxDistance(SEARCH_HORIZ);
 
 	/**
 	 * Initializes the observer.
@@ -43,15 +43,15 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 	}
 
 	@Override
-	public void onSoftLock(ServerPlayer player) {
+	public void onSoftLock(ServerPlayerEntity player) {
 		// kill nearby monsters
-		for (Mob entity : player.getLevel().getNearbyEntities(
-				Mob.class,
+		for (MobEntity entity : player.getWorld().getTargets(
+				MobEntity.class,
 				conditions,
 				player,
-				AABB.ofSize(player.position(), SEARCH_HORIZ*2, SEARCH_VERT*2, SEARCH_HORIZ*2)
+				Box.of(player.getPos(), SEARCH_HORIZ*2, SEARCH_VERT*2, SEARCH_HORIZ*2)
 		)) {
-			if (entity instanceof Enemy)
+			if (entity instanceof Monster)
 				entity.remove(RemovalReason.KILLED);
 		}
 
@@ -59,11 +59,11 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {
 			for (int y = -SEARCH_VERT; y <= SEARCH_VERT; y++) {
 				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
-					ServerLevel level = player.getLevel();
-					BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
+					ServerWorld level = player.getWorld();
+					BlockPos pos = BlockPos.ofFloored(player.getPos().add(x, y, z));
 					BlockState block = level.getBlockState(pos);
 					if (dangerousBlocks.contains(block.getBlock()))
-						level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+						level.setBlockState(pos, Blocks.AIR.getDefaultState());
 				}
 			}
 		}
@@ -77,7 +77,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 
 	@Listener
 	public void onDeathEvent(Death death) {
-		if (death.entity() instanceof ServerPlayer player)
+		if (death.entity() instanceof ServerPlayerEntity player)
 			onDeath(player);
 	}
 }

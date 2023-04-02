@@ -6,8 +6,8 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -27,13 +27,13 @@ public final class CraftItemCondition extends AbstractBooleanListeningCondition 
 		this.item = item;
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.craft." + key,
-				Component.translatable(new ItemStack(item).getDescriptionId(), NamedTextColor.GREEN)
+				Component.translatable(new ItemStack(item).getTranslationKey(), NamedTextColor.GREEN)
 		);
 	}
 
 	@Listener
 	public void onCraft(Craft event) {
-		UUID uuid = event.player().getUUID();
+		UUID uuid = event.player().getUuid();
 		if (!statuses.containsKey(uuid))
 			return;
 		if (event.result().getItem() != item)

@@ -7,8 +7,8 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -34,10 +34,10 @@ public class WeatherCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder builder = request.buildResponse().type(ResultType.FAILURE).message("Requested weather is already active");
-		for (ServerLevel world : plugin.server().getAllLevels()) {
-			if (!world.dimension().location().getPath().equals("overworld"))
+		for (ServerWorld world : plugin.server().getWorlds()) {
+			if (!world.getRegistryKey().getValue().getPath().equals("overworld"))
 				continue;
 			if (storm && world.isThundering())
 				continue;
@@ -46,9 +46,9 @@ public class WeatherCommand extends ImmediateCommand {
 			if (!rain && !world.isRaining() && !world.isThundering())
 				continue;
 			if (!rain)
-				sync(() -> world.setWeatherParameters(ticks, 0, false, false));
+				sync(() -> world.setWeather(ticks, 0, false, false));
 			else
-				sync(() -> world.setWeatherParameters(0, ticks, true, storm));
+				sync(() -> world.setWeather(0, ticks, true, storm));
 			builder.type(ResultType.SUCCESS).message("SUCCESS");
 		}
 		return builder;

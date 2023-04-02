@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.event;
 
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-public record Join(ServerPlayer player) implements Event {
+public record Join(ServerPlayerEntity player) implements Event {
 }

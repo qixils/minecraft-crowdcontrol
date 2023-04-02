@@ -6,8 +6,8 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,14 +21,14 @@ public class SoundCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		for (ServerPlayer player : players) {
-			Vec3 playAt = player.position().add(new Vec3(player.getDirection().getOpposite().step()));
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
+		for (ServerPlayerEntity player : players) {
+			Vec3d playAt = player.getPos().add(new Vec3d(player.getHorizontalFacing().getOpposite().getUnitVector()));
 			player.playSound(
 					Sounds.SPOOKY.get(),
-					playAt.x(),
-					playAt.y(),
-					playAt.z()
+					playAt.getX(),
+					playAt.getY(),
+					playAt.getZ()
 			);
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

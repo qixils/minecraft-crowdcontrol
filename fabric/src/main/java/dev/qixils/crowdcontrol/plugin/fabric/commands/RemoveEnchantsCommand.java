@@ -6,10 +6,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,14 +25,14 @@ public final class RemoveEnchantsCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Target was not holding an enchanted item");
 
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			for (EquipmentSlot slot : EquipmentSlot.values()) {
-				if (tryRemoveEnchants(player.getItemBySlot(slot))) {
+				if (tryRemoveEnchants(player.getEquippedStack(slot))) {
 					result.type(ResultType.SUCCESS).message("SUCCESS");
 					break;
 				}
@@ -45,7 +45,7 @@ public final class RemoveEnchantsCommand extends ImmediateCommand {
 	private boolean tryRemoveEnchants(ItemStack item) {
 		if (item.isEmpty())
 			return false;
-		ListTag enchantments = item.getEnchantmentTags();
+		NbtList enchantments = item.getEnchantments();
 		if (enchantments.isEmpty())
 			return false;
 		enchantments.clear();

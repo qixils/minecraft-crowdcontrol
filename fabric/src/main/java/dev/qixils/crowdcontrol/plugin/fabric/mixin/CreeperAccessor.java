@@ -1,14 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.mob.CreeperEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(Creeper.class)
+@Mixin(CreeperEntity.class)
 public interface CreeperAccessor {
-	@Accessor("DATA_IS_POWERED")
-	static EntityDataAccessor<Boolean> getIsPoweredAccessor() {
+	@Accessor("CHARGED")
+	static TrackedData<Boolean> getIsPoweredAccessor() {
 		throw new AssertionError();
 	}
 }

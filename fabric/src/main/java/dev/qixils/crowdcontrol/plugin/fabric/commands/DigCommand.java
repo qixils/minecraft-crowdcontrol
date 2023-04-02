@@ -6,8 +6,8 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -27,10 +27,10 @@ public class DigCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Set<Location> locations = new HashSet<>();
 		int depth = getDigDepth();
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			Location playerLocation = new Location(player);
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 				for (int y = depth; y < 0; ++y) {
@@ -48,7 +48,7 @@ public class DigCommand extends ImmediateCommand {
 
 		sync(() -> {
 			for (Location location : locations)
-				location.block(Blocks.AIR.defaultBlockState());
+				location.block(Blocks.AIR.getDefaultState());
 		});
 
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

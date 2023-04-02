@@ -6,10 +6,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Hand;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,21 +26,21 @@ public class HatCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Held item(s) and hat are the same");
 
-		for (ServerPlayer player : players) {
-			ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
-			for (InteractionHand handType : InteractionHand.values()) {
-				ItemStack hand = player.getItemInHand(handType);
+		for (ServerPlayerEntity player : players) {
+			ItemStack head = player.getEquippedStack(EquipmentSlot.HEAD);
+			for (Hand handType : Hand.values()) {
+				ItemStack hand = player.getStackInHand(handType);
 				if (isSimilar(hand, head))
 					continue;
 				response.type(ResultType.SUCCESS).message("SUCCESS");
 				sync(() -> {
-					player.setItemSlot(EquipmentSlot.HEAD, hand);
-					player.setItemInHand(handType, head);
+					player.equipStack(EquipmentSlot.HEAD, hand);
+					player.setStackInHand(handType, head);
 				});
 				break;
 			}

@@ -10,10 +10,10 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +29,7 @@ public class BlockCommand extends ImmediateCommand {
 		this(
 				plugin,
 				blockType,
-				"block_" + BuiltInRegistries.BLOCK.getKey(blockType).getPath(),
+				"block_" + Registries.BLOCK.getId(blockType).getPath(),
 				Component.translatable("cc.effect.block.name", blockType.getName())
 		);
 	}
@@ -42,7 +42,7 @@ public class BlockCommand extends ImmediateCommand {
 	}
 
 	@Nullable
-	protected Location getLocation(ServerPlayer player) {
+	protected Location getLocation(ServerPlayerEntity player) {
 		Location location = new Location(player);
 		if (!BlockFinder.isReplaceable(location))
 			return null;
@@ -51,11 +51,11 @@ public class BlockCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Builder result = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("No available locations to set blocks");
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			Location location = getLocation(player);
 			if (location == null)
 				continue;
@@ -63,7 +63,7 @@ public class BlockCommand extends ImmediateCommand {
 			Block currentType = currentBlock.getBlock();
 			if (BlockFinder.isReplaceable(currentBlock) && !currentType.equals(blockType)) {
 				result.type(ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> location.block(blockType.defaultBlockState()));
+				sync(() -> location.block(blockType.getDefaultState()));
 			}
 		}
 		return result;

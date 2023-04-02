@@ -5,10 +5,10 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,22 +21,22 @@ public class RespawnCommand extends ImmediateCommand {
 		super(plugin);
 	}
 
-	private void teleport(ServerPlayer player, ServerLevel level, BlockPos pos, float angle) {
-		sync(() -> player.teleportTo(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, angle, 0));
+	private void teleport(ServerPlayerEntity player, ServerWorld level, BlockPos pos, float angle) {
+		sync(() -> player.teleport(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, angle, 0));
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder response = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find a respawn point");
-		for (ServerPlayer player : players) {
-			ServerLevel level = player.server.getLevel(player.getRespawnDimension());
-			BlockPos pos = player.getRespawnPosition();
-			float angle = player.getRespawnAngle();
+		for (ServerPlayerEntity player : players) {
+			ServerWorld level = player.server.getWorld(player.getSpawnPointDimension());
+			BlockPos pos = player.getSpawnPointPosition();
+			float angle = player.getSpawnAngle();
 			if (level == null || pos == null) {
-				level = player.server.getLevel(Level.OVERWORLD);
+				level = player.server.getWorld(World.OVERWORLD);
 				if (level == null)
 					continue;
-				pos = level.getSharedSpawnPos();
+				pos = level.getSpawnPos();
 			}
 			teleport(player, level, pos, angle);
 			response.type(Response.ResultType.SUCCESS).message("SUCCESS");

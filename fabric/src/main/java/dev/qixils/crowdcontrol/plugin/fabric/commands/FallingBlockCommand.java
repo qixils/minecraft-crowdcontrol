@@ -4,12 +4,12 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FALLING_BLOCK_FALL_DISTANCE;
 
@@ -18,20 +18,20 @@ public class FallingBlockCommand extends BlockCommand {
 		super(
 				plugin,
 				blockType,
-				"falling_block_" + BuiltInRegistries.BLOCK.getKey(blockType).getPath(),
+				"falling_block_" + Registries.BLOCK.getId(blockType).getPath(),
 				Component.translatable("cc.effect.falling_block.name", blockType.getName())
 		);
 	}
 
 	@Override
-	protected Location getLocation(ServerPlayer player) {
+	protected Location getLocation(ServerPlayerEntity player) {
 		Location playerLoc = new Location(player);
-		ServerLevel world = player.getLevel();
-		BlockPos position = BlockPos.containing(
+		ServerWorld world = player.getWorld();
+		BlockPos position = BlockPos.ofFloored(
 				playerLoc.x(),
 				Math.min(
 						playerLoc.y() + FALLING_BLOCK_FALL_DISTANCE,
-						world.getMaxBuildHeight() - 1
+						world.getTopY() - 1
 				),
 				playerLoc.z()
 		);

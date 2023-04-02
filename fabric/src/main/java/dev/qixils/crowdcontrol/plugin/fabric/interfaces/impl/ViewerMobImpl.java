@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl;
 
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
 
 public class ViewerMobImpl implements ViewerMob {
@@ -18,12 +18,12 @@ public class ViewerMobImpl implements ViewerMob {
 	}
 
 	@Override
-	public void writeToNbt(@NotNull CompoundTag tag) {
+	public void writeToNbt(@NotNull NbtCompound tag) {
 		tag.putBoolean("value", value);
 	}
 
 	@Override
-	public void readFromNbt(@NotNull CompoundTag tag) {
+	public void readFromNbt(@NotNull NbtCompound tag) {
 		if (tag.contains("value")) {
 			value = tag.getBoolean("value");
 		}

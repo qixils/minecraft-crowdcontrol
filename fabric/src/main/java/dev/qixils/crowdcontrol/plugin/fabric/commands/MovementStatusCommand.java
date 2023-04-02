@@ -13,8 +13,8 @@ import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -53,14 +53,14 @@ public class MovementStatusCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
-		AtomicReference<List<ServerPlayer>> atomicPlayers = new AtomicReference<>();
+	public void voidExecute(@NotNull List<@NotNull ServerPlayerEntity> ignored, @NotNull Request request) {
+		AtomicReference<List<ServerPlayerEntity>> atomicPlayers = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup(effectGroup)
 				.duration(getDuration(request))
 				.startCallback($ -> {
-					List<ServerPlayer> players = plugin.getPlayers(request);
+					List<ServerPlayerEntity> players = plugin.getPlayers(request);
 					if (clientOnly)
 						players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minimumModVersion));
 					atomicPlayers.set(players);
@@ -70,14 +70,14 @@ public class MovementStatusCommand extends TimedVoidCommand {
 								.type(Response.ResultType.FAILURE)
 								.message("No targetable players online");
 
-					for (Player player : players)
+					for (PlayerEntity player : players)
 						Components.MOVEMENT_STATUS.get(player).set(type, value);
 					playerAnnounce(players, request);
 
 					return null; // success
 				})
 				.completionCallback($ -> {
-					for (Player player : atomicPlayers.get())
+					for (PlayerEntity player : atomicPlayers.get())
 						Components.MOVEMENT_STATUS.get(player).set(type, MovementStatus.Value.ALLOWED);
 				})
 				.build().queue();
@@ -106,14 +106,14 @@ public class MovementStatusCommand extends TimedVoidCommand {
 
 		@Listener
 		public void onJump(Jump event) {
-			Player player = event.player();
+			PlayerEntity player = event.player();
 			MovementStatus status = Components.MOVEMENT_STATUS.get(player);
 			boolean cantJump = status.get(MovementStatus.Type.JUMP) == MovementStatus.Value.DENIED;
 			boolean cantWalk = status.get(MovementStatus.Type.WALK) == MovementStatus.Value.DENIED;
 			if (cantJump || cantWalk) {
 				event.cancel();
-				if (!event.isClientSide() && player instanceof ServerPlayer sPlayer /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {
-					sPlayer.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+				if (!event.isClientSide() && player instanceof ServerPlayerEntity sPlayer /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {
+					sPlayer.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
 				}
 			}
 		}

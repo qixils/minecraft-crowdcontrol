@@ -3,11 +3,11 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.InventoryUtil;
 import lombok.Builder;
 import lombok.Data;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -19,20 +19,20 @@ import static java.util.Collections.singletonList;
 
 @Data
 @Builder
-public final class ConditionFlags implements Predicate<ServerPlayer> {
+public final class ConditionFlags implements Predicate<ServerPlayerEntity> {
 	public static final @NotNull ConditionFlags DEFAULT = ConditionFlags.builder().build();
-	public static final @NotNull ConditionFlags OVERWORLD = ConditionFlags.builder().allowedDimensions(singletonList(Level.OVERWORLD)).build();
-	public static final @NotNull ConditionFlags NETHER = ConditionFlags.builder().allowedDimensions(singletonList(Level.NETHER)).build();
-	public static final @NotNull ConditionFlags THE_END = ConditionFlags.builder().allowedDimensions(singletonList(Level.END)).build();
+	public static final @NotNull ConditionFlags OVERWORLD = ConditionFlags.builder().allowedDimensions(singletonList(World.OVERWORLD)).build();
+	public static final @NotNull ConditionFlags NETHER = ConditionFlags.builder().allowedDimensions(singletonList(World.NETHER)).build();
+	public static final @NotNull ConditionFlags THE_END = ConditionFlags.builder().allowedDimensions(singletonList(World.END)).build();
 
 	@Builder.Default
-	private final @NotNull List<ResourceKey<Level>> allowedDimensions = Collections.emptyList();
+	private final @NotNull List<RegistryKey<World>> allowedDimensions = Collections.emptyList();
 	@Builder.Default
 	private final @NotNull Map<Item, Integer> requiredItems = Collections.emptyMap();
 
 	@Override
-	public boolean test(@NotNull ServerPlayer player) {
-		if (!allowedDimensions.isEmpty() && !allowedDimensions.contains(player.getLevel().dimension()))
+	public boolean test(@NotNull ServerPlayerEntity player) {
+		if (!allowedDimensions.isEmpty() && !allowedDimensions.contains(player.getWorld().getRegistryKey()))
 			return false;
 		for (Map.Entry<Item, Integer> entry : requiredItems.entrySet()) {
 			Item item = entry.getKey();

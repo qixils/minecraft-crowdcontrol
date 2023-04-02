@@ -8,20 +8,20 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.block.Block;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.GameMode;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class CommandRegister extends AbstractCommandRegister<ServerPlayer, FabricCrowdControlPlugin> {
+public class CommandRegister extends AbstractCommandRegister<ServerPlayerEntity, FabricCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
 	private MappedKeyedTag<Block> setBlocks;
 	private MappedKeyedTag<Block> setFallingBlocks;
@@ -34,14 +34,14 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, BuiltInRegistries.BLOCK);
-			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, BuiltInRegistries.BLOCK);
-			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, BuiltInRegistries.ITEM);
+			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, Registries.BLOCK);
+			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, Registries.BLOCK);
+			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, Registries.ITEM);
 		}
 	}
 
 	@Override
-	protected void createCommands(List<Command<ServerPlayer>> commands) {
+	protected void createCommands(List<Command<ServerPlayerEntity>> commands) {
 		super.createCommands(commands);
 		registerTags();
 		commands.addAll(Arrays.asList(
@@ -114,7 +114,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 		));
 
 		// entity commands
-		for (EntityType<?> entity : BuiltInRegistries.ENTITY_TYPE) {
+		for (EntityType<?> entity : Registries.ENTITY_TYPE) {
 			commands.add(new SummonEntityCommand<>(plugin, entity));
 			commands.add(new RemoveEntityCommand<>(plugin, entity));
 		}
@@ -124,7 +124,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			commands.add(new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		for (MobEffect potion : BuiltInRegistries.MOB_EFFECT)
+		for (StatusEffect potion : Registries.STATUS_EFFECT)
 			commands.add(new PotionCommand(plugin, potion));
 
 		// block sets
@@ -135,7 +135,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			commands.add(new FallingBlockCommand(plugin, block));
 
 		// enchantments
-		for (Enchantment enchantment : BuiltInRegistries.ENCHANTMENT)
+		for (Enchantment enchantment : Registries.ENCHANTMENT)
 			commands.add(new EnchantmentCommand(plugin, enchantment));
 
 		// give/take items
@@ -145,14 +145,14 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 		}
 
 		// gamemode commands
-		for (GameType gameType : GameType.values()) {
-			if (gameType == GameType.SURVIVAL) continue;
-			commands.add(new GameModeCommand(plugin, gameType, gameType == GameType.SPECTATOR ? 8L : 15L));
+		for (GameMode gameType : GameMode.values()) {
+			if (gameType == GameMode.SURVIVAL) continue;
+			commands.add(new GameModeCommand(plugin, gameType, gameType == GameMode.SPECTATOR ? 8L : 15L));
 		}
 	}
 
 	@Override
-	protected void registerListener(Command<ServerPlayer> command) {
+	protected void registerListener(Command<ServerPlayerEntity> command) {
 		plugin.getEventManager().registerListeners(command);
 	}
 

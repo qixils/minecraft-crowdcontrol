@@ -7,7 +7,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -22,10 +22,10 @@ public class TimeCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players,
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players,
 														@NotNull Request request) {
-		sync(() -> plugin.server().getAllLevels().forEach(world ->
-				world.setDayTime(world.getDayTime() + CommandConstants.ZIP_TIME_TICKS)));
+		sync(() -> plugin.server().getWorlds().forEach(world ->
+				world.setTimeOfDay(world.getTimeOfDay() + CommandConstants.ZIP_TIME_TICKS)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

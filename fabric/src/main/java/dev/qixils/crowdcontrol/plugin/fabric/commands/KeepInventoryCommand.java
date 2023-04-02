@@ -10,8 +10,8 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,10 +40,10 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	public static boolean isKeepingInventory(Entity player) {
-		return isKeepingInventory(player.getUUID());
+		return isKeepingInventory(player.getUuid());
 	}
 
-	private void alert(List<ServerPlayer> players) {
+	private void alert(List<ServerPlayerEntity> players) {
 		Audience audience = plugin.playerMapper().asAudience(players);
 		audience.sendActionBar(enable ? KEEP_INVENTORY_MESSAGE : LOSE_INVENTORY_MESSAGE);
 		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get(), Sound.Emitter.self());
@@ -59,7 +59,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse();
 
 		if (plugin.isGlobal()) {
@@ -73,8 +73,8 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		}
 
 		List<UUID> uuids = new ArrayList<>(players.size());
-		for (ServerPlayer player : players)
-			uuids.add(player.getUUID());
+		for (ServerPlayerEntity player : players)
+			uuids.add(player.getUuid());
 
 		if (enable) {
 			if (keepingInventory.addAll(uuids)) {

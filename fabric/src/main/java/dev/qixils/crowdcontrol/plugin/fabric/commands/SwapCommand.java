@@ -8,7 +8,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -23,18 +23,18 @@ public class SwapCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		if (players.size() < 2)
 			return request.buildResponse().type(ResultType.FAILURE).message("Not enough participating players online");
 
 		// get shuffled list of players
 		Collections.shuffle(players, RandomUtil.RNG);
 		// create a list offset by one
-		List<ServerPlayer> offset = new ArrayList<>(players.size());
+		List<ServerPlayerEntity> offset = new ArrayList<>(players.size());
 		offset.addAll(players.subList(1, players.size()));
 		offset.add(players.get(0));
 		// get teleport destinations
-		Map<ServerPlayer, Location> destinations = new HashMap<>(players.size());
+		Map<ServerPlayerEntity, Location> destinations = new HashMap<>(players.size());
 		for (int i = 0; i < players.size(); i++)
 			destinations.put(players.get(i), new Location(offset.get(i)));
 		// teleport

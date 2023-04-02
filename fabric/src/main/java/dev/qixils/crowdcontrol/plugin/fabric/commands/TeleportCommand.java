@@ -9,8 +9,8 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -24,11 +24,11 @@ public class TeleportCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.FAILURE)
 				.message("No teleportation destinations were available");
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			Location tempDest = BlockFinder.builder()
 					.origin(player)
 					.minRadius(3)
@@ -47,7 +47,7 @@ public class TeleportCommand extends ImmediateCommand {
 						.count(100)
 						.distance(.5f, 1f, .5f)
 						.send();
-				plugin.adventure().world(player.level.dimension().location()).playSound(
+				plugin.adventure().world(player.world.getRegistryKey().getValue()).playSound(
 						Sounds.TELEPORT.get(),
 						Sound.Emitter.self()
 				);

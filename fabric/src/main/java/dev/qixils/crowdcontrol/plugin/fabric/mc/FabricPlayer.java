@@ -1,38 +1,38 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mc;
 
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 public class FabricPlayer extends FabricLivingEntity implements CCPlayer {
 
-	public FabricPlayer(ServerPlayer entity) {
+	public FabricPlayer(ServerPlayerEntity entity) {
 		super(entity);
 	}
 
 	@Override
-	public @NotNull ServerPlayer entity() {
-		return (ServerPlayer) super.entity();
+	public @NotNull ServerPlayerEntity entity() {
+		return (ServerPlayerEntity) super.entity();
 	}
 
 	@Override
 	public int foodLevel() {
-		return entity().getFoodData().getFoodLevel();
+		return entity().getHungerManager().getFoodLevel();
 	}
 
 	@Override
 	public void foodLevel(int foodLevel) {
-		entity().getFoodData().setFoodLevel(foodLevel);
+		entity().getHungerManager().setFoodLevel(foodLevel);
 	}
 
 	@Override
 	public double saturation() {
-		return entity().getFoodData().getSaturationLevel();
+		return entity().getHungerManager().getSaturationLevel();
 	}
 
 	@Override
 	public void saturation(double saturation) {
-		entity().getFoodData().setSaturation((float) saturation);
+		entity().getHungerManager().setSaturationLevel((float) saturation);
 	}
 
 	@Override
@@ -42,11 +42,11 @@ public class FabricPlayer extends FabricLivingEntity implements CCPlayer {
 
 	@Override
 	public void xpLevel(int xpLevel) {
-		entity().setExperienceLevels(xpLevel);
+		entity().setExperienceLevel(xpLevel);
 	}
 
 	@Override
 	public void addXpLevel(int xpLevel) {
-		entity().giveExperienceLevels(xpLevel);
+		entity().addExperienceLevels(xpLevel);
 	}
 }

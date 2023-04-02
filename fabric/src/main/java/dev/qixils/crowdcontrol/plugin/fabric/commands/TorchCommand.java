@@ -9,13 +9,13 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.WallTorchBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.WallTorchBlock;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -39,11 +39,11 @@ public class TorchCommand extends ImmediateCommand {
 		super(plugin);
 		this.placeTorches = placeTorches;
 		this.effectName = placeTorches ? "lit" : "dim";
-		this.torches = new TypedTag<>(CommandConstants.TORCHES, BuiltInRegistries.BLOCK);
+		this.torches = new TypedTag<>(CommandConstants.TORCHES, Registries.BLOCK);
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Predicate<Location> predicate = placeTorches
 				? loc -> BlockFinder.isReplaceable(loc.block())
 				: loc -> torches.contains(loc.block().getBlock());
@@ -64,7 +64,7 @@ public class TorchCommand extends ImmediateCommand {
 				if (placeTorches)
 					placeTorch(location);
 				else
-					location.block(Blocks.AIR.defaultBlockState());
+					location.block(Blocks.AIR.getDefaultState());
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
@@ -86,8 +86,8 @@ public class TorchCommand extends ImmediateCommand {
 			return;
 
 		BlockState setBlock = placeFace == Direction.DOWN
-				? Blocks.TORCH.defaultBlockState()
-				: Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, placeFace);
+				? Blocks.TORCH.getDefaultState()
+				: Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.FACING, placeFace);
 		location.block(setBlock);
 	}
 }

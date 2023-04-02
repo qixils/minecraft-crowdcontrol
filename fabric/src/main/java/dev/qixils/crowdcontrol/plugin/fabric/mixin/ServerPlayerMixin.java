@@ -4,12 +4,12 @@ import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand.FreezeData;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameRules.BooleanValue;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.GameRules.BooleanRule;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,14 +22,14 @@ import java.util.UUID;
 
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInventoryRedirect;
 
-@Mixin(ServerPlayer.class)
+@Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerMixin {
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	void onTick(CallbackInfo ci) {
 		//noinspection ConstantConditions
-		ServerPlayer thiss = (ServerPlayer) (Object) this;
-		UUID uuid = thiss.getUUID();
+		ServerPlayerEntity thiss = (ServerPlayerEntity) (Object) this;
+		UUID uuid = thiss.getUuid();
 
 		if (!FreezeCommand.DATA.containsKey(uuid))
 			return;
@@ -54,19 +54,19 @@ public abstract class ServerPlayerMixin {
 	}
 
 	@Redirect(
-			method = "restoreFrom",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
+			method = "copyFrom",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/GameRules;getBoolean(Lnet/minecraft/world/GameRules$Key;)Z")
 	)
-	private boolean restoreFromRedirectKeepInventory(GameRules gameRules, GameRules.Key<BooleanValue> key) {
+	private boolean restoreFromRedirectKeepInventory(GameRules gameRules, GameRules.Key<BooleanRule> key) {
 		return keepInventoryRedirect((Entity) (Object) this, gameRules, key);
 	}
 
-	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "onDeath", at = @At("HEAD"), cancellable = true)
 	private void callDeathEvent(final DamageSource source, final CallbackInfo ci) {
 		EntityUtil.handleDie((LivingEntity) (Object) this, source, ci);
 	}
 
-	@Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "damage", at = @At("HEAD"), cancellable = true)
 	private void callDamageEvent(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
 		EntityUtil.handleDamage((Entity) (Object) this, source, amount, cir);
 	}

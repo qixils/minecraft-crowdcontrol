@@ -11,10 +11,10 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public class VeinCommand extends ImmediateCommand {
 
 	public VeinCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);
-		stones = new TypedTag<>(CommonTags.STONES, BuiltInRegistries.BLOCK);
+		stones = new TypedTag<>(CommonTags.STONES, Registries.BLOCK);
 	}
 
 	// Gets a 2x2 chunk of blocks
@@ -64,9 +64,9 @@ public class VeinCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(new Location(player))
 					.maxRadius(VEIN_RADIUS)
@@ -94,8 +94,8 @@ public class VeinCommand extends ImmediateCommand {
 				randomlyShrinkOreVein(setDeepslateBlocks);
 
 				sync(() -> {
-					setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().defaultBlockState()));
-					setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().defaultBlockState()));
+					setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().getDefaultState()));
+					setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().getDefaultState()));
 				});
 			}
 		}

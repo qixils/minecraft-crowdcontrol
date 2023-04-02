@@ -12,24 +12,24 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.Registries;
+import net.minecraft.screen.GenericContainerScreenHandler;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,20 +40,20 @@ import java.util.stream.Collectors;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
 import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
-import static net.minecraft.world.entity.EquipmentSlot.MAINHAND;
-import static net.minecraft.world.entity.EquipmentSlot.OFFHAND;
+import static net.minecraft.entity.EquipmentSlot.MAINHAND;
+import static net.minecraft.entity.EquipmentSlot.OFFHAND;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-	private static final List<Attribute> ATTRIBUTES = Arrays.asList(
-			Attributes.MAX_HEALTH,
-			Attributes.KNOCKBACK_RESISTANCE,
-			Attributes.MOVEMENT_SPEED,
-			Attributes.ATTACK_DAMAGE,
-			Attributes.ARMOR,
-			Attributes.ARMOR_TOUGHNESS,
-			Attributes.ATTACK_KNOCKBACK,
-			Attributes.ATTACK_SPEED
+	private static final List<EntityAttribute> ATTRIBUTES = Arrays.asList(
+			EntityAttributes.GENERIC_MAX_HEALTH,
+			EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE,
+			EntityAttributes.GENERIC_MOVEMENT_SPEED,
+			EntityAttributes.GENERIC_ATTACK_DAMAGE,
+			EntityAttributes.GENERIC_ARMOR,
+			EntityAttributes.GENERIC_ARMOR_TOUGHNESS,
+			EntityAttributes.GENERIC_ATTACK_KNOCKBACK,
+			EntityAttributes.GENERIC_ATTACK_SPEED
 	);
 	private final List<Item> allItems;
 	private final List<Item> goodItems;
@@ -72,7 +72,7 @@ public class LootboxCommand extends ImmediateCommand {
 		this.effectName = effectName.toString();
 
 		// create item collections
-		allItems = BuiltInRegistries.ITEM.stream().toList();
+		allItems = Registries.ITEM.stream().toList();
 		goodItems = allItems.stream()
 				.filter(itemType ->
 						itemType.getMaxDamage() > 1
@@ -112,9 +112,9 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// determine the size of the item stack
 		int quantity = 1;
-		if (item.getMaxStackSize() > 1) {
+		if (item.getMaxCount() > 1) {
 			for (int i = 0; i <= luck; i++) {
-				quantity = Math.max(quantity, RandomUtil.nextInclusiveInt(1, item.getMaxStackSize()));
+				quantity = Math.max(quantity, RandomUtil.nextInclusiveInt(1, item.getMaxCount()));
 			}
 		}
 
@@ -135,7 +135,7 @@ public class LootboxCommand extends ImmediateCommand {
 	public void randomlyModifyItem(ItemStack itemStack, int luck) {
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
-			itemStack.getOrCreateTag().putBoolean("Unbreakable", true);
+			itemStack.getOrCreateNbt().putBoolean("Unbreakable", true);
 
 		// determine enchantments to add
 		int _enchantments = 0;
@@ -143,10 +143,10 @@ public class LootboxCommand extends ImmediateCommand {
 			_enchantments = Math.max(_enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		final int enchantments = _enchantments;
-		List<Enchantment> enchantmentList = BuiltInRegistries.ENCHANTMENT.stream()
-				.filter(enchantmentType -> enchantmentType.canEnchant(itemStack)).collect(Collectors.toList());
+		List<Enchantment> enchantmentList = Registries.ENCHANTMENT.stream()
+				.filter(enchantmentType -> enchantmentType.isAcceptableItem(itemStack)).collect(Collectors.toList());
 		if (random.nextDouble() >= (.8d - (luck * .2d)))
-			enchantmentList.removeIf(Enchantment::isCurse);
+			enchantmentList.removeIf(Enchantment::isCursed);
 
 		// add enchantments
 		List<Enchantment> addedEnchantments = new ArrayList<>(enchantments);
@@ -154,7 +154,7 @@ public class LootboxCommand extends ImmediateCommand {
 			Enchantment enchantment = enchantmentList.remove(0);
 
 			// block conflicting enchantments (unless the die roll decides otherwise)
-			if (addedEnchantments.stream().anyMatch(x -> !x.isCompatibleWith(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
+			if (addedEnchantments.stream().anyMatch(x -> !x.canCombine(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
 				continue;
 			addedEnchantments.add(enchantment);
 
@@ -169,7 +169,7 @@ public class LootboxCommand extends ImmediateCommand {
 			}
 
 			// create & add enchant
-			itemStack.enchant(enchantment, level);
+			itemStack.addEnchantment(enchantment, level);
 		}
 
 		// determine attributes to add
@@ -180,14 +180,14 @@ public class LootboxCommand extends ImmediateCommand {
 		// add attributes
 		if (attributes > 0) {
 			// get equipment slot(s)
-			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getEquipmentSlot() : null;
+			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getSlotType() : null;
 			EquipmentSlot[] equipmentSlots = equipmentSlot == null ? new EquipmentSlot[]{MAINHAND, OFFHAND} : new EquipmentSlot[]{equipmentSlot};
 			// add custom attributes
-			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
+			List<EntityAttribute> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
-				Attribute attribute = attributeList.get(i);
-				String name = "lootbox_" + Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(attribute)).getPath();
+				EntityAttribute attribute = attributeList.get(i);
+				String name = "lootbox_" + Objects.requireNonNull(Registries.ATTRIBUTE.getId(attribute)).getPath();
 				// determine percent amount for the modifier
 				double amount = 0d;
 				for (int j = 0; j <= luck; j++) {
@@ -195,13 +195,13 @@ public class LootboxCommand extends ImmediateCommand {
 				}
 				// create & add attribute
 				for (int k = 0; k < equipmentSlots.length; k++) {
-					AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name + "_" + k, amount, Operation.ADDITION);
+					EntityAttributeModifier attributeModifier = new EntityAttributeModifier(UUID.randomUUID(), name + "_" + k, amount, Operation.ADDITION);
 					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentSlots[k]);
 				}
 			}
 			// add default attributes
 			for (EquipmentSlot type : equipmentSlots) {
-				itemStack.getItem().getDefaultAttributeModifiers(type)
+				itemStack.getItem().getAttributeModifiers(type)
 						.forEach((attribute, modifiers) -> itemStack.addAttributeModifier(attribute, modifiers, type));
 			}
 		}
@@ -209,44 +209,44 @@ public class LootboxCommand extends ImmediateCommand {
 
 	// lore getter
 	private static List<net.kyori.adventure.text.Component> getLore(ItemStack itemStack) {
-		final CompoundTag displayTag = itemStack.getTag();
+		final NbtCompound displayTag = itemStack.getNbt();
 		if (displayTag == null || !displayTag.contains("display"))
 			return new ArrayList<>();
-		final CompoundTag displayCompound = displayTag.getCompound("display");
-		final ListTag list = displayCompound.getList("Lore", 8);
-		return list.isEmpty() ? new ArrayList<>() : list.stream().map(tag -> gson().deserialize(tag.getAsString())).collect(Collectors.toList());
+		final NbtCompound displayCompound = displayTag.getCompound("display");
+		final NbtList list = displayCompound.getList("Lore", 8);
+		return list.isEmpty() ? new ArrayList<>() : list.stream().map(tag -> gson().deserialize(tag.asString())).collect(Collectors.toList());
 	}
 
 	// lore setter
 	private static void setLore(ItemStack itemStack, List<net.kyori.adventure.text.Component> lore) {
 		if (lore.isEmpty()) {
-			final CompoundTag tag = itemStack.getTag();
+			final NbtCompound tag = itemStack.getNbt();
 			if (tag != null && tag.contains("display"))
 				tag.getCompound("display").remove("Lore");
 			return;
 		}
-		final ListTag list = new ListTag();
-		lore.forEach(component -> list.add(StringTag.valueOf(gson().serialize(component))));
-		itemStack.getOrCreateTagElement("display").put("Lore", list);
+		final NbtList list = new NbtList();
+		lore.forEach(component -> list.add(NbtString.of(gson().serialize(component))));
+		itemStack.getOrCreateSubNbt("display").put("Lore", list);
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		for (ServerPlayer player : players) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
+		for (ServerPlayerEntity player : players) {
 			// init container
-			SimpleContainer container = new SimpleContainer(27);
+			SimpleInventory container = new SimpleInventory(27);
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
 				ItemStack itemStack = createRandomItem(luck);
 				List<Component> lore = getLore(itemStack);
 				lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), player));
 				setLore(itemStack, lore);
-				container.setItem(slot, itemStack);
+				container.setStack(slot, itemStack);
 			}
 
 			// sound & open
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
-			sync(() -> player.openMenu(
-					new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container),
+			sync(() -> player.openHandledScreen(
+					new SimpleNamedScreenHandlerFactory((i, inventory, p) -> GenericContainerScreenHandler.createGeneric9x3(i, inventory, container),
 							plugin.adventure().toNative(buildLootboxTitle(plugin, request)))
 			));
 		}

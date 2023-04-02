@@ -2,8 +2,8 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -8,12 +8,12 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,13 +34,13 @@ abstract class NearbyLocationCommand<S> extends Command {
 			return null;
 
 		int air = 0;
-		final ServerLevel world = origin.level();
+		final ServerWorld world = origin.level();
 		Location location = new Location(world, origin.x(), world.getLogicalHeight() - 1, origin.z(), origin.yaw(), origin.pitch());
 		while (true) {
 			BlockState block = location.block();
-			if (location.y() < (world.getMinBuildHeight() + 1)) // idk if the +1 is necessary but why not
+			if (location.y() < (world.getBottomY() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (block.getBlock().isPossibleToRespawnInThis() && !block.getMaterial().blocksMotion())
+			else if (block.getBlock().canMobSpawnInside() && !block.getMaterial().blocksMovement())
 				air += 1;
 			else if (air >= 1)
 				break;
@@ -62,9 +62,9 @@ abstract class NearbyLocationCommand<S> extends Command {
 		BlockState block = location.block();
 		Block type = block.getBlock();
 		if (Blocks.FIRE.equals(type))
-			location.block(Blocks.AIR.defaultBlockState());
+			location.block(Blocks.AIR.getDefaultState());
 		else if (Blocks.LAVA.equals(type))
-			location.block(Blocks.GLASS.defaultBlockState());
+			location.block(Blocks.GLASS.getDefaultState());
 
 		// place player on top of the block
 		location = location.add(0.5, 1, 0.5);
@@ -77,7 +77,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 	protected abstract Location search(@NotNull Location origin, @NotNull S searchType);
 
 	@NotNull
-	protected abstract Collection<S> getSearchTypes(@NotNull ServerLevel level);
+	protected abstract Collection<S> getSearchTypes(@NotNull ServerWorld level);
 
 	protected abstract @NotNull Component nameOf(@NotNull S searchType);
 
@@ -87,12 +87,12 @@ abstract class NearbyLocationCommand<S> extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<@Nullable Builder> execute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public @NotNull CompletableFuture<@Nullable Builder> execute(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		CompletableFuture<Builder> future = new CompletableFuture<>();
 		sync(() -> {
 			Builder response = request.buildResponse().type(ResultType.FAILURE).message("Could not find a location to teleport to");
-			for (ServerPlayer player : players) {
-				ServerLevel world = player.getLevel();
+			for (ServerPlayerEntity player : players) {
+				ServerWorld world = player.getWorld();
 				Location location = new Location(player);
 				S currentType = currentType(location);
 				List<S> searchTypes = new ArrayList<>(getSearchTypes(world));
@@ -109,11 +109,11 @@ abstract class NearbyLocationCommand<S> extends Command {
 						continue;
 					}
 					// TODO: feature parity issue -- this length check uses only X/Z while other platforms use X/Y/Z. former is probably preferable.
-					if (Mth.lengthSquared(destination.x() - location.x(), destination.z() - location.z()) <= 2500) // 50 blocks
+					if (MathHelper.squaredHypot(destination.x() - location.x(), destination.z() - location.z()) <= 2500) // 50 blocks
 						continue;
-					if (!world.getWorldBorder().isWithinBounds(destination.x(), destination.z()))
+					if (!world.getWorldBorder().contains(destination.x(), destination.z()))
 						continue;
-					player.teleportTo(destination.x(), destination.y(), destination.z());
+					player.requestTeleport(destination.x(), destination.y(), destination.z());
 					player.sendActionBar(Component.translatable(
 							"cc.effect.nearby_location.output",
 							nameOf(searchType).color(NamedTextColor.YELLOW)

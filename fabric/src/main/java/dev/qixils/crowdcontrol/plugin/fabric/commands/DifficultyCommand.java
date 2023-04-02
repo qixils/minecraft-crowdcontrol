@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.Difficulty;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,24 +24,24 @@ public class DifficultyCommand extends ImmediateCommand {
 	private final Component displayName;
 
 	private static String effectNameOf(Difficulty difficulty) {
-		return "difficulty_" + difficulty.getKey();
+		return "difficulty_" + difficulty.getName();
 	}
 
 	public DifficultyCommand(FabricCrowdControlPlugin plugin, Difficulty difficulty) {
 		super(plugin);
 		this.difficulty = difficulty;
 		this.effectName = effectNameOf(difficulty);
-		this.displayName = Component.translatable("cc.effect.difficulty.name", difficulty.getDisplayName());
+		this.displayName = Component.translatable("cc.effect.difficulty.name", difficulty.getTranslatableName());
 	}
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Builder response = request.buildResponse().type(ResultType.SUCCESS);
 
-		if (plugin.server().getWorldData().isDifficultyLocked())
+		if (plugin.server().getSaveProperties().isDifficultyLocked())
 			return response.type(ResultType.UNAVAILABLE).message("Server difficulty is locked");
-		if (plugin.server().getWorldData().getDifficulty() == difficulty)
+		if (plugin.server().getSaveProperties().getDifficulty() == difficulty)
 			return response.type(ResultType.FAILURE).message("Server difficulty is already set to " + displayName);
 
 		async(() -> {
@@ -55,9 +55,9 @@ public class DifficultyCommand extends ImmediateCommand {
 
 	@Override
 	public TriState isSelectable() {
-		if (plugin.server().getWorldData().isDifficultyLocked())
+		if (plugin.server().getSaveProperties().isDifficultyLocked())
 			return TriState.FALSE;
-		if (plugin.server().getWorldData().getDifficulty() == difficulty)
+		if (plugin.server().getSaveProperties().getDifficulty() == difficulty)
 			return TriState.FALSE;
 		return TriState.TRUE;
 	}

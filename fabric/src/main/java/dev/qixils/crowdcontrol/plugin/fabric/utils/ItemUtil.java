@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ public class ItemUtil {
 		itemClone1.setCount(1);
 		ItemStack itemClone2 = item2.copy();
 		itemClone2.setCount(1);
-		return ItemStack.matches(itemClone1, itemClone2);
+		return ItemStack.areEqual(itemClone1, itemClone2);
 	}
 
 	@Contract("null -> true; _ -> _")

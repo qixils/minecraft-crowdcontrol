@@ -13,10 +13,10 @@ import java.util.function.BooleanSupplier;
 @Mixin(MinecraftServer.class)
 public class TickMixin {
 	@Shadow
-	private int tickCount;
+	private int ticks;
 
-	@Inject(method = "tickChildren", at = @At("HEAD"))
+	@Inject(method = "tickWorlds", at = @At("HEAD"))
 	public void tick(BooleanSupplier booleanSupplier, CallbackInfo ci) {
-		new Tick(tickCount).fire();
+		new Tick(ticks).fire();
 	}
 }

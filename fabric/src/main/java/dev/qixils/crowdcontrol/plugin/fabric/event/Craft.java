@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric.event;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.CraftingRecipe;
 
-public record Craft(Player player, CraftingRecipe recipe, ItemStack result) implements Event {
+public record Craft(PlayerEntity player, CraftingRecipe recipe, ItemStack result) implements Event {
 }

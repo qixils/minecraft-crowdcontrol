@@ -2,9 +2,9 @@ package dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl;
 
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +14,10 @@ import java.util.Locale;
 
 public class MovementStatusImpl implements MovementStatus {
 	private static final Logger logger = LoggerFactory.getLogger("MovementStatus");
-	private final @NotNull Player provider;
+	private final @NotNull PlayerEntity provider;
 	private final @NotNull EnumMap<Type, Value> prohibited = new EnumMap<>(Type.class);
 
-	public MovementStatusImpl(@NotNull Player provider) {
+	public MovementStatusImpl(@NotNull PlayerEntity provider) {
 		this.provider = provider;
 	}
 
@@ -51,13 +51,13 @@ public class MovementStatusImpl implements MovementStatus {
 	}
 
 	@Override
-	public void writeToNbt(@NotNull CompoundTag tag) {
+	public void writeToNbt(@NotNull NbtCompound tag) {
 		for (Type type : Type.values())
 			tag.putString(getTypeKey(type), get(type).name());
 	}
 
 	@Override
-	public void readFromNbt(@NotNull CompoundTag tag) {
+	public void readFromNbt(@NotNull NbtCompound tag) {
 		for (Type type : Type.values()) {
 			String key = getTypeKey(type);
 			if (tag.contains(key)) {
@@ -71,7 +71,7 @@ public class MovementStatusImpl implements MovementStatus {
 	}
 
 	@Override
-	public boolean shouldSyncWith(ServerPlayer player) {
+	public boolean shouldSyncWith(ServerPlayerEntity player) {
 		return this.provider == player;
 	}
 }

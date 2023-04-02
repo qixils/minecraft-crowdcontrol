@@ -25,12 +25,12 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,14 +55,14 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
  * {@link Command Commands}.
  */
 @Getter
-public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> implements ModInitializer {
+public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEntity, ServerCommandSource> implements ModInitializer {
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
 	// packet stuff
-	public static ResourceLocation VERSION_REQUEST_ID = new ResourceLocation("crowdcontrol", "version-request");
-	public static ResourceLocation VERSION_RESPONSE_ID = new ResourceLocation("crowdcontrol", "version-response");
-	public static ResourceLocation SHADER_ID = new ResourceLocation("crowdcontrol", "shader");
+	public static Identifier VERSION_REQUEST_ID = new Identifier("crowdcontrol", "version-request");
+	public static Identifier VERSION_RESPONSE_ID = new Identifier("crowdcontrol", "version-response");
+	public static Identifier SHADER_ID = new Identifier("crowdcontrol", "shader");
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -79,13 +79,13 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowdcontrol");
-	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
+	private final PlayerManager<ServerPlayerEntity> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)
-	private final PlayerEntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
+	private final PlayerEntityMapper<ServerPlayerEntity> playerMapper = new ServerPlayerMapper(this);
 	@Accessors(fluent = true)
-	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(this);
-	private final FabricServerCommandManager<CommandSourceStack> commandManager
-			= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>builder()
+	private final EntityMapper<ServerCommandSource> commandSenderMapper = new CommandSourceStackMapper(this);
+	private final FabricServerCommandManager<ServerCommandSource> commandManager
+			= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<ServerCommandSource>builder()
 			.withAsynchronousParsing()
 			.withExecutor(getAsyncExecutor())
 			.build()
@@ -97,8 +97,8 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
 	public FabricCrowdControlPlugin() {
-		super(ServerPlayer.class, CommandSourceStack.class);
-		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
+		super(ServerPlayerEntity.class, ServerCommandSource.class);
+		CommandConstants.SOUND_VALIDATOR = key -> Registries.SOUND_EVENT.containsId(new Identifier(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().registerListeners(softLockResolver);
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
@@ -112,13 +112,13 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
 		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender) -> {
 			getSLF4JLogger().debug("Received version response from client!");
-			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(32)));
+			clientVersions.put(player.getUuid(), new SemVer(buf.readString(32)));
 			updateConditionalEffectVisibility(crowdControl);
 		});
 	}
 
 	@Override
-	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayer player) {
+	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayerEntity player) {
 		return new FabricPlayer(player);
 	}
 
@@ -143,9 +143,9 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		return instance != null;
 	}
 
-	public boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request) {
-		final List<ServerPlayer> players = validateNotNullElseGet(possiblePlayers, () -> getPlayers(request));
-		return players.stream().anyMatch(player -> clientVersions.containsKey(player.getUUID()));
+	public boolean isClientAvailable(@Nullable List<ServerPlayerEntity> possiblePlayers, @NotNull Request request) {
+		final List<ServerPlayerEntity> players = validateNotNullElseGet(possiblePlayers, () -> getPlayers(request));
+		return players.stream().anyMatch(player -> clientVersions.containsKey(player.getUuid()));
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		if (CLIENT_AVAILABLE) {
 			FabricPlatformClient.get()
 					.player()
-					.map(player -> player.getUUID().toString().toLowerCase(Locale.ENGLISH))
+					.map(player -> player.getUuid().toString().toLowerCase(Locale.ENGLISH))
 					.ifPresent(hosts::add);
 		}
 		return hosts;
@@ -209,8 +209,8 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
-	public @NotNull Optional<SemVer> getModVersion(@NotNull ServerPlayer player) {
-		return Optional.ofNullable(clientVersions.get(player.getUUID()));
+	public @NotNull Optional<SemVer> getModVersion(@NotNull ServerPlayerEntity player) {
+		return Optional.ofNullable(clientVersions.get(player.getUuid()));
 	}
 
 	@Override
@@ -219,17 +219,17 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
-	public void onPlayerJoin(ServerPlayer player) {
+	public void onPlayerJoin(ServerPlayerEntity player) {
 		// put client version
 		if (CLIENT_AVAILABLE) {
 			FabricPlatformClient.get().player()
-					.map(LocalPlayer::getUUID)
-					.filter(uuid -> uuid.equals(player.getUUID()))
+					.map(ClientPlayerEntity::getUuid)
+					.filter(uuid -> uuid.equals(player.getUuid()))
 					.ifPresent(uuid -> clientVersions.put(uuid, SemVer.MOD));
 		}
 		// request client version if not available
-		if (!clientVersions.containsKey(player.getUUID())) {
-			getSLF4JLogger().debug("Sending version request to " + player.getUUID());
+		if (!clientVersions.containsKey(player.getUuid())) {
+			getSLF4JLogger().debug("Sending version request to " + player.getUuid());
 			ServerPlayNetworking.send(player, VERSION_REQUEST_ID, PacketByteBufs.empty());
 		}
 		// super
@@ -237,13 +237,13 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
-	public void onPlayerLeave(ServerPlayer player) {
-		clientVersions.remove(player.getUUID());
+	public void onPlayerLeave(ServerPlayerEntity player) {
+		clientVersions.remove(player.getUuid());
 		super.onPlayerLeave(player);
 	}
 
 	@Override
-	public @Nullable ServerPlayer asPlayer(@NotNull CommandSourceStack sender) {
+	public @Nullable ServerPlayerEntity asPlayer(@NotNull ServerCommandSource sender) {
 		return sender.getPlayer();
 	}
 }

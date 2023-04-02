@@ -1,26 +1,26 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, ServerLevel> {
+public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, ServerWorld> {
 	public static final Predicate<Location> SPAWNING_SPACE = location ->
-			!location.block().getMaterial().blocksMotion()
+			!location.block().getMaterial().blocksMovement()
 					&& isPassable(location.add(0, 1, 0).block())
 					&& isSolid(location.add(0, -1, 0).block());
 
 	// helper methods
 
 	public static boolean isPassable(Material material) {
-		return !material.blocksMotion();
+		return !material.blocksMovement();
 	}
 
 	public static boolean isPassable(BlockState block) {
@@ -57,7 +57,7 @@ public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, S
 
 	// actual class stuff
 
-	private BlockFinder(ServerLevel origin, List<BlockPos> positions, Predicate<Location> locationValidator) {
+	private BlockFinder(ServerWorld origin, List<BlockPos> positions, Predicate<Location> locationValidator) {
 		super(origin, positions, locationValidator);
 	}
 
@@ -70,7 +70,7 @@ public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, S
 		return new Location(origin, position);
 	}
 
-	public static final class BlockFinderBuilder extends AbstractBlockFinderBuilder<BlockFinderBuilder, BlockFinder, Location, BlockPos, ServerLevel> {
+	public static final class BlockFinderBuilder extends AbstractBlockFinderBuilder<BlockFinderBuilder, BlockFinder, Location, BlockPos, ServerWorld> {
 
 		public @NotNull BlockFinderBuilder origin(Location origin) {
 			if (origin == null)

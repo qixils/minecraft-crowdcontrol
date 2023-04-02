@@ -9,10 +9,10 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	private static @Nullable FabricPlatformClient INSTANCE = null;
 	public static boolean SHADER_ACTIVE = false;
-	private Minecraft client = null;
+	private MinecraftClient client = null;
 
 	/**
 	 * Fetches the initialized client.
@@ -56,13 +56,13 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
 		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.VERSION_REQUEST_ID, (client, handler, inputBuf, responseSender) -> {
 			logger.debug("Received version request from server!");
-			FriendlyByteBuf buf = PacketByteBufs.create();
-			buf.writeUtf(SemVer.MOD_STRING, 32);
+			PacketByteBuf buf = PacketByteBufs.create();
+			buf.writeString(SemVer.MOD_STRING, 32);
 			responseSender.sendPacket(FabricCrowdControlPlugin.VERSION_RESPONSE_ID, buf);
 		});
 		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.SHADER_ID, (client, handler, inputBuf, responseSender) -> {
 			logger.debug("Received shader request from server!");
-			ResourceLocation shader = new ResourceLocation("shaders/post/" + inputBuf.readUtf(64) + ".json");
+			Identifier shader = new Identifier("shaders/post/" + inputBuf.readString(64) + ".json");
 			long millis = inputBuf.readLong();
 
 			client.execute(() -> {
@@ -71,12 +71,12 @@ public final class FabricPlatformClient implements ClientModInitializer {
 			});
 			executor.schedule(() -> client.execute(() -> {
 				SHADER_ACTIVE = false;
-				client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
+				client.gameRenderer.onCameraEntitySet(client.cameraEntity);
 			}), millis, TimeUnit.MILLISECONDS);
 		});
 	}
 
-	private void setClient(@Nullable Minecraft client) {
+	private void setClient(@Nullable MinecraftClient client) {
 		if (client == null) {
 			this.client = null;
 			FabricCrowdControlPlugin.CLIENT_AVAILABLE = false;
@@ -86,7 +86,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		}
 	}
 
-	public @NotNull Optional<LocalPlayer> player() {
+	public @NotNull Optional<ClientPlayerEntity> player() {
 		return Optional.ofNullable(client).map(minecraft -> minecraft.player);
 	}
 }

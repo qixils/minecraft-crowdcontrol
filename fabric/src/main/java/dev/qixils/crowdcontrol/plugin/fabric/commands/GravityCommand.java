@@ -6,10 +6,10 @@ import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -30,20 +30,20 @@ public class GravityCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull ServerPlayerEntity> ignored, @NotNull Request request) {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gravity")
 				.duration(getDuration(request))
 				.startCallback($ -> {
-					List<ServerPlayer> players = plugin.getPlayers(request);
+					List<ServerPlayerEntity> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
 							.type(Response.ResultType.RETRY)
 							.message("A conflicting potion effect is already active");
-					for (Player player : players) {
-						if (player.hasEffect(MobEffects.LEVITATION))
+					for (PlayerEntity player : players) {
+						if (player.hasStatusEffect(StatusEffects.LEVITATION))
 							continue;
-						sync(() -> player.addEffect(new MobEffectInstance(MobEffects.LEVITATION, (int) getDuration(request).getSeconds() * 20, level, true, true, false)));
+						sync(() -> player.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, (int) getDuration(request).getSeconds() * 20, level, true, true, false)));
 						response.type(Response.ResultType.SUCCESS).message("SUCCESS");
 					}
 					if (response.type() == Response.ResultType.SUCCESS)

@@ -8,9 +8,9 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -27,17 +27,17 @@ public class ClearInventoryCommand extends ImmediateCommand {
 
 	@Override
 	@NotNull
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder resp = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("All inventories are already empty or protected");
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			// ensure keep inventory is not enabled
 			if (KeepInventoryCommand.isKeepingInventory(player)) {
 				resp.type(ResultType.FAILURE);
 				continue;
 			}
-			Inventory inv = player.getInventory();
+			PlayerInventory inv = player.getInventory();
 			// ensure inventory is not empty
 			boolean hasItems = false;
 			for (ItemStack item : InventoryUtil.viewAllItems(inv)) {
@@ -49,7 +49,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			if (!hasItems) continue;
 			// clear inventory
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
-			sync(inv::clearContent);
+			sync(inv::clear);
 		}
 		return resp;
 	}

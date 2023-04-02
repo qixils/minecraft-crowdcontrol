@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +43,7 @@ public class MojmapTextUtil implements TextUtil {
 
 	// helper methods for native objects
 
-	public @NotNull String asPlain(@NotNull Component component) {
+	public @NotNull String asPlain(@NotNull Text component) {
 		return asPlain(component.asComponent());
 	}
 }

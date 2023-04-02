@@ -8,9 +8,9 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -26,13 +26,13 @@ public class GravelCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Set<Location> locations = new HashSet<>();
-		for (ServerPlayer player : players)
+		for (ServerPlayerEntity player : players)
 			locations.addAll(BlockFinder.builder()
 					.origin(player)
 					.locationValidator(loc ->
-							CommonTags.STONES_EXCEPT_GRAVEL.contains(BuiltInRegistries.BLOCK.getKey(loc.block().getBlock()).toString()))
+							CommonTags.STONES_EXCEPT_GRAVEL.contains(Registries.BLOCK.getId(loc.block().getBlock()).toString()))
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());
@@ -42,7 +42,7 @@ public class GravelCommand extends ImmediateCommand {
 					.type(Response.ResultType.FAILURE)
 					.message("No replaceable blocks nearby");
 
-		sync(() -> locations.forEach(location -> location.block(Blocks.GRAVEL.defaultBlockState())));
+		sync(() -> locations.forEach(location -> location.block(Blocks.GRAVEL.getDefaultState())));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

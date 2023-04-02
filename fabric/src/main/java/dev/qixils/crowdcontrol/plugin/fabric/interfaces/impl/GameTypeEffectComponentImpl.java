@@ -1,26 +1,26 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl;
 
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.GameTypeEffectComponent;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.GameType;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GameTypeEffectComponentImpl implements GameTypeEffectComponent {
-	private @Nullable GameType value = null;
+	private @Nullable GameMode value = null;
 
 	@Override
-	public @Nullable GameType getValue() {
+	public @Nullable GameMode getValue() {
 		return value;
 	}
 
 	@Override
-	public void setValue(@Nullable GameType value) {
+	public void setValue(@Nullable GameMode value) {
 		this.value = value;
 	}
 
 	@Override
-	public void writeToNbt(@NotNull CompoundTag tag) {
+	public void writeToNbt(@NotNull NbtCompound tag) {
 		if (value != null) {
 			tag.putString("value", value.getName());
 		} else {
@@ -29,9 +29,9 @@ public class GameTypeEffectComponentImpl implements GameTypeEffectComponent {
 	}
 
 	@Override
-	public void readFromNbt(CompoundTag tag) {
+	public void readFromNbt(NbtCompound tag) {
 		if (tag.contains("value")) {
-			value = GameType.byName(tag.getString("value"));
+			value = GameMode.byName(tag.getString("value"));
 		}
 	}
 

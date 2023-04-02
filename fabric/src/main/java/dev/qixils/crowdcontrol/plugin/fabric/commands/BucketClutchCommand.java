@@ -7,10 +7,10 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Hand;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,12 +26,12 @@ public class BucketClutchCommand extends ImmediateCommand {
 	private final String effectName = "bucket_clutch";
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.RETRY)
 				.message("No players are on the surface");
-		for (ServerPlayer player : players) {
-			if (player.getLevel().dimensionType().ultraWarm())
+		for (ServerPlayerEntity player : players) {
+			if (player.getWorld().getDimension().ultrawarm())
 				continue;
 			Location curr = new Location(player);
 			boolean obstruction = false;
@@ -45,16 +45,16 @@ public class BucketClutchCommand extends ImmediateCommand {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				Location dest = curr.add(0, OFFSET, 0);
 				sync(() -> {
-					player.teleportTo(dest.x(), dest.y(), dest.z());
-					ItemStack hand = player.getMainHandItem();
+					player.requestTeleport(dest.x(), dest.y(), dest.z());
+					ItemStack hand = player.getMainHandStack();
 					if (!hand.isEmpty() && hand.getItem() != Items.WATER_BUCKET) {
-						ItemStack offhand = player.getOffhandItem();
+						ItemStack offhand = player.getOffHandStack();
 						if (offhand.isEmpty()) {
-							player.setItemInHand(InteractionHand.OFF_HAND, hand);
+							player.setStackInHand(Hand.OFF_HAND, hand);
 						} else {
 							boolean slotFound = false;
 							for (int i = 0; i <= 36; i++) {
-								List<ItemStack> items = player.getInventory().items;
+								List<ItemStack> items = player.getInventory().main;
 								ItemStack item = items.get(i);
 								if (item.isEmpty()) {
 									slotFound = true;
@@ -63,10 +63,10 @@ public class BucketClutchCommand extends ImmediateCommand {
 								}
 							}
 							if (!slotFound)
-								player.drop(true);
+								player.dropSelectedItem(true);
 						}
 					}
-					player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
+					player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
 				});
 			}
 		}

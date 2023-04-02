@@ -3,9 +3,9 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.ChatFormatting;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.Block;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,12 +25,12 @@ public final class StandOnBlockCondition extends AbstractCondition {
 		this.blocks = List.of(blocks);
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.stand." + key,
-				blocks[0].getName().withStyle(ChatFormatting.GREEN)
+				blocks[0].getName().formatted(Formatting.GREEN)
 		);
 	}
 
 	@Override
-	public boolean hasSucceeded(@NotNull ServerPlayer player) {
+	public boolean hasSucceeded(@NotNull ServerPlayerEntity player) {
 		Location location = new Location(player);
 		return blocks.contains(location.block().getBlock())
 				|| blocks.contains(location.add(0, -1, 0).block().getBlock());

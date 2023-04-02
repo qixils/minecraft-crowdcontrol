@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.common.mc.CCEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

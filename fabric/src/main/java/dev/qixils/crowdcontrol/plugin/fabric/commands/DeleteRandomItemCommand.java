@@ -5,9 +5,9 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,23 +25,23 @@ public class DeleteRandomItemCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(Response.ResultType.RETRY)
 				.message("No players have items");
-		for (ServerPlayer player : players) {
-			Inventory inv = player.getInventory();
+		for (ServerPlayerEntity player : players) {
+			PlayerInventory inv = player.getInventory();
 			if (inv.isEmpty())
 				continue;
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			List<Integer> indices = IntStream.range(0, inv.getContainerSize()).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+			List<Integer> indices = IntStream.range(0, inv.size()).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 			Collections.shuffle(indices);
 			sync(() -> {
 				for (int i : indices) {
-					ItemStack stack = inv.getItem(i);
+					ItemStack stack = inv.getStack(i);
 					if (stack.isEmpty())
 						continue;
-					inv.setItem(i, ItemStack.EMPTY);
+					inv.setStack(i, ItemStack.EMPTY);
 					break;
 				}
 			});

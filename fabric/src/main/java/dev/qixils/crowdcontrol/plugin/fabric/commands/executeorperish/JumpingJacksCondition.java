@@ -5,7 +5,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 public final class JumpingJacksCondition extends AbstractListeningCondition<Integer> {
@@ -24,12 +24,12 @@ public final class JumpingJacksCondition extends AbstractListeningCondition<Inte
 
 	@Listener
 	public void onJump(@NotNull Jump event) {
-		if (event.player() instanceof ServerPlayer player)
+		if (event.player() instanceof ServerPlayerEntity player)
 			computeStatus(player, i -> i + 1);
 	}
 
 	@Override
-	public boolean hasSucceeded(@NotNull ServerPlayer player) {
+	public boolean hasSucceeded(@NotNull ServerPlayerEntity player) {
 		return getStatus(player) >= goal;
 	}
 }

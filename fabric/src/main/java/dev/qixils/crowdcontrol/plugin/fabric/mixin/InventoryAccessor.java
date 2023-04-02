@@ -1,16 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
 
 @SuppressWarnings("UnusedMixin")
-@Mixin(Inventory.class)
+@Mixin(PlayerInventory.class)
 public interface InventoryAccessor {
-	@Accessor
-	List<NonNullList<ItemStack>> getCompartments();
+	@Accessor("combinedInventory")
+	List<DefaultedList<ItemStack>> getCompartments();
 }

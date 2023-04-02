@@ -4,11 +4,11 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Options;
-import net.minecraft.client.player.Input;
-import net.minecraft.client.player.KeyboardInput;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.input.KeyboardInput;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
@@ -23,63 +23,63 @@ import java.util.Optional;
 public abstract class KeyboardInputMixin extends Input {
 	@Shadow
 	@Final
-	private Options options;
+	private GameOptions settings;
 
-	private boolean handleIsDown(@NotNull KeyMapping key, @Nullable KeyMapping inverse, MovementStatus.@NotNull Type type) {
+	private boolean handleIsDown(@NotNull KeyBinding key, @Nullable KeyBinding inverse, MovementStatus.@NotNull Type type) {
 		if (!FabricCrowdControlPlugin.CLIENT_INITIALIZED)
-			return key.isDown();
-		Optional<LocalPlayer> player = FabricPlatformClient.get().player();
+			return key.isPressed();
+		Optional<ClientPlayerEntity> player = FabricPlatformClient.get().player();
 		if (player.isEmpty())
-			return key.isDown();
+			return key.isPressed();
 		MovementStatus.Value status = Components.MOVEMENT_STATUS.get(player.get()).get(type);
 		if (status == MovementStatus.Value.DENIED)
 			return false;
 		if (status == MovementStatus.Value.INVERTED && inverse != null)
-			return inverse.isDown();
-		return key.isDown();
+			return inverse.isPressed();
+		return key.isPressed();
 	}
 
-	private boolean handleIsDown(@NotNull KeyMapping key, @Nullable KeyMapping inverse) {
+	private boolean handleIsDown(@NotNull KeyBinding key, @Nullable KeyBinding inverse) {
 		return handleIsDown(key, inverse, MovementStatus.Type.WALK);
 	}
 
 	@SuppressWarnings("SameParameterValue")
-	private boolean handleIsDown(@NotNull KeyMapping key, MovementStatus.@NotNull Type type) {
+	private boolean handleIsDown(@NotNull KeyBinding key, MovementStatus.@NotNull Type type) {
 		return handleIsDown(key, null, type);
 	}
 
-	private boolean handleIsDown(@NotNull KeyMapping key) {
-		return handleIsDown(key, (KeyMapping) null);
+	private boolean handleIsDown(@NotNull KeyBinding key) {
+		return handleIsDown(key, (KeyBinding) null);
 	}
 
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 0))
-	public boolean isForwardDown(KeyMapping keyMapping) {
-		return handleIsDown(keyMapping, options.keyDown);
+	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z", ordinal = 0))
+	public boolean isForwardDown(KeyBinding keyMapping) {
+		return handleIsDown(keyMapping, settings.backKey);
 	}
 
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 1))
-	public boolean isBackDown(KeyMapping keyMapping) {
-		return handleIsDown(keyMapping, options.keyUp);
+	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z", ordinal = 1))
+	public boolean isBackDown(KeyBinding keyMapping) {
+		return handleIsDown(keyMapping, settings.forwardKey);
 	}
 
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 2))
-	public boolean isLeftDown(KeyMapping keyMapping) {
-		return handleIsDown(keyMapping, options.keyRight);
+	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z", ordinal = 2))
+	public boolean isLeftDown(KeyBinding keyMapping) {
+		return handleIsDown(keyMapping, settings.rightKey);
 	}
 
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 3))
-	public boolean isRightDown(KeyMapping keyMapping) {
-		return handleIsDown(keyMapping, options.keyLeft);
+	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z", ordinal = 3))
+	public boolean isRightDown(KeyBinding keyMapping) {
+		return handleIsDown(keyMapping, settings.leftKey);
 	}
 
 	// commented out because it interferes with non-jump actions like swimming
-//	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 4))
+//	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z", ordinal = 4))
 //	public boolean isJumpDown(KeyMapping keyMapping) {
 //		return handleIsDown(keyMapping, MovementStatus.Type.JUMP);
 //	}
 
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 5))
-	public boolean isSprintDown(KeyMapping keyMapping) {
+	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z", ordinal = 5))
+	public boolean isSprintDown(KeyBinding keyMapping) {
 		return handleIsDown(keyMapping);
 	}
 }

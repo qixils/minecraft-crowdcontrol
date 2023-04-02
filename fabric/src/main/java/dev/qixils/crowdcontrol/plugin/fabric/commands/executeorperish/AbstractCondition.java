@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +16,7 @@ abstract class AbstractCondition implements SuccessCondition {
 	}
 
 	@Override
-	public boolean canApply(@NotNull ServerPlayer player) {
+	public boolean canApply(@NotNull ServerPlayerEntity player) {
 		return !hasSucceeded(player) && flags.test(player);
 	}
 

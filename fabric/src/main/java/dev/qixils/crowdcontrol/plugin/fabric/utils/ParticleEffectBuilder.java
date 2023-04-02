@@ -2,9 +2,9 @@ package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,9 +18,9 @@ import org.joml.Vector3f;
  */
 @Data
 @Accessors(fluent = true, chain = true)
-public class ParticleEffectBuilder<T extends ParticleOptions> {
+public class ParticleEffectBuilder<T extends ParticleEffect> {
 	private final @NotNull T particleOptions;
-	private @Nullable ServerLevel level = null;
+	private @Nullable ServerWorld level = null;
 	private @Nullable Vector3d position = null;
 	private @NotNull Vector3f distance = new Vector3f(0, 0, 0);
 	private float maxSpeed = .1f;
@@ -81,7 +81,7 @@ public class ParticleEffectBuilder<T extends ParticleOptions> {
 			throw new IllegalStateException("No level set");
 		if (position == null)
 			throw new IllegalStateException("No position set");
-		level.sendParticles(particleOptions, position.x, position.y, position.z, count, distance.x(), distance.y(), distance.z(), maxSpeed);
+		level.spawnParticles(particleOptions, position.x, position.y, position.z, count, distance.x(), distance.y(), distance.z(), maxSpeed);
 	}
 
 	/**
@@ -91,11 +91,11 @@ public class ParticleEffectBuilder<T extends ParticleOptions> {
 	 * @param force  whether to force the particle effect to render
 	 *               (i.e. ignore long distances and the "Minimal" particle effect setting)
 	 */
-	public void sendTo(ServerPlayer player, boolean force) {
+	public void sendTo(ServerPlayerEntity player, boolean force) {
 		if (level == null)
 			throw new IllegalStateException("No level set");
 		if (position == null)
 			throw new IllegalStateException("No position set");
-		level.sendParticles(player, particleOptions, force, position.x, position.y, position.z, count, distance.x(), distance.y(), distance.z(), maxSpeed);
+		level.spawnParticles(player, particleOptions, force, position.x, position.y, position.z, count, distance.x(), distance.y(), distance.z(), maxSpeed);
 	}
 }

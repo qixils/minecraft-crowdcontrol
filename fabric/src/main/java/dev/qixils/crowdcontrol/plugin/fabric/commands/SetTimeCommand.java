@@ -7,8 +7,8 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -31,13 +31,13 @@ public class SetTimeCommand extends ImmediateCommand {
 	@SuppressWarnings("UnnecessaryContinue")
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		for (ServerLevel level : plugin.server().getAllLevels()) {
-			long setTime = level.getDayTime();
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
+		for (ServerWorld level : plugin.server().getWorlds()) {
+			long setTime = level.getTimeOfDay();
 			while ((setTime++ % 24000) != time)
 				continue;
 			final long finalSetTime = setTime;
-			sync(() -> level.setDayTime(finalSetTime));
+			sync(() -> level.setTimeOfDay(finalSetTime));
 		}
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}

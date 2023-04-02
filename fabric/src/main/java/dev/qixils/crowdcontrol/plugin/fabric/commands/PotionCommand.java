@@ -8,11 +8,11 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -22,18 +22,18 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DUR
 
 @Getter
 public class PotionCommand extends TimedImmediateCommand {
-	private final @NotNull MobEffect potionEffectType;
+	private final @NotNull StatusEffect potionEffectType;
 	private final boolean isMinimal;
 	private final @NotNull String effectName;
 	private final @NotNull Component displayName;
 
 	@SuppressWarnings("ConstantConditions")
-	public PotionCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull MobEffect potionEffectType) {
+	public PotionCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull StatusEffect potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		this.effectName = "potion_" + BuiltInRegistries.MOB_EFFECT.getKey(potionEffectType).getPath();
-		this.isMinimal = potionEffectType.isInstantenous();
-		this.displayName = Component.translatable("cc.effect.potion.name", potionEffectType.getDisplayName());
+		this.effectName = "potion_" + Registries.STATUS_EFFECT.getId(potionEffectType).getPath();
+		this.isMinimal = potionEffectType.isInstant();
+		this.displayName = Component.translatable("cc.effect.potion.name", potionEffectType.getName());
 	}
 
 	public @NotNull Duration getDefaultDuration() {
@@ -49,8 +49,8 @@ public class PotionCommand extends TimedImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (potionEffectType == MobEffects.JUMP
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
+		if (potionEffectType == StatusEffects.JUMP_BOOST
 				&& TimedEffect.isActive("disable_jumping", request.getTargets())) {
 			return request.buildResponse()
 					.type(ResultType.RETRY)
@@ -60,25 +60,25 @@ public class PotionCommand extends TimedImmediateCommand {
 		int durationTicks = isMinimal ? 1 : (int) getDuration(request).getSeconds() * 20;
 
 		sync(() -> {
-			for (ServerPlayer player : players) {
-				MobEffectInstance effect = new MobEffectInstance(potionEffectType, durationTicks);
-				MobEffectInstance existingEffect = player.getEffect(potionEffectType);
+			for (ServerPlayerEntity player : players) {
+				StatusEffectInstance effect = new StatusEffectInstance(potionEffectType, durationTicks);
+				StatusEffectInstance existingEffect = player.getStatusEffect(potionEffectType);
 				if (existingEffect == null) {
 					plugin.getSLF4JLogger().debug("Adding new effect");
-					player.addEffect(effect);
+					player.addStatusEffect(effect);
 				} else {
 					plugin.getSLF4JLogger().debug("Updating existing effect");
 					int newDuration = Math.max(existingEffect.getDuration(), durationTicks);
 					int newAmplifier = existingEffect.getAmplifier() + 1;
-					if (potionEffectType == MobEffects.LEVITATION && newAmplifier > 127)
+					if (potionEffectType == StatusEffects.LEVITATION && newAmplifier > 127)
 						newAmplifier -= 1;
-					player.forceAddEffect(new MobEffectInstance(
+					player.setStatusEffect(new StatusEffectInstance(
 							potionEffectType,
 							newDuration,
 							newAmplifier,
 							existingEffect.isAmbient(),
-							existingEffect.isVisible(),
-							existingEffect.showIcon()
+							existingEffect.shouldShowParticles(),
+							existingEffect.shouldShowIcon()
 					), null);
 				}
 			}

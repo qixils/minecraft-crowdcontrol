@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.common.EventListener;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,24 +34,24 @@ abstract class AbstractListeningCondition<DataType> extends AbstractCondition im
 		return statuses.containsKey(player);
 	}
 
-	protected boolean hasStatus(@NotNull ServerPlayer player) {
-		return hasStatus(player.getUUID());
+	protected boolean hasStatus(@NotNull ServerPlayerEntity player) {
+		return hasStatus(player.getUuid());
 	}
 
 	protected @NotNull DataType getStatus(@NotNull UUID player) {
 		return statuses.getOrDefault(player, defaultStatus);
 	}
 
-	protected @NotNull DataType getStatus(@NotNull ServerPlayer player) {
-		return getStatus(player.getUUID());
+	protected @NotNull DataType getStatus(@NotNull ServerPlayerEntity player) {
+		return getStatus(player.getUuid());
 	}
 
 	protected void setStatus(@NotNull UUID player, @NotNull DataType status) {
 		statuses.put(player, status);
 	}
 
-	protected void setStatus(@NotNull ServerPlayer player, @NotNull DataType status) {
-		setStatus(player.getUUID(), status);
+	protected void setStatus(@NotNull ServerPlayerEntity player, @NotNull DataType status) {
+		setStatus(player.getUuid(), status);
 	}
 
 	protected void computeStatus(@NotNull UUID player, @NotNull Function<DataType, DataType> modifier) {
@@ -60,7 +60,7 @@ abstract class AbstractListeningCondition<DataType> extends AbstractCondition im
 		statuses.compute(player, (key, value) -> modifier.apply(value));
 	}
 
-	protected void computeStatus(@NotNull ServerPlayer player, @NotNull Function<DataType, DataType> modifier) {
-		computeStatus(player.getUUID(), modifier);
+	protected void computeStatus(@NotNull ServerPlayerEntity player, @NotNull Function<DataType, DataType> modifier) {
+		computeStatus(player.getUuid(), modifier);
 	}
 }

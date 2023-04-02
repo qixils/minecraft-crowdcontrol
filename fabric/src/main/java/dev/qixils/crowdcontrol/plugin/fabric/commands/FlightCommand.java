@@ -10,10 +10,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Abilities;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.entity.player.PlayerAbilities;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -30,34 +30,34 @@ public class FlightCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull ServerPlayerEntity> ignored, @NotNull Request request) {
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gamemode")
 				.duration(getDuration(request))
 				.startCallback($ -> {
-					List<ServerPlayer> players = plugin.getPlayers(request);
+					List<ServerPlayerEntity> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
 							.type(ResultType.RETRY)
 							.message("Target is already flying or able to fly");
-					for (ServerPlayer player : players) {
-						GameType gamemode = player.gameMode.getGameModeForPlayer();
-						if (gamemode == GameType.CREATIVE)
+					for (ServerPlayerEntity player : players) {
+						GameMode gamemode = player.interactionManager.getGameMode();
+						if (gamemode == GameMode.CREATIVE)
 							continue;
-						if (gamemode == GameType.SPECTATOR)
+						if (gamemode == GameMode.SPECTATOR)
 							continue;
-						Abilities abilities = player.getAbilities();
-						if (abilities.mayfly)
+						PlayerAbilities abilities = player.getAbilities();
+						if (abilities.allowFlying)
 							continue;
 						if (abilities.flying)
 							continue;
 						response.type(ResultType.SUCCESS).message("SUCCESS");
 						sync(() -> {
-							abilities.mayfly = true;
+							abilities.allowFlying = true;
 							abilities.flying = true;
-							player.addDeltaMovement(new Vec3(0, 0.2, 0));
-							player.hurtMarked = true;
-							player.onUpdateAbilities();
+							player.addVelocity(new Vec3d(0, 0.2, 0));
+							player.velocityModified = true;
+							player.sendAbilitiesUpdate();
 							// TODO: set abilities.flying=true; again after 1 tick
 						});
 					}
@@ -66,12 +66,12 @@ public class FlightCommand extends TimedVoidCommand {
 					return response;
 				})
 				.completionCallback($ -> {
-					List<ServerPlayer> players = plugin.getPlayers(request);
+					List<ServerPlayerEntity> players = plugin.getPlayers(request);
 					sync(() -> players.forEach(player -> {
-						Abilities abilities = player.getAbilities();
-						abilities.mayfly = false;
+						PlayerAbilities abilities = player.getAbilities();
+						abilities.allowFlying = false;
 						abilities.flying = false;
-						player.onUpdateAbilities();
+						player.sendAbilitiesUpdate();
 					}));
 				})
 				.build().queue();
@@ -80,17 +80,17 @@ public class FlightCommand extends TimedVoidCommand {
 	// clear flight on login if they disconnected mid-effect
 	@Listener
 	public void onJoin(Join event) {
-		ServerPlayer player = event.player();
-		GameType gamemode = player.gameMode.getGameModeForPlayer();
-		if (gamemode == GameType.CREATIVE)
+		ServerPlayerEntity player = event.player();
+		GameMode gamemode = player.interactionManager.getGameMode();
+		if (gamemode == GameMode.CREATIVE)
 			return;
-		if (gamemode == GameType.SPECTATOR)
+		if (gamemode == GameMode.SPECTATOR)
 			return;
-		Abilities abilities = player.getAbilities();
-		if (!abilities.flying && !abilities.mayfly)
+		PlayerAbilities abilities = player.getAbilities();
+		if (!abilities.flying && !abilities.allowFlying)
 			return;
-		abilities.mayfly = false;
+		abilities.allowFlying = false;
 		abilities.flying = false;
-		player.onUpdateAbilities();
+		player.sendAbilitiesUpdate();
 	}
 }

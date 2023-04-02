@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -56,17 +56,17 @@ public final class FreezeCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull ServerPlayerEntity> ignored, @NotNull Request request) {
 		AtomicReference<Map<UUID, FreezeData>> atomic = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup(effectGroup)
 				.duration(getDuration(request))
 				.startCallback($ -> {
-					List<ServerPlayer> players = getPlugin().getPlayers(request);
+					List<ServerPlayerEntity> players = getPlugin().getPlayers(request);
 					Map<UUID, FreezeData> locations = new HashMap<>();
 					players.forEach(player -> {
-						locations.put(player.getUUID(), new FreezeData(modifier, new Location(player)));
+						locations.put(player.getUuid(), new FreezeData(modifier, new Location(player)));
 						Components.MOVEMENT_STATUS.get(player).set(freezeType, freezeValue);
 					});
 					atomic.set(locations);
@@ -79,7 +79,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 					MinecraftServer server = getPlugin().getServer();
 					if (server == null)
 						return;
-					ServerPlayer player = server.getPlayerList().getPlayer(uuid);
+					ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
 					if (player == null)
 						return;
 					Components.MOVEMENT_STATUS.get(player).set(freezeType, MovementStatus.Value.ALLOWED);

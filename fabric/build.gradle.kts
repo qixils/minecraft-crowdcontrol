@@ -1,6 +1,6 @@
 val crowdControlVersion: String by project
 val minecraftVersion: String by project
-val parchmentVersion: String by project
+val yarnVersion: String by project
 val loaderVersion: String by project
 val fabricVersion: String by project
 val cloudVersion: String by project
@@ -37,10 +37,7 @@ repositories {
 dependencies {
     shade(project(":configurate-common"))
     minecraft("com.mojang:minecraft:$minecraftVersion")
-    mappings(loom.layered {
-        officialMojangMappings()
-        //parchment("org.parchmentmc.data:parchment-$minecraftVersion:$parchmentVersion@zip")
-    })
+    mappings("net.fabricmc:yarn:$yarnVersion")
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)

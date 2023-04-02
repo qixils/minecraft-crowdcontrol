@@ -10,30 +10,24 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.entity.*;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.mob.EndermanEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.*;
+import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.entity.vehicle.VehicleInventory;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
+import net.minecraft.village.VillagerDataContainer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.MushroomCow;
-import net.minecraft.world.entity.animal.Rabbit;
-import net.minecraft.world.entity.animal.Sheep;
-import net.minecraft.world.entity.animal.Wolf;
-import net.minecraft.world.entity.animal.axolotl.Axolotl;
-import net.minecraft.world.entity.animal.frog.Frog;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.EnderMan;
-import net.minecraft.world.entity.npc.VillagerDataHolder;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.ContainerEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,30 +45,30 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	protected final boolean isMonster;
 	private final String effectName;
 	private final Component displayName;
-	private @Nullable List<ResourceLocation> lootTables = null;
+	private @Nullable List<Identifier> lootTables = null;
 	private final Map<EntityType<?>, List<Item>> horseArmor = new HashMap<>();
-	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
-			Rabbit.Variant.BLACK, 16,
-			Rabbit.Variant.BROWN, 16,
-			Rabbit.Variant.GOLD, 16,
-			Rabbit.Variant.SALT, 16,
-			Rabbit.Variant.WHITE, 16,
-			Rabbit.Variant.WHITE_SPLOTCHED, 16,
-			Rabbit.Variant.EVIL, 1
+	private static final Map<RabbitEntity.RabbitType, Integer> RABBIT_VARIANTS = Map.of(
+			RabbitEntity.RabbitType.BLACK, 16,
+			RabbitEntity.RabbitType.BROWN, 16,
+			RabbitEntity.RabbitType.GOLD, 16,
+			RabbitEntity.RabbitType.SALT, 16,
+			RabbitEntity.RabbitType.WHITE, 16,
+			RabbitEntity.RabbitType.WHITE_SPLOTCHED, 16,
+			RabbitEntity.RabbitType.EVIL, 1
 	);
 
 	public SummonEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.isMonster = entityType.getCategory() == MobCategory.MONSTER;
-		this.effectName = "entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
-		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getDescription());
+		this.isMonster = entityType.getSpawnGroup() == SpawnGroup.MONSTER;
+		this.effectName = "entity_" + csIdOf(Registries.ENTITY_TYPE.getId(entityType));
+		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getName());
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
-		for (Item item : BuiltInRegistries.ITEM) {
+		for (Item item : Registries.ITEM) {
 			if (item instanceof ArmorItem armorItem) {
-				EquipmentSlot slot = armorItem.getEquipmentSlot();
+				EquipmentSlot slot = armorItem.getSlotType();
 				if (slot.getType() != EquipmentSlot.Type.ARMOR)
 					continue;
 				armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(armorItem);
@@ -88,22 +82,22 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	}
 
 	@NotNull
-	private List<ResourceLocation> getLootTables(MinecraftServer server) {
+	private List<Identifier> getLootTables(MinecraftServer server) {
 		if (lootTables != null)
 			return lootTables;
-		return lootTables = server.getLootTables().getIds().stream().filter(location -> location.getPath().startsWith("chests/")).toList();
+		return lootTables = server.getLootManager().getTableIds().stream().filter(location -> location.getPath().startsWith("chests/")).toList();
 	}
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		for (ServerPlayer player : players) {
-			if (isMonster && player.getLevel().getDifficulty() == Difficulty.PEACEFUL) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
+		for (ServerPlayerEntity player : players) {
+			if (isMonster && player.getWorld().getDifficulty() == Difficulty.PEACEFUL) {
 				return request.buildResponse()
 						.type(ResultType.FAILURE)
 						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
 			}
-			if (!isEnabled(player.getLevel().enabledFeatures())) {
+			if (!isEnabled(player.getWorld().getEnabledFeatures())) {
 				return request.buildResponse()
 						.type(ResultType.UNAVAILABLE)
 						.message("Mob is not available in this version of Minecraft");
@@ -111,13 +105,13 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		}
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+		int maxVictims = config.getItemLimit(Registries.ENTITY_TYPE.getId(entityType).getPath());
 
 		sync(() -> {
 			int victims = 0;
 
 			// first pass (hosts)
-			for (ServerPlayer player : players) {
+			for (ServerPlayerEntity player : players) {
 				if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
 					break;
 				if (!isHost(player))
@@ -127,7 +121,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 			}
 
 			// second pass (guests)
-			for (ServerPlayer player : players) {
+			for (ServerPlayerEntity player : players) {
 				if (maxVictims > 0 && victims >= maxVictims)
 					break;
 				if (isHost(player))
@@ -140,56 +134,56 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	}
 
 	@Blocking
-	protected E spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
-		ServerLevel level = player.getLevel();
-		E entity = entityType.create(player.level);
+	protected E spawnEntity(@NotNull Component viewer, @NotNull ServerPlayerEntity player) {
+		ServerWorld level = player.getWorld();
+		E entity = entityType.create(player.world);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
-		entity.setPos(player.position());
+		entity.setPosition(player.getPos());
 		entity.setCustomName(plugin.adventure().toNative(viewer));
 		entity.setCustomNameVisible(true);
-		if (entity instanceof Mob mob)
-			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
-		if (entity instanceof TamableAnimal tamable)
-			tamable.tame(player);
+		if (entity instanceof MobEntity mob)
+			mob.initialize(level, level.getLocalDifficulty(entity.getBlockPos()), SpawnReason.MOB_SUMMONED, null, null);
+		if (entity instanceof TameableEntity tamable)
+			tamable.setOwner(player);
 		if (entity instanceof LivingEntity)
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
-		if (entity instanceof Boat boat)
-			boat.setVariant(randomElementFrom(Boat.Type.class));
-		if (entity instanceof Wolf wolf)
+		if (entity instanceof BoatEntity boat)
+			boat.setVariant(randomElementFrom(BoatEntity.Type.class));
+		if (entity instanceof WolfEntity wolf)
 			wolf.setCollarColor(randomElementFrom(DyeColor.class));
-		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
-			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
-		if (entity instanceof AbstractHorse horse) {
-			if (horse.canWearArmor() && RandomUtil.RNG.nextBoolean()) {
-				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream().filter(item -> horse.isArmor(new ItemStack(item))).toList());
-				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
+		if (entity instanceof MooshroomEntity mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
+			mooshroom.setVariant(MooshroomEntity.Type.BROWN);
+		if (entity instanceof AbstractHorseEntity horse) {
+			if (horse.hasArmorSlot() && RandomUtil.RNG.nextBoolean()) {
+				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> Registries.ITEM.stream().filter(item -> horse.isHorseArmor(new ItemStack(item))).toList());
+				horse.getStackReference(401).set(new ItemStack(randomElementFrom(items)));
 			}
-			horse.setOwnerUUID(player.getUUID());
-			horse.setTamed(true);
+			horse.setOwnerUuid(player.getUuid());
+			horse.setTame(true);
 		}
-		if (entity instanceof Sheep sheep) // TODO: jeb
+		if (entity instanceof SheepEntity sheep) // TODO: jeb
 			sheep.setColor(randomElementFrom(DyeColor.class));
 		if (entity instanceof Saddleable saddleable && RandomUtil.RNG.nextBoolean())
-			saddleable.equipSaddle(null);
-		if (entity instanceof EnderMan enderman)
-			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
-		if (entity instanceof AbstractChestedHorse chested)
-			chested.setChest(RandomUtil.RNG.nextBoolean());
-		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT));
-		if (entity instanceof Axolotl axolotl)
-			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
-		if (entity instanceof Rabbit rabbit)
+			saddleable.saddle(null);
+		if (entity instanceof EndermanEntity enderman)
+			enderman.setCarriedBlock(randomElementFrom(Registries.BLOCK).getDefaultState());
+		if (entity instanceof AbstractDonkeyEntity chested)
+			chested.setHasChest(RandomUtil.RNG.nextBoolean());
+		if (entity instanceof FrogEntity frog)
+			frog.setVariant(randomElementFrom(Registries.FROG_VARIANT));
+		if (entity instanceof AxolotlEntity axolotl)
+			axolotl.setVariant(randomElementFrom(AxolotlEntity.Variant.class));
+		if (entity instanceof RabbitEntity rabbit)
 			rabbit.setVariant(weightedRandom(RABBIT_VARIANTS));
-		if (entity instanceof VillagerDataHolder villager)
-			villager.setVariant(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE));
-		if (entity instanceof ContainerEntity container)
-			container.setLootTable(randomElementFrom(getLootTables(level.getServer())));
+		if (entity instanceof VillagerDataContainer villager)
+			villager.setVariant(randomElementFrom(Registries.VILLAGER_TYPE));
+		if (entity instanceof VehicleInventory container)
+			container.setLootTableId(randomElementFrom(getLootTables(level.getServer())));
 
 		// add random armor to armor stands
-		if (entity instanceof ArmorStand) {
+		if (entity instanceof ArmorStandEntity) {
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
 			List<EquipmentSlot> slots = new ArrayList<>(armor.keySet());
@@ -205,12 +199,12 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
-				entity.setItemSlot(type, item);
+				entity.equipStack(type, item);
 			}
 		}
 
 		// spawn entity
-		level.addFreshEntity(entity);
+		level.spawnEntity(entity);
 		return entity;
 	}
 }

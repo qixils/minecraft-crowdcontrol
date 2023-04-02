@@ -11,24 +11,24 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.ServerRecipeBook;
-import net.minecraft.world.Container;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeManager;
+import net.minecraft.screen.GenericContainerScreenHandler;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerRecipeBook;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -59,7 +59,7 @@ public final class ToastCommand extends ImmediateCommand {
 	};
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private static final Map<UUID, ToastInventory> OPEN_INVENTORIES = new HashMap<>();
-	private static Component TITLE;
+	private static Text TITLE;
 	private final String effectName = "toast";
 
 	public ToastCommand(FabricCrowdControlPlugin plugin) {
@@ -74,28 +74,28 @@ public final class ToastCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		sync(() -> players.forEach(player -> {
 			// annoying sound
 			player.playSound(Sounds.ANNOYING.get(), Sound.Emitter.self());
 
 			// spam recipe toasts
 			ServerRecipeBook book = player.getRecipeBook();
-			RecipeManager recipeManager = player.getLevel().getRecipeManager();
+			RecipeManager recipeManager = player.getWorld().getRecipeManager();
 			@SuppressWarnings("unchecked") // casting ? extends XYZ to XYZ is safe >_>
 			Collection<Recipe<?>> recipes = ((RecipeBookAccessor) book).getKnown()
 					.stream()
-					.flatMap(location -> (Stream<Recipe<?>>) recipeManager.byKey(location).stream())
+					.flatMap(location -> (Stream<Recipe<?>>) recipeManager.get(location).stream())
 					.toList();
-			book.removeRecipes(recipes, player);
-			book.addRecipes(recipes, player);
+			book.lockRecipes(recipes, player);
+			book.unlockRecipes(recipes, player);
 
 			// pop-up inventory
-			Container container = new SimpleContainer(INVENTORY_SIZE);
+			Inventory container = new SimpleInventory(INVENTORY_SIZE);
 			ToastInventory toastInv = new ToastInventory(container);
 			toastInv.tick();
-			player.openMenu(new ToastMenuProvider(container));
-			OPEN_INVENTORIES.put(player.getUUID(), toastInv);
+			player.openHandledScreen(new ToastMenuProvider(container));
+			OPEN_INVENTORIES.put(player.getUuid(), toastInv);
 		}));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
@@ -106,53 +106,53 @@ public final class ToastCommand extends ImmediateCommand {
 	}
 
 	private static final class ToastInventory {
-		private final @NotNull Container inventory;
+		private final @NotNull Inventory inventory;
 		private int index = 0;
 
-		private ToastInventory(@NotNull Container inventory) {
+		private ToastInventory(@NotNull Inventory inventory) {
 			this.inventory = inventory;
 		}
 
 		public void tick() {
 			Item item = MATERIALS[index++ % MATERIALS.length];
 			for (int i = 0; i < INVENTORY_SIZE; i++) {
-				inventory.setItem(i, new ItemStack(item));
+				inventory.setStack(i, new ItemStack(item));
 			}
 		}
 	}
 
-	private record ToastMenuProvider(@NotNull Container container) implements MenuProvider {
+	private record ToastMenuProvider(@NotNull Inventory container) implements NamedScreenHandlerFactory {
 		@Override
 		@NotNull
-		public Component getDisplayName() {
+		public Text getDisplayName() {
 			return TITLE;
 		}
 
 		@Override
-		public AbstractContainerMenu createMenu(int i, @NotNull Inventory inventory, @NotNull Player player) {
+		public ScreenHandler createMenu(int i, @NotNull PlayerInventory inventory, @NotNull PlayerEntity player) {
 			return new ToastMenu(i, inventory, container);
 		}
 	}
 
-	private static final class ToastMenu extends ChestMenu {
-		public ToastMenu(int i, @NotNull Inventory inventory, @NotNull Container container) {
-			super(MenuType.GENERIC_9x3, i, inventory, container, 3);
+	private static final class ToastMenu extends GenericContainerScreenHandler {
+		public ToastMenu(int i, @NotNull PlayerInventory inventory, @NotNull Inventory container) {
+			super(ScreenHandlerType.GENERIC_9X3, i, inventory, container, 3);
 		}
 
 		@Override
-		public void removed(@NotNull Player player) {
-			super.removed(player);
-			OPEN_INVENTORIES.remove(player.getUUID());
+		public void onClosed(@NotNull PlayerEntity player) {
+			super.onClosed(player);
+			OPEN_INVENTORIES.remove(player.getUuid());
 		}
 
 		@Override
-		public void clicked(int slotIndex, int buttonIndex, @NotNull ClickType clickType, @NotNull Player player) {
-			if (!(player instanceof ServerPlayer sPlayer))
+		public void onSlotClick(int slotIndex, int buttonIndex, @NotNull SlotActionType clickType, @NotNull PlayerEntity player) {
+			if (!(player instanceof ServerPlayerEntity sPlayer))
 				return;
-			sPlayer.containerMenu.sendAllDataToRemote();
-			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, sPlayer.inventoryMenu.incrementStateId(), sPlayer.containerMenu.getCarried()));
-			if (slotIndex >= 0 && slotIndex < sPlayer.containerMenu.slots.size())
-				sPlayer.connection.send(new ClientboundContainerSetSlotPacket(sPlayer.containerMenu.containerId, sPlayer.inventoryMenu.incrementStateId(), slotIndex, sPlayer.containerMenu.getSlot(slotIndex).getItem()));
+			sPlayer.currentScreenHandler.syncState();
+			sPlayer.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-1, -1, sPlayer.playerScreenHandler.nextRevision(), sPlayer.currentScreenHandler.getCursorStack()));
+			if (slotIndex >= 0 && slotIndex < sPlayer.currentScreenHandler.slots.size())
+				sPlayer.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(sPlayer.currentScreenHandler.syncId, sPlayer.playerScreenHandler.nextRevision(), slotIndex, sPlayer.currentScreenHandler.getSlot(slotIndex).getStack()));
 		}
 	}
 }

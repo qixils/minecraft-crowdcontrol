@@ -6,9 +6,9 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,27 +26,27 @@ public class ExplodeCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		// generate a random explosion ~~power~~ radius
 		float power = (float) explosionPower();
 		// whether the explosion should place fire blocks (5% chance)
 		boolean fire = shouldSpawnFire();
 
 		// spawn explosions
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			sync(() -> {
-				Vec3 pos = player.position().subtract(0, .5, 0);
-				player.getLevel().explode(
+				Vec3d pos = player.getPos().subtract(0, .5, 0);
+				player.getWorld().createExplosion(
 						null,
 						pos.x,
 						pos.y,
 						pos.z,
 						power,
 						fire,
-						Level.ExplosionInteraction.TNT
+						World.ExplosionSourceType.TNT
 				);
-				player.setDeltaMovement(0, .5, 0);
-				player.hurtMarked = true;
+				player.setVelocity(0, .5, 0);
+				player.velocityModified = true;
 			});
 		}
 

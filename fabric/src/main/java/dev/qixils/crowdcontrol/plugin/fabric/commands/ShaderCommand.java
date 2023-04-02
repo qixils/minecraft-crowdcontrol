@@ -8,8 +8,8 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -36,23 +36,23 @@ public class ShaderCommand extends TimedImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		players.removeIf(player -> ACTIVE_SHADERS.contains(player.getUUID()));
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
+		players.removeIf(player -> ACTIVE_SHADERS.contains(player.getUuid()));
 		if (players.isEmpty())
 			return request.buildResponse().type(Response.ResultType.RETRY).message("All players already have an active screen effect");
 		// create byte buf
-		FriendlyByteBuf buf = PacketByteBufs.create();
-		buf.writeUtf(shader, 64);
+		PacketByteBuf buf = PacketByteBufs.create();
+		buf.writeString(shader, 64);
 		long duration = getDuration(request).toMillis();
 		buf.writeLong(duration);
 		// send packet
 		players.forEach(player -> {
-			ACTIVE_SHADERS.add(player.getUUID());
+			ACTIVE_SHADERS.add(player.getUuid());
 			ServerPlayNetworking.send(player, FabricCrowdControlPlugin.SHADER_ID, buf);
 		});
 		// schedule removal
 		plugin.getScheduledExecutor().schedule(
-				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), duration, TimeUnit.MILLISECONDS);
+				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUuid())), duration, TimeUnit.MILLISECONDS);
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

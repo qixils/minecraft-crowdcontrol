@@ -10,12 +10,12 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	public TakeItemCommand(FabricCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "take_" + BuiltInRegistries.ITEM.getKey(item).getPath();
+		this.effectName = "take_" + Registries.ITEM.getId(item).getPath();
 		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
 	}
 
@@ -45,8 +45,8 @@ public class TakeItemCommand extends ImmediateCommand {
 		return displayName.args(args);
 	}
 
-	private boolean takeItemFrom(Player player, int amount) {
-		Inventory inventory = player.getInventory();
+	private boolean takeItemFrom(PlayerEntity player, int amount) {
+		PlayerInventory inventory = player.getInventory();
 		// simulate
 		int toTake = 0;
 		for (ItemStack itemStack : InventoryUtil.viewAllItems(inventory)) {
@@ -62,7 +62,7 @@ public class TakeItemCommand extends ImmediateCommand {
 			if (itemStack.isEmpty()) continue;
 			if (itemStack.getItem() != this.item) continue;
 			int take = Math.min(toTake, itemStack.getCount());
-			itemStack.shrink(take);
+			itemStack.decrement(take);
 			toTake -= take;
 			if (toTake == 0) break;
 		}
@@ -71,18 +71,18 @@ public class TakeItemCommand extends ImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+		int maxVictims = config.getItemLimit(Registries.ITEM.getId(item).getPath());
 		int victims = 0;
 
 		// first pass (hosts)
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
 				break;
 			if (!isHost(player))
@@ -92,7 +92,7 @@ public class TakeItemCommand extends ImmediateCommand {
 		}
 
 		// second pass (guests)
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			if (maxVictims > 0 && victims >= maxVictims)
 				break;
 			if (isHost(player))

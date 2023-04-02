@@ -7,9 +7,9 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 	protected abstract int modifyDurability(int curDamage, int maxDamage);
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Targets not holding a durable item");
@@ -40,12 +40,12 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 		Collections.shuffle(slots);
 
 		// loop through all players and all slots, and apply the durability change
-		for (ServerPlayer player : players) {
+		for (ServerPlayerEntity player : players) {
 			for (EquipmentSlot slot : slots) {
-				ItemStack item = player.getItemBySlot(slot);
+				ItemStack item = player.getEquippedStack(slot);
 				if (item.isEmpty())
 					continue;
-				int curDamage = item.getDamageValue();
+				int curDamage = item.getDamage();
 				int maxDamage = item.getMaxDamage();
 				int newDamage = Math.min(maxDamage, Math.max(0, modifyDurability(curDamage, maxDamage)));
 
@@ -53,7 +53,7 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 					continue;
 
 				result.type(ResultType.SUCCESS).message("SUCCESS");
-				item.setDamageValue(newDamage);
+				item.setDamage(newDamage);
 				break;
 			}
 		}

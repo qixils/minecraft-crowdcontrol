@@ -4,10 +4,10 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.flag.FeatureElement;
+import net.minecraft.resource.featuretoggle.ToggleableFeature;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<ServerPlayer> {
+public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<ServerPlayerEntity> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
 	protected final FabricCrowdControlPlugin plugin;
@@ -25,12 +25,12 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 	}
 
 	@Override
-	public boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request) {
+	public boolean isClientAvailable(@Nullable List<ServerPlayerEntity> possiblePlayers, @NotNull Request request) {
 		return plugin.isClientAvailable(possiblePlayers, request);
 	}
 
-	protected static String csIdOf(ResourceLocation id) {
-		if (!id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
+	protected static String csIdOf(Identifier id) {
+		if (!id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE))
 			return id.getPath();
 		String path = id.getPath();
 		return switch (path) {
@@ -49,9 +49,9 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 	@SuppressWarnings("ConstantValue") // overworld can indeed be null early in initialization
 	@Override
 	public TriState isVisible() {
-		if (this instanceof FeatureElement element) {
-			ServerLevel overworld = plugin.server().overworld();
-			return TriState.fromBoolean(overworld != null && element.isEnabled(overworld.enabledFeatures()));
+		if (this instanceof ToggleableFeature element) {
+			ServerWorld overworld = plugin.server().getOverworld();
+			return TriState.fromBoolean(overworld != null && element.isEnabled(overworld.getEnabledFeatures()));
 		}
 		return TriState.UNKNOWN; // avoid sending any packet
 	}

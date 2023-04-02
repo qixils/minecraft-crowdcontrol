@@ -15,8 +15,8 @@ import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,12 +53,12 @@ public class DoOrDieCommand extends VoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull ServerPlayerEntity> ignored, @NotNull Request request) {
 		new TimedEffect.Builder()
 				.request(request)
 				.duration(DO_OR_DIE_COOLDOWN)
 				.startCallback(effect -> {
-					List<ServerPlayer> players = plugin.getPlayers(request);
+					List<ServerPlayerEntity> players = plugin.getPlayers(request);
 					List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
 					Collections.shuffle(conditions, random);
 					SuccessCondition condition = conditions.stream()
@@ -69,8 +69,8 @@ public class DoOrDieCommand extends VoidCommand {
 
 					Task task = new Task(
 							plugin,
-							plugin.server().getTickCount(),
-							players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
+							plugin.server().getTicks(),
+							players.stream().map(ServerPlayerEntity::getUuid).collect(Collectors.toSet()),
 							condition,
 							condition.getComponent()
 					);
@@ -93,7 +93,7 @@ public class DoOrDieCommand extends VoidCommand {
 		private int pastValue = 0;
 
 		public int ticksElapsed(@Nullable Tick event) {
-			int tick = event == null ? plugin.server().getTickCount() : event.tickCount();
+			int tick = event == null ? plugin.server().getTicks() : event.tickCount();
 			return Math.max(tick - startedAt, 1);
 		}
 
@@ -104,7 +104,7 @@ public class DoOrDieCommand extends VoidCommand {
 			pastValue = secondsLeft;
 			boolean isTimeUp = secondsLeft <= 0;
 			for (UUID uuid : notCompleted) {
-				ServerPlayer player = plugin.server().getPlayerList().getPlayer(uuid);
+				ServerPlayerEntity player = plugin.server().getPlayerManager().getPlayer(uuid);
 				if (player == null) continue;
 
 				if (condition.hasSucceeded(player)) {

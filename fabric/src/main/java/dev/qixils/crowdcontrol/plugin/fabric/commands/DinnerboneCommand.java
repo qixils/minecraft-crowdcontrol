@@ -9,10 +9,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE
 
 @Getter
 public class DinnerboneCommand extends Command {
-	private static final Component DINNERBONE_COMPONENT = Component.literal(DINNERBONE_NAME);
+	private static final Text DINNERBONE_COMPONENT = Text.literal(DINNERBONE_NAME);
 	private final String effectName = "dinnerbone";
 
 	public DinnerboneCommand(FabricCrowdControlPlugin plugin) {
@@ -36,15 +36,15 @@ public class DinnerboneCommand extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
 		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
 		sync(() -> {
 			Set<LivingEntity> entities = new HashSet<>();
-			for (ServerPlayer player : players) {
-				entities.addAll(StreamSupport.stream(player.getLevel().getAllEntities().spliterator(), false)
+			for (ServerPlayerEntity player : players) {
+				entities.addAll(StreamSupport.stream(player.getWorld().iterateEntities().spliterator(), false)
 						.filter(entity -> entity instanceof LivingEntity
 								&& entity.getType() != EntityType.PLAYER
-								&& entity.position().distanceToSqr(player.position()) <= (DINNERBONE_RADIUS * DINNERBONE_RADIUS))
+								&& entity.getPos().squaredDistanceTo(player.getPos()) <= (DINNERBONE_RADIUS * DINNERBONE_RADIUS))
 						.map(entity -> (LivingEntity) entity)
 						.toList());
 			}
@@ -52,8 +52,8 @@ public class DinnerboneCommand extends Command {
 			entities.forEach(entity -> {
 				OriginalDisplayName nameData = Components.ORIGINAL_DISPLAY_NAME.get(entity);
 				ViewerMob viewerData = Components.VIEWER_MOB.get(entity);
-				final @Nullable Component oldName = nameData.getValue();
-				final @Nullable Component currentName = entity.getCustomName();
+				final @Nullable Text oldName = nameData.getValue();
+				final @Nullable Text currentName = entity.getCustomName();
 				if (Objects.equals(currentName, DINNERBONE_COMPONENT)) {
 					entity.setCustomName(oldName);
 					nameData.setValue(null);
