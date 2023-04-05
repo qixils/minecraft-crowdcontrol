@@ -1,12 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import com.mojang.datafixers.util.Pair;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
@@ -98,7 +101,7 @@ public class BiomeCommand extends NearbyLocationCommand<RegistryKey<Biome>> {
 	protected @Nullable Location search(@NotNull Location origin, @NotNull RegistryKey<Biome> searchType) {
 //		BlockPos pos = origin.pos();
 //		var pair = origin.level().getChunkSource().getGenerator().getBiomeSource().findBiomeHorizontal(pos.getX(), pos.getY(), pos.getZ(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP, biome -> biome.is(searchType), origin.level().getRandom(), true, origin.level().getChunkSource().randomState().sampler());
-		var pair = origin.level().locateBiome(biome -> biome.matchesKey(searchType), origin.pos(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP, BIOME_SEARCH_STEP);
+		Pair<BlockPos, RegistryEntry<Biome>> pair = origin.level().locateBiome(biome -> biome.matchesKey(searchType), origin.pos(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP, BIOME_SEARCH_STEP);
 		if (pair == null)
 			return null;
 		return new Location(origin.level(), pair.getFirst());

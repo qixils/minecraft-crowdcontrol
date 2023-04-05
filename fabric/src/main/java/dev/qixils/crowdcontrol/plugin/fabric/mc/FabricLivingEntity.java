@@ -73,7 +73,7 @@ public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 
 	@Override
 	public void damage(double damage) {
-		entity().damage(entity().getDamageSources().outOfWorld(), (float) damage);
+		entity().method_50637(entity().getDamageSources().outOfWorld(), (float) damage);
 	}
 
 	@Override

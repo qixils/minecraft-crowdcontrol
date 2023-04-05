@@ -1,13 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import com.mojang.datafixers.util.Pair;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureKeys;
@@ -57,7 +60,7 @@ public class StructureCommand extends NearbyLocationCommand<StructureCommand.Str
 
 	@Override
 	protected @Nullable Location search(@NotNull Location origin, @NotNull StructureGroup searchType) {
-		var pair = origin.level().getChunkManager().getChunkGenerator().locateStructure(origin.level(), searchType.getStructures(origin.level()), origin.pos(), STRUCTURE_SEARCH_RADIUS, STRUCTURE_SEARCH_UNEXPLORED);
+		Pair<BlockPos, RegistryEntry<Structure>> pair = origin.level().getChunkManager().getChunkGenerator().locateStructure(origin.level(), searchType.getStructures(origin.level()), origin.pos(), STRUCTURE_SEARCH_RADIUS, STRUCTURE_SEARCH_UNEXPLORED);
 		if (pair == null)
 			return null;
 		return new Location(origin.level(), pair.getFirst());

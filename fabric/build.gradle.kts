@@ -32,6 +32,7 @@ repositories {
         name = "Parchment"
         url = uri("https://maven.parchmentmc.org")
     }
+    mavenLocal()
 }
 
 dependencies {
