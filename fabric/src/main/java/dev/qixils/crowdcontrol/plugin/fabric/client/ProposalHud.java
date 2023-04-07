@@ -26,7 +26,9 @@ public class ProposalHud extends DrawableHelper {
 	private static final int TEXT_COLOR = 0xFFFFFF;
 	private static final int WINNING_TEXT_COLOR = NamedTextColor.GREEN.value();
 	private static final int BACKGROUND_COLOR = 0x60000000;
-	private static final int BAR_COLOR = NamedTextColor.YELLOW.value() | 0xFF000000;
+	private static final int TIME_BAR_COLOR = NamedTextColor.GRAY.value() | 0xFF000000;
+	private static final int COOLDOWN_BAR_COLOR = NamedTextColor.DARK_GRAY.value() | 0xFF000000;
+	private static final int VOTE_BAR_COLOR = NamedTextColor.YELLOW.value() | 0xFF000000;
 	private static final int BAR_HEIGHT = 2;
 	private static final int BAR_MIN_WIDTH = 10;
 
@@ -57,15 +59,23 @@ public class ProposalHud extends DrawableHelper {
 				.mapToInt(textRenderer::getWidth)
 				.max().orElse(0);
 		int maxWidth = Math.max(ceil(textRenderer.getWidth(proposalText) * HEADER_TEXT_SCALE), ceil(maxOptionWidth * BODY_TEXT_SCALE));
-		int height = (PADDING*2) + ceil(TEXT_SIZE * HEADER_TEXT_SCALE) + ceil((TEXT_SIZE + BAR_HEIGHT + TEXT_MARGIN) * vote.getOptions().size() * BODY_TEXT_SCALE) - 2;
+		int height = (PADDING*2) + ceil((TEXT_SIZE + BAR_HEIGHT) * HEADER_TEXT_SCALE) + TEXT_MARGIN + ceil((TEXT_SIZE + BAR_HEIGHT + TEXT_MARGIN) * vote.getOptions().size() * BODY_TEXT_SCALE) - 2;
 		fill(matrixStack, 0, 0, maxWidth + (PADDING*2), height, BACKGROUND_COLOR);
 		// render text ...
 		matrixStack.translate(PADDING, PADDING, 0);
 		matrixStack.scale(HEADER_TEXT_SCALE, HEADER_TEXT_SCALE, 1);
 		textRenderer.drawWithShadow(matrixStack, proposalText, 0, 0, TEXT_COLOR);
+		matrixStack.translate(0, TEXT_SIZE, 0);
+		matrixStack.scale(1 / HEADER_TEXT_SCALE, 1 / HEADER_TEXT_SCALE, 1);
+		int cooldownBarWidth = vote.isClosed()
+				? ceil(maxWidth * (handler.proposalCooldown / (float) ProposalVote.COOLDOWN))
+				: maxWidth;
+		int timeBarWidth = ceil(maxWidth * vote.getRemainingTimePercentage());
+		fill(matrixStack, 0, 0, cooldownBarWidth, BAR_HEIGHT, COOLDOWN_BAR_COLOR);
+		fill(matrixStack, 0, 0, timeBarWidth, BAR_HEIGHT, TIME_BAR_COLOR);
 		matrixStack.pop();
 		matrixStack.push();
-		matrixStack.translate(MARGIN + PADDING, MARGIN + (TEXT_SIZE * HEADER_TEXT_SCALE) + PADDING, 0);
+		matrixStack.translate(MARGIN + PADDING, MARGIN + PADDING + ((TEXT_SIZE + BAR_HEIGHT) * HEADER_TEXT_SCALE) + TEXT_MARGIN, 0);
 		matrixStack.scale(BODY_TEXT_SCALE, BODY_TEXT_SCALE, 1);
 		Map<String, Integer> votes = new HashMap<>(vote.voteCounts());
 		int totalVotes = Math.max(1, votes.values().stream().mapToInt(Integer::intValue).sum());
@@ -78,7 +88,7 @@ public class ProposalHud extends DrawableHelper {
 			matrixStack.translate(0, TEXT_SIZE, 0);
 			// draw bar
 			int barWidth = BAR_MIN_WIDTH + MathHelper.ceil((maxWidth - BAR_MIN_WIDTH) * (votes.getOrDefault(voteCommand, 0) / (float) totalVotes));
-			fill(matrixStack, 0, 0, barWidth, BAR_HEIGHT, BAR_COLOR);
+			fill(matrixStack, 0, 0, barWidth, BAR_HEIGHT, VOTE_BAR_COLOR);
 			// translate
 			matrixStack.translate(0, BAR_HEIGHT + TEXT_MARGIN, 0);
 		}
