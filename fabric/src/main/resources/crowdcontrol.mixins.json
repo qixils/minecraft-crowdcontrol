@@ -18,6 +18,7 @@
     "TickMixin"
   ],
   "client": [
+    "ClientTickMixin",
     "CommandListenerMixin",
     "EffectInstanceMixin",
     "GameRendererAccessor",

@@ -8,7 +8,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,6 +23,7 @@ public final class ProposalHandler {
 	public final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	private ProposalVote currentProposal = null;
 	private int proposalCount = 0; // internal count of how many proposals have been voted on; used to alternate inputs
+	public int proposalCooldown = 0; // cooldown in ticks before the next proposal can be started
 
 	public ProposalHandler(FabricPlatformClient plugin) {
 		this.plugin = plugin;
@@ -63,23 +63,24 @@ public final class ProposalHandler {
 			return false;
 		if (!proposal.method_51080(player).method_51075()) // TODO: skip if any votes have been cast
 			return false;
-		return getRemainingTimeFor(proposal).compareTo(ProposalVote.MIN_DURATION) >= 0;
+		return getRemainingTimeFor(proposal) > ProposalVote.MIN_DURATION;
 	}
 
-	public Duration getRemainingTimeFor(UUID proposalId) {
+	public long getRemainingTimeFor(UUID proposalId) {
 		return getRemainingTimeFor(getProposal(proposalId));
 	}
 
-	public Duration getRemainingTimeFor(class_8471.class_8474 proposal) {
+	public long getRemainingTimeFor(class_8471.class_8474 proposal) {
 		if (proposal == null)
-			return Duration.ZERO;
+			return 0;
 		long worldTime = plugin.client().map(client -> client.world).map(World::getTime).orElse(0L);
-		long ticks = Math.max(0L, proposal.method_51079(worldTime));
-		return Duration.ofMillis(ticks * 50L);
+		return Math.max(0L, proposal.method_51079(worldTime));
 	}
 
 	public void startNextProposal() {
 		if (currentProposal != null && !currentProposal.isClosed())
+			return;
+		if (proposalCooldown > 0)
 			return;
 		if (twitchChat.getChannels().isEmpty())
 			return;
@@ -103,5 +104,12 @@ public final class ProposalHandler {
 
 	public @Nullable ProposalVote getCurrentProposal() {
 		return currentProposal;
+	}
+
+	public void tick() {
+		if (currentProposal != null && !currentProposal.isClosed())
+			currentProposal.tick();
+		else if (--proposalCooldown <= 0)
+			startNextProposal();
 	}
 }

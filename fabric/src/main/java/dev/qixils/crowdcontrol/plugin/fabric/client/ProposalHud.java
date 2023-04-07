@@ -45,7 +45,7 @@ public class ProposalHud extends DrawableHelper {
 		class_8471.class_8474 proposal = vote.getProposal();
 		if (proposal == null)
 			return;
-		int secondsLeft = Math.max(ceil(vote.getRemainingTime().toMillis() / 1000f), 0);
+		int secondsLeft = Math.max(ceil(vote.getRemainingTicks() / 20f), 0);
 		matrixStack.push();
 		matrixStack.translate(MARGIN, MARGIN, 0);
 		// render background ...

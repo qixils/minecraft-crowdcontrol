@@ -5,16 +5,15 @@ import net.minecraft.class_8471;
 import net.minecraft.util.math.MathHelper;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class ProposalVote {
-	public static final Duration MIN_DURATION = Duration.ofSeconds(20);
-	public static final Duration MAX_DURATION = Duration.ofSeconds(60);
-	private final Duration duration;
+	public static final long MIN_DURATION = 20L * 20L;
+	public static final long MAX_DURATION = 60L * 20L;
+	public static final int COOLDOWN = 10 * 60;
 	public final UUID id;
-	public final Instant endsAt; // TODO: remove and instead just update ticks remaining so it pauses with the game?
+	private final long originalDuration;
+	private long ticksLeft;
 	private final ProposalHandler handler;
 	private final SortedMap<String, OptionWrapper> options = new TreeMap<>();
 	private final Map<String, String> votes = new HashMap<>();
@@ -37,15 +36,19 @@ public class ProposalVote {
 			options.put(key, option);
 		}
 
-		Duration duration = handler.getRemainingTimeFor(vote);
-		if (duration.compareTo(MIN_DURATION) < 0)
+		long duration = handler.getRemainingTimeFor(vote);
+		if (duration < MIN_DURATION)
 			throw new IllegalArgumentException("Proposal too short");
-		else if (duration.compareTo(MAX_DURATION) > 0)
+		else if (duration > MAX_DURATION)
 			duration = MAX_DURATION;
-		this.duration = duration;
-		Instant started = Instant.now();
-		endsAt = started.plus(duration);
-		handler.executor.schedule(this::voteForWinner, duration.toMillis(), TimeUnit.MILLISECONDS);
+		this.originalDuration = duration;
+		this.ticksLeft = duration;
+	}
+
+	public void tick() {
+		if (closed) return;
+		if (--ticksLeft <= 0)
+			voteForWinner();
 	}
 
 	public void viewerVote(String userId, String vote) {
@@ -89,12 +92,12 @@ public class ProposalVote {
 	public void voteForWinner() {
 		if (isClosed()) return;
 		closed = true;
+		handler.proposalCooldown = COOLDOWN;
 		try {
 			// TODO: vote multiple times (if possible)?
 			// TODO: bypass resources?
 			handler.plugin.player().ifPresent(player -> player.networkHandler.method_51006(getWinner().id(), (i, optional) -> {}));
 		} catch (Exception ignored) {}
-		handler.executor.schedule(handler::startNextProposal, 10, TimeUnit.SECONDS);
 	}
 
 	public boolean isClosed() {
@@ -102,11 +105,15 @@ public class ProposalVote {
 	}
 
 	public Duration getRemainingTime() {
-		return Duration.between(Instant.now(), endsAt);
+		return Duration.ofMillis(ticksLeft * 50L);
+	}
+
+	public long getRemainingTicks() {
+		return ticksLeft;
 	}
 
 	public double getRemainingTimePercentage() {
-		return MathHelper.clamp(getRemainingTime().toMillis() / (double) duration.toMillis(), 0, 1);
+		return MathHelper.clamp(ticksLeft / (double) originalDuration, 0, 1);
 	}
 
 	public class_8471.class_8474 getProposal() {
