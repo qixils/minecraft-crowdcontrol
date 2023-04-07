@@ -4,7 +4,9 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import net.minecraft.class_8471;
+import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -13,11 +15,11 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-// TODO: overlay
 // TODO: prevent streamer from voting themselves in the vanilla UI
 
 public final class ProposalHandler {
 	public final FabricPlatformClient plugin;
+	public final ProposalHud overlay = new ProposalHud(this);
 	private final TwitchChat twitchChat;
 	public final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	private ProposalVote currentProposal = null;
@@ -52,6 +54,18 @@ public final class ProposalHandler {
 		return storage.method_51074(id);
 	}
 
+	public boolean canVote(UUID player, UUID proposal) {
+		return canVote(player, getProposal(proposal));
+	}
+
+	public boolean canVote(UUID player, class_8471.class_8474 proposal) {
+		if (proposal == null)
+			return false;
+		if (!proposal.method_51080(player).method_51075()) // TODO: skip if any votes have been cast
+			return false;
+		return getRemainingTimeFor(proposal).compareTo(ProposalVote.MIN_DURATION) >= 0;
+	}
+
 	public Duration getRemainingTimeFor(UUID proposalId) {
 		return getRemainingTimeFor(getProposal(proposalId));
 	}
@@ -72,16 +86,21 @@ public final class ProposalHandler {
 		class_8471 storage = getProposalStorage();
 		if (storage == null)
 			return;
-		Map<UUID, Duration> proposals = new HashMap<>();
-		storage.method_51072((id, proposal) -> proposals.put(id, getRemainingTimeFor(proposal)));
-		UUID proposal = proposals.entrySet()
+		UUID player = plugin.player().map(Entity::getUuid).orElse(null);
+		if (player == null)
+			return;
+		Map<UUID, class_8471.class_8474> proposals = new HashMap<>();
+		storage.method_51072((id, proposal) -> proposals.put(id, getProposal(id)));
+		proposals.entrySet()
 				.stream()
-				.filter(entry -> entry.getValue().compareTo(ProposalVote.MIN_DURATION) >= 0)
+				.filter(entry -> canVote(player, entry.getKey()))
+				.map(entry -> Map.entry(entry.getKey(), getRemainingTimeFor(entry.getValue())))
 				.min(Map.Entry.comparingByValue())
 				.map(Map.Entry::getKey)
-				.orElse(null);
-		if (proposal == null)
-			return;
-		currentProposal = new ProposalVote(this, proposal, proposalCount++);
+				.ifPresent(proposal -> currentProposal = new ProposalVote(this, proposal, proposalCount++));
+	}
+
+	public @Nullable ProposalVote getCurrentProposal() {
+		return currentProposal;
 	}
 }

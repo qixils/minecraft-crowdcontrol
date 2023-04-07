@@ -23,7 +23,8 @@
     "GameRendererAccessor",
     "GameRendererMixin",
     "KeyboardInputMixin",
-    "ProposalMixin"
+    "ProposalMixin",
+    "RenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

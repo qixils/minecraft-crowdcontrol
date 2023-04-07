@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import net.minecraft.class_8373;
 import net.minecraft.class_8471;
+import net.minecraft.util.math.MathHelper;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,16 +13,18 @@ public class ProposalVote {
 	public static final Duration MIN_DURATION = Duration.ofSeconds(20);
 	public static final Duration MAX_DURATION = Duration.ofSeconds(60);
 	private final Duration duration;
-	private final Instant endsAt;
+	public final UUID id;
+	public final Instant endsAt; // TODO: remove and instead just update ticks remaining so it pauses with the game?
 	private final ProposalHandler handler;
 	private final SortedMap<String, OptionWrapper> options = new TreeMap<>();
 	private final Map<String, String> votes = new HashMap<>();
 	private boolean closed = false;
 
 	public ProposalVote(ProposalHandler handler, UUID id, int streamProposalCount) {
+		this.id = id;
 		this.handler = handler;
 
-		class_8471.class_8474 vote = handler.getProposal(id);
+		class_8471.class_8474 vote = getProposal();
 		if (vote == null)
 			throw new IllegalArgumentException("Invalid proposal ID");
 
@@ -46,6 +49,7 @@ public class ProposalVote {
 	}
 
 	public void viewerVote(String userId, String vote) {
+		if (closed) return;
 		vote = vote.toUpperCase(Locale.ENGLISH).split(" ")[0];
 		if (options.containsKey(vote))
 			votes.put(userId, vote);
@@ -85,7 +89,11 @@ public class ProposalVote {
 	public void voteForWinner() {
 		if (closed) return;
 		closed = true;
-		handler.plugin.player().ifPresent(player -> player.networkHandler.method_51006(getWinner().id(), (i, optional) -> {}));
+		try {
+			// TODO: vote multiple times (if possible)?
+			// TODO: bypass resources?
+			handler.plugin.player().ifPresent(player -> player.networkHandler.method_51006(getWinner().id(), (i, optional) -> {}));
+		} catch (Exception ignored) {}
 		handler.executor.schedule(handler::startNextProposal, 10, TimeUnit.SECONDS);
 	}
 
@@ -98,6 +106,14 @@ public class ProposalVote {
 	}
 
 	public double getRemainingTimePercentage() {
-		return getRemainingTime().toMillis() / (double) duration.toMillis();
+		return MathHelper.clamp(getRemainingTime().toMillis() / (double) duration.toMillis(), 0, 1);
+	}
+
+	public class_8471.class_8474 getProposal() {
+		return handler.getProposal(id);
+	}
+
+	public SortedMap<String, OptionWrapper> getOptions() {
+		return Collections.unmodifiableSortedMap(options);
 	}
 }
