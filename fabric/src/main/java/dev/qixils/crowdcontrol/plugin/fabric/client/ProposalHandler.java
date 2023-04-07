@@ -91,13 +91,14 @@ public final class ProposalHandler {
 			return;
 		Map<UUID, class_8471.class_8474> proposals = new HashMap<>();
 		storage.method_51072((id, proposal) -> proposals.put(id, getProposal(id)));
-		proposals.entrySet()
+		currentProposal = proposals.entrySet()
 				.stream()
 				.filter(entry -> canVote(player, entry.getKey()))
 				.map(entry -> Map.entry(entry.getKey(), getRemainingTimeFor(entry.getValue())))
 				.min(Map.Entry.comparingByValue())
 				.map(Map.Entry::getKey)
-				.ifPresent(proposal -> currentProposal = new ProposalVote(this, proposal, proposalCount++));
+				.map(proposal -> new ProposalVote(this, proposal, proposalCount++))
+				.orElse(null);
 	}
 
 	public @Nullable ProposalVote getCurrentProposal() {

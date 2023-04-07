@@ -87,7 +87,7 @@ public class ProposalVote {
 	}
 
 	public void voteForWinner() {
-		if (closed) return;
+		if (isClosed()) return;
 		closed = true;
 		try {
 			// TODO: vote multiple times (if possible)?
@@ -98,7 +98,7 @@ public class ProposalVote {
 	}
 
 	public boolean isClosed() {
-		return closed;
+		return closed || getProposal() == null;
 	}
 
 	public Duration getRemainingTime() {
