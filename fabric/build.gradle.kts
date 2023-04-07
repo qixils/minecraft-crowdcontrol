@@ -7,6 +7,7 @@ val cloudVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformFabricVersion: String by project
 val cardinalComponentsVersion: String by project
+val twitch4jVersion: String by project
 
 val isMinecraftRelease = Regex("^\\d+\\.\\d+\\.\\d+$").matches(minecraftVersion)
 
@@ -38,13 +39,14 @@ repositories {
 dependencies {
     shade(project(":configurate-common"))
     minecraft("com.mojang:minecraft:$minecraftVersion")
-    mappings("net.fabricmc:yarn:$yarnVersion")
+    mappings("net.fabricmc:yarn:$minecraftVersion+build.$yarnVersion")
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion+$minecraftVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
     modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
     modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
     modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
+    shade("com.github.twitch4j:twitch4j-chat:$twitch4jVersion")
 
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")

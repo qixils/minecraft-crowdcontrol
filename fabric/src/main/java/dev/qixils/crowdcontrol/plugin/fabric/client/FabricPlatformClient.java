@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 public final class FabricPlatformClient implements ClientModInitializer {
 	private final Logger logger = LoggerFactory.getLogger(FabricPlatformClient.class);
 	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	public final ProposalHandler proposalHandler = new ProposalHandler(this);
 	private static @Nullable FabricPlatformClient INSTANCE = null;
 	public static boolean SHADER_ACTIVE = false;
 	private MinecraftClient client = null;
@@ -86,7 +87,11 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		}
 	}
 
+	public @NotNull Optional<MinecraftClient> client() {
+		return Optional.ofNullable(client);
+	}
+
 	public @NotNull Optional<ClientPlayerEntity> player() {
-		return Optional.ofNullable(client).map(minecraft -> minecraft.player);
+		return client().map(minecraft -> minecraft.player);
 	}
 }

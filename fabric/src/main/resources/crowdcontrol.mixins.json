@@ -18,10 +18,12 @@
     "TickMixin"
   ],
   "client": [
+    "CommandListenerMixin",
     "EffectInstanceMixin",
     "GameRendererAccessor",
     "GameRendererMixin",
-    "KeyboardInputMixin"
+    "KeyboardInputMixin",
+    "ProposalMixin"
   ],
   "injectors": {
     "defaultRequire": 1
