@@ -45,10 +45,6 @@ public class ProposalHud extends DrawableHelper {
 		return Text.literal(ceil(votes / (float) totalVotes * 100f) + "% (" + votes + ")");
 	}
 
-	private static int widthOfOption(TextRenderer renderer, String voteCommand, OptionWrapper option, int votes, int totalVotes) {
-		return renderer.getWidth(optionText(voteCommand, option)) + PERCENT_PADDING + renderer.getWidth(optionVotesText(votes, totalVotes));
-	}
-
 	public void render(MatrixStack matrixStack, TextRenderer textRenderer) {
 		ProposalVote vote = handler.getCurrentProposal();
 		if (vote == null)
@@ -66,8 +62,8 @@ public class ProposalHud extends DrawableHelper {
 		if (secondsLeft > 0)
 			proposalText.append(" (" + secondsLeft + "s)");
 		int maxOptionWidth = vote.getOptions().entrySet().stream()
-				.mapToInt(entry -> widthOfOption(textRenderer, entry.getKey(), entry.getValue(), votes.getOrDefault(entry.getKey(), 0), totalVotes))
-				.max().orElse(0);
+				.mapToInt(entry -> textRenderer.getWidth(optionText(entry.getKey(), entry.getValue())))
+				.max().orElse(0) + PERCENT_PADDING + textRenderer.getWidth(optionVotesText(totalVotes, totalVotes));
 		int maxWidth = Math.max(ceil(textRenderer.getWidth(proposalText) * HEADER_TEXT_SCALE), ceil(maxOptionWidth * BODY_TEXT_SCALE));
 		int height = (PADDING*2) + ceil((TEXT_SIZE + BAR_HEIGHT) * HEADER_TEXT_SCALE) + TEXT_MARGIN + ceil((TEXT_SIZE + BAR_HEIGHT + TEXT_MARGIN) * vote.getOptions().size() * BODY_TEXT_SCALE) - 2;
 		fill(matrixStack, 0, 0, maxWidth + (PADDING*2), height, BACKGROUND_COLOR);
