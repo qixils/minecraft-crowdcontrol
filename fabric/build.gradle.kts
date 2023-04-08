@@ -81,8 +81,9 @@ java {
 // configure loom
 loom {
     mixin {
-        defaultRefmapName.set("crowd-control-refmap.json")
+        defaultRefmapName.set("crowdcontrol-refmap.json")
     }
+    accessWidenerPath.set(file("src/main/resources/crowdcontrol.accesswidener"))
 }
 
 // configure shadowJar

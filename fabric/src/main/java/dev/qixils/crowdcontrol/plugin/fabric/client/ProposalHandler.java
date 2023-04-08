@@ -13,8 +13,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: prevent streamer from voting themselves in the vanilla UI
-
 public final class ProposalHandler {
 	public final FabricPlatformClient plugin;
 	public final ProposalHud overlay = new ProposalHud(this);
@@ -39,6 +37,10 @@ public final class ProposalHandler {
 
 	public void leaveChannel(String channel) {
 		twitchChat.leaveChannel(channel);
+	}
+
+	public boolean isActive() {
+		return !twitchChat.getChannels().isEmpty();
 	}
 
 	public class_8471 getProposalStorage() {

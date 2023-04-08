@@ -25,6 +25,7 @@
     "GameRendererMixin",
     "KeyboardInputMixin",
     "ProposalMixin",
+    "ProposalScreenMixin",
     "RenderMixin"
   ],
   "injectors": {

@@ -30,6 +30,7 @@
   "mixins": [
     "crowdcontrol.mixins.json"
   ],
+  "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
     "fabricloader": "*",
     "fabric": "*",

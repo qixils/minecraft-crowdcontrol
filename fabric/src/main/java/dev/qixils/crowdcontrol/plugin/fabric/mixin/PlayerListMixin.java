@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerManager.class)
 public class PlayerListMixin {
-	@Inject(method = "onPlayerConnect", at = @At(value = "TAIL"))
+	@Inject(method = "onPlayerConnect", at = @At(value = "RETURN"))
 	private void impl$onInitPlayer_join(final ClientConnection networkManager, final ServerPlayerEntity mcPlayer, final CallbackInfo ci) {
 		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
 		FabricCrowdControlPlugin.getInstance().getEventManager().fire(new Join(mcPlayer));

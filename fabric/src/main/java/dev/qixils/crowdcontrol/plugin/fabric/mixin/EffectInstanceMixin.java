@@ -24,7 +24,7 @@ public abstract class EffectInstanceMixin implements EffectShaderProgram, AutoCl
 		uniform.upload();
 	}
 
-	@Inject(method = "enable", at = @At("TAIL"))
+	@Inject(method = "enable", at = @At("RETURN"))
 	private void onApply(CallbackInfo ci) {
 		// setting uniforms marks the shader as dirty
 		// this reverses that

@@ -21,7 +21,7 @@ public abstract class RenderMixin extends DrawableHelper {
 	@Shadow
 	public abstract TextRenderer getTextRenderer();
 
-	@Inject(method = "render", at = @At("TAIL"))
+	@Inject(method = "render", at = @At("RETURN"))
 	private void render(MatrixStack matrixStack, float partialTick, CallbackInfo info) {
 		if (client.options.hudHidden) return;
 		if (client.options.debugEnabled) return;

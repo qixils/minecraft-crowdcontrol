@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Mixin(class_8471.class)
 public class ProposalMixin {
-	@Inject(method = "method_51071", at = @At("TAIL"))
+	@Inject(method = "method_51071", at = @At("RETURN"))
 	public void onRegisterProposal(UUID id, class_8367 proposal, CallbackInfo info) {
 		if (!FabricCrowdControlPlugin.CLIENT_INITIALIZED) return;
 		FabricPlatformClient.get().proposalHandler.startNextProposal();
