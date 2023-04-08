@@ -7,7 +7,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,16 +30,26 @@ public class ProposalHud extends DrawableHelper {
 	private static final int VOTE_BAR_COLOR = NamedTextColor.YELLOW.value() | 0xFF000000;
 	private static final int BAR_HEIGHT = 2;
 	private static final int BAR_MIN_WIDTH = 10;
+	private static final int PERCENT_PADDING = 6;
+	private static final int PERCENT_COLOR = NamedTextColor.GRAY.value();
 
 	public ProposalHud(ProposalHandler handler) {
 		this.handler = handler;
 	}
 
-	private Text optionText(String voteCommand, OptionWrapper option) {
+	private static Text optionText(String voteCommand, OptionWrapper option) {
 		return Text.translatable("options.generic_value", voteCommand, option.data().comp_1359());
 	}
 
-	public void render(MatrixStack matrixStack, TextRenderer textRenderer, float partialTick) {
+	private static Text optionVotesText(int votes, int totalVotes) {
+		return Text.literal(ceil(votes / (float) totalVotes * 100f) + "% (" + votes + ")");
+	}
+
+	private static int widthOfOption(TextRenderer renderer, String voteCommand, OptionWrapper option, int votes, int totalVotes) {
+		return renderer.getWidth(optionText(voteCommand, option)) + PERCENT_PADDING + renderer.getWidth(optionVotesText(votes, totalVotes));
+	}
+
+	public void render(MatrixStack matrixStack, TextRenderer textRenderer) {
 		ProposalVote vote = handler.getCurrentProposal();
 		if (vote == null)
 			return;
@@ -48,6 +57,8 @@ public class ProposalHud extends DrawableHelper {
 		if (proposal == null)
 			return;
 		int secondsLeft = Math.max(ceil(vote.getRemainingTicks() / 20f), 0);
+		Map<String, Integer> votes = new HashMap<>(vote.voteCounts());
+		int totalVotes = Math.max(1, votes.values().stream().mapToInt(Integer::intValue).sum());
 		matrixStack.push();
 		matrixStack.translate(MARGIN, MARGIN, 0);
 		// render background ...
@@ -55,8 +66,7 @@ public class ProposalHud extends DrawableHelper {
 		if (secondsLeft > 0)
 			proposalText.append(" (" + secondsLeft + "s)");
 		int maxOptionWidth = vote.getOptions().entrySet().stream()
-				.map(entry -> optionText(entry.getKey(), entry.getValue()))
-				.mapToInt(textRenderer::getWidth)
+				.mapToInt(entry -> widthOfOption(textRenderer, entry.getKey(), entry.getValue(), votes.getOrDefault(entry.getKey(), 0), totalVotes))
 				.max().orElse(0);
 		int maxWidth = Math.max(ceil(textRenderer.getWidth(proposalText) * HEADER_TEXT_SCALE), ceil(maxOptionWidth * BODY_TEXT_SCALE));
 		int height = (PADDING*2) + ceil((TEXT_SIZE + BAR_HEIGHT) * HEADER_TEXT_SCALE) + TEXT_MARGIN + ceil((TEXT_SIZE + BAR_HEIGHT + TEXT_MARGIN) * vote.getOptions().size() * BODY_TEXT_SCALE) - 2;
@@ -77,17 +87,18 @@ public class ProposalHud extends DrawableHelper {
 		matrixStack.push();
 		matrixStack.translate(MARGIN + PADDING, MARGIN + PADDING + ((TEXT_SIZE + BAR_HEIGHT) * HEADER_TEXT_SCALE) + TEXT_MARGIN, 0);
 		matrixStack.scale(BODY_TEXT_SCALE, BODY_TEXT_SCALE, 1);
-		Map<String, Integer> votes = new HashMap<>(vote.voteCounts());
-		int totalVotes = Math.max(1, votes.values().stream().mapToInt(Integer::intValue).sum());
 		String winnerKey = vote.isClosed() ? vote.getWinnerKey() : null;
 		for (Map.Entry<String, OptionWrapper> entry : vote.getOptions().entrySet()) {
 			String voteCommand = entry.getKey();
 			OptionWrapper option = entry.getValue();
+			int votesForOption = votes.getOrDefault(voteCommand, 0);
 			// draw text
 			textRenderer.drawWithShadow(matrixStack, optionText(voteCommand, option), 0, 0, Objects.equals(winnerKey, voteCommand) ? WINNING_TEXT_COLOR : TEXT_COLOR);
+			Text optionVotesText = optionVotesText(votesForOption, totalVotes);
+			textRenderer.drawWithShadow(matrixStack, optionVotesText, ceil((maxWidth - textRenderer.getWidth(optionVotesText)) / BODY_TEXT_SCALE), 0, PERCENT_COLOR);
 			matrixStack.translate(0, TEXT_SIZE, 0);
 			// draw bar
-			int barWidth = BAR_MIN_WIDTH + MathHelper.ceil((maxWidth - BAR_MIN_WIDTH) * (votes.getOrDefault(voteCommand, 0) / (float) totalVotes));
+			int barWidth = BAR_MIN_WIDTH + ceil(((maxWidth / BODY_TEXT_SCALE) - BAR_MIN_WIDTH) * (votesForOption / (float) totalVotes));
 			fill(matrixStack, 0, 0, barWidth, BAR_HEIGHT, VOTE_BAR_COLOR);
 			// translate
 			matrixStack.translate(0, BAR_HEIGHT + TEXT_MARGIN, 0);

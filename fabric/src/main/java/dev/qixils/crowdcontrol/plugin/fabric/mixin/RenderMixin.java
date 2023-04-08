@@ -26,6 +26,6 @@ public abstract class RenderMixin extends DrawableHelper {
 		if (client.options.hudHidden) return;
 		if (client.options.debugEnabled) return;
 		if (!FabricCrowdControlPlugin.CLIENT_INITIALIZED) return;
-		FabricPlatformClient.get().proposalHandler.overlay.render(matrixStack, getTextRenderer(), partialTick);
+		FabricPlatformClient.get().proposalHandler.overlay.render(matrixStack, getTextRenderer());
 	}
 }
