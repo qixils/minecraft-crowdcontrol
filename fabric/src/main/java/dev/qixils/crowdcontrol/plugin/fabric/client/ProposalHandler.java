@@ -9,10 +9,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 // TODO: prevent streamer from voting themselves in the vanilla UI
 
@@ -20,7 +19,6 @@ public final class ProposalHandler {
 	public final FabricPlatformClient plugin;
 	public final ProposalHud overlay = new ProposalHud(this);
 	private final TwitchChat twitchChat;
-	public final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	private ProposalVote currentProposal = null;
 	private int proposalCount = 0; // internal count of how many proposals have been voted on; used to alternate inputs
 	public int proposalCooldown = 0; // cooldown in ticks before the next proposal can be started
@@ -111,5 +109,14 @@ public final class ProposalHandler {
 			currentProposal.tick();
 		else if (--proposalCooldown <= 0)
 			startNextProposal();
+	}
+
+	public void reset() {
+		if (currentProposal != null)
+			currentProposal.close();
+		currentProposal = null;
+		proposalCooldown = 0;
+		proposalCount = 0;
+		new HashSet<>(twitchChat.getChannels()).forEach(this::leaveChannel);
 	}
 }

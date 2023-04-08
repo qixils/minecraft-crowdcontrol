@@ -100,6 +100,11 @@ public class ProposalVote {
 		} catch (Exception ignored) {}
 	}
 
+	public void close() {
+		// force close
+		closed = true;
+	}
+
 	public boolean isClosed() {
 		return closed || getProposal() == null;
 	}
