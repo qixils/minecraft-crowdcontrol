@@ -2,6 +2,8 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import net.minecraft.class_8373;
 import net.minecraft.class_8471;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 
 import java.time.Duration;
@@ -43,6 +45,11 @@ public class ProposalVote {
 			duration = MAX_DURATION;
 		this.originalDuration = duration;
 		this.ticksLeft = duration;
+
+		// play sound effect
+		FabricPlatformClient.getOptional()
+				.flatMap(FabricPlatformClient::player)
+				.ifPresent(player -> player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.comp_349(), SoundCategory.MASTER, /*volume:*/ 1.2f, /*pitch:*/ 1.2f));
 	}
 
 	public void tick() {

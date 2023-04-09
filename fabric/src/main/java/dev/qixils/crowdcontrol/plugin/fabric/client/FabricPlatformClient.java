@@ -32,6 +32,10 @@ public final class FabricPlatformClient implements ClientModInitializer {
 	public static boolean SHADER_ACTIVE = false;
 	private MinecraftClient client = null;
 
+	public FabricPlatformClient() {
+		INSTANCE = this;
+	}
+
 	/**
 	 * Fetches the initialized client.
 	 * <p>
@@ -49,9 +53,17 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		return INSTANCE;
 	}
 
+	/**
+	 * Fetches the initialized client.
+	 *
+	 * @return the loaded client, or {@link Optional#empty()} if the client is uninitialized
+	 */
+	public static @NotNull Optional<FabricPlatformClient> getOptional() {
+		return Optional.ofNullable(INSTANCE);
+	}
+
 	@Override
 	public void onInitializeClient() {
-		INSTANCE = this;
 		FabricCrowdControlPlugin.CLIENT_INITIALIZED = true;
 		ClientLifecycleEvents.CLIENT_STARTED.register(this::setClient);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
