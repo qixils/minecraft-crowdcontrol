@@ -61,7 +61,7 @@ public final class ProposalHandler {
 	public boolean canVote(UUID player, class_8471.class_8474 proposal) {
 		if (proposal == null)
 			return false;
-		if (!proposal.method_51080(player).method_51075()) // TODO: skip if any votes have been cast
+		if (proposal.method_51080(player).comp_1453() > 0)
 			return false;
 		return getRemainingTimeFor(proposal) > ProposalVote.MIN_DURATION;
 	}
