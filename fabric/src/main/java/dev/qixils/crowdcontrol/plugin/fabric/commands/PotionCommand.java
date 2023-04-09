@@ -57,6 +57,19 @@ public class PotionCommand extends TimedImmediateCommand {
 					.message("Cannot apply jump boost while Disable Jump is active");
 		}
 
+		boolean viable = false;
+		StatusEffectInstance dummyEffect = new StatusEffectInstance(potionEffectType);
+		for (ServerPlayerEntity player : players) {
+			if (player.canHaveStatusEffect(dummyEffect)) {
+				viable = true;
+				break;
+			}
+		}
+		if (!viable)
+			return request.buildResponse()
+					.type(ResultType.FAILURE)
+					.message("Cannot apply potion effect to any players");
+
 		int durationTicks = isMinimal ? 1 : (int) getDuration(request).getSeconds() * 20;
 
 		sync(() -> {
