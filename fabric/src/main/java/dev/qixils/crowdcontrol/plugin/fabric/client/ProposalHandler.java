@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
+// TODO: auto end proposals once all online players have voted
+
 public final class ProposalHandler {
 	public final FabricPlatformClient plugin;
 	public final ProposalHud overlay = new ProposalHud(this);
