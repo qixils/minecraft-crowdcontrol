@@ -63,6 +63,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEnti
 	public static Identifier VERSION_REQUEST_ID = new Identifier("crowdcontrol", "version-request");
 	public static Identifier VERSION_RESPONSE_ID = new Identifier("crowdcontrol", "version-response");
 	public static Identifier SHADER_ID = new Identifier("crowdcontrol", "shader");
+	public static Identifier VOTED_ID = new Identifier("crowdcontrol", "voted"); // indicates when a crowd control client has finished voting on a proposal
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -95,6 +96,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEnti
 	@MonotonicNonNull
 	private HoconConfigurationLoader configLoader;
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
+	public final Map<UUID, Set<UUID>> playerVotes = new HashMap<>(); // map of proposal UUIDs to a set of player UUIDs who voted on it
 
 	public FabricCrowdControlPlugin() {
 		super(ServerPlayerEntity.class, ServerCommandSource.class);
@@ -114,6 +116,16 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEnti
 			getSLF4JLogger().debug("Received version response from client!");
 			clientVersions.put(player.getUuid(), new SemVer(buf.readString(32)));
 			updateConditionalEffectVisibility(crowdControl);
+		});
+		ServerPlayNetworking.registerGlobalReceiver(VOTED_ID, (server, player, handler, buf, responseSender) -> {
+			getSLF4JLogger().debug("Client finished voting on proposal");
+			if (server == null) return;
+			UUID id = buf.readUuid();
+			playerVotes.computeIfAbsent(id, uuid -> new HashSet<>()).add(player.getUuid());
+			if (playerVotes.get(id).containsAll(server.getPlayerManager().getPlayerList().stream().map(ServerPlayerEntity::getUuid).toList())) {
+				server.method_51113(id, true);
+				playerVotes.remove(id); // TODO: move to mixin
+			}
 		});
 	}
 

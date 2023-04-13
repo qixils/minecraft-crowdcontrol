@@ -1,7 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
+import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.class_8373;
 import net.minecraft.class_8471;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
@@ -101,9 +105,39 @@ public class ProposalVote {
 		closed = true;
 		handler.proposalCooldown = COOLDOWN;
 		try {
-			// TODO: vote multiple times (if possible)?
-			// TODO: bypass resources?
-			handler.plugin.player().ifPresent(player -> player.networkHandler.method_51006(getWinner().id(), (i, optional) -> {}));
+			handler.plugin.player().ifPresent(player -> {
+				var proposal = getProposal();
+				int voteLimit = Math.min(
+						// total limit of votes
+						proposal.method_51080(player.getUuid()).comp_1454().orElse(1),
+						// limit of votes per option
+						options.values().stream()
+								.mapToInt(option -> proposal.method_51081(player.getUuid(), option.id()).comp_1454().orElse(1))
+								.min().orElse(1)
+				);
+				var viewerVotes = voteCounts();
+				int totalViewerVotes = viewerVotes.values().stream().mapToInt(Integer::intValue).sum();
+				// distribute votes proportionally to viewer votes
+				int votesUsed = 0;
+				voteloop: {
+					for (Map.Entry<String, Integer> entry : viewerVotes.entrySet()) {
+						String key = entry.getKey();
+						int count = entry.getValue();
+						int votes = (int) Math.round(count / (double) totalViewerVotes * voteLimit); // TODO: tie strategy
+						for (int i = 0; i < votes; i++) {
+							// TODO: bypass resources?
+							player.networkHandler.method_51006(options.get(key).id(), (j, optional) -> {});
+							if (++votesUsed >= voteLimit)
+								break voteloop;
+						}
+					}
+				}
+
+				// tell server voting is done
+				PacketByteBuf buf = PacketByteBufs.create();
+				buf.writeUuid(id);
+				ClientPlayNetworking.send(FabricCrowdControlPlugin.VOTED_ID, buf);
+			});
 		} catch (Exception ignored) {}
 	}
 
