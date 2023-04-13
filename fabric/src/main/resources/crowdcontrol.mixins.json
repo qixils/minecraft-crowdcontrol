@@ -15,7 +15,8 @@
     "RecipeBookAccessor",
     "ResultSlotMixin",
     "ServerPlayerMixin",
-    "TickMixin"
+    "TickMixin",
+    "VotingCostMixin"
   ],
   "client": [
     "ClientTickMixin",

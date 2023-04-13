@@ -82,7 +82,7 @@ public class ProposalVote {
 		return votes.size();
 	}
 
-	public String getWinnerKey() {
+	public String getTopOptionKey() {
 		int max = 0;
 		String maxKey = options.lastKey(); // 'Do nothing'
 		for (Map.Entry<String, Integer> entry : voteCounts().entrySet()) {
@@ -96,8 +96,8 @@ public class ProposalVote {
 		return maxKey;
 	}
 
-	public OptionWrapper getWinner() {
-		return options.get(getWinnerKey());
+	public OptionWrapper getTopOption() {
+		return options.get(getTopOptionKey());
 	}
 
 	public void voteForWinner() {
@@ -125,7 +125,6 @@ public class ProposalVote {
 						int count = entry.getValue();
 						int votes = (int) Math.round(count / (double) totalViewerVotes * voteLimit); // TODO: tie strategy
 						for (int i = 0; i < votes; i++) {
-							// TODO: bypass resources?
 							player.networkHandler.method_51006(options.get(key).id(), (j, optional) -> {});
 							if (++votesUsed >= voteLimit)
 								break voteloop;

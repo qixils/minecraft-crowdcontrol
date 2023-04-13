@@ -83,7 +83,7 @@ public class ProposalHud extends DrawableHelper {
 		matrixStack.push();
 		matrixStack.translate(MARGIN + PADDING, MARGIN + PADDING + ((TEXT_SIZE + BAR_HEIGHT) * HEADER_TEXT_SCALE) + TEXT_MARGIN, 0);
 		matrixStack.scale(BODY_TEXT_SCALE, BODY_TEXT_SCALE, 1);
-		String winnerKey = vote.isClosed() ? vote.getWinnerKey() : null;
+		String winnerKey = vote.isClosed() ? vote.getTopOptionKey() : null;
 		for (Map.Entry<String, OptionWrapper> entry : vote.getOptions().entrySet()) {
 			String voteCommand = entry.getKey();
 			OptionWrapper option = entry.getValue();
