@@ -4,6 +4,8 @@ The following steps are for streamers who are connecting to another individual's
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
 2. In the **Game Selection** tab, select **Minecraft (Fabric) (PC)**.
+    - If you do not see this option, you can use **Minecraft (Paper Server) (PC)** instead while we
+      work on rolling out this new version.
 3. Click **Start**. A pop-up menu will appear prompting you for information that you should have
    received from your server administrator.
     - In the host field, you should enter an IP address or a website URL. This will usually be the

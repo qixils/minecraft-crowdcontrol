@@ -1,4 +1,4 @@
-## Fabric 23w13a_or_b Client Installation
+## Fabric 23w13a_or_b: Client Installation
 
 The following steps detail how to manually install Crowd Control for Minecraft Fabric 23w13a_or_b
 (the Vote Update).

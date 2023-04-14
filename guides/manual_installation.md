@@ -1,4 +1,4 @@
-## Fabric 23w13a_or_b Manual Installation
+## Fabric 23w13a_or_b: Manual Installation
 
 The following steps detail how to manually set up a Minecraft Fabric 23w13a_or_b (the Vote Update)
 server with Crowd Control.
