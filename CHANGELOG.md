@@ -71,32 +71,6 @@ for Unicode in viewer usernames.
 
 Added support for Paper 1.18.2.
 
-## 3.2.5
-
-Fixed a harmless error for Paper 1.19.3.
-
-## 3.2.4
-
-[java-crowd-control](https://github.com/qixils/java-crowd-control/releases) has been updated to
-[v3.5.1](https://github.com/qixils/java-crowd-control/releases/tag/v3.5.1) which introduces support
-for Unicode in viewer usernames.
-
-## 3.2.3
-
-- UUIDs listed in the `hosts` config option now count as Crowd Control administrators
-- A new config option called `admin-required` has been added which restricts usage of the `/account`
-  command to CC admins (defaults to `false`)
-- All the "Summon Minecart with XYZ" effects have been fixed
-- The plugin will now load even if errors are encountered while registering effects
-- [java-crowd-control](https://github.com/qixils/java-crowd-control/releases) has been updated to
-  [v3.4.0](https://github.com/qixils/java-crowd-control/releases/tag/v3.4.0) which accounts for
-  breaking changes introduced by an upcoming Crowd Control update
-- Fixed a harmless error for Paper 1.19.0
-
-## 3.2.2
-
-Added support for Paper 1.18.2.
-
 ## 3.2.1
 
 The `/account` command is no longer case-sensitive.
