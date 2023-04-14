@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
 
 @Getter
-public final class RemoveEntityCommand extends Command {
+public final class RemoveEntityCommand extends Command implements EntityCommand {
 	private final EntityType entityType;
 	private final String effectName;
 	private final Component displayName;

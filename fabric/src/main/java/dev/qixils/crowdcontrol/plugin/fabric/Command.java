@@ -45,7 +45,6 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 		};
 	}
 
-	@SuppressWarnings("ConstantValue") // overworld can indeed be null early in initialization
 	@Override
 	public TriState isVisible() {
 		if (this instanceof FeatureElement element)

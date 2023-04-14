@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
@@ -84,6 +85,7 @@ public class LootboxCommand extends ImmediateCommand {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<Material> items = new ArrayList<>(ITEMS);
+		items.removeIf(item -> PaperCrowdControlPlugin.isDisabled(CraftMagicNumbers.getItem(item)));
 		Collections.shuffle(items, random);
 		Material item = null;
 		for (int i = 0; i <= luck * 5; i++) {

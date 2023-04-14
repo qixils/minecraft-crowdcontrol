@@ -15,11 +15,13 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.world.flag.FeatureElement;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -264,6 +266,14 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
 		return new PaperPlayer(player);
+	}
+
+	public static boolean isEnabled(FeatureElement feature) {
+		return feature.isEnabled(((CraftServer) Bukkit.getServer()).getServer().getWorldData().enabledFeatures());
+	}
+
+	public static boolean isDisabled(FeatureElement feature) {
+		return !isEnabled(feature);
 	}
 
 	// boilerplate stuff for the data container storage

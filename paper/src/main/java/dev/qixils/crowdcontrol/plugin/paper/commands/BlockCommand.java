@@ -6,9 +6,12 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.minecraft.world.flag.FeatureElement;
+import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +21,7 @@ import java.util.List;
 // TODO: prevent placing fire on non flammable blocks
 
 @Getter
-public class BlockCommand extends ImmediateCommand {
+public class BlockCommand extends ImmediateCommand implements FeatureElement {
 	protected final Material material;
 	private final String effectName;
 	private final Component displayName;
@@ -37,6 +40,11 @@ public class BlockCommand extends ImmediateCommand {
 		this.material = block;
 		this.effectName = effectName;
 		this.displayName = displayName;
+	}
+
+	@Override
+	public @NotNull FeatureFlagSet requiredFeatures() {
+		return CraftMagicNumbers.getBlock(material).requiredFeatures();
 	}
 
 	@Nullable

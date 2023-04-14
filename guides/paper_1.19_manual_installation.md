@@ -2,12 +2,6 @@
 
 The following steps detail how to manually set up a Minecraft 1.19.4 server with Crowd Control.
 
-> **Warning**  
-> Minecraft 1.19.4 made some breaking changes which are causing some adverse effects on the plugin.
-> For example, the Lootbox effect can now sometimes give unusable items from future versions of the
-> game. A fix for this is in the works, pending some updates from the Paper team, but in the mean
-> time we suggest either using the Fabric version of the mod or downgrading to Minecraft 1.19.3.
-
 1. Download and install [the latest version of Java](https://adoptium.net/).
    Java 17 or later is required.
 2. Download the latest version of [Paper 1.19.4](https://papermc.io/downloads). Spigot is not

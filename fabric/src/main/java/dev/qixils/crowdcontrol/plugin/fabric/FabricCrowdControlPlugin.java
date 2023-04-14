@@ -30,7 +30,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.flag.FeatureElement;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -249,12 +248,9 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		return sender.getPlayer();
 	}
 
-	@SuppressWarnings("ConstantValue") // overworld can be null
 	public boolean isEnabled(FeatureElement feature) {
 		if (server == null) return false;
-		ServerLevel overworld = server.overworld();
-		if (overworld == null) return false;
-		return feature.isEnabled(overworld.enabledFeatures());
+		return feature.isEnabled(server.getWorldData().enabledFeatures());
 	}
 
 	public boolean isDisabled(FeatureElement feature) {

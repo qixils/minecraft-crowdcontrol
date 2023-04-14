@@ -28,7 +28,7 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
 
 @Getter
-public class SummonEntityCommand extends Command {
+public class SummonEntityCommand extends Command implements EntityCommand {
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
 	private static final Set<Material> BLOCKS;

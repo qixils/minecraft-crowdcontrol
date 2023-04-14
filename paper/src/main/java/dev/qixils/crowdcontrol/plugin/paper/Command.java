@@ -1,7 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import lombok.Getter;
+import net.minecraft.world.flag.FeatureElement;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -21,5 +23,12 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 	@Override
 	public boolean isEventListener() {
 		return this instanceof Listener;
+	}
+
+	@Override
+	public TriState isVisible() {
+		if (this instanceof FeatureElement element)
+			return TriState.fromBoolean(PaperCrowdControlPlugin.isEnabled(element));
+		return TriState.UNKNOWN; // avoid sending any packet
 	}
 }
