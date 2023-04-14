@@ -11,8 +11,8 @@ The following steps are for streamers who are connecting to another individual's
     - In the password field, you must enter a secret passphrase provided to you by the server
       administrator. The default password is `crowdcontrol`.
 4. (Optional) For the best experience, you should install the mod yourself using the
-   [**Client Installation**](fabric_1.19_client_installation.md) guide.
-5. Join the Minecraft server in your Minecraft 1.19.3 client using the same IP address that you
+   [**Client Installation**](client_installation.md) guide.
+5. Join the Minecraft server in your Minecraft 23w13a_or_b client using the same IP address that you
    entered into the host field.
 6. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
    receive effects that viewers purchase for you. Example: `/account link jaku`
