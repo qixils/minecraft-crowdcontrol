@@ -1,12 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.plugin.paper.FeatureElementCommand;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.world.flag.FeatureElement;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +21,7 @@ import java.util.List;
 // TODO: prevent placing fire on non flammable blocks
 
 @Getter
-public class BlockCommand extends ImmediateCommand implements FeatureElement {
+public class BlockCommand extends ImmediateCommand implements FeatureElementCommand {
 	protected final Material material;
 	private final String effectName;
 	private final Component displayName;
