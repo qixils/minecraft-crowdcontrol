@@ -8,6 +8,8 @@ Updated the Fabric implementation to 23w13a_or_b, Minecraft's April Fools' Day u
 This special update to the mod allows your Twitch chat to take control of the new proposal system
 by typing in your stream chat what laws they want to see enacted!
 
+![A screenshot from a player in a taiga forest overlooking a river. In the top left is a HUD displaying a proposal for a chat to vote on. The option "Endermen Pick Up Anything" is winning with 100% of the vote over "Do Nothing."](https://user-images.githubusercontent.com/13265322/231916445-ecd2de5b-9f7f-4794-9b20-b7478dff54ce.png)
+
 Using Twitch chat integration is incredibly simple, as it's automatically started when you type
 `/account link TWITCH_USERNAME` in-game like you usually do to receive Crowd Control effects.
 The integration even works on servers that aren't running Crowd Control, although you should note
