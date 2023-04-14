@@ -2,7 +2,8 @@
 
 The following steps detail how to manually set up a Minecraft 1.18.2 server with Crowd Control.
 
-> **Note:** Crowd Control is no longer being updated for Paper 1.18.2. Please use the
+> **Warning**  
+> Crowd Control is no longer being updated for Paper 1.18.2. Please use the
 > [latest version of the game](paper_1.19_manual_installation.md) instead.
 
 1. Download and install [the latest version of Java](https://adoptium.net/).
@@ -13,7 +14,7 @@ The following steps detail how to manually set up a Minecraft 1.18.2 server with
    "root folder."
 4. Create a new folder named `plugins` inside the root folder.
 5. Download the
-   [Paper plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/tag/v3.2.5)
+   [Paper plugin jar](https://modrinth.com/mod/crowdcontrol/versions?l=paper&g=1.18.2)
    and place it in the `plugins` folder.
 6. Run the Minecraft server to initialize the plugin's configuration files. You will have to run it
    twice, as the first will prompt you to accept Minecraft's End User License Agreement by editing

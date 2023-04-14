@@ -13,7 +13,7 @@ The following steps provide a quick setup for running a local game server.
    `/password <password>` to change the password required to connect to the server. By default, the
    password is set to `crowdcontrol`.
 6. Once the Minecraft server has started, click **Start** in the Crowd Control app to connect to the
-   server. Enter in `localhost` as the host and the password you set (or `crowdcontrol` by default).
+   server. Enter in `localhost` as the host and `crowdcontrol` as the password.
 7. Open your Minecraft: Java Edition launcher (vanilla or custom is ok), select your 1.12.2-based
    modpack, and press Play.
 8. Open the Multiplayer menu, use the Add Server button with the IP `localhost` if you haven't

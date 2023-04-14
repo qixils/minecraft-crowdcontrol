@@ -16,7 +16,7 @@ The following steps detail how to manually install Crowd Control for Minecraft S
    and place it in the `mods` folder.
 8. Create a new folder inside the `mods` folder called `plugins`.
 9. Download the latest build of
-   [Crowd Control for Sponge 8](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+   [Crowd Control for Sponge 8](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.16.5)
    and place it in the `plugins` folder.
 10. Copy all the other Forge 1.16.5 mods that you want to play with into the `mods` folder.
 

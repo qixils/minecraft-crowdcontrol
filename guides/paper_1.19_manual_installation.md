@@ -1,16 +1,22 @@
 ## Paper 1.19 Manual Installation
 
-The following steps detail how to manually set up a Minecraft 1.19.3 server with Crowd Control.
+The following steps detail how to manually set up a Minecraft 1.19.4 server with Crowd Control.
+
+> **Warning**  
+> Minecraft 1.19.4 made some breaking changes which are causing some adverse effects on the plugin.
+> For example, the Lootbox effect can now sometimes give unusable items from future versions of the
+> game. A fix for this is in the works, pending some updates from the Paper team, but in the mean
+> time we suggest either using the Fabric version of the mod or downgrading to Minecraft 1.19.3.
 
 1. Download and install [the latest version of Java](https://adoptium.net/).
    Java 17 or later is required.
-2. Download the latest version of [Paper 1.19.3](https://papermc.io/downloads). Spigot is not
+2. Download the latest version of [Paper 1.19.4](https://papermc.io/downloads). Spigot is not
    supported.
 3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the
    "root folder."
 4. Create a new folder named `plugins` inside the root folder.
 5. Download
-   the [latest Paper plugin jar](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+   the [latest Paper plugin jar](https://modrinth.com/mod/crowdcontrol/versions?l=paper&g=1.19.4)
    and place it in the `plugins` folder.
 6. Run the Minecraft server to initialize the plugin's configuration files. You will have to run it
    twice, as the first will prompt you to accept Minecraft's End User License Agreement by editing

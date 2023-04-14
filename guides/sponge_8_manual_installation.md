@@ -16,7 +16,7 @@ with Crowd Control.
    for API v8 and place it in the `mods` folder.
 6. Create a new `plugins` folder inside the `mods` folder.
 7. Download the
-   [latest build of Crowd Control for Sponge 8](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+   [latest build of Crowd Control for Sponge 8](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.16.5)
    and place it in the `plugins` folder.
 8. Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with into the
    `mods` folder and the `plugins` folder respectively.

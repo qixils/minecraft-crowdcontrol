@@ -4,6 +4,8 @@ The following steps are for streamers who are connecting to another individual's
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
 2. In the **Game Selection** tab, select **Minecraft (Fabric) (PC)**.
+    - If you do not see this option, you can use **Minecraft (Paper Server) (PC)** instead while we
+      work on rolling out this new version.
 3. Click **Start**. A pop-up menu will appear prompting you for information that you should have
    received from your server administrator.
     - In the host field, you should enter an IP address or a website URL. This will usually be the
@@ -12,7 +14,7 @@ The following steps are for streamers who are connecting to another individual's
       administrator. The default password is `crowdcontrol`.
 4. (Optional) For the best experience, you should install the mod yourself using the
    [**Client Installation**](fabric_1.19_client_installation.md) guide.
-5. Join the Minecraft server in your Minecraft 1.19.3 client using the same IP address that you
+5. Join the Minecraft server in your Minecraft 1.19.4 client using the same IP address that you
    entered into the host field.
 6. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
    receive effects that viewers purchase for you. Example: `/account link jaku`

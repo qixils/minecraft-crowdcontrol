@@ -16,7 +16,7 @@ setup.
     - In the host field, enter `localhost`.
     - In the password field, enter the default password `crowdcontrol` or a custom password if you
       set one.
-4. Join the Minecraft server in your Minecraft 1.19.3 client using the IP address `localhost`.
+4. Join the Minecraft server in your Minecraft 1.19.4 client using the IP address `localhost`.
 5. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
    receive effects that viewers purchase for you. Example: `/account link jaku`
 
@@ -32,7 +32,7 @@ The following steps are for streamers who are connecting to another individual's
       same as the IP address that you connect to in Minecraft.
     - In the password field, you must enter a secret passphrase provided to you by the server
       administrator. The default password is `crowdcontrol`.
-4. Join the Minecraft server in your Minecraft 1.19.3 client using the same IP address that you
+4. Join the Minecraft server in your Minecraft 1.19.4 client using the same IP address that you
    entered into the host field.
 5. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
    receive effects that viewers purchase for you. Example: `/account link jaku`

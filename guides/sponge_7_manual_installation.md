@@ -15,7 +15,7 @@ with Crowd Control.
    [SpongeForge 1.12.2](https://www.spongepowered.org/downloads/spongeforge?minecraft=1.12.2&offset=0)
    for API v7 and place it in the `mods` folder.
 6. Download the
-   [latest build of Crowd Control for Sponge 7](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+   [latest build of Crowd Control for Sponge 7](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.12.2)
    and place it in the `mods` folder.
 7. Copy all the other Forge 1.12.2 mods or Sponge 7 plugins that you want to play with into the
    `mods` folder.
