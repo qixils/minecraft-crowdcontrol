@@ -64,6 +64,15 @@ public final class LimitConfig {
 	}
 
 	/**
+	 * Gets the view of item limits.
+	 *
+	 * @return the view of item limits
+	 */
+	public @NotNull Map<String, Integer> itemLimits() {
+		return Collections.unmodifiableMap(itemLimits);
+	}
+
+	/**
 	 * Gets the limit on the given entity effect.
 	 *
 	 * @param entity the ID of the entity
@@ -71,6 +80,15 @@ public final class LimitConfig {
 	 */
 	public int getEntityLimit(@NotNull String entity) {
 		return entityLimits.getOrDefault(entity, entityDefaultLimit);
+	}
+
+	/**
+	 * Gets the view of entity limits.
+	 *
+	 * @return the view of entity limits
+	 */
+	public @NotNull Map<String, Integer> entityLimits() {
+		return Collections.unmodifiableMap(entityLimits);
 	}
 
 	@Override

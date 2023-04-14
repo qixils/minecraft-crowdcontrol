@@ -7,6 +7,8 @@ val cloudVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformFabricVersion: String by project
 val cardinalComponentsVersion: String by project
+val modMenuVersion: String by project
+val clothConfigVersion: String by project
 
 val isMinecraftRelease = Regex("^\\d+\\.\\d+\\.\\d+$").matches(minecraftVersion)
 
@@ -32,6 +34,14 @@ repositories {
         name = "Parchment"
         url = uri("https://maven.parchmentmc.org")
     }
+    maven {
+        name = "TerraformersMC"
+        url = uri("https://maven.terraformersmc.com")
+    }
+    maven {
+        name = "Shedaniel"
+        url = uri("https://maven.shedaniel.me")
+    }
 }
 
 dependencies {
@@ -47,9 +57,17 @@ dependencies {
     modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
     modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
     modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
+    modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
+    modImplementation("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
+        exclude(group = "net.fabricmc.fabric-api")
+    }
+
 
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
+    include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
+        exclude(group = "net.fabricmc.fabric-api")
+    }
 }
 
 tasks.processResources {

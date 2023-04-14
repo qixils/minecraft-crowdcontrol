@@ -14,6 +14,7 @@ import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
+import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Respondable;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -88,6 +89,11 @@ public interface Plugin<P, S> {
 			.build();
 
 	/**
+	 * The default name of a viewer.
+	 */
+	Component VIEWER_NAME = Component.translatable("cc.effect.viewer");
+
+	/**
 	 * The permission node required to use administrative commands.
 	 */
 	String ADMIN_PERMISSION = "crowdcontrol.admin";
@@ -96,6 +102,11 @@ public interface Plugin<P, S> {
 	 * Port that the {@link CrowdControl} service connects to or listen on.
 	 */
 	int DEFAULT_PORT = 58431;
+
+	/**
+	 * Default password that clients must enter to connect to the {@link CrowdControl} service.
+	 */
+	String DEFAULT_PASSWORD = "crowdcontrol";
 
 	/**
 	 * Formats the provided text as an error message.
@@ -514,6 +525,11 @@ public interface Plugin<P, S> {
 	}
 
 	/**
+	 * Loads the configuration file.
+	 */
+	void loadConfig();
+
+	/**
 	 * Fetches the config variable which determines if all requests should be treated as global.
 	 *
 	 * @return true if all requests should be treated as global
@@ -605,6 +621,13 @@ public interface Plugin<P, S> {
 	 */
 	@CheckReturnValue
 	boolean announceEffects();
+
+	/**
+	 * Sets whether to announce the execution of effects in chat.
+	 *
+	 * @param announceEffects true if the plugin should announce the execution of effects in chat
+	 */
+	void setAnnounceEffects(boolean announceEffects);
 
 	/**
 	 * Returns the plugin's text utility class.
@@ -829,14 +852,26 @@ public interface Plugin<P, S> {
 	/**
 	 * Gets the password required for clients to connect to the server.
 	 * <p>
-	 * If not running in {@link #isServer() server mode} or the password is not set, this will
-	 * return null.
+	 * If the password is not set, this will return null.
 	 *
-	 * @return SHA-512 hex-encoded hash of the password
+	 * @return unencrypted password
 	 */
 	@Nullable
 	@CheckReturnValue
 	String getPassword();
+
+	/**
+	 * Gets the password required for clients to connect to the server.
+	 * <p>
+	 * If the password is not set, this will return an empty string.
+	 *
+	 * @return unencrypted password
+	 */
+	@NotNull
+	@CheckReturnValue
+	default String getPasswordOrEmpty() {
+		return ExceptionUtil.validateNotNullElse(getPassword(), "");
+	}
 
 	/**
 	 * Sets the password required for clients to connect to the server.
@@ -915,7 +950,7 @@ public interface Plugin<P, S> {
 			CrowdControl cc = getCrowdControl();
 			if (cc == null) {
 				if (mapper.isAdmin(player)) {
-					if (isServer() && getPassword() == null)
+					if (isServer() && getPasswordOrEmpty().equals(""))
 						audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
 					else
 						audience.sendMessage(NO_CC_UNKNOWN_ERROR);
@@ -995,6 +1030,25 @@ public interface Plugin<P, S> {
 	HideNames getHideNames();
 
 	/**
+	 * Sets the {@link HideNames} config.
+	 *
+	 * @param hideNames hide names config
+	 */
+	void setHideNames(@NotNull HideNames hideNames);
+
+	/**
+	 * Gets the viewer who triggered an effect as a component, or null if names are hidden.
+	 *
+	 * @param request the effect request
+	 * @param chat    whether the returned component will be used in chat
+	 * @return the viewer as a component, or null if names are hidden
+	 */
+	@Nullable
+	default Component getViewerComponentOrNull(@NotNull Request request, boolean chat) {
+		return getViewerComponentOrNull(getHideNames(), request, chat);
+	}
+
+	/**
 	 * Gets the viewer who triggered an effect as a component.
 	 *
 	 * @param request the effect request
@@ -1007,18 +1061,31 @@ public interface Plugin<P, S> {
 	}
 
 	/**
+	 * Gets the viewer who triggered an effect as a component, or null if names are hidden.
+	 *
+	 * @param hidesNames the {@link HideNames} config
+	 * @param request    the effect request
+	 * @param chat       whether the returned component will be used in chat
+	 * @return the viewer as a component, or null if names are hidden
+	 */
+	@Nullable
+	static Component getViewerComponentOrNull(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
+		if ((!chat && hidesNames.isHideOther()) || (chat && hidesNames.isHideChat()))
+			return null;
+		return Component.text(request.getViewer());
+	}
+
+	/**
 	 * Gets the viewer who triggered an effect as a component.
 	 *
 	 * @param hidesNames the {@link HideNames} config
 	 * @param request    the effect request
 	 * @param chat       whether the returned component will be used in chat
+	 * @return the viewer as a component
 	 */
 	@NotNull
 	static Component getViewerComponent(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
-		if ((!chat && hidesNames.isHideOther()) || (chat && hidesNames.isHideChat()))
-			return Component.translatable("cc.effect.viewer");
-		else
-			return Component.text(request.getViewer());
+		return ExceptionUtil.validateNotNullElse(getViewerComponentOrNull(hidesNames, request, chat), VIEWER_NAME);
 	}
 
 	/**

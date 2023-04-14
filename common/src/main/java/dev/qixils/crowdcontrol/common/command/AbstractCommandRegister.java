@@ -84,6 +84,16 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		return registeredCommands = commands;
 	}
 
+	public final <C extends Command<PLAYER>> List<? extends C> getCommands(Class<C> clazz) {
+		List<C> commands = new ArrayList<>();
+		for (Command<PLAYER> command : getCommands()) {
+			if (clazz.isInstance(command))
+				//noinspection unchecked
+				commands.add((C) command);
+		}
+		return commands;
+	}
+
 	protected abstract void onFirstRegistry();
 
 	protected abstract void registerListener(Command<PLAYER> command);

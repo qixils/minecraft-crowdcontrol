@@ -87,10 +87,10 @@ namespace CrowdControl.Games.Packs
             new("Zero Gravity", "zero_gravity") { Price = 100, Duration = 20, Description = "Disables the streamer's gravity" },
             // freeze-type commands
             new("Can't Move", "freeze") { Price = 100, Duration = 10, Description = "Temporarily prohibits movement" },
-            new("Lock Camera", "camera_lock") { Price = 100, Duration = 20, Description = "Temporarily freeze the streamer's camera" },
-            new("Lock Camera To Ground", "camera_lock_to_ground") { Price = 200, Duration = 20, Description = "Temporarily locks the streamer's camera to the ground" },
-            new("Lock Camera To Sky", "camera_lock_to_sky") { Price = 200, Duration = 20, Description = "Temporarily locks the streamer's camera to the sky" },
-            new("Disable Jumping", "disable_jumping") { Price = 100, Duration = 20, Description = "Temporarily prevents the streamer from jumping" },
+            new("Lock Camera", "camera_lock") { Price = 100, Duration = 15, Description = "Temporarily freeze the streamer's camera" },
+            new("Lock Camera To Ground", "camera_lock_to_ground") { Price = 200, Duration = 15, Description = "Temporarily locks the streamer's camera to the ground" },
+            new("Lock Camera To Sky", "camera_lock_to_sky") { Price = 200, Duration = 15, Description = "Temporarily locks the streamer's camera to the sky" },
+            new("Disable Jumping", "disable_jumping") { Price = 100, Duration = 15, Description = "Temporarily prevents the streamer from jumping" },
             // inventory commands
             new("Clear Inventory", "clear_inventory") { Price = 750, Description = "Wipes every item from the streamer's inventory" },
             new("Clutter Inventory", "clutter") { Price = 50, Description = "Shuffles around items in the streamer's inventory" },

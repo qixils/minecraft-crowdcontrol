@@ -25,6 +25,9 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
+import net.kyori.adventure.pointer.Pointered;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -46,9 +50,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
-
-// TODO:
-//  - Add a GUI config library
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
@@ -93,8 +94,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
-	@MonotonicNonNull
-	private HoconConfigurationLoader configLoader;
+	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(Path.of("config"));
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
 	public FabricCrowdControlPlugin() {
@@ -199,7 +199,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			this.adventure = FabricServerAudiences.of(server);
 			this.syncExecutor = server;
 			this.textUtil = new MojmapTextUtil(this);
-			this.configLoader = createConfigLoader(server.getFile("config").toPath());
 			initCrowdControl();
 		}
 	}
@@ -255,5 +254,13 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	public boolean isDisabled(FeatureElement feature) {
 		return !isEnabled(feature);
+	}
+
+	public @NotNull Component toAdventure(ComponentLike text, @NotNull Pointered viewer) {
+		return adventure().renderer().render(text.asComponent(), viewer);
+	}
+
+	public @NotNull net.minecraft.network.chat.Component toNative(ComponentLike text, @NotNull Pointered viewer) {
+		return adventure().toNative(toAdventure(text, viewer));
 	}
 }

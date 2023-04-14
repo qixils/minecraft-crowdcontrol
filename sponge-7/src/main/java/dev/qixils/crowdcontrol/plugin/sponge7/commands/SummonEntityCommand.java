@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.RabbitType;
@@ -21,7 +22,6 @@ import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.ArmorStand;
-import org.spongepowered.api.entity.living.monster.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -31,8 +31,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.HeldEquipmentType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.difficulty.Difficulties;
 
 import java.util.*;
 
@@ -41,7 +39,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARM
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
 @Getter
-public class SummonEntityCommand extends ImmediateCommand {
+public class SummonEntityCommand extends ImmediateCommand implements EntityCommand {
 	private final Map<EquipmentType, List<ItemType>> armor;
 	protected final EntityType entityType;
 	private final String effectName;
@@ -90,16 +88,8 @@ public class SummonEntityCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Class<? extends Entity> entityClass = entityType.getEntityClass();
-		if (Monster.class.isAssignableFrom(entityClass)) {
-			for (World world : plugin.getGame().getServer().getWorlds()) {
-				if (world.getDifficulty().equals(Difficulties.PEACEFUL)) {
-					return request.buildResponse()
-							.type(ResultType.FAILURE)
-							.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
-				}
-			}
-		}
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return tryExecute;
 
 		LimitConfig config = getPlugin().getLimitConfig();
 		int maxVictims = config.getItemLimit(SpongeTextUtil.csIdOf(entityType));
@@ -113,7 +103,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 					break;
 				if (!isHost(player))
 					continue;
-				spawnEntity(plugin.getViewerComponent(request, false), player);
+				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 				victims++;
 			}
 
@@ -123,7 +113,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 					break;
 				if (isHost(player))
 					continue;
-				spawnEntity(plugin.getViewerComponent(request, false), player);
+				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 				victims++;
 			}
 		});
@@ -131,11 +121,13 @@ public class SummonEntityCommand extends ImmediateCommand {
 	}
 
 	@Blocking
-	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
+	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
 		Entity entity = player.getLocation().createEntity(entityType);
 		// set variables
-		entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(GlobalTranslator.render(viewer, player.getLocale())));
-		entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
+		if (viewer != null) {
+			entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(GlobalTranslator.render(viewer, player.getLocale())));
+			entity.offer(Keys.CUSTOM_NAME_VISIBLE, true);
+		}
 		entity.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
 		entity.offer(Keys.TREE_TYPE, randomElementFrom(plugin.getRegistry().getAllOf(TreeType.class)));
 		entity.offer(Keys.DYE_COLOR, randomElementFrom(plugin.getRegistry().getAllOf(DyeColor.class)));

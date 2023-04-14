@@ -3,10 +3,9 @@ package dev.qixils.crowdcontrol.plugin.configurate;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
@@ -27,23 +26,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 
 	protected abstract ConfigurationLoader<?> getConfigLoader() throws IllegalStateException;
 
-	@Override
-	public @Nullable String getPassword() {
-		if (!isServer()) return null;
-		if (crowdControl != null)
-			return crowdControl.getPassword();
-		if (manualPassword != null)
-			return manualPassword;
-		try {
-			return getConfigLoader().load().node("password").getString();
-		} catch (IOException e) {
-			getSLF4JLogger().warn("Could not load config", e);
-			return null;
-		}
-	}
-
-	@Override
-	public void initCrowdControl() {
+	public void loadConfig() {
 		ConfigurationNode config;
 		try {
 			config = getConfigLoader().load();
@@ -51,59 +34,84 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			throw new RuntimeException("Could not load plugin config", e);
 		}
 
+		// hosts
+		TypeToken<Set<String>> hostToken = new TypeToken<Set<String>>() {};
 		try {
-			hosts = Collections.unmodifiableCollection(ExceptionUtil.validateNotNullElseGet(
-					config.node("hosts").getList(String.class),
-					Collections::emptyList
-			));
+			hosts = Collections.unmodifiableSet(config.node("hosts").get(hostToken, new HashSet<>(hosts)));
 		} catch (SerializationException e) {
 			throw new RuntimeException("Could not parse 'hosts' config variable", e);
 		}
-
-		// limit config
-		boolean hostsBypass = config.node("limits", "hosts-bypass").getBoolean(true);
-		TypeToken<Map<String, Integer>> typeToken = new TypeToken<Map<String, Integer>>() {};
-		try {
-			Map<String, Integer> itemLimits = config.node("limits", "items").get(typeToken);
-			Map<String, Integer> entityLimits = config.node("limits", "entities").get(typeToken);
-			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
-		} catch (SerializationException e) {
-			getSLF4JLogger().warn("Could not parse limits config", e);
-		}
-
-		global = config.node("global").getBoolean(false);
-		announce = config.node("announce").getBoolean(true);
-		adminRequired = config.node("admin-required").getBoolean(false);
-		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString("none"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
 				loweredHosts.add(host.toLowerCase(Locale.ROOT));
 			hosts = Collections.unmodifiableSet(loweredHosts);
 		}
-		isServer = !config.node("legacy").getBoolean(false);
-		int port = config.node("port").getInt(DEFAULT_PORT);
+
+		// limit config
+		boolean hostsBypass = config.node("limits", "hosts-bypass").getBoolean(limitConfig.hostsBypass());
+		TypeToken<Map<String, Integer>> limitToken = new TypeToken<Map<String, Integer>>() {};
+		try {
+			Map<String, Integer> itemLimits = config.node("limits", "items").get(limitToken, limitConfig.itemLimits());
+			Map<String, Integer> entityLimits = config.node("limits", "entities").get(limitToken, limitConfig.entityLimits());
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		} catch (SerializationException e) {
+			getSLF4JLogger().warn("Could not parse limits config", e);
+		}
+
+		// misc
+		global = config.node("global").getBoolean(global);
+		announce = config.node("announce").getBoolean(announce);
+		adminRequired = config.node("admin-required").getBoolean(adminRequired);
+		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(HideNames.NONE.getConfigCode()));
+		isServer = !config.node("legacy").getBoolean(!isServer);
+		port = config.node("port").getInt(port);
+		IP = config.node("ip").getString(IP);
+		password = config.node("password").getString(password);
+	}
+
+	public void saveConfig() {
+		try {
+			// TODO: add comments
+			ConfigurationNode config = getConfigLoader().createNode();
+			TypeToken<Set<String>> hostToken = new TypeToken<Set<String>>() {};
+			TypeToken<Map<String, Integer>> limitToken = new TypeToken<Map<String, Integer>>() {};
+			config.node("hosts").set(hostToken, new HashSet<>(hosts));
+			config.node("limits", "hosts-bypass").set(limitConfig.hostsBypass());
+			config.node("limits", "items").set(limitToken, limitConfig.itemLimits());
+			config.node("limits", "entities").set(limitToken, limitConfig.entityLimits());
+			config.node("global").set(global);
+			config.node("announce").set(announce);
+			config.node("admin-required").set(adminRequired);
+			config.node("hide-names").set(hideNames.getConfigCode());
+			config.node("legacy").set(!isServer);
+			config.node("port").set(port);
+			config.node("password").set(password);
+			config.node("ip").set(IP);
+			getConfigLoader().save(config);
+		} catch (ConfigurateException e) {
+			throw new RuntimeException("Could not save plugin config", e);
+		}
+	}
+
+	@Override
+	public void initCrowdControl() {
+		loadConfig();
+
 		if (isServer) {
 			getSLF4JLogger().info("Running Crowd Control in server mode");
-			String password;
-			if (manualPassword != null)
-				password = manualPassword;
-			else {
-				password = config.node("password").getString("crowdcontrol");
-				if (password == null || password.isEmpty()) {
-					getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
-					return;
-				}
+			if (password == null || password.isEmpty()) {
+				getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
+				return;
 			}
 			crowdControl = CrowdControl.server().port(port).password(password).build();
 		} else {
 			getSLF4JLogger().info("Running Crowd Control in legacy client mode");
-			String ip = config.node("ip").getString("127.0.0.1");
-			if (ip == null || ip.isEmpty()) {
+			if (IP == null || IP.isEmpty()) {
 				getSLF4JLogger().error("No IP address has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf");
 				return;
 			}
-			crowdControl = CrowdControl.client().port(port).ip(ip).build();
+			crowdControl = CrowdControl.client().port(port).ip(IP).build();
 		}
 
 		commandRegister().register();

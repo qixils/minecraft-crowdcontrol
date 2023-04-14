@@ -95,8 +95,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 
 		// entity commands
 		plugin.getGame().registry(RegistryTypes.ENTITY_TYPE).stream().forEach(entity -> {
-			commands.add(new SummonEntityCommand(plugin, entity));
-			commands.add(new RemoveEntityCommand(plugin, entity));
+			commands.add(new SummonEntityCommand<>(plugin, entity));
+			commands.add(new RemoveEntityCommand<>(plugin, entity));
 		});
 
 		// register difficulty commands

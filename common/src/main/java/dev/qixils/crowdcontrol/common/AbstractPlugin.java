@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.common;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.command.Command;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,13 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	@Getter @NotNull
 	private final Class<S> commandSenderClass;
 	@Nullable
-	protected String manualPassword = null;
+	@Getter @Setter
+	protected String password = DEFAULT_PASSWORD;
+	@Getter @Setter
+	protected int port = DEFAULT_PORT;
+	@Nullable
+	@Getter @Setter
+	protected String IP = "127.0.0.1";
 	@Getter @Nullable
 	protected CrowdControl crowdControl = null;
 	@Getter
@@ -35,10 +42,10 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	protected boolean announce = true;
 	@Getter
 	protected boolean adminRequired = false;
-	@Getter @NotNull
+	@Getter @Setter @NotNull
 	protected HideNames hideNames = HideNames.NONE;
 	@Getter @NotNull
-	protected Collection<String> hosts = Collections.emptyList();
+	protected Collection<String> hosts = Collections.emptySet();
 	@Getter @NotNull
 	protected LimitConfig limitConfig = new LimitConfig();
 	@Getter @NotNull
@@ -55,15 +62,13 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	}
 
 	@Override
-	public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
-		this.crowdControl = crowdControl;
+	public void setAnnounceEffects(boolean announce) {
+		this.announce = announce;
 	}
 
 	@Override
-	public void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException {
-		if (!isServer())
-			throw new IllegalStateException("Not running in server mode");
-		manualPassword = password;
+	public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
+		this.crowdControl = crowdControl;
 	}
 
 	@Override

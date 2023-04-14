@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
 public final class RemoveEntityCommand extends Command implements EntityCommand {
@@ -30,6 +31,13 @@ public final class RemoveEntityCommand extends Command implements EntityCommand 
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", Component.translatable(entityType));
 	}
 
+	@Override
+	public boolean isMonster() {
+		if (entityType == EntityType.ENDER_DRAGON)
+			return false; // ender dragon is persistent regardless of difficulty so allow it to be removed
+		return EntityCommand.super.isMonster();
+	}
+
 	private boolean removeEntityFrom(Player player) {
 		for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
 			entity.remove();
@@ -40,6 +48,9 @@ public final class RemoveEntityCommand extends Command implements EntityCommand 
 
 	@Override
 	public @NotNull CompletableFuture<Response.@NotNull Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return completedFuture(tryExecute);
+
 		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
 		sync(() -> {
 			Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY)

@@ -12,7 +12,7 @@ import java.util.Random;
 public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<Player> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
-	protected final SpongeCrowdControlPlugin plugin;
+	protected final @NotNull SpongeCrowdControlPlugin plugin;
 	protected final SpongeComponentSerializer spongeSerializer;
 
 	protected Command(@NotNull SpongeCrowdControlPlugin plugin) {

@@ -16,7 +16,7 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
 public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<ServerPlayer> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
-	protected final SpongeCrowdControlPlugin plugin;
+	protected final @NotNull SpongeCrowdControlPlugin plugin;
 
 	protected Command(@NotNull SpongeCrowdControlPlugin plugin) {
 		this.plugin = Objects.requireNonNull(plugin, "plugin");

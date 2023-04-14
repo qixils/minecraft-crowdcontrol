@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
@@ -66,7 +67,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final Class<CommandSender> commandSenderClass = CommandSender.class;
 	FileConfiguration config = getConfig();
 	// actual stuff
-	String manualPassword = null; // set via /password
+	@Getter @Setter
+	private @Nullable String password = DEFAULT_PASSWORD;
+	@Getter @Setter
+	private int port = DEFAULT_PORT;
+	@Getter @Setter
+	private @Nullable String IP = "127.0.0.1";
 	@Getter
 	CrowdControl crowdControl = null;
 	@Getter
@@ -75,7 +81,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private boolean isServer = true;
 	@Getter
 	private boolean global = false;
-	@Getter @NotNull
+	@Getter @Setter @NotNull
 	private HideNames hideNames = HideNames.NONE;
 	@Getter
 	private Collection<String> hosts = Collections.emptyList();
@@ -111,28 +117,61 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		};
 	}
 
-	public void initCrowdControl() {
+	@Override
+	public void loadConfig() {
 		reloadConfig();
 		config = getConfig();
-		int port = config.getInt("port", DEFAULT_PORT);
 
-		if (!config.getBoolean("legacy", false)) {
-			isServer = true;
-			String password = Objects.requireNonNullElseGet(manualPassword, () -> config.getString("password", ""));
-			if (!password.isBlank()) {
-				getLogger().info("Running Crowd Control in server mode");
-				crowdControl = CrowdControl.server().port(port).password(password).build();
-			} else {
+		// hosts
+		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
+		if (!hosts.isEmpty()) {
+			Set<String> loweredHosts = new HashSet<>(hosts.size());
+			for (String host : hosts)
+				loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
+			hosts = Collections.unmodifiableSet(loweredHosts);
+		}
+
+		// limit config
+		ConfigurationSection limitSection = config.getConfigurationSection("limits");
+		if (limitSection == null) {
+			getSLF4JLogger().debug("No limit config found, using defaults");
+			limitConfig = new LimitConfig();
+		} else {
+			getSLF4JLogger().debug("Loading limit config");
+			boolean hostsBypass = limitSection.getBoolean("hosts-bypass", true);
+			Map<String, Integer> itemLimits = parseLimitConfigSection(limitSection.getConfigurationSection("items"));
+			Map<String, Integer> entityLimits = parseLimitConfigSection(limitSection.getConfigurationSection("entities"));
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		}
+
+		// misc
+		global = config.getBoolean("global", global);
+		announce = config.getBoolean("announce", announce);
+		adminRequired = config.getBoolean("admin-required", adminRequired);
+		hideNames = HideNames.valueOf(config.getString("hide-names", hideNames.name()));
+		isServer = !config.getBoolean("legacy", !isServer);
+		port = config.getInt("port", port);
+		IP = config.getString("ip", IP);
+		password = config.getString("password", password);
+	}
+
+	public void initCrowdControl() {
+		loadConfig();
+
+		if (isServer) {
+			getLogger().info("Running Crowd Control in server mode");
+			if (password == null || password.isEmpty()) {
 				getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
 				return;
 			}
+			crowdControl = CrowdControl.server().port(port).password(password).build();
 		} else {
-			isServer = false;
-			String ip = config.getString("ip", "127.0.0.1");
-			if (ip.isBlank())
-				throw new IllegalStateException("IP address is blank. Please fix this in the plugins/CrowdControl/config.yml file.");
 			getLogger().info("Running Crowd Control in client mode");
-			crowdControl = CrowdControl.client().port(port).ip(ip).build();
+			if (IP == null || IP.isEmpty()) {
+				getLogger().severe("No IP address has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml");
+				return;
+			}
+			crowdControl = CrowdControl.client().port(port).ip(IP).build();
 		}
 
 		commandRegister().register();
@@ -159,31 +198,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@SneakyThrows
 	@Override
 	public void onEnable() {
-		global = config.getBoolean("global", false);
-		announce = config.getBoolean("announce", true);
-		adminRequired = config.getBoolean("admin-required", false);
-		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
-		hideNames = HideNames.fromConfigCode(config.getString("hide-names", "none"));
-		if (!hosts.isEmpty()) {
-			Set<String> loweredHosts = new HashSet<>(hosts.size());
-			for (String host : hosts)
-				loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
-			hosts = Collections.unmodifiableSet(loweredHosts);
-		}
-
-		// limit config
-		ConfigurationSection limitSection = config.getConfigurationSection("limits");
-		if (limitSection == null) {
-			getSLF4JLogger().debug("No limit config found, using defaults");
-			limitConfig = new LimitConfig();
-		} else {
-			getSLF4JLogger().debug("Loading limit config");
-			boolean hostsBypass = limitSection.getBoolean("hosts-bypass", true);
-			Map<String, Integer> itemLimits = parseLimitConfigSection(limitSection.getConfigurationSection("items"));
-			Map<String, Integer> entityLimits = parseLimitConfigSection(limitSection.getConfigurationSection("entities"));
-			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
-		}
-
 		initCrowdControl();
 
 		Bukkit.getPluginManager().registerEvents(this, this);
@@ -226,6 +240,11 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
+	public void setAnnounceEffects(boolean announceEffects) {
+		announce = announceEffects;
+	}
+
+	@Override
 	public void registerCommand(@NotNull String name, @NotNull Command<Player> command) {
 		name = name.toLowerCase(Locale.ENGLISH);
 		try {
@@ -234,23 +253,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		} catch (IllegalArgumentException e) {
 			getSLF4JLogger().warn("Failed to register command: " + name, e);
 		}
-	}
-
-	@Override
-	public @Nullable String getPassword() {
-		if (!isServer()) return null;
-		if (crowdControl != null)
-			return crowdControl.getPassword(); // should be non-null because isServer is true
-		if (manualPassword != null)
-			return manualPassword;
-		return config.getString("password");
-	}
-
-	@Override
-	public void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException {
-		if (!isServer())
-			throw new IllegalStateException("Not running in server mode");
-		manualPassword = password;
 	}
 
 	@Override

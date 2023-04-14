@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.Global;
+import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -45,6 +46,13 @@ public class DifficultyCommand extends ImmediateCommand {
 		async(() -> {
 			for (Difficulty dif : plugin.registryIterable(RegistryTypes.DIFFICULTY))
 				plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+			for (Command<ServerPlayer> command : plugin.commandRegister().getCommands()) {
+				if (!(command instanceof EntityCommand<?>))
+					continue;
+				TriState state = command.isSelectable();
+				if (state != TriState.UNKNOWN)
+					plugin.updateEffectStatus(plugin.getCrowdControl(), command, state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE);
+			}
 		});
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}

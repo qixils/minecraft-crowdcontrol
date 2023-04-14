@@ -10,12 +10,12 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.MooshroomTypes;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RabbitTypes;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityCategories;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -28,7 +28,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroups;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.registry.RegistryTypes;
-import org.spongepowered.api.world.difficulty.Difficulties;
 
 import java.util.*;
 
@@ -37,10 +36,9 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 import static dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil.csIdOf;
 
 @Getter
-public class SummonEntityCommand extends ImmediateCommand {
+public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
 	private final Map<EquipmentType, List<ItemType>> armor;
-	protected final EntityType<?> entityType;
-	protected final boolean isMonster;
+	protected final EntityType<E> entityType;
 	private final String effectName;
 	private final Component displayName;
 	private static final Map<RabbitType, Integer> RABBIT_VARIANTS;
@@ -57,10 +55,9 @@ public class SummonEntityCommand extends ImmediateCommand {
 		RABBIT_VARIANTS = Collections.unmodifiableMap(variants);
 	}
 
-	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<?> entityType) {
+	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.isMonster = entityType.category().equals(EntityCategories.MONSTER.get());
 		this.effectName = "entity_" + csIdOf(entityType.key(RegistryTypes.ENTITY_TYPE));
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType);
 
@@ -85,15 +82,8 @@ public class SummonEntityCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (isMonster) {
-			for (ServerPlayer player : players) {
-				if (player.world().difficulty().equals(Difficulties.PEACEFUL.get())) {
-					return request.buildResponse()
-							.type(ResultType.FAILURE)
-							.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
-				}
-			}
-		}
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return tryExecute;
 
 		LimitConfig config = getPlugin().getLimitConfig();
 		int maxVictims = config.getItemLimit(entityType.key(RegistryTypes.ENTITY_TYPE).value());
@@ -108,7 +98,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 				if (!isHost(player))
 					continue;
 
-				spawnEntity(plugin.getViewerComponent(request, false), player);
+				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 				victims++;
 			}
 
@@ -119,7 +109,7 @@ public class SummonEntityCommand extends ImmediateCommand {
 				if (isHost(player))
 					continue;
 
-				spawnEntity(plugin.getViewerComponent(request, false), player);
+				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 				victims++;
 			}
 		});
@@ -127,11 +117,13 @@ public class SummonEntityCommand extends ImmediateCommand {
 	}
 
 	@Blocking
-	protected Entity spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
+	protected Entity spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
 		Entity entity = player.world().createEntity(entityType, player.position());
 		// set variables
-		entity.offer(Keys.CUSTOM_NAME, viewer);
-		entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
+		if (viewer != null) {
+			entity.offer(Keys.CUSTOM_NAME, viewer);
+			entity.offer(Keys.IS_CUSTOM_NAME_VISIBLE, true);
+		}
 		entity.offer(Keys.IS_TAMED, true);
 		entity.offer(Keys.TAMER, player.uniqueId());
 		entity.offer(Keys.BOAT_TYPE, randomElementFrom(plugin.registryIterator(RegistryTypes.BOAT_TYPE)));
