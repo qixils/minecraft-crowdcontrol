@@ -36,6 +36,8 @@ A list of all changes made to the software in reverse chronological order.
 - Repair/Damage Item effects now randomly pick from armor items as well as held items
 - Damage Item now takes a fixed 20% of the item's max durability instead of 50% of its remaining
   durability
+- Lootbox/Do-or-Die/etc. no longer gives unusable items on 1.19.4 (Fabric only for now, pending
+  updates to Paper)
 - Added support for Crowd Control 2.0 (customizable effect durations, non-Twitch streamer targets,
   etc.)
 - Added sliders to various effects (give/take health/hunger/items/etc.)

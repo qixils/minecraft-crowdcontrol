@@ -30,7 +30,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.flag.FeatureElement;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -245,5 +247,17 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Override
 	public @Nullable ServerPlayer asPlayer(@NotNull CommandSourceStack sender) {
 		return sender.getPlayer();
+	}
+
+	@SuppressWarnings("ConstantValue") // overworld can be null
+	public boolean isEnabled(FeatureElement feature) {
+		if (server == null) return false;
+		ServerLevel overworld = server.overworld();
+		if (overworld == null) return false;
+		return feature.isEnabled(overworld.enabledFeatures());
+	}
+
+	public boolean isDisabled(FeatureElement feature) {
+		return !isEnabled(feature);
 	}
 }

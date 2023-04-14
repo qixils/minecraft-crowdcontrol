@@ -12,6 +12,8 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.flag.FeatureElement;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @Getter
-public class BlockCommand extends ImmediateCommand {
+public class BlockCommand extends ImmediateCommand implements FeatureElement {
 	private final Block blockType;
 	private final String effectName;
 	private final Component displayName;
@@ -39,6 +41,11 @@ public class BlockCommand extends ImmediateCommand {
 		this.blockType = blockType;
 		this.effectName = effectName;
 		this.displayName = displayName;
+	}
+
+	@Override
+	public @NotNull FeatureFlagSet requiredFeatures() {
+		return blockType.requiredFeatures();
 	}
 
 	@Nullable
