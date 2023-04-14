@@ -16,6 +16,9 @@ The integration even works on servers that aren't running Crowd Control, althoug
 that there will be a delay between when chat finishes voting on a proposal and when the proposal
 actually goes into effect.
 
+Note that this update is available exclusively for the Fabric version of the mod. Furthermore, this
+update is a special release which is unlikely to see new features going forward.
+
 ## 3.3.0
 
 - Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16. Speedrun Minecraft
