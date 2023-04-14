@@ -2,6 +2,18 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 23.13.0
+
+Updated the Fabric implementation to 23w13a_or_b, Minecraft's April Fools' Day update.
+This special update to the mod allows your Twitch chat to take control of the new proposal system
+by typing in your stream chat what laws they want to see enacted!
+
+Using Twitch chat integration is incredibly simple, as it's automatically started when you type
+`/account link TWITCH_USERNAME` in-game like you usually do to receive Crowd Control effects.
+The integration even works on servers that aren't running Crowd Control, although you should note
+that there will be a delay between when chat finishes voting on a proposal and when the proposal
+actually goes into effect.
+
 ## 3.3.0
 
 - Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16. Speedrun Minecraft

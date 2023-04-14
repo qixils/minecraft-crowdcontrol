@@ -85,6 +85,7 @@ public final class ProposalHandler {
 			return;
 		if (proposalCooldown > 0)
 			return;
+		currentProposal = null;
 		if (twitchChat.getChannels().isEmpty())
 			return;
 		class_8471 storage = getProposalStorage();
