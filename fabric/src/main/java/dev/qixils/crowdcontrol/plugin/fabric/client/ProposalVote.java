@@ -14,9 +14,9 @@ import java.time.Duration;
 import java.util.*;
 
 public class ProposalVote {
-	public static final long MIN_DURATION = 20L * 20L;
-	public static final long MAX_DURATION = 60L * 20L;
-	public static final int COOLDOWN = 10 * 60;
+	public static final int MIN_DURATION = 20 * 20;
+	public static final int MAX_DURATION = 60 * 20;
+	public static final int COOLDOWN = 10 * 20;
 	/**
 	 * How many ticks to subtract from the time remaining on a proposal to ensure our vote gets sent on time.
 	 */
