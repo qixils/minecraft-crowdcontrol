@@ -1,13 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
+import net.minecraft.class_8390;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "net.minecraft.class_8390$class_8391")
+@Mixin(class_8390.class_8391.class)
 public class VotingCostMixin {
 	@Inject(method = "method_50605", at = @At("HEAD"), cancellable = true)
 	private void onApplyCost(ServerPlayerEntity player, boolean dryRun, CallbackInfoReturnable<Boolean> cir) {

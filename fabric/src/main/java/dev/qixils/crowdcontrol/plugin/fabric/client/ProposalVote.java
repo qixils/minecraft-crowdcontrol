@@ -17,6 +17,10 @@ public class ProposalVote {
 	public static final long MIN_DURATION = 20L * 20L;
 	public static final long MAX_DURATION = 60L * 20L;
 	public static final int COOLDOWN = 10 * 60;
+	/**
+	 * How many ticks to subtract from the time remaining on a proposal to ensure our vote gets sent on time.
+	 */
+	public static final int DURATION_PADDING = 2;
 	public final UUID id;
 	private final long originalDuration;
 	private long ticksLeft;
@@ -24,6 +28,9 @@ public class ProposalVote {
 	private final SortedMap<String, OptionWrapper> options = new TreeMap<>();
 	private final Map<String, String> votes = new HashMap<>();
 	private boolean closed = false;
+	private boolean pendingFinishedPacket = false;
+	private class_8471.class_8474 proposalCache = null;
+	private String topOptionKey = null;
 
 	public ProposalVote(ProposalHandler handler, UUID id, int streamProposalCount) {
 		this.id = id;
@@ -57,6 +64,13 @@ public class ProposalVote {
 	}
 
 	public void tick() {
+		if (pendingFinishedPacket) {
+			PacketByteBuf buf = PacketByteBufs.create();
+			buf.writeUuid(id);
+			ClientPlayNetworking.send(FabricCrowdControlPlugin.VOTED_ID, buf);
+			pendingFinishedPacket = false;
+			return;
+		}
 		if (closed) return;
 		if (--ticksLeft <= 0)
 			voteForWinner();
@@ -75,7 +89,7 @@ public class ProposalVote {
 			counts.put(key, 0);
 		for (String key : votes.values())
 			counts.put(key, counts.get(key) + 1);
-		return counts;
+		return Collections.unmodifiableMap(counts);
 	}
 
 	public int voteCount() {
@@ -83,6 +97,8 @@ public class ProposalVote {
 	}
 
 	public String getTopOptionKey() {
+		if (topOptionKey != null)
+			return topOptionKey;
 		int max = 0;
 		String maxKey = options.lastKey(); // 'Do nothing'
 		for (Map.Entry<String, Integer> entry : voteCounts().entrySet()) {
@@ -104,6 +120,8 @@ public class ProposalVote {
 		if (isClosed()) return;
 		closed = true;
 		handler.proposalCooldown = COOLDOWN;
+		proposalCache = getProposal();
+		topOptionKey = getTopOptionKey();
 		try {
 			handler.plugin.player().ifPresent(player -> {
 				var proposal = getProposal();
@@ -115,15 +133,16 @@ public class ProposalVote {
 								.mapToInt(option -> proposal.method_51081(player.getUuid(), option.id()).comp_1454().orElse(1))
 								.min().orElse(1)
 				);
-				var viewerVotes = voteCounts();
+				Map<String, Integer> viewerVotes = voteCounts();
 				int totalViewerVotes = viewerVotes.values().stream().mapToInt(Integer::intValue).sum();
 				// distribute votes proportionally to viewer votes
 				int votesUsed = 0;
 				voteloop: {
+					// TODO: TieStrategy
 					for (Map.Entry<String, Integer> entry : viewerVotes.entrySet()) {
 						String key = entry.getKey();
 						int count = entry.getValue();
-						int votes = (int) Math.round(count / (double) totalViewerVotes * voteLimit); // TODO: tie strategy
+						int votes = (int) Math.round(count / (double) totalViewerVotes * voteLimit);
 						for (int i = 0; i < votes; i++) {
 							player.networkHandler.method_51006(options.get(key).id(), (j, optional) -> {});
 							if (++votesUsed >= voteLimit)
@@ -131,11 +150,7 @@ public class ProposalVote {
 						}
 					}
 				}
-
-				// tell server voting is done
-				PacketByteBuf buf = PacketByteBufs.create();
-				buf.writeUuid(id);
-				ClientPlayNetworking.send(FabricCrowdControlPlugin.VOTED_ID, buf);
+				pendingFinishedPacket = true;
 			});
 		} catch (Exception ignored) {}
 	}
@@ -162,6 +177,8 @@ public class ProposalVote {
 	}
 
 	public class_8471.class_8474 getProposal() {
+		if (proposalCache != null)
+			return proposalCache;
 		return handler.getProposal(id);
 	}
 

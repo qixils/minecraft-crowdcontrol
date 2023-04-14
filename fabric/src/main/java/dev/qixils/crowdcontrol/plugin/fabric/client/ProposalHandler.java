@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.plugin.fabric.client.ProposalVote.DURATION_PADDING;
+import static dev.qixils.crowdcontrol.plugin.fabric.client.ProposalVote.MIN_DURATION;
+
 public final class ProposalHandler {
 	public final FabricPlatformClient plugin;
 	public final ProposalHud overlay = new ProposalHud(this);
@@ -63,7 +66,7 @@ public final class ProposalHandler {
 			return false;
 		if (proposal.method_51080(player).comp_1453() > 0)
 			return false;
-		return getRemainingTimeFor(proposal) > ProposalVote.MIN_DURATION;
+		return getRemainingTimeFor(proposal) > MIN_DURATION;
 	}
 
 	public long getRemainingTimeFor(UUID proposalId) {
@@ -74,7 +77,7 @@ public final class ProposalHandler {
 		if (proposal == null)
 			return 0;
 		long worldTime = plugin.client().map(client -> client.world).map(World::getTime).orElse(0L);
-		return Math.max(0L, proposal.method_51079(worldTime));
+		return Math.max(0L, proposal.method_51079(worldTime) - DURATION_PADDING);
 	}
 
 	public void startNextProposal() {
@@ -107,9 +110,9 @@ public final class ProposalHandler {
 	}
 
 	public void tick() {
-		if (currentProposal != null && !currentProposal.isClosed())
+		if (currentProposal != null)
 			currentProposal.tick();
-		else if (--proposalCooldown <= 0)
+		if (--proposalCooldown <= 0)
 			startNextProposal();
 	}
 
