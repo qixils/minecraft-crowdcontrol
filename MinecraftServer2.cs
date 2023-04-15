@@ -32,6 +32,7 @@ namespace CrowdControl.Games.Packs
 
         private static readonly EffectList AllEffects = new(new Effect[]
         {
+            // TODO: more effect descriptions from old MinecraftServer.cs
             // miscellaneous
             new("Annoy Players", "toast") { Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound" },
             new("Dig Hole", "dig") { Price = 200, Description = "Digs a small hole underneath the streamer" },
