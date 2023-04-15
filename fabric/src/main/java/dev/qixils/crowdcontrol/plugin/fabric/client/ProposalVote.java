@@ -31,6 +31,7 @@ public class ProposalVote {
 	private boolean pendingFinishedPacket = false;
 	private class_8471.class_8474 proposalCache = null;
 	private String topOptionKey = null;
+	public final boolean isNumbered;
 
 	public ProposalVote(ProposalHandler handler, UUID id, int streamProposalCount) {
 		this.id = id;
@@ -41,9 +42,10 @@ public class ProposalVote {
 			throw new IllegalArgumentException("Invalid proposal ID");
 
 		List<OptionWrapper> optionList = vote.method_51082().comp_1358().entrySet().stream().sorted(Map.Entry.comparingByKey(class_8373.field_43985)).map(OptionWrapper::new).toList();
+		isNumbered = streamProposalCount % 2 == 0;
 		for (int i = 0; i < optionList.size(); i++) {
 			OptionWrapper option = optionList.get(i);
-			String key = streamProposalCount % 2 == 0
+			String key = isNumbered
 					? String.valueOf(i + 1)
 					: String.valueOf((char) ('A' + i));
 			options.put(key, option);
