@@ -288,7 +288,7 @@ namespace CrowdControl.Games.Packs
             new("Hard Mode", "difficulty_hard") { Price = 400 },
             // applies potion effects to every player
             new("Absorption", "potion_absorption") { Price = 50, Duration = 20, Description = "Grants extra health that cannot be regenerated" },
-            new("Bad Omen", "potion_bad_omen") { Price = 400, Duration = 120, Description = "Causes a village raid when a player possessing this effect is inside of a village" },
+            new("Bad Omen", "potion_bad_omen") { Price = 400, Duration = 20, Description = "Causes a village raid when a player possessing this effect is inside of a village" },
             new("Blindness", "potion_blindness") { Price = 100, Duration = 20, Description = "Temporarily reduces a player's range of vision and disables their sprinting" },
             new("Conduit Power", "potion_conduit_power") { Price = 50, Duration = 20, Description = "Grants water breathing, night vision, and haste when underwater" },
             new("Darkness", "potion_darkness") { Price = 75, Duration = 20, Description = "Temporarily reduces a player's range of vision" },

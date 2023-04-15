@@ -301,7 +301,7 @@ namespace CrowdControl.Games.Packs
             // applies potion effects to every player
             new Effect("Apply Potion", "apply_potion_effect", ItemKind.Folder),
             new Effect("Absorption", "potion_absorption", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants extra health that cannot be regenerated" },
-            new Effect("Bad Omen", "potion_bad_omen", "apply_potion_effect") { Price = 400, Duration = 120, Description = "Causes a village raid when a player possessing this effect is inside of a village" },
+            new Effect("Bad Omen", "potion_bad_omen", "apply_potion_effect") { Price = 400, Duration = 20, Description = "Causes a village raid when a player possessing this effect is inside of a village" },
             new Effect("Blindness", "potion_blindness", "apply_potion_effect") { Price = 100, Duration = 20, Description = "Temporarily reduces a player's range of vision and disables their sprinting" },
             new Effect("Conduit Power", "potion_conduit_power", "apply_potion_effect") { Price = 50, Duration = 20, Description = "Grants water breathing, night vision, and haste when underwater" },
             new Effect("Darkness", "potion_darkness", "apply_potion_effect") { Price = 75, Duration = 20, Description = "Temporarily reduces a player's range of vision" },
