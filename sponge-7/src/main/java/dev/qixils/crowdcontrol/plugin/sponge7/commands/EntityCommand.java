@@ -8,7 +8,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.living.monster.Monster;
+import org.spongepowered.api.entity.living.Hostile;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulties;
@@ -22,7 +22,7 @@ public interface EntityCommand extends Command<Player> {
 	@NotNull EntityType getEntityType();
 
 	default boolean isMonster() {
-		return Monster.class.isAssignableFrom(getEntityType().getEntityClass());
+		return Hostile.class.isAssignableFrom(getEntityType().getEntityClass());
 	}
 
 	default boolean levelIsPeaceful(@NotNull World level) {

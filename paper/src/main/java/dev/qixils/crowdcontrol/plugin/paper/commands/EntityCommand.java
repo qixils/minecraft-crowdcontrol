@@ -11,9 +11,9 @@ import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
+import org.bukkit.entity.Enemy;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +33,7 @@ public interface EntityCommand extends FeatureElementCommand {
 	}
 
 	default boolean isMonster() {
-		return Monster.class.isAssignableFrom(getEntityClass());
+		return Enemy.class.isAssignableFrom(getEntityClass());
 	}
 
 	default boolean levelIsPeaceful(@NotNull World level) {
