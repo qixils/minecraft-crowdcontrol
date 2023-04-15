@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 23.13.1
+
+Added text to the in-game overlay explaining to chatters how to vote on proposals.
+
 ## 23.13.0
 
 Updated the Fabric implementation to 23w13a_or_b, Minecraft's April Fools' Day update.
