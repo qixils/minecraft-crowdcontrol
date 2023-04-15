@@ -45,6 +45,8 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				ItemStack item = slot.getItem(player);
 				if (item.isEmpty())
 					continue;
+				if (item.getOrElse(Keys.IS_UNBREAKABLE, false))
+					continue;
 				if (!item.supports(Keys.ITEM_DURABILITY))
 					continue;
 				if (!item.supports(Keys.MAX_DURABILITY))

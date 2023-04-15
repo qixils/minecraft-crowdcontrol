@@ -48,19 +48,25 @@ public class ItemDamageCommand extends ImmediateCommand {
 			PlayerInventory inv = player.getInventory();
 			for (EquipmentSlot slot : slots) {
 				ItemStack item = inv.getItem(slot);
-				if (item.getType().isEmpty() || item.getAmount() == 0)
+				if (item.getType().isEmpty())
+					continue;
+				if (item.getAmount() < 1)
+					continue;
+				if (item.getType().getMaxDurability() <= 1)
 					continue;
 				ItemMeta meta = item.getItemMeta();
-				if (meta instanceof Damageable damageable && item.getType().getMaxDurability() > 1) {
-					Material type = item.getType();
-					int curDamage = damageable.getDamage();
-					int newDamage = handleItem.apply(damageable.getDamage(), type);
-					if (CommandConstants.canApplyDamage(curDamage, newDamage, type.getMaxDurability())) {
-						result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-						damageable.setDamage(newDamage);
-						item.setItemMeta(damageable);
-						break;
-					}
+				if (meta.isUnbreakable())
+					continue;
+				if (!(meta instanceof Damageable damageable))
+					continue;
+				Material type = item.getType();
+				int curDamage = damageable.getDamage();
+				int newDamage = handleItem.apply(damageable.getDamage(), type);
+				if (CommandConstants.canApplyDamage(curDamage, newDamage, type.getMaxDurability())) {
+					result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+					damageable.setDamage(newDamage);
+					item.setItemMeta(damageable);
+					break;
 				}
 			}
 		}

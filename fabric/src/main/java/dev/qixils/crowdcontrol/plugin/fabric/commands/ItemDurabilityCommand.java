@@ -45,6 +45,8 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				ItemStack item = player.getItemBySlot(slot);
 				if (item.isEmpty())
 					continue;
+				if (!item.isDamageableItem())
+					continue;
 				int curDamage = item.getDamageValue();
 				int maxDamage = item.getMaxDamage();
 				int newDamage = Math.min(maxDamage, Math.max(0, modifyDurability(curDamage, maxDamage)));

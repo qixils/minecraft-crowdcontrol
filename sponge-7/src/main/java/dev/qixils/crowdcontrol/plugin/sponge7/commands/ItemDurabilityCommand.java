@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
@@ -50,12 +51,14 @@ public abstract class ItemDurabilityCommand extends ImmediateCommand {
 				ItemStack item = optionalItem.get();
 				if (item.isEmpty())
 					continue;
+				if (item.getOrElse(Keys.UNBREAKABLE, false))
+					continue;
 				if (!item.supports(DurabilityData.class))
 					continue;
-				Optional<UseLimitProperty> optionalProperty = item.getProperty(UseLimitProperty.class);
-				if (!optionalProperty.isPresent())
+				Optional<UseLimitProperty> useLimitProperty = item.getProperty(UseLimitProperty.class);
+				if (!useLimitProperty.isPresent())
 					continue;
-				Integer _max = optionalProperty.get().getValue();
+				Integer _max = useLimitProperty.get().getValue();
 				if (_max == null)
 					continue;
 
