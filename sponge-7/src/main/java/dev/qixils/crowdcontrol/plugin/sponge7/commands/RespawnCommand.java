@@ -32,8 +32,6 @@ public class RespawnCommand extends ImmediateCommand {
 		// TODO: this is always going to the world spawn, not the player's bed spawn
 		sync(() -> {
 			for (Player player : players) {
-				if (player.respawnPlayer())
-					continue;
 				Optional<RespawnLocationData> optionalData = player.get(RespawnLocationData.class);
 				if (!optionalData.isPresent()) {
 					player.setLocationSafely(getDefaultSpawn());
@@ -74,6 +72,8 @@ public class RespawnCommand extends ImmediateCommand {
 					break;
 				}
 			}
+			if (!world.isPresent())
+				world = Optional.of(plugin.getGame().getServer().getWorlds().iterator().next());
 		}
 		return world.orElseThrow(() -> new IllegalStateException("Couldn't find an overworld world"));
 	}
