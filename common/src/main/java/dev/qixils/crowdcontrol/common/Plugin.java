@@ -543,7 +543,7 @@ public interface Plugin<P, S> {
 	 * @return true if global effects could execute
 	 */
 	default boolean globalEffectsUsable() {
-		return isGlobal() || (!getHosts().isEmpty() && getAllPlayers().stream().anyMatch(this::isHost));
+		return isGlobal() || (!getHosts().isEmpty());// && getAllPlayers().stream().anyMatch(this::isHost)); TODO: I need to trigger the status update on /account if I want this
 	}
 
 	/**
@@ -914,7 +914,7 @@ public interface Plugin<P, S> {
 				updateEffectVisibility(service, effect, visibility.getPrimitiveBoolean());
 
 			TriState selectable = effect.isSelectable();
-			if (selectable != TriState.UNKNOWN)
+			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
 				updateEffectStatus(service, effect, selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE);
 		}
 	}
