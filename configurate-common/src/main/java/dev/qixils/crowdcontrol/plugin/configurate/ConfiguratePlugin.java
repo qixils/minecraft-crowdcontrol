@@ -63,7 +63,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		global = config.node("global").getBoolean(global);
 		announce = config.node("announce").getBoolean(announce);
 		adminRequired = config.node("admin-required").getBoolean(adminRequired);
-		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(HideNames.NONE.getConfigCode()));
+		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
 		isServer = !config.node("legacy").getBoolean(!isServer);
 		port = config.node("port").getInt(port);
 		IP = config.node("ip").getString(IP);

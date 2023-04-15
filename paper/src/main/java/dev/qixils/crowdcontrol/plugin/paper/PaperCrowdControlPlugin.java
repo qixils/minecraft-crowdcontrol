@@ -148,7 +148,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		global = config.getBoolean("global", global);
 		announce = config.getBoolean("announce", announce);
 		adminRequired = config.getBoolean("admin-required", adminRequired);
-		hideNames = HideNames.valueOf(config.getString("hide-names", hideNames.name()));
+		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
 		isServer = !config.getBoolean("legacy", !isServer);
 		port = config.getInt("port", port);
 		IP = config.getString("ip", IP);

@@ -299,7 +299,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		global = config.getNode("global").getBoolean(global);
 		announce = config.getNode("announce").getBoolean(announce);
 		adminRequired = config.getNode("admin-required").getBoolean(adminRequired);
-		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString(HideNames.NONE.getConfigCode()));
+		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString(hideNames.getConfigCode()));
 		isServer = !config.getNode("legacy").getBoolean(!isServer);
 		port = config.getNode("port").getInt(port);
 		IP = config.getNode("ip").getString(IP);
