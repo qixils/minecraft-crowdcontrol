@@ -53,7 +53,7 @@ public class VeinCommand extends ImmediateCommand {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(player.getLocation())
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(location -> stones.contains(location.getBlock().getType()))
+					.locationValidator(location -> !location.getBlock().getType().equals(BlockTypes.AIR))
 					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {

@@ -15,6 +15,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,10 +44,11 @@ public class VeinCommand extends ImmediateCommand {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 1; ++z) {
 					Location loc = base.add(x, y, z);
-					Block matType = loc.block().getBlock();
+					BlockState block = loc.block();
+					Block matType = block.getBlock();
 					if (matType == Blocks.DEEPSLATE) {
 						deepslateBlocks.add(loc);
-					} else if (stones.contains(matType)) {
+					} else if (!block.isAir()) {
 						stoneBlocks.add(loc);
 					}
 				}

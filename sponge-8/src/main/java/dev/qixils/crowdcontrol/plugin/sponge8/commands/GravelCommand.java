@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
@@ -10,12 +9,13 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder.isAir;
 
 @Getter
 public class GravelCommand extends ImmediateCommand {
@@ -32,8 +32,7 @@ public class GravelCommand extends ImmediateCommand {
 		for (ServerPlayer player : players)
 			locations.addAll(BlockFinder.builder()
 					.origin(player.serverLocation())
-					.locationValidator(location -> CommonTags.STONES_EXCEPT_GRAVEL.contains(
-							location.block().type().key(RegistryTypes.BLOCK_TYPE).asString()))
+					.locationValidator(location -> !isAir(location.blockType()))
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());

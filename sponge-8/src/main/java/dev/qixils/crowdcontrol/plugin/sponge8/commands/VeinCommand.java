@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_COUNT;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIUS;
+import static dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder.isAir;
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
@@ -49,12 +50,13 @@ public class VeinCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		// TODO (API9): deepslate
 		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
 		for (ServerPlayer player : players) {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(player.serverLocation())
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(location -> stones.contains(location.blockType()))
+					.locationValidator(location -> !isAir(location.blockType()))
 					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {

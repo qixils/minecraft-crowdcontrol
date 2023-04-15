@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
@@ -8,7 +7,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +29,7 @@ public class GravelCommand extends ImmediateCommand {
 		for (ServerPlayer player : players)
 			locations.addAll(BlockFinder.builder()
 					.origin(player)
-					.locationValidator(loc ->
-							CommonTags.STONES_EXCEPT_GRAVEL.contains(BuiltInRegistries.BLOCK.getKey(loc.block().getBlock()).toString()))
+					.locationValidator(loc -> !loc.block().isAir())
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());

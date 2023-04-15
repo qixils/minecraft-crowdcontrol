@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil;
@@ -30,8 +29,7 @@ public class GravelCommand extends ImmediateCommand {
 		for (Player player : players)
 			locations.addAll(BlockUtil.BlockFinder.builder()
 					.origin(player.getLocation())
-					.locationValidator(loc ->
-							CommonTags.STONES_EXCEPT_GRAVEL.contains(loc.getBlock().getType().getKey().asString()))
+					.locationValidator(loc -> !loc.getBlock().isEmpty())
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());
