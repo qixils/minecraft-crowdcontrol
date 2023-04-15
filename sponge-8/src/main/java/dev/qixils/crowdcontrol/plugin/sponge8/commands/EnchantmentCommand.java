@@ -36,7 +36,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		this.effectName = "enchant_" + csIdOf(enchantmentType.key(RegistryTypes.ENCHANTMENT_TYPE));
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
-				((TranslatableComponent) enchantmentType.asComponent()).args(Component.text(enchantmentType.maximumLevel()))
+				((TranslatableComponent) enchantmentType.asComponent()).args(Component.text(enchantmentType.maximumLevel()).color(null))
 		);
 	}
 
