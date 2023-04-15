@@ -56,6 +56,7 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 	@Override
 	public void maxHealthOffset(double newOffset) {
+		// TODO: this is doing full hearts instead of half hearts I think
 		AttributeInstance attribute = entity().getAttribute(Attribute.GENERIC_MAX_HEALTH);
 		if (attribute == null) {
 			logger.warn("Player missing GENERIC_MAX_HEALTH attribute");

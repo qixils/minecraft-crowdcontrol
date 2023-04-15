@@ -21,9 +21,9 @@ public final class HealthModifierManager {
 		switch (modifier) {
 			case OHKO:
 				Optional<DamageSource> source = event.cause().first(DamageSource.class);
-				if (source.isPresent() && source.get().equals(DamageSources.VOID) && event.originalDamage() == Float.MAX_VALUE)
+				if (source.isPresent() && source.get().equals(DamageSources.VOID) && event.originalDamage() >= Float.MAX_VALUE)
 					return; // we've caught ourselves! ignore this damage
-				player.damage(Double.MAX_VALUE, DamageSources.VOID);
+				player.damage(Float.MAX_VALUE, DamageSources.VOID);
 			case INVINCIBLE:
 				event.setCancelled(true);
 		}
