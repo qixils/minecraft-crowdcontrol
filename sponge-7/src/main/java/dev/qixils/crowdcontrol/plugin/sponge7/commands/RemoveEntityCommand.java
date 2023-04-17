@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
 
 @Getter
-public class RemoveEntityCommand extends ImmediateCommand {
+public class RemoveEntityCommand extends ImmediateCommand implements EntityCommand {
 	protected final EntityType entityType;
 	private final String effectName;
 	private final Component displayName;
@@ -31,6 +33,13 @@ public class RemoveEntityCommand extends ImmediateCommand {
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + SpongeTextUtil.csIdOf(entityType);
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", SpongeTextUtil.getFixedName(entityType));
+	}
+
+	@Override
+	public boolean isMonster() {
+		if (entityType == EntityTypes.ENDER_DRAGON)
+			return false; // ender dragon is persistent regardless of difficulty so allow it to be removed
+		return EntityCommand.super.isMonster();
 	}
 
 	private boolean removeEntityFrom(Player player) {
@@ -54,6 +63,9 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return tryExecute;
+
 		Builder result = request.buildResponse().type(ResultType.RETRY)
 				.message("No " + entityType.getTranslation().get() + "s found nearby to remove");
 

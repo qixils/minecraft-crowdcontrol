@@ -100,6 +100,7 @@ public class LootboxCommand extends ImmediateCommand {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<Item> items = new ArrayList<>(allItems);
+		items.removeIf(plugin::isDisabled);
 		Collections.shuffle(items, random);
 		Item item = null;
 		for (int i = 0; i <= luck * 5; i++) {

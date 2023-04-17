@@ -1,5 +1,19 @@
 {
     "crowdcontrol.proposal.explanatory.letters": "Type the letter of the option you want in chat!",
     "crowdcontrol.proposal.explanatory.numbers": "Type the number of the option you want in chat!",
-    "crowdcontrol.proposal.explanatory.closed": "Final results"
+    "crowdcontrol.proposal.explanatory.closed": "Final results",
+    "config.crowdcontrol.title": "Crowd Control",
+    "config.crowdcontrol.category.general": "General",
+    "config.crowdcontrol.password.name": "Password",
+    "config.crowdcontrol.password.description": "Default password that Crowd Control\nclients must enter to connect.",
+    "config.crowdcontrol.port.name": "Port",
+    "config.crowdcontrol.port.description": "The port to listen for incoming\nCrowd Control connections on. To allow\nremote connections, the port must be\nopened in your firewall.",
+    "config.crowdcontrol.announce.name": "Announce Effects",
+    "config.crowdcontrol.announce.description": "Whether to post an alert in chat when an\neffect has been activated.",
+    "config.crowdcontrol.hide_names.name": "Name Visibilty",
+    "config.crowdcontrol.hide_names.description": "Determines where to show the names of\nviewers who have purchased effects.",
+    "config.crowdcontrol.hide_names.option.none": "Show",
+    "config.crowdcontrol.hide_names.option.chat": "Hide in chat",
+    "config.crowdcontrol.hide_names.option.all": "Hide everywhere",
+    "config.crowdcontrol.advanced_settings": "Advanced settings can be found in the mod's config file."
 }

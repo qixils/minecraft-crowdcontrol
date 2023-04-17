@@ -42,6 +42,7 @@ public class DeleteRandomItemCommand extends ImmediateCommand {
 				if (stack == null || stack.isEmpty() || stack.type().isAnyOf(ItemTypes.AIR.get()))
 					continue;
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+				break;
 			}
 		}
 		return result;

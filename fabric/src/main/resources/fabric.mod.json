@@ -25,6 +25,9 @@
     ],
     "cardinal-components": [
       "dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components"
+    ],
+    "modmenu": [
+      "dev.qixils.crowdcontrol.plugin.fabric.client.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -34,7 +37,12 @@
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
-    "minecraft": "1.20-alpha.23.13.ab"
+    "minecraft": "1.20-alpha.23.13.ab",
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
   },
   "custom": {
     "cardinal-components": [
@@ -42,6 +50,11 @@
       "crowdcontrol:original-display-name",
       "crowdcontrol:game-type-effect",
       "crowdcontrol:movement-status"
-    ]
+    ],
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/warpworld"
+      }
+    }
   }
 }

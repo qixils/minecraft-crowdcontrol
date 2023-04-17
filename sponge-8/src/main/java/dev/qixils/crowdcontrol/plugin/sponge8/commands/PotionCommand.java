@@ -18,6 +18,7 @@ import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.util.Ticks;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -66,49 +67,57 @@ public class PotionCommand extends TimedImmediateCommand {
 				.potionType(potionEffectType)
 				.duration(duration);
 
+		Response.Builder response = request.buildResponse().type(ResultType.FAILURE).message("Player already has this effect");
+
 		for (ServerPlayer player : players) {
 			PotionEffect effect = builder.build();
-			player.transform(Keys.POTION_EFFECTS, effects -> {
-				if (effects == null)
-					return Collections.singletonList(effect);
+			List<PotionEffect> effects = new ArrayList<>(player.get(Keys.POTION_EFFECTS).orElseGet(Collections::emptyList));
+			effects = new ArrayList<>(effects);
 
-				boolean overridden = false;
-				for (int i = 0; i < effects.size(); i++) {
-					PotionEffect existingEffect = effects.get(i);
-					if (existingEffect.type().equals(potionEffectType)) {
-						plugin.getSLF4JLogger().debug("Updating existing effect");
-						overridden = true;
+			boolean overridden = false;
+			for (int i = 0; i < effects.size(); i++) {
+				PotionEffect existingEffect = effects.get(i);
+				if (!potionEffectType.equals(existingEffect.type()))
+					continue;
 
-						long newDuration = Math.max(durationLong, existingEffect.duration().ticks());
-						int newAmplifier = existingEffect.amplifier() + 1;
-						if (potionEffectType.equals(PotionEffectTypes.LEVITATION.get()) && newAmplifier > 127)
-							newAmplifier -= 1; // don't mess with gravity effects
-
-						PotionEffect.Builder newEffect = PotionEffect.builder();
-						try {
-							newEffect.from(existingEffect);
-						} catch (AbstractMethodError ignored) {
-							newEffect.potionType(existingEffect.type())
-									.ambient(existingEffect.isAmbient())
-									.showParticles(existingEffect.showsParticles())
-									.duration(Ticks.of(newDuration))
-									.amplifier(newAmplifier);
-							// showIcon is not set because it's what causes the AbstractMethodError in the first place
-						}
-						effects.set(i, newEffect.build());
-						break;
-					}
+				plugin.getSLF4JLogger().debug("Updating existing effect");
+				overridden = true;
+				if (true) {
+					// working around sponge bug. TODO: remove when fixed
+					break;
 				}
 
-				if (!overridden) {
-					plugin.getSLF4JLogger().debug("Adding new effect");
-					effects.add(effect);
-				}
+				long oldDuration = existingEffect.duration().ticks();
+				long newDuration = oldDuration == -1 ? -1 : Math.max(durationLong, oldDuration);
+				int newAmplifier = existingEffect.amplifier() + 1;
+				if (potionEffectType.equals(PotionEffectTypes.LEVITATION.get()) && newAmplifier > 127)
+					newAmplifier -= 1; // don't mess with gravity effects
 
-				return effects;
-			});
+				PotionEffect.Builder newEffect = PotionEffect.builder();
+				try {
+					newEffect.from(existingEffect);
+				} catch (AbstractMethodError ignored) {
+					newEffect.potionType(existingEffect.type())
+							.ambient(existingEffect.isAmbient())
+							.showParticles(existingEffect.showsParticles())
+							.duration(Ticks.of(newDuration))
+							.amplifier(newAmplifier);
+					// showIcon is not set because it's what causes the AbstractMethodError in the first place
+				}
+				effects.set(i, newEffect.build());
+				response.type(ResultType.SUCCESS).message("SUCCESS");
+				break;
+			}
+
+			if (!overridden) {
+				plugin.getSLF4JLogger().debug("Adding new effect");
+				effects.add(effect);
+				response.type(ResultType.SUCCESS).message("SUCCESS");
+			}
+
+			player.offer(Keys.POTION_EFFECTS, effects);
 		}
 
-		return request.buildResponse().type(ResultType.SUCCESS);
+		return response;
 	}
 }

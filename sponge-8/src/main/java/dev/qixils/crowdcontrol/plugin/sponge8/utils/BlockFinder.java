@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
 import dev.qixils.crowdcontrol.common.util.CommonTags;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.value.Value;
@@ -42,7 +43,11 @@ public final class BlockFinder extends AbstractBlockFinder<ServerLocation, Vecto
 	}
 
 	public static boolean isAir(BlockState block) {
-		return CommonTags.AIR.contains(block.type().key(RegistryTypes.BLOCK_TYPE));
+		return isAir(block.type());
+	}
+
+	public static boolean isAir(BlockType block) {
+		return CommonTags.AIR.contains(block.key(RegistryTypes.BLOCK_TYPE));
 	}
 
 	public static BlockFinderBuilder builder() {

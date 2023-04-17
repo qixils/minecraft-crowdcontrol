@@ -24,7 +24,6 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Game;
@@ -202,21 +201,6 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		return hosts;
 	}
 
-	@Override
-	public @Nullable String getPassword() {
-		if (!isServer()) return null;
-		if (crowdControl != null)
-			return crowdControl.getPassword();
-		if (manualPassword != null)
-			return manualPassword;
-		try {
-			return configLoader.load().getNode("password").getString();
-		} catch (IOException e) {
-			logger.warn("Could not load config", e);
-			return null;
-		}
-	}
-
 	@Listener
 	public void onKeyRegistration(GameRegistryEvent.Register<Key<?>> event) {
 		ORIGINAL_DISPLAY_NAME = Key.builder()
@@ -278,7 +262,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	}
 
 	@Override
-	public void initCrowdControl() {
+	public void loadConfig() {
 		ConfigurationNode config;
 		try {
 			config = configLoader.load();
@@ -286,56 +270,60 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			throw new RuntimeException("Could not load plugin config", e);
 		}
 
+		// hosts
+		TypeToken<Set<String>> hostToken = new TypeToken<Set<String>>() {};
 		try {
-			hosts = Collections.unmodifiableCollection(config.getNode("hosts").getList(TypeToken.of(String.class)));
+			hosts = Collections.unmodifiableSet(config.getNode("hosts").getValue(hostToken, new HashSet<>(hosts)));
 		} catch (ObjectMappingException e) {
 			throw new RuntimeException("Could not parse 'hosts' config variable", e);
 		}
-
-		// limit config
-		boolean hostsBypass = config.getNode("limits", "hosts-bypass").getBoolean(true);
-		TypeToken<Map<String, Integer>> typeToken = new TypeToken<Map<String, Integer>>() {};
-		try {
-			Map<String, Integer> itemLimits = config.getNode("limits", "items").getValue(typeToken);
-			Map<String, Integer> entityLimits = config.getNode("limits", "entities").getValue(typeToken);
-			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
-		} catch (ObjectMappingException e) {
-			getSLF4JLogger().warn("Could not parse limits config", e);
-		}
-
-		global = config.getNode("global").getBoolean(false);
-		announce = config.getNode("announce").getBoolean(true);
-		adminRequired = config.getNode("admin-required").getBoolean(false);
-		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString("none"));
 		if (!hosts.isEmpty()) {
 			Set<String> loweredHosts = new HashSet<>(hosts.size());
 			for (String host : hosts)
 				loweredHosts.add(host.toLowerCase(Locale.ROOT));
 			hosts = Collections.unmodifiableSet(loweredHosts);
 		}
-		isServer = !config.getNode("legacy").getBoolean(false);
-		int port = config.getNode("port").getInt(DEFAULT_PORT);
+
+		// limit config
+		boolean hostsBypass = config.getNode("limits", "hosts-bypass").getBoolean(limitConfig.hostsBypass());
+		TypeToken<Map<String, Integer>> limitToken = new TypeToken<Map<String, Integer>>() {};
+		try {
+			Map<String, Integer> itemLimits = config.getNode("limits", "items").getValue(limitToken, limitConfig.itemLimits());
+			Map<String, Integer> entityLimits = config.getNode("limits", "entities").getValue(limitToken, limitConfig.entityLimits());
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		} catch (ObjectMappingException e) {
+			getSLF4JLogger().warn("Could not parse limits config", e);
+		}
+
+		// misc
+		global = config.getNode("global").getBoolean(global);
+		announce = config.getNode("announce").getBoolean(announce);
+		adminRequired = config.getNode("admin-required").getBoolean(adminRequired);
+		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString(hideNames.getConfigCode()));
+		isServer = !config.getNode("legacy").getBoolean(!isServer);
+		port = config.getNode("port").getInt(port);
+		IP = config.getNode("ip").getString(IP);
+		password = config.getNode("password").getString(password);
+	}
+
+	@Override
+	public void initCrowdControl() {
+		loadConfig();
+
 		if (isServer) {
 			getLogger().info("Running Crowd Control in server mode");
-			String password;
-			if (manualPassword != null)
-				password = manualPassword;
-			else {
-				password = config.getNode("password").getString("crowdcontrol");
-				if (password == null || password.isEmpty()) {
-					logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
-					return;
-				}
+			if (password == null || password.isEmpty()) {
+				logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
+				return;
 			}
 			crowdControl = CrowdControl.server().port(port).password(password).build();
 		} else {
 			getLogger().info("Running Crowd Control in legacy client mode");
-			String ip = config.getNode("ip").getString("127.0.0.1");
-			if (ip == null || ip.isEmpty()) {
+			if (IP == null || IP.isEmpty()) {
 				logger.error("No IP address has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf");
 				return;
 			}
-			crowdControl = CrowdControl.client().port(port).ip(ip).build();
+			crowdControl = CrowdControl.client().port(port).ip(IP).build();
 		}
 
 		commandRegister.register();

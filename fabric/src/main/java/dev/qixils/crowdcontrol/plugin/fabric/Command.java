@@ -1,12 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
-import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
-import net.minecraft.resource.featuretoggle.ToggleableFeature;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,9 +13,9 @@ import java.util.Objects;
 import java.util.Random;
 
 public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<ServerPlayerEntity> {
-	protected static final Random random = RandomUtil.RNG;
+	protected static final @NotNull Random random = RandomUtil.RNG;
 	@Getter
-	protected final FabricCrowdControlPlugin plugin;
+	protected final @NotNull FabricCrowdControlPlugin plugin;
 
 	protected Command(@NotNull FabricCrowdControlPlugin plugin) {
 		this.plugin = Objects.requireNonNull(plugin, "plugin");
@@ -44,15 +41,5 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 			case "sweeping" -> "sweeping_edge";
 			default -> path;
 		};
-	}
-
-	@SuppressWarnings("ConstantValue") // overworld can indeed be null early in initialization
-	@Override
-	public TriState isVisible() {
-		if (this instanceof ToggleableFeature element) {
-			ServerWorld overworld = plugin.server().getOverworld();
-			return TriState.fromBoolean(overworld != null && element.isEnabled(overworld.getEnabledFeatures()));
-		}
-		return TriState.UNKNOWN; // avoid sending any packet
 	}
 }

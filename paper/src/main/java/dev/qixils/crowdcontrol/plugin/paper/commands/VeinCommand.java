@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -38,10 +39,11 @@ public class VeinCommand extends ImmediateCommand {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 1; ++z) {
 					Location loc = base.clone().add(x, y, z);
-					Material matType = loc.getBlock().getType();
+					Block block = loc.getBlock();
+					Material matType = block.getType();
 					if (matType == Material.DEEPSLATE) {
 						deepslateBlocks.add(loc);
-					} else if (BlockUtil.STONES_TAG.contains(matType)) {
+					} else if (!block.isEmpty()) {
 						stoneBlocks.add(loc);
 					}
 				}

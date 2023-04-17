@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.math.vector.Vector3d;
@@ -22,16 +24,23 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENT
 import static dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil.csIdOf;
 
 @Getter
-public class RemoveEntityCommand extends ImmediateCommand {
-	protected final EntityType<?> entityType;
+public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
+	protected final EntityType<E> entityType;
 	private final String effectName;
 	private final Component displayName;
 
-	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<?> entityType) {
+	public RemoveEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "remove_entity_" + csIdOf(entityType.key(RegistryTypes.ENTITY_TYPE));
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType);
+	}
+
+	@Override
+	public boolean isMonster() {
+		if (EntityTypes.ENDER_DRAGON.get().equals(entityType))
+			return false; // ender dragon is persistent regardless of difficulty so allow it to be removed
+		return EntityCommand.super.isMonster();
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
@@ -55,6 +64,9 @@ public class RemoveEntityCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return tryExecute;
+
 		Builder result = request.buildResponse().type(ResultType.RETRY)
 				.message("No " + plugin.getTextUtil().asPlain(entityType) + "s found nearby to remove");
 

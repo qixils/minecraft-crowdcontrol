@@ -25,8 +25,12 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
+import net.kyori.adventure.pointer.Pointered;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.registry.Registries;
+import net.minecraft.resource.featuretoggle.ToggleableFeature;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -38,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -45,9 +50,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
-
-// TODO:
-//  - Add a GUI config library
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
@@ -76,7 +78,17 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEnti
 	@NotNull
 	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
 	@NotNull
-	private Executor syncExecutor = Runnable::run;
+	private Executor syncExecutor = runnable -> {
+		try {
+			if (server != null) {
+				server.executeSync(runnable);
+			} else {
+				runnable.run();
+			}
+		} catch (Exception e) {
+			getSLF4JLogger().error("Error while executing sync task", e);
+		}
+	};
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowdcontrol");
@@ -93,8 +105,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEnti
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
-	@MonotonicNonNull
-	private HoconConfigurationLoader configLoader;
+	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(Path.of("config"));
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 	public final Map<UUID, Set<UUID>> playerVotes = new HashMap<>(); // map of proposal UUIDs to a set of player UUIDs who voted on it
 
@@ -210,7 +221,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEnti
 			this.adventure = FabricServerAudiences.of(server);
 			this.syncExecutor = server;
 			this.textUtil = new MojmapTextUtil(this);
-			this.configLoader = createConfigLoader(server.getFile("config").toPath());
 			initCrowdControl();
 		}
 	}
@@ -257,5 +267,22 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayerEnti
 	@Override
 	public @Nullable ServerPlayerEntity asPlayer(@NotNull ServerCommandSource sender) {
 		return sender.getPlayer();
+	}
+
+	public boolean isEnabled(ToggleableFeature feature) {
+		if (server == null) return false;
+		return feature.isEnabled(server.getSaveProperties().getEnabledFeatures());
+	}
+
+	public boolean isDisabled(ToggleableFeature feature) {
+		return !isEnabled(feature);
+	}
+
+	public @NotNull Component toAdventure(ComponentLike text, @NotNull Pointered viewer) {
+		return adventure().renderer().render(text.asComponent(), viewer);
+	}
+
+	public @NotNull net.minecraft.text.Text toNative(ComponentLike text, @NotNull Pointered viewer) {
+		return adventure().toNative(toAdventure(text, viewer));
 	}
 }

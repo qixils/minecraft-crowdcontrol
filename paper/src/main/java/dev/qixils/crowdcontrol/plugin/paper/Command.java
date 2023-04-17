@@ -12,7 +12,7 @@ import java.util.Random;
 public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<Player> {
 	protected static final Random random = RandomUtil.RNG;
 	@Getter
-	protected final PaperCrowdControlPlugin plugin;
+	protected final @NotNull PaperCrowdControlPlugin plugin;
 
 	protected Command(@NotNull PaperCrowdControlPlugin plugin) {
 		this.plugin = Objects.requireNonNull(plugin, "plugin");

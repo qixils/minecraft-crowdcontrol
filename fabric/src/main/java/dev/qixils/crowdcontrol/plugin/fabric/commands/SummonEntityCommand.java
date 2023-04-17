@@ -27,7 +27,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.village.VillagerDataContainer;
-import net.minecraft.world.Difficulty;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +41,6 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.weightedRandom;
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
 	private final Map<EquipmentSlot, List<Item>> armor;
 	protected final EntityType<E> entityType;
-	protected final boolean isMonster;
 	private final String effectName;
 	private final Component displayName;
 	private @Nullable List<Identifier> lootTables = null;
@@ -60,7 +58,6 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	public SummonEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.isMonster = entityType.getSpawnGroup() == SpawnGroup.MONSTER;
 		this.effectName = "entity_" + csIdOf(Registries.ENTITY_TYPE.getId(entityType));
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getName());
 
@@ -91,18 +88,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
-		for (ServerPlayerEntity player : players) {
-			if (isMonster && player.getWorld().getDifficulty() == Difficulty.PEACEFUL) {
-				return request.buildResponse()
-						.type(ResultType.FAILURE)
-						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
-			}
-			if (!isEnabled(player.getWorld().getEnabledFeatures())) {
-				return request.buildResponse()
-						.type(ResultType.UNAVAILABLE)
-						.message("Mob is not available in this version of Minecraft");
-			}
-		}
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return tryExecute;
 
 		LimitConfig config = getPlugin().getLimitConfig();
 		int maxVictims = config.getItemLimit(Registries.ENTITY_TYPE.getId(entityType).getPath());
@@ -116,7 +103,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 					break;
 				if (!isHost(player))
 					continue;
-				spawnEntity(plugin.getViewerComponent(request, false), player);
+				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 				victims++;
 			}
 
@@ -126,7 +113,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 					break;
 				if (isHost(player))
 					continue;
-				spawnEntity(plugin.getViewerComponent(request, false), player);
+				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 				victims++;
 			}
 		});
@@ -134,15 +121,17 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	}
 
 	@Blocking
-	protected E spawnEntity(@NotNull Component viewer, @NotNull ServerPlayerEntity player) {
+	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayerEntity player) {
 		ServerWorld level = player.getWorld();
 		E entity = entityType.create(player.world);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
 		entity.setPosition(player.getPos());
-		entity.setCustomName(plugin.adventure().toNative(viewer));
-		entity.setCustomNameVisible(true);
+		if (viewer != null) {
+			entity.setCustomName(plugin.toNative(viewer, player));
+			entity.setCustomNameVisible(true);
+		}
 		if (entity instanceof MobEntity mob)
 			mob.initialize(level, level.getLocalDifficulty(entity.getBlockPos()), SpawnReason.MOB_SUMMONED, null, null);
 		if (entity instanceof TameableEntity tamable)

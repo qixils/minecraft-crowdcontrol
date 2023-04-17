@@ -79,7 +79,8 @@ public class PotionCommand extends TimedImmediateCommand {
 					if (existingEffect.getType().equals(potionEffectType)) {
 						overridden = true;
 						player.removePotionEffect(potionEffectType);
-						int newDuration = Math.max(durationTicks, existingEffect.getDuration());
+						int oldDuration = existingEffect.getDuration();
+						int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
 						int newAmplifier = existingEffect.getAmplifier() + 1;
 						if (potionEffectType == PotionEffectType.LEVITATION && newAmplifier > 127)
 							newAmplifier -= 1; // don't mess with gravity effects

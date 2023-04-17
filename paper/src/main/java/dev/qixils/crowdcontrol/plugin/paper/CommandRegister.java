@@ -91,7 +91,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		// entity commands
 		for (EntityType entity : EntityType.values()) {
 			if (entity == EntityType.UNKNOWN) continue;
-			// TODO: skip experimental entities (blocked by Paper#8950(Issue)/Paper#8952(PR))
 			commands.add(new SummonEntityCommand(plugin, entity));
 			commands.add(new RemoveEntityCommand(plugin, entity));
 		}

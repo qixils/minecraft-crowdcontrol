@@ -1,13 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -33,8 +31,7 @@ public class GravelCommand extends ImmediateCommand {
 		for (Player player : players)
 			locations.addAll(BlockFinder.builder()
 					.origin(player.getLocation())
-					.locationValidator(location -> CommonTags.STONES_EXCEPT_GRAVEL.contains(
-							Key.key(location.getBlock().getType().getId())))
+					.locationValidator(location -> !location.getBlock().getType().equals(BlockTypes.AIR))
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());

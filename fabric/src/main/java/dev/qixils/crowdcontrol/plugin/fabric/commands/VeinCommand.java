@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -43,10 +44,11 @@ public class VeinCommand extends ImmediateCommand {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 1; ++z) {
 					Location loc = base.add(x, y, z);
-					Block matType = loc.block().getBlock();
+					BlockState block = loc.block();
+					Block matType = block.getBlock();
 					if (matType == Blocks.DEEPSLATE) {
 						deepslateBlocks.add(loc);
-					} else if (stones.contains(matType)) {
+					} else if (!block.isAir()) {
 						stoneBlocks.add(loc);
 					}
 				}

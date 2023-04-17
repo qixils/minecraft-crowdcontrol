@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.FeatureElementCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
@@ -13,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registries;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @Getter
-public class BlockCommand extends ImmediateCommand {
+public class BlockCommand extends ImmediateCommand implements FeatureElementCommand {
 	private final Block blockType;
 	private final String effectName;
 	private final Component displayName;
@@ -39,6 +41,11 @@ public class BlockCommand extends ImmediateCommand {
 		this.blockType = blockType;
 		this.effectName = effectName;
 		this.displayName = displayName;
+	}
+
+	@Override
+	public @NotNull FeatureSet getRequiredFeatures() {
+		return blockType.getRequiredFeatures();
 	}
 
 	@Nullable

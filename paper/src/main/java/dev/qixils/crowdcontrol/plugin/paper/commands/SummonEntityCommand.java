@@ -10,7 +10,10 @@ import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.*;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -26,9 +29,10 @@ import java.util.concurrent.CompletableFuture;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
-public class SummonEntityCommand extends Command {
+public class SummonEntityCommand extends Command implements EntityCommand {
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
 	private static final Set<Material> BLOCKS;
@@ -102,14 +106,8 @@ public class SummonEntityCommand extends Command {
 
 	@Override
 	public @NotNull CompletableFuture<Response.@Nullable Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (entityType.getEntityClass() != null && Monster.class.isAssignableFrom(entityType.getEntityClass())) {
-			for (World world : Bukkit.getWorlds()) {
-				if (world.getDifficulty() == Difficulty.PEACEFUL)
-					return CompletableFuture.completedFuture(request.buildResponse()
-							.type(Response.ResultType.FAILURE)
-							.message("Hostile mobs cannot be spawned while on Peaceful difficulty"));
-			}
-		}
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return completedFuture(tryExecute);
 
 		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
 		LimitConfig config = plugin.getLimitConfig();
@@ -125,7 +123,7 @@ public class SummonEntityCommand extends Command {
 						break;
 					if (!isHost(player))
 						continue;
-					spawnEntity(plugin.getViewerComponent(request, false), player);
+					spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 					victims++;
 				}
 
@@ -135,7 +133,7 @@ public class SummonEntityCommand extends Command {
 						break;
 					if (isHost(player))
 						continue;
-					spawnEntity(plugin.getViewerComponent(request, false), player);
+					spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 					victims++;
 				}
 			} catch (Exception e) {
@@ -148,10 +146,12 @@ public class SummonEntityCommand extends Command {
 		return future;
 	}
 
-	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
+	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
 		Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
-		entity.customName(viewer);
-		entity.setCustomNameVisible(true);
+		if (viewer != null) {
+			entity.customName(viewer);
+			entity.setCustomNameVisible(true);
+		}
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
 		if (entity instanceof Boat boat)

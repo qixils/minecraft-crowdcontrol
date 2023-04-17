@@ -81,7 +81,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 				new ItemDamageCommand(plugin),
 				new RemoveEnchantsCommand(plugin),
 				new HatCommand(plugin),
-				new RespawnCommand(plugin),
+				// TODO: broken -- new RespawnCommand(plugin),
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
 				new BucketClutchCommand(plugin),

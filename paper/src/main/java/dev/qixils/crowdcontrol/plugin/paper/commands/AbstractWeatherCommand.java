@@ -14,7 +14,7 @@ import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.WEATHER_TICKS;
 
-@Global // test if this applies to subclasses
+@Global
 public abstract class AbstractWeatherCommand extends ImmediateCommand {
 	protected static final int WEATHER_DURATION = (int) WEATHER_TICKS;
 

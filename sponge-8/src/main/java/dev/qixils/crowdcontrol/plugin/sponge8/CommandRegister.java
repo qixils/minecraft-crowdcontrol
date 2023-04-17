@@ -69,7 +69,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 				new ItemDamageCommand(plugin),
 				new RemoveEnchantsCommand(plugin),
 				new HatCommand(plugin),
-				new RespawnCommand(plugin),
+				// TODO: fails to get bed location and defaults to 0,0 -- new RespawnCommand(plugin),
 				new DropItemCommand(plugin),
 				new DeleteItemCommand(plugin),
 				new BucketClutchCommand(plugin),
@@ -95,8 +95,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 
 		// entity commands
 		plugin.getGame().registry(RegistryTypes.ENTITY_TYPE).stream().forEach(entity -> {
-			commands.add(new SummonEntityCommand(plugin, entity));
-			commands.add(new RemoveEntityCommand(plugin, entity));
+			commands.add(new SummonEntityCommand<>(plugin, entity));
+			commands.add(new RemoveEntityCommand<>(plugin, entity));
 		});
 
 		// register difficulty commands

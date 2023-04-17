@@ -35,6 +35,13 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", entityType.getName());
 	}
 
+	@Override
+	public boolean isMonster() {
+		if (entityType == EntityType.ENDER_DRAGON)
+			return false; // ender dragon is persistent regardless of difficulty so allow it to be removed
+		return EntityCommand.super.isMonster();
+	}
+
 	private boolean removeEntityFrom(ServerPlayerEntity player) {
 		Vec3d playerPosition = player.getPos();
 		List<Entity> entities = StreamSupport.stream(player.getWorld().iterateEntities().spliterator(), false)
@@ -49,13 +56,8 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayerEntity> players, @NotNull Request request) {
-		for (ServerPlayerEntity player : players) {
-			if (!isEnabled(player.getWorld().getEnabledFeatures())) {
-				return request.buildResponse()
-						.type(ResultType.UNAVAILABLE)
-						.message("Mob is not available in this version of Minecraft");
-			}
-		}
+		Response.Builder tryExecute = tryExecute(players, request);
+		if (tryExecute != null) return tryExecute;
 
 		Builder result = request.buildResponse().type(ResultType.RETRY)
 				.message("No " + plugin.getTextUtil().asPlain(entityType.getName()) + "s found nearby to remove");

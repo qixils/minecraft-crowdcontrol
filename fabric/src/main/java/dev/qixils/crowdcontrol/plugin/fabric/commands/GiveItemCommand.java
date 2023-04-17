@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class GiveItemCommand extends ImmediateCommand {
+public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 	private final Item item;
 	private final String effectName;
 	private final TranslatableComponent defaultDisplayName;

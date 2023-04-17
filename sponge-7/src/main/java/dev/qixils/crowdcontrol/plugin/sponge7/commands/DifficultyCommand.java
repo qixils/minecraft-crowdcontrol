@@ -45,6 +45,11 @@ public class DifficultyCommand extends ImmediateCommand {
 		async(() -> {
 			for (Difficulty dif : plugin.getRegistry().getAllOf(Difficulty.class))
 				plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+			for (EntityCommand command : plugin.commandRegister().getCommands(EntityCommand.class)) {
+				TriState state = command.isSelectable();
+				if (state != TriState.UNKNOWN)
+					plugin.updateEffectStatus(plugin.getCrowdControl(), command, state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE);
+			}
 		});
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
