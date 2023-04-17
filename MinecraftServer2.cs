@@ -32,13 +32,12 @@ namespace CrowdControl.Games.Packs
 
         private static readonly EffectList AllEffects = new(new Effect[]
         {
-            // TODO: more effect descriptions from old MinecraftServer.cs
             // miscellaneous
             new("Annoy Players", "toast") { Price = 50, Description = "Plays an obnoxious animation and an obnoxious sound" },
             new("Dig Hole", "dig") { Price = 200, Description = "Digs a small hole underneath players" },
             new("Do-or-Die", "do_or_die") { Price = 500, Description = "Gives players a task to complete within 30 seconds or else they die" },
             new("Eat Chorus Fruit", "chorus_fruit") { Price = 75, Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit" },
-            // disabled because this is killing anyone in the air: new("Explode", "explode") { Price = 750, Description = "Spawns a harmless TNT-like explosion at players' feet" },
+            // TODO: disabled because this is killing anyone in the air -- new("Explode", "explode") { Price = 750, Description = "Spawns a harmless TNT-like explosion at players' feet" },
             new("Fling Randomly", "fling") { Price = 100, Description = "Flings players in a totally random direction" },
             new("Flip Mobs Upside-Down", "dinnerbone") { Price = 50, Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone" },
             new("Invert Camera", "invert_look") { Price = 200, Duration = 15, Description = "Temporarily inverts mouse movement" },
@@ -297,7 +296,6 @@ namespace CrowdControl.Games.Packs
             new("Haste", "potion_haste") { Price = 50, Duration = 20, Description = "Increases mining speed" },
             new("Health Boost", "potion_health_boost") { Price = 50, Duration = 20, Description = "Increases maximum health" },
             new("Invisibility", "potion_invisibility") { Price = 25, Duration = 20, Description = "Makes the player invisible" },
-            // disabled in favor of "Low Gravity" -- new("Jump Boost", "potion_jump_boost") { Price = 50, Duration = 20, Description = "Makes the player jump higher" },
             new("Levitation", "potion_levitation") { Price = 100, Duration = 20, Description = "Gradually lifts the player up into the air" },
             new("Mining Fatigue", "potion_mining_fatigue") { Price = 50, Duration = 20, Description = "Decreases mining speed" },
             new("Nausea", "potion_nausea") { Price = 100, Duration = 20, Description = "Makes the player's screen shake" },
@@ -305,7 +303,6 @@ namespace CrowdControl.Games.Packs
             new("Poison", "potion_poison") { Price = 50, Duration = 20, Description = "Gradually damages the player" },
             new("Regeneration", "potion_regeneration") { Price = 50, Duration = 20, Description = "Gradually heals the player" },
             new("Resistance", "potion_resistance") { Price = 50, Duration = 20, Description = "Reduces damage taken" },
-            // disabled in favor of "Low Gravity" -- new("Slow Falling", "potion_slow_falling") { Price = 25, Duration = 20, Description = "Reduces the player's falling speed" },
             new("Slowness", "potion_slowness") { Price = 50, Duration = 20, Description = "Decreases the player's walking speed" },
             new("Speed", "potion_speed") { Price = 50, Duration = 20, Description = "Increases the player's walking speed" },
             new("Strength", "potion_strength") { Price = 50, Duration = 20, Description = "Increases the player's damage output" },
@@ -374,64 +371,64 @@ namespace CrowdControl.Games.Packs
             // gives 1 item
             new("Elytra", "give_elytra") { Price = 500, Description = "Gives an Elytra, a pair of wings that allows the player to fly" },
             new("Eye of Ender", "give_ender_eye") { Price = 100, Quantity = 64, Description = "Gives an Eye of Ender, a critical part of finding the End Portal and completing the game" },
-            new("End Portal Frame", "give_end_portal_frame") { Price = 200, Quantity = 64, Description = "Gives you a part of the frame required to build an end portal. Note that some server configurations may limit how many players get one." },
-            new("Recovery Compass", "give_recovery_compass") { Price = 400, Quantity = 64, Description = "Gives you a compass that points to the location of your most recent death" },
-            new("Trident", "give_trident") { Price = 300, Description = "Gives you a Trident, a powerful melee weapon that can be thrown" },
+            new("End Portal Frame", "give_end_portal_frame") { Price = 200, Quantity = 64, Description = "Gives a part of the frame required to build an end portal. Note that some server configurations may limit how many players get one." },
+            new("Recovery Compass", "give_recovery_compass") { Price = 400, Quantity = 64, Description = "Gives a compass that points to the location of your most recent death" },
+            new("Trident", "give_trident") { Price = 300, Description = "Gives a Trident, a powerful melee weapon that can be thrown" },
 
-            new("Cooked Porkchop", "give_cooked_porkchop") { Price = 40, Quantity = 64, Description = "Gives you a Cooked Porkchop, a food item that restores 4 bars of hunger" },
-            new("Golden Apple", "give_golden_apple") { Price = 200, Quantity = 64, Description = "Gives you a Golden Apple, a food item that restores 2 bars of hunger, 2 bars of health, and temporarily grants an extra 2 hearts of maximum health" },
-            new("Enchanted Golden Apple", "give_enchanted_golden_apple") { Price = 300, Quantity = 64, Description = "Gives you an Enchanted Golden Apple, a food item that restores 2 bars of hunger, 8 bars of health, and temporarily grants fire resistance, an extra 8 hearts of maximum health, resistance, and fire resistance" },
+            new("Cooked Porkchop", "give_cooked_porkchop") { Price = 40, Quantity = 64, Description = "Gives a Cooked Porkchop, a food item that restores 4 bars of hunger" },
+            new("Golden Apple", "give_golden_apple") { Price = 200, Quantity = 64, Description = "Gives a Golden Apple, a food item that restores 2 bars of hunger, 2 bars of health, and temporarily grants an extra 2 hearts of maximum health" },
+            new("Enchanted Golden Apple", "give_enchanted_golden_apple") { Price = 300, Quantity = 64, Description = "Gives an Enchanted Golden Apple, a food item that restores 2 bars of hunger, 8 bars of health, and temporarily grants fire resistance, an extra 8 hearts of maximum health, resistance, and fire resistance" },
 
-            new("Coal", "give_coal") { Price = 10, Quantity = 64, Description = "Gives you a piece of Coal, a mineral that can be used to smelt ores and cook food" },
-            new("Gold Ingot", "give_gold_ingot") { Price = 20, Quantity = 64, Description = "Gives you a Gold Ingot, a mineral that can be used to craft tools, armor, and golden apples" },
-            new("Iron Ingot", "give_iron_ingot") { Price = 25, Quantity = 64, Description = "Gives you an Iron Ingot, a mineral that can be used to craft tools, armor, and shields" },
-            new("Diamond", "give_diamond") { Price = 100, Quantity = 64, Description = "Gives you a Diamond, a mineral that can be used to craft tools and armor" },
-            new("Netherite Ingot", "give_netherite_ingot") { Price = 200, Quantity = 64, Description = "Gives you a Netherite Ingot, a mineral that can be used to upgrade diamond tools and armor" },
+            new("Coal", "give_coal") { Price = 10, Quantity = 64, Description = "Gives a piece of Coal, a mineral that can be used to smelt ores and cook food" },
+            new("Gold Ingot", "give_gold_ingot") { Price = 20, Quantity = 64, Description = "Gives a Gold Ingot, a mineral that can be used to craft tools, armor, and golden apples" },
+            new("Iron Ingot", "give_iron_ingot") { Price = 25, Quantity = 64, Description = "Gives an Iron Ingot, a mineral that can be used to craft tools, armor, and shields" },
+            new("Diamond", "give_diamond") { Price = 100, Quantity = 64, Description = "Gives a Diamond, a mineral that can be used to craft tools and armor" },
+            new("Netherite Ingot", "give_netherite_ingot") { Price = 200, Quantity = 64, Description = "Gives a Netherite Ingot, a mineral that can be used to upgrade diamond tools and armor" },
 
-            new("Wooden Pickaxe", "give_wooden_pickaxe") { Price = 25 },
-            new("Stone Pickaxe", "give_stone_pickaxe") { Price = 50 },
-            new("Golden Pickaxe", "give_golden_pickaxe") { Price = 50 },
-            new("Iron Pickaxe", "give_iron_pickaxe") { Price = 100 },
-            new("Diamond Pickaxe", "give_diamond_pickaxe") { Price = 250 },
-            new("Netherite Pickaxe", "give_netherite_pickaxe") { Price = 350 },
+            new("Golden Pickaxe", "give_golden_pickaxe") { Price = 25, Description = "Gives a Golden Pickaxe, a fast but fragile tool that can't mine much more than stone" },
+            new("Wooden Pickaxe", "give_wooden_pickaxe") { Price = 25, Description = "Gives a Wooden Pickaxe, a tool that can be used to mine stone and coal ore" },
+            new("Stone Pickaxe", "give_stone_pickaxe") { Price = 50, Description = "Gives a Stone Pickaxe, a tool that can be used to mine iron ore" },
+            new("Iron Pickaxe", "give_iron_pickaxe") { Price = 100, Description = "Gives an Iron Pickaxe, a tool that can be used to mine diamond ore" },
+            new("Diamond Pickaxe", "give_diamond_pickaxe") { Price = 250, Description = "Gives a Diamond Pickaxe, a tool that can be used to mine obsidian and ancient debris" },
+            new("Netherite Pickaxe", "give_netherite_pickaxe") { Price = 350, Description = "Gives a Netherite Pickaxe, a tool that mines blocks faster and longer than any other" },
 
-            new("Wooden Sword", "give_wooden_sword") { Price = 25 },
-            new("Stone Sword", "give_stone_sword") { Price = 50 },
-            new("Golden Sword", "give_golden_sword") { Price = 50 },
-            new("Iron Sword", "give_iron_sword") { Price = 100 },
-            new("Diamond Sword", "give_diamond_sword") { Price = 250 },
-            new("Netherite Sword", "give_netherite_sword") { Price = 350 },
+            new("Golden Sword", "give_golden_sword") { Price = 15, Description = "Gives a Golden Sword, a highly fragile melee weapon" },
+            new("Wooden Sword", "give_wooden_sword") { Price = 25, Description = "Gives a Wooden Sword, a primitive melee weapon" },
+            new("Stone Sword", "give_stone_sword") { Price = 50, Description = "Gives a Stone Sword, a slightly stronger melee weapon" },
+            new("Iron Sword", "give_iron_sword") { Price = 100, Description = "Gives an Iron Sword, an average melee weapon" },
+            new("Diamond Sword", "give_diamond_sword") { Price = 250, Description = "Gives a Diamond Sword, a powerful melee weapon" },
+            new("Netherite Sword", "give_netherite_sword") { Price = 350, Description = "Gives a Netherite Sword, a very powerful and durable melee weapon" },
 
             // takes 1 item
-            new("Elytra", "take_elytra") { Price = 700 },
-            new("Eye of Ender", "take_ender_eye") { Price = 200, Quantity = 64 },
-            new("End Portal Frame", "take_end_portal_frame") { Price = 300, Quantity = 64 },
-            new("Recovery Compass", "take_recovery_compass") { Price = 500, Quantity = 64 },
-            new("Trident", "take_trident") { Price = 400 },
+            new("Elytra", "take_elytra") { Price = 700, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Eye of Ender", "take_ender_eye") { Price = 200, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("End Portal Frame", "take_end_portal_frame") { Price = 300, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Recovery Compass", "take_recovery_compass") { Price = 500, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Trident", "take_trident") { Price = 400, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
 
-            new("Cooked Porkchop", "take_cooked_porkchop") { Price = 100, Quantity = 64 },
-            new("Golden Apple", "take_golden_apple") { Price = 400, Quantity = 64 },
-            new("Enchanted Golden Apple", "take_enchanted_golden_apple") { Price = 500, Quantity = 64 },
+            new("Cooked Porkchop", "take_cooked_porkchop") { Price = 100, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Golden Apple", "take_golden_apple") { Price = 400, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Enchanted Golden Apple", "take_enchanted_golden_apple") { Price = 500, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
 
-            new("Coal", "take_coal") { Price = 50, Quantity = 64 },
-            new("Iron Ingot", "take_iron_ingot") { Price = 100, Quantity = 64 },
-            new("Gold Ingot", "take_gold_ingot") { Price = 100, Quantity = 64 },
-            new("Diamond", "take_diamond") { Price = 300, Quantity = 64 },
-            new("Netherite Ingot", "take_netherite_ingot") { Price = 400, Quantity = 64 },
+            new("Coal", "take_coal") { Price = 50, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Iron Ingot", "take_iron_ingot") { Price = 100, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Gold Ingot", "take_gold_ingot") { Price = 100, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Diamond", "take_diamond") { Price = 300, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Netherite Ingot", "take_netherite_ingot") { Price = 400, Quantity = 64, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
 
-            new("Wooden Pickaxe", "take_wooden_pickaxe") { Price = 50 },
-            new("Stone Pickaxe", "take_stone_pickaxe") { Price = 100 },
-            new("Golden Pickaxe", "take_golden_pickaxe") { Price = 100 },
-            new("Iron Pickaxe", "take_iron_pickaxe") { Price = 400 },
-            new("Diamond Pickaxe", "take_diamond_pickaxe") { Price = 500 },
-            new("Netherite Pickaxe", "take_netherite_pickaxe") { Price = 500 },
+            new("Wooden Pickaxe", "take_wooden_pickaxe") { Price = 50, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Stone Pickaxe", "take_stone_pickaxe") { Price = 100, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Golden Pickaxe", "take_golden_pickaxe") { Price = 100, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Iron Pickaxe", "take_iron_pickaxe") { Price = 400, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Diamond Pickaxe", "take_diamond_pickaxe") { Price = 500, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Netherite Pickaxe", "take_netherite_pickaxe") { Price = 500, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
 
-            new("Wooden Sword", "take_wooden_sword") { Price = 50 },
-            new("Stone Sword", "take_stone_sword") { Price = 100 },
-            new("Golden Sword", "take_golden_sword") { Price = 100 },
-            new("Iron Sword", "take_iron_sword") { Price = 400 },
-            new("Diamond Sword", "take_diamond_sword") { Price = 500 },
-            new("Netherite Sword", "take_netherite_sword") { Price = 500 },
+            new("Wooden Sword", "take_wooden_sword") { Price = 50, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Stone Sword", "take_stone_sword") { Price = 100, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Golden Sword", "take_golden_sword") { Price = 100, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Iron Sword", "take_iron_sword") { Price = 400, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Diamond Sword", "take_diamond_sword") { Price = 500, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
+            new("Netherite Sword", "take_netherite_sword") { Price = 500, Description = "Tries to take items from a player. Refunds after a few minutes if none can be found." },
 
             // shaders
             new("Bumpy", "shader_bumpy") { Price = 50, Duration = 30, Description = "Adds a faint white outline to everything giving the impression of bumpy textures" },
@@ -447,17 +444,6 @@ namespace CrowdControl.Games.Packs
             new("Retro", "shader_bits") { Price = 200, Duration = 30, Description = "Makes the game look like it's running on an NES" },
             new("Spider", "shader_spider") { Price = 100, Duration = 30, Description = "See the game through the eight eyes of a spider" },
             new("Trail", "shader_phosphor") { Price = 200, Duration = 30, Description = "Duplicates every frame to create a ghostly trail effect" },
-            //new("Retro", "shader_notch"), -- not as retro looking as "bits"
-            //new("FXAA", "shader_fxaa"), -- doesn't do much
-            //new("Oil Painting", "shader_art"), -- very very similar to blobs2 but with a slight white glow on everything
-            //new("Color Convolve", "shader_color_convolve"), -- vanilla but slightly more saturated
-            //new("Deconverge", "shader_deconverge"), -- kinda minor color channel offsets
-            //new("Outline", "shader_outline"), -- broken
-            //new("Scan Pincushion", "shader_scan_pincushion"), -- looks like NTSC but without the blur
-            //new("Blur", "shader_blur"), -- broken
-            //new("Blobs", "shader_blobs"), -- less extreme version of blobs2
-            //new("Antialias", "shader_antialias"), -- just makes the game look a bit smoother
-            //new("Creeper", "shader_creeper"), -- like green but without the CRT effect
         });
 
         public override EffectList Effects => AllEffects;
