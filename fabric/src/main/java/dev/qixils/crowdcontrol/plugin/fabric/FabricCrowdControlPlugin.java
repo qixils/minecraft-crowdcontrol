@@ -77,7 +77,17 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@NotNull
 	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
 	@NotNull
-	private Executor syncExecutor = Runnable::run;
+	private Executor syncExecutor = runnable -> {
+		try {
+			if (server != null) {
+				server.executeBlocking(runnable);
+			} else {
+				runnable.run();
+			}
+		} catch (Exception e) {
+			getSLF4JLogger().error("Error while executing sync task", e);
+		}
+	};
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowdcontrol");
