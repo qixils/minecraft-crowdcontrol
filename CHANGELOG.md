@@ -27,6 +27,7 @@ A list of all changes made to the software in reverse chronological order.
   if the effects have not been enabled
 - When global effects are available, various commands will be grayed out when they cannot be used
   (i.e. enable/disable keep inventory, set difficulty, etc.)
+- Hostile enemy spawns are now greyed out when the difficulty is set to peaceful
 - Added a warning in chat for when global effects are unavailable
 - Global effects can now always be used on the host of a singleplayer world
 - Spawned entities now feature various random attributes, including random armor for armor stands
@@ -37,9 +38,14 @@ A list of all changes made to the software in reverse chronological order.
 - Damage Item now takes a fixed 20% of the item's max durability instead of 50% of its remaining
   durability
 - Lootbox/Do-or-Die/etc. no longer gives unusable items on 1.19.4
+- The Gravel & Ore Vein effects can now replace any non-air block instead of just stones
+- "Give XYZ Potion Effect" no longer turns infinite duration effects into finite effects
+- Fixed an error in the Water Bucket Clutch effect that could cause your held item to be deleted on
+  Paper
 - Added support for Crowd Control 2.0 (customizable effect durations, non-Twitch streamer targets,
-  etc.)
+  refactored CS, etc.)
 - Added sliders to various effects (give/take health/hunger/items/etc.)
+- Added more descriptions to effects
 - Added a config option to hide viewer names in-game
 - Added a set of config options for limiting how many items or entities can be summoned at once
 - Added support for localization of the mod's messages (currently only English US is supported)
