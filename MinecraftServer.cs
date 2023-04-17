@@ -394,7 +394,7 @@ namespace CrowdControl.Games.Packs
 
             // gives 1 item
             new Effect("Give an Item", "give_item", ItemKind.Folder),
-            new Effect("Elytra", "give_elytra", "give_item") { Price = 500, Description = "Gives an Elytra, a pair of wings that allows the player to fly"
+            new Effect("Elytra", "give_elytra", "give_item") { Price = 500, Description = "Gives an Elytra, a pair of wings that allows the player to fly" },
             new Effect("Eye of Ender", "give_ender_eye", new[]{"items64"}, "give_item") { Price = 100, Description = "Gives an Eye of Ender, a critical part of finding the End Portal and completing the game" },
             new Effect("End Portal Frame", "give_end_portal_frame", new[]{"items64"}, "give_item") { Price = 200, Description = "Gives you a part of the frame required to build an end portal. Note that some server configurations may limit how many players get one." },
             new Effect("Recovery Compass", "give_recovery_compass", new[]{"items64"}, "give_item") { Price = 400, Description = "Gives you a compass that points to the location of your most recent death" },
