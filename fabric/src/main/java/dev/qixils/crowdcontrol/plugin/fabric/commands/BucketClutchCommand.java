@@ -53,7 +53,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 							player.setItemInHand(InteractionHand.OFF_HAND, hand);
 						} else {
 							boolean slotFound = false;
-							for (int i = 0; i <= 36; i++) {
+							for (int i = 0; i < 36; i++) {
 								List<ItemStack> items = player.getInventory().items;
 								ItemStack item = items.get(i);
 								if (item.isEmpty()) {
