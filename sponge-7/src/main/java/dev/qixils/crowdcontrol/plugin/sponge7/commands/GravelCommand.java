@@ -31,7 +31,7 @@ public class GravelCommand extends ImmediateCommand {
 		for (Player player : players)
 			locations.addAll(BlockFinder.builder()
 					.origin(player.getLocation())
-					.locationValidator(location -> !location.getBlock().getType().equals(BlockTypes.AIR))
+					.locationValidator(location -> !location.getBlock().getType().equals(BlockTypes.AIR) && !location.getBlock().getType().equals(BlockTypes.GRAVEL))
 					.shuffleLocations(false)
 					.maxRadius(6)
 					.build().getAll());
