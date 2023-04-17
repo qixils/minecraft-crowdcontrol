@@ -78,7 +78,8 @@ public class PotionCommand extends TimedImmediateCommand {
 						plugin.getSLF4JLogger().debug("Updating existing effect");
 						overridden = true;
 
-						int newDuration = Math.max(duration, existingEffect.getDuration());
+						int oldDuration = existingEffect.getDuration();
+						int newDuration = oldDuration == -1 ? -1 : Math.max(duration, oldDuration);
 						int newAmplifier = existingEffect.getAmplifier() + 1;
 						if (potionEffectType.equals(PotionEffectTypes.LEVITATION) && newAmplifier > 127)
 							newAmplifier -= 1; // don't mess with gravity effects

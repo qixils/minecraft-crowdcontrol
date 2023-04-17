@@ -68,7 +68,8 @@ public class PotionCommand extends TimedImmediateCommand {
 					player.addEffect(effect);
 				} else {
 					plugin.getSLF4JLogger().debug("Updating existing effect");
-					int newDuration = Math.max(existingEffect.getDuration(), durationTicks);
+					int oldDuration = existingEffect.getDuration();
+					int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
 					int newAmplifier = existingEffect.getAmplifier() + 1;
 					if (potionEffectType == MobEffects.LEVITATION && newAmplifier > 127)
 						newAmplifier -= 1;

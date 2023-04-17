@@ -87,7 +87,8 @@ public class PotionCommand extends TimedImmediateCommand {
 					break;
 				}
 
-				long newDuration = Math.max(durationLong, existingEffect.duration().ticks());
+				long oldDuration = existingEffect.duration().ticks();
+				long newDuration = oldDuration == -1 ? -1 : Math.max(durationLong, oldDuration);
 				int newAmplifier = existingEffect.amplifier() + 1;
 				if (potionEffectType.equals(PotionEffectTypes.LEVITATION.get()) && newAmplifier > 127)
 					newAmplifier -= 1; // don't mess with gravity effects
