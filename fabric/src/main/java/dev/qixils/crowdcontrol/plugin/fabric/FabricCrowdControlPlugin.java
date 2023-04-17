@@ -80,7 +80,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private Executor syncExecutor = runnable -> {
 		try {
 			if (server != null) {
-				server.executeBlocking(runnable);
+				server.executeIfPossible(runnable);
 			} else {
 				runnable.run();
 			}
