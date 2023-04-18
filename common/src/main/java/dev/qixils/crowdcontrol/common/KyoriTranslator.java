@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
-public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements Translator {
+public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements TranslationRegistry {
 	private static final Set<Locale> LOCALES = Stream.of(
 			"en_US"
 	)
@@ -50,12 +50,12 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	private static KyoriTranslator instance;
 	private final TranslationRegistry translator;
 	private final List<ClassLoader> classLoaders;
-	private final Key name = Key.key("crowdcontrol", "translations");
 
 	private KyoriTranslator(ClassLoader... secondaryClassLoaders) {
 		logger.info("Registering translator");
 
 		// create translator
+		Key name = Key.key("crowdcontrol", "translations");
 		translator = TranslationRegistry.create(name);
 		translator.defaultLocale(Objects.requireNonNull(Translator.parseLocale("en_US")));
 
@@ -106,7 +106,27 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 
 	@Override
 	public @NotNull Key name() {
-		return name;
+		return translator.name();
+	}
+
+	@Override
+	public boolean contains(@NotNull String key) {
+		return translator.contains(key);
+	}
+
+	@Override
+	public void defaultLocale(@NotNull Locale locale) {
+		translator.defaultLocale(locale);
+	}
+
+	@Override
+	public void register(@NotNull String key, @NotNull Locale locale, @NotNull MessageFormat format) {
+		translator.register(key, locale, format);
+	}
+
+	@Override
+	public void unregister(@NotNull String key) {
+		translator.unregister(key);
 	}
 
 	private void register(Locale locale, @Nullable ClassLoader classLoader) {

@@ -23,7 +23,7 @@ the guide for **Joining an External Server**.
 
 Not sure which mod loader to choose between Fabric and Paper? If you're running a server for a large
 multi-streamer event, then the highly-performant **Paper** is likely the way to go. Otherwise, we
-would recommend **Fabric** as it has the most features and is the easiest to use. 
+would recommend **Fabric** as it has the most features and is the easiest to use.
 
 | MC Version / Mod Loader |                      Automatic Setup                      |                    Joining an External Server                     |                               Dedicated Server                                |                              Client Installation                              |
 |:-----------------------:|:---------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------------------:|:-----------------------------------------------------------------------------:|

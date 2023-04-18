@@ -78,7 +78,7 @@ public class ClutterCommand extends ImmediateCommand {
 		// swaps random items in player's inventory
 		for (Player player : players) {
 			if (!(player.getInventory() instanceof PlayerInventory)) {
-				plugin.getLogger().warn("Player " + player.getName() + "'s inventory "
+				plugin.getSLF4JLogger().warn("Player " + player.getName() + "'s inventory "
 						+ player.getInventory().getClass().getSimpleName()
 						+ " is not an instance of PlayerInventory");
 				continue;
