@@ -53,6 +53,18 @@ bukkit {
 
 // configure runServer task
 tasks {
+    assemble {
+        dependsOn("reobfJar")
+    }
+    shadowJar {
+        archiveBaseName.set("shadow-CrowdControl")
+        archiveVersion.set("")
+    }
+    reobfJar {
+        // set name of output file to CrowdControl-XYZ-VERSION.jar | TODO: reduce code repetition
+        val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
+        outputJar.set(layout.buildDirectory.file("libs/CrowdControl-$titleCaseName-${project.version}.jar"))
+    }
     runServer {
         minecraftVersion(minecraftVersion)
     }
