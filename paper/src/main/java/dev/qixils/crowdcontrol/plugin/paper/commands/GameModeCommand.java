@@ -63,7 +63,6 @@ public class GameModeCommand extends TimedVoidCommand {
 					List<Player> curPlayers = plugin.getPlayers(request);
 					players.addAll(curPlayers);
 					setGameMode(request, curPlayers, gamemode);
-					announce(players, request);
 					return null;
 				})
 				.completionCallback($ -> setGameMode(null, players, GameMode.SURVIVAL))
@@ -78,6 +77,9 @@ public class GameModeCommand extends TimedVoidCommand {
 		sync(() -> players.forEach(player -> {
 			player.setGameMode(gamemode);
 			player.getPersistentDataContainer().set(gamemodeKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, request != null);
+			if (request != null) {
+				announce(players, request);
+			}
 		}));
 	}
 

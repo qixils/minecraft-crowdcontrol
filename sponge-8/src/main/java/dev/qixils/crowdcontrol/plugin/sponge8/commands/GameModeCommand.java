@@ -49,7 +49,6 @@ public class GameModeCommand extends TimedVoidCommand {
 					List<ServerPlayer> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);
 					players.addAll(curPlayers);
-					playerAnnounce(players, request);
 					return null;
 				})
 				.completionCallback($ -> setGameMode(null, players, GameModes.SURVIVAL.get()))
@@ -65,8 +64,10 @@ public class GameModeCommand extends TimedVoidCommand {
 			player.offer(Keys.GAME_MODE, gamemode);
 			if (request == null)
 				player.remove(GAME_MODE_EFFECT);
-			else
+			else {
 				player.offer(GAME_MODE_EFFECT, gamemode.key(RegistryTypes.GAME_MODE));
+				playerAnnounce(players, request);
+			}
 		}));
 	}
 

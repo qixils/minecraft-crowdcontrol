@@ -46,7 +46,6 @@ public class GameModeCommand extends TimedVoidCommand {
 					List<ServerPlayer> curPlayers = plugin.getPlayers(request);
 					setGameMode(request, curPlayers, gamemode);
 					players.addAll(curPlayers);
-					playerAnnounce(players, request); // sometimes duplicates after death but I think this is exclusive to the dev environment
 					return null;
 				})
 				.completionCallback($ -> setGameMode(null, players, GameType.SURVIVAL))
@@ -63,8 +62,10 @@ public class GameModeCommand extends TimedVoidCommand {
 			player.setGameMode(gamemode);
 			if (request == null)
 				data.setValue(null);
-			else
+			else {
 				data.setValue(gamemode);
+				playerAnnounce(players, request);
+			}
 		}));
 	}
 
