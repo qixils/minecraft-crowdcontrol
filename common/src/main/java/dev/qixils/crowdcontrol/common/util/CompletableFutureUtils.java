@@ -3,7 +3,9 @@ package dev.qixils.crowdcontrol.common.util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for {@link CompletableFuture}s.
@@ -20,10 +22,11 @@ public class CompletableFutureUtils {
 	 * @param futures collection of {@link CompletableFuture}s
 	 * @return array of {@link CompletableFuture}s
 	 */
-	public static CompletableFuture<?> @NotNull [] toArray(Collection<CompletableFuture<?>> futures) {
-		CompletableFuture<?>[] array = new CompletableFuture[futures.size()];
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public static <T> CompletableFuture<T> @NotNull [] toArray(Collection<CompletableFuture<T>> futures) {
+		CompletableFuture[] array = new CompletableFuture[futures.size()];
 		int i = 0;
-		for (CompletableFuture<?> future : futures) {
+		for (CompletableFuture<T> future : futures) {
 			array[i++] = future;
 		}
 		return array;
@@ -53,7 +56,7 @@ public class CompletableFutureUtils {
 	 */
 	@SuppressWarnings("GrazieInspection")
 	@NotNull
-	public static CompletableFuture<?> allOf(@NotNull Collection<@NotNull CompletableFuture<?>> futures) {
-		return CompletableFuture.allOf(toArray(futures));
+	public static <T> CompletableFuture<List<T>> allOf(@NotNull Collection<@NotNull CompletableFuture<T>> futures) {
+		return CompletableFuture.allOf(toArray(futures)).thenApplyAsync($ -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()));
 	}
 }

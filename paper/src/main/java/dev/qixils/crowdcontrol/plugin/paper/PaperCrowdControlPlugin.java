@@ -7,8 +7,10 @@ import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.scheduling.AgnosticExecutor;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
+import dev.qixils.crowdcontrol.plugin.paper.scheduling.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -18,7 +20,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.world.flag.FeatureElement;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -36,19 +40,29 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
+	public static final boolean FOLIA_AVAILABLE;
+
+	static {
+		boolean folia;
+		try {
+			Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+			folia = true;
+		} catch (ClassNotFoundException e) {
+			folia = false;
+		}
+		FOLIA_AVAILABLE = folia;
+	}
+
 	@Getter
-	private final Executor syncExecutor = runnable -> Bukkit.getScheduler().runTask(this, runnable);
+	private final AgnosticExecutor globalExecutor;
 	@Getter
-	private final Executor asyncExecutor = runnable -> Bukkit.getScheduler().runTaskAsynchronously(this, runnable);
+	private final AgnosticExecutor asyncExecutor;
 	@Getter
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
@@ -93,8 +107,35 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
-	@Getter @NotNull
-	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+
+	public PaperCrowdControlPlugin() {
+		if (FOLIA_AVAILABLE) {
+			globalExecutor = new FoliaGlobalExecutor(this);
+			asyncExecutor = new FoliaAsyncExecutor(this);
+		} else {
+			globalExecutor = new PaperGlobalExecutor(this);
+			asyncExecutor = new PaperAsyncExecutor(this);
+		}
+	}
+
+	@Override
+	public @NotNull AgnosticExecutor getPlayerExecutor(@NotNull Player player) {
+		return FOLIA_AVAILABLE
+				? new FoliaPlayerExecutor(this, player)
+				: getGlobalExecutor();
+	}
+
+	public @NotNull AgnosticExecutor getRegionExecutor(@NotNull Location location) {
+		return FOLIA_AVAILABLE
+				? new FoliaRegionExecutor(this, location)
+				: getGlobalExecutor();
+	}
+
+	public @NotNull AgnosticExecutor getRegionExecutor(@NotNull World world, int chunkX, int chunkZ) {
+		return FOLIA_AVAILABLE
+				? new FoliaRegionExecutor(this, world, chunkX, chunkZ)
+				: getGlobalExecutor();
+	}
 
 	@Override
 	public void onLoad() {

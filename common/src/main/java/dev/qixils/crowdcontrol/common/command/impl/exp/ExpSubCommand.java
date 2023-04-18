@@ -39,7 +39,7 @@ public class ExpSubCommand<P> implements ImmediateCommand<P> {
 			int curLevel = player.xpLevel();
 			int newLevel = curLevel - amount;
 			if (newLevel >= 0) {
-				sync(() -> player.xpLevel(newLevel));
+				sync(rawPlayer, () -> player.xpLevel(newLevel));
 				resp.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 		}

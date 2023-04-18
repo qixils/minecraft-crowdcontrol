@@ -51,7 +51,7 @@ public class PlantTreeCommand extends Command {
 				.message("Streamer is not in a suitable place for tree planting");
 		PopulatorObject treeType = RandomUtil.randomElementFrom(trees);
 
-		Collection<CompletableFuture<?>> futures = new ArrayList<>(players.size());
+		Collection<CompletableFuture<Void>> futures = new ArrayList<>(players.size());
 		for (Player player : players) {
 			Location<World> location = player.getLocation();
 			CompletableFuture<Void> future = new CompletableFuture<>();

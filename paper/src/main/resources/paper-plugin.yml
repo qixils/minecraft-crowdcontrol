@@ -1,0 +1,10 @@
+name: CrowdControl
+prefix: CrowdControl
+version: '${version}'
+main: dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin
+description: The Ultimate Interactive Experience for Streamers
+api-version: '1.19.4'
+authors: ["qixils"]
+website: https://github.com/qixils/minecraft-crowdcontrol
+load: POSTWORLD
+folia-supported: true

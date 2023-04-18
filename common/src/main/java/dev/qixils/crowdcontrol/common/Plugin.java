@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.scheduling.AgnosticExecutor;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
@@ -32,10 +33,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
+import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -657,14 +656,6 @@ public interface Plugin<P, S> {
 	AbstractCommandRegister<P, ?> commandRegister();
 
 	/**
-	 * Gets the {@link ScheduledExecutorService} used by the plugin.
-	 *
-	 * @return the executor service
-	 */
-	@NotNull
-	ScheduledExecutorService getScheduledExecutor();
-
-	/**
 	 * Gets the {@link CrowdControl} instance.
 	 *
 	 * @return crowd control instance
@@ -692,7 +683,7 @@ public interface Plugin<P, S> {
 			return;
 		}
 		final @NotNull SocketManager finalService = service;
-		getScheduledExecutor().schedule(() -> {
+		getAsyncExecutor().runLater(Duration.ofSeconds(1), () -> {
 			try {
 				getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
 				Response response = finalService.buildResponse()
@@ -706,7 +697,7 @@ public interface Plugin<P, S> {
 			} catch (Exception e) {
 				getSLF4JLogger().error("Failed to send embedded message packet", e);
 			}
-		}, 1, TimeUnit.SECONDS);
+		});
 	}
 
 	/**
@@ -936,7 +927,7 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
 		}
-		getScheduledExecutor().schedule(() -> {
+		getAsyncExecutor().runLater(Duration.ofSeconds(1), () -> {
 			// ensure player is still online
 			Optional<P> optPlayer = mapper.getPlayer(uuid);
 			if (!optPlayer.isPresent())
@@ -963,7 +954,7 @@ public interface Plugin<P, S> {
 			}
 			// update conditional effects
 			updateConditionalEffectVisibility(cc);
-		}, 1, TimeUnit.SECONDS);
+		});
 	}
 
 	/**
@@ -985,12 +976,12 @@ public interface Plugin<P, S> {
 	Logger getSLF4JLogger();
 
 	/**
-	 * Gets the executor which runs code synchronously (i.e. on the server's main thread).
+	 * Gets the executor which runs code on the global server region, typically the server's main thread.
 	 *
 	 * @return synchronous executor
 	 */
 	@NotNull
-	Executor getSyncExecutor();
+	AgnosticExecutor getGlobalExecutor();
 
 	/**
 	 * Gets the executor which runs code asynchronously (i.e. off the server's main thread).
@@ -998,7 +989,16 @@ public interface Plugin<P, S> {
 	 * @return asynchronous executor
 	 */
 	@NotNull
-	Executor getAsyncExecutor();
+	AgnosticExecutor getAsyncExecutor();
+
+	/**
+	 * Gets the executor which runs code on the thread of the provided player.
+	 *
+	 * @param player player to get the executor for
+	 * @return player executor
+	 */
+	@NotNull
+	AgnosticExecutor getPlayerExecutor(@NotNull P player);
 
 	/**
 	 * Gets the plugin's {@link LimitConfig}.

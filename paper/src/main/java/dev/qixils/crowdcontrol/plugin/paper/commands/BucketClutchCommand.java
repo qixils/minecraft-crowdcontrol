@@ -45,7 +45,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 			}
 			if (!obstruction) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.teleportAsync(curr.clone().add(0, OFFSET, 0)).thenRun(() -> {
+				player.teleportAsync(curr.clone().add(0, OFFSET, 0)).thenRunAsync(() -> {
 					PlayerInventory inv = player.getInventory();
 					ItemStack hand = inv.getItemInMainHand();
 					Material handType = hand.getType();
@@ -68,7 +68,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 						}
 					}
 					inv.setItemInMainHand(new ItemStack(Material.WATER_BUCKET));
-				}));
+				}, plugin.getPlayerExecutor(player));
 			}
 		}
 		return result;

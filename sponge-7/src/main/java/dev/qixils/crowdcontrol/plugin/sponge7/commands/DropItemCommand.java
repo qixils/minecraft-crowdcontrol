@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.plugin.sponge7.Command;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.MinecraftMath;
@@ -53,8 +54,8 @@ public class DropItemCommand extends ImmediateCommand {
 		return new Vector3d(x, y, z);
 	}
 
-	public static boolean dropItem(SpongeCrowdControlPlugin plugin, Player player) {
-		for (HandType hand : plugin.getRegistry().getAllOf(HandType.class)) {
+	public static boolean dropItem(Command command, Player player) {
+		for (HandType hand : command.getPlugin().getRegistry().getAllOf(HandType.class)) {
 			Optional<ItemStack> optionalItem = player.getItemInHand(hand);
 			if (!optionalItem.isPresent())
 				continue;
@@ -65,7 +66,7 @@ public class DropItemCommand extends ImmediateCommand {
 			Vector3d rotation = asItemVector(player.getHeadRotation());
 
 			// spawn the entity
-			plugin.getSyncExecutor().execute(() -> {
+			command.sync(() -> {
 				Entity item = player.getLocation() // API8: use eye location (if available)
 						.add(0, 1.4, 0)
 						.createEntity(EntityTypes.ITEM);
@@ -73,7 +74,7 @@ public class DropItemCommand extends ImmediateCommand {
 				item.setVelocity(rotation);
 				item.offer(Keys.PICKUP_DELAY, 40);
 
-				try (StackFrame frame = plugin.getGame().getCauseStackManager().pushCauseFrame()) {
+				try (StackFrame frame = command.getPlugin().getGame().getCauseStackManager().pushCauseFrame()) {
 					frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
 					player.getWorld().spawnEntity(item);
 					player.setItemInHand(hand, null);
@@ -92,7 +93,7 @@ public class DropItemCommand extends ImmediateCommand {
 				.message("No players were holding items");
 
 		for (Player player : players) {
-			if (dropItem(plugin, player))
+			if (dropItem(this, player))
 				response.type(ResultType.SUCCESS).message("SUCCESS");
 		}
 

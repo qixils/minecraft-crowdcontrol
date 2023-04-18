@@ -49,7 +49,7 @@ public class EntityChaosCommand extends ImmediateCommand {
 			int i = 0;
 			for (Entity entity : entities) {
 				entity.getPassengers().forEach(entity::removePassenger);
-				entity.teleport(players.get((i++) % players.size()));
+				entity.teleportAsync((players.get((i++) % players.size())).getLocation());
 			}
 		});
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

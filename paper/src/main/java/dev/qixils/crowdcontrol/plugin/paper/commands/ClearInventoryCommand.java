@@ -38,7 +38,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 			if (inv.isEmpty())
 				continue;
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
-			sync(inv::clear);
+			sync(player, inv::clear);
 		}
 		return resp;
 	}

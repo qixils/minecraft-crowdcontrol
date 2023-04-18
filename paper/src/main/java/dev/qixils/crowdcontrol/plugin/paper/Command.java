@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,7 @@ import java.util.Random;
 
 public abstract class Command implements dev.qixils.crowdcontrol.common.command.Command<Player> {
 	protected static final Random random = RandomUtil.RNG;
+
 	@Getter
 	protected final @NotNull PaperCrowdControlPlugin plugin;
 
@@ -21,5 +23,9 @@ public abstract class Command implements dev.qixils.crowdcontrol.common.command.
 	@Override
 	public boolean isEventListener() {
 		return this instanceof Listener;
+	}
+
+	public void sync(@NotNull Location syncAt, @NotNull Runnable runnable) {
+		plugin.getRegionExecutor(syncAt).execute(runnable);
 	}
 }

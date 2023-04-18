@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 public class ShaderCommand extends TimedImmediateCommand {
@@ -43,16 +42,15 @@ public class ShaderCommand extends TimedImmediateCommand {
 		// create byte buf
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		buf.writeUtf(shader, 64);
-		long duration = getDuration(request).toMillis();
-		buf.writeLong(duration);
+		Duration duration = getDuration(request);
+		buf.writeLong(duration.toMillis());
 		// send packet
 		players.forEach(player -> {
 			ACTIVE_SHADERS.add(player.getUUID());
 			ServerPlayNetworking.send(player, FabricCrowdControlPlugin.SHADER_ID, buf);
 		});
 		// schedule removal
-		plugin.getScheduledExecutor().schedule(
-				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), duration, TimeUnit.MILLISECONDS);
+		plugin.getAsyncExecutor().runLater(duration, () -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

@@ -42,7 +42,7 @@ public class HealCommand<P> implements ImmediateCommand<P> {
 			// don't apply effect unless it is 100% utilized
 			if ((newHealth - oldHealth) == amount) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.health(newHealth));
+				sync(rawPlayer, () -> player.health(newHealth));
 			}
 		}
 		return result;

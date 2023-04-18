@@ -18,7 +18,7 @@ dependencies {
     implementation(project(":base-common"))
     implementation("cloud.commandframework:cloud-paper:${cloudVersion}")
     //compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
-    paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
+    paperweight.foliaDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
 }
 
 // Java 17 boilerplate
@@ -38,17 +38,13 @@ java {
 //    withSourcesJar()
 }
 
-// plugin.yml generation
-bukkit {
-    name = "CrowdControl"
-    version = project.version.toString()
-    main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
-    apiVersion = mcVersionSplit[0] + "." + mcVersionSplit[1]
-    prefix = "CrowdControl"
-    authors = listOf("qixils")
-    description = "The Ultimate Interactive Experience for Streamers"
-    website = "https://github.com/qixils/minecraft-crowdcontrol"
-    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+tasks.processResources {
+    inputs.property("version", project.version)
+    filteringCharset = "UTF-8"
+
+    filesMatching("paper-plugin.yml") {
+        expand("version" to project.version)
+    }
 }
 
 // configure runServer task

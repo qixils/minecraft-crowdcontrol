@@ -26,7 +26,7 @@ public class FullHealCommand<P> implements ImmediateCommand<P> {
 			double maxHealth = player.maxHealth();
 			if (player.health() < maxHealth) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.health(maxHealth));
+				sync(rawPlayer, () -> player.health(maxHealth));
 			}
 		}
 		return result;

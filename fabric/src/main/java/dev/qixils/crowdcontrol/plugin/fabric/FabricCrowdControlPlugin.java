@@ -8,6 +8,8 @@ import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.scheduling.AgnosticExecutor;
+import dev.qixils.crowdcontrol.common.scheduling.AsyncExecutor;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
@@ -44,10 +46,6 @@ import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
 
@@ -77,7 +75,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@NotNull
 	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
 	@NotNull
-	private Executor syncExecutor = runnable -> {
+	private AgnosticExecutor syncExecutor = runnable -> {
 		try {
 			if (server != null) {
 				server.executeIfPossible(runnable);
@@ -88,8 +86,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			getSLF4JLogger().error("Error while executing sync task", e);
 		}
 	};
-	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
-	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
+	private final AgnosticExecutor asyncExecutor = new AsyncExecutor();
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowdcontrol");
 	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)

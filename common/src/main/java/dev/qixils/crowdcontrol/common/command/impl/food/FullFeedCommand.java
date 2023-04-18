@@ -25,12 +25,12 @@ public class FullFeedCommand<P> implements ImmediateCommand<P> {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
 
 			if (player.foodLevel() < 20) {
-				sync(() -> player.foodLevel(20));
+				sync(rawPlayer, () -> player.foodLevel(20));
 				resp.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 
 			if (player.saturation() < 20) {
-				sync(() -> player.saturation(20));
+				sync(rawPlayer, () -> player.saturation(20));
 				resp.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 		}

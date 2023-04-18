@@ -325,7 +325,17 @@ public interface Command<P> {
 	 * @param runnable command to execute synchronously
 	 */
 	default void sync(@NotNull Runnable runnable) {
-		getPlugin().getSyncExecutor().execute(runnable);
+		getPlugin().getGlobalExecutor().execute(runnable);
+	}
+
+	/**
+	 * Helper method which executes some code on a player's thread.
+	 *
+	 * @param syncOn player to execute the command on
+	 * @param runnable command to execute on the player's thread
+	 */
+	default void sync(@NotNull P syncOn, @NotNull Runnable runnable) {
+		getPlugin().getPlayerExecutor(syncOn).execute(runnable);
 	}
 
 

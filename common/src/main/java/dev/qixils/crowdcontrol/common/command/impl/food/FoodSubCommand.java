@@ -43,7 +43,7 @@ public class FoodSubCommand<P> implements ImmediateCommand<P> {
 			double newSaturation = Math.min(newFood, currSaturation);
 			// don't apply effect unless it is 100% utilized
 			if ((currFood - newFood) == amount) {
-				sync(() -> {
+				sync(rawPlayer, () -> {
 					player.foodLevel(newFood);
 					player.saturation(newSaturation);
 				});

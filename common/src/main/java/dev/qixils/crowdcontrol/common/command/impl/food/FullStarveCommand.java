@@ -25,7 +25,7 @@ public class FullStarveCommand<P> implements ImmediateCommand<P> {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
 
 			if (player.foodLevel() > 0) {
-				sync(() -> {
+				sync(rawPlayer, () -> {
 					player.foodLevel(0);
 					player.saturation(0);
 				});

@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.common.command.impl.health;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.ImmediateCommand;
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -20,7 +19,8 @@ public class KillCommand<P> implements ImmediateCommand<P> {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
-		sync(() -> players.stream().map(plugin::getPlayer).forEach(CCPlayer::kill));
+		for (P rawPlayer : players)
+			sync(rawPlayer, () -> plugin.getPlayer(rawPlayer).kill());
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

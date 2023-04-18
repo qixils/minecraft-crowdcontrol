@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.plugin.sponge8.Command;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.MinecraftMath;
@@ -54,8 +55,8 @@ public class DropItemCommand extends ImmediateCommand {
 		return new Vector3d(x, y, z);
 	}
 
-	public static boolean dropItem(SpongeCrowdControlPlugin plugin, ServerPlayer player) {
-		for (HandType hand : plugin.registryIterable(RegistryTypes.HAND_TYPE)) {
+	public static boolean dropItem(Command command, ServerPlayer player) {
+		for (HandType hand : command.getPlugin().registryIterable(RegistryTypes.HAND_TYPE)) {
 			ItemStack itemStack = player.itemInHand(hand);
 			if (itemStack.isEmpty())
 				continue;
@@ -63,7 +64,7 @@ public class DropItemCommand extends ImmediateCommand {
 			Vector3d rotation = asItemVector(player.headRotation().get());
 
 			// spawn the entity
-			plugin.getSyncExecutor().execute(() -> {
+			command.sync(() -> {
 				Entity item = player.world().createEntity(
 						EntityTypes.ITEM,
 						player.position().add(0, 1.35, 0)
@@ -72,7 +73,7 @@ public class DropItemCommand extends ImmediateCommand {
 				item.offer(Keys.VELOCITY, rotation);
 				item.offer(Keys.PICKUP_DELAY, Ticks.of(40));
 
-				try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
+				try (StackFrame frame = command.getPlugin().getGame().server().causeStackManager().pushCauseFrame()) {
 					frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
 					player.world().spawnEntity(item);
 					player.setItemInHand(hand, null);

@@ -42,7 +42,7 @@ public class FoodAddCommand<P> implements ImmediateCommand<P> {
 			int newFood = Math.min(20, currFood + amount);
 			// don't apply effect unless it is 100% utilized
 			if ((newFood - currFood) == amount || (newFood - currSaturation) >= amount) {
-				sync(() -> {
+				sync(rawPlayer, () -> {
 					player.foodLevel(newFood);
 					player.saturation(newFood);
 				});

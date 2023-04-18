@@ -41,7 +41,7 @@ public class DamageCommand<P> implements ImmediateCommand<P> {
 			// don't apply effect unless it is 100% utilized
 			if (appliedDamage == amount) {
 				success = true;
-				sync(() -> player.damage(appliedDamage));
+				sync(rawPlayer, () -> player.damage(appliedDamage));
 			}
 		}
 

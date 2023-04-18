@@ -24,7 +24,7 @@ public class ResetExpCommand<P> implements ImmediateCommand<P> {
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
 			if (player.xpLevel() > 0) {
-				sync(() -> player.xpLevel(0));
+				sync(rawPlayer, () -> player.xpLevel(0));
 				resp.type(Response.ResultType.SUCCESS).message("SUCCESS");
 			}
 		}

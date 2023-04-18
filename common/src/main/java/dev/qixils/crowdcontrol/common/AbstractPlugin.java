@@ -10,8 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Abstraction layer for {@link Plugin} which implements platform-agnostic methods.
@@ -48,8 +46,6 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	protected Collection<String> hosts = Collections.emptySet();
 	@Getter @NotNull
 	protected LimitConfig limitConfig = new LimitConfig();
-	@Getter @NotNull
-	protected final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
 	protected AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;

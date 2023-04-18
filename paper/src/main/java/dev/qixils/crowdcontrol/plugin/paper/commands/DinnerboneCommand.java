@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.util.CompletableFutureUtils;
 import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -7,17 +8,17 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_COMPONENT;
@@ -36,33 +37,33 @@ public class DinnerboneCommand extends Command {
 
 	@Override
 	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Set<LivingEntity> entities = new HashSet<>();
-		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
-		sync(() -> {
-			for (Player player : players) {
-				entities.addAll(player.getLocation().getNearbyLivingEntities(DINNERBONE_RADIUS,
-						x -> x.getType() != EntityType.PLAYER
-				));
-			}
-			successFuture.complete(!entities.isEmpty());
-			for (Entity entity : entities) {
-				PersistentDataContainer data = entity.getPersistentDataContainer();
-				Component currentName = entity.customName();
-				if (DINNERBONE_COMPONENT.equals(currentName)) {
-					Component savedName = data.get(key, COMPONENT_TYPE);
-					entity.customName(savedName);
-					if (savedName != null)
-						entity.setCustomNameVisible(true);
-					data.remove(key);
-				} else {
-					if (currentName != null)
-						data.set(key, COMPONENT_TYPE, currentName);
-					entity.customName(DINNERBONE_COMPONENT);
-					entity.setCustomNameVisible(false);
+		List<CompletableFuture<Boolean>> successFutures = new ArrayList<>();
+		for (Player player : players) {
+			Location location = player.getLocation();
+			CompletableFuture<Boolean> future = new CompletableFuture<>();
+			successFutures.add(future);
+			sync(location, () -> {
+				Collection<LivingEntity> entities = location.getNearbyLivingEntities(DINNERBONE_RADIUS, e -> e.getType() != EntityType.PLAYER);
+				future.complete(!entities.isEmpty());
+				for (LivingEntity entity : entities) {
+					PersistentDataContainer data = entity.getPersistentDataContainer();
+					Component currentName = entity.customName();
+					if (DINNERBONE_COMPONENT.equals(currentName)) {
+						Component savedName = data.get(key, COMPONENT_TYPE);
+						entity.customName(savedName);
+						if (savedName != null)
+							entity.setCustomNameVisible(true);
+						data.remove(key);
+					} else {
+						if (currentName != null)
+							data.set(key, COMPONENT_TYPE, currentName);
+						entity.customName(DINNERBONE_COMPONENT);
+						entity.setCustomNameVisible(false);
+					}
 				}
-			}
-		});
-		return successFuture.thenApply(success -> success
+			});
+		}
+		return CompletableFutureUtils.allOf(successFutures).thenApply(successes -> successes.stream().anyMatch(Boolean::booleanValue)
 				? request.buildResponse().type(ResultType.SUCCESS)
 				: request.buildResponse().type(ResultType.RETRY).message("No nearby entities"));
 	}

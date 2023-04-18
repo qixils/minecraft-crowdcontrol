@@ -25,7 +25,7 @@ public class DropItemCommand extends ImmediateCommand {
 				.message("No players were holding items");
 		for (Player player : players) {
 			if (!player.getInventory().getItemInMainHand().getType().isEmpty()) {
-				sync(() -> {
+				sync(player, () -> {
 					player.dropItem(true);
 					player.updateInventory();
 				});

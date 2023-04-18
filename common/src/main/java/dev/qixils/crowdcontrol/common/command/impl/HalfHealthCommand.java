@@ -32,7 +32,7 @@ public class HalfHealthCommand<P> implements ImmediateCommand<P> {
 			double health = player.health();
 			if (health > HALVE_HEALTH_MIN_HEALTH) {
 				response.type(ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.damage(health / 2f));
+				sync(rawPlayer, () -> player.damage(health / 2f));
 			}
 		}
 
