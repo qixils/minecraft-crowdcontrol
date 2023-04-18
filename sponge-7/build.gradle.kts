@@ -14,3 +14,12 @@ dependencies {
     implementation("net.kyori:adventure-platform-spongeapi:$adventurePlatformVersion")
     compileOnly("org.spongepowered:spongeapi:7.4.0")
 }
+
+tasks.processResources {
+    inputs.property("version", project.version)
+    filteringCharset = "UTF-8"
+
+    filesMatching("mcmod.info") {
+        expand("version" to project.version)
+    }
+}

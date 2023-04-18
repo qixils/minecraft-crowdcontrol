@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "crowdcontrol",
+    "name": "Crowd Control",
+    "version": "${version}",
+    "description": "Allows viewers to interact with your Minecraft world",
+    "url": "https://github.com/qixils/minecraft-crowdcontrol",
+    "authorList": [
+      "qixils"
+    ],
+    "dependencies": [
+      "spongeapi@7.4.0"
+    ],
+    "requiredMods": [
+      "spongeapi@7.4.0"
+    ]
+  }
+]
