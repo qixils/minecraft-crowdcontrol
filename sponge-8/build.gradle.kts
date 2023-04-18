@@ -36,7 +36,7 @@ sponge {
     license("Mozilla Public License Version 2.0")
     plugin("crowdcontrol") {
         displayName("Crowd Control")
-        version(project.version.toString())
+        version(project.version.toString() + "-8")
         entrypoint("dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin")
         description("The Ultimate Interactive Experience for Streamers")
         links {
