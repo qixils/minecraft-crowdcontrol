@@ -34,15 +34,15 @@
     "crowdcontrol.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.17",
-    "fabric": ">=0.76.0",
-    "minecraft": "1.19.4",
+    "fabricloader": "^0.14.17",
+    "fabric": "^0.75.3",
+    "minecraft": ">=1.19.4 <=1.20-alpha.23.13.a",
     "cardinal-components-base": ">=5.1.0",
     "cardinal-components-entity": ">=5.1.0",
-    "cloud": ">=1.8.3",
-    "adventure-platform-fabric": ">=5.8.0",
-    "net_kyori_adventure-api": ">=4.13.0",
-    "cloth-config": ">=10.0.96"
+    "cloud": "^1.8.3",
+    "adventure-platform-fabric": "^5.8.0",
+    "net_kyori_adventure-api": "^4.13.0",
+    "cloth-config": "^10.0.96"
   },
   "suggests": {
     "modmenu": ">=5.0.2"
