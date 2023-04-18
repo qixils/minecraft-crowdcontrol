@@ -39,7 +39,7 @@ public class GravelCommand extends ImmediateCommand {
 
 		if (locations.isEmpty())
 			return request.buildResponse()
-					.type(Response.ResultType.FAILURE)
+					.type(Response.ResultType.RETRY)
 					.message("No replaceable blocks nearby");
 
 		sync(() -> locations.forEach(location -> location.setBlockType(BlockTypes.GRAVEL.get())));

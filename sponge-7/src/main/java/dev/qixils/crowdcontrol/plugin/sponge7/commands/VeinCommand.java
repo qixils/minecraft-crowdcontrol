@@ -48,7 +48,7 @@ public class VeinCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find any blocks to replace");
+		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Could not find any blocks to replace");
 		for (Player player : players) {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(player.getLocation())
