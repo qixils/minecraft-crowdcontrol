@@ -93,7 +93,7 @@ public class VeinCommand extends ImmediateCommand {
 				for (int z = 0; z <= 1; ++z) {
 					ServerLocation loc = base.add(x, y, z);
 					BlockType blockType = loc.blockType();
-					if (stones.contains(blockType)) {
+					if (!isAir(blockType)) {
 						stoneBlocks.add(loc);
 					}
 				}

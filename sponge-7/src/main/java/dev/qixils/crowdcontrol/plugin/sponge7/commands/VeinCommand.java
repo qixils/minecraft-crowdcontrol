@@ -46,6 +46,14 @@ public class VeinCommand extends ImmediateCommand {
 			blockLocations.remove(0);
 	}
 
+	private static boolean isAir(Location<World> location) {
+		return location.getBlock().getType().equals(BlockTypes.AIR);
+	}
+
+	private static boolean isNotAir(Location<World> location) {
+		return !isAir(location);
+	}
+
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Could not find any blocks to replace");
@@ -53,14 +61,13 @@ public class VeinCommand extends ImmediateCommand {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(player.getLocation())
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(location -> !location.getBlock().getType().equals(BlockTypes.AIR))
+					.locationValidator(VeinCommand::isNotAir)
 					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {
 				Ores ore = RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS);
 
 				List<Location<World>> setBlocks = new ArrayList<>(8);
-				// API9: deepslate
 				Location<World> oreLocation = finder.next();
 				if (oreLocation == null)
 					continue;
@@ -89,8 +96,7 @@ public class VeinCommand extends ImmediateCommand {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 1; ++z) {
 					Location<World> loc = base.add(x, y, z);
-					BlockType blockType = loc.getBlock().getType();
-					if (stones.contains(blockType)) {
+					if (isNotAir(loc)) {
 						stoneBlocks.add(loc);
 					}
 				}
@@ -98,7 +104,7 @@ public class VeinCommand extends ImmediateCommand {
 		}
 	}
 
-	@Getter // API9: add back deepslate
+	@Getter
 	public enum Ores implements Weighted {
 		DIAMOND(BlockTypes.DIAMOND_ORE, 3),
 		IRON(BlockTypes.IRON_ORE, 3),
@@ -107,13 +113,7 @@ public class VeinCommand extends ImmediateCommand {
 		GOLD(BlockTypes.GOLD_ORE, 3),
 		REDSTONE(BlockTypes.REDSTONE_ORE, 3),
 		LAPIS(BlockTypes.LAPIS_ORE, 3),
-
-		// API8:
-//		ANCIENT_DEBRIS(BlockTypes.ANCIENT_DEBRIS, 1),
-//		QUARTZ(BlockTypes.NETHER_QUARTZ_ORE, 3),
-//		NETHER_GOLD(BlockTypes.NETHER_GOLD_ORE, 3),
-//		SILVERFISH(BlockTypes.INFESTED_STONE, Material.INFESTED_DEEPSLATE, 2),
-		LAVA(BlockTypes.LAVA, 2) // API8 increase weight to 8
+		LAVA(BlockTypes.LAVA, 2)
 		;
 
 		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(Ores::getWeight).sum();
