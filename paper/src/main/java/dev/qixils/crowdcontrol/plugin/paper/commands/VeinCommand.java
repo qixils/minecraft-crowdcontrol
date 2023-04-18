@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil;
 import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -67,7 +66,7 @@ public class VeinCommand extends ImmediateCommand {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(player.getLocation())
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(BlockUtil.STONES_TAG::contains)
+					.locationValidator(loc -> !loc.getBlock().isEmpty())
 					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {
