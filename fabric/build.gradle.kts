@@ -116,8 +116,6 @@ tasks.remapJar {
     // configure remapJar to use output of shadowJar
     dependsOn(tasks.shadowJar)
     inputFile.set(project.buildDir.resolve("libs/shadow-CrowdControl.jar"))
-    // set name of output file to CrowdControl-XYZ-VERSION.jar | TODO: reduce code repetition
-    val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
-    archiveBaseName.set("CrowdControl-$titleCaseName")
+    archiveBaseName.set("CrowdControl-Fabric+$minecraftVersion")
     archiveClassifier.set("")
 }
