@@ -34,9 +34,9 @@
     "crowdcontrol.mixins.json"
   ],
   "depends": {
-    "fabricloader": "^0.14.17",
-    "fabric": "^0.75.3",
-    "minecraft": ">=1.19.4 <=1.20-alpha.23.13.a",
+    "fabricloader": "^0.14.19",
+    "fabric": "^0.77.1",
+    "minecraft": "1.20-alpha.23.14.a",
     "cardinal-components-base": ">=5.1.0",
     "cardinal-components-entity": ">=5.1.0",
     "cloud": "^1.8.3",

@@ -40,7 +40,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 			BlockState block = location.block();
 			if (location.y() < (world.getMinBuildHeight() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (block.getBlock().isPossibleToRespawnInThis() && !block.getMaterial().blocksMotion())
+			else if (block.getBlock().isPossibleToRespawnInThis(block) && !block.getMaterial().blocksMotion())
 				air += 1;
 			else if (air >= 1)
 				break;
@@ -63,7 +63,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 		Block type = block.getBlock();
 		if (Blocks.FIRE.equals(type))
 			location.block(Blocks.AIR.defaultBlockState());
-		else if (Blocks.LAVA.equals(type))
+		else if (!type.isPossibleToRespawnInThis(block))
 			location.block(Blocks.GLASS.defaultBlockState());
 
 		// place player on top of the block
