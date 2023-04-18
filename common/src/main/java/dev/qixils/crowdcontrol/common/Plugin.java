@@ -158,7 +158,7 @@ public interface Plugin<P, S> {
 	Component JOIN_MESSAGE_1 = Component.translatable(
 			"cc.join.info",
 			JOIN_MESSAGE_COLOR,
-			// TODO: move these args back into the i18n file
+			// TODO: move these args back into the i18n file?
 			Component.text("Crowd Control", TextColor.color(0xFAE100)),
 			Component.text("qi", TextColor.color(0xFFC7B5))
 					.append(Component.text("xi", TextColor.color(0xFFDECA)))
@@ -275,17 +275,19 @@ public interface Plugin<P, S> {
 					Audience audience = mapper.asAudience(sender);
 					UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerManager().linkPlayer(uuid, username))
+					if (getPlayerManager().linkPlayer(uuid, username)) {
+						updateConditionalEffectVisibility(getCrowdControl());
 						audience.sendMessage(output(Component.translatable(
 								"cc.command.account.link.output",
 								Component.text(username, NamedTextColor.AQUA)
 						)));
-					else
+					} else {
 						audience.sendMessage(output(Component.translatable(
 								"cc.command.account.link.error",
 								NamedTextColor.RED,
 								Component.text(username, NamedTextColor.AQUA)
 						)));
+					}
 				}));
 		// unlink command
 		manager.command(account.literal("unlink")
@@ -321,17 +323,19 @@ public interface Plugin<P, S> {
 					Audience audience = mapper.asAudience(sender);
 					UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerManager().unlinkPlayer(uuid, username))
+					if (getPlayerManager().unlinkPlayer(uuid, username)) {
+						updateConditionalEffectVisibility(getCrowdControl());
 						audience.sendMessage(output(Component.translatable(
 								"cc.command.account.unlink.output",
 								Component.text(username, NamedTextColor.AQUA)
 						)));
-					else
+					} else {
 						audience.sendMessage(output(Component.translatable(
 								"cc.command.account.unlink.error",
 								NamedTextColor.RED,
 								Component.text(username, NamedTextColor.AQUA)
 						)));
+					}
 				}));
 
 		//// CrowdControl Command ////
@@ -543,7 +547,7 @@ public interface Plugin<P, S> {
 	 * @return true if global effects could execute
 	 */
 	default boolean globalEffectsUsable() {
-		return isGlobal() || (!getHosts().isEmpty());// && getAllPlayers().stream().anyMatch(this::isHost)); TODO: I need to trigger the status update on /account if I want this
+		return isGlobal() || (!getHosts().isEmpty() && getAllPlayers().stream().anyMatch(this::isHost));
 	}
 
 	/**

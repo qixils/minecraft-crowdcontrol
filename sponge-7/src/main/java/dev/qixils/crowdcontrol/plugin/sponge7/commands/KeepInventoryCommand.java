@@ -58,7 +58,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		}
 	}
 
-	private void updateEffectVisibility(@Nullable Respondable respondable) { // TODO: add to other impls (and check like difficulty too ig?)
+	private void updateEffectVisibility(@Nullable Respondable respondable) {
 		async(() -> {
 			plugin.updateEffectStatus(respondable, effectName, ResultType.NOT_SELECTABLE);
 			plugin.updateEffectStatus(respondable, "keep_inventory_" + (!enable ? "on" : "off"), ResultType.SELECTABLE);

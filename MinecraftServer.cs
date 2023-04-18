@@ -541,7 +541,6 @@ namespace CrowdControl.Games.Packs
 
         private void OnServerStatusPacket(Response response)
         {
-            // TODO: not working in CCPAK
             // load packet data
             var payload = response.message.Replace("_mc_cc_server_status_", "");
             var registeredEffects = JsonConvert.DeserializeObject<string[]>(payload);

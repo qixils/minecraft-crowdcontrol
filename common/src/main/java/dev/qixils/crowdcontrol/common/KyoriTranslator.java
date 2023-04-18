@@ -320,6 +320,4 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 			instance = new KyoriTranslator(secondaryClassLoaders);
 		//return instance;
 	}
-
-	// TODO: override ComponentFlattener?
 }

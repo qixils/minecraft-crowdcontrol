@@ -4,7 +4,7 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.3.0
 
-- Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16. Speedrun Minecraft
+- Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16+. Speedrun Minecraft
   while your chat spawns dragons and creepers on you!
 - Created a Fabric implementation for 1.19.4. Play the latest modpacks alone or with your friends!
 - Added new timed effect: Invincible
