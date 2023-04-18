@@ -46,7 +46,7 @@ bukkit {
     apiVersion = mcVersionSplit[0] + "." + mcVersionSplit[1]
     prefix = "CrowdControl"
     authors = listOf("qixils")
-    description = "Allows viewers to interact with your Minecraft world"
+    description = "The Ultimate Interactive Experience for Streamers"
     website = "https://github.com/qixils/minecraft-crowdcontrol"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 }

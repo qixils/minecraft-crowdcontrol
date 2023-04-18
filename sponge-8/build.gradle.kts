@@ -38,7 +38,7 @@ sponge {
         displayName("Crowd Control")
         version(project.version.toString())
         entrypoint("dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin")
-        description("Allows viewers to interact with your Minecraft world")
+        description("The Ultimate Interactive Experience for Streamers")
         links {
             homepage("https://github.com/qixils/minecraft-crowdcontrol")
             source("https://github.com/qixils/minecraft-crowdcontrol")

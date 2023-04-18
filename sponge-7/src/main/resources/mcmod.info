@@ -3,7 +3,7 @@
     "modid": "crowdcontrol",
     "name": "Crowd Control",
     "version": "${version}",
-    "description": "Allows viewers to interact with your Minecraft world",
+    "description": "The Ultimate Interactive Experience for Streamers",
     "url": "https://github.com/qixils/minecraft-crowdcontrol",
     "authorList": [
       "qixils"
