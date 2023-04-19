@@ -34,7 +34,7 @@ would recommend **Fabric** as it has the most features and is the easiest to use
 |     1.19.4 / Fabric     |   [Fabric: One-Click Setup](guides/fabric_one_click.md)   |   [Fabric: Joining a Server](guides/fabric_joining_a_server.md)   | [Fabric 1.19: Manual Installation](guides/fabric_1.19_manual_installation.md) | [Fabric 1.19: Client Installation](guides/fabric_1.19_client_installation.md) |
 |     1.19.4 / Paper      |    [Paper: One-Click Setup](guides/paper_one_click.md)    |    [Paper: Joining a Server](guides/paper_joining_a_server.md)    |  [Paper 1.19: Manual Installation](guides/paper_1.19_manual_installation.md)  |                                      N/A                                      |
 
-_* No longer officially supported. Please use the latest version of Minecraft._
+_* No longer updated or supported. Please use the latest version of Minecraft._
 
 By default, all servers support Vanilla clients. This means that players connecting to your server
 will **not** need to install any sort of mod or software except for the Crowd Control desktop
