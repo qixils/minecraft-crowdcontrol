@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -13,42 +12,30 @@ import java.util.function.Predicate;
 
 public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, ServerLevel> {
 	public static final Predicate<Location> SPAWNING_SPACE = location ->
-			!location.block().getMaterial().blocksMotion()
+			isPassable(location)
 					&& isPassable(location.add(0, 1, 0).block())
 					&& isSolid(location.add(0, -1, 0).block());
 
 	// helper methods
 
-	public static boolean isPassable(Material material) {
-		return !material.blocksMotion();
-	}
-
 	public static boolean isPassable(BlockState block) {
-		return isPassable(block.getMaterial());
+		return !block.blocksMotion();
 	}
 
 	public static boolean isPassable(Location location) {
 		return isPassable(location.block());
 	}
 
-	public static boolean isSolid(Material material) {
-		return material.isSolid();
-	}
-
 	public static boolean isSolid(BlockState block) {
-		return isSolid(block.getMaterial());
+		return !block.isSolid();
 	}
 
 	public static boolean isSolid(Location location) {
 		return isSolid(location.block());
 	}
 
-	public static boolean isReplaceable(Material material) {
-		return material.isReplaceable();
-	}
-
 	public static boolean isReplaceable(BlockState block) {
-		return isReplaceable(block.getMaterial());
+		return block.canBeReplaced();
 	}
 
 	public static boolean isReplaceable(Location location) {

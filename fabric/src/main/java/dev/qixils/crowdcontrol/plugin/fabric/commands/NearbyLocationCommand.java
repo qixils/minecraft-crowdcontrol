@@ -40,7 +40,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 			BlockState block = location.block();
 			if (location.y() < (world.getMinBuildHeight() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (block.getBlock().isPossibleToRespawnInThis(block) && !block.getMaterial().blocksMotion())
+			else if (block.getBlock().isPossibleToRespawnInThis(block) && !block.blocksMotion())
 				air += 1;
 			else if (air >= 1)
 				break;
