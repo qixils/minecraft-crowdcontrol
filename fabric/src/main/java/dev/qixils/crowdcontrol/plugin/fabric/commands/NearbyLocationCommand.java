@@ -63,7 +63,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 		Block type = block.getBlock();
 		if (Blocks.FIRE.equals(type))
 			location.block(Blocks.AIR.defaultBlockState());
-		else if (Blocks.LAVA.equals(type))
+		else if (!block.getMaterial().blocksMotion())
 			location.block(Blocks.GLASS.defaultBlockState());
 
 		// place player on top of the block
