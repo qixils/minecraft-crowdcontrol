@@ -12,6 +12,6 @@ public interface FeatureElementCommand extends Command<ServerPlayer>, FeatureEle
 
 	@Override
 	default TriState isVisible() {
-		return TriState.fromBoolean(getPlugin().isEnabled(this));
+		return getPlugin().isEnabled(this);
 	}
 }

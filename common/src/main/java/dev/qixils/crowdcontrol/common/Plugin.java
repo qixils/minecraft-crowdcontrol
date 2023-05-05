@@ -6,7 +6,6 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import com.google.gson.Gson;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
@@ -27,6 +26,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -237,7 +237,7 @@ public interface Plugin<P, S> {
 	 */
 	default void registerChatCommands() {
 		try {
-			KyoriTranslator.initialize(Plugin.class.getClassLoader(), getClass().getClassLoader());
+			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "i18n/CrowdControl"));
 		} catch (Exception e) {
 			System.out.println("Failed to initialize i18n");
 			e.printStackTrace();
@@ -679,12 +679,13 @@ public interface Plugin<P, S> {
 	void initCrowdControl();
 
 	/**
-	 * Sends a packet with an embedded message for the C# client.
+	 * Sends a packet to trigger a remote function on the Crowd Control service.
 	 *
 	 * @param service the service to send the packet to
-	 * @param message the message to send
+	 * @param method the name of the remote function to call
+	 * @param args the arguments to pass to the remote function
 	 */
-	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String message) {
+	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String method, @Nullable Object @Nullable ... args) {
 		if (service == null)
 			service = getCrowdControl();
 		if (service == null) {
@@ -694,12 +695,11 @@ public interface Plugin<P, S> {
 		final @NotNull SocketManager finalService = service;
 		getScheduledExecutor().schedule(() -> {
 			try {
-				getSLF4JLogger().debug("sending packet {} to {}", message, finalService);
+				getSLF4JLogger().debug("sending packet {} {} to {}", method, Arrays.toString(args), finalService);
 				Response response = finalService.buildResponse()
-						.packetType(PacketType.EFFECT_STATUS)
-						.type(ResultType.NOT_VISIBLE)
-						.effect("embedded_message")
-						.message(message)
+						.packetType(PacketType.REMOTE_FUNCTION)
+						.method(method)
+						.addArguments(args)
 						.build();
 				getSLF4JLogger().debug("final packet: {}", response.toJSON());
 				response.send();
@@ -710,12 +710,13 @@ public interface Plugin<P, S> {
 	}
 
 	/**
-	 * Sends a packet with an embedded message for the C# client.
+	 * Sends a packet to trigger a remote function on the Crowd Control service.
 	 *
-	 * @param message the message to send
+	 * @param method the name of the remote function to call
+	 * @param args the arguments to pass to the remote function
 	 */
-	default void sendEmbeddedMessagePacket(@NotNull String message) {
-		sendEmbeddedMessagePacket(null, message);
+	default void sendEmbeddedMessagePacket(@NotNull String method, @Nullable Object @Nullable ... args) {
+		sendEmbeddedMessagePacket(null, method, args);
 	}
 
 	/**
@@ -724,9 +725,9 @@ public interface Plugin<P, S> {
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
-		String message = "_mc_cc_server_status_" + new Gson().toJson(commandRegister().getCommands().stream().map(Command::getEffectName).collect(Collectors.toList()));
+		Object[] effects = commandRegister().getCommands().stream().map(command -> command.getEffectName().toLowerCase(Locale.US)).toArray();
 		service.addConnectListener(connectingService -> {
-			sendEmbeddedMessagePacket(connectingService, message);
+			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
 			updateConditionalEffectVisibility(connectingService);
 		});
 	}
@@ -902,17 +903,11 @@ public interface Plugin<P, S> {
 		updateEffectStatus(service, "swap", getAllPlayers().size() <= 1 ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
 		for (Command<?> effect : commandRegister().getCommands()) {
 			TriState visibility = effect.isVisible();
-			if (effect.isClientOnly()) {
-				if (!clientVisible)
-					visibility = TriState.FALSE;
-				else if (visibility == TriState.UNKNOWN)
-					visibility = TriState.TRUE;
-			}
-			else if (effect.isGlobal()) {
-				if (!globalVisible)
-					visibility = TriState.FALSE;
-				else if (visibility == TriState.UNKNOWN)
-					visibility = TriState.TRUE;
+			if (visibility != TriState.FALSE) {
+				if (effect.isClientOnly())
+					visibility = TriState.fromBoolean(clientVisible);
+				else if (effect.isGlobal())
+					visibility = TriState.fromBoolean(globalVisible);
 			}
 			if (visibility != TriState.UNKNOWN)
 				updateEffectVisibility(service, effect, visibility.getPrimitiveBoolean());
