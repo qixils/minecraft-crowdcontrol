@@ -136,10 +136,14 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	@Override
 	protected @NotNull Component renderTranslatable(@NotNull TranslatableComponent component, @NotNull Locale context) {
 		logger.debug("Richly translating " + component.key() + " for " + context);
-		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method
-		// instead it will just like waste a bunch of method calls to the internal translator but that's fine
 		final @Nullable MessageFormat format = translate(component.key(), context);
-		if (format == null) return GlobalTranslator.renderer().render(component, context);
+
+		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method
+		//  (and in fact, it hasn't from a lot of testing)
+		// also this needs to be here because #optionallyRenderChildrenAppendAndBuild calls this method to, well, render children
+		// although that's not to say that this couldn't be improved. it probably could be.
+		if (format == null)
+			return GlobalTranslator.renderer().render(component, context);
 
 		final TextComponent.Builder builder = Component.text(); // mostly just a dummy for appending children
 		this.mergeStyle(component, builder, context);
