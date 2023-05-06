@@ -23,18 +23,10 @@ import javax.annotation.Nullable;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements TranslationRegistry {
-	private static final Set<Locale> LOCALES = Stream.of(
-			"en_US"
-	)
-			.map(Translator::parseLocale)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toSet());
 	private static final Logger logger = LoggerFactory.getLogger("KyoriTranslator");
 	private final String prefix;
 	private final TranslationRegistry translator;
@@ -46,9 +38,11 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	 *
 	 * @param modId the ID of your mod/plugin
 	 * @param prefix the prefix for language resource files
+	 * @param locales the locales to load (used only if reflection fails)
 	 */
-	public KyoriTranslator(@NotNull String modId, @NotNull String prefix) {
+	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Set<Locale> locales) {
 		this.prefix = prefix;
+
 		Pattern filePattern = Pattern.compile("^/?" + Pattern.quote(prefix) + "_");
 		logger.info("Registering translator");
 
@@ -58,18 +52,21 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		translator.defaultLocale(Objects.requireNonNull(Translator.parseLocale("en_US")));
 
 		// load locales
-		// TODO: workaround Forge's bizarre custom "modjar" URL on Sponge 8
+		// TODO(reflections): workaround Forge's bizarre custom "modjar" URL on Sponge 8
+		String[] pkg = prefix.split("/");
+		pkg = Arrays.copyOfRange(pkg, 0, pkg.length - 1);
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
 				.addScanners(Scanners.Resources)
-				.forPackage("i18n"));
-		Set<String> resources = new HashSet<>(reflections.getResources(filePattern));
+				.forPackage(String.join(".", pkg)));
+		Set<String> resources = new HashSet<>(reflections.getResources(".+\\.properties"));
+		resources.removeIf(s -> !filePattern.matcher(s).find()); // ^ reflections regex doesn't actually work
 
 		if (!resources.isEmpty()) {
 			logger.info("Using Reflections to load locales");
 			resources.forEach(this::register);
 		} else {
 			logger.info("Manually loading locales");
-			for (Locale locale : LOCALES)
+			for (Locale locale : locales)
 				register(locale);
 		}
 	}
