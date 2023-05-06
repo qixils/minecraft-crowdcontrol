@@ -40,7 +40,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	 * @param prefix the prefix for language resource files
 	 * @param locales the locales to load (used only if reflection fails)
 	 */
-	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Set<Locale> locales) {
+	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Locale @NotNull ... locales) {
 		this.prefix = prefix;
 
 		Pattern filePattern = Pattern.compile("^/?" + Pattern.quote(prefix) + "_");

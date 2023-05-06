@@ -237,7 +237,7 @@ public interface Plugin<P, S> {
 	 */
 	default void registerChatCommands() {
 		try {
-			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "i18n/CrowdControl"));
+			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "i18n/CrowdControl", Locale.US));
 		} catch (Exception e) {
 			System.out.println("Failed to initialize i18n");
 			e.printStackTrace();
