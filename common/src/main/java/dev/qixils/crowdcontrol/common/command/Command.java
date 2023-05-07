@@ -118,7 +118,43 @@ public interface Command<P> {
 	@NotNull
 	@CheckReturnValue
 	default Component getProcessedDisplayName(@NotNull Request request) {
-		return getDisplayName();
+		Component displayName = getDisplayName();
+
+		QuantityStyle style = getQuantityStyle();
+		if (style == QuantityStyle.NONE || !(displayName instanceof TranslatableComponent))
+			return displayName;
+
+		TranslatableComponent translatable = (TranslatableComponent) displayName;
+		List<Component> args = new ArrayList<>(translatable.args());
+		Component quantity = Component.text(request.getQuantityOrDefault());
+		if (style == QuantityStyle.APPEND || style == QuantityStyle.APPEND_X) {
+			args.add(quantity);
+		} else if (style == QuantityStyle.PREPEND || style == QuantityStyle.PREPEND_X) {
+			args.add(0, quantity);
+		}
+		translatable = translatable.args(args);
+
+		if ((style == QuantityStyle.APPEND_X || style == QuantityStyle.PREPEND_X) && request.getQuantityOrDefault() > 1) {
+			String[] keyParts = translatable.key().split("\\.");
+			if (keyParts.length == 4 && keyParts[0].equals("cc") && keyParts[1].equals("effect") && keyParts[3].equals("name")) {
+				keyParts[2] += "_x";
+				String key = String.join(".", keyParts);
+				translatable = translatable.key(key);
+			}
+		}
+
+		return translatable;
+	}
+
+	/**
+	 * Returns which style to use for rendering the quantity of this command's effects.
+	 *
+	 * @return quantity style
+	 */
+	@NotNull
+	@CheckReturnValue
+	default QuantityStyle getQuantityStyle() {
+		return QuantityStyle.NONE;
 	}
 
 	/**

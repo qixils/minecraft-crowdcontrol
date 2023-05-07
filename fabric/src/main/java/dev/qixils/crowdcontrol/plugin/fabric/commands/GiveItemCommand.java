@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.command.QuantityStyle;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -17,11 +18,11 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
+	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Item item;
 	private final String effectName;
 	private final TranslatableComponent defaultDisplayName;
@@ -31,17 +32,6 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 		this.item = item;
 		this.effectName = "give_" + BuiltInRegistries.ITEM.getKey(item).getPath();
 		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", item.getName(new ItemStack(item)));
-	}
-
-	@Override
-	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
-		if (request.getParameters() == null)
-			return getDefaultDisplayName();
-		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.give_item_x.name");
-		List<Component> args = new ArrayList<>(displayName.args());
-		args.add(Component.text(amount));
-		return displayName.args(args);
 	}
 
 	@Blocking
@@ -57,7 +47,7 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
+		int amount = request.getQuantityOrDefault();
 		ItemStack itemStack = new ItemStack(item, amount);
 
 		LimitConfig config = getPlugin().getLimitConfig();

@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.command.QuantityStyle;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -17,11 +18,11 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.registry.RegistryTypes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class TakeItemCommand extends ImmediateCommand {
+	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final ItemType item;
 	private final String effectName;
 	private final TranslatableComponent defaultDisplayName;
@@ -31,17 +32,6 @@ public class TakeItemCommand extends ImmediateCommand {
 		this.item = item;
 		this.effectName = "take_" + item.key(RegistryTypes.ITEM_TYPE).value();
 		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", item);
-	}
-
-	@Override
-	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
-		if (request.getParameters() == null)
-			return getDefaultDisplayName();
-		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.take_item_x.name");
-		List<Component> args = new ArrayList<>(displayName.args());
-		args.add(Component.text(amount));
-		return displayName.args(args);
 	}
 
 	private boolean takeItemFrom(ServerPlayer player, int amount) {
@@ -75,7 +65,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
+		int amount = request.getQuantityOrDefault();
 
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
