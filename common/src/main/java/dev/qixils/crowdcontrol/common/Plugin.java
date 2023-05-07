@@ -262,7 +262,7 @@ public interface Plugin<P, S> {
 		manager.command(account.literal("link")
 				.meta(CommandMeta.DESCRIPTION, "Link a Twitch account to your Minecraft account")
 				.argument(
-						StringArgument.<S>builder("username")
+						StringArgument.<S>newBuilder("username")
 								.single()
 								.asRequired()
 								.manager(manager)
@@ -293,7 +293,7 @@ public interface Plugin<P, S> {
 		manager.command(account.literal("unlink")
 				.meta(CommandMeta.DESCRIPTION, "Unlink a Twitch account from your Minecraft account")
 				.argument(
-						StringArgument.<S>builder("username")
+						StringArgument.<S>newBuilder("username")
 								.single()
 								.asRequired()
 								.manager(manager)
@@ -393,7 +393,7 @@ public interface Plugin<P, S> {
 					.meta(CommandMeta.DESCRIPTION, "Executes the effect with the given ID")
 					.permission(mapper::isAdmin)
 					.argument(
-							StringArgument.<S>builder("effect")
+							StringArgument.<S>newBuilder("effect")
 									.single()
 									.asRequired()
 									.manager(manager)
@@ -437,7 +437,7 @@ public interface Plugin<P, S> {
 		manager.command(manager.commandBuilder("password")
 				.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
 				.permission(mapper::isAdmin)
-				.argument(StringArgument.<S>builder("password").greedy().asRequired())
+				.argument(StringArgument.<S>newBuilder("password").greedy().asRequired())
 				.handler(commandContext -> {
 					Audience sender = mapper.asAudience(commandContext.getSender());
 					if (!isServer()) {

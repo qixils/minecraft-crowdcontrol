@@ -9,10 +9,9 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -34,9 +33,8 @@ public class PlantTreeCommand extends Command {
 		super(plugin);
 	}
 
-	private static List<ConfiguredFeature<?, ?>> getTreesFor(Level level) {
-		return level.registryAccess().registry(Registries.CONFIGURED_FEATURE)
-				.orElseThrow(() -> new IllegalStateException("No configured feature registry"))
+	private static List<ConfiguredFeature<?, ?>> getTrees() {
+		return BuiltinRegistries.CONFIGURED_FEATURE
 				.stream()
 				.filter(feature -> {
 					FeatureConfiguration c = feature.config();
@@ -53,7 +51,7 @@ public class PlantTreeCommand extends Command {
 
 		Collection<CompletableFuture<?>> futures = new ArrayList<>(players.size());
 		for (ServerPlayer player : players) {
-			ConfiguredFeature<?, ?> treeType = RandomUtil.randomElementFrom(getTreesFor(player.level));
+			ConfiguredFeature<?, ?> treeType = RandomUtil.randomElementFrom(getTrees());
 			CompletableFuture<Void> future = new CompletableFuture<>();
 			futures.add(future);
 

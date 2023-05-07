@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mc;
 
 import dev.qixils.crowdcontrol.common.mc.CCLivingEntity;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -73,7 +74,7 @@ public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 
 	@Override
 	public void damage(double damage) {
-		entity().hurt(entity().damageSources().outOfWorld(), (float) damage);
+		entity().hurt(DamageSource.OUT_OF_WORLD, (float) damage);
 	}
 
 	@Override

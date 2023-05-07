@@ -12,7 +12,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -72,7 +72,7 @@ public class LootboxCommand extends ImmediateCommand {
 		this.effectName = effectName.toString();
 
 		// create item collections
-		allItems = BuiltInRegistries.ITEM.stream().toList();
+		allItems = Registry.ITEM.stream().toList();
 		goodItems = allItems.stream()
 				.filter(itemType ->
 						itemType.getMaxDamage() > 1
@@ -100,7 +100,6 @@ public class LootboxCommand extends ImmediateCommand {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<Item> items = new ArrayList<>(allItems);
-		items.removeIf(plugin::isDisabled);
 		Collections.shuffle(items, random);
 		Item item = null;
 		for (int i = 0; i <= luck * 5; i++) {
@@ -144,7 +143,7 @@ public class LootboxCommand extends ImmediateCommand {
 			_enchantments = Math.max(_enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		final int enchantments = _enchantments;
-		List<Enchantment> enchantmentList = BuiltInRegistries.ENCHANTMENT.stream()
+		List<Enchantment> enchantmentList = Registry.ENCHANTMENT.stream()
 				.filter(enchantmentType -> enchantmentType.canEnchant(itemStack)).collect(Collectors.toList());
 		if (random.nextDouble() >= (.8d - (luck * .2d)))
 			enchantmentList.removeIf(Enchantment::isCurse);
@@ -181,14 +180,14 @@ public class LootboxCommand extends ImmediateCommand {
 		// add attributes
 		if (attributes > 0) {
 			// get equipment slot(s)
-			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getEquipmentSlot() : null;
+			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getSlot() : null;
 			EquipmentSlot[] equipmentSlots = equipmentSlot == null ? new EquipmentSlot[]{MAINHAND, OFFHAND} : new EquipmentSlot[]{equipmentSlot};
 			// add custom attributes
 			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
 				Attribute attribute = attributeList.get(i);
-				String name = "lootbox_" + Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(attribute)).getPath();
+				String name = "lootbox_" + Objects.requireNonNull(Registry.ATTRIBUTE.getKey(attribute)).getPath();
 				// determine percent amount for the modifier
 				double amount = 0d;
 				for (int j = 0; j <= luck; j++) {

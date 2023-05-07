@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
-import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
@@ -31,11 +30,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.flag.FeatureElement;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,7 +96,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(this);
 	private final FabricServerCommandManager<CommandSourceStack> commandManager
-			= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>builder()
+			= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>newBuilder()
 			.withAsynchronousParsing()
 			.withExecutor(getAsyncExecutor())
 			.build()
@@ -110,7 +108,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	public FabricCrowdControlPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
-		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
+		CommandConstants.SOUND_VALIDATOR = key -> Registry.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().registerListeners(softLockResolver);
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
@@ -256,16 +254,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Override
 	public @Nullable ServerPlayer asPlayer(@NotNull CommandSourceStack sender) {
 		return sender.getPlayer();
-	}
-
-	@NotNull
-	public TriState isEnabled(FeatureElement feature) {
-		if (server == null) return TriState.UNKNOWN;
-		return TriState.fromBoolean(feature.isEnabled(server.getWorldData().enabledFeatures()));
-	}
-
-	public boolean isDisabled(FeatureElement feature) {
-		return isEnabled(feature) == TriState.FALSE;
 	}
 
 	public @NotNull Component toAdventure(ComponentLike text, @NotNull Pointered viewer) {

@@ -8,7 +8,7 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffect;
@@ -34,9 +34,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, BuiltInRegistries.BLOCK);
-			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, BuiltInRegistries.BLOCK);
-			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, BuiltInRegistries.ITEM);
+			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, Registry.BLOCK);
+			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, Registry.BLOCK);
+			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, Registry.ITEM);
 		}
 	}
 
@@ -113,7 +113,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 		));
 
 		// entity commands
-		for (EntityType<?> entity : BuiltInRegistries.ENTITY_TYPE) {
+		for (EntityType<?> entity : Registry.ENTITY_TYPE) {
 			commands.add(new SummonEntityCommand<>(plugin, entity));
 			commands.add(new RemoveEntityCommand<>(plugin, entity));
 		}
@@ -123,7 +123,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			commands.add(new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		for (MobEffect potion : BuiltInRegistries.MOB_EFFECT)
+		for (MobEffect potion : Registry.MOB_EFFECT)
 			commands.add(new PotionCommand(plugin, potion));
 
 		// block sets
@@ -134,7 +134,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			commands.add(new FallingBlockCommand(plugin, block));
 
 		// enchantments
-		for (Enchantment enchantment : BuiltInRegistries.ENCHANTMENT)
+		for (Enchantment enchantment : Registry.ENCHANTMENT)
 			commands.add(new EnchantmentCommand(plugin, enchantment));
 
 		// give/take items

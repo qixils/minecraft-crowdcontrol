@@ -7,7 +7,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +43,7 @@ public class ExplodeCommand extends ImmediateCommand {
 						pos.z,
 						power,
 						fire,
-						Level.ExplosionInteraction.TNT
+						Explosion.BlockInteraction.BREAK
 				);
 				player.setDeltaMovement(0, .5, 0);
 				player.hurtMarked = true;

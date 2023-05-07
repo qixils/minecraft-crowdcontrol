@@ -11,7 +11,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -34,7 +34,7 @@ public class VeinCommand extends ImmediateCommand {
 
 	public VeinCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);
-		stones = new TypedTag<>(CommonTags.STONES, BuiltInRegistries.BLOCK);
+		stones = new TypedTag<>(CommonTags.STONES, Registry.BLOCK);
 	}
 
 	// Gets a 2x2 chunk of blocks

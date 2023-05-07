@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 @Getter
 public class FlowerCommand extends ImmediateCommand {
 	private final String effectName = "flowers";
-	private final MappedKeyedTag<Block> flowers = new TypedTag<>(FLOWERS, BuiltInRegistries.BLOCK);
+	private final MappedKeyedTag<Block> flowers = new TypedTag<>(FLOWERS, Registry.BLOCK);
 
 	public FlowerCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);

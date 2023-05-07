@@ -13,7 +13,6 @@ import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -55,7 +54,7 @@ public class FlightCommand extends TimedVoidCommand {
 						sync(() -> {
 							abilities.mayfly = true;
 							abilities.flying = true;
-							player.addDeltaMovement(new Vec3(0, 0.2, 0));
+							player.setDeltaMovement(player.getDeltaMovement().add(0, 0.2, 0));
 							player.hurtMarked = true;
 							player.onUpdateAbilities();
 							// TODO: set abilities.flying=true; again after 1 tick

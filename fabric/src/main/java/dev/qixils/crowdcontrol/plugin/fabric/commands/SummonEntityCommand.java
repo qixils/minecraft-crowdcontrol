@@ -10,23 +10,19 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.MushroomCow;
-import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.animal.Wolf;
-import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.EnderMan;
-import net.minecraft.world.entity.npc.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.ArmorItem;
@@ -39,9 +35,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_INC;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
-import static dev.qixils.crowdcontrol.common.util.RandomUtil.weightedRandom;
 
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
@@ -51,27 +47,18 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	private final Component displayName;
 	private @Nullable List<ResourceLocation> lootTables = null;
 	private final Map<EntityType<?>, List<Item>> horseArmor = new HashMap<>();
-	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
-			Rabbit.Variant.BLACK, 16,
-			Rabbit.Variant.BROWN, 16,
-			Rabbit.Variant.GOLD, 16,
-			Rabbit.Variant.SALT, 16,
-			Rabbit.Variant.WHITE, 16,
-			Rabbit.Variant.WHITE_SPLOTCHED, 16,
-			Rabbit.Variant.EVIL, 1
-	);
 
 	public SummonEntityCommand(FabricCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
+		this.effectName = "entity_" + csIdOf(Registry.ENTITY_TYPE.getKey(entityType));
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getDescription());
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
-		for (Item item : BuiltInRegistries.ITEM) {
+		for (Item item : Registry.ITEM) {
 			if (item instanceof ArmorItem armorItem) {
-				EquipmentSlot slot = armorItem.getEquipmentSlot();
+				EquipmentSlot slot = armorItem.getSlot();
 				if (slot.getType() != EquipmentSlot.Type.ARMOR)
 					continue;
 				armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(armorItem);
@@ -98,7 +85,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (tryExecute != null) return tryExecute;
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+		int maxVictims = config.getItemLimit(Registry.ENTITY_TYPE.getKey(entityType).getPath());
 
 		sync(() -> {
 			int victims = 0;
@@ -145,14 +132,12 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof LivingEntity)
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
 		if (entity instanceof Boat boat)
-			boat.setVariant(randomElementFrom(Boat.Type.class));
+			boat.setType(randomElementFrom(Boat.Type.class));
 		if (entity instanceof Wolf wolf)
 			wolf.setCollarColor(randomElementFrom(DyeColor.class));
-		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
-			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
 		if (entity instanceof AbstractHorse horse) {
 			if (horse.canWearArmor() && RandomUtil.RNG.nextBoolean()) {
-				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream().filter(item -> horse.isArmor(new ItemStack(item))).toList());
+				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> Registry.ITEM.stream().filter(item -> horse.isArmor(new ItemStack(item))).toList());
 				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
 			}
 			horse.setOwnerUUID(player.getUUID());
@@ -163,17 +148,11 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof Saddleable saddleable && RandomUtil.RNG.nextBoolean())
 			saddleable.equipSaddle(null);
 		if (entity instanceof EnderMan enderman)
-			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
+			enderman.setCarriedBlock(randomElementFrom(Registry.BLOCK).defaultBlockState());
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
 		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT));
-		if (entity instanceof Axolotl axolotl)
-			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
-		if (entity instanceof Rabbit rabbit)
-			rabbit.setVariant(weightedRandom(RABBIT_VARIANTS));
-		if (entity instanceof VillagerDataHolder villager)
-			villager.setVariant(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE));
+			frog.setVariant(randomElementFrom(Registry.FROG_VARIANT));
 		if (entity instanceof ContainerEntity container)
 			container.setLootTable(randomElementFrom(getLootTables(level.getServer())));
 

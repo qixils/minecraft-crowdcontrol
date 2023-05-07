@@ -11,7 +11,7 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Getter
-public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
+public class TakeItemCommand extends ImmediateCommand {
 	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Item item;
 	private final String effectName;
@@ -31,7 +31,7 @@ public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
 	public TakeItemCommand(FabricCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "take_" + BuiltInRegistries.ITEM.getKey(item).getPath();
+		this.effectName = "take_" + Registry.ITEM.getKey(item).getPath();
 		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
 	}
 
@@ -68,7 +68,7 @@ public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
 				.message("Item could not be found in target inventories");
 
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+		int maxVictims = config.getItemLimit(Registry.ITEM.getKey(item).getPath());
 		int victims = 0;
 
 		// first pass (hosts)

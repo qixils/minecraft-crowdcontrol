@@ -35,17 +35,17 @@
   ],
   "depends": {
     "fabricloader": "^0.14.17",
-    "fabric": "^0.75.3",
-    "minecraft": ">=1.19.4 <=1.20-alpha.23.13.a",
-    "cardinal-components-base": ">=5.1.0",
-    "cardinal-components-entity": ">=5.1.0",
-    "cloud": "^1.8.3",
-    "adventure-platform-fabric": "^5.8.0",
+    "fabric": "^0.76.0",
+    "minecraft": "1.19.2",
+    "cardinal-components-base": ">=5.0.2",
+    "cardinal-components-entity": ">=5.0.2",
+    "cloud": "^1.7.1",
+    "adventure-platform-fabric": "^5.5.2",
     "net_kyori_adventure-api": "^4.13.0",
-    "cloth-config": "^10.0.96"
+    "cloth-config": "^8.2.88"
   },
   "suggests": {
-    "modmenu": ">=6.1.0"
+    "modmenu": ">=4.1.2"
   },
   "custom": {
     "cardinal-components": [

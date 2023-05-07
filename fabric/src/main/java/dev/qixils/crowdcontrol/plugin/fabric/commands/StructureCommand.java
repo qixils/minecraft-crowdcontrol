@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -116,8 +116,8 @@ public class StructureCommand extends NearbyLocationCommand<StructureCommand.Str
 		}
 
 		HolderSet<Structure> getStructures(ServerLevel level) {
-			var registry = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
-			return HolderSet.direct(Arrays.stream(structures).map(registry::get).flatMap(Optional::stream).toList());
+			var registry = level.registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY);
+			return HolderSet.direct(Arrays.stream(structures).map(registry::getHolder).flatMap(Optional::stream).toList());
 		}
 	}
 }

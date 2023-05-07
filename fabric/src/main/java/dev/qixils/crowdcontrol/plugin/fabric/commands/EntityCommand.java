@@ -1,7 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TriState;
-import dev.qixils.crowdcontrol.plugin.fabric.FeatureElementCommand;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import net.minecraft.server.level.ServerLevel;
@@ -10,20 +11,18 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
-	@NotNull EntityType<E> getEntityType();
+public interface EntityCommand<E extends Entity> extends Command<ServerPlayer> {
 
 	@Override
-	default @NotNull FeatureFlagSet requiredFeatures() {
-		return getEntityType().requiredFeatures();
-	}
+	@NotNull FabricCrowdControlPlugin getPlugin();
+
+	@NotNull EntityType<E> getEntityType();
 
 	default boolean isMonster() {
 		return getEntityType().getCategory() == MobCategory.MONSTER;
@@ -52,11 +51,6 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 				return request.buildResponse()
 						.type(Response.ResultType.FAILURE)
 						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
-			}
-			if (!isEnabled(player.getLevel().enabledFeatures())) {
-				return request.buildResponse()
-						.type(Response.ResultType.UNAVAILABLE)
-						.message("Mob is not available in this version of Minecraft");
 			}
 		}
 		return null;

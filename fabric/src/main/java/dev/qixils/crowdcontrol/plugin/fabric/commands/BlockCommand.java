@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.FeatureElementCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
@@ -11,9 +10,8 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @Getter
-public class BlockCommand extends ImmediateCommand implements FeatureElementCommand {
+public class BlockCommand extends ImmediateCommand {
 	private final Block blockType;
 	private final String effectName;
 	private final Component displayName;
@@ -31,7 +29,7 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 		this(
 				plugin,
 				blockType,
-				"block_" + BuiltInRegistries.BLOCK.getKey(blockType).getPath(),
+				"block_" + Registry.BLOCK.getKey(blockType).getPath(),
 				Component.translatable("cc.effect.block.name", blockType.getName())
 		);
 	}
@@ -41,11 +39,6 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 		this.blockType = blockType;
 		this.effectName = effectName;
 		this.displayName = displayName;
-	}
-
-	@Override
-	public @NotNull FeatureFlagSet requiredFeatures() {
-		return blockType.requiredFeatures();
 	}
 
 	@Nullable

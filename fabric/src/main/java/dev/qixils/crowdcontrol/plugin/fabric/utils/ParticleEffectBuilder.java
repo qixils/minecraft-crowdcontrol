@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
+import com.mojang.math.Vector3d;
+import com.mojang.math.Vector3f;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import net.minecraft.core.particles.ParticleOptions;
@@ -8,8 +10,6 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
 
 /**
  * Builds a particle effect.

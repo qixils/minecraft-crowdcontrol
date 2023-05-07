@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
+import com.mojang.math.Vector3d;
+import com.mojang.math.Vector3f;
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -11,8 +13,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Contract;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
 
 import javax.annotation.CheckReturnValue;
 
@@ -36,7 +36,7 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	}
 
 	public BlockPos pos() {
-		return BlockPos.containing(x, y, z);
+		return new BlockPos(x, y, z);
 	}
 
 	public Vec3 vec3() {
