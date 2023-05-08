@@ -58,7 +58,9 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				if (player.connection == null)
 					continue;
-				SocketAddress address = player.connection.getRemoteAddress();
+				if (player.connection.connection == null)
+					continue;
+				SocketAddress address = player.connection.connection.getRemoteAddress();
 				if (!(address instanceof InetSocketAddress inetAddress))
 					continue;
 				if (!Objects.equals(inetAddress.getAddress(), ip))
