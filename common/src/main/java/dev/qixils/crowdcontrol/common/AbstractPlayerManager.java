@@ -39,12 +39,13 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 		if (target.getLogin() != null)
 			uuids.addAll(twitchToUserMap.get(target.getLogin().toLowerCase(Locale.ENGLISH)));
 
+		if (!getPlugin().isAutoDetectIP())
+			return uuids;
+
 		CrowdControl cc = getPlugin().getCrowdControl();
 		if (cc == null)
 			return uuids;
 		PlayerEntityMapper<P> mapper = getPlugin().playerMapper();
-
-		// TODO: config setting for this "autodetect" behavior
 
 		for (Request.Source source : cc.getSources()) {
 			if (!target.equals(source.target()))

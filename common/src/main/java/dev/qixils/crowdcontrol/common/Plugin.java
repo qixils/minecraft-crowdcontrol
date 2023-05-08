@@ -1106,4 +1106,13 @@ public interface Plugin<P, S> {
 	default int getModdedPlayerCount() {
 		return 0;
 	}
+
+	/**
+	 * Gets whether to try auto-linking accounts based on IP address.
+	 *
+	 * @return whether to try auto-linking accounts based on IP address
+	 */
+	default boolean isAutoDetectIP() {
+		return true;
+	}
 }
