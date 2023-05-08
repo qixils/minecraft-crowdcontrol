@@ -2,6 +2,18 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.1
+
+- Added an account autodetection feature which tries to automatically link a streamer's Minecraft
+  account and their Crowd Control app session to remove the need to run `/account link`. Certain
+  event setups may wish to utilize the `autodetect` config option to disable this feature.
+- Further updates and fixes for Crowd Control 2.0
+- Increased the height of the Dig Hole effect to destroy partial blocks (i.e. slabs, stairs, etc.)
+- Teleport to X Location effects are now more likely to place a glass block to stand on
+- Backported the Fabric mod to 1.19.2 (experimental) and updated to 1.20 snapshots
+- Fixed loading the Sponge 1.16 mod in the CurseForge client
+- Updated some error messages to be more relevant
+
 ## 3.3.0
 
 - Created a Sponge 8 implementation for SpongeForge 1.16 and SpongeVanilla 1.16+. Speedrun Minecraft
