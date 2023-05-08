@@ -1,5 +1,4 @@
 val cloudVersion: String by project
-val logbackVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 8"
 
@@ -35,7 +34,7 @@ sponge {
     license("Mozilla Public License Version 2.0")
     plugin("crowdcontrol") {
         displayName("Crowd Control")
-        version(project.version.toString() + "-8")
+        version(project.version.toString() + "+sponge8")
         entrypoint("dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin")
         description("The Ultimate Interactive Experience for Streamers")
         links {
