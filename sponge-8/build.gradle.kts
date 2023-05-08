@@ -1,5 +1,4 @@
 val cloudVersion: String by project
-val logbackVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 8"
 
