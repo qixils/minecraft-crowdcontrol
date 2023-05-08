@@ -41,7 +41,7 @@ java {
 // plugin.yml generation
 bukkit {
     name = "CrowdControl"
-    version = project.version.toString()
+    version = project.version.toString() + "+paper"
     main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
     apiVersion = mcVersionSplit[0] + "." + mcVersionSplit[1]
     prefix = "CrowdControl"
