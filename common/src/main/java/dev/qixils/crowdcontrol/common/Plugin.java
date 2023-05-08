@@ -186,7 +186,8 @@ public interface Plugin<P, S> {
 	Component NO_GLOBAL_EFFECTS_MESSAGE = warning(Component.translatable(
 			"cc.error.no-global-effects",
 			Component.text("global", TextColor.color(0xF9AD9E)),
-			Component.text("true", TextColor.color(0xF9AD9E))
+			Component.text("true", TextColor.color(0xF9AD9E)),
+			Component.text("hosts", TextColor.color(0xF9AD9E))
 	));
 
 	/**
