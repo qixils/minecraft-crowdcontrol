@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
@@ -11,7 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,8 +111,7 @@ public class StructureCommand extends NearbyLocationCommand<StructureCommand.Str
 
 		@SafeVarargs
 		StructureGroup(ResourceKey<Structure>... structures) {
-			//noinspection deprecation
-			this.name = Component.text(WordUtils.capitalizeFully(name().replace('_', ' ')));
+			this.name = Component.text(TextUtil.titleCase(this));
 			this.structures = structures;
 		}
 

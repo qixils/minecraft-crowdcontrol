@@ -4,6 +4,7 @@ import net.kyori.adventure.identity.Identity;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
+import java.net.InetAddress;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,4 +48,13 @@ public interface PlayerEntityMapper<P> extends EntityMapper<P> {
 		return tryGetUniqueId(entity).orElseThrow(() ->
 				new UnsupportedOperationException("Player object does not support UUID"));
 	}
+
+	/**
+	 * Gets an online player connected with the provided IP address.
+	 *
+	 * @param ip the IP address of the player
+	 * @return the player with the given IP address, or empty if not found
+	 */
+	@CheckReturnValue
+	@NotNull Optional<P> getPlayer(@NotNull InetAddress ip);
 }

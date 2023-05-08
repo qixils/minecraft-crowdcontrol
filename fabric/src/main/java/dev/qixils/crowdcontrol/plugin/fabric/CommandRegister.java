@@ -66,7 +66,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
 				new DigCommand(plugin),
-				new TimeCommand(plugin),
 				new ItemDurabilityCommand.Repair(plugin),
 				new ItemDurabilityCommand.Damage(plugin),
 				new RemoveEnchantsCommand(plugin),

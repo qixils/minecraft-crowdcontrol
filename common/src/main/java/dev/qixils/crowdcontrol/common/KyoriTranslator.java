@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
+import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -11,7 +12,6 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
 import net.kyori.adventure.util.UTF8ResourceBundleControl;
-import net.kyori.examination.Examinable;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -20,88 +20,55 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.io.*;
-import java.net.URL;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements TranslationRegistry {
-	private static final Set<Locale> LOCALES = Stream.of(
-			"en_US"
-	)
-			.map(Translator::parseLocale)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toSet());
-	private static final Set<String> DIRECTORIES = Stream.of(
-			"/i18n/",
-			"i18n/"
-	)
-			.collect(Collectors.toSet());
-	private static final Logger logger = LoggerFactory.getLogger("CC-KyoriTranslator");
-	private static KyoriTranslator instance;
+	private static final Logger logger = LoggerFactory.getLogger("KyoriTranslator");
+	private final String prefix;
 	private final TranslationRegistry translator;
-	private final List<ClassLoader> classLoaders;
 
-	private KyoriTranslator(ClassLoader... secondaryClassLoaders) {
+	/**
+	 * Creates a new translator with the given language file prefix.
+	 * For a prefix like "i18n/MyModName", the translator will load all files matching "i18n/MyModName_*.properties",
+	 * where the asterisk is a language code like "en_US".
+	 *
+	 * @param modId the ID of your mod/plugin
+	 * @param prefix the prefix for language resource files
+	 * @param locales the locales to load (used only if reflection fails)
+	 */
+	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Locale @NotNull ... locales) {
+		this.prefix = prefix;
+
+		Pattern filePattern = Pattern.compile("^/?" + Pattern.quote(prefix) + "_");
 		logger.info("Registering translator");
 
 		// create translator
-		Key name = Key.key("crowdcontrol", "translations");
+		Key name = Key.key(modId, "translations");
 		translator = TranslationRegistry.create(name);
 		translator.defaultLocale(Objects.requireNonNull(Translator.parseLocale("en_US")));
 
-		// create class loaders list
-		classLoaders = new ArrayList<>(secondaryClassLoaders.length + 3);
-		classLoaders.add(KyoriTranslator.class.getClassLoader());
-		classLoaders.addAll(Arrays.asList(secondaryClassLoaders));
-		classLoaders.add(Thread.currentThread().getContextClassLoader());
-		classLoaders.add(ClassLoader.getSystemClassLoader());
-
 		// load locales
+		// TODO(reflections): workaround Forge's bizarre custom "modjar" URL on Sponge 8
+		String[] pkg = prefix.split("/");
+		pkg = Arrays.copyOfRange(pkg, 0, pkg.length - 1);
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
-				.addClassLoaders(classLoaders.toArray(new ClassLoader[0]))
 				.addScanners(Scanners.Resources)
-				.forPackage("i18n"));
-		Set<String> resources = new HashSet<>(reflections.getResources(Pattern.compile(".+\\.properties")));
-		resources.removeIf(s -> !s.startsWith("i18n/CrowdControl_") && !s.startsWith("/i18n/CrowdControl_"));
+				.forPackage(String.join(".", pkg)));
+		Set<String> resources = new HashSet<>(reflections.getResources(".+\\.properties"));
+		resources.removeIf(s -> !filePattern.matcher(s).find()); // ^ reflections regex doesn't actually work
 
-		// try one of a million redundancies to load locales
-		// (this is probably over the top and i'm sure a lot of them aren't necessary and will never be used but. uh. oh well lol)
 		if (!resources.isEmpty()) {
 			logger.info("Using Reflections to load locales");
-			resources.forEach(file -> register(file, null));
-		} else if (tryFileRegister()) {
-			logger.info("Used File method to load locales");
-		} else if (tryStreamRegister()) {
-			logger.info("Used InputStream method to load locales");
-		} else if (tryPathRegister()) {
-			logger.info("Used Path method to load locales");
+			resources.forEach(this::register);
 		} else {
-			// TODO: try ClassGraph
 			logger.info("Manually loading locales");
-			for (Locale locale : LOCALES)
-				register(locale, null);
+			for (Locale locale : locales)
+				register(locale);
 		}
-
-		logger.info("Registering translator to global translator");
-		GlobalTranslator.translator().addSource(this);
-	}
-
-	private int countRegisteredLocales() {
-		Set<Locale> locales = new HashSet<>();
-		if (!(translator instanceof Examinable))
-			return -1;
-		// TODO figure out how to use Examiner
-		return -1;//locales.size();
 	}
 
 	@Override
@@ -129,154 +96,29 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		translator.unregister(key);
 	}
 
-	private void register(Locale locale, @Nullable ClassLoader classLoader) {
-		if (classLoader == null)
-			classLoader = KyoriTranslator.class.getClassLoader();
-		ResourceBundle bundle = ResourceBundle.getBundle("i18n.CrowdControl", locale, classLoader, UTF8ResourceBundleControl.get());
-		int registeredLocales = countRegisteredLocales();
+	private void register(Locale locale) {
+		ClassLoader loader = ExceptionUtil.validateNotNullElseGet(Thread.currentThread().getContextClassLoader(), ClassLoader::getSystemClassLoader);
+		ResourceBundle bundle = ResourceBundle.getBundle(prefix.replace('/', '.'), locale, loader, UTF8ResourceBundleControl.get());
 		translator.registerAll(locale, bundle, false);
-
-		if (registeredLocales > -1 && registeredLocales == countRegisteredLocales())
-			logger.warn("Failed to register locale " + locale);
-		else
-			logger.info("Registered locale " + locale);
+		logger.info("Registered locale " + locale);
 	}
 
-	private void register(String file, @Nullable ClassLoader classLoader) {
+	private void register(String file) {
 		logger.debug("Processing " + file);
-		String[] segments = file.split("_", 2);
-		if (segments.length <= 1)
+		String[] seg1 = file.split("/");
+		String[] seg2 = seg1[seg1.length - 1].split("_", 2);
+		if (seg2.length <= 1)
 			return;
-		if (!segments[0].equals("i18n/CrowdControl") && !segments[0].equals("CrowdControl"))
+		String[] prefSeg = prefix.split("/");
+		if (!seg2[0].equals(prefSeg[prefSeg.length - 1]))
 			return;
-		if (!segments[1].endsWith(".properties"))
+		if (!seg2[1].endsWith(".properties"))
 			return;
-		String localeStr = segments[1].replace(".properties", "");
+		String localeStr = seg2[1].replace(".properties", "");
 		Locale locale = Translator.parseLocale(localeStr);
 		if (locale == null)
 			return;
-		register(locale, classLoader);
-	}
-
-	private static @Nullable File getFileFromURL(@Nullable URL url) {
-		if (url == null)
-			return null;
-
-		try {
-			File file;
-			try {
-				file = new File(url.toURI());
-			} catch (Exception e) {
-				file = new File(url.getPath());
-			}
-			if (file.listFiles() == null)
-				return null;
-			return file;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	private static @Nullable Path getPathFromURL(@Nullable URL url) {
-		if (url == null)
-			return null;
-
-		try {
-			Path path;
-			try {
-				path = Paths.get(url.toURI());
-			} catch (Exception e) {
-				path = Paths.get(url.getPath());
-			}
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-				if (stream == null)
-					return null;
-			}
-			return path;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	private static List<String> getResourceFiles(String path, ClassLoader classLoader) throws IOException {
-		List<String> filenames = new ArrayList<>();
-
-		try (InputStream in = classLoader.getResourceAsStream(path)) {
-			if (in == null)
-				throw new IllegalStateException("Could not load language files (directory does not exist)");
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-				String resource;
-				while ((resource = br.readLine()) != null) {
-					filenames.add(resource);
-				}
-			}
-		}
-
-		return filenames;
-	}
-
-	private boolean tryFileRegister() {
-		for (String directory : DIRECTORIES) {
-			for (ClassLoader classLoader : classLoaders) {
-				try {
-					URL url = classLoader.getResource(directory);
-					File dir = getFileFromURL(url);
-					if (dir == null)
-						throw new IllegalStateException("Could not load language files (directory does not exist)");
-					File[] files = dir.listFiles();
-					if (files == null)
-						throw new IllegalStateException("Could not load language files (path is not a directory)");
-					for (File file : files)
-						register(file.getName(), classLoader);
-					return true;
-				} catch (Exception e) {
-					logger.debug("Could not load language files", e);
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean tryStreamRegister() {
-		for (String directory : DIRECTORIES) {
-			for (ClassLoader classLoader : classLoaders) {
-				try {
-					List<String> files = getResourceFiles(directory, classLoader);
-					if (files.isEmpty())
-						throw new IllegalStateException("Could not load language files (directory does not exist)");
-					for (String file : files)
-						register(file, classLoader);
-					return true;
-				} catch (Exception e) {
-					logger.debug("Could not load language files", e);
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean tryPathRegister() {
-		for (String directory : DIRECTORIES) {
-			for (ClassLoader classLoader : classLoaders) {
-				try {
-					URL url = classLoader.getResource(directory);
-					Path dir = getPathFromURL(url);
-					if (dir == null)
-						throw new IllegalStateException("Could not load language files (directory does not exist)");
-					try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-						Iterator<Path> iterator = stream.iterator();
-						if (!iterator.hasNext())
-							throw new IllegalStateException("Could not load language files (directory is empty)");
-						while (iterator.hasNext())
-							register(iterator.next().getFileName().toString(), classLoader);
-					}
-					return true;
-				} catch (Exception e) {
-					logger.debug("Could not load language files", e);
-				}
-			}
-		}
-		return false;
+		register(locale);
 	}
 
 	@Override
@@ -294,10 +136,14 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	@Override
 	protected @NotNull Component renderTranslatable(@NotNull TranslatableComponent component, @NotNull Locale context) {
 		logger.debug("Richly translating " + component.key() + " for " + context);
-		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method
-		// instead it will just like waste a bunch of method calls to the internal translator but that's fine
 		final @Nullable MessageFormat format = translate(component.key(), context);
-		if (format == null) return GlobalTranslator.renderer().render(component, context);
+
+		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method
+		//  (and in fact, it hasn't from a lot of testing)
+		// also this needs to be here because #optionallyRenderChildrenAppendAndBuild calls this method to, well, render children
+		// although that's not to say that this couldn't be improved. it probably could be.
+		if (format == null)
+			return GlobalTranslator.renderer().render(component, context);
 
 		final TextComponent.Builder builder = Component.text(); // mostly just a dummy for appending children
 		this.mergeStyle(component, builder, context);
@@ -313,11 +159,5 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 			builder.append(miniMessage().deserialize(format.format(null, new StringBuffer(), null).toString(), resolver.build()));
 		}
 		return this.optionallyRenderChildrenAppendAndBuild(component.children(), builder, context);
-	}
-
-	public static void initialize(ClassLoader... secondaryClassLoaders) {
-		if (instance == null)
-			instance = new KyoriTranslator(secondaryClassLoaders);
-		//return instance;
 	}
 }

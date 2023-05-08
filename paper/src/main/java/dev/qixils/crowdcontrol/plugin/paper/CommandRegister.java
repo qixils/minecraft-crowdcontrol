@@ -54,7 +54,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
 				new DigCommand(plugin),
-				new TimeCommand(plugin),
 				new ItemDamageCommand(plugin, true),
 				new ItemDamageCommand(plugin, false),
 				new RemoveEnchantsCommand(plugin),

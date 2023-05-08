@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.plugin.paper.commands.GameModeCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -12,11 +13,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.CheckReturnValue;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+@Getter
 @RequiredArgsConstructor
 public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 	private final PaperCrowdControlPlugin plugin;
@@ -43,11 +42,13 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 		if (plugin.isGlobal(request))
 			return getAllPlayers();
 
-		List<Player> players = new ArrayList<>(request.getTargets().length);
-		for (Target target : request.getTargets()) {
-			for (UUID uuid : getLinkedPlayers(target))
-				players.add(Bukkit.getPlayer(uuid));
-		}
+		Set<UUID> uuids = new HashSet<>(request.getTargets().length);
+		for (Target target : request.getTargets())
+			uuids.addAll(getLinkedPlayers(target));
+
+		List<Player> players = new ArrayList<>(uuids.size());
+		for (UUID uuid : uuids)
+			players.add(Bukkit.getPlayer(uuid));
 
 		return filter(players);
 	}
