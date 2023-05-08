@@ -62,10 +62,6 @@ public class CommandConstants {
 	 */
 	public static final long WEATHER_TICKS = 20 * 60 * 60;
 	/**
-	 * The amount of time in the day to skip from the Zip Time command.
-	 */
-	public static final long ZIP_TIME_TICKS = 8000;
-	/**
 	 * The amount of time to disable jumping for.
 	 */
 	public static final @NotNull Duration DISABLE_JUMPING_DURATION = Duration.ofSeconds(10);
@@ -309,7 +305,7 @@ public class CommandConstants {
 	/**
 	 * The maximum search radius for locating biomes.
 	 */
-	public static final int BIOME_SEARCH_RADIUS = 1024;
+	public static final int BIOME_SEARCH_RADIUS = 512;
 	/**
 	 * The step size for locating biomes.
 	 * A value of 1 will search every block, while a value of 32 will search every 32 blocks.
@@ -318,7 +314,7 @@ public class CommandConstants {
 	/**
 	 * The maximum search radius in chunks for locating structures.
 	 */
-	public static final int STRUCTURE_SEARCH_RADIUS = 128;
+	public static final int STRUCTURE_SEARCH_RADIUS = 64;
 	/**
 	 * Whether to search only for unexplored structures.
 	 */
