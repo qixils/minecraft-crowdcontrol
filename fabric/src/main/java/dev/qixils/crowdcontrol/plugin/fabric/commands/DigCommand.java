@@ -33,7 +33,7 @@ public class DigCommand extends ImmediateCommand {
 		for (ServerPlayer player : players) {
 			Location playerLocation = new Location(player);
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
-				for (int y = depth; y < 0; ++y) {
+				for (int y = depth; y <= 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
 						Location block = playerLocation.add(x, y, z);
 						if (!block.block().isAir())

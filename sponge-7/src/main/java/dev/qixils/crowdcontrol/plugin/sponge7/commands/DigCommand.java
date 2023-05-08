@@ -34,7 +34,7 @@ public class DigCommand extends ImmediateCommand {
 		for (Player player : players) {
 			Location<World> playerLocation = player.getLocation();
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
-				for (int y = depth; y < 0; ++y) {
+				for (int y = depth; y <= 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
 						Location<World> block = playerLocation.add(x, y, z);
 						if (!block.getBlockType().equals(BlockTypes.AIR))
