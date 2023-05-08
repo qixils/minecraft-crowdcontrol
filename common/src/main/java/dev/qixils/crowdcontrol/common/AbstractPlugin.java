@@ -42,6 +42,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	protected boolean announce = true;
 	@Getter
 	protected boolean adminRequired = false;
+	@Getter
+	protected boolean autoDetectIP = true;
 	@Getter @Setter @NotNull
 	protected HideNames hideNames = HideNames.NONE;
 	@Getter @NotNull

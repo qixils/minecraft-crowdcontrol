@@ -7,6 +7,10 @@ import net.kyori.adventure.audience.Audience;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,5 +48,30 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	@Override
 	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull UUID uuid) {
 		return Optional.ofNullable(plugin.getServer()).map(server -> server.getPlayerList().getPlayer(uuid));
+	}
+
+	@SuppressWarnings("ConstantValue")
+	@Override
+	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull InetAddress ip) {
+		return Optional.ofNullable(plugin.getServer()).map(server -> {
+			ServerPlayer result = null;
+			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				if (player.connection == null)
+					continue;
+				SocketAddress address = player.connection.getRemoteAddress();
+				if (!(address instanceof InetSocketAddress inetAddress))
+					continue;
+				if (!Objects.equals(inetAddress.getAddress(), ip))
+					continue;
+
+				// found match; check for duplicates
+				if (result != null)
+					return null;
+
+				// ok
+				result = player;
+			}
+			return result;
+		});
 	}
 }

@@ -303,6 +303,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		port = config.getNode("port").getInt(port);
 		IP = config.getNode("ip").getString(IP);
 		password = config.getNode("password").getString(password);
+		autoDetectIP = config.getNode("autodetect").getBoolean(autoDetectIP);
 	}
 
 	@Override

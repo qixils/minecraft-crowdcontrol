@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -78,5 +79,5 @@ public interface PlayerManager<P> {
 	 */
 	@CheckReturnValue
 	@NotNull
-	Collection<@NotNull UUID> getLinkedPlayers(Request.@NotNull Target target);
+	Set<@NotNull UUID> getLinkedPlayers(Request.@NotNull Target target);
 }

@@ -32,7 +32,7 @@ public class DigCommand extends ImmediateCommand {
 		for (Player player : players) {
 			Location playerLocation = player.getLocation();
 			for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
-				for (int y = depth; y < 0; ++y) {
+				for (int y = depth; y <= 0; ++y) {
 					for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
 						Location block = playerLocation.clone().add(x, y, z);
 						if (!block.getBlock().isEmpty())
