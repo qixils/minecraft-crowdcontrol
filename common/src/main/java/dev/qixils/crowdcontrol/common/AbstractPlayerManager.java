@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.common;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.socket.Request;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,8 @@ import java.util.*;
  * @param <P> class used to represent online players
  */
 public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
+
+	protected abstract Plugin<P, ?> getPlugin();
 
 	private final Multimap<String, UUID> twitchToUserMap =
 			Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
@@ -29,12 +32,28 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 	}
 
 	@Override
-	public @NotNull Collection<UUID> getLinkedPlayers(@NotNull Request.Target target) {
+	public @NotNull Set<UUID> getLinkedPlayers(@NotNull Request.Target target) {
 		Set<UUID> uuids = new HashSet<>();
 		if (target.getName() != null)
 			uuids.addAll(twitchToUserMap.get(target.getName().toLowerCase(Locale.ENGLISH)));
 		if (target.getLogin() != null)
 			uuids.addAll(twitchToUserMap.get(target.getLogin().toLowerCase(Locale.ENGLISH)));
+
+		CrowdControl cc = getPlugin().getCrowdControl();
+		if (cc == null)
+			return uuids;
+		PlayerEntityMapper<P> mapper = getPlugin().playerMapper();
+
+		// TODO: config setting for this "autodetect" behavior
+
+		for (Request.Source source : cc.getSources()) {
+			if (!target.equals(source.target()))
+				continue;
+			if (source.ip() == null)
+				continue;
+			mapper.getPlayer(source.ip()).ifPresent(player -> uuids.add(mapper.getUniqueId(player)));
+		}
+
 		return uuids;
 	}
 

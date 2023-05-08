@@ -7,8 +7,12 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.network.ServerPlayerConnection;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,5 +55,28 @@ class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	@Override
 	public @NotNull Optional<Locale> getLocale(@NotNull ServerPlayer entity) {
 		return Optional.of(entity.locale());
+	}
+
+	@Override
+	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull InetAddress ip) {
+		ServerPlayer result = null;
+		for (ServerPlayer player : plugin.getGame().server().onlinePlayers()) {
+			ServerPlayerConnection connection = player.connection();
+			if (connection == null)
+				continue;
+			InetSocketAddress address = connection.address();
+			if (address == null)
+				continue;
+			if (!Objects.equals(address.getAddress(), ip))
+				continue;
+
+			// found match; check for duplicates
+			if (result != null)
+				return Optional.empty();
+
+			// ok
+			result = player;
+		}
+		return Optional.ofNullable(result);
 	}
 }

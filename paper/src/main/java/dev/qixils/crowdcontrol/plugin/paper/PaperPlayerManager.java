@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.plugin.paper.commands.GameModeCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 @RequiredArgsConstructor
 public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 	private final PaperCrowdControlPlugin plugin;

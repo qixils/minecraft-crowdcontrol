@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 	private final FabricCrowdControlPlugin plugin;
