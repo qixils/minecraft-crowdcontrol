@@ -31,7 +31,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 				.type(Response.ResultType.RETRY)
 				.message("No players are on the surface");
 		for (ServerPlayer player : players) {
-			if (player.getLevel().dimensionType().ultraWarm())
+			if (player.serverLevel().dimensionType().ultraWarm())
 				continue;
 			Location curr = new Location(player);
 			boolean obstruction = false;

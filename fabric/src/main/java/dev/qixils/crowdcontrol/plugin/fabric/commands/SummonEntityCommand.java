@@ -129,8 +129,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 
 	@Blocking
 	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
-		ServerLevel level = player.getLevel();
-		E entity = entityType.create(player.level);
+		ServerLevel level = player.serverLevel();
+		E entity = entityType.create(player.serverLevel());
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables

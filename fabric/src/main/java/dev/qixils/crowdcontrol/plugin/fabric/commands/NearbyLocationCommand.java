@@ -92,7 +92,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 		sync(() -> {
 			Builder response = request.buildResponse().type(ResultType.FAILURE).message("Could not find a location to teleport to");
 			for (ServerPlayer player : players) {
-				ServerLevel world = player.getLevel();
+				ServerLevel world = player.serverLevel();
 				Location location = new Location(player);
 				S currentType = currentType(location);
 				List<S> searchTypes = new ArrayList<>(getSearchTypes(world));

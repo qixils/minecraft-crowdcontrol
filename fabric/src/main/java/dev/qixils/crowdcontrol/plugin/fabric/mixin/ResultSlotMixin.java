@@ -34,17 +34,17 @@ public abstract class ResultSlotMixin extends Slot {
 
 	@Inject(method = "onTake", at = @At("HEAD"))
 	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
-		if (player.level.isClientSide)
+		if (player.level().isClientSide)
 			return;
-		CraftingRecipe recipe = player.level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level).orElse(null);
+		CraftingRecipe recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
 	@Inject(method = "onQuickCraft", at = @At("HEAD"))
 	public void onQuickCraft(ItemStack result, int i, CallbackInfo ci) {
-		if (player.level.isClientSide)
+		if (player.level().isClientSide)
 			return;
-		CraftingRecipe recipe = player.level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level).orElse(null);
+		CraftingRecipe recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
