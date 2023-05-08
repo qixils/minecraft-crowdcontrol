@@ -254,9 +254,8 @@ public interface Plugin<P, S> {
 
 		// base command
 		Builder<S> account = manager.commandBuilder("account")
-				.meta(CommandMeta.DESCRIPTION, "Manage your connected Twitch account(s)");
-		if (isAdminRequired())
-			account = account.permission(mapper::isAdmin);
+				.meta(CommandMeta.DESCRIPTION, "Manage your connected Twitch account(s)")
+				.permission(sender -> !isAdminRequired() || mapper.isAdmin(sender));
 
 		// link command
 		manager.command(account.literal("link")
