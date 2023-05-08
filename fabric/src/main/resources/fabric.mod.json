@@ -35,7 +35,7 @@
   ],
   "depends": {
     "fabricloader": "^0.14.17",
-    "fabric": "^0.76.0",
+    "fabric": "^0.58.6",
     "minecraft": "1.19.2",
     "cardinal-components-base": ">=5.0.2",
     "cardinal-components-entity": ">=5.0.2",
