@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.common;
 
-import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -30,6 +29,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	private static final Logger logger = LoggerFactory.getLogger("KyoriTranslator");
 	private final String prefix;
 	private final TranslationRegistry translator;
+	private final ClassLoader pluginClassLoader;
 
 	/**
 	 * Creates a new translator with the given language file prefix.
@@ -38,10 +38,12 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	 *
 	 * @param modId the ID of your mod/plugin
 	 * @param prefix the prefix for language resource files
+	 * @param pluginClass the main class of your plugin
 	 * @param locales the locales to load (used only if reflection fails)
 	 */
-	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Locale @NotNull ... locales) {
+	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Class<?> pluginClass, @NotNull Locale @NotNull ... locales) {
 		this.prefix = prefix;
+		this.pluginClassLoader = pluginClass.getClassLoader();
 
 		Pattern filePattern = Pattern.compile("^/?" + Pattern.quote(prefix) + "_");
 		logger.info("Registering translator");
@@ -56,15 +58,24 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		String[] pkg = prefix.split("/");
 		pkg = Arrays.copyOfRange(pkg, 0, pkg.length - 1);
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
+				.addClassLoaders(pluginClassLoader)
 				.addScanners(Scanners.Resources)
 				.forPackage(String.join(".", pkg)));
 		Set<String> resources = new HashSet<>(reflections.getResources(".+\\.properties"));
 		resources.removeIf(s -> !filePattern.matcher(s).find()); // ^ reflections regex doesn't actually work
 
+		boolean loaded = false;
 		if (!resources.isEmpty()) {
-			logger.info("Using Reflections to load locales");
-			resources.forEach(this::register);
-		} else {
+			try {
+				logger.info("Using Reflections to load locales");
+				resources.forEach(this::register);
+				loaded = true;
+			} catch (Exception e) {
+				logger.warn("Failed to load locales with Reflections", e);
+			}
+		}
+
+		if (!loaded) {
 			logger.info("Manually loading locales");
 			for (Locale locale : locales)
 				register(locale);
@@ -97,8 +108,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	}
 
 	private void register(Locale locale) {
-		ClassLoader loader = ExceptionUtil.validateNotNullElseGet(Thread.currentThread().getContextClassLoader(), ClassLoader::getSystemClassLoader);
-		ResourceBundle bundle = ResourceBundle.getBundle(prefix.replace('/', '.'), locale, loader, UTF8ResourceBundleControl.get());
+		ResourceBundle bundle = ResourceBundle.getBundle(prefix.replace('/', '.'), locale, pluginClassLoader, UTF8ResourceBundleControl.get());
 		translator.registerAll(locale, bundle, false);
 		logger.info("Registered locale " + locale);
 	}
