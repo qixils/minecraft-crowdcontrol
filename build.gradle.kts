@@ -56,7 +56,7 @@ subprojects {
                     exclude("META-INF/versions/")
                 }
                 // set name of output file to CrowdControl-XYZ-VERSION.jar
-                val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
+                val titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
                 archiveBaseName.set("CrowdControl-$titleCaseName")
                 archiveClassifier.set("")
             }

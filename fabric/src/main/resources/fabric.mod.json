@@ -36,13 +36,13 @@
   "depends": {
     "fabricloader": "^0.14.19",
     "fabric": "^0.82.1",
-    "minecraft": "1.20-beta.6",
+    "minecraft": "1.20-beta.7",
     "cardinal-components-base": ">=5.2.0",
     "cardinal-components-entity": ">=5.2.0",
     "cloud": "^1.8.3",
     "adventure-platform-fabric": "^5.8.0",
-    "net_kyori_adventure-api": "^4.13.0",
-    "cloth-config": "^10.0.96"
+    "net_kyori_adventure-api": "^4.13.1",
+    "cloth-config": "^11.0.98"
   },
   "suggests": {
     "modmenu": ">=7.0.0"
