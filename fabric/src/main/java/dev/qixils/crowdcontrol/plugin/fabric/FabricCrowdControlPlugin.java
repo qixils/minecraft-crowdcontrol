@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
@@ -254,13 +255,14 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		return sender.getPlayer();
 	}
 
-	public boolean isEnabled(FeatureElement feature) {
-		if (server == null) return false;
-		return feature.isEnabled(server.getWorldData().enabledFeatures());
+	@NotNull
+	public TriState isEnabled(FeatureElement feature) {
+		if (server == null) return TriState.UNKNOWN;
+		return TriState.fromBoolean(feature.isEnabled(server.getWorldData().enabledFeatures()));
 	}
 
 	public boolean isDisabled(FeatureElement feature) {
-		return !isEnabled(feature);
+		return isEnabled(feature) == TriState.FALSE;
 	}
 
 	public @NotNull Component toAdventure(ComponentLike text, @NotNull Pointered viewer) {

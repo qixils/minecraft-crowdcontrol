@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.command.QuantityStyle;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -23,11 +24,11 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class GiveItemCommand extends ImmediateCommand {
+	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final ItemStackSnapshot item;
 	private final String effectName;
 	private final TranslatableComponent defaultDisplayName;
@@ -44,17 +45,6 @@ public class GiveItemCommand extends ImmediateCommand {
 		this.item = item.createSnapshot();
 		this.effectName = effectName;
 		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", arg);
-	}
-
-	@Override
-	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
-		if (request.getParameters() == null)
-			return getDefaultDisplayName();
-		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.give_item_x.name");
-		List<Component> args = new ArrayList<>(displayName.args());
-		args.add(Component.text(amount));
-		return displayName.args(args);
 	}
 
 	@Blocking
@@ -77,7 +67,7 @@ public class GiveItemCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
+		int amount = request.getQuantityOrDefault();
 		ItemStack itemStack = this.item.createStack();
 		itemStack.setQuantity(amount);
 		ItemStackSnapshot item = itemStack.createSnapshot();

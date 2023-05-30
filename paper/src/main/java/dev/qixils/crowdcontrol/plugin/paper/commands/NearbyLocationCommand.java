@@ -62,7 +62,7 @@ abstract class NearbyLocationCommand<S> extends Command {
 		Material type = block.getType();
 		if (type == Material.FIRE)
 			block.setType(Material.AIR);
-		else if (type == Material.LAVA)
+		else if (!type.isSolid())
 			block.setType(Material.GLASS);
 
 		// place player on top of the block

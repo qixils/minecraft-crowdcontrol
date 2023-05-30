@@ -76,7 +76,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 				new TorchCommand(plugin, false),
 				new GravelCommand(plugin),
 				new DigCommand(plugin),
-				new TimeCommand(plugin),
 				new ItemRepairCommand(plugin),
 				new ItemDamageCommand(plugin),
 				new RemoveEnchantsCommand(plugin),

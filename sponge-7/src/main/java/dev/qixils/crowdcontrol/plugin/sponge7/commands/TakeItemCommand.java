@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.command.QuantityStyle;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -23,7 +24,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +32,7 @@ import java.util.Optional;
 
 @Getter
 public class TakeItemCommand extends ImmediateCommand {
+	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final @NotNull ItemType item;
 	private final @Nullable GoldenApple goldenAppleType;
 	private final @NotNull String effectName;
@@ -56,17 +57,6 @@ public class TakeItemCommand extends ImmediateCommand {
 
 	public TakeItemCommand(@NotNull SpongeCrowdControlPlugin plugin, @NotNull ItemType item) {
 		this(plugin, item, item.equals(ItemTypes.GOLDEN_APPLE) ? GoldenApples.GOLDEN_APPLE : null);
-	}
-
-	@Override
-	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
-		if (request.getParameters() == null)
-			return getDefaultDisplayName();
-		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.take_item_x.name");
-		List<Component> args = new ArrayList<>(displayName.args());
-		args.add(Component.text(amount));
-		return displayName.args(args);
 	}
 
 	private boolean takeItemFrom(Player player, int amount) {
@@ -104,7 +94,7 @@ public class TakeItemCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
+		int amount = request.getQuantityOrDefault();
 
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)

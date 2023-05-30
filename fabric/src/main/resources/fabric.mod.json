@@ -45,7 +45,7 @@
     "cloth-config": "^10.0.96"
   },
   "suggests": {
-    "modmenu": ">=5.0.2"
+    "modmenu": ">=6.1.0"
   },
   "custom": {
     "cardinal-components": [

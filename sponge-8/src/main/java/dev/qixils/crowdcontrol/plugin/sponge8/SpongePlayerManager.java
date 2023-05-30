@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8;
 import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.GAME_MODE_EFFECT;
 
+@Getter
 @RequiredArgsConstructor
 public class SpongePlayerManager extends AbstractPlayerManager<ServerPlayer> {
 	private final SpongeCrowdControlPlugin plugin;

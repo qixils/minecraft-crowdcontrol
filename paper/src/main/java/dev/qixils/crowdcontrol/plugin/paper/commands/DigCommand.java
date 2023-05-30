@@ -38,7 +38,7 @@ public class DigCommand extends Command {
 			sync(playerLocation, () -> {
 				boolean success = false;
 				for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
-					for (int y = depth; y < 0; ++y) {
+					for (int y = depth; y <= 0; ++y) {
 						for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
 							Block block = playerLocation.clone().add(x, y, z).getBlock();
 							if (!block.isEmpty()) {

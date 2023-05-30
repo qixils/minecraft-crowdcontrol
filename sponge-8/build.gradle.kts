@@ -1,5 +1,4 @@
 val cloudVersion: String by project
-val logbackVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 8"
 
@@ -22,7 +21,6 @@ repositories {
 dependencies {
     implementation(project(":configurate-common"))
     implementation("com.github.qixils.cloud:cloud-sponge:feature~sponge-SNAPSHOT")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion") // Sponge's version of log4j is too old to support slf4j 2.0
     compileOnly("org.spongepowered:spongeapi:8.1.0")
     //compileOnly("org.spongepowered:sponge:1.16.5-8.0.0-SNAPSHOT:dev")
 }
@@ -36,7 +34,7 @@ sponge {
     license("Mozilla Public License Version 2.0")
     plugin("crowdcontrol") {
         displayName("Crowd Control")
-        version(project.version.toString() + "-8")
+        version(project.version.toString() + "+sponge8")
         entrypoint("dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin")
         description("The Ultimate Interactive Experience for Streamers")
         links {

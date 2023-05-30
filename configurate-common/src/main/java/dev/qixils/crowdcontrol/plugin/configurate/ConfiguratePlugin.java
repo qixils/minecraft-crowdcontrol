@@ -68,6 +68,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		port = config.node("port").getInt(port);
 		IP = config.node("ip").getString(IP);
 		password = config.node("password").getString(password);
+		autoDetectIP = config.node("autodetect").getBoolean(autoDetectIP);
 	}
 
 	public void saveConfig() {
@@ -88,6 +89,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			config.node("port").set(port);
 			config.node("password").set(password);
 			config.node("ip").set(IP);
+			config.node("autodetect").set(autoDetectIP);
 			getConfigLoader().save(config);
 		} catch (ConfigurateException e) {
 			throw new RuntimeException("Could not save plugin config", e);

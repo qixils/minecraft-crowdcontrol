@@ -20,6 +20,6 @@ tasks.processResources {
     filteringCharset = "UTF-8"
 
     filesMatching("mcmod.info") {
-        expand("version" to (project.version.toString() + "-7"))
+        expand("version" to (project.version.toString() + "+sponge7"))
     }
 }

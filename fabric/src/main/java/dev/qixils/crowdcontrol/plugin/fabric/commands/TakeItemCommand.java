@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.command.QuantityStyle;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.InventoryUtil;
@@ -18,11 +19,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
+	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Item item;
 	private final String effectName;
 	private final TranslatableComponent defaultDisplayName;
@@ -32,17 +33,6 @@ public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
 		this.item = item;
 		this.effectName = "take_" + BuiltInRegistries.ITEM.getKey(item).getPath();
 		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
-	}
-
-	@Override
-	public @NotNull Component getProcessedDisplayName(@NotNull Request request) {
-		if (request.getParameters() == null)
-			return getDefaultDisplayName();
-		int amount = (int) (double) request.getParameters()[0];
-		TranslatableComponent displayName = getDefaultDisplayName().key("cc.effect.take_item_x.name");
-		List<Component> args = new ArrayList<>(displayName.args());
-		args.add(Component.text(amount));
-		return displayName.args(args);
 	}
 
 	private boolean takeItemFrom(Player player, int amount) {
@@ -72,7 +62,7 @@ public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		int amount = request.getParameters() == null ? 1 : (int) (double) request.getParameters()[0];
+		int amount = request.getQuantityOrDefault();
 		Response.Builder response = request.buildResponse()
 				.type(ResultType.RETRY)
 				.message("Item could not be found in target inventories");

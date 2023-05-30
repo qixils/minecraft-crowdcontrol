@@ -103,6 +103,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	private boolean adminRequired = false;
 	@Getter
+	private boolean autoDetectIP = true;
+	@Getter
 	private LimitConfig limitConfig = new LimitConfig();
 	@Getter
 	@Accessors(fluent = true)
@@ -194,6 +196,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		port = config.getInt("port", port);
 		IP = config.getString("ip", IP);
 		password = config.getString("password", password);
+		autoDetectIP = config.getBoolean("autodetect", autoDetectIP);
 	}
 
 	public void initCrowdControl() {
