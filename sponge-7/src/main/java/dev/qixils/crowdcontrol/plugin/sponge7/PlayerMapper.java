@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.common.util.UUIDUtil.parseUUID;
+
 class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMapper<Player> {
 	public PlayerMapper(@NotNull SpongeCrowdControlPlugin plugin) {
 		super(plugin);
@@ -70,5 +72,15 @@ class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMa
 			result = player;
 		}
 		return Optional.ofNullable(result);
+	}
+
+	@Override
+	public @NotNull Optional<Player> getPlayerByLogin(@NotNull String login) {
+		UUID parsedId = parseUUID(login);
+		for (Player player : plugin.getGame().getServer().getOnlinePlayers()) {
+			if (player.getName().equalsIgnoreCase(login) || player.getUniqueId().equals(parsedId))
+				return Optional.of(player);
+		}
+		return Optional.empty();
 	}
 }

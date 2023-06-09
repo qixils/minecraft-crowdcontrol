@@ -57,4 +57,13 @@ public interface PlayerEntityMapper<P> extends EntityMapper<P> {
 	 */
 	@CheckReturnValue
 	@NotNull Optional<P> getPlayer(@NotNull InetAddress ip);
+
+	/**
+	 * Gets an online player connected with the provided login name or id.
+	 *
+	 * @param login the login name or id of the player
+	 * @return the player with the given login name or id, or empty if not found
+	 */
+	@CheckReturnValue
+	@NotNull Optional<P> getPlayerByLogin(@NotNull String login);
 }

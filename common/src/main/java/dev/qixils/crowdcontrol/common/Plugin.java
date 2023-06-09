@@ -692,21 +692,18 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
 			return;
 		}
-		final @NotNull SocketManager finalService = service;
-		getScheduledExecutor().schedule(() -> {
-			try {
-				getSLF4JLogger().debug("sending packet {} {} to {}", method, Arrays.toString(args), finalService);
-				Response response = finalService.buildResponse()
-						.packetType(PacketType.REMOTE_FUNCTION)
-						.method(method)
-						.addArguments(args)
-						.build();
-				getSLF4JLogger().debug("final packet: {}", response.toJSON());
-				response.send();
-			} catch (Exception e) {
-				getSLF4JLogger().error("Failed to send embedded message packet", e);
-			}
-		}, 1, TimeUnit.SECONDS);
+		try {
+			getSLF4JLogger().debug("sending packet {} {} to {}", method, Arrays.toString(args), service);
+			Response response = service.buildResponse()
+					.packetType(PacketType.REMOTE_FUNCTION)
+					.method(method)
+					.addArguments(args)
+					.build();
+			getSLF4JLogger().debug("final packet: {}", response.toJSON());
+			response.send();
+		} catch (Exception e) {
+			getSLF4JLogger().error("Failed to send embedded message packet", e);
+		}
 	}
 
 	/**
@@ -720,16 +717,39 @@ public interface Plugin<P, S> {
 	}
 
 	/**
+	 * Sends a player event packet.
+	 *
+	 * @param service the service to send the packet to
+	 * @param eventType the type of event to send
+	 */
+	default void sendPlayerEvent(@Nullable SocketManager service, @NotNull String eventType) {
+		if (service == null) {
+			getSLF4JLogger().warn("Attempted to send player event packet but the service is unavailable");
+			return;
+		}
+		Optional.ofNullable(service.getSource())
+				.map(Request.Source::login)
+				.flatMap(playerMapper()::getPlayerByLogin)
+				.ifPresent(player -> service.buildResponse()
+						.packetType(PacketType.GENERIC_EVENT)
+						.eventType(eventType)
+						.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH))
+						.internal(true)
+						.send());
+	}
+
+	/**
 	 * Performs actions that are reliant on the initialization of a {@link CrowdControl} instance.
 	 *
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
 		Object[] effects = commandRegister().getCommands().stream().map(command -> command.getEffectName().toLowerCase(Locale.US)).toArray();
-		service.addConnectListener(connectingService -> {
+		service.addConnectListener(connectingService -> getScheduledExecutor().schedule(() -> {
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
 			updateConditionalEffectVisibility(connectingService);
-		});
+			sendPlayerEvent(connectingService, "playerJoined");
+		}, 1, TimeUnit.SECONDS));
 	}
 
 	/**
@@ -931,6 +951,12 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
 		}
+		CrowdControl cc = getCrowdControl();
+		if (cc != null) {
+			for (SocketManager service : cc.getConnections()) {
+				sendPlayerEvent(service, "playerJoined");
+			}
+		}
 		getScheduledExecutor().schedule(() -> {
 			// ensure player is still online
 			Optional<P> optPlayer = mapper.getPlayer(uuid);
@@ -946,7 +972,6 @@ public interface Plugin<P, S> {
 				audience.sendMessage(JOIN_MESSAGE_2);
 			if (!globalEffectsUsable())
 				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
-			CrowdControl cc = getCrowdControl();
 			if (cc == null) {
 				if (mapper.isAdmin(player)) {
 					if (isServer() && getPasswordOrEmpty().equals(""))

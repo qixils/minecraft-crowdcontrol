@@ -14,6 +14,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.common.util.UUIDUtil.parseUUID;
+
 @Getter
 @RequiredArgsConstructor
 public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
@@ -72,6 +74,18 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 				result = player;
 			}
 			return result;
+		});
+	}
+
+	@Override
+	public @NotNull Optional<ServerPlayer> getPlayerByLogin(@NotNull String login) {
+		return Optional.ofNullable(plugin.getServer()).flatMap(server -> {
+			UUID parsedId = parseUUID(login);
+			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				if (player.getGameProfile().getName().equalsIgnoreCase(login) || player.getUUID().equals(parsedId))
+					return Optional.of(player);
+			}
+			return Optional.empty();
 		});
 	}
 }

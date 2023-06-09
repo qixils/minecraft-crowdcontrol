@@ -50,9 +50,17 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 		for (Request.Source source : cc.getSources()) {
 			if (!target.equals(source.target()))
 				continue;
-			if (source.ip() == null)
+			if (source.ip() == null && source.login() == null)
 				continue;
-			mapper.getPlayer(source.ip()).ifPresent(player -> uuids.add(mapper.getUniqueId(player)));
+
+			P player = null;
+			if (source.login() != null)
+				player = mapper.getPlayerByLogin(source.login()).orElse(null);
+			if (player == null && source.ip() != null)
+				player = mapper.getPlayer(source.ip()).orElse(null);
+
+			if (player != null)
+				uuids.add(mapper.getUniqueId(player));
 		}
 
 		return uuids;

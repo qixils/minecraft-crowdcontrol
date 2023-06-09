@@ -12,6 +12,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.common.util.UUIDUtil.parseUUID;
+
 class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMapper<Player> {
 	public PlayerMapper(PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -60,5 +62,15 @@ class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMa
 			result = player;
 		}
 		return Optional.ofNullable(result);
+	}
+
+	@Override
+	public @NotNull Optional<Player> getPlayerByLogin(@NotNull String login) {
+		UUID parsedId = parseUUID(login);
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getName().equalsIgnoreCase(login) || player.getUniqueId().equals(parsedId))
+				return Optional.of(player);
+		}
+		return Optional.empty();
 	}
 }
