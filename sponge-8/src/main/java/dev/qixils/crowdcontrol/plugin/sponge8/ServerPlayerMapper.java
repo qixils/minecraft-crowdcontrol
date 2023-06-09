@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8;
 
+import dev.qixils.crowdcontrol.common.LoginData;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
 import lombok.Getter;
@@ -15,8 +16,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.common.util.UUIDUtil.parseUUID;
 
 @Getter
 @RequiredArgsConstructor
@@ -83,12 +82,18 @@ class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	}
 
 	@Override
-	public @NotNull Optional<ServerPlayer> getPlayerByLogin(@NotNull String login) {
-		UUID parsedId = parseUUID(login);
+	public @NotNull Optional<ServerPlayer> getPlayerByLogin(@NotNull LoginData login) {
 		for (ServerPlayer player : plugin.getGame().server().onlinePlayers()) {
-			if (player.name().equalsIgnoreCase(login) || player.uniqueId().equals(parsedId))
+			if (player.name().equalsIgnoreCase(login.getName()) || player.uniqueId().equals(login.getId()))
 				return Optional.of(player);
 		}
 		return Optional.empty();
+	}
+
+	@Override
+	public @NotNull Optional<InetAddress> getIP(@NotNull ServerPlayer player) {
+		return Optional.ofNullable(player.connection())
+				.map(ServerPlayerConnection::address)
+				.map(InetSocketAddress::getAddress);
 	}
 }

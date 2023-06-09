@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
+import dev.qixils.crowdcontrol.common.LoginData;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,6 @@ import java.net.SocketAddress;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.common.util.UUIDUtil.parseUUID;
 
 @Getter
 @RequiredArgsConstructor
@@ -78,14 +77,24 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	}
 
 	@Override
-	public @NotNull Optional<ServerPlayer> getPlayerByLogin(@NotNull String login) {
+	public @NotNull Optional<ServerPlayer> getPlayerByLogin(@NotNull LoginData login) {
 		return Optional.ofNullable(plugin.getServer()).flatMap(server -> {
-			UUID parsedId = parseUUID(login);
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				if (player.getGameProfile().getName().equalsIgnoreCase(login) || player.getUUID().equals(parsedId))
+				if (player.getGameProfile().getName().equalsIgnoreCase(login.getName()) || player.getUUID().equals(login.getId()))
 					return Optional.of(player);
 			}
 			return Optional.empty();
+		});
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	@Override
+	public @NotNull Optional<InetAddress> getIP(@NotNull ServerPlayer player) {
+		return Optional.ofNullable(player.connection).map(connection -> {
+			SocketAddress address = connection.getRemoteAddress();
+			if (address instanceof InetSocketAddress inetAddress)
+				return inetAddress.getAddress();
+			return null;
 		});
 	}
 }

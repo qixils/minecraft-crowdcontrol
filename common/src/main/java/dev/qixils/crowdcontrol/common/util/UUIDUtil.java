@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.CheckReturnValue;
+import java.util.Locale;
 import java.util.UUID;
 
 public class UUIDUtil {
@@ -34,5 +35,11 @@ public class UUIDUtil {
 			// Invalid UUID string
 			return null;
 		}
+	}
+
+	@CheckReturnValue
+	@NotNull
+	public static String formatUUID(UUID uuid) {
+		return uuid.toString().toLowerCase(Locale.ENGLISH).replace("-", "");
 	}
 }

@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7;
 
+import dev.qixils.crowdcontrol.common.LoginData;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +13,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.common.util.UUIDUtil.parseUUID;
 
 class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMapper<Player> {
 	public PlayerMapper(@NotNull SpongeCrowdControlPlugin plugin) {
@@ -75,12 +74,19 @@ class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMa
 	}
 
 	@Override
-	public @NotNull Optional<Player> getPlayerByLogin(@NotNull String login) {
-		UUID parsedId = parseUUID(login);
+	public @NotNull Optional<Player> getPlayerByLogin(@NotNull LoginData login) {
 		for (Player player : plugin.getGame().getServer().getOnlinePlayers()) {
-			if (player.getName().equalsIgnoreCase(login) || player.getUniqueId().equals(parsedId))
+			if (player.getName().equalsIgnoreCase(login.getName()) || player.getUniqueId().equals(login.getId()))
 				return Optional.of(player);
 		}
 		return Optional.empty();
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	@Override
+	public @NotNull Optional<InetAddress> getIP(@NotNull Player player) {
+		return Optional.ofNullable(player.getConnection())
+				.map(PlayerConnection::getAddress)
+				.map(InetSocketAddress::getAddress);
 	}
 }
