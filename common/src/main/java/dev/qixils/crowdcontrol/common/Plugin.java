@@ -722,20 +722,25 @@ public interface Plugin<P, S> {
 	 * @param service the service to send the packet to
 	 * @param eventType the type of event to send
 	 */
-	default void sendPlayerEvent(@Nullable SocketManager service, @NotNull String eventType) {
+	default void sendPlayerEvent(@Nullable SocketManager service, @NotNull String eventType, boolean force) {
 		if (service == null) {
 			getSLF4JLogger().warn("Attempted to send player event packet but the service is unavailable");
 			return;
 		}
-		Optional.ofNullable(service.getSource())
-				.map(Request.Source::login)
-				.flatMap(playerMapper()::getPlayerByLogin)
-				.ifPresent(player -> service.buildResponse()
-						.packetType(PacketType.GENERIC_EVENT)
-						.eventType(eventType)
-						.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH))
-						.internal(true)
-						.send());
+		String login = Optional.ofNullable(service.getSource()).map(Request.Source::login).orElse(null);
+		Response.Builder builder = service.buildResponse()
+				.packetType(PacketType.GENERIC_EVENT)
+				.eventType(eventType)
+				.internal(true);
+		if (force) {
+			builder.putData("player", login).send();
+		} else {
+			Optional.ofNullable(login)
+					.flatMap(playerMapper()::getPlayerByLogin)
+					.ifPresent(player -> builder
+							.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH))
+							.send());
+		}
 	}
 
 	/**
@@ -748,7 +753,7 @@ public interface Plugin<P, S> {
 		service.addConnectListener(connectingService -> getScheduledExecutor().schedule(() -> {
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
 			updateConditionalEffectVisibility(connectingService);
-			sendPlayerEvent(connectingService, "playerJoined");
+			sendPlayerEvent(connectingService, "playerJoined", isGlobal());
 		}, 1, TimeUnit.SECONDS));
 	}
 
@@ -954,7 +959,7 @@ public interface Plugin<P, S> {
 		CrowdControl cc = getCrowdControl();
 		if (cc != null) {
 			for (SocketManager service : cc.getConnections()) {
-				sendPlayerEvent(service, "playerJoined");
+				sendPlayerEvent(service, "playerJoined", false);
 			}
 		}
 		getScheduledExecutor().schedule(() -> {
