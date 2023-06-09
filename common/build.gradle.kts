@@ -5,7 +5,7 @@ val cloudVersion: String by project
 val reflectionsVersion: String by project
 
 dependencies {
-    api("com.google.guava:guava:32.0.0-jre")
+    api("com.google.guava:guava:32.0.1-jre")
     api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
     api("net.kyori:adventure-api:$adventureVersion")
     api("net.kyori:adventure-platform-api:$adventurePlatformVersion")
