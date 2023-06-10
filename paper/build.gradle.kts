@@ -1,3 +1,5 @@
+import xyz.jpenilla.runpaper.task.RunServer
+
 val cloudVersion: String by project
 val minecraftVersion: String by project
 
@@ -62,10 +64,25 @@ tasks {
     }
     reobfJar {
         // set name of output file to CrowdControl-XYZ-VERSION.jar | TODO: reduce code repetition
-        val titleCaseName = project.name[0].toUpperCase() + project.name.substring(1, project.name.indexOf("-platform"))
+        val titleCaseName =
+            project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
         outputJar.set(layout.buildDirectory.file("libs/CrowdControl-$titleCaseName-${project.version}.jar"))
     }
     runServer {
-        minecraftVersion(minecraftVersion)
+        configure(minecraftVersion)
     }
+    // create extra runServer tasks for later versions of Minecraft
+    for (mcVersion in listOf("1.20")) {
+        register("runServer$mcVersion", RunServer::class.java) {
+            configure(mcVersion)
+            dependsOn("reobfJar")
+            pluginJars(reobfJar.get().outputJar)
+        }
+    }
+}
+
+fun RunServer.configure(mcVersion: String) {
+    minecraftVersion(mcVersion)
+    runDirectory.set(layout.projectDirectory.dir("run/$mcVersion"))
+    group = "run paper"
 }
