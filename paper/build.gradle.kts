@@ -9,7 +9,6 @@ description = "Minecraft Crowd Control: Paper"
 plugins {
     id("xyz.jpenilla.run-paper") // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") // Generates plugin.yml
-    id("io.papermc.paperweight.userdev") // Adds Paper-Server dependency
 }
 
 repositories {
@@ -19,8 +18,7 @@ repositories {
 dependencies {
     implementation(project(":base-common"))
     implementation("cloud.commandframework:cloud-paper:${cloudVersion}")
-    //compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
-    paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
 // Java 17 boilerplate
@@ -55,19 +53,6 @@ bukkit {
 
 // configure runServer task
 tasks {
-    assemble {
-        dependsOn("reobfJar")
-    }
-    shadowJar {
-        archiveBaseName.set("shadow-CrowdControl")
-        archiveVersion.set("")
-    }
-    reobfJar {
-        // set name of output file to CrowdControl-XYZ-VERSION.jar | TODO: reduce code repetition
-        val titleCaseName =
-            project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
-        outputJar.set(layout.buildDirectory.file("libs/CrowdControl-$titleCaseName-${project.version}.jar"))
-    }
     runServer {
         configure(minecraftVersion)
     }
@@ -75,8 +60,8 @@ tasks {
     for (mcVersion in listOf("1.20")) {
         register("runServer$mcVersion", RunServer::class.java) {
             configure(mcVersion)
-            dependsOn("reobfJar")
-            pluginJars(reobfJar.get().outputJar)
+            dependsOn("shadowJar")
+            pluginJars(shadowJar.get().archiveFile)
         }
     }
 }

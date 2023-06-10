@@ -2,12 +2,15 @@ package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.Command;
-import net.minecraft.world.flag.FeatureElement;
 import org.bukkit.entity.Player;
 
-public interface FeatureElementCommand extends Command<Player>, FeatureElement {
+import java.util.Optional;
+
+public interface FeatureElementCommand extends Command<Player> {
+	Optional<Object> requiredFeatures();
+
 	@Override
 	default TriState isVisible() {
-		return TriState.fromBoolean(PaperCrowdControlPlugin.isEnabled(this));
+		return TriState.fromBoolean(PaperCrowdControlPlugin.isFeatureEnabled(this));
 	}
 }
