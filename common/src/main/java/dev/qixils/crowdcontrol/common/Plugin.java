@@ -692,21 +692,18 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
 			return;
 		}
-		final @NotNull SocketManager finalService = service;
-		getScheduledExecutor().schedule(() -> {
-			try {
-				getSLF4JLogger().debug("sending packet {} {} to {}", method, Arrays.toString(args), finalService);
-				Response response = finalService.buildResponse()
-						.packetType(PacketType.REMOTE_FUNCTION)
-						.method(method)
-						.addArguments(args)
-						.build();
-				getSLF4JLogger().debug("final packet: {}", response.toJSON());
-				response.send();
-			} catch (Exception e) {
-				getSLF4JLogger().error("Failed to send embedded message packet", e);
-			}
-		}, 1, TimeUnit.SECONDS);
+		try {
+			getSLF4JLogger().debug("sending packet {} {} to {}", method, Arrays.toString(args), service);
+			Response response = service.buildResponse()
+					.packetType(PacketType.REMOTE_FUNCTION)
+					.method(method)
+					.addArguments(args)
+					.build();
+			getSLF4JLogger().debug("final packet: {}", response.toJSON());
+			response.send();
+		} catch (Exception e) {
+			getSLF4JLogger().error("Failed to send embedded message packet", e);
+		}
 	}
 
 	/**
@@ -720,16 +717,59 @@ public interface Plugin<P, S> {
 	}
 
 	/**
+	 * Sends a player event packet.
+	 *
+	 * @param service the service to send the packet to
+	 * @param eventType the type of event to send
+	 * @param force whether to send the event even if the player is not necessarily connected
+	 */
+	default void sendPlayerEvent(@Nullable SocketManager service, @NotNull String eventType, boolean force) {
+		if (service == null) {
+			getSLF4JLogger().warn("Attempted to send player event packet but the service is unavailable");
+			return;
+		}
+		String login = Optional.ofNullable(service.getSource()).map(Request.Source::login).orElse(null);
+		Response.Builder builder = service.buildResponse()
+				.packetType(PacketType.GENERIC_EVENT)
+				.eventType(eventType)
+				.internal(true);
+		if (force) {
+			getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, login, service.getSource());
+			builder.putData("player", login).send();
+		} else {
+			Optional.ofNullable(login)
+					.flatMap(playerMapper()::getPlayerByLogin)
+					.ifPresent(player -> {
+						getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, playerMapper().getUsername(player), service.getSource());
+						builder.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH)).send();
+					});
+		}
+	}
+
+	/**
+	 * Finds the {@link SocketManager}s for a player and sends a player event packet to each.
+	 *
+	 * @param player the player to send the event for
+	 * @param eventType the type of event to send
+	 */
+	default void sendPlayerEvent(@NotNull P player, @NotNull String eventType) {
+		for (SocketManager service : getSocketManagersFor(player)) {
+			sendPlayerEvent(service, eventType, true);
+		}
+	}
+
+	/**
 	 * Performs actions that are reliant on the initialization of a {@link CrowdControl} instance.
 	 *
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
 		Object[] effects = commandRegister().getCommands().stream().map(command -> command.getEffectName().toLowerCase(Locale.US)).toArray();
-		service.addConnectListener(connectingService -> {
+		service.addConnectListener(connectingService -> getScheduledExecutor().schedule(() -> {
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
 			updateConditionalEffectVisibility(connectingService);
-		});
+			sendPlayerEvent(connectingService, "playerJoined", isGlobal());
+		}, 1, TimeUnit.SECONDS));
 	}
 
 	/**
@@ -931,6 +971,8 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
 		}
+		if (!isGlobal())
+			sendPlayerEvent(joiningPlayer, "playerJoined");
 		getScheduledExecutor().schedule(() -> {
 			// ensure player is still online
 			Optional<P> optPlayer = mapper.getPlayer(uuid);
@@ -940,9 +982,7 @@ public interface Plugin<P, S> {
 			// send messages
 			Audience audience = mapper.asAudience(player);
 			audience.sendMessage(JOIN_MESSAGE_1);
-			//noinspection OptionalGetWithoutIsPresent
-			if (!isGlobal() && isServer() && getPlayerManager().getLinkedAccounts(mapper.tryGetUniqueId(player).get()).size() == 0
-					&& (!isAdminRequired() || playerMapper().isAdmin(player)))
+			if (!isGlobal() && isServer() && !hasLinkedAccount(joiningPlayer) && (!isAdminRequired() || playerMapper().isAdmin(player)))
 				audience.sendMessage(JOIN_MESSAGE_2);
 			if (!globalEffectsUsable())
 				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
@@ -969,6 +1009,8 @@ public interface Plugin<P, S> {
 	 */
 	default void onPlayerLeave(P player) {
 		updateConditionalEffectVisibility(getCrowdControl());
+		if (!isGlobal())
+			sendPlayerEvent(player, "playerJoined");
 	}
 
 	/**
@@ -1114,5 +1156,43 @@ public interface Plugin<P, S> {
 	 */
 	default boolean isAutoDetectIP() {
 		return true;
+	}
+
+	/**
+	 * Gets the SocketManager associated with the provided player.
+	 *
+	 * @param player the player to get the SocketManager for
+	 * @return the SocketManager associated with the provided player
+	 */
+	default @NotNull List<SocketManager> getSocketManagersFor(@NotNull P player) {
+		CrowdControl cc = getCrowdControl();
+		if (cc == null) return Collections.emptyList();
+		List<SocketManager> managers = new ArrayList<>();
+		for (SocketManager manager : cc.getConnections()) {
+			Request.Source source = manager.getSource();
+			if (source == null)
+				continue;
+			if (playerMapper().getUsername(player).equalsIgnoreCase(source.login())) {
+				managers.add(manager);
+				continue;
+			}
+			if (isAutoDetectIP() && source.ip() != null && source.ip().equals(playerMapper().getIP(player).orElse(null))) {
+				managers.add(manager);
+				continue;
+			}
+		}
+		return managers;
+	}
+
+	/**
+	 * Determines if the provided player has an account linked.
+	 *
+	 * @param player the player to check
+	 * @return true if the player has an account linked, false otherwise
+	 */
+	default boolean hasLinkedAccount(@NotNull P player) {
+		if (getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).size() > 0)
+			return true;
+		return getSocketManagersFor(player).size() > 0;
 	}
 }

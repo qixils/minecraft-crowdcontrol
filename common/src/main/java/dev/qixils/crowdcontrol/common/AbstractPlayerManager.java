@@ -16,8 +16,6 @@ import java.util.*;
  */
 public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
-	protected abstract Plugin<P, ?> getPlugin();
-
 	private final Multimap<String, UUID> twitchToUserMap =
 			Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
 
@@ -39,20 +37,29 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 		if (target.getLogin() != null)
 			uuids.addAll(twitchToUserMap.get(target.getLogin().toLowerCase(Locale.ENGLISH)));
 
-		if (!getPlugin().isAutoDetectIP())
-			return uuids;
-
 		CrowdControl cc = getPlugin().getCrowdControl();
 		if (cc == null)
 			return uuids;
 		PlayerEntityMapper<P> mapper = getPlugin().playerMapper();
 
 		for (Request.Source source : cc.getSources()) {
-			if (!target.equals(source.target()))
+			if (!target.equals(source.target())) {
+				getPlugin().getSLF4JLogger().info("Skipping source {} because it does not match target {}", source, target);
 				continue;
-			if (source.ip() == null)
-				continue;
-			mapper.getPlayer(source.ip()).ifPresent(player -> uuids.add(mapper.getUniqueId(player)));
+			}
+
+			P player = null;
+			if (source.login() != null)
+				player = mapper.getPlayerByLogin(source.login()).orElse(null);
+			if (player == null && source.ip() != null && getPlugin().isAutoDetectIP())
+				player = mapper.getPlayer(source.ip()).orElse(null);
+
+			if (player != null) {
+				getPlugin().getSLF4JLogger().info("Found player {} from source {}", player, source);
+				uuids.add(mapper.getUniqueId(player));
+			} else {
+				getPlugin().getSLF4JLogger().info("Failed to find player from source {}", source);
+			}
 		}
 
 		return uuids;

@@ -17,6 +17,15 @@ import java.util.UUID;
 public interface PlayerManager<P> {
 
 	/**
+	 * Gets the plugin that owns this PlayerManager.
+	 *
+	 * @return the plugin
+	 */
+	@CheckReturnValue
+	@NotNull
+	Plugin<P, ?> getPlugin();
+
+	/**
 	 * Fetches all online players that should be affected by the provided {@link Request}.
 	 *
 	 * @param request the request to be processed

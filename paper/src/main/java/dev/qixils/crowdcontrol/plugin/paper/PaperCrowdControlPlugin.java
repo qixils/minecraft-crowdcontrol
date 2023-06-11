@@ -7,8 +7,10 @@ import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
+import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -16,13 +18,11 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.world.flag.FeatureElement;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,7 +41,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
+import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.*;
+
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
+	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
@@ -273,12 +276,60 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		return new PaperPlayer(player);
 	}
 
-	public static boolean isEnabled(FeatureElement feature) {
-		return feature.isEnabled(((CraftServer) Bukkit.getServer()).getServer().getWorldData().enabledFeatures());
+	public static boolean isFeatureEnabled(Object feature) {
+		try {
+			Optional<Object> requiredFeaturesOpt;
+			if (feature instanceof FeatureElementCommand command) {
+				requiredFeaturesOpt = command.requiredFeatures();
+			} else if (isInstance(FEATURE_ELEMENT_CLAZZ, feature)) {
+				requiredFeaturesOpt = ReflectionUtil.invokeMethod(
+						feature,
+						switch (Bukkit.getMinecraftVersion()) {
+							case "1.19.4", "1.20" -> "m";
+							default -> throw new IllegalStateException();
+						}
+				);
+			} else if (isInstance(FEATURE_FLAG_SET_CLAZZ, feature)) {
+				requiredFeaturesOpt = Optional.of(feature);
+			} else {
+				return true;
+			}
+			return requiredFeaturesOpt.flatMap(requiredFeatures -> ReflectionUtil.invokeMethod(
+					Bukkit.getServer(),
+					// CraftServer#getServer
+					"getServer"
+			).flatMap(server -> ReflectionUtil.invokeMethod(
+					server,
+					// MinecraftServer#getWorldData
+					switch (Bukkit.getMinecraftVersion()) {
+						case "1.19.4" -> "aW";
+						case "1.20" -> "aU";
+						default -> throw new IllegalStateException();
+					}
+			)).flatMap(worldData -> ReflectionUtil.invokeMethod(
+					worldData,
+					// WorldData#enabledFeatures
+					switch (Bukkit.getMinecraftVersion()) {
+						case "1.19.4" -> "L";
+						case "1.20" -> "M";
+						default -> throw new IllegalStateException();
+					}
+			)).<Boolean>flatMap(enabledFeatures -> ReflectionUtil.invokeMethod(
+					requiredFeatures,
+					// FeatureFlagSet#isSubsetOf
+					switch (Bukkit.getMinecraftVersion()) {
+						case "1.19.4", "1.20" -> "a";
+						default -> throw new IllegalStateException();
+					},
+					enabledFeatures
+			))).orElse(true);
+		} catch (Exception e) {
+			return true;
+		}
 	}
 
-	public static boolean isDisabled(FeatureElement feature) {
-		return !isEnabled(feature);
+	public static boolean isFeatureDisabled(Object feature) {
+		return !isFeatureEnabled(feature);
 	}
 
 	// boilerplate stuff for the data container storage
