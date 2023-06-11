@@ -737,6 +737,7 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, login, service.getSource());
 			builder.putData("player", login).send();
 		} else {
+			getSLF4JLogger().info("Sources for service: {}", service.getSources());
 			Optional.ofNullable(login)
 					.flatMap(playerMapper()::getPlayerByLogin)
 					.ifPresent(player -> {
@@ -1172,13 +1173,17 @@ public interface Plugin<P, S> {
 			Request.Source source = manager.getSource();
 			if (source == null)
 				continue;
-			if (playerMapper().getUsername(player).equalsIgnoreCase(source.login())) {
-				managers.add(manager);
-				continue;
+			boolean found = false;
+			if (source.login() != null) {
+				LoginData data = new LoginData(source.login());
+				if (playerMapper().getUniqueId(player).equals(data.getId()) || playerMapper().getUsername(player).equalsIgnoreCase(data.getName()))
+					found = true;
 			}
-			if (isAutoDetectIP() && source.ip() != null && source.ip().equals(playerMapper().getIP(player).orElse(null))) {
+			if (!found && isAutoDetectIP() && source.ip() != null && source.ip().equals(playerMapper().getIP(player).orElse(null))) {
+				found = true;
+			}
+			if (found) {
 				managers.add(manager);
-				continue;
 			}
 		}
 		return managers;

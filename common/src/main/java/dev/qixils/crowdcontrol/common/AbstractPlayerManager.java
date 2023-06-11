@@ -43,7 +43,7 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 		PlayerEntityMapper<P> mapper = getPlugin().playerMapper();
 
 		for (Request.Source source : cc.getSources()) {
-			if (!target.equals(source.target())) {
+			if (!target.equalsRoughly(source.target())) {
 				getPlugin().getSLF4JLogger().info("Skipping source {} because it does not match target {}", source, target);
 				continue;
 			}
