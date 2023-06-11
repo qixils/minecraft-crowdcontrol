@@ -92,7 +92,9 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	@SuppressWarnings("DataFlowIssue")
 	@Override
 	public @NotNull Optional<InetAddress> getIP(@NotNull ServerPlayer player) {
-		return Optional.ofNullable(player.connection).map(connection -> {
+		return Optional.ofNullable(player.connection)
+				.map(connection -> connection.connection)
+				.map(connection -> {
 			SocketAddress address = connection.getRemoteAddress();
 			if (address instanceof InetSocketAddress inetAddress)
 				return inetAddress.getAddress();
