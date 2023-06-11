@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
+import dev.qixils.crowdcontrol.common.LoginData;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -60,5 +61,19 @@ class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMa
 			result = player;
 		}
 		return Optional.ofNullable(result);
+	}
+
+	@Override
+	public @NotNull Optional<Player> getPlayerByLogin(@NotNull LoginData login) {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getName().equalsIgnoreCase(login.getName()) || player.getUniqueId().equals(login.getId()))
+				return Optional.of(player);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public @NotNull Optional<InetAddress> getIP(@NotNull Player player) {
+		return Optional.ofNullable(player.getAddress()).map(InetSocketAddress::getAddress);
 	}
 }

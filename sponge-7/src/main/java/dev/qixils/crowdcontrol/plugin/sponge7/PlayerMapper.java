@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7;
 
+import dev.qixils.crowdcontrol.common.LoginData;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
@@ -70,5 +71,22 @@ class PlayerMapper extends CommandSourceMapper<Player> implements PlayerEntityMa
 			result = player;
 		}
 		return Optional.ofNullable(result);
+	}
+
+	@Override
+	public @NotNull Optional<Player> getPlayerByLogin(@NotNull LoginData login) {
+		for (Player player : plugin.getGame().getServer().getOnlinePlayers()) {
+			if (player.getName().equalsIgnoreCase(login.getName()) || player.getUniqueId().equals(login.getId()))
+				return Optional.of(player);
+		}
+		return Optional.empty();
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	@Override
+	public @NotNull Optional<InetAddress> getIP(@NotNull Player player) {
+		return Optional.ofNullable(player.getConnection())
+				.map(PlayerConnection::getAddress)
+				.map(InetSocketAddress::getAddress);
 	}
 }
