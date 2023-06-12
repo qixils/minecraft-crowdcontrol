@@ -55,7 +55,7 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 				player = mapper.getPlayer(source.ip()).orElse(null);
 
 			if (player != null) {
-				getPlugin().getSLF4JLogger().info("Found player {} from source {}", player, source);
+				getPlugin().getSLF4JLogger().info("Found player {} from source {} (matches target {})", player, source, target);
 				uuids.add(mapper.getUniqueId(player));
 			} else {
 				getPlugin().getSLF4JLogger().info("Failed to find player from source {}", source);
