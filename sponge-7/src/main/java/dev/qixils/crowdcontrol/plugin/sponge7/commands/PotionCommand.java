@@ -59,11 +59,12 @@ public class PotionCommand extends TimedImmediateCommand {
 					.message("Cannot apply jump boost while Disable Jump is active");
 		}
 
-		int duration = isMinimal ? 1 : (int) getDuration(request).getSeconds() * 20;
+		Duration duration = getDuration(request);
+		int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
 		PotionEffect.Builder builder = PotionEffect.builder()
 				.potionType(potionEffectType)
-				.duration(duration);
+				.duration(durationTicks);
 
 		for (Player player : players) {
 			PotionEffect effect = builder.build();
@@ -79,7 +80,7 @@ public class PotionCommand extends TimedImmediateCommand {
 						overridden = true;
 
 						int oldDuration = existingEffect.getDuration();
-						int newDuration = oldDuration == -1 ? -1 : Math.max(duration, oldDuration);
+						int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
 						int newAmplifier = existingEffect.getAmplifier() + 1;
 						if (potionEffectType.equals(PotionEffectTypes.LEVITATION) && newAmplifier > 127)
 							newAmplifier -= 1; // don't mess with gravity effects
@@ -102,6 +103,9 @@ public class PotionCommand extends TimedImmediateCommand {
 			});
 		}
 
-		return request.buildResponse().type(ResultType.SUCCESS);
+		Response.Builder response = request.buildResponse().type(Response.ResultType.SUCCESS);
+		if (!isMinimal)
+			response.timeRemaining(duration);
+		return response;
 	}
 }

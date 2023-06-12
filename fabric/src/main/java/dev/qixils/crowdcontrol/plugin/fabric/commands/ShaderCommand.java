@@ -43,8 +43,9 @@ public class ShaderCommand extends TimedImmediateCommand {
 		// create byte buf
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		buf.writeUtf(shader, 64);
-		long duration = getDuration(request).toMillis();
-		buf.writeLong(duration);
+		Duration duration = getDuration(request);
+		long durationMillis = duration.toMillis();
+		buf.writeLong(durationMillis);
 		// send packet
 		players.forEach(player -> {
 			ACTIVE_SHADERS.add(player.getUUID());
@@ -52,7 +53,7 @@ public class ShaderCommand extends TimedImmediateCommand {
 		});
 		// schedule removal
 		plugin.getScheduledExecutor().schedule(
-				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), duration, TimeUnit.MILLISECONDS);
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), durationMillis, TimeUnit.MILLISECONDS);
+		return request.buildResponse().type(Response.ResultType.SUCCESS).timeRemaining(duration);
 	}
 }

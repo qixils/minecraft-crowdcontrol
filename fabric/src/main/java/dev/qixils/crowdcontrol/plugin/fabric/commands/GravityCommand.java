@@ -35,7 +35,7 @@ public class GravityCommand extends TimedVoidCommand {
 				.request(request)
 				.effectGroup("gravity")
 				.duration(getDuration(request))
-				.startCallback($ -> {
+				.startCallback(effect -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
 							.type(Response.ResultType.RETRY)
@@ -43,7 +43,7 @@ public class GravityCommand extends TimedVoidCommand {
 					for (Player player : players) {
 						if (player.hasEffect(MobEffects.LEVITATION))
 							continue;
-						sync(() -> player.addEffect(new MobEffectInstance(MobEffects.LEVITATION, (int) getDuration(request).getSeconds() * 20, level, true, true, false)));
+						sync(() -> player.addEffect(new MobEffectInstance(MobEffects.LEVITATION, (int) effect.getCurrentDuration().getSeconds() * 20, level, true, true, false)));
 						response.type(Response.ResultType.SUCCESS).message("SUCCESS");
 					}
 					if (response.type() == Response.ResultType.SUCCESS)

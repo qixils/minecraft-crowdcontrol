@@ -57,7 +57,8 @@ public class PotionCommand extends TimedImmediateCommand {
 					.message("Cannot apply jump boost while Disable Jump is active");
 		}
 
-		int durationTicks = isMinimal ? 1 : (int) getDuration(request).getSeconds() * 20;
+		Duration duration = getDuration(request);
+		int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
 		sync(() -> {
 			for (ServerPlayer player : players) {
@@ -85,6 +86,9 @@ public class PotionCommand extends TimedImmediateCommand {
 			}
 		});
 
-		return request.buildResponse().type(ResultType.SUCCESS);
+		Response.Builder response = request.buildResponse().type(Response.ResultType.SUCCESS);
+		if (!isMinimal)
+			response.timeRemaining(duration);
+		return response;
 	}
 }
