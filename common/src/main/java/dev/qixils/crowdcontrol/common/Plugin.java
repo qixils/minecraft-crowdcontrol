@@ -774,79 +774,90 @@ public interface Plugin<P, S> {
 	}
 
 	/**
-	 * Updates the status of an effect.
+	 * Updates the status of effects.
 	 *
 	 * @param respondable an object that can be responded to
-	 * @param effect      the effect to update
 	 * @param status      the new status
+	 * @param ids         the IDs to update
 	 */
-	default void updateEffectStatus(@Nullable Respondable respondable, @NotNull String effect, Response.@NotNull ResultType status) {
+	default void updateEffectStatus(@Nullable Respondable respondable, @NotNull ResultType status, @NotNull String @NotNull ... ids) {
 		if (!status.isStatus())
 			throw new IllegalArgumentException("status must be a status type (not a result type)");
 		if (respondable == null)
 			return;
-		getSLF4JLogger().debug("Updating status of effect {} to {}", effect, status);
+		getSLF4JLogger().debug("Updating status of effects {} to {}", Arrays.toString(ids), status);
 		Response response = respondable.buildResponse()
 				.packetType(PacketType.EFFECT_STATUS)
-				.effect(effect.toLowerCase(Locale.ENGLISH))
+				.ids(Arrays.stream(ids).map(id -> id.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()))
 				.type(status)
 				.build();
 		response.send();
 	}
 
 	/**
-	 * Updates the status of an effect.
+	 * Updates the status of effects.
 	 *
 	 * @param respondable an object that can be responded to
-	 * @param effect      the effect to update
 	 * @param status      the new status
+	 * @param ids         the IDs to update
 	 */
-	default void updateEffectStatus(Respondable respondable, @NotNull Command<?> effect, Response.@NotNull ResultType status) {
-		updateEffectStatus(respondable, effect.getEffectName(), status);
+	default void updateEffectStatus(Respondable respondable, @NotNull ResultType status, @NotNull Command<?> @NotNull ... ids) {
+		updateEffectStatus(respondable, status, Arrays.stream(ids).map(Command::getEffectName).toArray(String[]::new));
+	}
+
+	/**
+	 * Updates the status of effects.
+	 *
+	 * @param respondable an object that can be responded to
+	 * @param status      the new status
+	 * @param ids         the IDs to update
+	 */
+	default void updateEffectIdStatus(Respondable respondable, @NotNull ResultType status, @NotNull Collection<String> ids) {
+		updateEffectStatus(respondable, status, ids.toArray(new String[0]));
 	}
 
 	/**
 	 * Updates the visibility of a collection of {@link Command effect} IDs.
 	 *
 	 * @param respondable an object that can be responded to
-	 * @param effectIds   IDs of the effect to update
 	 * @param visible     effects' new visibility
+	 * @param ids         the IDs to update
 	 */
-	default void updateEffectIdVisibility(Respondable respondable, @NotNull Collection<String> effectIds, boolean visible) {
-		effectIds.forEach(effectId -> updateEffectStatus(respondable, effectId, visible ? Response.ResultType.VISIBLE : Response.ResultType.NOT_VISIBLE));
+	default void updateEffectIdVisibility(Respondable respondable, boolean visible, @NotNull Collection<String> ids) {
+		updateEffectStatus(respondable, visible ? ResultType.VISIBLE : ResultType.NOT_VISIBLE, ids.toArray(new String[0]));
 	}
 
 	/**
 	 * Updates the visibility of an {@link Command effect} ID.
 	 *
 	 * @param respondable an object that can be responded to
-	 * @param effectId    ID of the effect to update
 	 * @param visible     effect's new visibility
+	 * @param ids         the IDs to update
 	 */
-	default void updateEffectIdVisibility(Respondable respondable, @NotNull String effectId, boolean visible) {
-		updateEffectIdVisibility(respondable, Collections.singletonList(effectId), visible);
+	default void updateEffectIdVisibility(Respondable respondable, boolean visible, @NotNull String @NotNull ... ids) {
+		updateEffectIdVisibility(respondable, visible, Arrays.asList(ids));
 	}
 
 	/**
 	 * Updates the visibility of a collection of {@link Command effects}.
 	 *
 	 * @param respondable an object that can be responded to
-	 * @param effects     the effect to update
 	 * @param visible     effects' new visibility
+	 * @param ids         the IDs to update
 	 */
-	default void updateEffectVisibility(Respondable respondable, @NotNull Collection<Command<?>> effects, boolean visible) {
-		updateEffectIdVisibility(respondable, effects.stream().map(Command::getEffectName).collect(Collectors.toList()), visible);
+	default void updateEffectVisibility(Respondable respondable, boolean visible, @NotNull Collection<Command<?>> ids) {
+		updateEffectIdVisibility(respondable, visible, ids.stream().map(Command::getEffectName).collect(Collectors.toList()));
 	}
 
 	/**
 	 * Updates the visibility of an {@link Command effect}.
 	 *
 	 * @param respondable an object that can be responded to
-	 * @param effect      the effect to update
 	 * @param visible     effect's new visibility
+	 * @param ids         the IDs to update
 	 */
-	default void updateEffectVisibility(Respondable respondable, @NotNull Command<?> effect, boolean visible) {
-		updateEffectVisibility(respondable, Collections.singletonList(effect), visible);
+	default void updateEffectVisibility(Respondable respondable, boolean visible, @NotNull Command<?> @NotNull ... ids) {
+		updateEffectVisibility(respondable, visible, Arrays.asList(ids));
 	}
 
 	/**
@@ -941,8 +952,9 @@ public interface Plugin<P, S> {
 		boolean clientVisible = getModdedPlayerCount() > 0;
 		boolean globalVisible = globalEffectsUsable();
 		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
-		updateEffectStatus(service, "swap", getAllPlayers().size() <= 1 ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+		Map<ResultType, Set<String>> effects = new HashMap<>();
 		for (Command<?> effect : commandRegister().getCommands()) {
+			String id = effect.getEffectName().toLowerCase(Locale.ENGLISH);
 			TriState visibility = effect.isVisible();
 			if (visibility != TriState.FALSE) {
 				if (effect.isClientOnly())
@@ -951,12 +963,14 @@ public interface Plugin<P, S> {
 					visibility = TriState.fromBoolean(globalVisible);
 			}
 			if (visibility != TriState.UNKNOWN)
-				updateEffectVisibility(service, effect, visibility.getPrimitiveBoolean());
+				effects.computeIfAbsent(visibility == TriState.TRUE ? ResultType.VISIBLE : ResultType.NOT_VISIBLE, k -> new HashSet<>()).add(id);
 
 			TriState selectable = effect.isSelectable();
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
-				updateEffectStatus(service, effect, selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE);
+				effects.computeIfAbsent(selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, k -> new HashSet<>()).add(id);
 		}
+		for (Map.Entry<ResultType, Set<String>> entry : effects.entrySet())
+			updateEffectIdStatus(service, entry.getKey(), entry.getValue());
 	}
 
 	/**

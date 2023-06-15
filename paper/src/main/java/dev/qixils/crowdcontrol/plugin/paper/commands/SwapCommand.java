@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -39,5 +40,10 @@ public class SwapCommand extends ImmediateCommand {
 		// teleport
 		sync(() -> destinations.forEach(Entity::teleportAsync));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
+
+	@Override
+	public TriState isSelectable() {
+		return plugin.getPlayerManager().getAllPlayers().size() <= 1 ? TriState.FALSE : TriState.TRUE;
 	}
 }

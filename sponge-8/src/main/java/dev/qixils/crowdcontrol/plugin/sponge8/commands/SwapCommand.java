@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -41,5 +42,10 @@ public class SwapCommand extends ImmediateCommand {
 		// teleport
 		sync(() -> destinations.forEach(Entity::setLocation));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
+
+	@Override
+	public TriState isSelectable() {
+		return plugin.getPlayerManager().getAllPlayers().size() <= 1 ? TriState.FALSE : TriState.TRUE;
 	}
 }
