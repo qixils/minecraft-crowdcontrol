@@ -45,13 +45,13 @@ public class DifficultyCommand extends ImmediateCommand {
 		sync(() -> plugin.getGame().server().worldManager().worlds().forEach(world -> world.properties().setDifficulty(difficulty)));
 		async(() -> {
 			for (Difficulty dif : plugin.registryIterable(RegistryTypes.DIFFICULTY))
-				plugin.updateEffectStatus(plugin.getCrowdControl(), effectNameOf(dif), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE);
+				plugin.updateEffectStatus(plugin.getCrowdControl(), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE, effectNameOf(dif));
 			for (Command<ServerPlayer> command : plugin.commandRegister().getCommands()) {
 				if (!(command instanceof EntityCommand<?>))
 					continue;
 				TriState state = command.isSelectable();
 				if (state != TriState.UNKNOWN)
-					plugin.updateEffectStatus(plugin.getCrowdControl(), command, state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE);
+					plugin.updateEffectStatus(plugin.getCrowdControl(), state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, command);
 			}
 		});
 		return request.buildResponse().type(ResultType.SUCCESS);

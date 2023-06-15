@@ -60,12 +60,13 @@ public class PotionCommand extends TimedImmediateCommand {
 					.message("Cannot apply jump boost while Disable Jump is active");
 		}
 
-		long durationLong = getDuration(request).getSeconds() * 20;
-		Ticks duration = Ticks.of(isMinimal ? 1 : durationLong);
+		Duration duration = getDuration(request);
+		long durationLong = duration.getSeconds() * 20;
+		Ticks durationTicks = Ticks.of(isMinimal ? 1 : durationLong);
 
 		PotionEffect.Builder builder = PotionEffect.builder()
 				.potionType(potionEffectType)
-				.duration(duration);
+				.duration(durationTicks);
 
 		Response.Builder response = request.buildResponse().type(ResultType.FAILURE).message("Player already has this effect");
 
@@ -118,6 +119,8 @@ public class PotionCommand extends TimedImmediateCommand {
 			player.offer(Keys.POTION_EFFECTS, effects);
 		}
 
+		if (!isMinimal && response.type() == ResultType.SUCCESS)
+			response.timeRemaining(duration);
 		return response;
 	}
 }

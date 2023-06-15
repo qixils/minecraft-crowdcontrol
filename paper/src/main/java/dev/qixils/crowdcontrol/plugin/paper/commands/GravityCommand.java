@@ -34,7 +34,7 @@ public class GravityCommand extends TimedVoidCommand {
 				.request(request)
 				.effectGroup("gravity")
 				.duration(getDuration(request))
-				.startCallback($ -> {
+				.startCallback(effect -> {
 					List<Player> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
 							.type(Response.ResultType.RETRY)
@@ -42,7 +42,7 @@ public class GravityCommand extends TimedVoidCommand {
 					for (Player player : players) {
 						if (player.hasPotionEffect(PotionEffectType.LEVITATION))
 							continue;
-						sync(() -> player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) getDuration(request).getSeconds() * 20, level, true, true, false)));
+						sync(() -> player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, (int) effect.getCurrentDuration().getSeconds() * 20, level, true, true, false)));
 						response.type(Response.ResultType.SUCCESS).message("SUCCESS");
 					}
 					if (response.type() == Response.ResultType.SUCCESS)

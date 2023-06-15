@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
@@ -40,5 +41,10 @@ public class SwapCommand extends ImmediateCommand {
 		// teleport
 		sync(() -> destinations.forEach((player, location) -> location.teleportHere(player)));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	}
+
+	@Override
+	public TriState isSelectable() {
+		return plugin.getPlayerManager().getAllPlayers().size() <= 1 ? TriState.FALSE : TriState.TRUE;
 	}
 }
