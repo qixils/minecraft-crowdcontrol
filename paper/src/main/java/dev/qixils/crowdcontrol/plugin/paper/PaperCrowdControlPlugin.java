@@ -158,7 +158,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		port = config.getInt("port", port);
 		IP = config.getString("ip", IP);
 		password = config.getString("password", password);
-		autoDetectIP = config.getBoolean("autodetect", autoDetectIP);
+		autoDetectIP = config.getBoolean("ip-detect", autoDetectIP);
 	}
 
 	public void initCrowdControl() {
