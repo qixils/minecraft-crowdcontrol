@@ -1,20 +1,14 @@
-val crowdControlVersion: String by project
-val adventureVersion: String by project
-val adventurePlatformVersion: String by project
-val cloudVersion: String by project
-val reflectionsVersion: String by project
-
 dependencies {
-    api("com.google.guava:guava:32.0.1-jre")
-    api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
-    api("net.kyori:adventure-api:$adventureVersion")
-    api("net.kyori:adventure-platform-api:$adventurePlatformVersion")
-    api("net.kyori:adventure-text-minimessage:$adventureVersion")
-    api("net.kyori:adventure-text-serializer-plain:$adventureVersion")
-    api("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
-    api("cloud.commandframework:cloud-core:$cloudVersion")
-    api("cloud.commandframework:cloud-minecraft-extras:$cloudVersion")
-    implementation("org.reflections:reflections:$reflectionsVersion")
+    api(libs.guava)
+    api(libs.crowdcontrol.receiver)
+    api(libs.adventure.api)
+    api(libs.adventure.platform.api)
+    api(libs.adventure.text.minimessage)
+    api(libs.adventure.text.serializer.plain)
+    api(libs.adventure.text.serializer.legacy)
+    api(libs.cloud.core)
+    api(libs.cloud.minecraft.extras)
+    implementation(libs.reflections)
 }
 
 description = "Minecraft Crowd Control: Common"

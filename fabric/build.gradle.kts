@@ -1,17 +1,3 @@
-val crowdControlVersion: String by project
-val minecraftVersion: String by project
-val parchmentVersion: String by project
-val loaderVersion: String by project
-val fabricVersion: String by project
-val cloudVersion: String by project
-val adventureVersion: String by project
-val adventurePlatformFabricVersion: String by project
-val cardinalComponentsVersion: String by project
-val modMenuVersion: String by project
-val clothConfigVersion: String by project
-
-val isMinecraftRelease = Regex("^\\d+\\.\\d+\\.\\d+$").matches(minecraftVersion)
-
 // shading configuration
 val shade: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
@@ -46,34 +32,43 @@ repositories {
 
 dependencies {
     shade(project(":configurate-common"))
-    minecraft("com.mojang:minecraft:$minecraftVersion")
+    minecraft(libs.minecraft.fabric)
     mappings(loom.officialMojangMappings())
-    modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
-    modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
-    modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
-    modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
-    modImplementation("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
+    modCompileOnly(libs.fabric.loader)
+    modCompileOnly(libs.fabric.api)
+
+    include(libs.adventure.platform.fabric)
+    modImplementation(libs.adventure.platform.fabric)
+
+    include(libs.cloud.fabric)
+    modImplementation(libs.cloud.fabric)
+
+    include(libs.cardinalcomponents.base)
+    modApi(libs.cardinalcomponents.base)
+
+    include(libs.cardinalcomponents.entity)
+    modImplementation(libs.cardinalcomponents.entity)
+
+    modImplementation(libs.modmenu)
+    modImplementation(libs.clothconfig.fabric) {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
 
     // misc includes
-    include("net.kyori:adventure-api:$adventureVersion")
-    include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
+    include(libs.adventure.api)
+    include(libs.clothconfig.fabric) {
         exclude(group = "net.fabricmc.fabric-api")
     }
 }
 
 tasks.processResources {
     inputs.property("version", project.version)
-    inputs.property("minecraftVersion", minecraftVersion)
+    inputs.property("minecraftVersion", libs.versions.minecraft.fabric)
     filteringCharset = "UTF-8"
 
     filesMatching("fabric.mod.json") {
-        expand("version" to project.version.toString() + "+fabric-$minecraftVersion")
+        expand("version" to project.version.toString() + "+fabric-${libs.versions.minecraft.fabric.get()}")
     }
 }
 
@@ -114,9 +109,10 @@ tasks.shadowJar {
 }
 
 tasks.remapJar {
+    inputs.property("minecraftVersion", libs.versions.minecraft.fabric)
     // configure remapJar to use output of shadowJar
     dependsOn(tasks.shadowJar)
     inputFile.set(project.buildDir.resolve("libs/shadow-CrowdControl.jar"))
-    archiveBaseName.set("CrowdControl-Fabric+$minecraftVersion")
+    archiveBaseName.set("CrowdControl-Fabric+${libs.versions.minecraft.fabric.get()}")
     archiveClassifier.set("")
 }

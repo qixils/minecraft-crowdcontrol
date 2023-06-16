@@ -1,8 +1,6 @@
 import xyz.jpenilla.runpaper.task.RunServer
 
-val cloudVersion: String by project
-val minecraftVersion: String by project
-
+val minecraftVersion = libs.versions.minecraft.paper.get()
 val mcVersionSplit = minecraftVersion.split(".")
 description = "Minecraft Crowd Control: Paper"
 
@@ -17,8 +15,8 @@ repositories {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("cloud.commandframework:cloud-paper:${cloudVersion}")
-    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
+    implementation(libs.cloud.paper)
+    compileOnly("io.papermc.paper:paper-api:${libs.versions.minecraft.paper}-R0.1-SNAPSHOT")
 }
 
 // Java 17 boilerplate

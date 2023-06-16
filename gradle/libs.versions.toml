@@ -1,0 +1,44 @@
+[versions]
+minecraft-fabric = "1.19.4"
+minecraft-paper = "1.19.4"
+crowdcontrol = "3.7.1"
+adventure = "4.13.1"
+adventure-platform = "4.3.0"
+adventure-platform-fabric = "5.8.0"
+cloud = "1.8.3"
+configurate = "4.1.2"
+reflections = "0.10.2"
+guava = "32.0.1-jre"
+fabric-loader = "0.14.17"
+fabric-api = "0.75.3+1.19.4"
+cardinalcomponents = "5.1.0"
+modmenu = "6.1.0"
+clothconfig = "10.0.96"
+
+[libraries]
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+crowdcontrol-receiver = { module = "dev.qixils.crowdcontrol:crowd-control-receiver", version.ref = "crowdcontrol" }
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
+adventure-text-serializer-plain = { module = "net.kyori:adventure-text-serializer-plain", version.ref = "adventure" }
+adventure-text-serializer-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
+adventure-platform-spongeapi = { module = "net.kyori:adventure-platform-spongeapi", version.ref = "adventure-platform" }
+adventure-platform-fabric = { module = "net.kyori:adventure-platform-fabric", version.ref = "adventure-platform-fabric" }
+cloud-core = { module = "cloud.commandframework:cloud-core", version.ref = "cloud" }
+cloud-minecraft-extras = { module = "cloud.commandframework:cloud-minecraft-extras", version.ref = "cloud" }
+cloud-fabric = { module = "cloud.commandframework:cloud-fabric", version.ref = "cloud" }
+cloud-paper = { module = "cloud.commandframework:cloud-paper", version.ref = "cloud" }
+cloud-sponge7 = { module = "cloud.commandframework:cloud-sponge7", version.ref = "cloud" }
+cloud-sponge8 = { module = "com.github.qixils.cloud:cloud-sponge", version = "feature~sponge-SNAPSHOT" }
+reflections = { module = "org.reflections:reflections", version.ref = "reflections" }
+minecraft-fabric = { module = "com.mojang:minecraft", version.ref = "minecraft-fabric" }
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
+cardinalcomponents-base = { module = "dev.onyxstudios.cardinal-components-api:cardinal-components-base", version.ref = "cardinalcomponents" }
+cardinalcomponents-entity = { module = "dev.onyxstudios.cardinal-components-api:cardinal-components-entity", version.ref = "cardinalcomponents" }
+modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
+clothconfig-fabric = { module = "me.shedaniel.cloth:cloth-config-fabric", version.ref = "clothconfig" }
+sponge7 = { module = "org.spongepowered:spongeapi", version = "7.4.0" }
+sponge8 = { module = "org.spongepowered:spongeapi", version = "8.1.0" }
+configurate-hocon = { module = "org.spongepowered:configurate-hocon", version.ref = "configurate" }
