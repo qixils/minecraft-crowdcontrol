@@ -455,25 +455,12 @@ public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
             {
                 // convert object[] to list of strings
                 var registeredEffects = args.Select(x => x?.ToString()?.ToLower()).ToList();
-                foreach (var unsupportedEffect in Effects.Where(effect =>
-                             !registeredEffects.Contains(effect.ID.ToLower())))
-                {
-                    HideEffect(unsupportedEffect);
-                }
+                var allEffects = Effects.Select(effect => effect.ID.ToLower());
+                var unknownEffects = allEffects.Where(effect => !registeredEffects.Contains(effect));
+                ReportStatus(unknownEffects, EffectStatus.MenuHidden);
 
                 return true;
             }
         }
     };
-
-    private void HideEffect(Effect effect)
-    {
-        HideEffect(effect.ID);
-    }
-
-    private void HideEffect(string effect)
-    {
-        Log.Message($"Hiding effect {effect}");
-        ReportStatus(effect, EffectStatus.MenuHidden);
-    }
 }
