@@ -26,8 +26,10 @@ public class MaxHealthAddCommand<P> implements ImmediateCommand<P> {
 
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
-			player.maxHealthOffset(player.maxHealthOffset() + amount);
-			player.health(player.health() + amount);
+			sync(() -> {
+				player.maxHealthOffset(player.maxHealthOffset() + amount);
+				player.health(player.health() + amount);
+			});
 		}
 
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

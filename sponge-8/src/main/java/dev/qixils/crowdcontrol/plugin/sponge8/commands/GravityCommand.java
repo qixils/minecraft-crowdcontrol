@@ -37,7 +37,7 @@ public class GravityCommand extends TimedVoidCommand {
 				.request(request)
 				.effectGroup("gravity")
 				.duration(getDuration(request))
-				.startCallback($ -> {
+				.startCallback(effect -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					Response.Builder response = request.buildResponse()
 							.type(Response.ResultType.RETRY)
@@ -49,7 +49,7 @@ public class GravityCommand extends TimedVoidCommand {
 						sync(() -> {
 							effects.add(PotionEffect.builder()
 									.potionType(PotionEffectTypes.LEVITATION)
-									.duration(Ticks.ofWallClockSeconds(plugin.getGame().server(), (int) getDuration(request).getSeconds()))
+									.duration(Ticks.ofWallClockSeconds(plugin.getGame().server(), (int) effect.getCurrentDuration().getSeconds()))
 									.amplifier(level)
 									.ambient(true)
 									.showParticles(true)
