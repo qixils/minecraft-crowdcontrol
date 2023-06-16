@@ -458,8 +458,45 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
                 var allEffects = Effects.Select(effect => effect.ID.ToLower());
                 var unknownEffects = allEffects.Where(effect => !registeredEffects.Contains(effect));
                 ReportStatus(unknownEffects, EffectStatus.MenuHidden);
-
                 return true;
+            }
+        },
+        {
+            "__init", args =>
+            {
+                switch (args?.Length ?? 0)
+                {
+                    case 3:
+                    {
+                        string? host = (args![0] as string);
+                        string? login = (args[1] as string);
+                        string? pass = (args[2] as string);
+
+                        if (string.IsNullOrWhiteSpace(host)) return false;
+                        if (string.IsNullOrWhiteSpace(login)) return false;
+                        if (string.IsNullOrWhiteSpace(pass)) return false;
+
+                        SetConnectionInfo(host, login, pass);
+
+                        return true;
+                    }
+                    case 4:
+                    {
+                        string? host = (args![0] as string);
+                        string? login = (args[2] as string) + ':' + (args[3] as string);
+                        string? pass = (args[1] as string);
+
+                        if (string.IsNullOrWhiteSpace(host)) return false;
+                        if (string.IsNullOrWhiteSpace(login)) return false;
+                        if (string.IsNullOrWhiteSpace(pass)) return false;
+
+                        SetConnectionInfo(host, login, pass);
+
+                        return true;
+                    }
+                    default:
+                        return false;
+                }
             }
         }
     };
