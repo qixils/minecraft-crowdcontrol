@@ -19,7 +19,7 @@ using static System.Linq.Enumerable;
 namespace CrowdControl.Games.Packs;
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
-public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
+public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
 {
     // default port: 58731
     public override ISimpleTCPPack.PromptType PromptType => ISimpleTCPPack.PromptType.Host | ISimpleTCPPack.PromptType.Username | ISimpleTCPPack.PromptType.Password;
@@ -28,12 +28,12 @@ public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
 
     public override ISimpleTCPPack.DigestAlgorithm AuthenticationHashMode => ISimpleTCPPack.DigestAlgorithm.SHA_512;
 
-    public MinecraftServer(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
+    public Minecraft(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
     {
         ConnectionDialogNames[ISimpleTCPPack.PromptType.Username] = "Minecraft ID";
     }
 
-    public override Game Game => new("Minecraft", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
+    public override Game Game => new("Minecraft", "Minecraft", "PC", ConnectorType.SimpleTCPClientConnector);
     public override EffectList Effects => new Effect[]
     {
         // miscellaneous
@@ -68,7 +68,7 @@ public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
         new("Peaceful Mode", "difficulty_peaceful") { Price = 200, SortName = "Difficulty: 0", Group = "global", Category = "Server", Description = "Sets the server difficulty to peaceful, removing all hostile mobs and preventing new ones from spawning" },
         new("Easy Mode", "difficulty_easy") { Price = 100, SortName = "Difficulty: 1", Group = "global", Category = "Server", Description = "Sets the server difficulty to easy, reducing the damage dealt by mobs by 50%" },
         new("Normal Mode", "difficulty_normal") { Price = 200, SortName = "Difficulty: 2", Group = "global", Category = "Server", Description = "Sets the server difficulty to normal, the default difficulty" },
-        new("Hard Hard", "difficulty_hard") { Price = 400, SortName = "Difficulty: 3", Group = "global", Category = "Server", Description = "Sets the server difficulty to hard, increasing the damage dealt by mobs by 50% and buffing several mobs" },
+        new("Hard Mode", "difficulty_hard") { Price = 400, SortName = "Difficulty: 3", Group = "global", Category = "Server", Description = "Sets the server difficulty to hard, increasing the damage dealt by mobs by 50% and buffing several mobs" },
         // sets the server weather
         new("Clear Weather", "clear") { Price = 25, SortName = "Weather: Clear", Group = "global", Category = "Server", Description = "Makes the weather sunny to allow rays of fire to shine down on hostile mobs" },
         new("Rainy Weather", "downfall") { Price = 50, SortName = "Weather: Rainy", Group = "global", Category = "Server", Description = "Makes the weather rainy which prevents hostile mobs from burning in the daylight" },
@@ -458,8 +458,45 @@ public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
                 var allEffects = Effects.Select(effect => effect.ID.ToLower());
                 var unknownEffects = allEffects.Where(effect => !registeredEffects.Contains(effect));
                 ReportStatus(unknownEffects, EffectStatus.MenuHidden);
-
                 return true;
+            }
+        },
+        {
+            "__init", args =>
+            {
+                switch (args?.Length ?? 0)
+                {
+                    case 3:
+                    {
+                        string? host = (args![0] as string);
+                        string? login = (args[1] as string);
+                        string? pass = (args[2] as string);
+
+                        if (string.IsNullOrWhiteSpace(host)) return false;
+                        if (string.IsNullOrWhiteSpace(login)) return false;
+                        if (string.IsNullOrWhiteSpace(pass)) return false;
+
+                        SetConnectionInfo(host, login, pass);
+
+                        return true;
+                    }
+                    case 4:
+                    {
+                        string? host = (args![0] as string);
+                        string? login = (args[2] as string) + ':' + (args[3] as string);
+                        string? pass = (args[1] as string);
+
+                        if (string.IsNullOrWhiteSpace(host)) return false;
+                        if (string.IsNullOrWhiteSpace(login)) return false;
+                        if (string.IsNullOrWhiteSpace(pass)) return false;
+
+                        SetConnectionInfo(host, login, pass);
+
+                        return true;
+                    }
+                    default:
+                        return false;
+                }
             }
         }
     };
