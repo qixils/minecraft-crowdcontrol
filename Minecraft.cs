@@ -19,7 +19,7 @@ using static System.Linq.Enumerable;
 namespace CrowdControl.Games.Packs;
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
-public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
+public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
 {
     // default port: 58731
     public override ISimpleTCPPack.PromptType PromptType => ISimpleTCPPack.PromptType.Host | ISimpleTCPPack.PromptType.Username | ISimpleTCPPack.PromptType.Password;
@@ -28,12 +28,12 @@ public class MinecraftServer : SimpleTCPPack<SimpleTCPClientConnector>
 
     public override ISimpleTCPPack.DigestAlgorithm AuthenticationHashMode => ISimpleTCPPack.DigestAlgorithm.SHA_512;
 
-    public MinecraftServer(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
+    public Minecraft(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
     {
         ConnectionDialogNames[ISimpleTCPPack.PromptType.Username] = "Minecraft ID";
     }
 
-    public override Game Game => new("Minecraft", "MinecraftServer", "PC", ConnectorType.SimpleTCPClientConnector);
+    public override Game Game => new("Minecraft", "Minecraft", "PC", ConnectorType.SimpleTCPClientConnector);
     public override EffectList Effects => new Effect[]
     {
         // miscellaneous
