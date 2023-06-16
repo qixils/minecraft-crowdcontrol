@@ -2,9 +2,15 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.2
+
+- Improved the reliability of the account auto-detection feature
+- Further updates and fixes for [Crowd Control 2.0](https://beta.crowdcontrol.live/)
+- Added support for 1.20.1 on Paper and Fabric
+
 ## 3.3.1
 
-- Added an account autodetection feature which tries to automatically link a streamer's Minecraft
+- Added an account auto-detection feature which tries to automatically link a streamer's Minecraft
   account and their Crowd Control app session to remove the need to run `/account link`. Certain
   event setups may wish to utilize the `autodetect` config option to disable this feature.
 - Further updates and fixes for [Crowd Control 2.0](https://beta.crowdcontrol.live/)

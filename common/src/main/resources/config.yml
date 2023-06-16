@@ -24,9 +24,10 @@ announce: true
 # Determines whether a user must be an operator to use the "/account" command.
 admin-required: false
 
-# Determines whether to try to autodetect each streamer's Minecraft player using connected IP addresses.
-# This bypasses the need for the "/account" command but this may be undesirable for some event setups.
-autodetect: true
+# When the server fails to find a player that matches data sent by the Crowd Control app for the purposes of
+# auto-linking Minecraft and Crowd Control accounts, this setting allows a fallback to find a matching Minecraft player
+# using connected IP addresses. This may be undesirable for some event setups.
+ip-detect: true
 
 # Hides the names of viewers who have purchased effects.
 # Can be 'none' to disable, 'chat' to hide only in chat, or 'all' to hide everywhere.
