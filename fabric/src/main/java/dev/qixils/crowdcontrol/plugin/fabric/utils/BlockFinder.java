@@ -27,7 +27,7 @@ public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, S
 	}
 
 	public static boolean isSolid(BlockState block) {
-		return !block.isSolid();
+		return block.isSolid();
 	}
 
 	public static boolean isSolid(Location location) {
