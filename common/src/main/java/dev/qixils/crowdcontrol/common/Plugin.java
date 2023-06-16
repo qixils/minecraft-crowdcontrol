@@ -717,6 +717,13 @@ public interface Plugin<P, S> {
 	}
 
 	/**
+	 * Gets a map of event types to the {@link SocketManager}s that have received the event.
+	 *
+	 * @return the map of event types to {@link SocketManager}s
+	 */
+	Map<String, List<SocketManager>> getSentEvents();
+
+	/**
 	 * Sends a player event packet.
 	 *
 	 * @param service the service to send the packet to
@@ -728,23 +735,29 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().warn("Attempted to send player event packet but the service is unavailable");
 			return;
 		}
+		if (getSentEvents().getOrDefault(eventType, Collections.emptyList()).contains(service))
+			return;
 		String login = Optional.ofNullable(service.getSource()).map(Request.Source::login).orElse(null);
 		Response.Builder builder = service.buildResponse()
 				.packetType(PacketType.GENERIC_EVENT)
 				.eventType(eventType)
 				.internal(true);
+		boolean success = force;
 		if (force) {
 			getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, login, service.getSource());
 			builder.putData("player", login).send();
 		} else {
 			getSLF4JLogger().info("Sources for service: {}", service.getSources());
-			Optional.ofNullable(login)
-					.flatMap(playerMapper()::getPlayerByLogin)
-					.ifPresent(player -> {
-						getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, playerMapper().getUsername(player), service.getSource());
-						builder.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH)).send();
-					});
+			Optional<P> optPlayer = Optional.ofNullable(login).flatMap(playerMapper()::getPlayerByLogin);
+			if (optPlayer.isPresent()) {
+				success = true;
+				P player = optPlayer.get();
+				getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, playerMapper().getUsername(player), service.getSource());
+				builder.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH)).send();
+			}
 		}
+		if (success)
+			getSentEvents().computeIfAbsent(eventType, key -> new ArrayList<>()).add(service);
 	}
 
 	/**
@@ -1024,8 +1037,6 @@ public interface Plugin<P, S> {
 	 */
 	default void onPlayerLeave(P player) {
 		updateConditionalEffectVisibility(getCrowdControl());
-		if (!isGlobal())
-			sendPlayerEvent(player, "playerJoined");
 	}
 
 	/**

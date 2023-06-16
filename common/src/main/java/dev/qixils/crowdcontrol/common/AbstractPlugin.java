@@ -2,14 +2,13 @@ package dev.qixils.crowdcontrol.common;
 
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.socket.SocketManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -52,6 +51,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	protected LimitConfig limitConfig = new LimitConfig();
 	@Getter @NotNull
 	protected final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	@Getter @NotNull
+	protected final Map<String, List<SocketManager>> sentEvents = new HashMap<>();
 
 	protected AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;
