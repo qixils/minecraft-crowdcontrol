@@ -32,6 +32,7 @@ subprojects {
                 url = uri("https://files.minecraftforge.net/maven/")
             }
         }
+        mavenLocal() // TODO: remove once adventure-platform-fabric is published
     }
 
     java {
