@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
+import dev.qixils.crowdcontrol.socket.SocketManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -100,6 +101,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Getter @NotNull
 	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	@Getter @NotNull
+	private final Map<String, List<SocketManager>> sentEvents = new HashMap<>();
 
 	@Override
 	public void onLoad() {
