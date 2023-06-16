@@ -68,7 +68,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Peaceful Mode", "difficulty_peaceful") { Price = 200, SortName = "Difficulty: 0", Group = "global", Category = "Server", Description = "Sets the server difficulty to peaceful, removing all hostile mobs and preventing new ones from spawning" },
         new("Easy Mode", "difficulty_easy") { Price = 100, SortName = "Difficulty: 1", Group = "global", Category = "Server", Description = "Sets the server difficulty to easy, reducing the damage dealt by mobs by 50%" },
         new("Normal Mode", "difficulty_normal") { Price = 200, SortName = "Difficulty: 2", Group = "global", Category = "Server", Description = "Sets the server difficulty to normal, the default difficulty" },
-        new("Hard Hard", "difficulty_hard") { Price = 400, SortName = "Difficulty: 3", Group = "global", Category = "Server", Description = "Sets the server difficulty to hard, increasing the damage dealt by mobs by 50% and buffing several mobs" },
+        new("Hard Mode", "difficulty_hard") { Price = 400, SortName = "Difficulty: 3", Group = "global", Category = "Server", Description = "Sets the server difficulty to hard, increasing the damage dealt by mobs by 50% and buffing several mobs" },
         // sets the server weather
         new("Clear Weather", "clear") { Price = 25, SortName = "Weather: Clear", Group = "global", Category = "Server", Description = "Makes the weather sunny to allow rays of fire to shine down on hostile mobs" },
         new("Rainy Weather", "downfall") { Price = 50, SortName = "Weather: Rainy", Group = "global", Category = "Server", Description = "Makes the weather rainy which prevents hostile mobs from burning in the daylight" },
