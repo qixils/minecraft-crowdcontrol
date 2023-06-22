@@ -43,6 +43,3 @@ sure to provide your public IP address and the password used in the config file 
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This
 prevents unknown players from joining the server and potentially griefing your builds.
-
-You may also be interested in setting up [GeyserMC](https://geysermc.org/) to allow Bedrock edition
-users (i.e. console players) to play.

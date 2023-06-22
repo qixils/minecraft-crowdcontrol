@@ -1,11 +1,11 @@
-## Paper 1.19 Manual Installation
+## Paper 1.20 Manual Installation
 
-The following steps detail how to manually set up a Minecraft 1.19 server with Crowd Control.
+The following steps detail how to manually set up a Minecraft 1.20 server with Crowd Control.
 
 1. Download and
    install [the latest version of Java](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot).
    Java 17 or later is required.
-2. Download the latest version of [Paper 1.19.4](https://papermc.io/downloads/all). Spigot is not
+2. Download the latest version of [Paper 1.20.1](https://papermc.io/downloads/paper). Spigot is not
    supported.
 3. Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the
    "root folder."
@@ -37,3 +37,6 @@ provide your public IP address and the password used in the config file to your 
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This
 prevents unknown players from joining the server and potentially griefing your builds.
+
+You may also be interested in setting up [GeyserMC](https://geysermc.org/) to allow Bedrock edition
+users (i.e. console players) to play.

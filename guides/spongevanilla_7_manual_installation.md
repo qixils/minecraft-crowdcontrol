@@ -22,9 +22,6 @@ with Crowd Control.
       "Open command window here" or "Open PowerShell here".
     - After opening your command window, run the
       command `java -Xmx2G -Xms2G -jar sponge.jar nogui` (by typing that in and pressing enter).
-      You can adjust the gigabytes of RAM used by the software by altering the `2G` text,
-      i.e. `-Xmx4G -Xms4G` would allocate 4 gigabytes of RAM to the game. This may be necessary if
-      you are playing with large mods.
     - When running for the first time, you will have to edit the file `eula.txt` in a program like
       Notepad or `nano` and then run the server command again.
 8. Once you shut down the server using `/stop`, you can edit the plugin's configuration file. A
@@ -39,6 +36,3 @@ sure to provide your public IP address and the password used in the config file 
 
 For extra security, consider enabling a user whitelist using the vanilla `/whitelist` command. This
 prevents unknown players from joining the server and potentially griefing your builds.
-
-You may also be interested in setting up [GeyserMC](https://geysermc.org/) to allow Bedrock edition
-users (i.e. console players) to play.

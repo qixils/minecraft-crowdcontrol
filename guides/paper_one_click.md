@@ -1,6 +1,6 @@
 ## Paper: Automatic Local Server
 
-The following steps provide a quick setup for running a local game server.
+The following steps provide a quick setup for running a local game server on Minecraft 1.19.3.
 
 1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
 2. In the Game Selection tab, select **Minecraft (Paper Server) (PC)**.
