@@ -15,7 +15,8 @@ minecrafter20211130** to receive the effects that your viewers are buying for yo
 
 ## Installation
 
-> **Note** The following information is for
+> **Note**  
+> The following information is for
 > [Crowd Control "1.0"](https://crowdcontrol.live/).
 > **If you are using the [Crowd Control 2.0 beta](https://beta.crowdcontrol.live/) then please see
 > [this document](https://github.com/qixils/minecraft-crowdcontrol/#installation) instead.**
