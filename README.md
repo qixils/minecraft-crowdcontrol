@@ -15,9 +15,10 @@ minecrafter20211130** to receive the effects that your viewers are buying for yo
 
 ## Installation
 
-The following information is for the latest full release of Crowd Control.
-**If you are using the Crowd Control 2.0 beta, please see
-[this document](https://github.com/qixils/minecraft-crowdcontrol/#installation) instead.**
+> **Note** The following information is for
+> [Crowd Control "1.0"](https://crowdcontrol.live/).
+> **If you are using the [Crowd Control 2.0 beta](https://beta.crowdcontrol.live/) then please see
+> [this document](https://github.com/qixils/minecraft-crowdcontrol/#installation) instead.**
 
 Installation steps differ depending on the Minecraft version you wish to use, whether you want to
 use Forge mods, and the type of installation you wish to perform. Most casual users of the software
