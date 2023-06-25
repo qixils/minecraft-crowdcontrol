@@ -2,6 +2,12 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.3
+
+- Allowed `/account link` to function once again
+- Fixed the descriptions of gravity effects
+- Fixed broken metadata from other mods causing initialization to fail
+
 ## 3.3.2
 
 - Improved the reliability of the account auto-detection feature
