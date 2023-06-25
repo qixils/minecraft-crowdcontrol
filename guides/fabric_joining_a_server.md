@@ -2,19 +2,30 @@
 
 The following steps are for streamers who are connecting to another individual's server.
 
-1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the **Game Selection** tab, select **Minecraft (Fabric) (PC)**.
-    - If you do not see this option, you can use **Minecraft (Paper Server) (PC)** instead while we
-      work on rolling out this new version.
-3. Click **Start**. A pop-up menu will appear prompting you for information that you should have
-   received from your server administrator.
-    - In the host field, you should enter an IP address or a website URL. This will usually be the
-      same as the IP address that you connect to in Minecraft.
-    - In the password field, you must enter a secret passphrase provided to you by the server
-      administrator. The default password is `crowdcontrol`.
-4. (Optional) For the best experience, you should install the mod yourself using the
-   [**Client Installation**](fabric_1.19_client_installation.md) guide.
-5. Join the Minecraft server in your Minecraft 1.19.4 client using the same IP address that you
-   entered into the host field.
-6. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
-   receive effects that viewers purchase for you. Example: `/account link jaku`
+1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+2. In the **Game Selection** tab, select **Minecraft**.
+3. Select **Configure Minecraft**.
+4. Enter your Minecraft username and click next.
+5. Select **Fabric** and click next.
+6. Select **Remote**.
+7. Enter the IP address of the server (usually the same as the one you connect to in Minecraft)
+   and click next.
+8. If you were provided a secret passphrase by the server administrator, enter it here. Otherwise,
+   leave the default value of `crowdcontrol`. Click next.
+9. The checklist should now all have green checks.
+    - If you are the server owner and are seeing Awaiting Connector or Connector Error, make sure
+      the port 58431 is open on the server's firewall. If you are assigned a random port, make sure
+      to specify that port in the mod's config file.
+10. (Optional) For extra effects and the best experience, install the client mod using the
+    [Client Installation](fabric_client_installation.md) guide.
+11. Join the Minecraft server in your game
+    (usually using the same IP as the one you entered in step 7).
+12. (Optional) If you're sharing effects with another streamer, run the command
+    `/account link INSERT_USERNAME` to receive their effects. The username should come from what's
+    displayed in the top left corner of their Crowd Control app.
+13. Select **Start Session** in the Crowd Control app.
+    - If you are the server owner and the button is greyed out, make sure the server is using the
+      latest version of the mod.
+
+If you experience issues at any point, please reach out for help on our
+[Discord](https://discord.gg/warpworld).
