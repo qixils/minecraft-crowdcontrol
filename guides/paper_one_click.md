@@ -7,13 +7,17 @@ The following steps provide a quick setup for running a local game server on Min
 3. Click **One Click Server Setup** to automatically set up a server. This may take several minutes
    to complete. Make sure to accept any prompts to install software (namely the Java runtime
    environment).
-4. Once setup is done, click **Launch Server** to start the Minecraft server. You may optionally
-   run `password <password>` to change the password required to connect to the server. By default,
-   the password is set to `crowdcontrol`.
+4. Once setup is done, click **Launch Server** to start the Minecraft server.
 5. Once the Minecraft server has started, click **Start** in the Crowd Control app to connect to the
-   server. Enter in `localhost` as the host and the password you set (or `crowdcontrol` by default).
-6. Open your Minecraft launcher and press Play on the Latest Release of Java Edition.
-7. Open the Multiplayer menu, use the Add Server button with the IP `localhost` if you haven't
+   server. Enter in `localhost` as the host and `crowdcontrol` as the password.
+6. Open your Minecraft launcher and press **Play** on a profile using Java Edition 1.19.3.
+   To create a new profile:
+   1. Click the **Installations** tab.
+   2. Click **New installation**.
+   3. Enter a name for the profile (e.g. Crowd Control).
+   4. Under the **Version** dropdown, select **release 1.19.3**.
+   5. Click **Create**.
+7. Open the Multiplayer menu, use the **Add Server** button with the IP `localhost` if you haven't
    already, and connect to the server.
 8. In Minecraft, run the command `/account link <your twitch username>` to ensure you receive
    effects that viewers purchase for you. Example: `/account link jaku`
