@@ -10,7 +10,9 @@ The following steps provide a quick setup for running a local game server.
 6. Select **Local**.
 7. Select **Click to install** and **Okay**.
 8. (Optional) You may now select **Open Folder** next to **Minecraft** on the **Game Paths** tab and
-   copy any Fabric 1.20.1 mods you want to play with into the `Fabric/mods` folder.
+   copy any Fabric 1.20.1 mods you want to play with into the `Fabric/mods` folder. If you're
+   playing a modpack, you may also have to copy the modpack's `config` folder into the `Fabric`
+    folder.
 9. In the **Live** tab, select **Launch Server**.
 10. (Optional) For extra effects and the best experience, install the client mod using the
     [Client Installation](fabric_1.20.1_client_installation.md) guide.

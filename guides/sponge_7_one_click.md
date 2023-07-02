@@ -10,7 +10,9 @@ The following steps provide a quick setup for running a local game server.
 6. Select **Local**.
 7. Select **Click to install** and **Okay**.
 8. (Optional) You may now select **Open Folder** next to **Minecraft** on the **Game Paths** tab and
-   copy any Sponge or Forge 1.12.2 mods you want to play with into the `Sponge7/mods` folder.
+   copy any Sponge or Forge 1.12.2 mods you want to play with into the `Sponge7/mods` folder. If
+   you're playing a modpack, you may also have to copy the modpack's `config` folder into the
+   `Sponge7` folder.
 9. In the **Live** tab, select **Launch Server**.
 10. Launch your instance of Minecraft 1.12.2. If you added any mods to the server, your client will
     need to have the same mods installed.
