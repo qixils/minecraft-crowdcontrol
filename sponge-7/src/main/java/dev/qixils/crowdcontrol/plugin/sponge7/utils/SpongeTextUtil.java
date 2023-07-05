@@ -5,6 +5,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.Translatable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityTypes;
@@ -34,14 +35,21 @@ public class SpongeTextUtil extends TextUtilImpl {
 		return Sponge.getRegistry().getTranslationById(key).map(Translation::get).orElse(key);
 	}
 
-	@NotNull
+	@Nullable
 	public static Key asKey(CatalogType type) {
-		return Key.key(type.getId());
+		try {
+			return Key.key(type.getId());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@NotNull
 	public static String valueOf(CatalogType type) {
-		return asKey(type).value();
+		Key key = asKey(type);
+		if (key == null)
+			return type.getId();
+		return key.value();
 	}
 
 	/**
@@ -53,6 +61,8 @@ public class SpongeTextUtil extends TextUtilImpl {
 	@NotNull
 	public static String csIdOf(CatalogType type) {
 		Key key = asKey(type);
+		if (key == null)
+			return type.getId();
 		String value = key.value();
 
 		if (!key.namespace().equals(Key.MINECRAFT_NAMESPACE))

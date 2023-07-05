@@ -18,8 +18,8 @@ with Crowd Control.
 7. Download the
    [latest build of Crowd Control for Sponge 8](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.16.5)
    and place it in the `plugins` folder.
-8. Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with into the
-   `mods` folder and the `plugins` folder respectively.
+8. (Optional) Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with
+   into the `mods` folder and the `plugins` folder respectively.
 9. Run the Minecraft server to initialize the plugin's configuration files. You will have to run it
    twice, as the first will prompt you to accept Minecraft's End User License Agreement.
    To run the server:
@@ -32,13 +32,11 @@ with Crowd Control.
       necessary if you are playing with large mods.
     - When running for the first time, you will have to edit the file `eula.txt` in a program like
       Notepad or `nano` and then run the server command again.
-10. Once you shut down the server using `/stop`, you can edit the plugin's configuration file. A
-    password must be set to use the plugin.
-    - The config file is located at `<root>/config/crowdcontrol.conf`.
-    - Be sure to enter a password into the `password` field.
+10. (Optional) Once you shut down the server using `/stop`, you can edit the plugin's configuration
+    file. The config file is located at `<root>/config/crowdcontrol.conf`.
 11. Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and
     its Crowd Control server.
-12. If you experience rubber-banding/laggy movement:
+12. (Optional) If you experience rubber-banding or laggy movement:
      - Navigate to `<root>/config/sponge/`
      - Open `global.conf` and set `moved-wrongly` to `false`
      - Open `sponge.conf` and set `movement-checks` to `true`

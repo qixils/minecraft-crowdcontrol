@@ -1,38 +1,29 @@
-## Paper: Joining a Server
-
-This document contains separate guides for
-[connecting to a local server](#local-server)
-and [connecting to an external server](#external-server).
-
-### Local Server
-
-The following steps are for streamers connecting to a local server, i.e. the Crowd Control one-click
-setup.
-
-1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the **Game Selection** tab, select **Minecraft (Paper Server) (PC)**.
-3. Click **Start**. A pop-up menu will appear prompting you for information required to connect to
-   the server.
-    - In the host field, enter `localhost`.
-    - In the password field, enter the default password `crowdcontrol` or a custom password if you
-      set one.
-4. Join the Minecraft server in your Minecraft 1.19.4 client using the IP address `localhost`.
-5. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
-   receive effects that viewers purchase for you. Example: `/account link jaku`
-
-### External Server
+## Paper: Joining an External Server
 
 The following steps are for streamers who are connecting to another individual's server.
 
-1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the **Game Selection** tab, select **Minecraft (Paper Server) (PC)**.
-3. Click **Start**. A pop-up menu will appear prompting you for information that you should have
-   received from your server administrator.
-    - In the host field, you should enter an IP address or a website URL. This will usually be the
-      same as the IP address that you connect to in Minecraft.
-    - In the password field, you must enter a secret passphrase provided to you by the server
-      administrator. The default password is `crowdcontrol`.
-4. Join the Minecraft server in your Minecraft 1.19.4 client using the same IP address that you
-   entered into the host field.
-5. Once you're in the game, run the command `/account link <your twitch username>` to ensure you
-   receive effects that viewers purchase for you. Example: `/account link jaku`
+1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+2. In the **Game Selection** tab, select **Minecraft**.
+3. Select **Configure Minecraft**.
+4. Enter your Minecraft username and click next.
+5. Select **Paper** and click next.
+6. Select **Remote**.
+7. Enter the IP address of the server (usually the same as the one you connect to in Minecraft)
+   and click next.
+8. If you were provided a secret passphrase by the server administrator, enter it here. Otherwise,
+   leave the default value of `crowdcontrol`. Click next.
+9. The checklist should now all have green checks.
+    - If you are the server owner and are seeing Awaiting Connector or Connector Error, make sure
+      the port 58431 is open on the server's firewall. If you are assigned a random port, make sure
+      to specify that port in the mod's config file.
+10. Join the Minecraft server in your game
+    (usually using the same IP as the one you entered in step 7).
+11. (Optional) If you're sharing effects with another streamer, run the command
+    `/account link INSERT_USERNAME` to receive their effects. The username should come from what's
+    displayed in the top left corner of their Crowd Control app.
+12. Click the **Start Session** button in the Crowd Control app.
+    - If you are the server owner and the button is greyed out, make sure the server is using the
+      latest version of the mod.
+
+If you experience issues at any point, please reach out for help on our
+[Discord](https://discord.gg/warpworld).

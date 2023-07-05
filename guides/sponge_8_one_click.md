@@ -2,20 +2,25 @@
 
 The following steps provide a quick setup for running a local game server.
 
-> **Warning**  
-> As of writing, the one-click installer has not yet been published for Sponge 8. You will likely
-> instead have to follow the [manual installation](sponge_8_manual_installation.md) steps
-> or the [client installation](sponge_8_client_installation.md) steps.
+1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+2. In the **Game Library** tab, select **Minecraft**.
+3. Select **Configure Minecraft**.
+4. Enter your Minecraft username and click next.
+5. Select **Sponge 8** and click next.
+6. Select **Local**.
+7. Select **Click to install** and **Okay**.
+8. (Optional) You may now select **Open Folder** next to **Minecraft** on the **Game Paths** tab and
+   copy any Forge 1.16.5 mods you want to play with into the `Sponge8/mods` folder. If you're
+   playing a modpack, you may also have to copy the modpack's `config` folder into the `Sponge8`
+   folder.
+9. In the **Live** tab, select **Launch Server**.
+10. Launch your instance of Minecraft 1.16.5. If you added any mods to the server, your client will
+    need to have the same mods installed.
+11. In Minecraft, add the server `localhost` to your multiplayer server list and join it.
+12. (Optional) If you're sharing effects with another streamer, run the command
+    `/account link INSERT_USERNAME` to receive their effects. The username should come from what's
+    displayed in the top left corner of their Crowd Control app.
+13. Select **Start Session** in the Crowd Control app.
 
-1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the Game Selection tab, select **Minecraft (Sponge) 1.16 (PC)**.
-3. Click **One Click Setup** to automatically set up a Crowd Control profile in your Minecraft
-   launcher.
-4. Once setup is done, you can click the **Open Profile Folder** button and copy any Forge 1.16.5
-   mods you want to play with into the `mods` folder.
-5. Open the Minecraft Launcher, select the `forge` profile, press Play, and open a
-   singleplayer world.
-6. Run the command `/account link <your twitch username>` to ensure you receive effects that viewers
-   purchase for you. Example: `/account link jaku`
-7. Click **Start** in the Crowd Control app to connect to the game. Enter in `localhost` as the host
-   and `crowdcontrol` as the password.
+If you experience issues at any point, please reach out for help on our
+[Discord](https://discord.gg/warpworld).

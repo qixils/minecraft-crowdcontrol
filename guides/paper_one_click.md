@@ -1,19 +1,23 @@
-## Paper: Automatic Local Server
+## Paper: Automatic Installation
 
 The following steps provide a quick setup for running a local game server.
 
-1. Download and install the [Crowd Control PC app](https://crowdcontrol.live/setup).
-2. In the Game Selection tab, select **Minecraft (Paper Server) (PC)**.
-3. Click **One Click Server Setup** to automatically set up a server. This may take several minutes
-   to complete. Make sure to accept any prompts to install software (namely the Java runtime
-   environment).
-4. Once setup is done, click **Launch Server** button to start the Minecraft server. You may
-   optionally run `password <password>` to change the password required to connect to the server.
-   By default, the password is set to `crowdcontrol`.
-5. Once the Minecraft server has started, click **Start** in the Crowd Control app to connect to the
-   server. Enter in `localhost` as the host and `crowdcontrol` as the password.
-6. Open your Minecraft launcher and press Play on the Latest Release of Java Edition.
-7. Open the Multiplayer menu, use the Add Server button with the IP `localhost` if you haven't
-   already, and connect to the server.
-8. In Minecraft, run the command `/account link <your twitch username>` to ensure you receive
-   effects that viewers purchase for you. Example: `/account link jaku`
+1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+2. In the **Game Library** tab, select **Minecraft**.
+3. Select **Configure Minecraft**.
+4. Enter your Minecraft username and click next.
+5. Select **Paper** and click next.
+6. Select **Local**.
+7. Select **Click to install** and **Okay**.
+8. (Optional) You may now select **Open Folder** next to **Minecraft** on the **Game Paths** tab and
+   copy any Paper plugins you want to play with into the `Paper/plugins` folder.
+9. In the **Live** tab, select **Launch Server**.
+10. Launch your instance of Minecraft 1.20.1.
+11. In Minecraft, add the server `localhost` to your multiplayer server list and join it.
+12. (Optional) If you're sharing effects with another streamer, run the command
+    `/account link INSERT_USERNAME` to receive their effects. The username should come from what's
+    displayed in the top left corner of their Crowd Control app.
+13. Select **Start Session** in the Crowd Control app.
+
+If you experience issues at any point, please reach out for help on our
+[Discord](https://discord.gg/warpworld).

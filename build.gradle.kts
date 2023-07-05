@@ -1,10 +1,10 @@
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "8.0.1" apply false
+    id("io.freefair.lombok") version "8.1.0" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
     id("fabric-loom") version "1.2-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.1.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.3" apply false // Generates plugin.yml
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("org.spongepowered.gradle.plugin") version "2.1.1" apply false // Generates sponge_plugins.json and runServer task
 }
 

@@ -313,8 +313,8 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Drink Weakness Potion", "potion_weakness") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Decreases the player's damage output" },
         // gravity commands
         new("Zero Gravity", "zero_gravity") { Price = 100, Duration = 20, SortName = "Gravity: 0", Category = new[]{"Potion Effects", "Movement"}, Description = "Disables player gravity, allowing players to float in the air" },
-        new("Low Gravity", "low_gravity") { Price = 50, Duration = 20, SortName = "Gravity: 1", Category = new[]{"Potion Effects", "Movement"}, Description = "Decreases player gravity, disallowing players from jumping up blocks" },
-        new("High Gravity", "high_gravity") { Price = 100, Duration = 20, SortName = "Gravity: 2", Category = new[]{"Potion Effects", "Movement"}, Description = "Increases player gravity, allowing players to jump higher and fall slower" },
+        new("Low Gravity", "low_gravity") { Price = 50, Duration = 20, SortName = "Gravity: 1", Category = new[]{"Potion Effects", "Movement"}, Description = "Decreases player gravity, allowing players to jump higher and fall slower" },
+        new("High Gravity", "high_gravity") { Price = 100, Duration = 20, SortName = "Gravity: 2", Category = new[]{"Potion Effects", "Movement"}, Description = "Increases player gravity, disallowing players from jumping up blocks" },
         new("Maximum Gravity", "maximum_gravity") { Price = 200, Duration = 20, SortName = "Gravity: 3", Category = new[]{"Potion Effects", "Movement"}, Description = "Maximizes player gravity, disallowing players from jumping up blocks and rapidly pulling them down to the ground" },
         // places a block at everyone's feet
         new("Place Block: Bedrock", "block_bedrock") { Price = 200, Category = "Place Blocks", Description = "Places the unbreakable bedrock block at every player's feet" },

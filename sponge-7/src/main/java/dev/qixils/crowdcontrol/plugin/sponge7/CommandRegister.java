@@ -25,7 +25,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -56,113 +55,112 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 		super.createCommands(commands);
 		registerTags();
 		// register normal commands
-		commands.addAll(Arrays.asList(
-				new VeinCommand(plugin),
-				new SoundCommand(plugin),
-				new ChargedCreeperCommand(plugin),
-				new SwapCommand(plugin),
-				new DinnerboneCommand(plugin),
-				new ClutterCommand(plugin),
-				new LootboxCommand(plugin, 0),
-				new LootboxCommand(plugin, 5),
-				new LootboxCommand(plugin, 10),
-				new TeleportCommand(plugin),
-				new ToastCommand(plugin),
-				new FreezeCommand(plugin),
-				new CameraLockCommand(plugin),
-				new FlowerCommand(plugin),
-				new FlingCommand(plugin),
-				new TorchCommand(plugin, true),
-				new TorchCommand(plugin, false),
-				new GravelCommand(plugin),
-				new DigCommand(plugin),
-				new ItemRepairCommand(plugin),
-				new ItemDamageCommand(plugin),
-				new RemoveEnchantsCommand(plugin),
-				new HatCommand(plugin),
-				// TODO: broken -- new RespawnCommand(plugin),
-				new DropItemCommand(plugin),
-				new DeleteItemCommand(plugin),
-				new BucketClutchCommand(plugin),
-				new DisableJumpingCommand(plugin),
-				new EntityChaosCommand(plugin),
-				new CameraLockToSkyCommand(plugin),
-				new CameraLockToGroundCommand(plugin),
-				new FlightCommand(plugin),
-				new KeepInventoryCommand(plugin, true),
-				new KeepInventoryCommand(plugin, false),
-				new ClearInventoryCommand(plugin),
-				new PlantTreeCommand(plugin),
-				new DoOrDieCommand(plugin),
-				new ExplodeCommand(plugin),
-				new SetTimeCommand(plugin, "time_day", DAY),
-				new SetTimeCommand(plugin, "time_night", NIGHT),
-				// manual implementation of enchanted gapple commands
-				new GiveItemCommand(plugin, ItemStack.builder()
-						.itemType(ItemTypes.GOLDEN_APPLE)
-						.quantity(1)
-						.add(Keys.GOLDEN_APPLE_TYPE, GoldenApples.ENCHANTED_GOLDEN_APPLE)
-						.build(),
-						"give_enchanted_golden_apple",
-						Component.translatable("cc.item.enchanted_golden_apple.name")
-				),
-				new TakeItemCommand(plugin, ItemTypes.GOLDEN_APPLE, GoldenApples.ENCHANTED_GOLDEN_APPLE),
-				GravityCommand.zero(plugin),
-				GravityCommand.low(plugin),
-				GravityCommand.high(plugin),
-				GravityCommand.maximum(plugin),
-				new DeleteRandomItemCommand(plugin)
+		commands.addAll(this.<Command<Player>>initAll(
+			() -> new VeinCommand(plugin),
+			() -> new SoundCommand(plugin),
+			() -> new ChargedCreeperCommand(plugin),
+			() -> new SwapCommand(plugin),
+			() -> new DinnerboneCommand(plugin),
+			() -> new ClutterCommand(plugin),
+			() -> new LootboxCommand(plugin, 0),
+			() -> new LootboxCommand(plugin, 5),
+			() -> new LootboxCommand(plugin, 10),
+			() -> new TeleportCommand(plugin),
+			() -> new ToastCommand(plugin),
+			() -> new FreezeCommand(plugin),
+			() -> new CameraLockCommand(plugin),
+			() -> new FlowerCommand(plugin),
+			() -> new FlingCommand(plugin),
+			() -> new TorchCommand(plugin, true),
+			() -> new TorchCommand(plugin, false),
+			() -> new GravelCommand(plugin),
+			() -> new DigCommand(plugin),
+			() -> new ItemRepairCommand(plugin),
+			() -> new ItemDamageCommand(plugin),
+			() -> new RemoveEnchantsCommand(plugin),
+			() -> new HatCommand(plugin),
+			// TODO: broken -- new RespawnCommand(plugin),
+			() -> new DropItemCommand(plugin),
+			() -> new DeleteItemCommand(plugin),
+			() -> new BucketClutchCommand(plugin),
+			() -> new DisableJumpingCommand(plugin),
+			() -> new EntityChaosCommand(plugin),
+			() -> new CameraLockToSkyCommand(plugin),
+			() -> new CameraLockToGroundCommand(plugin),
+			() -> new FlightCommand(plugin),
+			() -> new KeepInventoryCommand(plugin, true),
+			() -> new KeepInventoryCommand(plugin, false),
+			() -> new ClearInventoryCommand(plugin),
+			() -> new PlantTreeCommand(plugin),
+			() -> new DoOrDieCommand(plugin),
+			() -> new ExplodeCommand(plugin),
+			() -> new SetTimeCommand(plugin, "time_day", DAY),
+			() -> new SetTimeCommand(plugin, "time_night", NIGHT),
+			// manual implementation of enchanted gapple commands
+			() -> new GiveItemCommand(plugin, ItemStack.builder()
+				.itemType(ItemTypes.GOLDEN_APPLE)
+				.quantity(1)
+				.add(Keys.GOLDEN_APPLE_TYPE, GoldenApples.ENCHANTED_GOLDEN_APPLE)
+				.build(),
+				"give_enchanted_golden_apple",
+				Component.translatable("cc.item.enchanted_golden_apple.name")
+			),
+			() -> new TakeItemCommand(plugin, ItemTypes.GOLDEN_APPLE, GoldenApples.ENCHANTED_GOLDEN_APPLE),
+			() -> GravityCommand.zero(plugin),
+			() -> GravityCommand.low(plugin),
+			() -> GravityCommand.high(plugin),
+			() -> GravityCommand.maximum(plugin),
+			() -> new DeleteRandomItemCommand(plugin)
 		));
 
 		// entity commands
-		for (EntityType entity : new HashSet<>(plugin.getRegistry().getAllOf(EntityType.class))) { // for whatever reason there are some duplicated entities
-			commands.add(new SummonEntityCommand(plugin, entity));
-			commands.add(new RemoveEntityCommand(plugin, entity));
+		for (EntityType entity : new HashSet<>(plugin.getRegistry().getAllOf(EntityType.class))) {
+			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
+			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}
 
 		// register difficulty commands
 		for (Difficulty difficulty : plugin.getRegistry().getAllOf(Difficulty.class)) {
-			commands.add(new DifficultyCommand(plugin, difficulty));
+			initTo(commands, () -> new DifficultyCommand(plugin, difficulty));
 		}
 
 		// potions
 		for (PotionEffectType potionEffectType : plugin.getRegistry().getAllOf(PotionEffectType.class)) {
-			commands.add(new PotionCommand(plugin, potionEffectType));
+			initTo(commands, () -> new PotionCommand(plugin, potionEffectType));
 		}
 
 		// block sets
 		for (BlockType block : setBlocks) {
-			commands.add(new BlockCommand(plugin, block));
+			initTo(commands, () -> new BlockCommand(plugin, block));
 		}
 		// cobweb is named differently in 1.12.2 & I'm not refactoring KeyedTag to support fallbacks
-		commands.add(new BlockCommand(plugin, BlockTypes.WEB, "block_cobweb"));
+		initTo(commands, () -> new BlockCommand(plugin, BlockTypes.WEB, "block_cobweb"));
 
 		for (BlockType block : setFallingBlocks) {
-			commands.add(new FallingBlockCommand(plugin, block));
+			initTo(commands, () -> new FallingBlockCommand(plugin, block));
 		}
 
 		// weather commands
 		for (Weather weather : plugin.getRegistry().getAllOf(Weather.class)) {
-			commands.add(new WeatherCommand(plugin, weather));
+			initTo(commands, () -> new WeatherCommand(plugin, weather));
 		}
 
 		// enchantments
 		for (EnchantmentType enchantment : plugin.getRegistry().getAllOf(EnchantmentType.class)) {
-			commands.add(new EnchantmentCommand(plugin, enchantment));
+			initTo(commands, () -> new EnchantmentCommand(plugin, enchantment));
 		}
 
 		// give/take items
 		for (ItemType item : giveTakeItems) {
-			commands.add(new GiveItemCommand(plugin, item));
-			commands.add(new TakeItemCommand(plugin, item));
+			initTo(commands, () -> new GiveItemCommand(plugin, item));
+			initTo(commands, () -> new TakeItemCommand(plugin, item));
 		}
 
 		// gamemode commands
 		for (GameMode gamemode : plugin.getRegistry().getAllOf(GameMode.class)) {
 			if (gamemode.equals(GameModes.SURVIVAL))
 				continue;
-			commands.add(new GameModeCommand(plugin, gamemode,
-					gamemode.equals(GameModes.SPECTATOR) ? 8L : 15L)); // duration (in seconds)
+			initTo(commands, () -> new GameModeCommand(plugin, gamemode, gamemode.equals(GameModes.SPECTATOR) ? 8L : 15L));
 		}
 	}
 
