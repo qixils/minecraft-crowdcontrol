@@ -1,7 +1,7 @@
-## Fabric 1.19.4 Manual Installation
+## Fabric 1.19.2 Manual Installation
 
-The following steps detail how to manually set up a Minecraft Fabric 1.19.4 server
-with Crowd Control.
+The following steps detail how to manually set up a Minecraft Fabric 1.19.2 server
+with Crowd Control 2.0.
 
 ### Installing a local server
 
@@ -15,7 +15,7 @@ section may be skipped when using a remote server hosting service.
    Location to open the directory selector. Find or create a new, empty folder and click Open, then
    click OK. This folder will be important in later steps so don't lose it. From here on, this
    folder will be referred to as the "root folder".
-3. Ensure the Minecraft version is set to 1.19.4 and click the `Install` button to create the Fabric
+3. Ensure the Minecraft version is set to 1.19.2 and click the `Install` button to create the Fabric
    server. After the setup is complete, click `Download server jar` and `Generate` when prompted.
 4. Close the installer.
 
@@ -23,12 +23,12 @@ section may be skipped when using a remote server hosting service.
 
 1. Navigate to where you installed the server and create a new folder called `mods`.
 2. Download the latest build of the
-   [Fabric API](https://modrinth.com/mod/fabric-api/versions?g=1.19.4&c=release)
+   [Fabric API](https://modrinth.com/mod/fabric-api/versions?g=1.19.2&c=release)
    and place it in the `mods` folder.
 3. Download the latest build of
-   [Crowd Control for Fabric](https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=1.19.4)
+   [Crowd Control for Fabric](https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=1.19.2)
    and place it in the `mods` folder.
-4. Copy all the other Fabric 1.19.4 mods that you want to play with into the `mods` folder.
+4. Copy all the other Fabric 1.19.2 mods that you want to play with into the `mods` folder.
 5. Run the Minecraft server using the `start.bat` file on Windows or `start.sh` on Linux to
    initialize the plugin's configuration files. You will have to run it twice, as the first will
    prompt you to accept Minecraft's End User License Agreement.

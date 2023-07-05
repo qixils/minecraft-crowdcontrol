@@ -17,8 +17,8 @@ with Crowd Control.
 6. Download the
    [latest build of Crowd Control for Sponge 7](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.12.2)
    and place it in the `mods` folder.
-7. Copy all the other Forge 1.12.2 mods or Sponge 7 plugins that you want to play with into the
-   `mods` folder.
+7. (Optional) Copy all the other Forge 1.12.2 mods or Sponge 7 plugins that you want to play with
+   into the `mods` folder.
 8. Run the Minecraft server to initialize the plugin's configuration files. You will have to run it
    twice, as the first will prompt you to accept Minecraft's End User License Agreement.
    To run the server:
@@ -31,10 +31,8 @@ with Crowd Control.
       necessary if you are playing with large mods.
     - When running for the first time, you will have to edit the file `eula.txt` in a program like
       Notepad or `nano` and then run the server command again.
-9. Once you shut down the server using `/stop`, you can edit the plugin's configuration file. A
-   password must be set to use the plugin.
-    - The config file is located at `<root>/config/crowdcontrol.conf`.
-    - Be sure to enter a password into the `password` field.
+9. (Optional) Once you shut down the server using `/stop`, you can edit the plugin's configuration
+   file. The config file is located at `<root>/config/crowdcontrol.conf`.
 10. Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and
     its Crowd Control server.
 

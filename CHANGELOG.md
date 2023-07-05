@@ -2,6 +2,14 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.3
+
+- Allowed `/account link` to function once again
+- Fixed the descriptions of gravity effects
+- Fixed some broken metadata from other mods causing initialization to fail on Sponge 7
+- Added extra fail-safes to ensure broken effects don't prevent the mod from loading
+- Restored some backwards-compatibility with Crowd Control "1.0"
+
 ## 3.3.2
 
 - Improved the reliability of the account auto-detection feature

@@ -19,8 +19,10 @@ import dev.qixils.crowdcontrol.common.command.impl.maxhealth.MaxHealthCommand;
 import dev.qixils.crowdcontrol.common.command.impl.maxhealth.MaxHealthSubCommand;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Manages the registry of commands (aka effects).
@@ -39,27 +41,53 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		this.plugin = plugin;
 	}
 
+	@Nullable
+	protected final <T> T init(@NotNull Supplier<T> supplier) {
+		try {
+			return supplier.get();
+		} catch (Exception e) {
+			plugin.getSLF4JLogger().error("Failed to initialize " + supplier.getClass().getName(), e);
+			return null;
+		}
+	}
+
+	protected final <T> void initTo(@NotNull Collection<T> collection, @NotNull Supplier<? extends T> supplier) {
+		T t = init(supplier);
+		if (t != null)
+			collection.add(t);
+	}
+
+	@SafeVarargs
+	@NotNull
+	protected final <T> Collection<T> initAll(@NotNull Supplier<? extends T>... suppliers) {
+		Collection<T> collection = new ArrayList<>(suppliers.length);
+		for (Supplier<? extends T> supplier : suppliers) {
+			initTo(collection, supplier);
+		}
+		return collection;
+	}
+
 	protected void createCommands(List<Command<PLAYER>> commands) {
-		commands.addAll(Arrays.asList(
-				new HalfHealthCommand<>(plugin),
-				new MaxHealthSubCommand<>(plugin),
-				new MaxHealthAddCommand<>(plugin),
-				new MaxHealthCommand<>(plugin, 4), // used in hype trains only
-				new KillCommand<>(plugin),
-				new DamageCommand<>(plugin),
-				new FullHealCommand<>(plugin),
-				new HealCommand<>(plugin),
-				new FoodAddCommand<>(plugin),
-				new FoodSubCommand<>(plugin),
-				new FullFeedCommand<>(plugin),
-				new FullStarveCommand<>(plugin),
-				new ExpAddCommand<>(plugin),
-				new ExpSubCommand<>(plugin),
-				new ResetExpCommand<>(plugin)
+		commands.addAll(this.<Command<PLAYER>>initAll(
+			() -> new HalfHealthCommand<>(plugin),
+			() -> new MaxHealthSubCommand<>(plugin),
+			() -> new MaxHealthAddCommand<>(plugin),
+			() -> new MaxHealthCommand<>(plugin, 4), // used in hype trains only
+			() -> new KillCommand<>(plugin),
+			() -> new DamageCommand<>(plugin),
+			() -> new FullHealCommand<>(plugin),
+			() -> new HealCommand<>(plugin),
+			() -> new FoodAddCommand<>(plugin),
+			() -> new FoodSubCommand<>(plugin),
+			() -> new FullFeedCommand<>(plugin),
+			() -> new FullStarveCommand<>(plugin),
+			() -> new ExpAddCommand<>(plugin),
+			() -> new ExpSubCommand<>(plugin),
+			() -> new ResetExpCommand<>(plugin)
 		));
 
 		for (HealthModifierCommand.Modifier modifier : HealthModifierCommand.Modifier.values()) {
-			commands.add(new HealthModifierCommand<>(plugin, modifier));
+			initTo(commands, () -> new HealthModifierCommand<>(plugin, modifier));
 		}
 	}
 
@@ -126,7 +154,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	public final <T extends Command<PLAYER>> T getCommand(@NotNull Class<T> tClass) throws IllegalArgumentException {
 		if (!singleCommandInstances.containsKey(tClass))
 			throw new IllegalArgumentException("Requested class " + tClass.getName()
-					+ " is invalid. Please ensure that only one instance of this command is registered.");
+				+ " is invalid. Please ensure that only one instance of this command is registered.");
 		//noinspection unchecked
 		return (T) singleCommandInstances.get(tClass);
 	}
@@ -161,8 +189,8 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		Command<PLAYER> command = getCommandByName(name);
 		if (!expectedClass.isInstance(command))
 			throw new IllegalArgumentException("Expected command '" + name
-					+ "' to an instance of " + expectedClass.getSimpleName()
-					+ ", not " + command.getClass().getSimpleName());
+				+ "' to an instance of " + expectedClass.getSimpleName()
+				+ ", not " + command.getClass().getSimpleName());
 		//noinspection unchecked
 		return (T) command;
 	}

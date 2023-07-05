@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -227,7 +228,10 @@ public interface Plugin<P, S> {
 	 */
 	default @Nullable P asPlayer(@NotNull S sender) {
 		try {
-			return getPlayerClass().cast(sender);
+			Class<P> playerClass = getPlayerClass();
+			if (!playerClass.isInstance(sender))
+				return null;
+			return playerClass.cast(sender);
 		} catch (Exception e) {
 			return null;
 		}
@@ -277,6 +281,9 @@ public interface Plugin<P, S> {
 							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
 					if (getPlayerManager().linkPlayer(uuid, username)) {
 						updateConditionalEffectVisibility(getCrowdControl());
+						P player = asPlayer(sender);
+						if (player != null)
+							sendPlayerEvent(player, "playerJoined");
 						audience.sendMessage(output(Component.translatable(
 								"cc.command.account.link.output",
 								Component.text(username, NamedTextColor.AQUA)
@@ -999,8 +1006,7 @@ public interface Plugin<P, S> {
 			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
 		}
-		if (!isGlobal())
-			sendPlayerEvent(joiningPlayer, "playerJoined");
+		sendPlayerEvent(joiningPlayer, "playerJoined");
 		getScheduledExecutor().schedule(() -> {
 			// ensure player is still online
 			Optional<P> optPlayer = mapper.getPlayer(uuid);
@@ -1193,22 +1199,47 @@ public interface Plugin<P, S> {
 	default @NotNull List<SocketManager> getSocketManagersFor(@NotNull P player) {
 		CrowdControl cc = getCrowdControl();
 		if (cc == null) return Collections.emptyList();
+		// get player info
+		UUID uuid = playerMapper().getUniqueId(player);
+		String username = playerMapper().getUsername(player);
+		InetAddress ip = playerMapper().getIP(player).orElse(null);
+		// find managers
 		List<SocketManager> managers = new ArrayList<>();
 		for (SocketManager manager : cc.getConnections()) {
+			// check for source
 			Request.Source source = manager.getSource();
-			if (source == null)
+			if (source == null) {
+				getSLF4JLogger().debug("Skipping SocketManager {} in search for player {}'s sockets for lack of source", manager, username);
 				continue;
+			}
 			boolean found = false;
+			// search for matching data from the app (user-provided name or app-guessed UUID)
 			if (source.login() != null) {
 				LoginData data = new LoginData(source.login());
-				if (playerMapper().getUniqueId(player).equals(data.getId()) || playerMapper().getUsername(player).equalsIgnoreCase(data.getName()))
+				if (uuid.equals(data.getId()) || username.equalsIgnoreCase(data.getName()))
 					found = true;
 			}
-			if (!found && isAutoDetectIP() && source.ip() != null && source.ip().equals(playerMapper().getIP(player).orElse(null))) {
+			// else search for matching data from the game (user-provided twitch account)
+			if (!found && source.target() != null) {
+				String name = source.target().getName();
+				String login = source.target().getLogin();
+				for (String account : getPlayerManager().getLinkedAccounts(uuid)) {
+					if (account.equalsIgnoreCase(name) || account.equalsIgnoreCase(login)) {
+						found = true;
+						break;
+					}
+				}
+			}
+			// else check if CC app client's IP matches the player's IP
+			if (!found && isAutoDetectIP() && source.ip() != null && source.ip().equals(ip)) {
 				found = true;
 			}
+			// add manager if found
 			if (found) {
+				getSLF4JLogger().debug("Found SocketManager {} for player {}", manager, username);
 				managers.add(manager);
+			} else {
+				getSLF4JLogger().debug("Skipping SocketManager {} in search for player {}'s sockets for lack of matching data", manager, username);
 			}
 		}
 		return managers;
