@@ -751,15 +751,15 @@ public interface Plugin<P, S> {
 				.internal(true);
 		boolean success = force;
 		if (force) {
-			getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, login, service.getSource());
+			getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, login, service.getDisplayName());
 			builder.putData("player", login).send();
 		} else {
-			getSLF4JLogger().info("Sources for service: {}", service.getSources());
+			getSLF4JLogger().info("Sources for service {}: {}", service.getDisplayName(), service.getSources());
 			Optional<P> optPlayer = Optional.ofNullable(login).flatMap(playerMapper()::getPlayerByLogin);
 			if (optPlayer.isPresent()) {
 				success = true;
 				P player = optPlayer.get();
-				getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, playerMapper().getUsername(player), service.getSource());
+				getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, playerMapper().getUsername(player), service.getDisplayName());
 				builder.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH)).send();
 			}
 		}
