@@ -44,7 +44,7 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
 		for (Request.Source source : cc.getSources()) {
 			if (!target.equalsRoughly(source.target())) {
-				getPlugin().getSLF4JLogger().info("Skipping source {} because it does not match target {}", source, target);
+				getPlugin().getSLF4JLogger().debug("Skipping source {} because it does not match target {}", source, target);
 				continue;
 			}
 
@@ -55,7 +55,7 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 				player = mapper.getPlayer(source.ip()).orElse(null);
 
 			if (player != null) {
-				getPlugin().getSLF4JLogger().info("Found player {} from source {} (matches target {})", player, source, target);
+				getPlugin().getSLF4JLogger().debug("Found player {} from source {} (matches target {})", player, source, target);
 				uuids.add(mapper.getUniqueId(player));
 			} else {
 				getPlugin().getSLF4JLogger().info("Failed to find player from source {}", source);
