@@ -28,7 +28,8 @@ section may be skipped when using a remote server hosting service.
 3. Download the latest build of
    [Crowd Control for Fabric](https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=1.19.2)
    and place it in the `mods` folder.
-4. Copy all the other Fabric 1.19.2 mods that you want to play with into the `mods` folder.
+4. (Optional) Copy all the other Fabric 1.19.2 mods that you want to play with into the `mods`
+   folder.
 5. Run the Minecraft server using the `start.bat` file on Windows or `start.sh` on Linux to
    initialize the plugin's configuration files. You will have to run it twice, as the first will
    prompt you to accept Minecraft's End User License Agreement.
