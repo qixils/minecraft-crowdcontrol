@@ -17,7 +17,8 @@ for SpongeForge 1.16.5.
 6. Download the latest build of
    [Crowd Control for Sponge 8](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.16.5)
    and place it in the `plugins` folder.
-7. (Optional) Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with
+7. (Optional) Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with,
+   such as [my mod that emulates 1.16.1 speedrunning](https://modrinth.com/mod/depiglining/versions?g=1.16.5&l=forge),
    into the `mods` folder and the `plugins` folder respectively. Please be sure to read
    [this section of the troubleshooting guide](sponge_8_troubleshooting.md#incompatible-mods)
    to ensure you do not install any incompatible mods.
