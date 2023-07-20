@@ -19,7 +19,9 @@ with Crowd Control.
    [latest build of Crowd Control for Sponge 8](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.16.5)
    and place it in the `plugins` folder.
 8. (Optional) Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with
-   into the `mods` folder and the `plugins` folder respectively.
+   into the `mods` folder and the `plugins` folder respectively. Please be sure to read
+   [this section of the troubleshooting guide](sponge_8_troubleshooting.md#incompatible-mods)
+   to ensure you do not install any incompatible mods.
 9. Run the Minecraft server to initialize the plugin's configuration files. You will have to run it
    twice, as the first will prompt you to accept Minecraft's End User License Agreement.
    To run the server:
