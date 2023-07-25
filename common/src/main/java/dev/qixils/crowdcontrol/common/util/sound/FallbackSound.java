@@ -15,6 +15,7 @@ class FallbackSound extends AbstractCollectionSound {
 
 	@Override
 	public @NotNull Optional<Sound> get(@Nullable Predicate<@NotNull Key> validator, Object... args) {
+		// TODO: allow failing sounds from non-minecraft namespace
 		if (validator == null)
 			return Optional.of(sounds.get(0));
 		for (Sound sound : sounds) {

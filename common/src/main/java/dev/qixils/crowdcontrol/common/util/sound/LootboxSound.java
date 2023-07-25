@@ -14,12 +14,12 @@ import java.util.function.Predicate;
 
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
-public final class LootboxSound implements DynamicSound {
-	private static final Logger logger = LoggerFactory.getLogger(DynamicSound.class);
+final class LootboxSound implements DynamicSound {
+	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/LootboxSound");
 	// sounds
 	private static final Source SOURCE = Source.PLAYER;
 	private static final DynamicSound STANDARD = new FallbackSound(
-			SOURCE, 1f, 1f,
+			SOURCE, 1f, 1.2f,
 			Key.key(MINECRAFT_NAMESPACE, "block.note_block.chime"),
 			Key.key(MINECRAFT_NAMESPACE, "block.note.chime") // 1.12.2
 	);
@@ -29,7 +29,7 @@ public final class LootboxSound implements DynamicSound {
 			Key.key(MINECRAFT_NAMESPACE, "block.note.chime") // 1.12.2
 	);
 	private static final DynamicSound EXTRA_LUCKY = new FallbackSound(
-			SOURCE, 0.3f, 1f,
+			SOURCE, 0.3f, 1.1f,
 			Key.key(MINECRAFT_NAMESPACE, "ui.toast.challenge_complete")
 	);
 
@@ -42,7 +42,7 @@ public final class LootboxSound implements DynamicSound {
 		else if (args[0] instanceof Integer)
 			luck = (int) args[0];
 		else {
-			logger.warn("An invalid argument array was passed into LootboxSound: " + Arrays.toString(args));
+			logger.warn("An invalid argument array was passed: " + Arrays.toString(args));
 			luck = 0;
 		}
 

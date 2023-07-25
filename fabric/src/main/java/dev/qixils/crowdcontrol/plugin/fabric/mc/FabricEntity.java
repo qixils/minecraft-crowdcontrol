@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 @RequiredArgsConstructor
 public class FabricEntity implements CCEntity {
 
-	protected static final Logger logger = LoggerFactory.getLogger(FabricEntity.class);
+	protected static final Logger logger = LoggerFactory.getLogger("CrowdControl/Entity");
 	private final @NotNull Entity entity;
 
 	@Override

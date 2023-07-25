@@ -50,13 +50,7 @@ public final class Sounds {
 	/**
 	 * The sound to play when a lootbox is opened.
 	 */
-	public static final DynamicSound LOOTBOX_CHIME = new FallbackSound(
-			Source.PLAYER,
-			1f,
-			1.2f,
-			Key.key(MINECRAFT_NAMESPACE, "block.note_block.chime"),
-			Key.key(MINECRAFT_NAMESPACE, "block.note.chime") // 1.12.2
-	);
+	public static final DynamicSound LOOTBOX_CHIME = new LootboxSound();
 
 	/**
 	 * The sound to play upon completion of a Do-or-Die task.

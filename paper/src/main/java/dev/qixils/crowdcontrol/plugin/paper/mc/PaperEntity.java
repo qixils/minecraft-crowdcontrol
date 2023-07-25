@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class PaperEntity implements CCEntity {
 
-	protected static final Logger logger = LoggerFactory.getLogger(PaperEntity.class);
+	protected static final Logger logger = LoggerFactory.getLogger("CrowdControl/Entity");
 
 	private final Entity entity;
 

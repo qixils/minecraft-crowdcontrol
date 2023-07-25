@@ -13,7 +13,7 @@ import java.util.EnumMap;
 import java.util.Locale;
 
 public class MovementStatusImpl implements MovementStatus {
-	private static final Logger logger = LoggerFactory.getLogger("MovementStatus");
+	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/MovementStatus");
 	private final @NotNull Player provider;
 	private final @NotNull EnumMap<Type, Value> prohibited = new EnumMap<>(Type.class);
 

@@ -2,6 +2,11 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.4
+
+- Added unique sound for Open Lucky Lootbox
+- Added `CrowdControl` to the prefix of all log messages for easier filtering
+
 ## 3.3.3
 
 - Allowed `/account link` to function once again
