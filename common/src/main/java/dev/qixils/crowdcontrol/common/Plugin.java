@@ -126,6 +126,21 @@ public interface Plugin<P extends S, S> {
 			.build();
 
 	/**
+	 * Gets whether effect redemption is currently paused.
+	 *
+	 * @return true if effect redemption is paused
+	 */
+	@CheckReturnValue
+	boolean isPaused();
+
+	/**
+	 * Sets whether effect redemption is currently paused.
+	 *
+	 * @param paused true if effect redemption should be paused
+	 */
+	void setPaused(boolean paused);
+
+	/**
 	 * Registers the plugin's basic chat commands.
 	 */
 	default void registerChatCommands() {
@@ -192,8 +207,7 @@ public interface Plugin<P extends S, S> {
 
 		// base command
 		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
-				.meta(CommandMeta.DESCRIPTION, "Manage the Crowd Control socket")
-				.permission(this::isAdmin);
+				.meta(CommandMeta.DESCRIPTION, "Manage and query information about the Crowd Control service");
 
 		// connect command
 		final Component serviceNotDisconnected = TextBuilder.fromPrefix(PREFIX,
@@ -202,6 +216,7 @@ public interface Plugin<P extends S, S> {
 				"Service has been re-enabled and will be attempted in the background").build();
 		manager.command(ccCmd.literal("connect")
 				.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
+				.permission(this::isAdmin)
 				.handler(commandContext -> {
 					Audience sender = asAudience(commandContext.getSender());
 					if (getCrowdControl() != null)
@@ -218,6 +233,7 @@ public interface Plugin<P extends S, S> {
 				"Service has been disabled").build();
 		manager.command(ccCmd.literal("disconnect")
 				.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
+				.permission(this::isAdmin)
 				.handler(commandContext -> {
 					Audience sender = asAudience(commandContext.getSender());
 					if (getCrowdControl() == null)
@@ -233,6 +249,7 @@ public interface Plugin<P extends S, S> {
 				"Service has been reset").build();
 		manager.command(ccCmd.literal("reconnect")
 				.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
+				.permission(this::isAdmin)
 				.handler(commandContext -> {
 					Audience audience = asAudience(commandContext.getSender());
 					CrowdControl cc = getCrowdControl();
@@ -249,6 +266,16 @@ public interface Plugin<P extends S, S> {
 				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
 				.handler(commandContext -> asAudience(commandContext.getSender()).sendMessage(
 						getCrowdControl() == null ? notRunning : isRunning)));
+		// toggle command
+		final Component nowPaused = TextBuilder.fromPrefix(PREFIX, "&cEffect redemption has been paused").build();
+		final Component nowResumed = TextBuilder.fromPrefix(PREFIX, "&aEffect redemption has been resumed").build();
+		manager.command(ccCmd.literal("toggle")
+				.meta(CommandMeta.DESCRIPTION, "Toggle whether to accept incoming requests")
+				.permission(this::isAdmin)
+				.handler(ctx -> {
+					setPaused(!isPaused());
+					asAudience(ctx.getSender()).sendMessage(isPaused() ? nowPaused : nowResumed);
+				}));
 
 		//// Password Command ////
 		final Component passwordSuccessMessage = TextBuilder.fromPrefix(Plugin.PREFIX)

@@ -91,6 +91,11 @@ public interface Command<P> {
 	 */
 	default void executeAndNotify(@NotNull Request request) {
 		Plugin<P, ? super P> plugin = getPlugin();
+		if (plugin.isPaused()) {
+			request.buildResponse().type(ResultType.FAILURE).message("Effects are currently paused").send();
+			return;
+		}
+
 		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
 		List<P> players = plugin.getPlayers(request);
 

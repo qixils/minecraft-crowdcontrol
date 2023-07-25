@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.common;
 
 import dev.qixils.crowdcontrol.CrowdControl;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +34,9 @@ public abstract class AbstractPlugin<P extends S, S> implements Plugin<P, S> {
 	protected boolean adminRequired = false;
 	@Getter
 	protected Collection<String> hosts = Collections.emptyList();
+	@Getter
+	@Setter
+	protected boolean paused = false;
 
 	protected AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;

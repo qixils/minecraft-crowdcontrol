@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -72,6 +73,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private boolean announce = true;
 	@Getter
 	private boolean adminRequired = false;
+	@Getter
+	@Setter
+	private boolean paused = false;
 
 	@Override
 	public void onLoad() {
