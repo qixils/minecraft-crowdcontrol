@@ -351,7 +351,7 @@ public interface Command<P> {
 					getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
 			));
 		} catch (Exception e) {
-			LoggerFactory.getLogger(Command.class).warn("Failed to announce effect", e);
+			LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
 		}
 	}
 

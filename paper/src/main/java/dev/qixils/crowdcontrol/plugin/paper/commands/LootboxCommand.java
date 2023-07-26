@@ -37,7 +37,7 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.getClazz
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-	private static final List<Material> ITEMS = Arrays.stream(Material.values()).filter(Material::isItem).toList();
+	private static final List<Material> ITEMS = Arrays.stream(Material.values()).filter(mat -> mat.isItem() && !mat.isAir()).toList();
 	private static final Set<Material> GOOD_ITEMS = ITEMS.stream().filter(material ->
 			material.getMaxDurability() > 1
 					|| material == Material.GOLDEN_APPLE

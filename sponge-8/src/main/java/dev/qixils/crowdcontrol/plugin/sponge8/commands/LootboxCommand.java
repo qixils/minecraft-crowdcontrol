@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -74,7 +75,7 @@ public class LootboxCommand extends ImmediateCommand {
 		this.effectName = effectName.toString();
 
 		// create item collections
-		allItems = plugin.getGame().registry(RegistryTypes.ITEM_TYPE).stream().collect(Collectors.toList());
+		allItems = plugin.getGame().registry(RegistryTypes.ITEM_TYPE).stream().filter(it -> it != ItemTypes.AIR.get()).collect(Collectors.toList());
 		goodItems = allItems.stream()
 				.filter(itemType ->
 						ItemStack.of(itemType).get(Keys.MAX_DURABILITY).orElse(0) > 1

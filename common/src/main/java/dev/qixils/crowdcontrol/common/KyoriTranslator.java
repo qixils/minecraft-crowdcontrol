@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements TranslationRegistry {
-	private static final Logger logger = LoggerFactory.getLogger("KyoriTranslator");
+	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/KyoriTranslator");
 	private final String prefix;
 	private final TranslationRegistry translator;
 	private final ClassLoader pluginClassLoader;

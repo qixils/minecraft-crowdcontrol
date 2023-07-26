@@ -18,7 +18,8 @@ Users of other launchers should find and download the mod from Modrinth or Curse
 6. Download the latest build of
    [Crowd Control for Fabric](https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=1.20.1)
    and place it in the `mods` folder.
-7. Copy all the other Fabric 1.20.1 mods that you want to play with into the `mods` folder.
+7. (Optional) Copy all the other Fabric 1.20.1 mods that you want to play with into the `mods`
+   folder.
 
 You may now [join a Crowd Control server](fabric_joining_a_server.md) or
 [start a single player session](#starting-a-single-player-session).

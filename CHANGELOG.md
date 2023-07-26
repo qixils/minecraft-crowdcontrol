@@ -2,6 +2,14 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.4
+
+- Added a unique sound effect for Open Lucky Lootbox
+- Removed air from the Lootbox loot table
+- Added `CrowdControl` to the prefix of all log messages for easier filtering
+- Added new `/crowdcontrol version` command to display the version of the mod
+- Added extra diagnostic information to `/crowdcontrol status`
+
 ## 3.3.3
 
 - Allowed `/account link` to function once again

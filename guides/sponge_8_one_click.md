@@ -11,8 +11,10 @@ The following steps provide a quick setup for running a local game server.
 7. Select **Click to install** and **Okay**.
 8. (Optional) You may now select **Open Folder** next to **Minecraft** on the **Game Paths** tab and
    copy any Forge 1.16.5 mods you want to play with into the `Sponge8/mods` folder. If you're
-   playing a modpack, you may also have to copy the modpack's `config` folder into the `Sponge8`
-   folder.
+   playing a modpack, you should instead extract the modpack's server pack into the `Sponge8`
+   folder. You should also read
+   [this section of the troubleshooting guide](sponge_8_troubleshooting.md#incompatible-mods)
+   to ensure you do not install any incompatible mods.
 9. In the **Live** tab, select **Launch Server**.
 10. Launch your instance of Minecraft 1.16.5. If you added any mods to the server, your client will
     need to have the same mods installed.
