@@ -29,7 +29,7 @@ final class LootboxSound implements DynamicSound {
 			Key.key(MINECRAFT_NAMESPACE, "block.note.chime") // 1.12.2
 	);
 	private static final DynamicSound EXTRA_LUCKY = new FallbackSound(
-			SOURCE, 0.3f, 1.1f,
+			SOURCE, 0.3f, 1f,
 			Key.key(MINECRAFT_NAMESPACE, "ui.toast.challenge_complete")
 	);
 

@@ -72,7 +72,7 @@ public class LootboxCommand extends ImmediateCommand {
 		this.effectName = effectName.toString();
 
 		// create item collections
-		allItems = BuiltInRegistries.ITEM.stream().toList();
+		allItems = BuiltInRegistries.ITEM.stream().filter(it -> it != Items.AIR).toList();
 		goodItems = allItems.stream()
 				.filter(itemType ->
 						itemType.getMaxDamage() > 1
