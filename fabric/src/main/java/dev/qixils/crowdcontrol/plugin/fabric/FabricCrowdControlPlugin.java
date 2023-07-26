@@ -220,6 +220,11 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
+	public boolean canGetModVersion() {
+		return true;
+	}
+
+	@Override
 	public @NotNull Optional<SemVer> getModVersion(@NotNull ServerPlayer player) {
 		return Optional.ofNullable(clientVersions.get(player.getUUID()));
 	}
