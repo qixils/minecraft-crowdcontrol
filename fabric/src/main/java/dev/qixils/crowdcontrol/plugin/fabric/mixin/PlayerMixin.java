@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("DataFlowIssue")
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity {
 
@@ -24,7 +25,7 @@ public abstract class PlayerMixin extends LivingEntity {
 
 	@Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
 	public void jumpFromGround(CallbackInfo ci) {
-		Jump event = new Jump((Player) (Object) this, this.level.isClientSide);
+		Jump event = new Jump((Player) (Object) this, this.level().isClientSide);
 		event.fire();
 		if (event.cancelled())
 			ci.cancel();

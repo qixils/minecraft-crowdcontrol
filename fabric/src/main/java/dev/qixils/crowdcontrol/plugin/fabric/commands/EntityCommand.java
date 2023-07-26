@@ -48,12 +48,12 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 
 	default Response.@Nullable Builder tryExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		for (ServerPlayer player : players) {
-			if (isMonster() && levelIsPeaceful(player.getLevel())) {
+			if (isMonster() && levelIsPeaceful(player.serverLevel())) {
 				return request.buildResponse()
 						.type(Response.ResultType.FAILURE)
 						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
 			}
-			if (!isEnabled(player.getLevel().enabledFeatures())) {
+			if (!isEnabled(player.serverLevel().enabledFeatures())) {
 				return request.buildResponse()
 						.type(Response.ResultType.UNAVAILABLE)
 						.message("Mob is not available in this version of Minecraft");

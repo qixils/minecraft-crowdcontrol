@@ -47,7 +47,7 @@ public class TeleportCommand extends ImmediateCommand {
 						.count(100)
 						.distance(.5f, 1f, .5f)
 						.send();
-				plugin.adventure().world(player.level.dimension().location()).playSound(
+				plugin.adventure().world(player.serverLevel().dimension().location()).playSound(
 						Sounds.TELEPORT.get(),
 						Sound.Emitter.self()
 				);

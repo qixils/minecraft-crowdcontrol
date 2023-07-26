@@ -45,7 +45,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 	@Override
 	public void onSoftLock(ServerPlayer player) {
 		// kill nearby monsters
-		for (Mob entity : player.getLevel().getNearbyEntities(
+		for (Mob entity : player.serverLevel().getNearbyEntities(
 				Mob.class,
 				conditions,
 				player,
@@ -59,7 +59,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {
 			for (int y = -SEARCH_VERT; y <= SEARCH_VERT; y++) {
 				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
-					ServerLevel level = player.getLevel();
+					ServerLevel level = player.serverLevel();
 					BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
 					BlockState block = level.getBlockState(pos);
 					if (dangerousBlocks.contains(block.getBlock()))

@@ -33,6 +33,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootDataType;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,7 +89,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	private List<ResourceLocation> getLootTables(MinecraftServer server) {
 		if (lootTables != null)
 			return lootTables;
-		return lootTables = server.getLootTables().getIds().stream().filter(location -> location.getPath().startsWith("chests/")).toList();
+		return lootTables = server.getLootData().getKeys(LootDataType.TABLE).stream().filter(location -> location.getPath().startsWith("chests/")).toList();
 	}
 
 	@NotNull
@@ -128,8 +129,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 
 	@Blocking
 	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
-		ServerLevel level = player.getLevel();
-		E entity = entityType.create(player.level);
+		ServerLevel level = player.serverLevel();
+		E entity = entityType.create(player.serverLevel());
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
