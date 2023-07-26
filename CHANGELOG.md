@@ -4,10 +4,11 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.3.4
 
-- Added unique sound for Open Lucky Lootbox
+- Added a unique sound effect for Open Lucky Lootbox
 - Removed air from the Lootbox loot table
 - Added `CrowdControl` to the prefix of all log messages for easier filtering
-- Added `/crowdcontrol version` to display information about the installed mod
+- Added new `/crowdcontrol version` command to display the version of the mod
+- Added extra diagnostic information to `/crowdcontrol status`
 
 ## 3.3.3
 
