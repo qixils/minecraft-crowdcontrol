@@ -173,13 +173,11 @@ public interface Plugin<P, S> {
 	);
 
 	/**
-	 * A warning message sent to players when they join the server if they have no Twitch account
-	 * linked.
+	 * A warning message sent to players when they join the server if they have no stream account linked.
 	 */
 	Component JOIN_MESSAGE_2 = translatable(
 		"cc.join.link.text",
-		TextColor.color(0xF1D4FC),
-		text("/account link <username>", NamedTextColor.GOLD)
+		TextColor.color(0xF1D4FC)
 	)
 		.hoverEvent(translatable("cc.join.link.hover"))
 		.clickEvent(ClickEvent.suggestCommand("/account link "));
@@ -262,19 +260,19 @@ public interface Plugin<P, S> {
 
 		// base command
 		Builder<S> account = manager.commandBuilder("account")
-			.meta(CommandMeta.DESCRIPTION, "Manage your connected Twitch account(s)")
+			.meta(CommandMeta.DESCRIPTION, "Manage your connected stream account(s)")
 			.permission(sender -> !isAdminRequired() || mapper.isAdmin(sender));
 
 		// link command
 		manager.command(account.literal("link")
-			.meta(CommandMeta.DESCRIPTION, "Link a Twitch account to your Minecraft account")
+			.meta(CommandMeta.DESCRIPTION, "Link a stream account to your Minecraft account")
 			.argument(
 				StringArgument.<S>builder("username")
 					.single()
 					.asRequired()
 					.manager(manager)
 					.build(),
-				ArgumentDescription.of("The username of the Twitch account to link")
+				ArgumentDescription.of("The username of the stream account to link")
 			)
 			.handler(commandContext -> {
 				String username = commandContext.get("username");
@@ -301,7 +299,7 @@ public interface Plugin<P, S> {
 			}));
 		// unlink command
 		manager.command(account.literal("unlink")
-			.meta(CommandMeta.DESCRIPTION, "Unlink a Twitch account from your Minecraft account")
+			.meta(CommandMeta.DESCRIPTION, "Unlink a stream account from your Minecraft account")
 			.argument(
 				StringArgument.<S>builder("username")
 					.single()
@@ -325,7 +323,7 @@ public interface Plugin<P, S> {
 						return new ArrayList<>(suggestions);
 					})
 					.build(),
-				ArgumentDescription.of("The username of the Twitch account to unlink")
+				ArgumentDescription.of("The username of the stream account to unlink")
 			)
 			.handler(commandContext -> {
 				String username = commandContext.get("username");
@@ -472,7 +470,7 @@ public interface Plugin<P, S> {
 							return new ArrayList<>(suggestions);
 						})
 						.build(),
-					ArgumentDescription.of("The username of the Twitch account to unlink")
+					ArgumentDescription.of("The username of the stream account to unlink")
 				)
 				.handler(commandContext -> {
 					// TODO: allow targeting multiple players
@@ -625,7 +623,7 @@ public interface Plugin<P, S> {
 	 * "Hosts" are defined as streamers whose incoming requests should apply to all online players
 	 * instead of just that streamer.
 	 *
-	 * @return a collection of strings possibly containing Twitch usernames, IDs, Minecraft
+	 * @return a collection of strings possibly containing stream usernames, IDs, Minecraft
 	 * usernames, or Minecraft UUIDs
 	 */
 	@CheckReturnValue
@@ -1280,7 +1278,7 @@ public interface Plugin<P, S> {
 				if (uuid.equals(data.getId()) || username.equalsIgnoreCase(data.getName()))
 					found = true;
 			}
-			// else search for matching data from the game (user-provided twitch account)
+			// else search for matching data from the game (user-provided stream account)
 			if (!found && source.target() != null) {
 				String name = source.target().getName();
 				String login = source.target().getLogin();

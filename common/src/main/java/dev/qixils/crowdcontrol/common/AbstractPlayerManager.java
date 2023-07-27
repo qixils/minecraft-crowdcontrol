@@ -16,26 +16,26 @@ import java.util.*;
  */
 public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
-	private final Multimap<String, UUID> twitchToUserMap =
+	private final Multimap<String, UUID> streamToPlayerMap =
 			Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
 
 	@Override
-	public boolean linkPlayer(@NotNull UUID uuid, @NotNull String twitchUsername) {
-		return twitchToUserMap.put(twitchUsername.toLowerCase(Locale.ENGLISH), uuid);
+	public boolean linkPlayer(@NotNull UUID uuid, @NotNull String username) {
+		return streamToPlayerMap.put(username.toLowerCase(Locale.ENGLISH), uuid);
 	}
 
 	@Override
-	public boolean unlinkPlayer(@NotNull UUID uuid, @NotNull String twitchUsername) {
-		return twitchToUserMap.remove(twitchUsername.toLowerCase(Locale.ENGLISH), uuid);
+	public boolean unlinkPlayer(@NotNull UUID uuid, @NotNull String username) {
+		return streamToPlayerMap.remove(username.toLowerCase(Locale.ENGLISH), uuid);
 	}
 
 	@Override
 	public @NotNull Set<UUID> getLinkedPlayers(@NotNull Request.Target target) {
 		Set<UUID> uuids = new HashSet<>();
 		if (target.getName() != null)
-			uuids.addAll(twitchToUserMap.get(target.getName().toLowerCase(Locale.ENGLISH)));
+			uuids.addAll(streamToPlayerMap.get(target.getName().toLowerCase(Locale.ENGLISH)));
 		if (target.getLogin() != null)
-			uuids.addAll(twitchToUserMap.get(target.getLogin().toLowerCase(Locale.ENGLISH)));
+			uuids.addAll(streamToPlayerMap.get(target.getLogin().toLowerCase(Locale.ENGLISH)));
 
 		CrowdControl cc = getPlugin().getCrowdControl();
 		if (cc == null)
@@ -68,6 +68,6 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 	@Override
 	public @NotNull Collection<String> getLinkedAccounts(@NotNull UUID uuid) {
 		// TODO: optimize
-		return Multimaps.invertFrom(twitchToUserMap, HashMultimap.create(twitchToUserMap.size(), 1)).get(uuid);
+		return Multimaps.invertFrom(streamToPlayerMap, HashMultimap.create(streamToPlayerMap.size(), 1)).get(uuid);
 	}
 }
