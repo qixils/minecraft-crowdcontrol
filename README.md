@@ -18,6 +18,8 @@
   </a>
 </h1>
 
+[![Crowd Control banner](https://i.qixils.dev/cc-banner.png)](https://crowdcontrol.live)
+
 Minecraft Crowd Control is a Minecraft mod for various platforms that allows your livestream
 viewers to interact with your game using tips, bits, channel points, donations to charity, and more.
 It can run as a client mod or as a server plugin.
