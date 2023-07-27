@@ -9,6 +9,7 @@ A list of all changes made to the software in reverse chronological order.
 - Added `CrowdControl` to the prefix of all log messages for easier filtering
 - Added new `/crowdcontrol version` command to display the version of the mod
 - Added extra diagnostic information to `/crowdcontrol status`
+- Fixed warnings about duplicate effects on some modpacks
 
 ## 3.3.3
 
