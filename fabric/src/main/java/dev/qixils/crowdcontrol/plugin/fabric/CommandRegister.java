@@ -123,8 +123,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 		Map<String, EntityType<?>> minecraftEntities = new HashMap<>();
 		Map<String, EntityType<?>> moddedEntities = new HashMap<>();
 		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
-			Map<String, EntityType<?>> entities = entry.getKey().location().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			String id = csIdOf(entry.getKey().location());
+			if (!CommandConstants.ENTITIES.contains(id)) continue;
+			Map<String, EntityType<?>> entities = entry.getKey().location().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			entities.put(id, entry.getValue());
 		}
 		for (Map.Entry<String, EntityType<?>> entry : moddedEntities.entrySet()) {

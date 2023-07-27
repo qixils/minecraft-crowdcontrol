@@ -18,9 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
@@ -199,7 +197,7 @@ public class CommandConstants {
 	 */
 	public static final Component POPUP_TITLE = Component.translatable("cc.effect.toast.title");
 
-	// tags
+	// tags | TODO: probably deprecate these to allow backport mods?
 
 	/**
 	 * Collection of items to be used in the Give Item and Take Item commands.
@@ -263,6 +261,100 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "redstone_wall_torch"),
 			Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
 	);
+
+	/**
+	 * Collection of whitelisted spawnable entities.
+	 * These names generally match those of the {@code EntityType} enum from Bukkit.
+	 */
+	public static final @NotNull Set<String> ENTITIES = new HashSet<>(Arrays.asList(
+		"allay",
+		"armor_stand",
+		"axolotl",
+		"bat",
+		"bee",
+		"blaze",
+		"boat",
+		"chest_boat",
+		"camel",
+		"cat",
+		"cave_spider",
+		"charged_creeper",
+		"chicken",
+		"cod",
+		"cow",
+		"creeper",
+		"dolphin",
+		"donkey",
+		"drowned",
+		"elder_guardian",
+		"ender_dragon",
+		"enderman",
+		"endermite",
+		"evoker",
+		"fox",
+		"frog",
+		"ghast",
+		"giant",
+		"glow_squid",
+		"goat",
+		"guardian",
+		"hoglin",
+		"horse",
+		"husk",
+		"illusioner",
+		"iron_golem",
+		"lightning",
+		"llama",
+		"magma_cube",
+		"minecart",
+		"minecart_chest",
+		"mushroom_cow",
+		"mule",
+		"ocelot",
+		"panda",
+		"parrot",
+		"phantom",
+		"pig",
+		"piglin",
+		"piglin_brute",
+		"pillager",
+		"polar_bear",
+		"primed_tnt",
+		"pufferfish",
+		"rabbit",
+		"ravager",
+		"salmon",
+		"sheep",
+		"shulker",
+		"silverfish",
+		"skeleton",
+		"skeleton_horse",
+		"slime",
+		"sniffer",
+		"snowman",
+		"spider",
+		"squid",
+		"stray",
+		"strider",
+		"tadpole",
+		"trader_llama",
+		"tropical_fish",
+		"turtle",
+		"vex",
+		"villager",
+		"vindicator",
+		"wandering_trader",
+		"warden",
+		"witch",
+		"wither",
+		"wither_skeleton",
+		"wolf",
+		"zoglin",
+		"zombie",
+		"zombie_horse",
+		"zombie_villager",
+		"zombified_piglin"
+	));
 
 	// do-or-die
 	/**

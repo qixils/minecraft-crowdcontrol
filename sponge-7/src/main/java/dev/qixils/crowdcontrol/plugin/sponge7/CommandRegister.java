@@ -123,8 +123,9 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 		for (EntityType entity : new HashSet<>(plugin.getRegistry().getAllOf(EntityType.class))) {
 			Key key = SpongeTextUtil.asKey(entity);
 			if (key == null) continue;
-			Map<String, EntityType> entities = key.namespace().equals(Key.MINECRAFT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			String id = SpongeTextUtil.csIdOf(entity);
+			if (!CommandConstants.ENTITIES.contains(id)) continue;
+			Map<String, EntityType> entities = key.namespace().equals(Key.MINECRAFT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			entities.put(id, entity);
 		}
 		for (Map.Entry<String, EntityType> entry : moddedEntities.entrySet()) {

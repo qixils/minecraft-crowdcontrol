@@ -99,8 +99,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 		Map<String, EntityType<?>> minecraftEntities = new HashMap<>();
 		Map<String, EntityType<?>> moddedEntities = new HashMap<>();
 		plugin.getGame().registry(RegistryTypes.ENTITY_TYPE).streamEntries().forEach(entry -> {
-			Map<String, EntityType<?>> entities = entry.key().namespace().equals(Key.MINECRAFT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			String id = SpongeTextUtil.csIdOf(entry.key());
+			if (!CommandConstants.ENTITIES.contains(id)) return;
+			Map<String, EntityType<?>> entities = entry.key().namespace().equals(Key.MINECRAFT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			entities.put(id, entry.value());
 		});
 		for (Map.Entry<String, EntityType<?>> entry : moddedEntities.entrySet()) {

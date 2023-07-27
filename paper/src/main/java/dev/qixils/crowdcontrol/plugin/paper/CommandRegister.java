@@ -88,7 +88,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 
 		// entity commands
 		for (EntityType entity : EntityType.values()) {
-			if (entity == EntityType.UNKNOWN) continue;
+			if (!CommandConstants.ENTITIES.contains(entity.name())) continue;
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}

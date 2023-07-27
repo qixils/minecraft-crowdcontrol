@@ -26,8 +26,8 @@ public class SpongeTextUtil extends TextUtilImpl {
 	public static String csIdOf(Keyed type) {
 		Key key = type.key();
 		String value = key.value();
-		if (!key.namespace().equals(MINECRAFT_NAMESPACE))
-			return key.value();
+//		if (!key.namespace().equals(MINECRAFT_NAMESPACE))
+//			return key.value();
 
 		switch (value) {
 			case "lightning_bolt":
