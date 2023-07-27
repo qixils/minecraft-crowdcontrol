@@ -1,11 +1,23 @@
-# Minecraft Crowd Control [![Release](https://img.shields.io/github/v/release/qixils/minecraft-crowdcontrol?label=Release&logo=github)](https://github.com/qixils/minecraft-crowdcontrol/releases/latest) [![Release](https://img.shields.io/github/v/release/qixils/minecraft-crowdcontrol?include_prereleases&label=Pre-Release&logo=github&color=orange)](https://github.com/qixils/minecraft-crowdcontrol/releases)
+<div style="text-align: center;">
+
+# Minecraft Crowd Control
+
+[![Release](https://img.shields.io/github/v/release/qixils/minecraft-crowdcontrol?label=release&logo=github)](https://github.com/qixils/minecraft-crowdcontrol/releases/latest)
+[![Pre-release](https://img.shields.io/github/v/release/qixils/minecraft-crowdcontrol?include_prereleases&label=pre-release&logo=github&color=orange)](https://github.com/qixils/minecraft-crowdcontrol/releases)
+
+[![GitHub](https://img.shields.io/github/downloads/qixils/minecraft-crowdcontrol/total?logo=github&color=brightgreen)](https://github.com/qixils/minecraft-crowdcontrol/releases)
+[![Modrinth](https://img.shields.io/modrinth/dt/6XhH9LqD?logo=modrinth&color=brightgreen)](https://modrinth.com/plugin/crowdcontrol)
+[![CurseForge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.cfwidget.com%2F830331&query=%24.downloads.total&logo=curseforge&label=downloads&color=brightgreen)](https://www.curseforge.com/minecraft/mc-mods/crowdcontrol)
+
+</div>
 
 Minecraft Crowd Control is a Minecraft mod for various platforms that allows your livestream
 viewers to interact with your game using tips, bits, channel points, donations to charity, and more.
 
-Beginning with v2, this plugin has been developed for use
-with [crowdcontrol.live](https://crowdcontrol.live). This service handles the integration with
-Twitch (and other platforms) and is what your viewers will interact with to control your game.
+Beginning with v2, this plugin has been developed for use with
+[crowdcontrol.live](https://crowdcontrol.live).
+This service handles the integration with Twitch, YouTube, TikTok, Discord, etc. and is what your
+viewers will interact with to control your game.
 
 This mod is fully compatible with multiplayer servers. Players on the server will be able to
 receive effects targeted at them using **/account link \<username\>**.  
