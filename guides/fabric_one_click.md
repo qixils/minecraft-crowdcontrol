@@ -2,7 +2,7 @@
 
 The following steps provide a quick setup for running a local game server.
 
-1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+1. Download and install the [Crowd Control app](https://crowdcontrol.live/).
 2. In the **Game Library** tab, select **Minecraft**.
 3. Select **Configure Minecraft**.
 4. Enter your Minecraft username and click next.

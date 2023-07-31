@@ -31,13 +31,6 @@ viewers will interact with to control your game.
 
 ## Installation
 
-> **Note**  
-> The following information is for the
-> [Crowd Control 2.0 beta](https://beta.crowdcontrol.live/).
-> **If you are using [Crowd Control "1.0"](https://crowdcontrol.live/) then please see
-> [this document](https://github.com/qixils/minecraft-crowdcontrol/tree/legacy#installation)
-> instead.**
-
 Installation steps differ depending on the Minecraft version you wish to use, whether you want to
 use client mods, and the type of installation you wish to perform. Most casual users of the software
 will be interested in just the [Paper: One-Click Setup](guides/paper_one_click.md) guide. Users

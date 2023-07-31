@@ -2,7 +2,7 @@
 
 The following steps are for streamers who are connecting to another individual's server.
 
-1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+1. Download and install the [Crowd Control app](https://crowdcontrol.live/).
 2. In the **Game Selection** tab, select **Minecraft**.
 3. Select **Configure Minecraft**.
 4. Enter your Minecraft username and click next.
