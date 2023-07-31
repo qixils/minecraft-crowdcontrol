@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
@@ -36,6 +37,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 		for (ServerPlayer player : players) {
 			if (!player.world().worldType().equals(WorldTypes.OVERWORLD.get()))
 				continue;
+			ItemType material = (player.world().worldType().equals(WorldTypes.THE_NETHER.get()) ? ItemTypes.COBWEB : ItemTypes.WATER_BUCKET).get(); // TODO API?: ultrawarm
 			ServerLocation curr = player.serverLocation();
 			boolean obstruction = false;
 			for (int y = 1; y <= OFFSET; y++) {
@@ -50,7 +52,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 				sync(() -> {
 					player.setLocation(curr.add(0, OFFSET, 0));
 					ItemStack hand = player.itemInHand(HandTypes.MAIN_HAND);
-					if (hand != null && !hand.isEmpty() && !hand.type().equals(ItemTypes.WATER_BUCKET.get())) {
+					if (hand != null && !hand.isEmpty() && !hand.type().equals(material)) {
 						ItemStack offhand = player.itemInHand(HandTypes.OFF_HAND);
 						if (offhand.isEmpty()) {
 							player.setItemInHand(HandTypes.OFF_HAND, hand);
@@ -70,7 +72,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 								DropItemCommand.dropItem(plugin, player);
 						}
 					}
-					player.setItemInHand(HandTypes.MAIN_HAND, ItemStack.of(ItemTypes.WATER_BUCKET));
+					player.setItemInHand(HandTypes.MAIN_HAND, ItemStack.of(material));
 				});
 			}
 		}

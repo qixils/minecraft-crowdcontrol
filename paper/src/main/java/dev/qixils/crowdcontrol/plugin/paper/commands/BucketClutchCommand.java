@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,8 +31,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 				.type(Response.ResultType.RETRY)
 				.message("No players are on the surface");
 		for (Player player : players) {
-			if (player.getWorld().getEnvironment().equals(Environment.NETHER))
-				continue;
+			Material material = player.getWorld().isUltraWarm() ? Material.COBWEB : Material.WATER_BUCKET;
 			Location curr = player.getLocation();
 			boolean obstruction = false;
 			for (int y = 1; y <= OFFSET; y++) {
@@ -49,7 +47,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 					PlayerInventory inv = player.getInventory();
 					ItemStack hand = inv.getItemInMainHand();
 					Material handType = hand.getType();
-					if (!handType.isEmpty() && handType != Material.WATER_BUCKET && hand.getAmount() > 0) {
+					if (!handType.isEmpty() && handType != material && hand.getAmount() > 0) {
 						ItemStack offhand = inv.getItemInOffHand();
 						if (offhand.getAmount() == 0 || offhand.getType().isEmpty()) {
 							inv.setItemInOffHand(hand);
@@ -67,7 +65,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 								player.dropItem(true);
 						}
 					}
-					inv.setItemInMainHand(new ItemStack(Material.WATER_BUCKET));
+					inv.setItemInMainHand(new ItemStack(material));
 				}));
 			}
 		}

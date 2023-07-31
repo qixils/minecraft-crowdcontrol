@@ -5,8 +5,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.NotNull;
 
-import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
-
 public class SpongeTextUtil extends TextUtilImpl {
 
 	/**
