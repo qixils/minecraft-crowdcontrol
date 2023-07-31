@@ -28,6 +28,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -496,10 +498,6 @@ public interface Plugin<P, S> {
 			.argument(StringArgument.<S>builder("password").greedy().asRequired())
 			.handler(commandContext -> {
 				Audience sender = mapper.asAudience(commandContext.getSender());
-				if (!isServer()) {
-					sender.sendMessage(output(translatable("cc.command.password.error", NamedTextColor.RED)));
-					return;
-				}
 				String password = commandContext.get("password");
 				setPassword(password);
 				sender.sendMessage(output(translatable(
@@ -960,13 +958,6 @@ public interface Plugin<P, S> {
 	}
 
 	/**
-	 * Determines if the {@link CrowdControl} instance is running in server mode.
-	 *
-	 * @return true if the {@link CrowdControl} instance is running in server mode
-	 */
-	boolean isServer();
-
-	/**
 	 * Gets the plugin's {@link CommandManager}.
 	 *
 	 * @return command manager instance
@@ -1006,9 +997,8 @@ public interface Plugin<P, S> {
 	 *
 	 * @param password unencrypted password
 	 * @throws IllegalArgumentException if the password is null
-	 * @throws IllegalStateException    if the plugin is not running in {@link #isServer() server mode}
 	 */
-	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
+	void setPassword(@NotNull String password) throws IllegalArgumentException;
 
 	/**
 	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
@@ -1065,14 +1055,14 @@ public interface Plugin<P, S> {
 			// send messages
 			Audience audience = mapper.asAudience(player);
 			audience.sendMessage(JOIN_MESSAGE_1);
-			if (!isGlobal() && isServer() && !hasLinkedAccount(joiningPlayer) && (!isAdminRequired() || playerMapper().isAdmin(player)))
+			if (!isGlobal() && !hasLinkedAccount(joiningPlayer) && (!isAdminRequired() || playerMapper().isAdmin(player)))
 				audience.sendMessage(JOIN_MESSAGE_2);
 			if (!globalEffectsUsable())
 				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
 			CrowdControl cc = getCrowdControl();
 			if (cc == null) {
 				if (mapper.isAdmin(player)) {
-					if (isServer() && getPasswordOrEmpty().equals(""))
+					if (getPasswordOrEmpty().isEmpty())
 						audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
 					else
 						audience.sendMessage(NO_CC_UNKNOWN_ERROR);

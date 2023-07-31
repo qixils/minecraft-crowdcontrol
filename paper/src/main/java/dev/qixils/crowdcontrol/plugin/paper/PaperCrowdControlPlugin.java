@@ -75,14 +75,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private @Nullable String password = DEFAULT_PASSWORD;
 	@Getter @Setter
 	private int port = DEFAULT_PORT;
-	@Getter @Setter
-	private @Nullable String IP = "127.0.0.1";
 	@Getter
 	CrowdControl crowdControl = null;
 	@Getter
 	private PaperCommandManager<CommandSender> commandManager;
-	@Getter
-	private boolean isServer = true;
 	@Getter
 	private boolean global = false;
 	@Getter @Setter @NotNull
@@ -157,9 +153,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		announce = config.getBoolean("announce", announce);
 		adminRequired = config.getBoolean("admin-required", adminRequired);
 		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
-		isServer = !config.getBoolean("legacy", !isServer);
 		port = config.getInt("port", port);
-		IP = config.getString("ip", IP);
 		password = config.getString("password", password);
 		autoDetectIP = config.getBoolean("ip-detect", autoDetectIP);
 	}
@@ -167,21 +161,11 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public void initCrowdControl() {
 		loadConfig();
 
-		if (isServer) {
-			getLogger().info("Running Crowd Control in server mode");
-			if (password == null || password.isEmpty()) {
-				getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
-				return;
-			}
-			crowdControl = CrowdControl.server().port(port).password(password).build();
-		} else {
-			getLogger().info("Running Crowd Control in client mode");
-			if (IP == null || IP.isEmpty()) {
-				getLogger().severe("No IP address has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml");
-				return;
-			}
-			crowdControl = CrowdControl.client().port(port).ip(IP).build();
+		if (password == null || password.isEmpty()) { // TODO: allow empty password if CC allows it
+			getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
+			return;
 		}
+		crowdControl = CrowdControl.server().port(port).password(password).build();
 
 		commandRegister().register();
 		postInitCrowdControl(crowdControl);
