@@ -4,13 +4,15 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.3.4
 
+- Added a new effect Unite Players which teleports all players to one random player
 - Added a unique sound effect for Open Lucky Lootbox
-- Removed air from the Lootbox loot table
 - Added `CrowdControl` to the prefix of all log messages for easier filtering
 - Added new `/crowdcontrol version` command to display the version of the mod
 - Added extra diagnostic information to `/crowdcontrol status`
+- Removed air from the Lootbox loot table
 - Fixed warnings about duplicate effects on some modpacks
 - Reduced data sent to the client when using large modpacks
+- Removed the legacy config options which were no longer usable
 
 ## 3.3.3
 

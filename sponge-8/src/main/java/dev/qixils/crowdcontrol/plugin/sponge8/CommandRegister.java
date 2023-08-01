@@ -92,7 +92,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 			() -> GravityCommand.low(plugin),
 			() -> GravityCommand.high(plugin),
 			() -> GravityCommand.maximum(plugin),
-			() -> new DeleteRandomItemCommand(plugin)
+			() -> new DeleteRandomItemCommand(plugin),
+			() -> new UniteCommand(plugin)
 		));
 
 		// entity commands

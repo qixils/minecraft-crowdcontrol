@@ -114,7 +114,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			() -> new ShaderCommand(plugin, "bits", new SemVer(3, 3, 0)),
 			() -> new ShaderCommand(plugin, "spider", new SemVer(3, 3, 0)),
 			() -> new ShaderCommand(plugin, "phosphor", new SemVer(3, 3, 0)),
-			() -> new DeleteRandomItemCommand(plugin)
+			() -> new DeleteRandomItemCommand(plugin),
+			() -> new UniteCommand(plugin)
 		));
 
 		// entity commands
