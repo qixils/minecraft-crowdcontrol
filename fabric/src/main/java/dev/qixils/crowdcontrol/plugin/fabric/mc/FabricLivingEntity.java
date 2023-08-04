@@ -58,7 +58,7 @@ public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 		}
 		for (AttributeModifier attributeModifier : maxHealthAttr.getModifiers()) {
 			if (attributeModifier.getId() == MAX_HEALTH_MODIFIER_UUID || attributeModifier.getName().equals(MAX_HEALTH_MODIFIER_NAME)) {
-				maxHealthAttr.removeModifier(attributeModifier);
+				maxHealthAttr.removePermanentModifier(attributeModifier.getId());
 			}
 		}
 		maxHealthAttr.addPermanentModifier(new AttributeModifier(
