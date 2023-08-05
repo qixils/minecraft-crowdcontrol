@@ -58,6 +58,8 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Plugin("crowdcontrol")
@@ -135,12 +137,20 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		return isMatter(block, MatterTypes.LIQUID.get());
 	}
 
+	public <T> Stream<T> registryStream(RegistryType<T> registryType) {
+		return game.registry(registryType).stream();
+	}
+
 	public <T> Iterator<T> registryIterator(RegistryType<T> registryType) {
-		return game.registry(registryType).stream().iterator();
+		return registryStream(registryType).iterator();
 	}
 
 	public <T> Iterable<T> registryIterable(RegistryType<T> registryType) {
 		return () -> registryIterator(registryType);
+	}
+
+	public <T> List<T> registryList(RegistryType<T> registryType) {
+		return registryStream(registryType).collect(Collectors.toList());
 	}
 
 	@Override
