@@ -246,6 +246,10 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "cornflower"),
 			Key.key(MINECRAFT_NAMESPACE, "lily_of_the_valley"),
 			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
+			Key.key(MINECRAFT_NAMESPACE, "brown_mushroom"),
+			Key.key(MINECRAFT_NAMESPACE, "red_mushroom"),
+			Key.key(MINECRAFT_NAMESPACE, "crimson_fungus"),
+			Key.key(MINECRAFT_NAMESPACE, "warped_fungus"),
 			// legacy pre-1.12
 			Key.key(MINECRAFT_NAMESPACE, "red_flower"),
 			Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
