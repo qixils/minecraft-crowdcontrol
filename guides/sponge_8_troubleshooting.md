@@ -38,3 +38,9 @@ The following mods have not had a fix developed for them yet or are closed sourc
 to ever have a fix developed. You will not be able to play Crowd Control with these mods.
 
 - Quests Additions (Closed source)
+
+#### Other Mods
+
+If you're having issues with a mod not listed here, you may also want to check out Sponge's own list
+of compatibility issues
+[here](https://docs.spongepowered.org/stable/en/server/spongineer/incompatible.html).
