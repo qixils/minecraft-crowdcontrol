@@ -193,6 +193,14 @@ public class CommandConstants {
 	 */
 	public static final int CHAOS_LOCAL_RADIUS = 20;
 	/**
+	 * The minimum amount of blocks to teleport a player up by when executing the Bucket Clutch command.
+	 */
+	public static final int BUCKET_CLUTCH_MIN = 30;
+	/**
+	 * The maximum amount of blocks to teleport a player up by when executing the Bucket Clutch command.
+	 */
+	public static final int BUCKET_CLUTCH_MAX = 100;
+	/**
 	 * The title to use in the annoying pop-up menu.
 	 */
 	public static final Component POPUP_TITLE = Component.translatable("cc.effect.toast.title");
