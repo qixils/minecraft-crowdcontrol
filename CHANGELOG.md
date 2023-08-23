@@ -14,6 +14,7 @@ A list of all changes made to the software in reverse chronological order.
 - Changed the Bucket Clutch effect to teleport the player even higher where possible
 - Fixed warnings about duplicate effects on some modpacks
 - Fixed summon effects on Sponge 10+ (1.19+)
+- Fixed killer rabbits spawning more than intentional on Paper servers
 - Removed air from the Lootbox loot table
 - Removed the legacy config options which were no longer usable
 - Reduced data sent to the Crowd Control app when using large modpacks
