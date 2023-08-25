@@ -1,10 +1,8 @@
 package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.TriState;
-import dev.qixils.crowdcontrol.common.ClientOnly;
 import dev.qixils.crowdcontrol.common.EventListener;
-import dev.qixils.crowdcontrol.common.Global;
-import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -22,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.CheckReturnValue;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * A command which handles incoming effects requested by Crowd Control server.
@@ -165,64 +164,82 @@ public interface Command<P> {
 	 */
 	default void executeAndNotify(@NotNull Request request) {
 		Plugin<P, ?> plugin = getPlugin();
-		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
-		List<P> players = plugin.getPlayers(request);
 
-		// remove players on older version of the mod
-		SemVer minVersion = getMinimumModVersion();
-		if (minVersion.isGreaterThan(SemVer.ZERO))
-			players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
+		ExecuteUsing.Type executeUsing = Optional.ofNullable(getClass().getAnnotation(ExecuteUsing.class))
+			.map(ExecuteUsing::value)
+			.orElse(ExecuteUsing.Type.ASYNC);
+		Executor executor;
+		switch (executeUsing) {
+			case ASYNC:
+				executor = plugin.getAsyncExecutor();
+				break;
+			case SYNC_GLOBAL:
+				executor = plugin.getSyncExecutor(); // TODO: getGlobalExecutor
+				break;
+			default:
+				throw new IllegalStateException("Unknown ExecuteUsing type: " + executeUsing);
+		}
 
-		// ensure targets are online / available
-		if (players.isEmpty())
-			throw new NoApplicableTarget();
+		executor.execute(() -> {
+			plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
+			List<P> players = plugin.getPlayers(request);
 
-		// disallow execution of global commands
-		if (isGlobal()) {
-			if (!plugin.globalEffectsUsable()) {
-				request.buildResponse()
+			// remove players on older version of the mod
+			SemVer minVersion = getMinimumModVersion();
+			if (minVersion.isGreaterThan(SemVer.ZERO))
+				players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
+
+			// ensure targets are online / available
+			if (players.isEmpty())
+				throw new NoApplicableTarget();
+
+			// disallow execution of global commands
+			if (isGlobal()) {
+				if (!plugin.globalEffectsUsable()) {
+					request.buildResponse()
 						.type(ResultType.FAILURE)
 						.message("Global effects are disabled")
 						.send();
-				return;
-			} else if (!isGlobalCommandUsable(players, request)) {
-				request.buildResponse()
+					return;
+				} else if (!isGlobalCommandUsable(players, request)) {
+					request.buildResponse()
 						.type(ResultType.FAILURE)
 						.message("Global effects cannot be used on the targeted streamer")
 						.send();
-				return;
+					return;
+				}
 			}
-		}
 
-		// disallow execution of client commands
-		if (isClientOnly()) {
-			if (!getPlugin().supportsClientOnly()) {
-				request.buildResponse()
+			// disallow execution of client commands
+			if (isClientOnly()) {
+				if (!getPlugin().supportsClientOnly()) {
+					request.buildResponse()
 						.type(ResultType.UNAVAILABLE)
 						.message("Client-side effects are not supported by this setup")
 						.send();
-				return;
-			} else if (!isClientAvailable(players, request)) {
-				request.buildResponse()
+					return;
+				} else if (!isClientAvailable(players, request)) {
+					request.buildResponse()
 						.type(ResultType.FAILURE)
 						.message("Client-side effects are currently unavailable or cannot be used on this streamer")
 						.send();
-				return;
+					return;
+				}
 			}
-		}
 
-		// create shuffled copy of players so that the recipients of limited effects are random
-		List<P> shuffledPlayers = new ArrayList<>(players);
-		Collections.shuffle(shuffledPlayers);
+			// create shuffled copy of players so that the recipients of limited effects are random
+			List<P> shuffledPlayers = new ArrayList<>(players);
+			Collections.shuffle(shuffledPlayers);
 
-		execute(shuffledPlayers, request).thenAccept(builder -> {
-			if (builder == null) return;
+			execute(shuffledPlayers, request).thenAcceptAsync(builder -> {
+				if (builder == null) return;
 
-			Response response = builder.build();
-			response.send();
+				Response response = builder.build();
+				response.send();
 
-			if (response.getResultType() == Response.ResultType.SUCCESS)
-				announce(plugin.playerMapper().asAudience(players), request);
+				if (response.getResultType() == Response.ResultType.SUCCESS)
+					announce(plugin.playerMapper().asAudience(players), request);
+			}, plugin.getAsyncExecutor());
 		});
 	}
 

@@ -1,21 +1,22 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.common.util.sound.Sounds;
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
-import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.kyori.adventure.sound.Sound;
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 @Getter
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class TeleportCommand extends ImmediateCommand {
 	private final String effectName = "chorus_fruit";
 
@@ -29,29 +30,22 @@ public class TeleportCommand extends ImmediateCommand {
 				.type(Response.ResultType.FAILURE)
 				.message("No teleportation destinations were available");
 		for (ServerPlayer player : players) {
-			Location tempDest = BlockFinder.builder()
-					.origin(player)
-					.minRadius(3)
-					.maxRadius(15)
-					.locationValidator(BlockFinder.SPAWNING_SPACE)
-					.build().next();
-			if (tempDest == null) {
-				continue;
+			if (player.isPassenger())
+				player.stopRiding();
+			ServerLevel level = player.serverLevel();
+			double x = player.getX();
+			double y = player.getY();
+			double z = player.getZ();
+			for (int i = 0; i < 16; ++i) {
+				double destX = player.getX() + (player.getRandom().nextDouble() - 0.5) * 16.0;
+				double destY = Mth.clamp(player.getY() + (double)(player.getRandom().nextInt(16) - 8), level.getMinBuildHeight(), level.getMinBuildHeight() + level.getLogicalHeight() - 1);
+				double destZ = player.getZ() + (player.getRandom().nextDouble() - 0.5) * 16.0;
+				if (!player.randomTeleport(destX, destY, destZ, true)) continue;
+				level.playSound(null, x, y, z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);
+				player.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+				break;
 			}
-			final Location destination = tempDest.add(.5, 0, .5);
-			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			sync(() -> {
-				destination.teleportHere(player);
-				destination.atVertCeil()
-						.buildParticleEffect(ParticleTypes.PORTAL)
-						.count(100)
-						.distance(.5f, 1f, .5f)
-						.send();
-				plugin.adventure().world(player.serverLevel().dimension().location()).playSound(
-						Sounds.TELEPORT.get(),
-						Sound.Emitter.self()
-				);
-			});
 		}
 		return result;
 	}
