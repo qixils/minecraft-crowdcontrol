@@ -27,7 +27,7 @@ public class TeleportCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
-				.type(Response.ResultType.FAILURE)
+				.type(Response.ResultType.RETRY)
 				.message("No teleportation destinations were available");
 		for (ServerPlayer player : players) {
 			if (player.isPassenger())
@@ -37,9 +37,9 @@ public class TeleportCommand extends ImmediateCommand {
 			double y = player.getY();
 			double z = player.getZ();
 			for (int i = 0; i < 16; ++i) {
-				double destX = player.getX() + (player.getRandom().nextDouble() - 0.5) * 16.0;
-				double destY = Mth.clamp(player.getY() + (double)(player.getRandom().nextInt(16) - 8), level.getMinBuildHeight(), level.getMinBuildHeight() + level.getLogicalHeight() - 1);
-				double destZ = player.getZ() + (player.getRandom().nextDouble() - 0.5) * 16.0;
+				double destX = x + (player.getRandom().nextDouble() - 0.5) * 16.0;
+				double destY = Mth.clamp(y + (double)(player.getRandom().nextInt(16) - 8), level.getMinBuildHeight(), level.getMinBuildHeight() + level.getLogicalHeight() - 1);
+				double destZ = z + (player.getRandom().nextDouble() - 0.5) * 16.0;
 				if (!player.randomTeleport(destX, destY, destZ, true)) continue;
 				level.playSound(null, x, y, z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);
 				player.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);

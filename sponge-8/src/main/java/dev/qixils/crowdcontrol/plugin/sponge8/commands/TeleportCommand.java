@@ -28,7 +28,7 @@ public class TeleportCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
-				.type(Response.ResultType.FAILURE)
+				.type(Response.ResultType.RETRY)
 				.message("No teleportation destinations were available");
 		for (ServerPlayer player : players) {
 			ServerLocation tempDest = BlockFinder.builder()
