@@ -70,6 +70,14 @@ public class CommonTags {
 			Key.key(MINECRAFT_NAMESPACE, "void_air")
 	);
 
+	/**
+	 * Liquid blocks.
+	 */
+	public static final KeyedTag LIQUIDS = new KeyedTag(
+			Key.key(MINECRAFT_NAMESPACE, "water"),
+			Key.key(MINECRAFT_NAMESPACE, "lava")
+	);
+
 	private CommonTags() {
 		throw new IllegalStateException("Utility class");
 	}

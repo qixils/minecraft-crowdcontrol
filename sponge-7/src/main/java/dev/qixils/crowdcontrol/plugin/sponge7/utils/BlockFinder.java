@@ -4,7 +4,9 @@ import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.BooleanProperty;
+import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.data.property.block.SolidCubeProperty;
@@ -18,7 +20,9 @@ import java.util.function.Predicate;
 public final class BlockFinder extends AbstractBlockFinder<Location<World>, Vector3i, World> {
 	public static final Predicate<Location<World>> SPAWNING_SPACE = location ->
 			isPassable(location.getBlock())
+				    && !isLiquid(location.getBlock())
 					&& isPassable(location.add(0, 1, 0).getBlock())
+				    && !isLiquid(location.add(0, 1, 0).getBlock())
 					&& isSolid(location.sub(0, 1, 0).getBlock());
 
 	private BlockFinder(World origin, List<Vector3i> positions, Predicate<Location<World>> locationValidator) {
@@ -36,6 +40,21 @@ public final class BlockFinder extends AbstractBlockFinder<Location<World>, Vect
 		if (property == null)
 			return def;
 		return property;
+	}
+
+	public static boolean isMatter(BlockState block, MatterProperty.Matter matter) {
+		return block.getProperty(MatterProperty.class)
+			.map(AbstractProperty::getValue)
+			.map(value -> value.equals(matter))
+			.orElse(false);
+	}
+
+	public static boolean isLiquid(BlockState block) {
+		return isMatter(block, MatterProperty.Matter.LIQUID);
+	}
+
+	public static boolean isAir(BlockState block) {
+		return isMatter(block, MatterProperty.Matter.GAS);
 	}
 
 	public static boolean isPassable(BlockState block) {

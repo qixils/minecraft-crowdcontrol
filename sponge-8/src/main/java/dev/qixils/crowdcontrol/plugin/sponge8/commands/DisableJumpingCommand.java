@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedVoidCommand;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -123,6 +124,6 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 			return false;
 		checked.add(pos);
 		BlockState block = world.block(pos);
-		return block.type().equals(BlockTypes.LADDER.get()) || SpongeCrowdControlPlugin.isLiquid(block);
+		return block.type().equals(BlockTypes.LADDER.get()) || BlockFinder.isLiquid(block);
 	}
 }

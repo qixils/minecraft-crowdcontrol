@@ -17,6 +17,9 @@ import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MAX_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MIN_RADIUS;
+
 @Getter
 public class TeleportCommand extends ImmediateCommand {
 	private final String effectName = "chorus_fruit";
@@ -33,8 +36,8 @@ public class TeleportCommand extends ImmediateCommand {
 		for (ServerPlayer player : players) {
 			ServerLocation tempDest = BlockFinder.builder()
 					.origin(player.serverLocation())
-					.minRadius(3)
-					.maxRadius(15)
+					.minRadius(EAT_CHORUS_FRUIT_MIN_RADIUS)
+					.maxRadius(EAT_CHORUS_FRUIT_MAX_RADIUS)
 					.locationValidator(BlockFinder.SPAWNING_SPACE)
 					.build().next();
 			if (tempDest == null) {

@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -56,7 +57,7 @@ public class VeinCommand extends ImmediateCommand {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(player.serverLocation())
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(location -> !isAir(location.blockType()))
+					.locationValidator(location -> !isAir(location.block()))
 					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {
@@ -92,8 +93,8 @@ public class VeinCommand extends ImmediateCommand {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 1; ++z) {
 					ServerLocation loc = base.add(x, y, z);
-					BlockType blockType = loc.blockType();
-					if (!isAir(blockType)) {
+					BlockState block = loc.block();
+					if (!isAir(block)) {
 						stoneBlocks.add(loc);
 					}
 				}

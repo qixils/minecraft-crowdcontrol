@@ -427,6 +427,14 @@ public class CommandConstants {
 	 * The chance of a summoned mushroom cow being brown as a percentage from 0 to 1.
 	 */
 	public static final double MUSHROOM_COW_BROWN_CHANCE = 0.01;
+	/**
+	 * The minimum radius to teleport from the Eat Chorus Fruit command. Vanilla is 0.
+	 */
+	public static final int EAT_CHORUS_FRUIT_MIN_RADIUS = 3;
+	/**
+	 * The maximum radius to teleport from the Eat Chorus Fruit command. Vanilla is 8.
+	 */
+	public static final int EAT_CHORUS_FRUIT_MAX_RADIUS = 16;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");

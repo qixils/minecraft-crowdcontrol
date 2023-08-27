@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.ExecuteUsing;
+import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,6 +16,9 @@ import org.joml.Math;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MAX_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MIN_RADIUS;
+
 @Getter
 @ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class TeleportCommand extends ImmediateCommand {
@@ -22,6 +26,22 @@ public class TeleportCommand extends ImmediateCommand {
 
 	public TeleportCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
+	}
+
+	private static double nextDoubleOffset() {
+		double value = RandomUtil.RNG.nextDouble(EAT_CHORUS_FRUIT_MIN_RADIUS, EAT_CHORUS_FRUIT_MAX_RADIUS);
+		if (RandomUtil.RNG.nextBoolean()) {
+			value = -value;
+		}
+		return value;
+	}
+
+	private static int nextIntOffset() {
+		int value = RandomUtil.RNG.nextInt(EAT_CHORUS_FRUIT_MIN_RADIUS, EAT_CHORUS_FRUIT_MAX_RADIUS);
+		if (RandomUtil.RNG.nextBoolean()) {
+			value = -value;
+		}
+		return value;
 	}
 
 	@Override
@@ -37,9 +57,9 @@ public class TeleportCommand extends ImmediateCommand {
 			double y = loc.getY();
 			double z = loc.getZ();
 			for (int i = 0; i < 16; ++i) {
-				double destX = x + (random.nextDouble() - 0.5) * 16.0;
-				double destY = Math.clamp(y + (double)(random.nextInt(16) - 8), level.getMinHeight(), level.getMinHeight() + level.getLogicalHeight() - 1);
-				double destZ = z + (random.nextDouble() - 0.5) * 16.0;
+				double destX = x + nextDoubleOffset();
+				double destY = Math.clamp(y + nextIntOffset(), level.getMinHeight(), level.getMinHeight() + level.getLogicalHeight() - 1);
+				double destZ = z + nextDoubleOffset();
 				if (!randomTeleport(player, destX, destY, destZ)) continue;
 				// play sound
 				level.playSound(loc, Sound.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.0f);

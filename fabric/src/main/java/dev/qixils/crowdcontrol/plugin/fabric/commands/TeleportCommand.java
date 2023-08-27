@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.ExecuteUsing;
+import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,6 +16,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MAX_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MIN_RADIUS;
+
 @Getter
 @ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class TeleportCommand extends ImmediateCommand {
@@ -22,6 +26,22 @@ public class TeleportCommand extends ImmediateCommand {
 
 	public TeleportCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);
+	}
+
+	private static double nextDoubleOffset() {
+		double value = RandomUtil.RNG.nextDouble(EAT_CHORUS_FRUIT_MIN_RADIUS, EAT_CHORUS_FRUIT_MAX_RADIUS);
+		if (RandomUtil.RNG.nextBoolean()) {
+			value = -value;
+		}
+		return value;
+	}
+
+	private static int nextIntOffset() {
+		int value = RandomUtil.RNG.nextInt(EAT_CHORUS_FRUIT_MIN_RADIUS, EAT_CHORUS_FRUIT_MAX_RADIUS);
+		if (RandomUtil.RNG.nextBoolean()) {
+			value = -value;
+		}
+		return value;
 	}
 
 	@Override
@@ -37,9 +57,9 @@ public class TeleportCommand extends ImmediateCommand {
 			double y = player.getY();
 			double z = player.getZ();
 			for (int i = 0; i < 16; ++i) {
-				double destX = x + (player.getRandom().nextDouble() - 0.5) * 16.0;
-				double destY = Mth.clamp(y + (double)(player.getRandom().nextInt(16) - 8), level.getMinBuildHeight(), level.getMinBuildHeight() + level.getLogicalHeight() - 1);
-				double destZ = z + (player.getRandom().nextDouble() - 0.5) * 16.0;
+				double destX = x + nextDoubleOffset();
+				double destY = Mth.clamp(y + nextIntOffset(), level.getMinBuildHeight(), level.getMinBuildHeight() + level.getLogicalHeight() - 1);
+				double destZ = z + nextDoubleOffset();
 				if (!player.randomTeleport(destX, destY, destZ, true)) continue;
 				level.playSound(null, x, y, z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);
 				player.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);
