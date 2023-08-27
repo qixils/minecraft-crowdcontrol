@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.paper.utils;
 
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
@@ -13,7 +12,6 @@ import java.util.function.Predicate;
 
 public class BlockUtil {
 	public static final MaterialTag FLOWERS = new MaterialTag(CommandConstants.FLOWERS);
-	public static final MaterialTag STONES_TAG = new MaterialTag(CommonTags.STONES);
 	public static final MaterialTag TORCHES = new MaterialTag(CommandConstants.TORCHES);
 
 	public static final Predicate<Location> SPAWNING_SPACE = location -> location.getBlock().isPassable()
