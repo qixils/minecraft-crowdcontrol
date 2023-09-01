@@ -13,6 +13,7 @@ A list of all changes made to the software in reverse chronological order.
 - Changed the Bucket Clutch effect to work in the nether by using a cobweb instead of water
 - Changed the Bucket Clutch effect to teleport the player even higher where possible
 - Changed the Chorus Fruit effect to better match vanilla behavior
+- Fixed compatibility with the latest version (2.0.2) of Crowd Control
 - Fixed warnings about duplicate effects on some modpacks
 - Fixed summon effects on Sponge 10+ (1.19+)
 - Fixed killer rabbits spawning more than intentional on Paper servers
