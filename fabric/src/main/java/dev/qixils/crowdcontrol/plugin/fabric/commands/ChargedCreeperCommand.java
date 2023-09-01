@@ -27,7 +27,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 		Creeper creeper = super.spawnEntity(viewer, player);
 		creeper.getEntityData().set(CreeperAccessor.getIsPoweredAccessor(), true);
 		Vec3 pos = creeper.position();
-		plugin.adventure().world(creeper.level().dimension().location()).playSound(
+		plugin.adventure().world(creeper.getLevel().dimension().location()).playSound(
 				Sounds.LIGHTNING_STRIKE.get(),
 				pos.x(),
 				pos.y(),

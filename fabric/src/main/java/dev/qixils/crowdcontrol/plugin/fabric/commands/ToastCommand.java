@@ -81,7 +81,7 @@ public final class ToastCommand extends ImmediateCommand {
 
 			// spam recipe toasts
 			ServerRecipeBook book = player.getRecipeBook();
-			RecipeManager recipeManager = player.serverLevel().getRecipeManager();
+			RecipeManager recipeManager = player.getLevel().getRecipeManager();
 			@SuppressWarnings("unchecked") // casting ? extends XYZ to XYZ is safe >_>
 			Collection<Recipe<?>> recipes = ((RecipeBookAccessor) book).getKnown()
 					.stream()

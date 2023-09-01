@@ -41,7 +41,7 @@ public class DinnerboneCommand extends Command {
 		sync(() -> {
 			Set<LivingEntity> entities = new HashSet<>();
 			for (ServerPlayer player : players) {
-				entities.addAll(StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
+				entities.addAll(StreamSupport.stream(player.getLevel().getAllEntities().spliterator(), false)
 						.filter(entity -> entity instanceof LivingEntity
 								&& entity.getType() != EntityType.PLAYER
 								&& entity.position().distanceToSqr(player.position()) <= (DINNERBONE_RADIUS * DINNERBONE_RADIUS))

@@ -53,14 +53,14 @@ public class PlantTreeCommand extends Command {
 
 		Collection<CompletableFuture<?>> futures = new ArrayList<>(players.size());
 		for (ServerPlayer player : players) {
-			ConfiguredFeature<?, ?> treeType = RandomUtil.randomElementFrom(getTreesFor(player.serverLevel()));
+			ConfiguredFeature<?, ?> treeType = RandomUtil.randomElementFrom(getTreesFor(player.getLevel()));
 			CompletableFuture<Void> future = new CompletableFuture<>();
 			futures.add(future);
 
 			// the #canPlaceAt method sometimes erroneously trips up the async catcher
 			// so this is run as sync to avoid confusing, useless errors
 			sync(() -> {
-				ServerLevel level = player.serverLevel();
+				ServerLevel level = player.getLevel();
 				if (treeType.place(level, level.getChunkSource().getGenerator(), level.random, player.blockPosition()))
 					resp.type(ResultType.SUCCESS).message("SUCCESS");
 				future.complete(null);

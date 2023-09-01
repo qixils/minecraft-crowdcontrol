@@ -36,7 +36,7 @@ public class ExplodeCommand extends ImmediateCommand {
 		for (ServerPlayer player : players) {
 			sync(() -> {
 				Vec3 pos = player.position().subtract(0, .5, 0);
-				player.serverLevel().explode(
+				player.getLevel().explode(
 						null,
 						pos.x,
 						pos.y,

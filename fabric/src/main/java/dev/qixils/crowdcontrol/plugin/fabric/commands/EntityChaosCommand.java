@@ -41,7 +41,7 @@ public class EntityChaosCommand extends ImmediateCommand {
 			} else {
 				for (ServerPlayer player : players) {
 					Vec3 pp = player.position();
-					for (Entity entity : ((ServerLevel) player.level()).getAllEntities()) {
+					for (Entity entity : player.getLevel().getAllEntities()) {
 						if (entity.getType() == EntityType.PLAYER) continue;
 						Vec3 ep = entity.position();
 						double x = pp.x - ep.x;

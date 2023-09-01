@@ -20,7 +20,7 @@ import javax.annotation.CheckReturnValue;
 @MethodsReturnNonnullByDefault
 public record Location(ServerLevel level, double x, double y, double z, float yaw, float pitch) {
 	public Location(Entity player) {
-		this((ServerLevel) player.level(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+		this((ServerLevel) player.getLevel(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
 	}
 
 	public Location(ServerLevel level, double x, double y, double z) {

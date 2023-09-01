@@ -52,7 +52,7 @@ public class TeleportCommand extends ImmediateCommand {
 		for (ServerPlayer player : players) {
 			if (player.isPassenger())
 				player.stopRiding();
-			ServerLevel level = player.serverLevel();
+			ServerLevel level = player.getLevel();
 			double x = player.getX();
 			double y = player.getY();
 			double z = player.getZ();

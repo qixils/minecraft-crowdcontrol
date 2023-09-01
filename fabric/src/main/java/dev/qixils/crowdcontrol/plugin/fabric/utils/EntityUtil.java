@@ -34,7 +34,7 @@ public class EntityUtil {
 	}
 
 	public static void handleDie(LivingEntity entity, final DamageSource cause, final CallbackInfo ci) {
-		if (entity.level().isClientSide) return;
+		if (entity.getLevel().isClientSide) return;
 		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
 		if (((LivingEntityAccessor) entity).getDead()) return;
 		Death event = new Death(entity, cause);
@@ -43,7 +43,7 @@ public class EntityUtil {
 	}
 
 	public static void handleDamage(final Entity entity, final DamageSource cause, final float amount, final CallbackInfoReturnable<Boolean> cir) {
-		if (entity.level().isClientSide) return;
+		if (entity.getLevel().isClientSide) return;
 		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
 		Damage event = new Damage(entity, cause, amount);
 		event.fire(FabricCrowdControlPlugin.getInstance());

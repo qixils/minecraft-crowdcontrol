@@ -25,7 +25,7 @@ public abstract class PlayerMixin extends LivingEntity {
 
 	@Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
 	public void jumpFromGround(CallbackInfo ci) {
-		Jump event = new Jump((Player) (Object) this, this.level().isClientSide);
+		Jump event = new Jump((Player) (Object) this, this.getLevel().isClientSide);
 		event.fire();
 		if (event.cancelled())
 			ci.cancel();

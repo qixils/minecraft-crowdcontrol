@@ -44,7 +44,7 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 
 	private boolean removeEntityFrom(ServerPlayer player) {
 		Vec3 playerPosition = player.position();
-		List<Entity> entities = StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
+		List<Entity> entities = StreamSupport.stream(player.getLevel().getAllEntities().spliterator(), false)
 				.filter(entity -> entity.getType() == entityType && entity.distanceToSqr(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
 				.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
 		if (entities.isEmpty())

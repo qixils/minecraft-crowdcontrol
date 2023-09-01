@@ -33,7 +33,7 @@ public class BucketClutchCommand extends ImmediateCommand {
 				.type(Response.ResultType.RETRY)
 				.message("No players are on the surface");
 		for (ServerPlayer player : players) {
-			Item material = player.serverLevel().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
+			Item material = player.getLevel().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
 
 			Location curr = new Location(player);
 			int offset = BUCKET_CLUTCH_MAX - 1;
