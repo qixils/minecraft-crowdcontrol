@@ -6,7 +6,9 @@ import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.executeorperish.DoOrDieCommand;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.TypedTag;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockType;
@@ -25,8 +27,10 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
@@ -110,11 +114,26 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 			() -> GravityCommand.low(plugin),
 			() -> GravityCommand.high(plugin),
 			() -> GravityCommand.maximum(plugin),
-			() -> new DeleteRandomItemCommand(plugin)
+			() -> new DeleteRandomItemCommand(plugin),
+			() -> new UniteCommand(plugin)
 		));
 
 		// entity commands
+		Map<String, EntityType> minecraftEntities = new HashMap<>();
+		Map<String, EntityType> moddedEntities = new HashMap<>();
 		for (EntityType entity : new HashSet<>(plugin.getRegistry().getAllOf(EntityType.class))) {
+			Key key = SpongeTextUtil.asKey(entity);
+			if (key == null) continue;
+			String id = SpongeTextUtil.csIdOf(entity);
+			if (!CommandConstants.ENTITIES.contains(id)) continue;
+			Map<String, EntityType> entities = key.namespace().equals(Key.MINECRAFT_NAMESPACE) ? minecraftEntities : moddedEntities;
+			entities.put(id, entity);
+		}
+		for (Map.Entry<String, EntityType> entry : moddedEntities.entrySet()) {
+			if (minecraftEntities.containsKey(entry.getKey())) continue;
+			minecraftEntities.put(entry.getKey(), entry.getValue());
+		}
+		for (EntityType entity : minecraftEntities.values()) {
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}

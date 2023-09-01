@@ -29,13 +29,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	protected String password = DEFAULT_PASSWORD;
 	@Getter @Setter
 	protected int port = DEFAULT_PORT;
-	@Nullable
-	@Getter @Setter
-	protected String IP = "127.0.0.1";
 	@Getter @Nullable
 	protected CrowdControl crowdControl = null;
-	@Getter
-	protected boolean isServer = true;
 	@Getter
 	protected boolean global = false;
 	protected boolean announce = true;

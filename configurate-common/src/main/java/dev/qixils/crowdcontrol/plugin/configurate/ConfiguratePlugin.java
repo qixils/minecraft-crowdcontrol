@@ -64,9 +64,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		announce = config.node("announce").getBoolean(announce);
 		adminRequired = config.node("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
-		isServer = !config.node("legacy").getBoolean(!isServer);
 		port = config.node("port").getInt(port);
-		IP = config.node("ip").getString(IP);
 		password = config.node("password").getString(password);
 		autoDetectIP = config.node("ip-detect").getBoolean(autoDetectIP);
 	}
@@ -85,10 +83,8 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			config.node("announce").set(announce);
 			config.node("admin-required").set(adminRequired);
 			config.node("hide-names").set(hideNames.getConfigCode());
-			config.node("legacy").set(!isServer);
 			config.node("port").set(port);
 			config.node("password").set(password);
-			config.node("ip").set(IP);
 			config.node("ip-detect").set(autoDetectIP);
 			getConfigLoader().save(config);
 		} catch (ConfigurateException e) {
@@ -100,21 +96,11 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 	public void initCrowdControl() {
 		loadConfig();
 
-		if (isServer) {
-			getSLF4JLogger().info("Running Crowd Control in server mode");
-			if (password == null || password.isEmpty()) {
-				getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
-				return;
-			}
-			crowdControl = CrowdControl.server().port(port).password(password).build();
-		} else {
-			getSLF4JLogger().info("Running Crowd Control in legacy client mode");
-			if (IP == null || IP.isEmpty()) {
-				getSLF4JLogger().error("No IP address has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf");
-				return;
-			}
-			crowdControl = CrowdControl.client().port(port).ip(IP).build();
+		if (password == null || password.isEmpty()) { // TODO: allow empty password if CC allows it
+			getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
+			return;
 		}
+		crowdControl = CrowdControl.server().port(port).password(password).build();
 
 		commandRegister().register();
 		postInitCrowdControl(crowdControl);

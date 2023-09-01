@@ -17,14 +17,17 @@ for SpongeForge 1.16.5.
 6. Download the latest build of
    [Crowd Control for Sponge 8](https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=1.16.5)
    and place it in the `plugins` folder.
-7. (Optional) Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with
-   into the `mods` folder and the `plugins` folder respectively.
+7. (Optional) Copy all the other Forge 1.16.5 mods or Sponge 8 plugins that you want to play with,
+   such as [my mod that emulates 1.16.1 speedrunning](https://modrinth.com/mod/depiglining/versions?g=1.16.5&l=forge),
+   into the `mods` folder and the `plugins` folder respectively. Please be sure to read
+   [this section of the troubleshooting guide](sponge_8_troubleshooting.md#incompatible-mods)
+   to ensure you do not install any incompatible mods.
 
 The mod is now installed! Open your Minecraft Launcher and select the `forge` profile to play. To
 use Crowd Control on a remote server, see the [**Joining a Server**](sponge_8_joining_a_server.md)
 guide. Else, to use Crowd Control on a single player world:
 
-1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+1. Download and install the [Crowd Control app](https://crowdcontrol.live/).
 2. In the **Game Library** tab, select **Minecraft**.
 3. Select **Configure Minecraft**.
 4. Enter your Minecraft username and click next.

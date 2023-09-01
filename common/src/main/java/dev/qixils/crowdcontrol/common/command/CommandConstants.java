@@ -18,9 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
@@ -195,11 +193,19 @@ public class CommandConstants {
 	 */
 	public static final int CHAOS_LOCAL_RADIUS = 20;
 	/**
+	 * The minimum amount of blocks to teleport a player up by when executing the Bucket Clutch command.
+	 */
+	public static final int BUCKET_CLUTCH_MIN = 30;
+	/**
+	 * The maximum amount of blocks to teleport a player up by when executing the Bucket Clutch command.
+	 */
+	public static final int BUCKET_CLUTCH_MAX = 100;
+	/**
 	 * The title to use in the annoying pop-up menu.
 	 */
 	public static final Component POPUP_TITLE = Component.translatable("cc.effect.toast.title");
 
-	// tags
+	// tags | TODO: probably deprecate these to allow backport mods?
 
 	/**
 	 * Collection of items to be used in the Give Item and Take Item commands.
@@ -248,6 +254,10 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "cornflower"),
 			Key.key(MINECRAFT_NAMESPACE, "lily_of_the_valley"),
 			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
+			Key.key(MINECRAFT_NAMESPACE, "brown_mushroom"),
+			Key.key(MINECRAFT_NAMESPACE, "red_mushroom"),
+			Key.key(MINECRAFT_NAMESPACE, "crimson_fungus"),
+			Key.key(MINECRAFT_NAMESPACE, "warped_fungus"),
 			// legacy pre-1.12
 			Key.key(MINECRAFT_NAMESPACE, "red_flower"),
 			Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
@@ -263,6 +273,100 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "redstone_wall_torch"),
 			Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
 	);
+
+	/**
+	 * Collection of whitelisted spawnable entities.
+	 * These names generally match those of the {@code EntityType} enum from Bukkit.
+	 */
+	public static final @NotNull Set<String> ENTITIES = new HashSet<>(Arrays.asList(
+		"allay",
+		"armor_stand",
+		"axolotl",
+		"bat",
+		"bee",
+		"blaze",
+		"boat",
+		"chest_boat",
+		"camel",
+		"cat",
+		"cave_spider",
+		"charged_creeper",
+		"chicken",
+		"cod",
+		"cow",
+		"creeper",
+		"dolphin",
+		"donkey",
+		"drowned",
+		"elder_guardian",
+		"ender_dragon",
+		"enderman",
+		"endermite",
+		"evoker",
+		"fox",
+		"frog",
+		"ghast",
+		"giant",
+		"glow_squid",
+		"goat",
+		"guardian",
+		"hoglin",
+		"horse",
+		"husk",
+		"illusioner",
+		"iron_golem",
+		"lightning",
+		"llama",
+		"magma_cube",
+		"minecart",
+		"minecart_chest",
+		"mushroom_cow",
+		"mule",
+		"ocelot",
+		"panda",
+		"parrot",
+		"phantom",
+		"pig",
+		"piglin",
+		"piglin_brute",
+		"pillager",
+		"polar_bear",
+		"primed_tnt",
+		"pufferfish",
+		"rabbit",
+		"ravager",
+		"salmon",
+		"sheep",
+		"shulker",
+		"silverfish",
+		"skeleton",
+		"skeleton_horse",
+		"slime",
+		"sniffer",
+		"snowman",
+		"spider",
+		"squid",
+		"stray",
+		"strider",
+		"tadpole",
+		"trader_llama",
+		"tropical_fish",
+		"turtle",
+		"vex",
+		"villager",
+		"vindicator",
+		"wandering_trader",
+		"warden",
+		"witch",
+		"wither",
+		"wither_skeleton",
+		"wolf",
+		"zoglin",
+		"zombie",
+		"zombie_horse",
+		"zombie_villager",
+		"zombified_piglin"
+	));
 
 	// do-or-die
 	/**
@@ -323,6 +427,14 @@ public class CommandConstants {
 	 * The chance of a summoned mushroom cow being brown as a percentage from 0 to 1.
 	 */
 	public static final double MUSHROOM_COW_BROWN_CHANCE = 0.01;
+	/**
+	 * The minimum radius to teleport from the Eat Chorus Fruit command. Vanilla is 0.
+	 */
+	public static final int EAT_CHORUS_FRUIT_MIN_RADIUS = 3;
+	/**
+	 * The maximum radius to teleport from the Eat Chorus Fruit command. Vanilla is 8.
+	 */
+	public static final int EAT_CHORUS_FRUIT_MAX_RADIUS = 16;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");

@@ -22,6 +22,7 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -38,6 +39,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static java.util.Optional.ofNullable;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 
 /**
  * The main class used by a Crowd Control implementation which defines numerous methods for
@@ -81,18 +86,17 @@ public interface Plugin<P, S> {
 	/**
 	 * The prefix to use in command output as a {@link Component}.
 	 */
-	Component PREFIX_COMPONENT = Component.text()
-			.color(NamedTextColor.DARK_AQUA)
-			.append(Component.text('[', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
-			.append(Component.text(PREFIX, NamedTextColor.YELLOW))
-			.append(Component.text(']', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
-			.append(Component.space())
-			.build();
+	Component PREFIX_COMPONENT = text()
+		.append(text('[', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+		.append(text(PREFIX, NamedTextColor.YELLOW))
+		.append(text(']', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+		.appendSpace()
+		.build();
 
 	/**
 	 * The default name of a viewer.
 	 */
-	Component VIEWER_NAME = Component.translatable("cc.effect.viewer");
+	Component VIEWER_NAME = translatable("cc.effect.viewer");
 
 	/**
 	 * The permission node required to use administrative commands.
@@ -118,11 +122,11 @@ public interface Plugin<P, S> {
 	static @NotNull Component error(@NotNull Component text) {
 		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
 			text = text.decoration(TextDecoration.BOLD, false);
-		return Component.translatable(
-				"cc.error.prefix.critical",
-				NamedTextColor.RED,
-				EnumSet.of(TextDecoration.BOLD),
-				text.colorIfAbsent(_ERROR_COLOR)
+		return translatable(
+			"cc.error.prefix.critical",
+			NamedTextColor.RED,
+			EnumSet.of(TextDecoration.BOLD),
+			text.colorIfAbsent(_ERROR_COLOR)
 		);
 	}
 
@@ -135,11 +139,11 @@ public interface Plugin<P, S> {
 	static @NotNull Component warning(@NotNull Component text) {
 		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
 			text = text.decoration(TextDecoration.BOLD, false);
-		return Component.translatable(
-				"cc.error.prefix.warning",
-				NamedTextColor.RED,
-				EnumSet.of(TextDecoration.BOLD),
-				text.colorIfAbsent(_ERROR_COLOR)
+		return translatable(
+			"cc.error.prefix.warning",
+			NamedTextColor.RED,
+			EnumSet.of(TextDecoration.BOLD),
+			text.colorIfAbsent(_ERROR_COLOR)
 		);
 	}
 
@@ -156,69 +160,67 @@ public interface Plugin<P, S> {
 	/**
 	 * The message to send to a player when they join the server.
 	 */
-	Component JOIN_MESSAGE_1 = Component.translatable(
-			"cc.join.info",
-			JOIN_MESSAGE_COLOR,
-			// TODO: move these args back into the i18n file?
-			Component.text("Crowd Control", TextColor.color(0xFAE100)),
-			Component.text("qi", TextColor.color(0xFFC7B5))
-					.append(Component.text("xi", TextColor.color(0xFFDECA)))
-					.append(Component.text("ls", TextColor.color(0xFFCEEA)))
-					.append(Component.text(".dev", TextColor.color(0xFFB7E5))),
-			Component.text("crowdcontrol.live", TextColor.color(0xFAE100))
+	Component JOIN_MESSAGE_1 = translatable(
+		"cc.join.info",
+		JOIN_MESSAGE_COLOR,
+		// TODO: move these args back into the i18n file?
+		text("Crowd Control", TextColor.color(0xFAE100)),
+		text("qi", TextColor.color(0xFFC7B5))
+			.append(text("xi", TextColor.color(0xFFDECA)))
+			.append(text("ls", TextColor.color(0xFFCEEA)))
+			.append(text(".dev", TextColor.color(0xFFB7E5))),
+		text("crowdcontrol.live", TextColor.color(0xFAE100))
 	);
 
 	/**
-	 * A warning message sent to players when they join the server if they have no Twitch account
-	 * linked.
+	 * A warning message sent to players when they join the server if they have no stream account linked.
 	 */
-	Component JOIN_MESSAGE_2 = Component.translatable(
-			"cc.join.link.text",
-			TextColor.color(0xF1D4FC),
-			Component.text("/account link <username>", NamedTextColor.GOLD)
+	Component JOIN_MESSAGE_2 = translatable(
+		"cc.join.link.text",
+		TextColor.color(0xF1D4FC)
 	)
-			.hoverEvent(Component.translatable("cc.join.link.hover"))
-			.clickEvent(ClickEvent.suggestCommand("/account link "));
+		.hoverEvent(translatable("cc.join.link.hover"))
+		.clickEvent(ClickEvent.suggestCommand("/account link "));
 
 	/**
 	 * A warning message sent to players when they join the server if global effects are
 	 * completely unavailable.
 	 */
-	Component NO_GLOBAL_EFFECTS_MESSAGE = warning(Component.translatable(
-			"cc.error.no-global-effects",
-			Component.text("global", TextColor.color(0xF9AD9E)),
-			Component.text("true", TextColor.color(0xF9AD9E)),
-			Component.text("hosts", TextColor.color(0xF9AD9E))
+	Component NO_GLOBAL_EFFECTS_MESSAGE = warning(translatable(
+		"cc.error.no-global-effects",
+		text("global", TextColor.color(0xF9AD9E)),
+		text("true", TextColor.color(0xF9AD9E)),
+		text("hosts", TextColor.color(0xF9AD9E))
 	));
 
 	/**
 	 * Error message displayed to non-admins when the service is not enabled.
 	 */
-	Component NO_CC_USER_ERROR = Component.translatable(
-			"cc.error.prefix.critical",
-			NamedTextColor.RED,
-			Component.translatable(
-					"cc.error.user-error",
-					_ERROR_COLOR
-			)
+	Component NO_CC_USER_ERROR = translatable(
+		"cc.error.prefix.critical",
+		NamedTextColor.RED,
+		translatable(
+			"cc.error.user-error",
+			_ERROR_COLOR
+		)
 	);
 
 	/**
 	 * Error message displayed to admins when the password is not set.
 	 */
-	Component NO_CC_OP_ERROR_NO_PASSWORD = warning(Component.translatable(
+	Component NO_CC_OP_ERROR_NO_PASSWORD = warning(translatable(
 			"cc.error.no-password.text",
-			Component.text("/password <password>", NamedTextColor.GOLD),
-			Component.text("/crowdcontrol reconnect", NamedTextColor.GOLD)
-	)
+			text("/password <password>", NamedTextColor.GOLD),
+			text("/crowdcontrol reconnect", NamedTextColor.GOLD)
+		)
 			.clickEvent(ClickEvent.suggestCommand("/password "))
-			.hoverEvent(Component.translatable("cc.error.no-password.hover"))
+			.hoverEvent(translatable("cc.error.no-password.hover"))
 	);
 
 	/**
 	 * Error message displayed to admins when the error is unknown.
 	 */
-	Component NO_CC_UNKNOWN_ERROR = error(Component.translatable("cc.error.unknown"));
+	Component NO_CC_UNKNOWN_ERROR = error(translatable("cc.error.unknown"));
 
 	/**
 	 * Gets the provided command sender as a player.
@@ -244,8 +246,7 @@ public interface Plugin<P, S> {
 		try {
 			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "i18n/CrowdControl", getClass(), Locale.US));
 		} catch (Exception e) {
-			System.out.println("Failed to initialize i18n");
-			e.printStackTrace();
+			getSLF4JLogger().error("Failed to initialize i18n", e);
 		}
 
 		CommandManager<S> manager = getCommandManager();
@@ -259,217 +260,261 @@ public interface Plugin<P, S> {
 
 		// base command
 		Builder<S> account = manager.commandBuilder("account")
-				.meta(CommandMeta.DESCRIPTION, "Manage your connected Twitch account(s)")
-				.permission(sender -> !isAdminRequired() || mapper.isAdmin(sender));
+			.meta(CommandMeta.DESCRIPTION, "Manage your connected stream account(s)")
+			.permission(sender -> !isAdminRequired() || mapper.isAdmin(sender));
 
 		// link command
 		manager.command(account.literal("link")
-				.meta(CommandMeta.DESCRIPTION, "Link a Twitch account to your Minecraft account")
-				.argument(
-						StringArgument.<S>newBuilder("username")
-								.single()
-								.asRequired()
-								.manager(manager)
-								.build(),
-						ArgumentDescription.of("The username of the Twitch account to link")
-				)
-				.handler(commandContext -> {
-					String username = commandContext.get("username");
-					S sender = commandContext.getSender();
-					Audience audience = mapper.asAudience(sender);
-					UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
-							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerManager().linkPlayer(uuid, username)) {
-						updateConditionalEffectVisibility(getCrowdControl());
-						P player = asPlayer(sender);
-						if (player != null)
-							sendPlayerEvent(player, "playerJoined");
-						audience.sendMessage(output(Component.translatable(
-								"cc.command.account.link.output",
-								Component.text(username, NamedTextColor.AQUA)
-						)));
-					} else {
-						audience.sendMessage(output(Component.translatable(
-								"cc.command.account.link.error",
-								NamedTextColor.RED,
-								Component.text(username, NamedTextColor.AQUA)
-						)));
-					}
-				}));
+			.meta(CommandMeta.DESCRIPTION, "Link a stream account to your Minecraft account")
+			.argument(
+				StringArgument.<S>newBuilder("username")
+					.single()
+					.asRequired()
+					.manager(manager)
+					.build(),
+				ArgumentDescription.of("The username of the stream account to link")
+			)
+			.handler(commandContext -> {
+				String username = commandContext.get("username");
+				S sender = commandContext.getSender();
+				Audience audience = mapper.asAudience(sender);
+				UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
+					new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
+				if (getPlayerManager().linkPlayer(uuid, username)) {
+					updateConditionalEffectVisibility(getCrowdControl());
+					P player = asPlayer(sender);
+					if (player != null)
+						sendPlayerEvent(player, "playerJoined");
+					audience.sendMessage(output(translatable(
+						"cc.command.account.link.output",
+						text(username, NamedTextColor.AQUA)
+					)));
+				} else {
+					audience.sendMessage(output(translatable(
+						"cc.command.account.link.error",
+						NamedTextColor.RED,
+						text(username, NamedTextColor.AQUA)
+					)));
+				}
+			}));
 		// unlink command
 		manager.command(account.literal("unlink")
-				.meta(CommandMeta.DESCRIPTION, "Unlink a Twitch account from your Minecraft account")
-				.argument(
-						StringArgument.<S>newBuilder("username")
-								.single()
-								.asRequired()
-								.manager(manager)
-								.withSuggestionsProvider((ctx, input) -> {
-									Optional<UUID> uuid = mapper.tryGetUniqueId(ctx.getSender());
-									if (!uuid.isPresent()) return Collections.emptyList();
-									Collection<String> linkedAccounts = getPlayerManager().getLinkedAccounts(uuid.get());
-									if (linkedAccounts.isEmpty()) return Collections.emptyList();
-									String lowerInput = input.toLowerCase(Locale.ENGLISH);
-									Set<String> suggestions = new LinkedHashSet<>();
-									for (String acc : linkedAccounts) {
-										if (acc.startsWith(lowerInput))
-											suggestions.add(acc);
-									}
-									for (String acc : linkedAccounts) {
-										if (acc.contains(lowerInput))
-											suggestions.add(acc);
-									}
-									return new ArrayList<>(suggestions);
-								})
-								.build(),
-						ArgumentDescription.of("The username of the Twitch account to unlink")
-				)
-				.handler(commandContext -> {
-					String username = commandContext.get("username");
-					S sender = commandContext.getSender();
-					Audience audience = mapper.asAudience(sender);
-					UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
-							new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-					if (getPlayerManager().unlinkPlayer(uuid, username)) {
-						updateConditionalEffectVisibility(getCrowdControl());
-						audience.sendMessage(output(Component.translatable(
-								"cc.command.account.unlink.output",
-								Component.text(username, NamedTextColor.AQUA)
-						)));
-					} else {
-						audience.sendMessage(output(Component.translatable(
-								"cc.command.account.unlink.error",
-								NamedTextColor.RED,
-								Component.text(username, NamedTextColor.AQUA)
-						)));
-					}
-				}));
+			.meta(CommandMeta.DESCRIPTION, "Unlink a stream account from your Minecraft account")
+			.argument(
+				StringArgument.<S>newBuilder("username")
+					.single()
+					.asRequired()
+					.manager(manager)
+					.withSuggestionsProvider((ctx, input) -> {
+						Optional<UUID> uuid = mapper.tryGetUniqueId(ctx.getSender());
+						if (!uuid.isPresent()) return Collections.emptyList();
+						Collection<String> linkedAccounts = getPlayerManager().getLinkedAccounts(uuid.get());
+						if (linkedAccounts.isEmpty()) return Collections.emptyList();
+						String lowerInput = input.toLowerCase(Locale.ENGLISH);
+						Set<String> suggestions = new LinkedHashSet<>();
+						for (String acc : linkedAccounts) {
+							if (acc.startsWith(lowerInput))
+								suggestions.add(acc);
+						}
+						for (String acc : linkedAccounts) {
+							if (acc.contains(lowerInput))
+								suggestions.add(acc);
+						}
+						return new ArrayList<>(suggestions);
+					})
+					.build(),
+				ArgumentDescription.of("The username of the stream account to unlink")
+			)
+			.handler(commandContext -> {
+				String username = commandContext.get("username");
+				S sender = commandContext.getSender();
+				Audience audience = mapper.asAudience(sender);
+				UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
+					new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
+				if (getPlayerManager().unlinkPlayer(uuid, username)) {
+					updateConditionalEffectVisibility(getCrowdControl());
+					audience.sendMessage(output(translatable(
+						"cc.command.account.unlink.output",
+						text(username, NamedTextColor.AQUA)
+					)));
+				} else {
+					audience.sendMessage(output(translatable(
+						"cc.command.account.unlink.error",
+						NamedTextColor.RED,
+						text(username, NamedTextColor.AQUA)
+					)));
+				}
+			}));
 
 		//// CrowdControl Command ////
 
 		// base command
 		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
-				.meta(CommandMeta.DESCRIPTION, "Manage the Crowd Control socket")
-				.permission(mapper::isAdmin);
+			.meta(CommandMeta.DESCRIPTION, "View information about and manage the Crowd Control service");
 
 		// connect command
 		manager.command(ccCmd.literal("connect")
-				.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
-				.handler(commandContext -> {
-					Audience sender = mapper.asAudience(commandContext.getSender());
-					if (getCrowdControl() != null)
-						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.connect.error", NamedTextColor.RED)));
-					else {
-						initCrowdControl();
-						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.connect.output")));
-					}
-				}));
+			.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
+			.permission(mapper::isAdmin)
+			.handler(commandContext -> {
+				Audience sender = mapper.asAudience(commandContext.getSender());
+				if (getCrowdControl() != null)
+					sender.sendMessage(output(translatable("cc.command.crowdcontrol.connect.error", NamedTextColor.RED)));
+				else {
+					initCrowdControl();
+					sender.sendMessage(output(translatable("cc.command.crowdcontrol.connect.output")));
+				}
+			}));
 		// disconnect command
 		manager.command(ccCmd.literal("disconnect")
-				.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
-				.handler(commandContext -> {
-					Audience sender = mapper.asAudience(commandContext.getSender());
-					if (getCrowdControl() == null)
-						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.disconnect.error", NamedTextColor.RED)));
-					else {
-						getCrowdControl().shutdown("Disconnected issued by server administrator");
-						updateCrowdControl(null);
-						sender.sendMessage(output(Component.translatable("cc.command.crowdcontrol.disconnect.output")));
-					}
-				}));
+			.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
+			.permission(mapper::isAdmin)
+			.handler(commandContext -> {
+				Audience sender = mapper.asAudience(commandContext.getSender());
+				if (getCrowdControl() == null)
+					sender.sendMessage(output(translatable("cc.command.crowdcontrol.disconnect.error", NamedTextColor.RED)));
+				else {
+					getCrowdControl().shutdown("Disconnected issued by server administrator");
+					updateCrowdControl(null);
+					sender.sendMessage(output(translatable("cc.command.crowdcontrol.disconnect.output")));
+				}
+			}));
 		// reconnect command
 		manager.command(ccCmd.literal("reconnect")
-				.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
-				.handler(commandContext -> {
-					Audience audience = mapper.asAudience(commandContext.getSender());
-					CrowdControl cc = getCrowdControl();
-					if (cc != null)
-						cc.shutdown("Reconnect issued by server administrator");
-					initCrowdControl();
+			.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
+			.permission(mapper::isAdmin)
+			.handler(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.getSender());
+				CrowdControl cc = getCrowdControl();
+				if (cc != null)
+					cc.shutdown("Reconnect issued by server administrator");
+				initCrowdControl();
 
-					audience.sendMessage(output(Component.translatable("cc.command.crowdcontrol.reconnect.output")));
-				}));
+				audience.sendMessage(output(translatable("cc.command.crowdcontrol.reconnect.output")));
+			}));
 		// status command
 		manager.command(ccCmd.literal("status")
-				.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-				.handler(commandContext -> mapper.asAudience(commandContext.getSender()).sendMessage(output(
-						Component.translatable("cc.command.crowdcontrol.status." + (getCrowdControl() != null))))));
+			.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
+			.permission(mapper::isAdmin)
+			.handler(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.getSender());
+				CrowdControl cc = getCrowdControl();
+				if (cc == null) {
+					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
+					return;
+				}
+				TextComponent.Builder msg = text()
+					.append(PREFIX_COMPONENT)
+					.append(translatable("cc.command.crowdcontrol.status.online"))
+					.appendSpace();
+				Set<Request.Source> sources = cc.getSources();
+				if (sources.isEmpty())
+					msg.append(translatable("cc.command.crowdcontrol.status.sources.none"));
+				else {
+					msg.append(translatable("cc.command.crowdcontrol.status.sources.header"));
+					Component unknown = translatable("cc.command.crowdcontrol.status.sources.unknown", NamedTextColor.GRAY);
+					for (Request.Source source : sources) {
+						Component ip = ofNullable(source.ip()).map(InetAddress::toString).<Component>map(Component::text).orElse(unknown);
+						Component login = ofNullable(source.login()).<Component>map(Component::text).orElse(unknown);
+						Component service = ofNullable(source.target()).map(Request.Target::getService).<Component>map(Component::text).orElse(unknown);
+						Component name = ofNullable(source.target()).map(Request.Target::getName).<Component>map(Component::text).orElse(unknown);
+						msg.appendNewline().append(translatable("cc.command.crowdcontrol.status.sources.entry", ip, login, service, name));
+					}
+				}
+				audience.sendMessage(msg);
+			}));
+		// version command
+		manager.command(ccCmd.literal("version")
+			.meta(CommandMeta.DESCRIPTION, "Get the version of the server's and players' Crowd Control mod")
+			.handler(ctx -> {
+				Audience audience = mapper.asAudience(ctx.getSender());
+				Component message = output(translatable("cc.command.crowdcontrol.version.server", text(SemVer.MOD.toString())));
+				if (canGetModVersion()) {
+					audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.header")));
+					for (P player : getAllPlayers()) { // TODO: get all players real
+						Optional<SemVer> version = getModVersion(player);
+						if (version.isPresent()) {
+							String key = "cc.command.crowdcontrol.version.client." + (version.get().equals(SemVer.MOD) ? "match" : "mismatch");
+							audience.sendMessage(translatable(key, text(playerMapper().getUsername(player)), text(version.get().toString())));
+						} else
+							audience.sendMessage(translatable("cc.command.crowdcontrol.version.client.unknown", text(playerMapper().getUsername(player))));
+					}
+				} else {
+					audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.unknown")));
+				}
+			}));
 		// execute command
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")
-					.meta(CommandMeta.DESCRIPTION, "Executes the effect with the given ID")
-					.permission(mapper::isAdmin)
-					.argument(
-							StringArgument.<S>newBuilder("effect")
-									.single()
-									.asRequired()
-									.manager(manager)
-									.withSuggestionsProvider((ctx, input) -> {
-										List<Command<P>> effects = commandRegister().getCommands();
-										String lowerInput = input.toLowerCase(Locale.ENGLISH);
-										Set<String> suggestions = new LinkedHashSet<>();
-										for (Command<P> effect : effects) {
-											String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-											if (effectName.startsWith(lowerInput))
-												suggestions.add(effectName);
-										}
-										for (Command<P> effect : effects) {
-											String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-											if (effectName.contains(lowerInput))
-												suggestions.add(effectName);
-										}
-										return new ArrayList<>(suggestions);
-									})
-									.build(),
-							ArgumentDescription.of("The username of the Twitch account to unlink")
-					)
-					.handler(commandContext -> {
-						// TODO: allow targeting multiple players
-						S sender = commandContext.getSender();
-						Audience audience = mapper.asAudience(sender);
-						P player = asPlayer(sender);
-						if (player == null) {
-							audience.sendMessage(output(Component.translatable("cc.command.cast-error", NamedTextColor.RED)));
-							return;
-						}
-						Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
-						@SuppressWarnings("ArraysAsListWithZeroOrOneArgument") // need mutable list
-						List<P> players = Arrays.asList(player);
-						effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build());
-					})
+				.meta(CommandMeta.DESCRIPTION, "Executes the effect with the given ID")
+				.permission(mapper::isAdmin)
+				.argument(
+					StringArgument.<S>newBuilder("effect")
+						.single()
+						.asRequired()
+						.manager(manager)
+						.withSuggestionsProvider((ctx, input) -> {
+							List<Command<P>> effects = commandRegister().getCommands();
+							String lowerInput = input.toLowerCase(Locale.ENGLISH);
+							Set<String> suggestions = new LinkedHashSet<>();
+							for (Command<P> effect : effects) {
+								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
+								if (effectName.startsWith(lowerInput))
+									suggestions.add(effectName);
+							}
+							for (Command<P> effect : effects) {
+								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
+								if (effectName.contains(lowerInput))
+									suggestions.add(effectName);
+							}
+							return new ArrayList<>(suggestions);
+						})
+						.build(),
+					ArgumentDescription.of("The username of the stream account to unlink")
+				)
+				.handler(commandContext -> {
+					// TODO: allow targeting multiple players
+					S sender = commandContext.getSender();
+					Audience audience = mapper.asAudience(sender);
+					P player = asPlayer(sender);
+					if (player == null) {
+						audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+						return;
+					}
+					Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
+					@SuppressWarnings("ArraysAsListWithZeroOrOneArgument") // need mutable list
+					List<P> players = Arrays.asList(player);
+					effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build());
+				})
 			);
 		}
 
 		//// Password Command ////
 		manager.command(manager.commandBuilder("password")
-				.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
-				.permission(mapper::isAdmin)
-				.argument(StringArgument.<S>newBuilder("password").greedy().asRequired())
-				.handler(commandContext -> {
-					Audience sender = mapper.asAudience(commandContext.getSender());
-					if (!isServer()) {
-						sender.sendMessage(output(Component.translatable("cc.command.password.error", NamedTextColor.RED)));
-						return;
-					}
-					String password = commandContext.get("password");
-					setPassword(password);
-					sender.sendMessage(output(Component.translatable(
-							"cc.command.password.output",
-							Component.text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
+			.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
+			.permission(mapper::isAdmin)
+			.argument(StringArgument.<S>newBuilder("password").greedy().asRequired())
+			.handler(commandContext -> {
+				Audience sender = mapper.asAudience(commandContext.getSender());
+				String password = commandContext.get("password");
+				setPassword(password);
+				sender.sendMessage(output(translatable(
+						"cc.command.password.output",
+						text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
 					)
-							.hoverEvent(Component.translatable(
-									"cc.command.password.output.hover",
-									Component.text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
-							))
-							.clickEvent(ClickEvent.runCommand("/crowdcontrol reconnect"))
-					));
-				})
+						.hoverEvent(translatable(
+							"cc.command.password.output.hover",
+							text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
+						))
+						.clickEvent(ClickEvent.runCommand("/crowdcontrol reconnect"))
+				));
+			})
 		);
 
 		new MinecraftExceptionHandler<S>()
-				.withDefaultHandlers()
-				.withDecorator(component -> output(component).color(NamedTextColor.RED))
-				.apply(manager, mapper::asAudience);
+			.withDefaultHandlers()
+			.withDecorator(component -> output(component).color(NamedTextColor.RED))
+			.apply(manager, mapper::asAudience);
 	}
 
 	/**
@@ -574,7 +619,7 @@ public interface Plugin<P, S> {
 	 * "Hosts" are defined as streamers whose incoming requests should apply to all online players
 	 * instead of just that streamer.
 	 *
-	 * @return a collection of strings possibly containing Twitch usernames, IDs, Minecraft
+	 * @return a collection of strings possibly containing stream usernames, IDs, Minecraft
 	 * usernames, or Minecraft UUIDs
 	 */
 	@CheckReturnValue
@@ -689,8 +734,8 @@ public interface Plugin<P, S> {
 	 * Sends a packet to trigger a remote function on the Crowd Control service.
 	 *
 	 * @param service the service to send the packet to
-	 * @param method the name of the remote function to call
-	 * @param args the arguments to pass to the remote function
+	 * @param method  the name of the remote function to call
+	 * @param args    the arguments to pass to the remote function
 	 */
 	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String method, @Nullable Object @Nullable ... args) {
 		if (service == null)
@@ -702,10 +747,10 @@ public interface Plugin<P, S> {
 		try {
 			getSLF4JLogger().debug("sending packet {} {} to {}", method, Arrays.toString(args), service);
 			Response response = service.buildResponse()
-					.packetType(PacketType.REMOTE_FUNCTION)
-					.method(method)
-					.addArguments(args)
-					.build();
+				.packetType(PacketType.REMOTE_FUNCTION)
+				.method(method)
+				.addArguments(args)
+				.build();
 			getSLF4JLogger().debug("final packet: {}", response.toJSON());
 			response.send();
 		} catch (Exception e) {
@@ -717,7 +762,7 @@ public interface Plugin<P, S> {
 	 * Sends a packet to trigger a remote function on the Crowd Control service.
 	 *
 	 * @param method the name of the remote function to call
-	 * @param args the arguments to pass to the remote function
+	 * @param args   the arguments to pass to the remote function
 	 */
 	default void sendEmbeddedMessagePacket(@NotNull String method, @Nullable Object @Nullable ... args) {
 		sendEmbeddedMessagePacket(null, method, args);
@@ -733,9 +778,9 @@ public interface Plugin<P, S> {
 	/**
 	 * Sends a player event packet.
 	 *
-	 * @param service the service to send the packet to
+	 * @param service   the service to send the packet to
 	 * @param eventType the type of event to send
-	 * @param force whether to send the event even if the player is not necessarily connected
+	 * @param force     whether to send the event even if the player is not necessarily connected
 	 */
 	default void sendPlayerEvent(@Nullable SocketManager service, @NotNull String eventType, boolean force) {
 		if (service == null) {
@@ -744,18 +789,18 @@ public interface Plugin<P, S> {
 		}
 		if (getSentEvents().getOrDefault(eventType, Collections.emptyList()).contains(service))
 			return;
-		String login = Optional.ofNullable(service.getSource()).map(Request.Source::login).orElse(null);
+		String login = ofNullable(service.getSource()).map(Request.Source::login).orElse(null);
 		Response.Builder builder = service.buildResponse()
-				.packetType(PacketType.GENERIC_EVENT)
-				.eventType(eventType)
-				.internal(true);
+			.packetType(PacketType.GENERIC_EVENT)
+			.eventType(eventType)
+			.internal(true);
 		boolean success = force;
 		if (force) {
 			getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, login, service.getDisplayName());
 			builder.putData("player", login).send();
 		} else {
 			getSLF4JLogger().info("Sources for service {}: {}", service.getDisplayName(), service.getSources());
-			Optional<P> optPlayer = Optional.ofNullable(login).flatMap(playerMapper()::getPlayerByLogin);
+			Optional<P> optPlayer = ofNullable(login).flatMap(playerMapper()::getPlayerByLogin);
 			if (optPlayer.isPresent()) {
 				success = true;
 				P player = optPlayer.get();
@@ -770,7 +815,7 @@ public interface Plugin<P, S> {
 	/**
 	 * Finds the {@link SocketManager}s for a player and sends a player event packet to each.
 	 *
-	 * @param player the player to send the event for
+	 * @param player    the player to send the event for
 	 * @param eventType the type of event to send
 	 */
 	default void sendPlayerEvent(@NotNull P player, @NotNull String eventType) {
@@ -807,10 +852,10 @@ public interface Plugin<P, S> {
 			return;
 		getSLF4JLogger().debug("Updating status of effects {} to {}", Arrays.toString(ids), status);
 		Response response = respondable.buildResponse()
-				.packetType(PacketType.EFFECT_STATUS)
-				.ids(Arrays.stream(ids).map(id -> id.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()))
-				.type(status)
-				.build();
+			.packetType(PacketType.EFFECT_STATUS)
+			.ids(Arrays.stream(ids).map(id -> id.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()))
+			.type(status)
+			.build();
 		response.send();
 	}
 
@@ -911,13 +956,6 @@ public interface Plugin<P, S> {
 	}
 
 	/**
-	 * Determines if the {@link CrowdControl} instance is running in server mode.
-	 *
-	 * @return true if the {@link CrowdControl} instance is running in server mode
-	 */
-	boolean isServer();
-
-	/**
 	 * Gets the plugin's {@link CommandManager}.
 	 *
 	 * @return command manager instance
@@ -957,9 +995,8 @@ public interface Plugin<P, S> {
 	 *
 	 * @param password unencrypted password
 	 * @throws IllegalArgumentException if the password is null
-	 * @throws IllegalStateException    if the plugin is not running in {@link #isServer() server mode}
 	 */
-	void setPassword(@NotNull String password) throws IllegalArgumentException, IllegalStateException;
+	void setPassword(@NotNull String password) throws IllegalArgumentException;
 
 	/**
 	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
@@ -1016,14 +1053,14 @@ public interface Plugin<P, S> {
 			// send messages
 			Audience audience = mapper.asAudience(player);
 			audience.sendMessage(JOIN_MESSAGE_1);
-			if (!isGlobal() && isServer() && !hasLinkedAccount(joiningPlayer) && (!isAdminRequired() || playerMapper().isAdmin(player)))
+			if (!isGlobal() && !hasLinkedAccount(joiningPlayer) && (!isAdminRequired() || playerMapper().isAdmin(player)))
 				audience.sendMessage(JOIN_MESSAGE_2);
 			if (!globalEffectsUsable())
 				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
 			CrowdControl cc = getCrowdControl();
 			if (cc == null) {
 				if (mapper.isAdmin(player)) {
-					if (isServer() && getPasswordOrEmpty().equals(""))
+					if (getPasswordOrEmpty().isEmpty())
 						audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
 					else
 						audience.sendMessage(NO_CC_UNKNOWN_ERROR);
@@ -1145,7 +1182,7 @@ public interface Plugin<P, S> {
 	static Component getViewerComponentOrNull(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
 		if ((!chat && hidesNames.isHideOther()) || (chat && hidesNames.isHideChat()))
 			return null;
-		return Component.text(request.getViewer());
+		return text(request.getViewer());
 	}
 
 	/**
@@ -1159,6 +1196,16 @@ public interface Plugin<P, S> {
 	@NotNull
 	static Component getViewerComponent(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
 		return ExceptionUtil.validateNotNullElse(getViewerComponentOrNull(hidesNames, request, chat), VIEWER_NAME);
+	}
+
+	/**
+	 * Returns whether {@link #getModVersion(Object)} is expected to be able to produce a value.
+	 * This is {@code false} on mod implementations that do not support mod version checking and client-side effects.
+	 *
+	 * @return whether {@link #getModVersion(Object)} is expected to be able to produce a value
+	 */
+	default boolean canGetModVersion() {
+		return false;
 	}
 
 	/**
@@ -1219,7 +1266,7 @@ public interface Plugin<P, S> {
 				if (uuid.equals(data.getId()) || username.equalsIgnoreCase(data.getName()))
 					found = true;
 			}
-			// else search for matching data from the game (user-provided twitch account)
+			// else search for matching data from the game (user-provided stream account)
 			if (!found && source.target() != null) {
 				String name = source.target().getName();
 				String login = source.target().getLogin();

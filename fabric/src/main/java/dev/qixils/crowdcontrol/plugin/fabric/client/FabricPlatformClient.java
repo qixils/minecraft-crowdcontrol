@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 @Environment(EnvType.CLIENT)
 public final class FabricPlatformClient implements ClientModInitializer {
-	private final Logger logger = LoggerFactory.getLogger(FabricPlatformClient.class);
+	private final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
 	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	private static @Nullable FabricPlatformClient INSTANCE = null;
 	public static boolean SHADER_ACTIVE = false;

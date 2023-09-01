@@ -1,12 +1,10 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.BlockFinder;
-import dev.qixils.crowdcontrol.plugin.sponge7.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -29,12 +27,10 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
-	private final TypedTag<BlockType> stones;
 	private final String effectName = "vein";
 
 	public VeinCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
-		stones = new TypedTag<>(CommonTags.STONES, plugin, BlockType.class);
 	}
 
 	@Contract(value = "null -> fail", mutates = "param1")

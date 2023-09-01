@@ -160,11 +160,6 @@ public final class ConcatenatedList<E> extends AbstractList<E> {
 	}
 
 	@Override
-	public void add(int index, E element) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public E remove(int index) {
 		throw new UnsupportedOperationException();
 	}

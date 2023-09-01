@@ -1,17 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -29,12 +26,10 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
-	private final TypedTag<Block> stones;
 	private final String effectName = "vein";
 
 	public VeinCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);
-		stones = new TypedTag<>(CommonTags.STONES, Registry.BLOCK);
 	}
 
 	// Gets a 2x2 chunk of blocks

@@ -1,10 +1,8 @@
 package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.TriState;
-import dev.qixils.crowdcontrol.common.ClientOnly;
 import dev.qixils.crowdcontrol.common.EventListener;
-import dev.qixils.crowdcontrol.common.Global;
-import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -15,6 +13,7 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.CheckReturnValue;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * A command which handles incoming effects requested by Crowd Control server.
@@ -164,6 +164,25 @@ public interface Command<P> {
 	 * @param request request that prompted the execution of this command
 	 */
 	default void executeAndNotify(@NotNull Request request) {
+		ExecuteUsing.Type executeUsing = Optional.ofNullable(getClass().getAnnotation(ExecuteUsing.class))
+			.map(ExecuteUsing::value)
+			.orElse(ExecuteUsing.Type.ASYNC);
+		Executor executor;
+		switch (executeUsing) {
+			case ASYNC:
+				executor = getPlugin().getAsyncExecutor();
+				break;
+			case SYNC_GLOBAL:
+				executor = getPlugin().getSyncExecutor(); // TODO: getGlobalExecutor
+				break;
+			default:
+				throw new IllegalStateException("Unknown ExecuteUsing type: " + executeUsing);
+		}
+		executor.execute(() -> wrappedExecuteAndNotify(request));
+	}
+
+	@ApiStatus.Internal
+	default void wrappedExecuteAndNotify(@NotNull Request request) {
 		Plugin<P, ?> plugin = getPlugin();
 		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
 		List<P> players = plugin.getPlayers(request);
@@ -181,15 +200,15 @@ public interface Command<P> {
 		if (isGlobal()) {
 			if (!plugin.globalEffectsUsable()) {
 				request.buildResponse()
-						.type(ResultType.FAILURE)
-						.message("Global effects are disabled")
-						.send();
+					.type(ResultType.FAILURE)
+					.message("Global effects are disabled")
+					.send();
 				return;
 			} else if (!isGlobalCommandUsable(players, request)) {
 				request.buildResponse()
-						.type(ResultType.FAILURE)
-						.message("Global effects cannot be used on the targeted streamer")
-						.send();
+					.type(ResultType.FAILURE)
+					.message("Global effects cannot be used on the targeted streamer")
+					.send();
 				return;
 			}
 		}
@@ -198,15 +217,15 @@ public interface Command<P> {
 		if (isClientOnly()) {
 			if (!getPlugin().supportsClientOnly()) {
 				request.buildResponse()
-						.type(ResultType.UNAVAILABLE)
-						.message("Client-side effects are not supported by this setup")
-						.send();
+					.type(ResultType.UNAVAILABLE)
+					.message("Client-side effects are not supported by this setup")
+					.send();
 				return;
 			} else if (!isClientAvailable(players, request)) {
 				request.buildResponse()
-						.type(ResultType.FAILURE)
-						.message("Client-side effects are currently unavailable or cannot be used on this streamer")
-						.send();
+					.type(ResultType.FAILURE)
+					.message("Client-side effects are currently unavailable or cannot be used on this streamer")
+					.send();
 				return;
 			}
 		}
@@ -215,7 +234,7 @@ public interface Command<P> {
 		List<P> shuffledPlayers = new ArrayList<>(players);
 		Collections.shuffle(shuffledPlayers);
 
-		execute(shuffledPlayers, request).thenAccept(builder -> {
+		execute(shuffledPlayers, request).thenAcceptAsync(builder -> {
 			if (builder == null) return;
 
 			Response response = builder.build();
@@ -223,7 +242,7 @@ public interface Command<P> {
 
 			if (response.getResultType() == Response.ResultType.SUCCESS)
 				announce(plugin.playerMapper().asAudience(players), request);
-		});
+		}, plugin.getAsyncExecutor());
 	}
 
 	/**
@@ -351,7 +370,7 @@ public interface Command<P> {
 					getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
 			));
 		} catch (Exception e) {
-			LoggerFactory.getLogger(Command.class).warn("Failed to announce effect", e);
+			LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
 		}
 	}
 

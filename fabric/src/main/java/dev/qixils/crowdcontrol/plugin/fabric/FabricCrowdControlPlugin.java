@@ -89,7 +89,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	};
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
-	private final Logger SLF4JLogger = LoggerFactory.getLogger("crowdcontrol");
+	private final Logger SLF4JLogger = LoggerFactory.getLogger("CrowdControl");
 	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
@@ -215,6 +215,11 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Override
 	public @NotNull Audience getConsole() {
 		return adventure().console();
+	}
+
+	@Override
+	public boolean canGetModVersion() {
+		return true;
 	}
 
 	@Override

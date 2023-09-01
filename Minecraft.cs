@@ -60,6 +60,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Teleport to a Nearby Structure", "structure") { Price = 750, Category = "World", Description = "Teleports players to a random nearby structure (i.e. village, desert temple, nether fortress, etc.)" },
         new("Teleport to a Random Biome", "biome") { Price = 750, Category = "World", Description = "Teleports players to a random nearby biome (i.e. ocean, plains, desert, etc.)" },
         new("Teleport All Entities To Players", "entity_chaos") { Price = 3000, Category = "World", Description = "Teleports every loaded mob on the server to the targeted players in an even split. Note that this may only teleport nearby mobs on certain server configurations." },
+        new("Unite Players", "unite") { Price = 500, Category = new("World", "Player"), Description = "Teleports all players in the session to one random player" },
         new("Water Bucket Clutch", "bucket_clutch") { Price = 400, Category = new("World", "Player"), Description = "Teleports players 30 blocks up and gives them a water bucket, forcing them to clutch if they want to live" },
         // time commands
         new("Set Time to Day", "time_day") { Price = 50, SortName = "Time: Day", Group = "global", Category = "Server", Description = "Jumps the clock ahead to daytime" },

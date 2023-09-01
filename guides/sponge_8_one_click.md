@@ -2,7 +2,7 @@
 
 The following steps provide a quick setup for running a local game server.
 
-1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+1. Download and install the [Crowd Control app](https://crowdcontrol.live/).
 2. In the **Game Library** tab, select **Minecraft**.
 3. Select **Configure Minecraft**.
 4. Enter your Minecraft username and click next.
@@ -10,9 +10,13 @@ The following steps provide a quick setup for running a local game server.
 6. Select **Local**.
 7. Select **Click to install** and **Okay**.
 8. (Optional) You may now select **Open Folder** next to **Minecraft** on the **Game Paths** tab and
-   copy any Forge 1.16.5 mods you want to play with into the `Sponge8/mods` folder. If you're
-   playing a modpack, you may also have to copy the modpack's `config` folder into the `Sponge8`
-   folder.
+   copy any Forge 1.16.5 mods you want to play with,
+   such as [my mod that emulates 1.16.1 speedrunning](https://modrinth.com/mod/depiglining/versions?g=1.16.5&l=forge),
+   into the `Sponge8/mods` folder. If you're
+   playing a modpack, you should instead extract the modpack's server pack into the `Sponge8`
+   folder. You should also read
+   [this section of the troubleshooting guide](sponge_8_troubleshooting.md#incompatible-mods)
+   to ensure you do not install any incompatible mods.
 9. In the **Live** tab, select **Launch Server**.
 10. Launch your instance of Minecraft 1.16.5. If you added any mods to the server, your client will
     need to have the same mods installed.

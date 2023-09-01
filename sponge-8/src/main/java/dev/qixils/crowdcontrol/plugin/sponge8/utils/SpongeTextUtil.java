@@ -5,8 +5,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.NotNull;
 
-import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
-
 public class SpongeTextUtil extends TextUtilImpl {
 
 	/**
@@ -26,8 +24,8 @@ public class SpongeTextUtil extends TextUtilImpl {
 	public static String csIdOf(Keyed type) {
 		Key key = type.key();
 		String value = key.value();
-		if (!key.namespace().equals(MINECRAFT_NAMESPACE))
-			return key.value();
+//		if (!key.namespace().equals(MINECRAFT_NAMESPACE))
+//			return key.value();
 
 		switch (value) {
 			case "lightning_bolt":

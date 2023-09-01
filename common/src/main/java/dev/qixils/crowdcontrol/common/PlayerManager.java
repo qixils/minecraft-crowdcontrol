@@ -53,28 +53,28 @@ public interface PlayerManager<P> {
 	Collection<@NotNull P> getSpectators();
 
 	/**
-	 * Links a Twitch account to a Minecraft account. Account links are not exclusive.
+	 * Links a stream account to a Minecraft account. Account links are not exclusive.
 	 *
 	 * @param uuid the UUID of the Minecraft account
-	 * @param twitchUsername the Twitch username
+	 * @param username the streamer's username
 	 * @return whether a new link was created
 	 */
-	boolean linkPlayer(@NotNull UUID uuid, @NotNull String twitchUsername);
+	boolean linkPlayer(@NotNull UUID uuid, @NotNull String username);
 
 	/**
-	 * Unlinks a Twitch account from a Minecraft account.
+	 * Unlinks a stream account from a Minecraft account.
 	 *
 	 * @param uuid the UUID of the Minecraft account
-	 * @param twitchUsername the Twitch username
+	 * @param username the streamer's username
 	 * @return whether a link was deleted
 	 */
-	boolean unlinkPlayer(@NotNull UUID uuid, @NotNull String twitchUsername);
+	boolean unlinkPlayer(@NotNull UUID uuid, @NotNull String username);
 
 	/**
-	 * Returns the Twitch accounts linked to a Minecraft account.
+	 * Returns the stream accounts linked to a Minecraft account.
 	 *
 	 * @param uuid the UUID of the Minecraft account
-	 * @return a collection of Twitch accounts
+	 * @return a collection of stream accounts
 	 */
 	@CheckReturnValue
 	@NotNull

@@ -9,6 +9,8 @@ import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffect;
@@ -18,7 +20,11 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static dev.qixils.crowdcontrol.plugin.fabric.Command.csIdOf;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, FabricCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
@@ -108,11 +114,24 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			() -> new ShaderCommand(plugin, "bits", new SemVer(3, 3, 0)),
 			() -> new ShaderCommand(plugin, "spider", new SemVer(3, 3, 0)),
 			() -> new ShaderCommand(plugin, "phosphor", new SemVer(3, 3, 0)),
-			() -> new DeleteRandomItemCommand(plugin)
+			() -> new DeleteRandomItemCommand(plugin),
+			() -> new UniteCommand(plugin)
 		));
 
 		// entity commands
-		for (EntityType<?> entity : Registry.ENTITY_TYPE) {
+		Map<String, EntityType<?>> minecraftEntities = new HashMap<>();
+		Map<String, EntityType<?>> moddedEntities = new HashMap<>();
+		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : Registry.ENTITY_TYPE.entrySet()) {
+			String id = csIdOf(entry.getKey().location());
+			if (!CommandConstants.ENTITIES.contains(id)) continue;
+			Map<String, EntityType<?>> entities = entry.getKey().location().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE) ? minecraftEntities : moddedEntities;
+			entities.put(id, entry.getValue());
+		}
+		for (Map.Entry<String, EntityType<?>> entry : moddedEntities.entrySet()) {
+			if (minecraftEntities.containsKey(entry.getKey())) continue;
+			minecraftEntities.put(entry.getKey(), entry.getValue());
+		}
+		for (EntityType<?> entity : minecraftEntities.values()) {
 			initTo(commands, () -> new SummonEntityCommand<>(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand<>(plugin, entity));
 		}

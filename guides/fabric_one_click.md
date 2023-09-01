@@ -2,7 +2,7 @@
 
 The following steps provide a quick setup for running a local game server.
 
-1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+1. Download and install the [Crowd Control app](https://crowdcontrol.live/).
 2. In the **Game Library** tab, select **Minecraft**.
 3. Select **Configure Minecraft**.
 4. Enter your Minecraft username and click next.
@@ -12,7 +12,7 @@ The following steps provide a quick setup for running a local game server.
 8. (Optional) You may now select **Open Folder** next to **Minecraft** on the **Game Paths** tab and
    copy any Fabric 1.20.1 mods you want to play with into the `Fabric/mods` folder. If you're
    playing a modpack, you may also have to copy the modpack's `config` folder into the `Fabric`
-    folder.
+   folder.
 9. In the **Live** tab, select **Launch Server**.
 10. (Optional) For extra effects and the best experience, install the client mod using the
     [Client Installation](fabric_1.20.1_client_installation.md) guide.

@@ -2,6 +2,25 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.4
+
+- Added a new effect Unite Players which teleports all players to one random player
+- Added a unique sound effect for Open Lucky Lootbox
+- Added extra plants to the Place Flowers effect (mushrooms and fungi)
+- Added `CrowdControl` to the prefix of all log messages for easier filtering
+- Added new `/crowdcontrol version` command to display the version of the mod
+- Added extra diagnostic information to `/crowdcontrol status`
+- Changed the Bucket Clutch effect to work in the nether by using a cobweb instead of water
+- Changed the Bucket Clutch effect to teleport the player even higher where possible
+- Changed the Chorus Fruit effect to better match vanilla behavior
+- Fixed compatibility with the latest version (2.0.2) of Crowd Control
+- Fixed warnings about duplicate effects on some modpacks
+- Fixed summon effects on Sponge 10+ (1.19+)
+- Fixed killer rabbits spawning more than intentional on Paper servers
+- Removed air from the Lootbox loot table
+- Removed the legacy config options which were no longer usable
+- Reduced data sent to the Crowd Control app when using large modpacks
+
 ## 3.3.3
 
 - Allowed `/account link` to function once again
@@ -13,7 +32,7 @@ A list of all changes made to the software in reverse chronological order.
 ## 3.3.2
 
 - Improved the reliability of the account auto-detection feature
-- Further updates and fixes for [Crowd Control 2.0](https://beta.crowdcontrol.live/)
+- Further updates and fixes for Crowd Control 2.0
 - Added support for 1.20.1 on Paper and Fabric
 
 ## 3.3.1
@@ -21,7 +40,7 @@ A list of all changes made to the software in reverse chronological order.
 - Added an account auto-detection feature which tries to automatically link a streamer's Minecraft
   account and their Crowd Control app session to remove the need to run `/account link`. Certain
   event setups may wish to utilize the `autodetect` config option to disable this feature.
-- Further updates and fixes for [Crowd Control 2.0](https://beta.crowdcontrol.live/)
+- Further updates and fixes for Crowd Control 2.0
 - Increased the height of the Dig Hole effect to destroy partial blocks (i.e. slabs, stairs, etc.)
 - Teleport to X Location effects are now more likely to place a glass block to stand on
 - Backported the Fabric mod to 1.19.2 (experimental) and updated to 1.20 snapshots

@@ -18,7 +18,8 @@ Users of other launchers should find and download the mod from Modrinth or Curse
 6. Download the latest build of
    [Crowd Control for Fabric](https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=1.20.1)
    and place it in the `mods` folder.
-7. Copy all the other Fabric 1.20.1 mods that you want to play with into the `mods` folder.
+7. (Optional) Copy all the other Fabric 1.20.1 mods that you want to play with into the `mods`
+   folder.
 
 You may now [join a Crowd Control server](fabric_joining_a_server.md) or
 [start a single player session](#starting-a-single-player-session).
@@ -28,7 +29,7 @@ You may now [join a Crowd Control server](fabric_joining_a_server.md) or
 The following steps detail how to start a Crowd Control session on a single player world. It assumes
 you have already downloaded and installed the mod.
 
-1. Download and install the [Crowd Control 2.0 app](https://beta.crowdcontrol.live/).
+1. Download and install the [Crowd Control app](https://crowdcontrol.live/).
 2. In the **Game Library** tab, select **Minecraft**.
 3. Select **Configure Minecraft**.
 4. Enter your Minecraft username and click next.

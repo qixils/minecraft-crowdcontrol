@@ -129,3 +129,12 @@ MinecraftServer.sln
 .gradle/
 buildSrc/
 build/
+
+# JavaScript
+node_modules/
+.svelte-kit/
+.env
+.env.*
+!.env.example
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

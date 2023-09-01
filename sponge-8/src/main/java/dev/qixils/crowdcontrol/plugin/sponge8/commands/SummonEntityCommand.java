@@ -11,10 +11,10 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.MooshroomTypes;
 import org.spongepowered.api.data.type.RabbitType;
-import org.spongepowered.api.data.type.RabbitTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.ArmorStand;
@@ -41,25 +41,27 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	protected final EntityType<E> entityType;
 	private final String effectName;
 	private final Component displayName;
-	private static final Map<RabbitType, Integer> RABBIT_VARIANTS;
-
-	static {
-		Map<RabbitType, Integer> variants = new HashMap<>();
-		variants.put(RabbitTypes.BLACK.get(), 16);
-		variants.put(RabbitTypes.BLACK_AND_WHITE.get(), 16);
-		variants.put(RabbitTypes.BROWN.get(), 16);
-		variants.put(RabbitTypes.GOLD.get(), 16);
-		variants.put(RabbitTypes.SALT_AND_PEPPER.get(), 16);
-		variants.put(RabbitTypes.WHITE.get(), 16);
-		variants.put(RabbitTypes.KILLER.get(), 1);
-		RABBIT_VARIANTS = Collections.unmodifiableMap(variants);
-	}
+	private final Map<RabbitType, Integer> rabbitVariants;
 
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "entity_" + csIdOf(entityType.key(RegistryTypes.ENTITY_TYPE));
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType);
+
+		// pre-compute rabbits
+		List<RabbitType> allVariants = plugin.registryList(RegistryTypes.RABBIT_TYPE);
+		Map<RabbitType, Integer> weightedVariants = new HashMap<>();
+		int totalVariants = allVariants.size() - 1; // subtract 1 for killer rabbit
+		int weight = 100 / totalVariants;
+		for (RabbitType variant : allVariants) {
+			ResourceKey key = variant.key(RegistryTypes.RABBIT_TYPE);
+			if (key.value().equals("evil") || key.value().equals("killer"))
+				weightedVariants.put(variant, 1);
+			else
+				weightedVariants.put(variant, weight);
+		}
+		rabbitVariants = Collections.unmodifiableMap(weightedVariants);
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentType, List<ItemType>> armor = new HashMap<>(4);
@@ -134,7 +136,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		entity.offer(Keys.HAS_CHEST, RNG.nextBoolean());
 		// TODO horse armor
 		// enderman held block API is unavailable in API v8 | todo: open issue?
-		entity.offer(Keys.RABBIT_TYPE, weightedRandom(RABBIT_VARIANTS));
+		entity.offer(Keys.RABBIT_TYPE, weightedRandom(rabbitVariants));
 		entity.offer(Keys.VILLAGER_TYPE, randomElementFrom(plugin.registryIterator(RegistryTypes.VILLAGER_TYPE)));
 		entity.offer(SpongeCrowdControlPlugin.VIEWER_SPAWNED, true);
 		// API8: loot table data | TODO: still no API for it; may need to open an issue

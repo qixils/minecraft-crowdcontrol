@@ -74,7 +74,7 @@ public class LootboxCommand extends ImmediateCommand {
 		this.effectName = effectName.toString();
 
 		// create item collections
-		allItems = plugin.getGame().registry(RegistryTypes.ITEM_TYPE).stream().collect(Collectors.toList());
+		allItems = plugin.getGame().registry(RegistryTypes.ITEM_TYPE).stream().filter(it -> it != ItemTypes.AIR.get()).collect(Collectors.toList());
 		goodItems = allItems.stream()
 				.filter(itemType ->
 						ItemStack.of(itemType).get(Keys.MAX_DURABILITY).orElse(0) > 1

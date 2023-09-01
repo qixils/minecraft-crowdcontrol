@@ -13,7 +13,7 @@ global: false
 # The hosts or owners of a server, through which viewers are able to purchase specific universal
 #  effects such as setting the server difficulty or changing the weather.
 # Acceptable values for this field include Minecraft usernames,
-#  UUIDs (formatted with or without dashes), Twitch usernames, and Twitch IDs.
+#  UUIDs (formatted with or without dashes), stream usernames, and stream IDs.
 # Example:
 #hosts: ["MinecraftUsername1", "TwitchUsername2", "123456", "d1de9ca878f64aae87a18c112f675f12"]
 hosts: []
@@ -54,18 +54,3 @@ limits:
     default: 0
     ender_dragon: 1
     wither: 1
-
-##################
-# Legacy Options #
-##################
-
-# When enabled, the plugin will run using the legacy client mode.
-# This mode is considered legacy as it is unsupported by the Crowd Control app.
-# You will need a custom .ccpak file to use this mode.
-legacy: false
-
-# IP address to connect to when running in the legacy client mode.
-# This should usually be a local IP address (i.e. "127.0.0.1") unless this server is being
-#  run on a different machine than the streamer's PC.
-# This value is not applicable when running in server mode and thus will be ignored.
-ip: 127.0.0.1

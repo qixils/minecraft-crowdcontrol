@@ -83,12 +83,13 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> GravityCommand.low(plugin),
 			() -> GravityCommand.high(plugin),
 			() -> GravityCommand.maximum(plugin),
-			() -> new DeleteRandomItemCommand(plugin)
+			() -> new DeleteRandomItemCommand(plugin),
+			() -> new UniteCommand(plugin)
 		));
 
 		// entity commands
 		for (EntityType entity : EntityType.values()) {
-			if (entity == EntityType.UNKNOWN) continue;
+			if (!CommandConstants.ENTITIES.contains(entity.name())) continue;
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}

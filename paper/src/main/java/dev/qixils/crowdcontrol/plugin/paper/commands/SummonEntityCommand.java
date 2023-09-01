@@ -27,8 +27,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
-import static dev.qixils.crowdcontrol.common.util.RandomUtil.RNG;
-import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
@@ -177,7 +176,7 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
 		if (entity instanceof Rabbit rabbit)
-			rabbit.setRabbitType(randomElementFrom(Rabbit.Type.class));
+			rabbit.setRabbitType(weightedRandom(RABBIT_VARIANTS));
 		if (entity instanceof Villager villager)
 			villager.setVillagerType(randomElementFrom(Villager.Type.class));
 		if (entity instanceof ZombieVillager villager)
