@@ -6,9 +6,10 @@ for SpongeForge 1.16.5.
 1. Download and install the latest build (36.2.39)
    of [Forge 1.16.5](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.16.5.html).
     - You may first need to download and install [Java](https://adoptium.net/temurin/releases/).
+    - This step may be skipped for preinstalled modpacks.
 2. Navigate to your Minecraft installation folder.
-    - On Windows, this can be accessed by Pressing `Windows Key + R` and typing
-      `%AppData%\.minecraft`.
+    - On Windows, for the vanilla launcher, this can be accessed by Pressing `Windows Key + R` and
+      typing `%AppData%\.minecraft`.
 3. Create a new folder called `mods`.
 4. Download the latest build of
    [Sponge 8](https://spongepowered.org/downloads/spongeforge?minecraft=1.16.5&offset=0)
