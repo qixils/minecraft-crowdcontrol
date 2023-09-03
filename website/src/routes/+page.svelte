@@ -1,4 +1,4 @@
-<h1 id="header">Minecraft Crowd Control</h1>
+<h1>Minecraft Crowd Control</h1>
 
 <p>
     Minecraft <a href="https://crowdcontrol.live/">Crowd Control</a> is a Minecraft mod that allows your livestream
@@ -8,7 +8,13 @@
 
 <h2>Installation</h2>
 <p>
-    For help installing the mod, see the new <a href="/setup">dynamic setup guide</a>.
+    For help installing the mod, see the <a href="/setup">dynamic setup guide</a>.
+</p>
+
+<h2>Credits</h2>
+<p>
+    This mod was created by <a href="https://qixils.dev/">Lexi</a>
+    with the support of <a href="https://crowdcontrol.live">Crowd Control</a>.
 </p>
 
 <style>
