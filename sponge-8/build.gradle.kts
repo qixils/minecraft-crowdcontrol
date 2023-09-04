@@ -21,7 +21,7 @@ repositories {
 dependencies {
     implementation(project(":configurate-common"))
     implementation("com.github.qixils.cloud:cloud-sponge:feature~sponge-SNAPSHOT")
-    compileOnly("org.spongepowered:spongeapi:8.1.0")
+    compileOnly("org.spongepowered:spongeapi:10.0.0")
     //compileOnly("org.spongepowered:sponge:1.16.5-8.0.0-SNAPSHOT:dev")
 }
 
