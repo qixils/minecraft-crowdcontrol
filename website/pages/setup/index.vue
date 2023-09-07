@@ -73,6 +73,5 @@ function set(value: any) {
         </NuxtLink>
       </p>
     </div>
-    <!-- TODO -->
   </main>
 </template>
