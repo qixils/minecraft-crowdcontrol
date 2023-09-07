@@ -1,4 +1,18 @@
-html {
+<script setup lang="ts">
+//const route = useRoute()
+</script>
+
+<template>
+  <div>
+    <NuxtLayout>
+      <NuxtLoadingIndicator />
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
+</template>
+
+<style>
+  html {
     --neutral-color: #151129;
     --accent-color: #ffec3b;
     --font-size-base: 1.125em;
@@ -11,15 +25,15 @@ html {
     font-family: var(--font-base);
     font-size: var(--font-size-base);
     line-height: var(--leading-base);
-}
+  }
 
-main {
+  main {
     margin: 0 auto;
     max-width: 40em;
     padding: 0 1em;
-}
+  }
 
-code {
+  code {
     background-color: #282943;
     border-radius: 0.75em;
     color: #f74660;
@@ -27,13 +41,14 @@ code {
     display: inline-block;
     line-height: var(--leading-tight);
     padding: 0.25em 0.5em;
-}
+  }
 
-a {
+  a {
     color: var(--accent-color);
     text-decoration: none;
-}
+  }
 
-header, h1 {
+  header, h1 {
     text-align: center;
-}
+  }
+</style>
