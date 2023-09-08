@@ -1,21 +1,19 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
-import dev.qixils.crowdcontrol.common.util.CommonTags;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.TypedTag;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.server.ServerLocation;
 
@@ -31,12 +29,10 @@ import static dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder.isAir;
 
 @Getter
 public class VeinCommand extends ImmediateCommand {
-	private final TypedTag<BlockType> stones;
 	private final String effectName = "vein";
 
 	public VeinCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
-		stones = new TypedTag<>(CommonTags.STONES, plugin, RegistryTypes.BLOCK_TYPE);
 	}
 
 	@Contract(value = "null -> fail", mutates = "param1")
@@ -56,7 +52,7 @@ public class VeinCommand extends ImmediateCommand {
 			BlockFinder finder = BlockFinder.builder()
 					.origin(player.serverLocation())
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(location -> !isAir(location.blockType()))
+					.locationValidator(location -> !isAir(location.block()))
 					.build();
 
 			for (int iter = 0; iter < VEIN_COUNT; iter++) {
@@ -92,8 +88,8 @@ public class VeinCommand extends ImmediateCommand {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 1; ++z) {
 					ServerLocation loc = base.add(x, y, z);
-					BlockType blockType = loc.blockType();
-					if (!isAir(blockType)) {
+					BlockState block = loc.block();
+					if (!isAir(block)) {
 						stoneBlocks.add(loc);
 					}
 				}

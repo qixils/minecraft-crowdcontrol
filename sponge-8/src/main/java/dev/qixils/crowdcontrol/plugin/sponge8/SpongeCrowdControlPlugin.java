@@ -24,16 +24,12 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataStore;
-import org.spongepowered.api.data.type.MatterType;
-import org.spongepowered.api.data.type.MatterTypes;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
@@ -58,6 +54,8 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Plugin("crowdcontrol")
@@ -127,20 +125,20 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		);
 	}
 
-	public static boolean isMatter(BlockState block, MatterType matter) {
-		return block.get(Keys.MATTER_TYPE).map(actual -> actual.equals(matter)).orElse(false);
-	}
-
-	public static boolean isLiquid(BlockState block) {
-		return isMatter(block, MatterTypes.LIQUID.get());
+	public <T> Stream<T> registryStream(RegistryType<T> registryType) {
+		return game.registry(registryType).stream();
 	}
 
 	public <T> Iterator<T> registryIterator(RegistryType<T> registryType) {
-		return game.registry(registryType).stream().iterator();
+		return registryStream(registryType).iterator();
 	}
 
 	public <T> Iterable<T> registryIterable(RegistryType<T> registryType) {
 		return () -> registryIterator(registryType);
+	}
+
+	public <T> List<T> registryList(RegistryType<T> registryType) {
+		return registryStream(registryType).collect(Collectors.toList());
 	}
 
 	@Override

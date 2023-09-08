@@ -363,8 +363,10 @@ public class RandomUtil {
 	 * @param to   exclusive maximum value
 	 * @return random double between {@code from} and {@code to}
 	 */
+	@Deprecated
 	public static double nextDouble(double from, double to) {
-		return from + (RNG.nextDouble() * (to - from));
+		return RNG.nextDouble(from, to);
+		//return from + (RNG.nextDouble() * (to - from));
 	}
 
 }

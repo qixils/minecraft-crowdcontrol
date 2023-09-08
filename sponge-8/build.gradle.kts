@@ -7,10 +7,10 @@ plugins {
 }
 
 repositories {
-//    maven {
-//        name = "Sponge"
-//        url = uri("https://repo.spongepowered.org/")
-//    }
+    maven {
+        name = "Sponge"
+        url = uri("https://repo.spongepowered.org/")
+    }
 
     maven {
         name = "Jitpack"

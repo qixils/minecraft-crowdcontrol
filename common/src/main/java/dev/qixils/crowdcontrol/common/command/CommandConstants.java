@@ -193,6 +193,14 @@ public class CommandConstants {
 	 */
 	public static final int CHAOS_LOCAL_RADIUS = 20;
 	/**
+	 * The minimum amount of blocks to teleport a player up by when executing the Bucket Clutch command.
+	 */
+	public static final int BUCKET_CLUTCH_MIN = 30;
+	/**
+	 * The maximum amount of blocks to teleport a player up by when executing the Bucket Clutch command.
+	 */
+	public static final int BUCKET_CLUTCH_MAX = 100;
+	/**
 	 * The title to use in the annoying pop-up menu.
 	 */
 	public static final Component POPUP_TITLE = Component.translatable("cc.effect.toast.title");
@@ -246,6 +254,10 @@ public class CommandConstants {
 			Key.key(MINECRAFT_NAMESPACE, "cornflower"),
 			Key.key(MINECRAFT_NAMESPACE, "lily_of_the_valley"),
 			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
+			Key.key(MINECRAFT_NAMESPACE, "brown_mushroom"),
+			Key.key(MINECRAFT_NAMESPACE, "red_mushroom"),
+			Key.key(MINECRAFT_NAMESPACE, "crimson_fungus"),
+			Key.key(MINECRAFT_NAMESPACE, "warped_fungus"),
 			// legacy pre-1.12
 			Key.key(MINECRAFT_NAMESPACE, "red_flower"),
 			Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
@@ -415,6 +427,14 @@ public class CommandConstants {
 	 * The chance of a summoned mushroom cow being brown as a percentage from 0 to 1.
 	 */
 	public static final double MUSHROOM_COW_BROWN_CHANCE = 0.01;
+	/**
+	 * The minimum radius to teleport from the Eat Chorus Fruit command. Vanilla is 0.
+	 */
+	public static final int EAT_CHORUS_FRUIT_MIN_RADIUS = 3;
+	/**
+	 * The maximum radius to teleport from the Eat Chorus Fruit command. Vanilla is 8.
+	 */
+	public static final int EAT_CHORUS_FRUIT_MAX_RADIUS = 16;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");
