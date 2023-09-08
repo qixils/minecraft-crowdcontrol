@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const version = paperVersions[0];
+const version = paperLatest;
 </script>
 
 <template>

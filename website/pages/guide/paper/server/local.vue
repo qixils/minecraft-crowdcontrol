@@ -3,8 +3,8 @@ import {computed} from 'vue';
 
 const route = useRoute();
 const version = useState('version', () => route.query.v);
-if (!version.value || !paperVersions.includes(version.value)) { version.value = paperVersions[0]; }
-const latest = computed(() => version.value === paperVersions[0]);
+if (!version.value || !paperVersions.includes(version.value)) { version.value = paperLatest; }
+const latest = computed(() => version.value === paperLatest);
 </script>
 
 <template>

@@ -3,8 +3,8 @@ import {computed} from 'vue';
 
 const route = useRoute();
 const version = useState('version', () => route.query.v);
-if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricVersions[0]; }
-const latest = computed(() => version.value === fabricVersions[0]);
+if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricLatest; }
+const latest = computed(() => version.value === fabricLatest);
 </script>
 
 <template>

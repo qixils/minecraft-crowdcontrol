@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const version = fabricVersions[0];
+const version = fabricLatest;
 </script>
 
 <template>

@@ -19,6 +19,6 @@ Minecraft [Crowd Control](https://crowdcontrol.live/) is a Minecraft mod that al
 viewers on any platform to interact with your game using tips, bits, channel points, charitable
 donations, and more. It can run as a client mod or as a server plugin.
 
-## Installation
+## Setup
 
-Please use the new [dynamic setup guide](https://mccc.qixils.dev/setup) to help you install the mod.
+For help installing and using the mod, please see the [setup guide](https://mccc.qixils.dev/setup).

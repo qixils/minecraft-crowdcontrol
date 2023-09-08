@@ -55,6 +55,29 @@
     text-align: center;
   }
 
+  .alert {
+    background-color: var(--alert-bg-color, black);
+    color: var(--alert-fg-color, white);
+    padding: 0.75rem 1.25rem;
+    margin: 1rem 0;
+    border-radius: 0.25rem;
+    box-shadow: var(--alert-bg-color, black) 0 0 0.4rem;
+  }
+
+  .alert-warning {
+    --alert-bg-color: #fbbd23;
+    --alert-fg-color: #382800;
+  }
+
+  .alert-danger {
+    --alert-bg-color: #f87272;
+    --alert-fg-color: #470000;
+  }
+
+  .alert-warning a, .alert-danger a {
+    color: #ad1818;
+  }
+
   @media (prefers-color-scheme: light) {
     html {
       --bg-color: #f5f5f5;

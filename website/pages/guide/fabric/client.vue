@@ -3,8 +3,8 @@ import {computed} from 'vue';
 
 const route = useRoute();
 const version = useState('version', () => route.query.v);
-if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricVersions[0]; }
-const latest = computed(() => version.value === fabricVersions[0]);
+if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricLatest; }
+const latest = computed(() => version.value === fabricLatest);
 </script>
 
 <template>
@@ -15,8 +15,8 @@ const latest = computed(() => version.value === fabricVersions[0]);
 
     <p>
       The following steps detail how to install the Crowd Control mod in the vanilla Minecraft launcher.
-      Users of third-party launchers should download and install the mod from
-      <a href="https://modrinth.com/plugin/crowdcontrol">Modrinth</a>
+      Users of third-party launchers likely can skip this section, as you should be able to download and install the mod
+      from <a href="https://modrinth.com/plugin/crowdcontrol">Modrinth</a>
       or <a href="https://curseforge.com/minecraft/mc-mods/crowdcontrol">CurseForge</a>
       using your launcher's mod management system.
     </p>
@@ -39,7 +39,11 @@ const latest = computed(() => version.value === fabricVersions[0]);
       <li>(Optional) Copy all the other Fabric {{ version }} mods that you want to play with into the <code>mods</code> folder.</li>
     </ol>
 
-    <p>You may now <NuxtLink :to="`/guide/fabric/join?v=${version}`">join a Crowd Control server</NuxtLink> or <a href="#starting">start a single player session</a>.</p>
+    <p>
+      The mod is now installed! Open your Minecraft Launcher and select the <code>fabric-loader-{{version}}</code> profile to play.
+      You may now <NuxtLink :to="`/guide/fabric/join?v=${version}`">join a Crowd Control server</NuxtLink>
+      or <a href="#starting">start a single player session</a>.
+    </p>
 
     <h2 id="starting">Starting a Single Player Session</h2>
 
