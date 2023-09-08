@@ -8,7 +8,7 @@ const latest = computed(() => version.value === fabricVersions[0]);
 </script>
 
 <template>
-  <main>
+  <div>
     <h1>Fabric {{ version }} Client Setup</h1>
 
     <h2>Installing the Mod</h2>
@@ -39,7 +39,7 @@ const latest = computed(() => version.value === fabricVersions[0]);
       <li>(Optional) Copy all the other Fabric {{ version }} mods that you want to play with into the <code>mods</code> folder.</li>
     </ol>
 
-    <p>You may now <NuxtLink to="/setup/fabric/join">join a Crowd Control server</NuxtLink> or <a href="#starting">start a single player session</a>.</p>
+    <p>You may now <NuxtLink :to="`/guide/fabric/join?v=${version}`">join a Crowd Control server</NuxtLink> or <a href="#starting">start a single player session</a>.</p>
 
     <h2 id="starting">Starting a Single Player Session</h2>
 
@@ -59,7 +59,5 @@ const latest = computed(() => version.value === fabricVersions[0]);
       <li>In the app, if you see a <strong>Connector Error</strong> button, click on it to refresh the connection to the game.</li>
       <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
     </ol>
-
-    <p>If you experience issues at any point, please reach out for help on our <a href="https://discord.gg/warpworld">Discord</a>.</p>
-  </main>
+  </div>
 </template>

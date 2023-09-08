@@ -17,7 +17,7 @@
     --fg-color: white;
     --accent-color: #ffec3b;
     --code-bg-color: rgba(100, 100, 100, 0.1);
-    --code-fg-color: rgb(246, 23, 55);
+    --code-fg-color: #F06478;
     --font-size-base: 1.125em;
     --font-base: Poppins,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
     --leading-base: 1.65;
@@ -61,6 +61,7 @@
       --fg-color: #0d0a1a;
       --accent-color: #5d01c0;
       --code-bg-color: rgba(120, 120, 120, 0.1);
+      --code-fg-color: #F61737;
     }
   }
 </style>

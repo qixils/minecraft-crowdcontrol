@@ -5,7 +5,7 @@ if (!version.value || !paperVersions.includes(version.value)) { version.value = 
 </script>
 
 <template>
-  <main>
+  <div>
     <h1>Paper {{ version }} Remote Server Setup</h1>
 
     <p>The following steps detail how to set up a Minecraft {{ version }} remote Paper server with Crowd Control.</p>
@@ -24,10 +24,10 @@ if (!version.value || !paperVersions.includes(version.value)) { version.value = 
       <li>(Optional) To edit the plugin's config file, you must first shut down the server using <code>/stop</code>. The config file can be found at <code>&lt;root&gt;/plugins/CrowdControl/config.yml</code>.</li>
     </ol>
 
-    <p>Users may now connect using the <NuxtLink :to="`/setup/paper/join?v=${version}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide the server's IP address and the password used in the config file (default: <code>crowdcontrol</code>) to your streamers.</p>
+    <p>Users may now connect using the <NuxtLink :to="`/guide/paper/join?v=${version}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide the server's IP address and the password used in the config file (default: <code>crowdcontrol</code>) to your streamers.</p>
 
     <p>For extra security, consider enabling a user whitelist using the vanilla <code>/whitelist</code> command. This prevents unknown players from joining the server and potentially griefing your builds.</p>
 
     <p>You may also be interested in setting up <a href="https://geysermc.org/">GeyserMC</a> to allow Bedrock edition users (i.e. console players) to play.</p>
-  </main>
+  </div>
 </template>

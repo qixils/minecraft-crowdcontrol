@@ -11,9 +11,9 @@
       It can run as a client mod or as a server plugin.
     </p>
 
-    <h2>Installation</h2>
+    <h2>Setup</h2>
     <p>
-      For help installing the mod, see the <NuxtLink to="/setup">dynamic setup guide</NuxtLink>.
+      For help installing and using the mod, please see the <NuxtLink to="/setup">setup guide</NuxtLink>.
     </p>
 
     <h2>Credits</h2>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const version = "1.20.1";
+const version = paperVersions[0];
 </script>
 
 <template>
-  <main>
+  <div>
     <h1>Paper {{ version }} Automatic Setup</h1>
 
     <p>The following steps provide a quick setup for running a local game server.</p>
@@ -23,7 +23,5 @@ const version = "1.20.1";
       <li>(Optional) If you're sharing effects with another streamer, run the command <code>/account link INSERT_USERNAME</code> to receive their effects. The username should come from what's displayed in the top left corner of their Crowd Control app.</li>
       <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
     </ol>
-
-    <p>If you experience issues at any point, please reach out for help on our <a href="https://discord.gg/warpworld">Discord</a>.</p>
-  </main>
+  </div>
 </template>

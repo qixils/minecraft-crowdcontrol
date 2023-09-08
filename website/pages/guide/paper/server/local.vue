@@ -8,7 +8,7 @@ const latest = computed(() => version.value === paperVersions[0]);
 </script>
 
 <template>
-  <main>
+  <div>
     <h1>Paper {{ version }} Local Server Setup</h1>
 
     <p>The following steps detail how to manually set up a Minecraft {{ version }} local Paper server with Crowd Control.</p>
@@ -31,10 +31,10 @@ const latest = computed(() => version.value === paperVersions[0]);
       <li>Ensure the ports 25565 and 58431 are open in your router's firewall so that users may connect to the Minecraft server and its Crowd Control server.</li>
     </ol>
 
-    <p>Users may now connect using the <NuxtLink :to="`/setup/paper/join?v=${version}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide your public IP address and the password used in the config file (default: <code>crowdcontrol</code>) to your streamers.</p>
+    <p>Users may now connect using the <NuxtLink :to="`/guide/paper/join?v=${version}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide your public IP address and the password used in the config file (default: <code>crowdcontrol</code>) to your streamers.</p>
 
     <p>For extra security, consider enabling a user whitelist using the vanilla <code>/whitelist</code> command. This prevents unknown players from joining the server and potentially griefing your builds.</p>
 
     <p>You may also be interested in setting up <a href="https://geysermc.org/">GeyserMC</a> to allow Bedrock edition users (i.e. console players) to play.</p>
-  </main>
+  </div>
 </template>
