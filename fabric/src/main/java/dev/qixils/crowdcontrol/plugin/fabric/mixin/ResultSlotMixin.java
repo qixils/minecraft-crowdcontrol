@@ -8,6 +8,7 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +37,7 @@ public abstract class ResultSlotMixin extends Slot {
 	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
 		if (player.level().isClientSide)
 			return;
-		CraftingRecipe recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
+		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
@@ -44,7 +45,7 @@ public abstract class ResultSlotMixin extends Slot {
 	public void onQuickCraft(ItemStack result, int i, CallbackInfo ci) {
 		if (player.level().isClientSide)
 			return;
-		CraftingRecipe recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
+		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
