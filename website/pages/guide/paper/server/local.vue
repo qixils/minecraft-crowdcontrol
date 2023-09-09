@@ -7,9 +7,9 @@ if (!version.value || !paperVersions.includes(version.value)) { version.value = 
 const latest = computed(() => version.value === paperLatest);
 
 useSeoMeta({
-  title: `Paper ${version} Local Server Setup · Minecraft Crowd Control`,
-  description: `Paper ${version} Local Server Setup Guide`,
-  ogDescription: `Paper ${version} Local Server Setup Guide`,
+  title: `Paper ${version.value} Local Server Setup · Minecraft Crowd Control`,
+  description: `Paper ${version.value} Local Server Setup Guide`,
+  ogDescription: `Paper ${version.value} Local Server Setup Guide`,
 })
 </script>
 

@@ -16,9 +16,9 @@ const forge = computed(() => {
 });
 
 useSeoMeta({
-  title: `Sponge ${version} Local Server Setup · Minecraft Crowd Control`,
-  description: `Sponge ${version} Local Server Setup Guide`,
-  ogDescription: `Sponge ${version} Local Server Setup Guide`,
+  title: `Sponge ${version.value} Local Server Setup · Minecraft Crowd Control`,
+  description: `Sponge ${version.value} Local Server Setup Guide`,
+  ogDescription: `Sponge ${version.value} Local Server Setup Guide`,
 })
 </script>
 

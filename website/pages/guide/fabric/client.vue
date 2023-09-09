@@ -7,9 +7,9 @@ if (!version.value || !fabricVersions.includes(version.value)) { version.value =
 const latest = computed(() => version.value === fabricLatest);
 
 useSeoMeta({
-  title: `Fabric ${version} Client Setup · Minecraft Crowd Control`,
-  description: `Fabric ${version} Client Setup Guide`,
-  ogDescription: `Fabric ${version} Client Setup Guide`,
+  title: `Fabric ${version.value} Client Setup · Minecraft Crowd Control`,
+  description: `Fabric ${version.value} Client Setup Guide`,
+  ogDescription: `Fabric ${version.value} Client Setup Guide`,
 })
 </script>
 

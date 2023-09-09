@@ -4,9 +4,9 @@ const version = useState('version', () => route.query.v);
 if (!version.value || !paperVersions.includes(version.value)) { version.value = paperLatest; }
 
 useSeoMeta({
-  title: `Paper ${version} Remote Server Setup · Minecraft Crowd Control`,
-  description: `Paper ${version} Remote Server Setup Guide`,
-  ogDescription: `Paper ${version} Remote Server Setup Guide`,
+  title: `Paper ${version.value} Remote Server Setup · Minecraft Crowd Control`,
+  description: `Paper ${version.value} Remote Server Setup Guide`,
+  ogDescription: `Paper ${version.value} Remote Server Setup Guide`,
 })
 </script>
 

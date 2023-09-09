@@ -8,9 +8,9 @@ const latest = computed(() => version.value === spongeLatest);
 const api = computed(() => spongeVersions.get(version.value));
 
 useSeoMeta({
-  title: `Sponge ${version} Join Guide · Minecraft Crowd Control`,
-  description: `Sponge ${version} Join Guide`,
-  ogDescription: `Sponge ${version} Join Guide`,
+  title: `Sponge ${version.value} Join Guide · Minecraft Crowd Control`,
+  description: `Sponge ${version.value} Join Guide`,
+  ogDescription: `Sponge ${version.value} Join Guide`,
 })
 </script>
 
