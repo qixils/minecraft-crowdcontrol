@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed} from 'vue'
+import {fabricML} from "~/utils/versions";
 
 const question = useState('question', () => "gamemode")
 const gamemode_index = useState<number | undefined>('gamemode_index', () => undefined)
@@ -13,24 +14,14 @@ const gamemode = computed(() => {
   return gamemodes[gamemode_index.value]
 })
 
-const modloaders: string[][] = [
-  ["Unsure", ...allVersions],
-  ["Paper", ...paperVersions],
-  ["Fabric", ...fabricVersions],
-  ["Sponge/Forge", ...spongeVersionsArray]
-]
 const modloader = computed(() => {
   if (modloader_index.value === undefined) return undefined
-  return modloaders[modloader_index.value][0]
-})
-const modloaderVersions = computed(() => {
-  if (modloader_index.value === undefined) return []
-  return modloaders[modloader_index.value].slice(1)
+  return modloaders[modloader_index.value]
 })
 
 const version = computed(() => {
   if (version_index.value === undefined) return undefined
-  return modloaderVersions.value[version_index.value]
+  return modloader.value!.versions[version_index.value]
 })
 
 function set(value: any) {
@@ -45,7 +36,7 @@ function set(value: any) {
       break;
     case "version":
       version_index.value = value;
-      question.value = (modloader.value === "Unsure" && gamemode.value === "Singleplayer" && fabricVersions.includes(modloaderVersions.value[value])) ? "experience" : "done";
+      question.value = (modloader.value?.id === "unsure" && gamemode.value === "Singleplayer" && fabricVersions.includes(allVersions[value])) ? "experience" : "done";
       break;
     case "experience":
       experience.value = value;
@@ -55,35 +46,31 @@ function set(value: any) {
 }
 
 const guide = computed(() => {
-  if (gamemode.value === undefined) return "ERR! Missing field"
-  if (version.value === undefined) return "ERR! Missing field"
-  if (modloader.value === undefined) return "ERR! Missing field"
-
   let gmval = gamemode.value
   let verval = version.value
   let mlval = modloader.value
-  let mlversval = modloaderVersions.value
   let expval = experience.value
 
+  if (gmval === undefined) return "ERR! Missing field"
+  if (verval === undefined) return "ERR! Missing field"
+  if (mlval === undefined) return "ERR! Missing field"
+
   // pick modloader
-  if (mlval === "Unsure") {
+  if (mlval.id === "unsure") {
     if (fabricVersions.includes(verval) && gmval === "Singleplayer" && expval === true) {
-      mlval = "Fabric";
-      mlversval = fabricVersions;
+      mlval = fabricML;
     } else {
       // just pick the first supported one
       for (const ml of modloaders) {
-        if (ml[0] === "Unsure") continue;
-        let versval = ml.slice(1);
-        if (versval.includes(verval)) {
-          mlval = ml[0];
-          mlversval = versval;
+        if (ml.id === "unsure") continue;
+        if (ml.versions.includes(verval)) {
+          mlval = ml;
           break;
         }
       }
     }
 
-    if (mlval === "Unsure") {
+    if (mlval.id === "unsure") {
       return "ERR! Unable to pick a modloader for your version of Minecraft. Please pick one manually.";
     }
   }
@@ -92,15 +79,15 @@ const guide = computed(() => {
   let page: string;
   if (gmval === "Multiplayer on a remote server") {
     page = "server/remote";
-  } else if (mlval === "Fabric" && gmval === "Singleplayer" && expval === true) {
+  } else if (mlval.id === "fabric" && gmval === "Singleplayer" && expval === true) {
     page = "client";
-  } else if (verval === mlversval[0]) {
+  } else if (verval === mlval.versions[0]) {
     page = "automatic";
   } else {
     page = "server/local";
   }
 
-  return `/guide/${mlval!.toLocaleLowerCase("en-US")}/${page}?v=${verval}`;
+  return `/guide/${mlval.id}/${page}?v=${verval}`;
 })
 </script>
 
@@ -126,14 +113,14 @@ const guide = computed(() => {
       <p>What modloader are you using?</p>
       <div class="buttons">
         <button v-for="(value, index) in modloaders" :key="index" @click="set(index)">
-          {{ value[0] }}
+          {{ value.name }}
         </button>
       </div>
     </div>
     <div v-else-if="question === 'version'">
       <p>What version of Minecraft are you playing?</p>
       <div class="buttons">
-        <button v-for="(value, index) in modloaderVersions" :key="index" @click="set(index)">
+        <button v-for="(value, index) in modloader!.versions" :key="index" @click="set(index)">
           <span v-if="value === allVersions[0]">Latest ({{ value }})</span>
           <span v-else>{{ value }}</span>
         </button>
@@ -148,11 +135,37 @@ const guide = computed(() => {
     </div>
     <div v-else-if="guide.startsWith('ERR! ')">
       <p>
-        Error: {{ guide }}
+        Error: {{ guide.substring(5) }}
       </p>
     </div>
     <div v-else>
-      Please follow <NuxtLink :to="guide">this guide</NuxtLink> to set up Crowd Control.
+      Please follow <NuxtLink :to="guide" class="underline">this guide</NuxtLink> to set up Crowd Control.
     </div>
   </main>
 </template>
+
+<style scoped>
+.buttons {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.buttons button {
+  background-color: var(--accent-color);
+  color: var(--accent-text-color);
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.3rem;
+  box-shadow: var(--accent-color) 0 0 0.2rem;
+  cursor: pointer;
+}
+@media (max-width: 40em) {
+  .buttons {
+    flex-flow: column nowrap;
+  }
+  .buttons button {
+    width: 100%;
+  }
+}
+</style>

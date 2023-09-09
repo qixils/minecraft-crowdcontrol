@@ -16,6 +16,7 @@
     --bg-color: #151129;
     --fg-color: white;
     --accent-color: #ffec3b;
+    --accent-text-color: black;
     --code-bg-color: rgba(100, 100, 100, 0.1);
     --code-fg-color: #F06478;
     --font-size-base: 1.125em;
@@ -78,11 +79,16 @@
     color: #ad1818;
   }
 
+  .underline {
+    text-decoration: underline;
+  }
+
   @media (prefers-color-scheme: light) {
     html {
       --bg-color: #f5f5f5;
       --fg-color: #0d0a1a;
       --accent-color: #5d01c0;
+      --accent-text-color: white;
       --code-bg-color: rgba(120, 120, 120, 0.1);
       --code-fg-color: #F61737;
     }
