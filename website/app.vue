@@ -14,6 +14,12 @@ useHead({
       sizes: '192x192'
     }
   ],
+  meta: [
+    {
+      name: 'theme-color',
+      content: '#F5E339'
+    }
+  ]
 })
 useServerSeoMeta({
   ogTitle: 'Minecraft Crowd Control',
@@ -63,7 +69,7 @@ useServerSeoMeta({
     border-radius: 0.75em;
     color: var(--code-fg-color);
     font-family: monospace;
-    display: inline-block;
+    display: inline;
     line-height: var(--leading-tight);
     padding: 0.25em 0.5em;
   }
