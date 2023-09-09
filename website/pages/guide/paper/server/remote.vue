@@ -13,10 +13,10 @@ if (!version.value || !paperVersions.includes(version.value)) { version.value = 
     <ol>
       <li>In your admin panel, setup a Paper {{ version }} server. Spigot is not supported.</li>
       <li>In the file upload panel, create a new folder named <code>plugins</code>.</li>
-      <li>Download the <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=paper&g=${version}`">latest Paper plugin jar</a> and upload it to the <code>plugins</code> folder.</li>
-      <li>(Optional) Upload any Paper plugins you want to play with into the <code>plugins</code> folder.
+      <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=paper&g=${version}`">Crowd Control</a> and upload it to the <code>plugins</code> folder.</li>
+      <li>(Optional) Upload any other Paper plugins you want to play with into the <code>plugins</code> folder.
         <ul>
-          <li>Pre-generating chunks using a plugin like <a :href="`https://modrinth.com/plugin/chunky/versions?g=${version}&l=paper`">Chunky</a> is recommended for optimal performance though not required.</li>
+          <li>(Optional) Pre-generating chunks using a plugin like <a :href="`https://modrinth.com/plugin/chunky/versions?g=${version}&l=paper`">Chunky</a> is recommended for optimal performance.</li>
         </ul>
       </li>
       <li>In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.</li>

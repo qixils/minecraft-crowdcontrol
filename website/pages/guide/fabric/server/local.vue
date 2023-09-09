@@ -11,11 +11,7 @@ const latest = computed(() => version.value === fabricLatest);
   <div>
     <h1>Fabric {{version}} Local Server Setup</h1>
 
-    <p>The following steps detail how to manually set up a Minecraft Fabric {{version}} server with Crowd Control 2.0.</p>
-
-    <h2>Installing a local server</h2>
-
-    <p>This section walks you through installing a Fabric server to run on your local computer. This section may be skipped when using a remote server hosting service.</p>
+    <p>The following steps detail how to manually set up a Minecraft {{version}} local Fabric server with Crowd Control.</p>
 
     <ol>
       <li>Download and run the <a href="https://fabricmc.net/use/installer/">Fabric Loader installer</a>.
@@ -26,15 +22,10 @@ const latest = computed(() => version.value === fabricLatest);
       <li>In the installer window, click the <code>Server</code> tab and then the triple dots next to the Install Location to open the directory selector. Find or create a new, empty folder and click Open, then click OK. This folder will be important in later steps so don't lose it. From here on, this folder will be referred to as the "root folder".</li>
       <li>Ensure the Minecraft version is set to {{version}} and click the <code>Install</code> button to create the Fabric server. After the setup is complete, click <code>Download server jar</code> and <code>Generate</code> when prompted.</li>
       <li>Close the installer.</li>
-    </ol>
-
-    <h2>Installing the mod</h2>
-
-    <ol>
       <li>Navigate to where you installed the server and create a new folder called <code>mods</code>.</li>
       <li>Download the latest build of the <a :href="`https://modrinth.com/mod/fabric-api/versions?g=${version}&c=release`">Fabric API</a> and place it in the <code>mods</code> folder.</li>
       <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=${version}`">Crowd Control for Fabric</a> and place it in the <code>mods</code> folder.</li>
-      <li>(Optional) Copy all the other Fabric {{version}} mods that you want to play with into the <code>mods</code> folder.</li>
+      <li>(Optional) Copy any other Fabric {{version}} mods that you want to play with into the <code>mods</code> folder.</li>
       <li>Run the Minecraft server using the <code>start.bat</code> file on Windows or <code>start.sh</code> on Linux to initialize the plugin's configuration files. You will have to run it twice, as the first will prompt you to accept Minecraft's End User License Agreement.</li>
       <li>To change the plugin's configuration file, you must first shut down the server by typing <code>stop</code> in the server window. The config file is located at <code>&lt;root&gt;/config/crowdcontrol.conf</code>.</li>
       <li>Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and the Crowd Control server.</li>

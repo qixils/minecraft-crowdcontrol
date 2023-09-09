@@ -20,7 +20,7 @@ const forge = computed(() => {
   <div>
     <h2>SpongeForge {{version}} Local Server Setup</h2>
 
-    <p>The following steps detail how to manually set up a Minecraft Forge {{version}} server with Crowd Control.</p>
+    <p>The following steps detail how to manually set up a Minecraft {{version}} local Forge server with Crowd Control.</p>
 
     <ol>
       <li>Download and install <a :href="`https://adoptium.net/temurin/releases/?version=${java}`">Java {{java}}</a>.</li>
@@ -28,18 +28,11 @@ const forge = computed(() => {
       <li>In the Forge pop-up window, click <code>Install server</code> and then the triple dots in the corner to open
         the directory selector. Find or create a new, empty folder and click Open, then click OK. This
         folder will be important in later steps and will hereafter be referred to as the "root folder".</li>
-      <li>Navigate to the folder you created in your file explorer and create a new folder inside it
-        called <code>mods</code>.</li>
-      <li>Download the latest build of
-        <a :href="`https://www.spongepowered.org/downloads/spongeforge?minecraft=${version}&offset=0`">SpongeForge {{version}}</a>
-        for API v{{api}} and place it in the <code>mods</code> folder.</li>
+      <li>Navigate to the folder you created in your file explorer and create a new folder inside it called <code>mods</code>.</li>
+      <li>Download the latest build of <a :href="`https://www.spongepowered.org/downloads/spongeforge?minecraft=${version}&offset=0`">SpongeForge</a> and place it in the <code>mods</code> folder.</li>
       <li>Create a new <code>plugins</code> folder inside the <code>mods</code> folder.</li>
-      <li>Download the
-        <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=${version}`">latest build of Crowd Control for Sponge {{api}}</a>
-        and place it in the <code>plugins</code> folder.</li>
-      <li>
-        (Optional) Copy all the other Forge {{version}} mods or Sponge {{api}} plugins that you want to play with
-        into the <code>mods</code> folder and the <code>plugins</code> folder respectively.
+      <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=sponge&g=${version}`">Crowd Control</a> and place it in the <code>plugins</code> folder.</li>
+      <li>(Optional) Copy any other Forge {{version}} mods or Sponge {{api}} plugins that you want to play with into the <code>mods</code> folder and the <code>plugins</code> folder respectively.
         <ul>
           <li>
             Please read

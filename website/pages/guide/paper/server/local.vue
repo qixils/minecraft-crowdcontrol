@@ -19,7 +19,7 @@ const latest = computed(() => version.value === paperLatest);
       <li>Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the "root folder."</li>
       <li>Create a new folder named <code>plugins</code> inside the root folder.</li>
       <li>Download the <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=paper&g=${version}`">latest Paper plugin jar</a> and place it in the <code>plugins</code> folder.</li>
-      <li>(Optional) Copy any Paper plugins you want to play with into the <code>plugins</code> folder.</li>
+      <li>(Optional) Copy any other Paper plugins you want to play with into the <code>plugins</code> folder.</li>
       <li>Run the Minecraft server to initialize the plugin's configuration files. You will have to run it twice, as the first will prompt you to accept Minecraft's End User License Agreement by editing <code>eula.txt</code> in a text editing program like Notepad. To run the server:
         <ul>
           <li>On Windows, hold shift and right click inside the root folder. From the context menu, select "Open command window here" or "Open PowerShell here".</li>

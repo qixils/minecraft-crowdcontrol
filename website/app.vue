@@ -33,7 +33,7 @@
 
   main {
     margin: 0 auto;
-    max-width: 40em;
+    max-width: 42em;
     padding: 0 1em;
   }
 
