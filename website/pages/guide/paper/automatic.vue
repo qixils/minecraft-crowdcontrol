@@ -14,6 +14,8 @@ useSeoMeta({
 
     <p>The following steps provide a quick setup for running a local game server.</p>
 
+    <img id="tutorial" src="https://images.warp.world/site/setup/minecraftconfig2.gif" alt="Demonstration of configuring Minecraft in the Crowd Control app." />
+
     <ol>
       <li>Download and install the <a href="https://crowdcontrol.live/">Crowd Control app</a>.</li>
       <li>In the <strong>Game Library</strong> tab, select <strong>Minecraft</strong>.</li>
@@ -37,3 +39,11 @@ useSeoMeta({
     </ol>
   </div>
 </template>
+
+<style scoped>
+  img {
+    display: block;
+    margin: 0 auto;
+    max-width: 28rem;
+  }
+</style>

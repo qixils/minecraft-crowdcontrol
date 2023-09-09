@@ -1,26 +1,4 @@
 <script setup lang="ts">
-useHead({
-  link: [
-    {
-      rel: 'icon',
-      type: 'image/png',
-      href: '/favicon-32.png',
-      sizes: '32x32'
-    },
-    {
-      rel: 'icon',
-      type: 'image/png',
-      href: '/favicon-192.png',
-      sizes: '192x192'
-    }
-  ],
-  meta: [
-    {
-      name: 'theme-color',
-      content: '#F5E339'
-    }
-  ]
-})
 useServerSeoMeta({
   ogTitle: 'Minecraft Crowd Control',
   ogImage: '/logo-2048.png',
