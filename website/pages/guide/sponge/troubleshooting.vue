@@ -11,6 +11,12 @@ const docs = computed(() => {
   return 'stable';
 })
 
+useSeoMeta({
+  title: `Sponge ${version} Troubleshooting Guide · Minecraft Crowd Control`,
+  description: `Sponge ${version} Troubleshooting Guide`,
+  ogDescription: `Sponge ${version} Troubleshooting Guide`,
+})
+
 // TODO: move all the mod data here
 </script>
 

@@ -2,6 +2,12 @@
 const route = useRoute();
 const version = useState('version', () => route.query.v);
 if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricLatest; }
+
+useSeoMeta({
+  title: `Fabric ${version} Remote Server Setup · Minecraft Crowd Control`,
+  description: `Fabric ${version} Remote Server Setup Guide`,
+  ogDescription: `Fabric ${version} Remote Server Setup Guide`,
+})
 </script>
 
 <template>

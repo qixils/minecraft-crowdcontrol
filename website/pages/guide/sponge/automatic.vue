@@ -6,6 +6,12 @@ const version = useState('version', () => route.query.v);
 if (!version.value || !spongeVersions.has(version.value)) { version.value = spongeLatest; }
 const latest = computed(() => version.value === spongeLatest);
 const api = computed(() => spongeVersions.get(version.value));
+
+useSeoMeta({
+  title: `Sponge ${version} Automatic Server Setup · Minecraft Crowd Control`,
+  description: `Sponge ${version} Automatic Server Setup Guide`,
+  ogDescription: `Sponge ${version} Automatic Server Setup Guide`,
+})
 </script>
 
 <template>

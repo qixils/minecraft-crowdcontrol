@@ -14,6 +14,12 @@ const forge = computed(() => {
   if (version.value === '1.16.5') return '36.2.39';
   return 'unknown';
 });
+
+useSeoMeta({
+  title: `Sponge ${version} Local Server Setup · Minecraft Crowd Control`,
+  description: `Sponge ${version} Local Server Setup Guide`,
+  ogDescription: `Sponge ${version} Local Server Setup Guide`,
+})
 </script>
 
 <template>

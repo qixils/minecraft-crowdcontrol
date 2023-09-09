@@ -1,5 +1,11 @@
 <script setup lang="ts">
 const version = paperLatest;
+
+useSeoMeta({
+  title: `Paper ${version} Automatic Server Setup · Minecraft Crowd Control`,
+  description: `Paper ${version} Automatic Server Setup Guide`,
+  ogDescription: `Paper ${version} Automatic Server Setup Guide`,
+})
 </script>
 
 <template>

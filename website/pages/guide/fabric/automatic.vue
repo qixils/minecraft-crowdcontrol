@@ -1,5 +1,11 @@
 <script setup lang="ts">
 const version = fabricLatest;
+
+useSeoMeta({
+  title: `Fabric ${version} Automatic Server Setup · Minecraft Crowd Control`,
+  description: `Fabric ${version} Automatic Server Setup Guide`,
+  ogDescription: `Fabric ${version} Automatic Server Setup Guide`,
+})
 </script>
 
 <template>

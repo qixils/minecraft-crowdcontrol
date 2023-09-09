@@ -5,6 +5,12 @@ const route = useRoute();
 const version = useState('version', () => route.query.v);
 if (!version.value || !paperVersions.includes(version.value)) { version.value = paperLatest; }
 const latest = computed(() => version.value === paperLatest);
+
+useSeoMeta({
+  title: `Paper ${version} Local Server Setup · Minecraft Crowd Control`,
+  description: `Paper ${version} Local Server Setup Guide`,
+  ogDescription: `Paper ${version} Local Server Setup Guide`,
+})
 </script>
 
 <template>

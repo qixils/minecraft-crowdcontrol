@@ -1,4 +1,9 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: `Fabric Join Guide · Minecraft Crowd Control`,
+  description: `Fabric Join Guide`,
+  ogDescription: `Fabric Join Guide`,
+})
 </script>
 
 <template>

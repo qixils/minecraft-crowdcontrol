@@ -1,4 +1,10 @@
 <script setup lang="ts">
+useServerSeoMeta({
+  ogSiteName: undefined,
+  title: 'Minecraft Crowd Control',
+  description: 'Minecraft Crowd Control is a Minecraft mod that allows your livestream viewers on any platform to interact with your game using tips, bits, channel points, charitable donations, and more.',
+  ogDescription: 'Minecraft Crowd Control is a Minecraft mod that allows your livestream viewers on any platform to interact with your game using tips, bits, channel points, charitable donations, and more.',
+})
 </script>
 
 <template>

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: `Setup Guide · Minecraft Crowd Control`,
+  description: `Setup Guide`,
+  ogDescription: `Setup Guide`,
+})
 </script>
 
 <template>

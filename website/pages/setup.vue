@@ -1,4 +1,10 @@
 <script setup lang="ts">
+useServerSeoMeta({
+  title: 'Setup · Minecraft Crowd Control',
+  description: 'Dynamic setup guide for Minecraft Crowd Control',
+  ogDescription: 'Dynamic setup guide for Minecraft Crowd Control',
+})
+
 import {computed} from 'vue'
 import {fabricML} from "~/utils/versions";
 

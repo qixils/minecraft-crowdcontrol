@@ -1,5 +1,26 @@
 <script setup lang="ts">
-//const route = useRoute()
+useHead({
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/favicon-32.png',
+      sizes: '32x32'
+    },
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/favicon-192.png',
+      sizes: '192x192'
+    }
+  ],
+})
+useServerSeoMeta({
+  ogTitle: 'Minecraft Crowd Control',
+  ogImage: '/logo-2048.png',
+  ogImageAlt: 'Crowd Control logo',
+  twitterCard: 'summary',
+})
 </script>
 
 <template>
