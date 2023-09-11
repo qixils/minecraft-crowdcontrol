@@ -5,7 +5,7 @@ plugins {
     id("fabric-loom") version "1.2-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.1.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
-    id("org.spongepowered.gradle.plugin") version "2.1.1" apply false // Generates sponge_plugins.json and runServer task
+    id("org.spongepowered.gradle.plugin") version "2.2.0" apply false // Generates sponge_plugins.json and runServer task
 }
 
 repositories {
