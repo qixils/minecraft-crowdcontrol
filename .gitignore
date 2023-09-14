@@ -1,4 +1,5 @@
 # User-specific stuff
+.fleet/
 .idea/
 
 *.iml
@@ -138,3 +139,9 @@ node_modules/
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+.output/
+.data/
+.nuxt/
+.nitro/
+.cache/
+dist/
