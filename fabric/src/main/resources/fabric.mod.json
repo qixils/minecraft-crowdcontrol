@@ -35,10 +35,10 @@
   ],
   "depends": {
     "fabricloader": ">=0.14.22",
-    "fabric": ">=0.88.4+1.20.2",
+    "fabric": ">=0.88.5+1.20.2",
     "minecraft": ">=1.20.2- <=1.20.2",
-    "cardinal-components-base": ">=5.2.2",
-    "cardinal-components-entity": ">=5.2.2",
+    "cardinal-components-base": ">=5.3.0",
+    "cardinal-components-entity": ">=5.3.0",
     "cloud": "^1.8.3",
     "adventure-platform-fabric": ">=5.9.0",
     "net_kyori_adventure-api": "^4.13.1",
