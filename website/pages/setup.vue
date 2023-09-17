@@ -42,7 +42,7 @@ function set(value: any) {
       break;
     case "version":
       version_index.value = value;
-      question.value = (modloader.value?.id === "unsure" && gamemode.value === "Singleplayer" && fabricVersions.includes(allVersions[value])) ? "experience" : "done";
+      question.value = (((modloader.value?.id === "unsure" && fabricVersions.includes(allVersions[value])) || modloader.value?.id === "fabric") && gamemode.value === "Singleplayer") ? "experience" : "done";
       break;
     case "experience":
       experience.value = value;
