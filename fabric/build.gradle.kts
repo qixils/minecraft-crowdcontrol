@@ -42,6 +42,7 @@ repositories {
         name = "Shedaniel"
         url = uri("https://maven.shedaniel.me")
     }
+    mavenLocal() // todo remove
 }
 
 dependencies {
