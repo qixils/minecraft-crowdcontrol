@@ -38,7 +38,7 @@ public final class CameraLockCommand extends TimedVoidCommand {
 
 		new TimedEffect.Builder()
 				.request(request)
-				.effectGroup("camera_lock")
+				.effectGroup("look")
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
