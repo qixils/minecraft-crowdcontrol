@@ -27,9 +27,11 @@ subprojects {
     repositories {
         mavenCentral()
         repositories {
-            maven {
+            maven(url = "https://files.minecraftforge.net/maven/") {
                 name = "Minecraft Forge"
-                url = uri("https://files.minecraftforge.net/maven/")
+            }
+            maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                name = "sonatype-oss-snapshots"
             }
         }
     }
