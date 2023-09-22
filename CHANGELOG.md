@@ -2,6 +2,12 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.5
+
+- Added support for Paper 1.20.2
+- Added support for Fabric 1.20.2
+- Created a [website](https://mccc.qixils.dev) to guide you through setting up the mod!
+
 ## 3.3.4
 
 - Added a new effect Unite Players which teleports all players to one random player
@@ -20,6 +26,7 @@ A list of all changes made to the software in reverse chronological order.
 - Removed air from the Lootbox loot table
 - Removed the legacy config options which were no longer usable
 - Reduced data sent to the Crowd Control app when using large modpacks
+- (Hotfix) Fixed entity effects not registering on Paper servers
 
 ## 3.3.3
 
