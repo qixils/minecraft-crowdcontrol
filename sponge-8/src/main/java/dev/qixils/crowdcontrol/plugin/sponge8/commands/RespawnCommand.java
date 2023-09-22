@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static dev.qixils.crowdcontrol.TimedEffect.isActive;
+
 @Getter
 public class RespawnCommand extends ImmediateCommand {
 	private final String effectName = "respawn";
@@ -30,6 +32,8 @@ public class RespawnCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		if (isActive("walk", request) || isActive("look", request))
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Cannot fling while frozen");
 		sync(() -> {
 			for (ServerPlayer player : players) {
 				RespawnLocation location = null;

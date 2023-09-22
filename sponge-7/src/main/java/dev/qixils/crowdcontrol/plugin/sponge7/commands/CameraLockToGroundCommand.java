@@ -33,7 +33,7 @@ public class CameraLockToGroundCommand extends TimedVoidCommand {
 		AtomicReference<Task> task = new AtomicReference<>();
 		new TimedEffect.Builder()
 				.request(request)
-				.effectGroup("camera_lock")
+				.effectGroup("look")
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);

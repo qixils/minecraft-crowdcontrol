@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.TimedEffect.isActive;
+
 @Getter
 public class RespawnCommand extends ImmediateCommand {
 	private final String effectName = "respawn";
@@ -27,6 +29,8 @@ public class RespawnCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		if (isActive("walk", request) || isActive("look", request))
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Cannot fling while frozen");
 		Response.Builder response = request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find a respawn point");
 		for (ServerPlayer player : players) {
 			ServerLevel level = player.server.getLevel(player.getRespawnDimension());
