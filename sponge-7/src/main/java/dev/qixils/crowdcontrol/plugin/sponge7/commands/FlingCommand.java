@@ -13,6 +13,8 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.TimedEffect.isActive;
+
 @Getter
 public class FlingCommand extends ImmediateCommand {
 	private final @NotNull String effectName = "fling";
@@ -30,6 +32,8 @@ public class FlingCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		if (isActive("walk", request) || isActive("look", request))
+			return request.buildResponse().type(ResultType.RETRY).message("Cannot fling while frozen");
 		for (Player player : players)
 			sync(() -> player.setVelocity(randomVector()));
 		return request.buildResponse().type(ResultType.SUCCESS);

@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static dev.qixils.crowdcontrol.TimedEffect.isActive;
+
 @RequiredArgsConstructor
 @Getter
 public class KillCommand<P> implements ImmediateCommand<P> {
@@ -20,6 +22,8 @@ public class KillCommand<P> implements ImmediateCommand<P> {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
+		if (isActive("walk", request) || isActive("look", request))
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Cannot fling while frozen");
 		sync(() -> players.stream().map(plugin::getPlayer).forEach(CCPlayer::kill));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}

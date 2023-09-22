@@ -40,6 +40,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 
 		new TimedEffect.Builder()
 				.request(request)
+				.effectGroup("walk")
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);

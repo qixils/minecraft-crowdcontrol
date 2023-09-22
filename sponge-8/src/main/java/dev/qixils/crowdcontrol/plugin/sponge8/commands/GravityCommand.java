@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
 
 @Getter
@@ -33,6 +34,10 @@ public class GravityCommand extends TimedVoidCommand {
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+		if (isActive("walk", request)) {
+			request.buildResponse().type(Response.ResultType.RETRY).message("Cannot fling while frozen").send();
+			return;
+		}
 		new TimedEffect.Builder()
 				.request(request)
 				.effectGroup("gravity")
