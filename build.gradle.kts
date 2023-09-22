@@ -2,7 +2,7 @@ plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "8.3" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
-    id("fabric-loom") version "1.2-SNAPSHOT" apply false
+    id("fabric-loom") version "1.3-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.1.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("org.spongepowered.gradle.plugin") version "2.2.0" apply false // Generates sponge_plugins.json and runServer task
@@ -27,9 +27,11 @@ subprojects {
     repositories {
         mavenCentral()
         repositories {
-            maven {
+            maven(url = "https://files.minecraftforge.net/maven/") {
                 name = "Minecraft Forge"
-                url = uri("https://files.minecraftforge.net/maven/")
+            }
+            maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                name = "sonatype-oss-snapshots"
             }
         }
     }

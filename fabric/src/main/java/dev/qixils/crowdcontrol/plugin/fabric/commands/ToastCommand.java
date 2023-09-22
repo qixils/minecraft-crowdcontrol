@@ -27,12 +27,11 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
 
@@ -82,10 +81,9 @@ public final class ToastCommand extends ImmediateCommand {
 			// spam recipe toasts
 			ServerRecipeBook book = player.getRecipeBook();
 			RecipeManager recipeManager = player.serverLevel().getRecipeManager();
-			@SuppressWarnings("unchecked") // casting ? extends XYZ to XYZ is safe >_>
-			Collection<Recipe<?>> recipes = ((RecipeBookAccessor) book).getKnown()
+			Collection<RecipeHolder<?>> recipes = ((RecipeBookAccessor) book).getKnown()
 					.stream()
-					.flatMap(location -> (Stream<Recipe<?>>) recipeManager.byKey(location).stream())
+					.flatMap(location -> recipeManager.byKey(location).stream())
 					.toList();
 			book.removeRecipes(recipes, player);
 			book.addRecipes(recipes, player);
