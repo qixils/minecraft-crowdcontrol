@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.CB_PACKAGE;
+import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.cbClass;
 
 public interface EntityCommand extends FeatureElementCommand {
 	@NotNull EntityType getEntityType();
@@ -31,7 +31,7 @@ public interface EntityCommand extends FeatureElementCommand {
 	@Override
 	default @NotNull Optional<Object> requiredFeatures() {
 		//return CraftMagicNumbers.getEntityTypes(getEntityType()).requiredFeatures();
-		return ReflectionUtil.getClazz(CB_PACKAGE + ".util.CraftMagicNumbers").flatMap(clazz -> ReflectionUtil.invokeMethod(
+		return ReflectionUtil.getClazz(cbClass("util.CraftMagicNumbers")).flatMap(clazz -> ReflectionUtil.invokeMethod(
 				(Object) null,
 				clazz,
 				"getEntityTypes",

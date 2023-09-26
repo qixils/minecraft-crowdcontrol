@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.6
+
+- Updated some code in preparation for breaking changes to Paper
+
 ## 3.3.5
 
 - Added support for Paper 1.20.2

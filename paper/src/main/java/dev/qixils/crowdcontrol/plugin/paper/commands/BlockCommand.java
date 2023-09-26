@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.CB_PACKAGE;
+import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.cbClass;
 
 @Getter
 public class BlockCommand extends ImmediateCommand implements FeatureElementCommand {
@@ -45,7 +45,7 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 	@Override
 	public @NotNull Optional<Object> requiredFeatures() {
 		//return CraftMagicNumbers.getBlock(material).requiredFeatures();
-		return ReflectionUtil.getClazz(CB_PACKAGE + ".util.CraftMagicNumbers").flatMap(clazz -> ReflectionUtil.invokeMethod(
+		return ReflectionUtil.getClazz(cbClass("util.CraftMagicNumbers")).flatMap(clazz -> ReflectionUtil.invokeMethod(
 				(Object) null,
 				clazz,
 				"getBlock",

@@ -18,6 +18,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -45,6 +46,7 @@ import java.util.function.Function;
 import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.*;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
+	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
@@ -280,6 +282,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			} else if (isInstance(FEATURE_FLAG_SET_CLAZZ, feature)) {
 				requiredFeaturesOpt = Optional.of(feature);
 			} else {
+				LOGGER.warn("Unknown feature type: " + feature.getClass().getName());
 				return true;
 			}
 			return requiredFeaturesOpt.flatMap(requiredFeatures -> ReflectionUtil.invokeMethod(

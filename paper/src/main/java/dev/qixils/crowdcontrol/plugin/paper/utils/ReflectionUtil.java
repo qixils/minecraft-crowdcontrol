@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.utils;
 
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -7,14 +8,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import static dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin.MINECRAFT_VERSION;
-
 @SuppressWarnings("unchecked")
 public class ReflectionUtil {
 	public static final @Nullable Class<?> FEATURE_ELEMENT_CLAZZ = getClazz("net.minecraft.world.flag.FeatureElement").orElse(null);
 	public static final @Nullable Class<?> FEATURE_FLAG_SET_CLAZZ = getClazz("net.minecraft.world.flag.FeatureFlagSet").orElse(null);
-	public static final @NotNull String CB_PACKAGE = String.format("org.bukkit.craftbukkit.v%d_%d_R%d",
-			MINECRAFT_VERSION.major(), MINECRAFT_VERSION.minor(), MINECRAFT_VERSION.patch()-1);
+	public static final @NotNull String CB_PACKAGE = Bukkit.getServer().getClass().getPackage().getName();
+
+	public static @NotNull String cbClass(@NotNull String name) {
+		return CB_PACKAGE + '.' + name;
+	}
 
 	public static boolean isInstance(@Nullable Class<?> clazz, @Nullable Object object) {
 		return clazz != null && clazz.isInstance(object);

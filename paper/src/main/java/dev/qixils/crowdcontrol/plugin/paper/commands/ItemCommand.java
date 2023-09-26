@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.CB_PACKAGE;
+import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.cbClass;
 
 public interface ItemCommand extends FeatureElementCommand {
 	@NotNull Material getItem();
@@ -15,7 +15,7 @@ public interface ItemCommand extends FeatureElementCommand {
 	@Override
 	default @NotNull Optional<Object> requiredFeatures() {
 //		return CraftMagicNumbers.getItem(getItem()).requiredFeatures();
-		return ReflectionUtil.getClazz(CB_PACKAGE + ".util.CraftMagicNumbers").flatMap(clazz -> ReflectionUtil.invokeMethod(
+		return ReflectionUtil.getClazz(cbClass("util.CraftMagicNumbers")).flatMap(clazz -> ReflectionUtil.invokeMethod(
 				(Object) null,
 				clazz,
 				"getItem",

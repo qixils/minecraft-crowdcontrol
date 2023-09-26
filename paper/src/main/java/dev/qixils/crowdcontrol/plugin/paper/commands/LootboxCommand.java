@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.lootboxItemSlots;
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.CB_PACKAGE;
+import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.cbClass;
 import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.getClazz;
 
 @Getter
@@ -89,7 +89,7 @@ public class LootboxCommand extends ImmediateCommand {
 		List<Material> items = new ArrayList<>(ITEMS);
 //		items.removeIf(item -> PaperCrowdControlPlugin.isFeatureDisabled(CraftMagicNumbers.getItem(item)));
 		items.removeIf(item ->
-				getClazz(CB_PACKAGE + ".util.CraftMagicNumbers")
+				getClazz(cbClass("util.CraftMagicNumbers"))
 						.flatMap(clazz -> ReflectionUtil.invokeMethod((Object) null, clazz, "getItem", new Class<?>[]{Material.class}, item))
 						.map(PaperCrowdControlPlugin::isFeatureDisabled)
 						.orElse(false));
