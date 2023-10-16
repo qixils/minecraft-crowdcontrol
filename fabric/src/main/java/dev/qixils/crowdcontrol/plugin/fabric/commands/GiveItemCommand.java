@@ -40,7 +40,7 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn item entity");
 		entity.setTarget(player.getUUID());
-		entity.setThrower(player.getUUID());
+		entity.setThrower(player);
 		entity.setPickUpDelay(0);
 	}
 
