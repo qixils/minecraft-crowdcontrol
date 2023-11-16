@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import {computed} from 'vue';
+
 const route = useRoute();
 const version = useState('version', () => route.query.v);
 if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricLatest; }
+const supported = computed(() => supportedFabricVersions.includes(version.value));
+const latest = computed(() => version.value === fabricLatest);
 
 useSeoMeta({
   title: `Fabric ${version.value} Remote Server Setup · Minecraft Crowd Control`,
@@ -13,6 +17,11 @@ useSeoMeta({
 <template>
   <div>
     <h1>Fabric {{ version }} Remote Server Setup</h1>
+
+    <p class="alert alert-warning" v-if="!supported">
+      The selected Minecraft version is no longer receiving non-critical mod updates.
+      Please consider updating to {{ fabricLatest }}.
+    </p>
 
     <p>The following steps detail how to set up a Minecraft {{ version }} remote Fabric server with Crowd Control.</p>
 
