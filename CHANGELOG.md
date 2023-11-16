@@ -5,6 +5,8 @@ A list of all changes made to the software in reverse chronological order.
 ## 3.3.6
 
 - Updated some code in preparation for breaking changes to Paper
+- Fixed translations being broken by some old mappacks
+- Marked the mod as incompatible with Noxesium due to a crashing issue on their end
 
 ## 3.3.5
 

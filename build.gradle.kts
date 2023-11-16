@@ -45,6 +45,18 @@ subprojects {
         options.encoding = Charsets.UTF_8.name()
     }
 
+    tasks.shadowJar {
+        relocate("org.reflections", "dev.qixils.relocated.reflections")
+        relocate("com.google.guava", "dev.qixils.relocated.guava")
+
+        if (project.name != "fabric-platform") {
+            relocate("cloud.commandframework", "dev.qixils.relocated.cloud")
+        }
+
+    }
+
+
+
     if (project.name.endsWith("-platform")) {
         // inherit resources from common module
         sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
