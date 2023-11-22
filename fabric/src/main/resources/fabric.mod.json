@@ -47,6 +47,9 @@
   "suggests": {
     "modmenu": ">=8.0.0-"
   },
+  "breaks": {
+    "noxesium": "*"
+  },
   "custom": {
     "cardinal-components": [
       "crowdcontrol:viewer-mob",

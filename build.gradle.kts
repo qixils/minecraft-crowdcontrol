@@ -1,9 +1,9 @@
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "8.3" apply false
+    id("io.freefair.lombok") version "8.4" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
     id("fabric-loom") version "1.4-SNAPSHOT" apply false
-    id("xyz.jpenilla.run-paper") version "2.1.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
+    id("xyz.jpenilla.run-paper") version "2.2.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("org.spongepowered.gradle.plugin") version "2.2.0" apply false // Generates sponge_plugins.json and runServer task
 }
@@ -44,6 +44,18 @@ subprojects {
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
     }
+
+    tasks.shadowJar {
+        relocate("org.reflections", "dev.qixils.relocated.reflections")
+        relocate("com.google.guava", "dev.qixils.relocated.guava")
+
+        if (project.name != "fabric-platform") {
+            relocate("cloud.commandframework", "dev.qixils.relocated.cloud")
+        }
+
+    }
+
+
 
     if (project.name.endsWith("-platform")) {
         // inherit resources from common module

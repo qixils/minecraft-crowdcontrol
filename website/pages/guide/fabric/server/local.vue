@@ -4,6 +4,7 @@ import {computed} from 'vue';
 const route = useRoute();
 const version = useState('version', () => route.query.v);
 if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricLatest; }
+const supported = computed(() => supportedFabricVersions.includes(version.value));
 const latest = computed(() => version.value === fabricLatest);
 
 useSeoMeta({
@@ -16,6 +17,11 @@ useSeoMeta({
 <template>
   <div>
     <h1>Fabric {{version}} Local Server Setup</h1>
+
+    <p class="alert alert-warning" v-if="!supported">
+      The selected Minecraft version is no longer receiving non-critical mod updates.
+      Please consider updating to {{ fabricLatest }}.
+    </p>
 
     <p>The following steps detail how to manually set up a Minecraft {{version}} local Fabric server with Crowd Control.</p>
 
