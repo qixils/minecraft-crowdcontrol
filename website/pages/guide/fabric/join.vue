@@ -34,6 +34,7 @@ useSeoMeta({
           <li>If you are the server owner and the button is greyed out, make sure the server is using the latest version of the mod.</li>
         </ul>
       </li>
+      <li>Open the <strong>Effect Manager</strong> in the Crowd Control app to test effects.</li>
     </ol>
   </div>
 </template>

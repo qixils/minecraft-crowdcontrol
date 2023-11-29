@@ -93,6 +93,7 @@ useSeoMeta({
       <li>Launch your modded instance of Minecraft {{version}} and open the world you want to play on.</li>
       <li>In the app, if you see a <strong>Connector Error</strong> button, click on it to refresh the connection to the game.</li>
       <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
+      <li>Open the <strong>Effect Manager</strong> in the Crowd Control app to test effects.</li>
     </ol>
   </div>
 </template>
