@@ -4,8 +4,10 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.3.6
 
-- Dropped non-critical support for Fabric 1.19.2 - 1.20.1
-- Updated some code in preparation for breaking changes to Paper
+- Added support for 1.20.3 on Paper and Fabric
+- Dropped non-critical support for Fabric 1.19.2 - 1.20.2
+- Added configuration options for the soft-lock resolver
+- Fixed some rare effect visibility issues with a recent Crowd Control app update
 - Fixed translations being broken by some old mappacks
 - Marked the mod as incompatible with Noxesium due to a crashing issue on their end
 
