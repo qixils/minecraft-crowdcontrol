@@ -1,9 +1,9 @@
 package dev.qixils.crowdcontrol.common;
 
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -16,8 +16,6 @@ import static dev.qixils.crowdcontrol.common.Plugin.output;
  */
 @ParametersAreNonnullByDefault
 public abstract class SoftLockObserver<P> {
-	protected static final int SEARCH_HORIZ = 20;
-	protected static final int SEARCH_VERT = 8;
 	protected static final Component ALERT = output(Component.translatable("cc.soft-lock.output"));
 
 	private final Map<UUID, DeathData> deathData = new HashMap<>();
@@ -35,6 +33,14 @@ public abstract class SoftLockObserver<P> {
 		this.plugin = plugin;
 	}
 
+	protected int getSearchH() {
+		return plugin.getSoftLockConfig().getSearchH();
+	}
+
+	protected int getSearchV() {
+		return plugin.getSoftLockConfig().getSearchV();
+	}
+
 	/**
 	 * Called when a player seems to be soft-locked.
 	 *
@@ -50,7 +56,7 @@ public abstract class SoftLockObserver<P> {
 	protected void onDeath(P player) {
 		UUID uuid = plugin.playerMapper().tryGetUniqueId(player)
 				.orElseThrow(() -> new IllegalArgumentException("Expected player to have a UUID"));
-		DeathData data = deathData.computeIfAbsent(uuid, $ -> new DeathData());
+		DeathData data = deathData.computeIfAbsent(uuid, $ -> new DeathData(plugin.getSoftLockConfig()));
 		if (data.isSoftLocked()) {
 			onSoftLock(player);
 			deathData.remove(uuid);
@@ -58,23 +64,23 @@ public abstract class SoftLockObserver<P> {
 	}
 
 	private static final class DeathData {
-		private static final Duration EXPIRY_TIME = Duration.ofMinutes(2);
-		private static final int EXCESS_DEATHS = 6;
 		private final List<LocalDateTime> deaths = new ArrayList<>();
+		private final @NotNull SoftLockConfig config;
 
-		public DeathData() {
+		public DeathData(@NotNull SoftLockConfig config) {
+			this.config = config;
 			addDeath();
 		}
 
 		private void addDeath() {
 			LocalDateTime now = LocalDateTime.now();
-			deaths.removeIf(d -> d.isBefore(now.minus(EXPIRY_TIME)));
+			deaths.removeIf(d -> d.isBefore(now.minus(config.getPeriod())));
 			deaths.add(now);
 		}
 
 		public boolean isSoftLocked() {
 			addDeath();
-			return deaths.size() >= EXCESS_DEATHS;
+			return deaths.size() >= config.getDeaths();
 		}
 	}
 }

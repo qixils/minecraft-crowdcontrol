@@ -68,6 +68,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 
+import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
 @Plugin(
@@ -268,6 +269,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		} catch (IOException e) {
 			throw new RuntimeException("Could not load plugin config", e);
 		}
+
+		// soft-lock observer
+		softLockConfig = new SoftLockConfig(
+			config.getNode("soft-lock-observer.period").getInt(DEF_PERIOD),
+			config.getNode("soft-lock-observer.deaths").getInt(DEF_DEATHS),
+			config.getNode("soft-lock-observer.search-horizontal").getInt(DEF_SEARCH_HORIZ),
+			config.getNode("soft-lock-observer.search-vertical").getInt(DEF_SEARCH_VERT)
+		);
 
 		// hosts
 		TypeToken<Set<String>> hostToken = new TypeToken<Set<String>>() {};

@@ -1115,6 +1115,14 @@ public interface Plugin<P, S> {
 	LimitConfig getLimitConfig();
 
 	/**
+	 * Gets the plugin's {@link SoftLockConfig}.
+	 *
+	 * @return soft-lock config parsed from the plugin's config file
+	 */
+	@NotNull
+	SoftLockConfig getSoftLockConfig();
+
+	/**
 	 * Gets the server's console {@link Audience}.
 	 *
 	 * @return console audience

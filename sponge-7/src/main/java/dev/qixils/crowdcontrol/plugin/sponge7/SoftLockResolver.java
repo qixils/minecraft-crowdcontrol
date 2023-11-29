@@ -29,7 +29,7 @@ public class SoftLockResolver extends SoftLockObserver<Player> {
 		World world = player.getWorld();
 		Vector3d pos = player.getPosition();
 		// kill nearby monsters
-		for (Entity entity : world.getNearbyEntities(pos, SEARCH_HORIZ)) {
+		for (Entity entity : world.getNearbyEntities(pos, getSearchH())) {
 			if (entity instanceof Hostile)
 				entity.remove();
 			else if (entity instanceof EnderDragonPart) {
@@ -38,9 +38,9 @@ public class SoftLockResolver extends SoftLockObserver<Player> {
 			}
 		}
 		// remove nearby dangerous blocks
-		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {
-			for (int y = -SEARCH_VERT; y <= SEARCH_VERT; y++) {
-				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
+		for (int x = -getSearchH(); x <= getSearchH(); x++) {
+			for (int y = -getSearchV(); y <= getSearchV(); y++) {
+				for (int z = -getSearchH(); z <= getSearchH(); z++) {
 					Location<World> loc = world.getLocation(pos.add(x, y, z));
 					BlockType type = loc.getBlockType();
 					if (type.equals(BlockTypes.LAVA) || type.equals(BlockTypes.FIRE) || type.equals(BlockTypes.FLOWING_LAVA)) // API8: wither rose

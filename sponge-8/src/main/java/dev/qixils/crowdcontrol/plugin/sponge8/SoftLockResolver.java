@@ -46,7 +46,7 @@ public class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 		ServerWorld world = player.world();
 		Vector3d pos = player.position();
 		// kill nearby monsters
-		for (Entity entity : world.nearbyEntities(pos, SEARCH_HORIZ)) {
+		for (Entity entity : world.nearbyEntities(pos, getSearchH())) {
 			if (entity instanceof Hostile)
 				entity.remove();
 			else if (entity instanceof EnderDragonPart) {
@@ -55,9 +55,9 @@ public class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 			}
 		}
 		// remove nearby dangerous blocks
-		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {
-			for (int y = -SEARCH_VERT; y <= SEARCH_VERT; y++) {
-				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
+		for (int x = -getSearchH(); x <= getSearchH(); x++) {
+			for (int y = -getSearchV(); y <= getSearchV(); y++) {
+				for (int z = -getSearchH(); z <= getSearchH(); z++) {
 					ServerLocation loc = world.location(pos.add(x, y, z));
 					BlockType type = loc.blockType();
 					if (getDangerousBlocks().contains(type))

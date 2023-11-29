@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.configurate;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.SoftLockConfig;
 import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurateException;
@@ -17,6 +18,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+
+import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 
 public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.common.AbstractPlugin<P, S> {
 
@@ -33,6 +36,14 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		} catch (IOException e) {
 			throw new RuntimeException("Could not load plugin config", e);
 		}
+
+		// soft-lock observer
+		softLockConfig = new SoftLockConfig(
+			config.node("soft-lock-observer.period").getInt(DEF_PERIOD),
+			config.node("soft-lock-observer.deaths").getInt(DEF_DEATHS),
+			config.node("soft-lock-observer.search-horizontal").getInt(DEF_SEARCH_HORIZ),
+			config.node("soft-lock-observer.search-vertical").getInt(DEF_SEARCH_VERT)
+		);
 
 		// hosts
 		TypeToken<Set<String>> hostToken = new TypeToken<Set<String>>() {};

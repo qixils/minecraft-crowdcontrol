@@ -43,6 +43,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
+import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.*;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
@@ -94,6 +95,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private boolean autoDetectIP = true;
 	@Getter
 	private LimitConfig limitConfig = new LimitConfig();
+	@Getter @NotNull
+	private SoftLockConfig softLockConfig = new SoftLockConfig();
 	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
@@ -127,6 +130,21 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public void loadConfig() {
 		reloadConfig();
 		config = getConfig();
+
+		// soft-lock observer
+		ConfigurationSection softLockSection = config.getConfigurationSection("soft-lock-observer");
+		if (softLockSection == null) {
+			getSLF4JLogger().debug("No soft-lock config found, using defaults");
+			softLockConfig = new SoftLockConfig();
+		} else {
+			getSLF4JLogger().debug("Loading soft-lock config");
+			softLockConfig = new SoftLockConfig(
+				softLockSection.getInt("period", DEF_PERIOD),
+				softLockSection.getInt("deaths", DEF_DEATHS),
+				config.getInt("search-horizontal", DEF_SEARCH_HORIZ),
+				config.getInt("search-vertical", DEF_SEARCH_VERT)
+			);
+		}
 
 		// hosts
 		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));

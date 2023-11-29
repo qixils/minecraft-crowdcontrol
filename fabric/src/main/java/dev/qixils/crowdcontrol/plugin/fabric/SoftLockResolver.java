@@ -28,10 +28,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 			Blocks.FIRE,
 			Blocks.WITHER_ROSE
 	);
-	private final @NotNull TargetingConditions conditions = TargetingConditions.forNonCombat()
-			.ignoreLineOfSight()
-			.ignoreInvisibilityTesting()
-			.range(SEARCH_HORIZ);
+	private final @NotNull TargetingConditions conditions;
 
 	/**
 	 * Initializes the observer.
@@ -40,6 +37,10 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 	 */
 	public SoftLockResolver(FabricCrowdControlPlugin plugin) {
 		super(plugin);
+		this.conditions = TargetingConditions.forNonCombat()
+			.ignoreLineOfSight()
+			.ignoreInvisibilityTesting()
+			.range(getSearchH());
 	}
 
 	@Override
@@ -49,16 +50,16 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 				Mob.class,
 				conditions,
 				player,
-				AABB.ofSize(player.position(), SEARCH_HORIZ*2, SEARCH_VERT*2, SEARCH_HORIZ*2)
+				AABB.ofSize(player.position(), getSearchH() *2, getSearchV() *2, getSearchH() *2)
 		)) {
 			if (entity instanceof Enemy)
 				entity.remove(RemovalReason.KILLED);
 		}
 
 		// remove nearby dangerous blocks
-		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {
-			for (int y = -SEARCH_VERT; y <= SEARCH_VERT; y++) {
-				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
+		for (int x = -getSearchH(); x <= getSearchH(); x++) {
+			for (int y = -getSearchV(); y <= getSearchV(); y++) {
+				for (int z = -getSearchH(); z <= getSearchH(); z++) {
 					ServerLevel level = player.serverLevel();
 					BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
 					BlockState block = level.getBlockState(pos);

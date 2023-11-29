@@ -33,7 +33,7 @@ public class SoftLockResolver extends SoftLockObserver<Player> implements Listen
 	public void onSoftLock(@NotNull Player player) {
 		Location location = player.getLocation();
 		// kill nearby monsters
-		for (Entity entity : location.getNearbyEntities(SEARCH_HORIZ, SEARCH_VERT, SEARCH_HORIZ)) {
+		for (Entity entity : location.getNearbyEntities(getSearchH(), getSearchV(), getSearchH())) {
 			if (entity instanceof Monster || entity instanceof EnderDragon)
 				entity.remove();
 			else if (entity instanceof EnderDragonPart enderDragonPart) {
@@ -42,9 +42,9 @@ public class SoftLockResolver extends SoftLockObserver<Player> implements Listen
 			}
 		}
 		// remove nearby dangerous blocks
-		for (int x = -SEARCH_HORIZ; x <= SEARCH_HORIZ; x++) {
-			for (int y = -SEARCH_VERT; y <= SEARCH_VERT; y++) {
-				for (int z = -SEARCH_HORIZ; z <= SEARCH_HORIZ; z++) {
+		for (int x = -getSearchH(); x <= getSearchH(); x++) {
+			for (int y = -getSearchV(); y <= getSearchV(); y++) {
+				for (int z = -getSearchH(); z <= getSearchH(); z++) {
 					Location blockLocation = location.clone().add(x, y, z);
 					Block block = blockLocation.getBlock();
 					Material material = block.getType();

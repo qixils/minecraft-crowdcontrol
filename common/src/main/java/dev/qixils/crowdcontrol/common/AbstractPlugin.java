@@ -45,6 +45,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	@Getter @NotNull
 	protected LimitConfig limitConfig = new LimitConfig();
 	@Getter @NotNull
+	protected SoftLockConfig softLockConfig = new SoftLockConfig();
+	@Getter @NotNull
 	protected final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 	@Getter @NotNull
 	protected final Map<String, List<SocketManager>> sentEvents = new HashMap<>();
