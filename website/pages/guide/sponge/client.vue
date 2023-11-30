@@ -89,7 +89,7 @@ useSeoMeta({
       <li>Select <strong>Sponge {{api}}</strong> and click next.</li>
       <li>Select <strong>Remote</strong>.</li>
       <li>Enter in <code>localhost</code> as the host and click next.</li>
-      <li>Accept the default password by clicking next.</li>
+      <li>Accept the default password <code>crowdcontrol</code> by clicking next.</li>
       <li>Launch your modded instance of Minecraft {{version}} and open the world you want to play on.</li>
       <li>In the app, if you see a <strong>Connector Error</strong> button, click on it to refresh the connection to the game.</li>
       <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>

@@ -14,8 +14,7 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.3.5
 
-- Added support for Paper 1.20.2
-- Added support for Fabric 1.20.2
+- Added support for 1.20.2 on Paper and Fabric
 - Created a [website](https://mccc.qixils.dev) to guide you through setting up the mod
 - Disabled several effects from executing while "Can't Move" is active
 
