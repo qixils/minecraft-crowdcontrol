@@ -831,7 +831,7 @@ public interface Plugin<P, S> {
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
 		Object[] effects = commandRegister().getCommands().stream().map(command -> command.getEffectName().toLowerCase(Locale.US)).toArray();
-		service.addConnectListener(connectingService -> getScheduledExecutor().schedule(() -> {
+		service.addLoginListener(connectingService -> getScheduledExecutor().schedule(() -> {
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
 			updateConditionalEffectVisibility(connectingService);
 			sendPlayerEvent(connectingService, "playerJoined", isGlobal());
