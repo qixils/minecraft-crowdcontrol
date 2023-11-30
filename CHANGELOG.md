@@ -7,6 +7,7 @@ A list of all changes made to the software in reverse chronological order.
 - Added support for 1.20.3 on Paper and Fabric
 - Dropped non-critical support for Fabric 1.19.2 - 1.20.2
 - Added configuration options for the soft-lock resolver
+- Added support for pausing some effects in singleplayer
 - Fixed some rare effect visibility issues with a recent Crowd Control app update
 - Fixed translations being broken by some old mappacks
 - Marked the mod as incompatible with Noxesium due to a crashing issue on their end

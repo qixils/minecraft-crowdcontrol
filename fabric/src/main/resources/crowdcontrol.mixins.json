@@ -21,7 +21,8 @@
     "EffectInstanceMixin",
     "GameRendererAccessor",
     "GameRendererMixin",
-    "KeyboardInputMixin"
+    "KeyboardInputMixin",
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1
