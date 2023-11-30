@@ -10,7 +10,7 @@ A list of all changes made to the software in reverse chronological order.
 - Added support for pausing some effects in singleplayer
 - Fixed some rare effect visibility issues with a recent Crowd Control app update
 - Fixed translations being broken by some old mappacks
-- Marked the mod as incompatible with Noxesium due to a crashing issue on their end
+- Marked the mod as incompatible with Noxesium and ExtraSounds, pending a fix for https://github.com/KyoriPowered/adventure-platform-fabric/issues/115
 
 ## 3.3.5
 

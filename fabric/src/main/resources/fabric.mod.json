@@ -48,7 +48,8 @@
     "modmenu": ">=8.0.0-"
   },
   "breaks": {
-    "noxesium": "*"
+    "noxesium": "*",
+    "extrasounds": "*"
   },
   "custom": {
     "cardinal-components": [
