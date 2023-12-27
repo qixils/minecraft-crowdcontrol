@@ -293,7 +293,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 						feature,
 						// FeatureElement#requiredFeatures
 						switch (Bukkit.getMinecraftVersion()) {
-							case "1.19.4", "1.20", "1.20.1", "1.20.2" -> "m";
+							case "1.19.4", "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4" -> "m";
 							default -> throw new IllegalStateException();
 						}
 				);
@@ -314,6 +314,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 						case "1.19.4" -> "aW";
 						case "1.20", "1.20.1" -> "aU";
 						case "1.20.2" -> "aT";
+						case "1.20.3", "1.20.4" -> "aY";
 						default -> throw new IllegalStateException();
 					}
 			)).flatMap(worldData -> ReflectionUtil.invokeMethod(
@@ -321,14 +322,14 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 					// WorldData#enabledFeatures
 					switch (Bukkit.getMinecraftVersion()) {
 						case "1.19.4" -> "L";
-						case "1.20", "1.20.1", "1.20.2" -> "M";
+						case "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4" -> "M";
 						default -> throw new IllegalStateException();
 					}
 			)).<Boolean>flatMap(enabledFeatures -> ReflectionUtil.invokeMethod(
 					requiredFeatures,
 					// FeatureFlagSet#isSubsetOf
 					switch (Bukkit.getMinecraftVersion()) {
-						case "1.19.4", "1.20", "1.20.1", "1.20.2" -> "a";
+						case "1.19.4", "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4" -> "a";
 						default -> throw new IllegalStateException();
 					},
 					enabledFeatures
