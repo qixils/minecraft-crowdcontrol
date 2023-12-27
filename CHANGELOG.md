@@ -4,12 +4,13 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.3.6
 
-- Added support for 1.20.3 on Paper and Fabric
+- Added support for 1.20.4 on Paper and Fabric
 - Dropped non-critical support for Fabric 1.19.2 - 1.20.2
 - Added configuration options for the soft-lock resolver
 - Added support for pausing some effects in singleplayer
 - Fixed some rare effect visibility issues with a recent Crowd Control app update
 - Fixed translations being broken by some old mappacks
+- Fixed lootbox enchantments maxing out at level 1 on Fabric
 - Marked the mod as incompatible with ExtraSounds due to https://github.com/KyoriPowered/adventure-platform-fabric/issues/115
 
 ## 3.3.5
