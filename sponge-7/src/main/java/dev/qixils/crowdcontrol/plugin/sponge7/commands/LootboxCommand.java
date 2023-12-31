@@ -150,7 +150,7 @@ public class LootboxCommand extends ImmediateCommand {
 
 			// determine enchantment level
 			int level = enchantment.getMinimumLevel();
-			if (enchantment.getMaximumLevel() > enchantment.getMinimumLevel()) {
+			if (enchantment.getMaximumLevel() > level) {
 				for (int j = 0; j <= luck; j++) {
 					level = Math.max(level, RandomUtil.nextInclusiveInt(enchantment.getMinimumLevel(), enchantment.getMaximumLevel()));
 				}
