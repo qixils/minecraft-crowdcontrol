@@ -11,6 +11,7 @@ A list of all changes made to the software in reverse chronological order.
 - Fixed some rare effect visibility issues with a recent Crowd Control app update
 - Fixed translations being broken by some old mappacks
 - Fixed lootbox enchantments maxing out at level 1 on Fabric
+- Fixed the "Clutter Inventory" effect always being marked as successful
 - Marked the mod as incompatible with ExtraSounds due to https://github.com/KyoriPowered/adventure-platform-fabric/issues/115
 
 ## 3.3.5

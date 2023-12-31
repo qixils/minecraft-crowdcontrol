@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.ItemUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -62,20 +63,26 @@ public class ClutterCommand extends ImmediateCommand {
 		}
 	}
 
-	private static void swap(MainPlayerInventory inv, SlotPos slotPos1, SlotPos slotPos2) {
+	private static boolean swap(MainPlayerInventory inv, SlotPos slotPos1, SlotPos slotPos2) {
 		Slot slot1 = unwrap(inv, slotPos1);
 		Slot slot2 = unwrap(inv, slotPos2);
 
-		Optional<ItemStack> slot1item = slot1.poll();
-		Optional<ItemStack> slot2item = slot2.poll();
+		ItemStack slot1item = slot1.poll().orElseGet(ItemStack::empty);
+		ItemStack slot2item = slot2.poll().orElseGet(ItemStack::empty);
 
-		slot1item.ifPresent(slot2::offer);
-		slot2item.ifPresent(slot1::offer);
+		if (ItemUtil.isSimilar(slot1item, slot2item))
+			return false;
+
+		slot2.offer(slot1item);
+		slot1.offer(slot2item);
+
+		return true;
 	}
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		// swaps random items in player's inventory
+		boolean success = false;
 		for (Player player : players) {
 			if (!(player.getInventory() instanceof PlayerInventory)) {
 				plugin.getSLF4JLogger().warn("Player " + player.getName() + "'s inventory "
@@ -90,16 +97,19 @@ public class ClutterCommand extends ImmediateCommand {
 			swappedSlots.add(heldItemSlot);
 			SlotPos swapItemWith = uniqueSlot(inventory, swappedSlots);
 			swappedSlots.add(swapItemWith);
-			swap(inventory, heldItemSlot, swapItemWith);
+			success |= swap(inventory, heldItemSlot, swapItemWith);
 
 			while (swappedSlots.size() < CLUTTER_ITEMS) {
 				SlotPos newSlot1 = uniqueSlot(inventory, swappedSlots);
 				swappedSlots.add(newSlot1);
 				SlotPos newSlot2 = uniqueSlot(inventory, swappedSlots);
 				swappedSlots.add(newSlot2);
-				swap(inventory, newSlot1, newSlot2);
+				success |= swap(inventory, newSlot1, newSlot2);
 			}
 		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		if (success)
+			return request.buildResponse().type(Response.ResultType.SUCCESS);
+		else
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Could not find items to swap");
 	}
 }

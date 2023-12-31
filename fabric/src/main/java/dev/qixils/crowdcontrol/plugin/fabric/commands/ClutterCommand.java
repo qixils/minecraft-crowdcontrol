@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.ItemUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -35,16 +36,20 @@ public class ClutterCommand extends ImmediateCommand {
 		throw new IllegalArgumentException("All slots have been used");
 	}
 
-	private static void swap(Inventory inventory, int slot1, int slot2) {
+	private static boolean swap(Inventory inventory, int slot1, int slot2) {
 		ItemStack item1 = inventory.getItem(slot1);
 		ItemStack item2 = inventory.getItem(slot2);
+		if (ItemUtil.isSimilar(item1, item2))
+			return false;
 		inventory.setItem(slot1, item2);
 		inventory.setItem(slot2, item1);
+		return true;
 	}
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		// swaps random items in player's inventory
+		boolean success = false;
 		for (ServerPlayer player : players) {
 			Inventory inventory = player.getInventory();
 			Set<Integer> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
@@ -53,16 +58,19 @@ public class ClutterCommand extends ImmediateCommand {
 			swappedSlots.add(heldItemSlot);
 			int heldItemSwap = uniqueSlot(inventory, swappedSlots);
 			swappedSlots.add(heldItemSwap);
-			swap(inventory, heldItemSlot, heldItemSwap);
+			success |= swap(inventory, heldItemSlot, heldItemSwap);
 
 			while (swappedSlots.size() < CLUTTER_ITEMS) {
 				int newSlot1 = uniqueSlot(inventory, swappedSlots);
 				swappedSlots.add(newSlot1);
 				int newSlot2 = uniqueSlot(inventory, swappedSlots);
 				swappedSlots.add(newSlot2);
-				swap(inventory, newSlot1, newSlot2);
+				success |= swap(inventory, newSlot1, newSlot2);
 			}
 		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		if (success)
+			return request.buildResponse().type(Response.ResultType.SUCCESS);
+		else
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Could not find items to swap");
 	}
 }

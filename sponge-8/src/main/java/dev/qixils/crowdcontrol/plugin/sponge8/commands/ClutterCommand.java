@@ -1,7 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.ItemUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -20,6 +22,7 @@ import java.util.*;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.CLUTTER_ITEMS;
 
 @Getter
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class ClutterCommand extends ImmediateCommand {
 	private final String effectName = "clutter";
 
@@ -55,46 +58,53 @@ public class ClutterCommand extends ImmediateCommand {
 		return unwrap(inventory.slot(pos).orElse(null), pos);
 	}
 
-	private static void swap(GridInventory inv, Vector2i slotPos1, Vector2i slotPos2) {
+	private static boolean swap(GridInventory inv, Vector2i slotPos1, Vector2i slotPos2) {
 		Slot slot1 = unwrap(inv, slotPos1);
 		Slot slot2 = unwrap(inv, slotPos2);
 
 		ItemStack slot1item = slot1.poll().polledItem().createStack();
 		ItemStack slot2item = slot2.poll().polledItem().createStack();
 
+		if (ItemUtil.isSimilar(slot1item, slot2item))
+			return false;
+
 		// this is throwing warnings in the console which I cannot silence >.>
 		slot2.offer(slot1item);
 		slot1.offer(slot2item);
+
+		return true;
 	}
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		// swaps random items in player's inventory
-		sync(() -> {
-			try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
-				frame.pushCause(plugin.getPluginContainer());
-				for (ServerPlayer player : players) {
-					PrimaryPlayerInventory inventory = player.inventory().primary();
-					GridInventory gridInventory = inventory.asGrid();
-					Set<Vector2i> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
+		boolean success = false;
+		try (StackFrame frame = plugin.getGame().server().causeStackManager().pushCauseFrame()) {
+			frame.pushCause(plugin.getPluginContainer());
+			for (ServerPlayer player : players) {
+				PrimaryPlayerInventory inventory = player.inventory().primary();
+				GridInventory gridInventory = inventory.asGrid();
+				Set<Vector2i> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
 
-					Vector2i heldItemSlot = Vector2i.from(inventory.hotbar().selectedSlotIndex(), 3);
-					swappedSlots.add(heldItemSlot);
-					Vector2i swapItemWith = uniqueSlot(gridInventory, swappedSlots);
-					swappedSlots.add(swapItemWith);
-					swap(gridInventory, heldItemSlot, swapItemWith);
+				Vector2i heldItemSlot = Vector2i.from(inventory.hotbar().selectedSlotIndex(), 3);
+				swappedSlots.add(heldItemSlot);
+				Vector2i swapItemWith = uniqueSlot(gridInventory, swappedSlots);
+				swappedSlots.add(swapItemWith);
+				success |= swap(gridInventory, heldItemSlot, swapItemWith);
 
-					while (swappedSlots.size() < CLUTTER_ITEMS) {
-						Vector2i newSlot1 = uniqueSlot(gridInventory, swappedSlots);
-						swappedSlots.add(newSlot1);
-						Vector2i newSlot2 = uniqueSlot(gridInventory, swappedSlots);
-						swappedSlots.add(newSlot2);
-						swap(gridInventory, newSlot1, newSlot2);
-					}
+				while (swappedSlots.size() < CLUTTER_ITEMS) {
+					Vector2i newSlot1 = uniqueSlot(gridInventory, swappedSlots);
+					swappedSlots.add(newSlot1);
+					Vector2i newSlot2 = uniqueSlot(gridInventory, swappedSlots);
+					swappedSlots.add(newSlot2);
+					success |= swap(gridInventory, newSlot1, newSlot2);
 				}
-				frame.popCause();
 			}
-		});
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+			frame.popCause();
+		}
+		if (success)
+			return request.buildResponse().type(Response.ResultType.SUCCESS);
+		else
+			return request.buildResponse().type(Response.ResultType.RETRY).message("Could not find items to swap");
 	}
 }
