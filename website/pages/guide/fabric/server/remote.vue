@@ -23,7 +23,14 @@ useSeoMeta({
       Please consider updating to {{ fabricLatest }}.
     </p>
 
-    <p>The following steps detail how to set up a Minecraft {{ version }} remote Fabric server with Crowd Control.</p>
+    <p>
+      The following steps detail how to set up a Minecraft {{ version }} remote Fabric server with Crowd Control.
+      It is expected that you have already rented a remote server through a service like
+      <a href="https://grryno.com/">Grryno</a> or <a href="https://bloom.host/">bloom.host</a>.
+
+      Note that no free hosts that we are aware of, including Aternos,
+      support the firewall features necessary to use Crowd Control.
+    </p>
 
     <ol>
       <li>In your admin panel, setup a Fabric {{ version }} server.</li>
