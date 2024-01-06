@@ -77,6 +77,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter @Setter
 	private @Nullable String password = DEFAULT_PASSWORD;
 	@Getter @Setter
+	private String IP = null;
+	@Getter @Setter
 	private int port = DEFAULT_PORT;
 	@Getter
 	CrowdControl crowdControl = null;
@@ -174,6 +176,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		adminRequired = config.getBoolean("admin-required", adminRequired);
 		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
 		port = config.getInt("port", port);
+		IP = config.getString("ip", IP);
 		password = config.getString("password", password);
 		autoDetectIP = config.getBoolean("ip-detect", autoDetectIP);
 	}
@@ -185,7 +188,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
 			return;
 		}
-		crowdControl = CrowdControl.server().port(port).password(password).build();
+		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
 
 		commandRegister().register();
 		postInitCrowdControl(crowdControl);

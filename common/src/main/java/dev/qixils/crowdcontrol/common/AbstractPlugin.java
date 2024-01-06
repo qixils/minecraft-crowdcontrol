@@ -28,6 +28,8 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	@Getter @Setter
 	protected String password = DEFAULT_PASSWORD;
 	@Getter @Setter
+	protected String IP = null;
+	@Getter @Setter
 	protected int port = DEFAULT_PORT;
 	@Getter @Nullable
 	protected CrowdControl crowdControl = null;

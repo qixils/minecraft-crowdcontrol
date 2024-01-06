@@ -308,6 +308,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		announce = config.getNode("announce").getBoolean(announce);
 		adminRequired = config.getNode("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString(hideNames.getConfigCode()));
+		IP = config.getNode("ip").getString(IP);
 		port = config.getNode("port").getInt(port);
 		password = config.getNode("password").getString(password);
 		autoDetectIP = config.getNode("ip-detect").getBoolean(autoDetectIP);
@@ -321,7 +322,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
 			return;
 		}
-		crowdControl = CrowdControl.server().port(port).password(password).build();
+		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
 
 		commandRegister.register();
 		postInitCrowdControl(crowdControl);

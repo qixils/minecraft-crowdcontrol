@@ -75,6 +75,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		announce = config.node("announce").getBoolean(announce);
 		adminRequired = config.node("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
+		IP = config.node("ip").getString(IP);
 		port = config.node("port").getInt(port);
 		password = config.node("password").getString(password);
 		autoDetectIP = config.node("ip-detect").getBoolean(autoDetectIP);
@@ -94,6 +95,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			config.node("announce").set(announce);
 			config.node("admin-required").set(adminRequired);
 			config.node("hide-names").set(hideNames.getConfigCode());
+			config.node("ip").set(IP);
 			config.node("port").set(port);
 			config.node("password").set(password);
 			config.node("ip-detect").set(autoDetectIP);
@@ -111,7 +113,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
 			return;
 		}
-		crowdControl = CrowdControl.server().port(port).password(password).build();
+		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
 
 		commandRegister().register();
 		postInitCrowdControl(crowdControl);
