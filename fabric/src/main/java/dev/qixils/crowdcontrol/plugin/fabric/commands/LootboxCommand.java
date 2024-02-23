@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -45,7 +46,7 @@ import static net.minecraft.world.entity.EquipmentSlot.OFFHAND;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-	private static final List<Attribute> ATTRIBUTES = Arrays.asList(
+	private static final List<Holder<Attribute>> ATTRIBUTES = Arrays.asList(
 			Attributes.MAX_HEALTH,
 			Attributes.KNOCKBACK_RESISTANCE,
 			Attributes.MOVEMENT_SPEED,
@@ -184,11 +185,11 @@ public class LootboxCommand extends ImmediateCommand {
 			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getEquipmentSlot() : null;
 			EquipmentSlot[] equipmentSlots = equipmentSlot == null ? new EquipmentSlot[]{MAINHAND, OFFHAND} : new EquipmentSlot[]{equipmentSlot};
 			// add custom attributes
-			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
+			List<Holder<Attribute>> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
-				Attribute attribute = attributeList.get(i);
-				String name = "lootbox_" + Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(attribute)).getPath();
+				Holder<Attribute> attribute = attributeList.get(i);
+				String name = "lootbox_" + attribute.unwrapKey().orElseThrow().location().getPath();
 				// determine percent amount for the modifier
 				double amount = 0d;
 				for (int j = 0; j <= luck; j++) {

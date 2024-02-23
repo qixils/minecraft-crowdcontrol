@@ -16,13 +16,15 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
@@ -122,9 +124,10 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		registerChatCommands();
 		ServerLifecycleEvents.SERVER_STARTING.register(this::setServer);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
-		ServerPlayNetworking.registerGlobalReceiver(VERSION_RESPONSE_ID, (server, player, handler, buf, responseSender) -> {
+		PacketUtil.registerPackets();
+		ServerPlayNetworking.registerGlobalReceiver(ResponseVersionC2S.PACKET_ID, (payload, context) -> {
 			getSLF4JLogger().debug("Received version response from client!");
-			clientVersions.put(player.getUUID(), new SemVer(buf.readUtf(32)));
+			clientVersions.put(context.player().getUUID(), payload.version());
 			updateConditionalEffectVisibility(crowdControl);
 		});
 	}
@@ -246,7 +249,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
 			getSLF4JLogger().debug("Sending version request to " + player.getUUID());
-			ServerPlayNetworking.send(player, VERSION_REQUEST_ID, PacketByteBufs.empty());
+			ServerPlayNetworking.send(player, RequestVersionS2C.INSTANCE);
 		}
 		// super
 		super.onPlayerJoin(player);
