@@ -34,7 +34,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	protected final @NotNull PLUGIN plugin;
 	protected final @NotNull Set<Class<? extends Command<PLAYER>>> registeredCommandClasses = new HashSet<>();
 	protected final @NotNull Map<Class<? extends Command<PLAYER>>, Command<PLAYER>> singleCommandInstances = new HashMap<>();
-	protected final @NotNull Map<String, Command<PLAYER>> registeredCommandMap = new HashMap<>();
+	protected final @NotNull Map<@Nullable String, Command<PLAYER>> registeredCommandMap = new HashMap<>();
 	protected @MonotonicNonNull List<Command<PLAYER>> registeredCommands;
 
 	protected AbstractCommandRegister(@NotNull PLUGIN plugin) {
@@ -98,7 +98,9 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		List<Command<PLAYER>> commands = new ArrayList<>();
 		createCommands(commands);
 		for (Command<PLAYER> command : commands) {
-			registeredCommandMap.put(command.getEffectName().toLowerCase(Locale.ENGLISH), command);
+			String effectName = command.getEffectName();
+			if (effectName != null) effectName = effectName.toLowerCase(Locale.ENGLISH);
+			registeredCommandMap.put(effectName, command);
 
 			//noinspection unchecked
 			Class<Command<PLAYER>> clazz = (Class<Command<PLAYER>>) command.getClass();
@@ -129,7 +131,8 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	public final void register() {
 		boolean firstRegistry = registeredCommands == null;
 		for (Command<PLAYER> command : getCommands()) {
-			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
+			String name = command.getEffectName();
+			if (name != null) name = name.toLowerCase(Locale.ENGLISH);
 			plugin.registerCommand(name, command);
 
 			if (firstRegistry && command.isEventListener()) {
@@ -167,8 +170,9 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	 * @throws IllegalArgumentException the requested command does not exist
 	 */
 	@NotNull
-	public final Command<PLAYER> getCommandByName(@NotNull String name) throws IllegalArgumentException {
-		name = name.toLowerCase(Locale.ENGLISH);
+	public final Command<PLAYER> getCommandByName(@Nullable String name) throws IllegalArgumentException {
+		if (name != null)
+			name = name.toLowerCase(Locale.ENGLISH);
 		if (!registeredCommandMap.containsKey(name))
 			throw new IllegalArgumentException("Could not find a command by the name of " + name);
 		return registeredCommandMap.get(name);

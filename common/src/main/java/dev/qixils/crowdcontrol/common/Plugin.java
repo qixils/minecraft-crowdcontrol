@@ -458,11 +458,13 @@ public interface Plugin<P, S> {
 							String lowerInput = input.toLowerCase(Locale.ENGLISH);
 							Set<String> suggestions = new LinkedHashSet<>();
 							for (Command<P> effect : effects) {
+								if (effect.getEffectName() == null) continue;
 								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
 								if (effectName.startsWith(lowerInput))
 									suggestions.add(effectName);
 							}
 							for (Command<P> effect : effects) {
+								if (effect.getEffectName() == null) continue;
 								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
 								if (effectName.contains(lowerInput))
 									suggestions.add(effectName);
@@ -697,7 +699,7 @@ public interface Plugin<P, S> {
 	 * @param name    the name of the command
 	 * @param command the command to register
 	 */
-	void registerCommand(@NotNull String name, @NotNull Command<P> command);
+	void registerCommand(@Nullable String name, @NotNull Command<P> command);
 
 	/**
 	 * Returns the object that manages the registering of effects/commands.
@@ -830,7 +832,7 @@ public interface Plugin<P, S> {
 	 * @param service the initialized {@link CrowdControl} instance
 	 */
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
-		Object[] effects = commandRegister().getCommands().stream().map(command -> command.getEffectName().toLowerCase(Locale.US)).toArray();
+		Object[] effects = commandRegister().getCommands().stream().filter(c -> c.getEffectName() != null).map(c -> c.getEffectName().toLowerCase(Locale.US)).toArray();
 		service.addLoginListener(connectingService -> getScheduledExecutor().schedule(() -> {
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
 			updateConditionalEffectVisibility(connectingService);
@@ -867,7 +869,7 @@ public interface Plugin<P, S> {
 	 * @param ids         the IDs to update
 	 */
 	default void updateEffectStatus(Respondable respondable, @NotNull ResultType status, @NotNull Command<?> @NotNull ... ids) {
-		updateEffectStatus(respondable, status, Arrays.stream(ids).map(Command::getEffectName).toArray(String[]::new));
+		updateEffectStatus(respondable, status, Arrays.stream(ids).map(Command::getEffectName).filter(Objects::nonNull).toArray(String[]::new));
 	}
 
 	/**
@@ -911,7 +913,7 @@ public interface Plugin<P, S> {
 	 * @param ids         the IDs to update
 	 */
 	default void updateEffectVisibility(Respondable respondable, boolean visible, @NotNull Collection<Command<?>> ids) {
-		updateEffectIdVisibility(respondable, visible, ids.stream().map(Command::getEffectName).collect(Collectors.toList()));
+		updateEffectIdVisibility(respondable, visible, ids.stream().map(Command::getEffectName).filter(Objects::nonNull).collect(Collectors.toList()));
 	}
 
 	/**
@@ -1011,6 +1013,7 @@ public interface Plugin<P, S> {
 		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
 		Map<ResultType, Set<String>> effects = new HashMap<>();
 		for (Command<?> effect : commandRegister().getCommands()) {
+			if (effect.getEffectName() == null) continue;
 			String id = effect.getEffectName().toLowerCase(Locale.ENGLISH);
 			TriState visibility = effect.isVisible();
 			if (visibility != TriState.FALSE) {

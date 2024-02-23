@@ -67,7 +67,7 @@ public interface Command<P> {
 	 *
 	 * @return internal code name
 	 */
-	@NotNull
+	@Nullable
 	@CheckReturnValue
 	String getEffectName();
 

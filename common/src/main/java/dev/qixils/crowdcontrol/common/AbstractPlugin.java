@@ -74,8 +74,9 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	}
 
 	@Override
-	public void registerCommand(@NotNull String name, @NotNull Command<P> command) {
-		name = name.toLowerCase(Locale.ENGLISH);
+	public void registerCommand(@Nullable String name, @NotNull Command<P> command) {
+		if (name != null)
+			name = name.toLowerCase(Locale.ENGLISH);
 		if (crowdControl == null)
 			throw new IllegalStateException("CrowdControl is not initialized");
 		try {
