@@ -2,6 +2,11 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.3.7
+
+- Added support for the upcoming Stop All Effects button in the Crowd Control app
+- Added support for binding to a specific IP address. Useful for owners of large server networks.
+
 ## 3.3.6
 
 - Added support for 1.20.4 on Paper and Fabric
