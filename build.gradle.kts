@@ -34,7 +34,6 @@ subprojects {
                 name = "sonatype-oss-snapshots"
             }
         }
-        mavenLocal()
     }
 
     java {
