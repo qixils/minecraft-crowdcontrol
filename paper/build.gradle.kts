@@ -66,6 +66,10 @@ tasks {
             pluginJars(shadowJar.get().archiveFile)
         }
     }
+
+    shadowJar {
+        relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
+    }
 }
 
 fun RunServer.configure(mcVersion: String) {
