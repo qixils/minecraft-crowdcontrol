@@ -46,7 +46,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		this.pluginClassLoader = pluginClass.getClassLoader();
 
 		Pattern filePattern = Pattern.compile("^/?" + Pattern.quote(prefix) + "_");
-		logger.info("Registering translator");
+		logger.debug("Registering translator");
 
 		// create translator
 		Key name = Key.key(modId, "translations");
@@ -67,7 +67,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		boolean loaded = false;
 		if (!resources.isEmpty()) {
 			try {
-				logger.info("Using Reflections to load locales");
+				logger.debug("Using Reflections to load locales");
 				resources.forEach(this::register);
 				loaded = true;
 			} catch (Exception e) {

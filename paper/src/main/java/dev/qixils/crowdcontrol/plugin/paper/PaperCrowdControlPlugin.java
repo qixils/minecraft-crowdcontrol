@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import dev.qixils.crowdcontrol.socket.SocketManager;
+import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -49,6 +50,14 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.*;
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
+	public static final @NotNull Set<SemVer> MAPPED_VERSIONS = Set.of(
+		new SemVer(1, 19, 4),
+		new SemVer(1, 20),
+		new SemVer(1, 20, 1),
+		new SemVer(1, 20, 2),
+		new SemVer(1, 20, 3),
+		new SemVer(1, 20, 4)
+	);
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
@@ -214,6 +223,16 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@SneakyThrows
 	@Override
 	public void onEnable() {
+		if (!PaperLib.isPaper()) {
+			throw new IllegalStateException("The Paper server software is required. Please upgrade from Spigot to Paper, it should be a simple and painless upgrade in 99.99% of cases.");
+		}
+		if (MINECRAFT_VERSION.isLessThan(new SemVer(1, 19, 4))) {
+			throw new IllegalStateException("Versions prior to 1.19.4 are no longer supported.");
+		}
+		if (!MAPPED_VERSIONS.contains(MINECRAFT_VERSION)) {
+			getLogger().warning("This version of Crowd Control has not been confirmed to work with the current version of Minecraft. Please check for updates to the plugin.");
+		}
+
 		initCrowdControl();
 
 		Bukkit.getPluginManager().registerEvents(this, this);
@@ -261,8 +280,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
-	public void registerCommand(@NotNull String name, @NotNull Command<Player> command) {
-		name = name.toLowerCase(Locale.ENGLISH);
+	public void registerCommand(@Nullable String name, @NotNull Command<Player> command) {
+		if (name != null)
+			name = name.toLowerCase(Locale.ENGLISH);
 		try {
 			crowdControl.registerHandler(name, command::executeAndNotify);
 			getLogger().fine("Registered CC command '" + name + "'");
