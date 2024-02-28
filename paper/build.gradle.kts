@@ -2,6 +2,7 @@ import xyz.jpenilla.runpaper.task.RunServer
 
 val cloudVersion: String by project
 val minecraftVersion: String by project
+val paperlibVersion: String by project
 
 val mcVersionSplit = minecraftVersion.split(".")
 description = "Minecraft Crowd Control: Paper"
@@ -17,7 +18,8 @@ repositories {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("cloud.commandframework:cloud-paper:${cloudVersion}")
+    implementation("cloud.commandframework:cloud-paper:$cloudVersion")
+    implementation("io.papermc:paperlib:$paperlibVersion")
     compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
@@ -57,12 +59,16 @@ tasks {
         configure(minecraftVersion)
     }
     // create extra runServer tasks for later versions of Minecraft
-    for (mcVersion in listOf("1.20", "1.20.1", "1.20.2", "1.20.4")) {
+    for (mcVersion in listOf("1.20.1", "1.20.2", "1.20.4")) {
         register("runServer$mcVersion", RunServer::class.java) {
             configure(mcVersion)
             dependsOn("shadowJar")
             pluginJars(shadowJar.get().archiveFile)
         }
+    }
+
+    shadowJar {
+        relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
     }
 }
 

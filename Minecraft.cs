@@ -3,34 +3,31 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using ConnectorLib;
-using ConnectorLib.JSON;
 using ConnectorLib.SimpleTCP;
 using CrowdControl.Common;
-using Newtonsoft.Json;
+using static System.Windows.Forms.AxHost;
+using static CrowdControl.Games.Packs.ISimplePipelinePack;
 using ConnectorType = CrowdControl.Common.ConnectorType;
-using EffectResponse = ConnectorLib.JSON.EffectResponse;
-using EffectStatus = CrowdControl.Common.EffectStatus;
-using Log = CrowdControl.Common.Log;
-using LogLevel = CrowdControl.Common.LogLevel;
-using static System.Linq.Enumerable;
 
-namespace CrowdControl.Games.Packs;
+namespace CrowdControl.Games.Packs.Minecraft;
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
 {
-    // default port: 58731
-    public override ISimpleTCPPack.PromptType PromptType => ISimpleTCPPack.PromptType.Host | ISimpleTCPPack.PromptType.Username | ISimpleTCPPack.PromptType.Password;
+    public override PromptType PromptType => PromptType.Host | PromptType.Username | PromptType.Password;
 
-    public override ISimpleTCPPack.AuthenticationType AuthenticationMode => ISimpleTCPPack.AuthenticationType.SimpleTCPSendKey;
+    public override AuthenticationType AuthenticationMode => AuthenticationType.SendKey;
 
-    public override ISimpleTCPPack.DigestAlgorithm AuthenticationHashMode => ISimpleTCPPack.DigestAlgorithm.SHA_512;
+    public override DigestAlgorithm AuthenticationHashMode => DigestAlgorithm.SHA_512;
 
     public Minecraft(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
     {
-        ConnectionDialogNames[ISimpleTCPPack.PromptType.Username] = "Minecraft ID";
+        ConnectionDialogNames[PromptType.Username] = "Minecraft ID";
     }
 
     public override Game Game => new("Minecraft", "Minecraft", "PC", ConnectorType.SimpleTCPClientConnector);
@@ -39,15 +36,15 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         // miscellaneous
         new("Annoying Pop-Up", "toast") { Price = 50, Category = "Player", Description = "Plays an obnoxious animation and an obnoxious sound" },
         new("Dig Hole", "dig") { Price = 200, Category = "World", Description = "Digs a small hole underneath players" },
-        new("Do-or-Die", "do_or_die") { Price = 500, Category = new("Health & Hunger", "Player"), Description = "Gives players a task to complete within 30 seconds or else they die" },
+        new("Do-or-Die", "do_or_die") { Price = 500, Category = new EffectGrouping("Health & Hunger", "Player"), Description = "Gives players a task to complete within 30 seconds or else they die" },
         new("Eat Chorus Fruit", "chorus_fruit") { Price = 75, Category = "World", Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit" },
         // TODO: disabled because this is killing anyone in the air -- new("Explode", "explode") { Price = 750, Category = "World", Description = "Spawns a harmless TNT-like explosion at players' feet" },
         new("Fling Randomly", "fling") { Price = 100, Category = "Movement", Description = "Flings players in a totally random direction" },
         new("Flip Mobs Upside-Down", "dinnerbone") { Price = 50, Category = "World", Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone" },
         new("Invert Camera", "invert_look") { Price = 200, Duration = 15, Group = "clientside", Category = "Movement", Description = "Temporarily inverts mouse movement" },
         new("Invert Controls", "invert_wasd") { Price = 200, Duration = 15, Group = "clientside", Category = "Movement", Description = "Temporarily inverts WASD movement" },
-        new("Open Lootbox", "lootbox") { Price = 100, Category = new("Inventory", "Give Items"), Description = "Gifts a completely random item with varying enchants and modifiers" },
-        new("Open Lucky Lootbox", "lootbox_5") { Price = 500, Category = new("Inventory", "Give Items"), Description = "Gifts two random items with vastly higher odds of having beneficial enchantments and modifiers" },
+        new("Open Lootbox", "lootbox") { Price = 100, Category = new EffectGrouping("Inventory", "Give Items"), Description = "Gifts a completely random item with varying enchants and modifiers" },
+        new("Open Lucky Lootbox", "lootbox_5") { Price = 500, Category = new EffectGrouping("Inventory", "Give Items"), Description = "Gifts two random items with vastly higher odds of having beneficial enchantments and modifiers" },
         new("Place Flowers", "flowers") { Price = 25, Category = "World", Description = "Randomly places flowers nearby, possibly including the toxic Wither Rose" },
         new("Place Torches", "lit") { Price = 100, Category = "World", Description = "Places torches on every nearby block" },
         new("Plant Tree", "plant_tree") { Price = 100, Category = "World", Description = "Plant a tree on top of every player" },
@@ -56,12 +53,11 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Respawn Player", "respawn") { Price = 500, Category = "Player", Description = "Sends players to their spawn point" },
         new("Spawn Ore Veins", "vein") { Price = 100, Category = "World", Description = "Places random ore veins (or lava) near every player" },
         new("Spooky Sound Effect", "sfx") { Price = 100, Category = "World", Description = "Plays a random spoooky sound effect" },
-        new("Swap Locations", "swap") { Price = 1000, Category = new("World", "Player"), Description = "Randomly swaps the locations of all players in the session" },
+        new("Swap Locations", "swap") { Price = 1000, Category = new EffectGrouping("World", "Player"), Description = "Randomly swaps the locations of all players in the session" },
         new("Teleport to a Nearby Structure", "structure") { Price = 750, Category = "World", Description = "Teleports players to a random nearby structure (i.e. village, desert temple, nether fortress, etc.)" },
         new("Teleport to a Random Biome", "biome") { Price = 750, Category = "World", Description = "Teleports players to a random nearby biome (i.e. ocean, plains, desert, etc.)" },
         new("Teleport All Entities To Players", "entity_chaos") { Price = 3000, Category = "World", Description = "Teleports every loaded mob on the server to the targeted players in an even split. Note that this may only teleport nearby mobs on certain server configurations." },
-        new("Unite Players", "unite") { Price = 500, Category = new("World", "Player"), Description = "Teleports all players in the session to one random player" },
-        new("Water Bucket Clutch", "bucket_clutch") { Price = 400, Category = new("World", "Player"), Description = "Teleports players 30 blocks up and gives them a water bucket, forcing them to clutch if they want to live" },
+        new("Water Bucket Clutch", "bucket_clutch") { Price = 400, Category = new EffectGrouping("World", "Player"), Description = "Teleports players 30 blocks up and gives them a water bucket, forcing them to clutch if they want to live" },
         // time commands
         new("Set Time to Day", "time_day") { Price = 50, SortName = "Time: Day", Group = "global", Category = "Server", Description = "Jumps the clock ahead to daytime" },
         new("Set Time to Night", "time_night") { Price = 50, SortName = "Time: Night", Group = "global", Category = "Server", Description = "Jumps the clock ahead to nighttime" },
@@ -465,7 +461,8 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         {
             "__init", args =>
             {
-                switch (args?.Length ?? 0)
+                int argLen = args?.Length ?? 0;
+                switch (argLen)
                 {
                     case 3:
                     {
@@ -473,13 +470,11 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
                         string? login = (args[1] as string);
                         string? pass = (args[2] as string);
 
-                        if (string.IsNullOrWhiteSpace(host)) return false;
-                        if (string.IsNullOrWhiteSpace(login)) return false;
-                        if (string.IsNullOrWhiteSpace(pass)) return false;
+                        if (string.IsNullOrWhiteSpace(host)) return (false, "Host was null or empty.");
+                        if (string.IsNullOrWhiteSpace(login)) return (false, "Login was null or empty.");
+                        if (string.IsNullOrWhiteSpace(pass)) return (false, "Password was null or empty.");
 
-                        SetConnectionInfo(host, login, pass);
-
-                        return true;
+                        return WaitForLogin(host, login, pass);
                     }
                     case 4:
                     {
@@ -487,18 +482,84 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
                         string? login = (args[2] as string) + ':' + (args[3] as string);
                         string? pass = (args[1] as string);
 
-                        if (string.IsNullOrWhiteSpace(host)) return false;
-                        if (string.IsNullOrWhiteSpace(login)) return false;
-                        if (string.IsNullOrWhiteSpace(pass)) return false;
+                        if (string.IsNullOrWhiteSpace(host)) return (false, "Host was null or empty.");
+                        if (string.IsNullOrWhiteSpace(login)) return (false, "Login was null or empty.");
+                        if (string.IsNullOrWhiteSpace(pass)) return (false, "Password was null or empty.");
 
-                        SetConnectionInfo(host, login, pass);
-
-                        return true;
+                        return WaitForLogin(host, login, pass);
                     }
                     default:
-                        return false;
+                        return (false, $"Unknown number of parameters. Expected 3 or 4, got {argLen}.");
                 }
             }
         }
     };
+
+    private (bool, string) WaitForLogin(string host, string login, string pass)
+    {
+        TaskCompletionSource<(bool, string)> state = new();
+        ManualResetEventSlim open = new();
+
+        try
+        {
+            AuthenticationStateChanged += ev;
+            if (Connector != null) Connector.ConnectionStatusChanged += sc;
+            open.Reset();
+            SetConnectionInfo(host, login, pass);
+
+            open.Wait(1000);
+            if (Connector is not { Connected: true }) Connector.Connect().Wait();
+            if (!state.Task.Wait(4000)) return (false, "Timed out waiting for login response.");
+
+            return state.Task.Result;
+        }
+        finally
+        {
+            try { AuthenticationStateChanged -= ev; }
+            catch { /**/ }
+
+            try { Connector.ConnectionStatusChanged -= sc; }
+            catch { /**/ }
+        }
+
+        void ev(object? _, AuthenticationState c)
+        {
+            if (!Connector.Connected)
+            {
+                state.TrySetResult((false, "Connector is unable to connect to the specified host.."));
+                return;
+            }
+
+            switch (c)
+            {
+                case AuthenticationState.BadPassword:
+                    state.TrySetResult((false, "Bad password."));
+                    return;
+                case AuthenticationState.Error:
+                    state.TrySetResult((false, "Unknown login error."));
+                    return;
+                case AuthenticationState.Connected:
+                    state.TrySetResult((true, string.Empty));
+                    return;
+                default:
+                    return;
+            }
+        }
+
+        void sc(object? _, (ConnectionStatus status, string message) status)
+        {
+            string message = status.message;
+            switch (status.status)
+            {
+                case ConnectionStatus.Closed:
+                    state.TrySetResult(string.IsNullOrWhiteSpace(message)
+                        ? (false, $"The connector was disconnected with no message.")
+                        : (false, $"The connector was disconnected with the message: " + message));
+                    break;
+                case ConnectionStatus.Open:
+                    open.Set();
+                    break;
+            }
+        }
+    }
 }
