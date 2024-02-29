@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import com.google.common.collect.Lists;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.command.CommandConstants.AttributeWeights;
 import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
@@ -12,15 +13,15 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
@@ -30,6 +31,9 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -40,9 +44,6 @@ import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
-import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
-import static net.minecraft.world.entity.EquipmentSlot.MAINHAND;
-import static net.minecraft.world.entity.EquipmentSlot.OFFHAND;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
@@ -55,6 +56,15 @@ public class LootboxCommand extends ImmediateCommand {
 			Attributes.ARMOR_TOUGHNESS,
 			Attributes.ATTACK_KNOCKBACK,
 			Attributes.ATTACK_SPEED
+	);
+	private static final Map<EquipmentSlot, EquipmentSlotGroup> SLOT_TO_GROUP = Map.of(
+		// can't use reflection cus mappings (probably)
+		EquipmentSlot.MAINHAND, EquipmentSlotGroup.MAINHAND,
+		EquipmentSlot.OFFHAND, EquipmentSlotGroup.OFFHAND,
+		EquipmentSlot.HEAD, EquipmentSlotGroup.HEAD,
+		EquipmentSlot.CHEST, EquipmentSlotGroup.CHEST,
+		EquipmentSlot.LEGS, EquipmentSlotGroup.LEGS,
+		EquipmentSlot.FEET, EquipmentSlotGroup.FEET
 	);
 	private final List<Item> allItems;
 	private final List<Item> goodItems;
@@ -137,7 +147,7 @@ public class LootboxCommand extends ImmediateCommand {
 	public void randomlyModifyItem(ItemStack itemStack, int luck) {
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
-			itemStack.getOrCreateTag().putBoolean("Unbreakable", true);
+			itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
 
 		// determine enchantments to add
 		int _enchantments = 0;
@@ -183,7 +193,7 @@ public class LootboxCommand extends ImmediateCommand {
 		if (attributes > 0) {
 			// get equipment slot(s)
 			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getEquipmentSlot() : null;
-			EquipmentSlot[] equipmentSlots = equipmentSlot == null ? new EquipmentSlot[]{MAINHAND, OFFHAND} : new EquipmentSlot[]{equipmentSlot};
+			EquipmentSlotGroup equipmentSlotGroup = equipmentSlot == null ? EquipmentSlotGroup.HAND : SLOT_TO_GROUP.get(equipmentSlot);
 			// add custom attributes
 			List<Holder<Attribute>> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
@@ -196,40 +206,41 @@ public class LootboxCommand extends ImmediateCommand {
 					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
 				}
 				// create & add attribute
-				for (int k = 0; k < equipmentSlots.length; k++) {
-					AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name + "_" + k, amount, Operation.ADDITION);
-					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentSlots[k]);
-				}
+				AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name, amount, Operation.ADD_VALUE);
+				ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+				modifiers = modifiers.withModifierAdded(attribute, attributeModifier, equipmentSlotGroup);
+				itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
 			}
 			// add default attributes
-			for (EquipmentSlot type : equipmentSlots) {
+			for (EquipmentSlot type : EquipmentSlot.values()) {
+				if (!equipmentSlotGroup.test(type)) continue;
 				itemStack.getItem().getDefaultAttributeModifiers(type)
-						.forEach((attribute, modifiers) -> itemStack.addAttributeModifier(attribute, modifiers, type));
+						.forEach((attribute, modifier) -> {
+							// TODO: does any of this make sense (especially the equipmentSlotGroup)
+							ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+							modifiers = modifiers.withModifierAdded(attribute, modifier, equipmentSlotGroup);
+							itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
+						});
 			}
 		}
 	}
 
 	// lore getter
 	private static List<net.kyori.adventure.text.Component> getLore(ItemStack itemStack) {
-		final CompoundTag displayTag = itemStack.getTag();
-		if (displayTag == null || !displayTag.contains("display"))
+		ItemLore itemLore = itemStack.get(DataComponents.LORE);
+		if (itemLore == null || itemLore.lines().isEmpty())
 			return new ArrayList<>();
-		final CompoundTag displayCompound = displayTag.getCompound("display");
-		final ListTag list = displayCompound.getList("Lore", 8);
-		return list.isEmpty() ? new ArrayList<>() : list.stream().map(tag -> gson().deserialize(tag.getAsString())).collect(Collectors.toList());
+		return itemLore.lines().stream().map(ComponentLike::asComponent).collect(Collectors.toList());
 	}
 
 	// lore setter
-	private static void setLore(ItemStack itemStack, List<net.kyori.adventure.text.Component> lore) {
+	private void setLore(ItemStack itemStack, List<net.kyori.adventure.text.Component> lore) {
 		if (lore.isEmpty()) {
-			final CompoundTag tag = itemStack.getTag();
-			if (tag != null && tag.contains("display"))
-				tag.getCompound("display").remove("Lore");
+			itemStack.remove(DataComponents.LORE);
 			return;
 		}
-		final ListTag list = new ListTag();
-		lore.forEach(component -> list.add(StringTag.valueOf(gson().serialize(component))));
-		itemStack.getOrCreateTagElement("display").put("Lore", list);
+		List<net.minecraft.network.chat.Component> nativeLore = Lists.transform(lore, component -> plugin.adventure().toNative(component));
+		itemStack.set(DataComponents.LORE, new ItemLore(nativeLore));
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 				MAX_HEALTH_MODIFIER_UUID,
 				MAX_HEALTH_MODIFIER_NAME,
 				newOffset,
-				AttributeModifier.Operation.ADDITION
+				AttributeModifier.Operation.ADD_VALUE
 		));
 		float computedMaxHealth = (float) (20 + newOffset);
 		health(Math.min(health(), computedMaxHealth));
