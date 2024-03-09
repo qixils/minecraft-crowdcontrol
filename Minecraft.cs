@@ -303,6 +303,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Drink Poison Potion", "potion_poison") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Gradually damages the player" },
         new("Drink Regeneration Potion", "potion_regeneration") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Gradually heals the player" },
         new("Drink Resistance Potion", "potion_resistance") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Reduces damage taken" },
+        new("Drink Slow Falling Potion", "potion_slow_falling") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Allows the player to fall gracefully down without fall damage" },
         new("Drink Slowness Potion", "potion_slowness") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Decreases the player's walking speed" },
         new("Drink Speed Potion", "potion_speed") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Increases the player's walking speed" },
         new("Drink Strength Potion", "potion_strength") { Price = 50, Duration = 20, Category = "Potion Effects", Description = "Increases the player's damage output" },
