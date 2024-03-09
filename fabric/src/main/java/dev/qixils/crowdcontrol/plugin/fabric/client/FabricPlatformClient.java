@@ -3,15 +3,17 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.mixin.GameRendererAccessor;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,16 +56,14 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		FabricCrowdControlPlugin.CLIENT_INITIALIZED = true;
 		ClientLifecycleEvents.CLIENT_STARTED.register(this::setClient);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
-		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.VERSION_REQUEST_ID, (client, handler, inputBuf, responseSender) -> {
+		PacketUtil.registerPackets();
+		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> {
 			logger.debug("Received version request from server!");
-			FriendlyByteBuf buf = PacketByteBufs.create();
-			buf.writeUtf(SemVer.MOD_STRING, 32);
-			responseSender.sendPacket(FabricCrowdControlPlugin.VERSION_RESPONSE_ID, buf);
+			context.responseSender().sendPacket(new ResponseVersionC2S(SemVer.MOD));
 		});
-		ClientPlayNetworking.registerGlobalReceiver(FabricCrowdControlPlugin.SHADER_ID, (client, handler, inputBuf, responseSender) -> {
+		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> {
 			logger.debug("Received shader request from server!");
-			ResourceLocation shader = new ResourceLocation("shaders/post/" + inputBuf.readUtf(64) + ".json");
-			long millis = inputBuf.readLong();
+			ResourceLocation shader = new ResourceLocation("shaders/post/" + payload.shader() + ".json");
 
 			client.execute(() -> {
 				((GameRendererAccessor) client.gameRenderer).invokeLoadEffect(shader);
@@ -72,7 +72,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 			executor.schedule(() -> client.execute(() -> {
 				SHADER_ACTIVE = false;
 				client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
-			}), millis, TimeUnit.MILLISECONDS);
+			}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
 		});
 	}
 

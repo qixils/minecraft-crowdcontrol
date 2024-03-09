@@ -8,7 +8,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,18 +22,18 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DUR
 
 @Getter
 public class PotionCommand extends TimedImmediateCommand {
-	private final @NotNull MobEffect potionEffectType;
+	private final @NotNull Holder<MobEffect> potionEffectType;
 	private final boolean isMinimal;
 	private final @NotNull String effectName;
 	private final @NotNull Component displayName;
 
 	@SuppressWarnings("ConstantConditions")
-	public PotionCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull MobEffect potionEffectType) {
+	public PotionCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull Holder<MobEffect> potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		this.effectName = "potion_" + BuiltInRegistries.MOB_EFFECT.getKey(potionEffectType).getPath();
-		this.isMinimal = potionEffectType.isInstantenous();
-		this.displayName = Component.translatable("cc.effect.potion.name", potionEffectType.getDisplayName());
+		this.effectName = "potion_" + potionEffectType.unwrapKey().orElseThrow().location().getPath();
+		this.isMinimal = potionEffectType.value().isInstantenous();
+		this.displayName = Component.translatable("cc.effect.potion.name", potionEffectType.value().getDisplayName());
 	}
 
 	public @NotNull Duration getDefaultDuration() {

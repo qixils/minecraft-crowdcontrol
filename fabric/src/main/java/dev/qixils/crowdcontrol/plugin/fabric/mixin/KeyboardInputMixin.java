@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -25,6 +26,7 @@ public abstract class KeyboardInputMixin extends Input {
 	@Final
 	private Options options;
 
+	@Unique
 	private boolean handleIsDown(@NotNull KeyMapping key, @Nullable KeyMapping inverse, MovementStatus.@NotNull Type type) {
 		if (!FabricCrowdControlPlugin.CLIENT_INITIALIZED)
 			return key.isDown();
@@ -39,15 +41,18 @@ public abstract class KeyboardInputMixin extends Input {
 		return key.isDown();
 	}
 
+	@Unique
 	private boolean handleIsDown(@NotNull KeyMapping key, @Nullable KeyMapping inverse) {
 		return handleIsDown(key, inverse, MovementStatus.Type.WALK);
 	}
 
 	@SuppressWarnings("SameParameterValue")
+	@Unique
 	private boolean handleIsDown(@NotNull KeyMapping key, MovementStatus.@NotNull Type type) {
 		return handleIsDown(key, null, type);
 	}
 
+	@Unique
 	private boolean handleIsDown(@NotNull KeyMapping key) {
 		return handleIsDown(key, (KeyMapping) null);
 	}

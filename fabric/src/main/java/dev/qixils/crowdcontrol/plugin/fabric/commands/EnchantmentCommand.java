@@ -7,9 +7,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
@@ -72,16 +70,13 @@ public class EnchantmentCommand extends ImmediateCommand {
 					.map(Entry::getKey).orElse(null);
 			if (slot == null)
 				continue;
-			// remove existing enchant
-			ResourceLocation tag = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
+			// add new enchant
 			ItemStack item = getItem(inv, slot);
 			int curLevel = getEnchantmentLevel(item, enchantment);
-			item.getEnchantmentTags().removeIf(ench ->
-					Objects.equals(tag, EnchantmentHelper.getEnchantmentId((CompoundTag) ench)));
-			// add new enchant
 			if (curLevel >= level)
 				level = curLevel + 1;
-			item.enchant(enchantment, level);
+			final int setLevel = level;
+			EnchantmentHelper.updateEnchantments(item, mutable -> mutable.set(enchantment, setLevel));
 			result.type(Response.ResultType.SUCCESS);
 		}
 		return result;

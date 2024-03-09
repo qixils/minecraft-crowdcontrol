@@ -3,12 +3,11 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,19 +40,16 @@ public class ShaderCommand extends TimedImmediateCommand {
 		if (players.isEmpty())
 			return request.buildResponse().type(Response.ResultType.RETRY).message("All players already have an active screen effect");
 		// create byte buf
-		FriendlyByteBuf buf = PacketByteBufs.create();
-		buf.writeUtf(shader, 64);
 		Duration duration = getDuration(request);
-		long durationMillis = duration.toMillis();
-		buf.writeLong(durationMillis);
+		SetShaderS2C packet = new SetShaderS2C(shader, duration);
 		// send packet
 		players.forEach(player -> {
 			ACTIVE_SHADERS.add(player.getUUID());
-			ServerPlayNetworking.send(player, FabricCrowdControlPlugin.SHADER_ID, buf);
+			ServerPlayNetworking.send(player, packet);
 		});
 		// schedule removal
 		plugin.getScheduledExecutor().schedule(
-				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), durationMillis, TimeUnit.MILLISECONDS);
+				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), duration.toMillis(), TimeUnit.MILLISECONDS);
 		return request.buildResponse().type(Response.ResultType.SUCCESS).timeRemaining(duration);
 	}
 }

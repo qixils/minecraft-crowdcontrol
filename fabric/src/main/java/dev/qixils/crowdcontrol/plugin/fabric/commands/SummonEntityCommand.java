@@ -140,7 +140,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 			entity.setCustomNameVisible(true);
 		}
 		if (entity instanceof Mob mob)
-			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
 		if (entity instanceof LivingEntity)
@@ -152,8 +152,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
 		if (entity instanceof AbstractHorse horse) {
-			if (horse.canWearArmor() && RandomUtil.RNG.nextBoolean()) {
-				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream().filter(item -> horse.isArmor(new ItemStack(item))).toList());
+			if (horse.canWearBodyArmor() && RandomUtil.RNG.nextBoolean()) {
+				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream().filter(item -> horse.isBodyArmorItem(new ItemStack(item))).toList());
 				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
 			}
 			horse.setOwnerUUID(player.getUUID());
@@ -179,7 +179,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 			container.setLootTable(randomElementFrom(getLootTables(level.getServer())));
 
 		// add random armor to armor stands
-		if (entity instanceof ArmorStand) {
+		if (entity instanceof ArmorStand armorStand) {
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
 			List<EquipmentSlot> slots = new ArrayList<>(armor.keySet());
@@ -195,7 +195,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
-				entity.setItemSlot(type, item);
+				armorStand.setItemSlot(type, item);
 			}
 		}
 

@@ -9,6 +9,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameRules.BooleanValue;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -31,6 +32,7 @@ public abstract class PlayerMixin extends LivingEntity {
 			ci.cancel();
 	}
 
+	@Unique
 	private boolean keepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {
 		return EntityUtil.keepInventoryRedirect(this, gameRules, key);
 	}

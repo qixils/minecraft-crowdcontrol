@@ -22,17 +22,18 @@ public class OriginalDisplayNameImpl implements OriginalDisplayName {
 
 	@Override
 	public void writeToNbt(@NotNull CompoundTag tag) {
-		if (value != null) {
-			tag.putString("value", Component.Serializer.toJson(value));
-		} else {
-			tag.remove("value");
-		}
+		// TODO
+//		if (value != null) {
+//			tag.putString("value", Component.Serializer.toJson(value));
+//		} else {
+//			tag.remove("value");
+//		}
 	}
 	
 	@Override
 	public void readFromNbt(@NotNull CompoundTag tag) {
-		if (tag.contains("value")) {
-			value = Component.Serializer.fromJson(tag.getString("value"));
-		}
+//		if (tag.contains("value")) {
+//			value = Component.Serializer.fromJson(tag.getString("value"));
+//		}
 	}
 }

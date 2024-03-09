@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -115,7 +114,10 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			() -> new ShaderCommand(plugin, "spider", new SemVer(3, 3, 0)),
 			() -> new ShaderCommand(plugin, "phosphor", new SemVer(3, 3, 0)),
 			() -> new DeleteRandomItemCommand(plugin),
-			() -> new UniteCommand(plugin)
+			() -> new UniteCommand(plugin),
+			() -> TickRateCommand.doubleRate(plugin),
+			() -> TickRateCommand.halfRate(plugin),
+			() -> new TickFreezeCommand(plugin)
 		));
 
 		// entity commands
@@ -141,8 +143,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			initTo(commands, () -> new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		for (MobEffect potion : BuiltInRegistries.MOB_EFFECT)
-			initTo(commands, () -> new PotionCommand(plugin, potion));
+		BuiltInRegistries.MOB_EFFECT.holders()
+			.forEach(potion -> initTo(commands, () -> new PotionCommand(plugin, potion)));
 
 		// block sets
 		for (Block block : setBlocks)
