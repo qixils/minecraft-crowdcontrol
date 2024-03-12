@@ -8,6 +8,7 @@ A list of all changes made to the software in reverse chronological order.
 - Added support for binding to a specific IP address. Useful for owners of large server networks.
 - Added support for pausing some more effects in singleplayer
 - Added warnings for running the Paper plugin on an unsupported version
+- Fixed an issue allowing sessions to be started earlier than intended
 
 ## 3.3.6
 
