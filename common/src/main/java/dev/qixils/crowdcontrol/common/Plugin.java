@@ -836,7 +836,7 @@ public interface Plugin<P, S> {
 		service.addLoginListener(connectingService -> getScheduledExecutor().schedule(() -> {
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
 			updateConditionalEffectVisibility(connectingService);
-			sendPlayerEvent(connectingService, "playerJoined", isGlobal());
+			sendPlayerEvent(connectingService, "playerJoined", false);
 		}, 1, TimeUnit.SECONDS));
 	}
 
