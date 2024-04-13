@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.util.SemVer;
-import dev.qixils.crowdcontrol.exceptions.NoApplicableTarget;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -170,7 +169,7 @@ public interface Command<P> {
 		Executor executor;
 		switch (executeUsing) {
 			case ASYNC:
-				executor = getPlugin().getAsyncExecutor();
+				executor = Runnable::run;
 				break;
 			case SYNC_GLOBAL:
 				executor = getPlugin().getSyncExecutor(); // TODO: getGlobalExecutor
@@ -183,8 +182,10 @@ public interface Command<P> {
 
 	@ApiStatus.Internal
 	default void wrappedExecuteAndNotify(@NotNull Request request) {
+		if (!request.getType().isEffectType()) return;
+
 		Plugin<P, ?> plugin = getPlugin();
-		plugin.getSLF4JLogger().debug("Executing " + getDisplayName());
+		plugin.getSLF4JLogger().debug("Executing " + getDisplayName() + " from " + request);
 		List<P> players = plugin.getPlayers(request);
 
 		// remove players on older version of the mod
@@ -193,8 +194,13 @@ public interface Command<P> {
 			players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
 
 		// ensure targets are online / available
-		if (players.isEmpty())
-			throw new NoApplicableTarget();
+		if (players.isEmpty()) {
+			request.buildResponse()
+				.type(ResultType.FAILURE)
+				.message("No available players online")
+				.send();
+			return;
+		}
 
 		// disallow execution of global commands
 		if (isGlobal()) {
