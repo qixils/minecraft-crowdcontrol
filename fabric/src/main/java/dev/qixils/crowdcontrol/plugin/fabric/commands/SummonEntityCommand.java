@@ -11,7 +11,8 @@ import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,7 +34,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.loot.LootDataType;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +51,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	protected final EntityType<E> entityType;
 	private final String effectName;
 	private final Component displayName;
-	private @Nullable List<ResourceLocation> lootTables = null;
+	private List<ResourceKey<LootTable>> lootTables = null;
 	private final Map<EntityType<?>, List<Item>> horseArmor = new HashMap<>();
 	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
 			Rabbit.Variant.BLACK, 16,
@@ -85,11 +86,15 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		this.armor = Collections.unmodifiableMap(armor);
 	}
 
-	@NotNull
-	private List<ResourceLocation> getLootTables(MinecraftServer server) {
+	private List<ResourceKey<LootTable>> getLootTables(MinecraftServer server) {
 		if (lootTables != null)
 			return lootTables;
-		return lootTables = server.getLootData().getKeys(LootDataType.TABLE).stream().filter(location -> location.getPath().startsWith("chests/")).toList();
+		return lootTables = server.registryAccess()
+			.lookupOrThrow(Registries.LOOT_TABLE)
+			.listElements()
+			.flatMap(reference -> reference.unwrapKey().stream())
+			.filter(key -> key.location().getPath().startsWith("chests/"))
+			.toList();
 	}
 
 	@NotNull
@@ -168,7 +173,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
 		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT));
+			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT.holders()));
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
 		if (entity instanceof Rabbit rabbit)

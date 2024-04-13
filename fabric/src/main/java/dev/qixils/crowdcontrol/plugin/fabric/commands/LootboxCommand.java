@@ -86,7 +86,7 @@ public class LootboxCommand extends ImmediateCommand {
 		allItems = BuiltInRegistries.ITEM.stream().filter(it -> it != Items.AIR).toList();
 		goodItems = allItems.stream()
 				.filter(itemType ->
-						itemType.getMaxDamage() > 1
+						itemType.components().getOrDefault(DataComponents.MAX_DAMAGE, 0) > 1
 								|| itemType == Items.GOLDEN_APPLE
 								|| itemType == Items.ENCHANTED_GOLDEN_APPLE
 								|| itemType == Items.NETHERITE_BLOCK
@@ -124,9 +124,10 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// determine the size of the item stack
 		int quantity = 1;
-		if (item.getMaxStackSize() > 1) {
+		int maxStackSize = item.components().getOrDefault(DataComponents.MAX_STACK_SIZE, 0);
+		if (maxStackSize > 1) {
 			for (int i = 0; i <= luck; i++) {
-				quantity = Math.max(quantity, RandomUtil.nextInclusiveInt(1, item.getMaxStackSize()));
+				quantity = Math.max(quantity, RandomUtil.nextInclusiveInt(1, maxStackSize));
 			}
 		}
 
@@ -214,8 +215,8 @@ public class LootboxCommand extends ImmediateCommand {
 			// add default attributes
 			for (EquipmentSlot type : EquipmentSlot.values()) {
 				if (!equipmentSlotGroup.test(type)) continue;
-				itemStack.getItem().getDefaultAttributeModifiers(type)
-						.forEach((attribute, modifier) -> {
+				itemStack.getItem().getDefaultAttributeModifiers()
+						.forEach(type, (attribute, modifier) -> {
 							// TODO: does any of this make sense (especially the equipmentSlotGroup)
 							ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 							modifiers = modifiers.withModifierAdded(attribute, modifier, equipmentSlotGroup);

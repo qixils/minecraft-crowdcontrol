@@ -70,7 +70,7 @@ public class GravityCommand extends TimedVoidCommand {
 						AttributeInstance maxHealthAttr = player.getAttribute(Attributes.GRAVITY);
 						if (maxHealthAttr == null) continue;
 						for (AttributeModifier attributeModifier : maxHealthAttr.getModifiers()) {
-							if (attributeModifier.getId() == GRAVITY_MODIFIER_UUID) {
+							if (attributeModifier.id() == GRAVITY_MODIFIER_UUID) {
 								maxHealthAttr.removePermanentModifier(GRAVITY_MODIFIER_UUID);
 							}
 						}

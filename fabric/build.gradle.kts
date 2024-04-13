@@ -79,7 +79,7 @@ tasks.processResources {
 
 // Java 17 boilerplate
 
-val targetJavaVersion = 17
+val targetJavaVersion = 21
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(targetJavaVersion)
 }
@@ -99,6 +99,7 @@ loom {
     mixin {
         defaultRefmapName.set("crowd-control-refmap.json")
     }
+    accessWidenerPath = file("src/main/resources/crowdcontrol.accesswidener")
 }
 
 // configure shadowJar

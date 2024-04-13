@@ -33,9 +33,10 @@
   "mixins": [
     "crowdcontrol.mixins.json"
   ],
+  "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
-    "fabricloader": ">=0.15.7",
-    "fabric": ">=0.96.4+1.20.5",
+    "fabricloader": ">=0.15.9",
+    "fabric": ">=0.96.15+1.20.5",
     "minecraft": ">=1.20.5- <=1.20.5",
     "cardinal-components-base": ">=5.4.0",
     "cardinal-components-entity": ">=5.4.0",
