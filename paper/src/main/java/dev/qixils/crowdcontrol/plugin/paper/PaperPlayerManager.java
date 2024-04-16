@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.plugin.paper.commands.GameModeCommand;
+import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 				|| !player.isValid()
 				|| player.isDead()
 				|| (player.getGameMode() == GameMode.SPECTATOR && !GameModeCommand.isEffectActive(plugin, player))
+				|| !player.hasPermission(PaperUtil.USE_PERMISSION)
 		);
 		return players;
 	}

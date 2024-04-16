@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.EntityMapper;
-import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
@@ -31,7 +31,7 @@ class CommandSenderMapper<E extends CommandSender> implements EntityMapper<E> {
 
 	@Override
 	public boolean isAdmin(@NotNull E commandSource) {
-		if (commandSource.hasPermission(Plugin.ADMIN_PERMISSION) || commandSource.isOp()) return true;
+		if (commandSource.hasPermission(PaperUtil.ADMIN_PERMISSION)) return true;
 		return EntityMapper.super.isAdmin(commandSource);
 	}
 }

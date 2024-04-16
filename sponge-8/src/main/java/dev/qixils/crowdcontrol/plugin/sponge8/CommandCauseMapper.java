@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8;
 
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
@@ -33,7 +34,7 @@ class CommandCauseMapper implements EntityMapper<CommandCause> {
 
 	@Override
 	public boolean isAdmin(@NotNull CommandCause entity) {
-		if (entity.hasPermission(Plugin.ADMIN_PERMISSION)) return true;
+		if (SpongeUtil.hasPermission(entity, Plugin.ADMIN_PERMISSION)) return true;
 		return EntityMapper.super.isAdmin(entity);
 	}
 }

@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
@@ -99,9 +100,22 @@ public interface Plugin<P, S> {
 	Component VIEWER_NAME = translatable("cc.effect.viewer");
 
 	/**
+	 * The permission node required to receive effects.
+	 */
+	PermissionWrapper USE_PERMISSION = PermissionWrapper.builder()
+		.node("crowdcontrol.use")
+		.description("Whether a player is allowed to receive effects")
+		.defaultPermission(PermissionWrapper.DefaultPermission.ALL)
+		.build();
+
+	/**
 	 * The permission node required to use administrative commands.
 	 */
-	String ADMIN_PERMISSION = "crowdcontrol.admin";
+	PermissionWrapper ADMIN_PERMISSION = PermissionWrapper.builder()
+		.node("crowdcontrol.admin")
+		.description("Whether a player is allowed to use administrative commands")
+		.defaultPermission(PermissionWrapper.DefaultPermission.OP)
+		.build();
 
 	/**
 	 * Port that the {@link CrowdControl} service connects to or listen on.
