@@ -7,6 +7,7 @@ A list of all changes made to the software in reverse chronological order.
 - Added support for 1.20.5 on Paper and Fabric
 - Added new effects for controlling the speed of the game (HyperSpeed, HyperSlowSpeed, Freeze Time)
 - Added support for the upcoming Stop All Effects button in the Crowd Control app
+- Added the permission node `crowdcontrol.use` for fine-grained control over where effects can be used
 - Added support for binding to a specific IP address. Useful for owners of large server networks.
 - Added support for pausing some more effects in singleplayer
 - Added warnings for running the Paper plugin on an unsupported version

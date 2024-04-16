@@ -31,6 +31,7 @@ public class CommandSourceStackMapper implements EntityMapper<CommandSourceStack
 
 	@Override
 	public final boolean isAdmin(@NotNull CommandSourceStack entity) {
+		// TODO: LuckPerms hook
 		if (entity.hasPermission(3)) return true;
 		return EntityMapper.super.isAdmin(entity);
 	}

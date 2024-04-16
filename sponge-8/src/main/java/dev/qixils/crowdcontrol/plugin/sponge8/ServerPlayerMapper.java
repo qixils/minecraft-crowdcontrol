@@ -39,7 +39,8 @@ class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public boolean isAdmin(@NotNull ServerPlayer entity) {
-		if (entity.hasPermission(Plugin.ADMIN_PERMISSION)) return true;
+		// TODO: better handle permission wrapper
+		if (entity.hasPermission(Plugin.ADMIN_PERMISSION.getNode())) return true;
 		return PlayerEntityMapper.super.isAdmin(entity);
 	}
 

@@ -1,7 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.sponge7;
 
 import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
+import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import lombok.Getter;
@@ -30,6 +32,7 @@ public class SpongePlayerManager extends AbstractPlayerManager<Player> {
 				|| !player.isLoaded()
 				|| player.health().get() <= 0.0
 				|| (player.gameMode().get().equals(GameModes.SPECTATOR) && !player.get(GameModeEffectData.class).isPresent())
+				|| !SpongeUtil.hasPermission(player, Plugin.USE_PERMISSION)
 		);
 		return players;
 	}
@@ -58,7 +61,8 @@ public class SpongePlayerManager extends AbstractPlayerManager<Player> {
 	public @NotNull Collection<@NotNull Player> getSpectators() {
 		List<Player> players = new ArrayList<>(plugin.getGame().getServer().getOnlinePlayers());
 		players.removeIf(player -> !player.gameMode().get().equals(GameModes.SPECTATOR)
-				|| player.get(GameModeEffectData.class).isPresent());
+				|| player.get(GameModeEffectData.class).isPresent()
+		);
 		return players;
 	}
 }
