@@ -36,14 +36,14 @@
   "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
     "fabricloader": ">=0.15.10",
-    "fabric": ">=0.97.1+1.20.5",
+    "fabric": ">=0.97.6+1.20.5",
     "minecraft": ">=1.20.5- <=1.20.5",
-    "cardinal-components-base": ">=5.4.0",
-    "cardinal-components-entity": ">=5.4.0",
-    "cloud": "^1.8.3",
+    "cardinal-components-base": ">=6.0.0-",
+    "cardinal-components-entity": ">=6.0.0-",
+    "cloud": "^1.8.4",
     "adventure-platform-fabric": ">=5.12.0-",
     "net_kyori_adventure-api": "^4.16.0",
-    "cloth-config": ">=13.0.121"
+    "cloth-config": ">=14.0.126"
   },
   "suggests": {
     "modmenu": "*"

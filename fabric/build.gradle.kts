@@ -42,6 +42,7 @@ repositories {
         name = "Shedaniel"
         url = uri("https://maven.shedaniel.me")
     }
+    mavenLocal() // TODO: adventure-platform-fabric
 }
 
 dependencies {
@@ -52,8 +53,8 @@ dependencies {
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
     modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
-    modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
+    modApi(include("org.ladysnake.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
+    modImplementation(include("org.ladysnake.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
