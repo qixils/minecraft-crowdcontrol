@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,9 +41,11 @@ public final class RemoveEnchantsCommand extends ImmediateCommand {
 		return result;
 	}
 
-	@Contract
 	private boolean tryRemoveEnchants(ItemStack item) {
 		if (item.isEmpty())
+			return false;
+		ItemEnchantments enchantments = item.get(DataComponents.ENCHANTMENTS);
+		if (enchantments == null || enchantments.isEmpty())
 			return false;
 		item.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
 		return true;
