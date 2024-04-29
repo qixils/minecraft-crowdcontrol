@@ -152,8 +152,10 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
 		if (entity instanceof Boat boat)
 			boat.setVariant(randomElementFrom(Boat.Type.class));
-		if (entity instanceof Wolf wolf)
+		if (entity instanceof Wolf wolf) {
 			wolf.setCollarColor(randomElementFrom(DyeColor.class));
+			wolf.setVariant(randomElementFrom(level.registryAccess().registryOrThrow(Registries.WOLF_VARIANT).holders()));
+		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
 		if (entity instanceof AbstractHorse horse) {
