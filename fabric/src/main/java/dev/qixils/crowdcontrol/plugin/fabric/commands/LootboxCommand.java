@@ -194,7 +194,8 @@ public class LootboxCommand extends ImmediateCommand {
 		if (attributes > 0) {
 			// get equipment slot(s)
 			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getEquipmentSlot() : null;
-			EquipmentSlotGroup equipmentSlotGroup = equipmentSlot == null ? EquipmentSlotGroup.HAND : SLOT_TO_GROUP.get(equipmentSlot);
+			EquipmentSlotGroup _equipmentSlotGroup = equipmentSlot == null ? null : SLOT_TO_GROUP.get(equipmentSlot);
+			final EquipmentSlotGroup equipmentSlotGroup = _equipmentSlotGroup == null ? EquipmentSlotGroup.HAND : _equipmentSlotGroup;
 			// add custom attributes
 			List<Holder<Attribute>> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
