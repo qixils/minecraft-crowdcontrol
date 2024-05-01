@@ -615,7 +615,7 @@ public interface Plugin<P, S> {
 	 * @return true if global effects could execute
 	 */
 	default boolean globalEffectsUsable() {
-		return isGlobal() || (!getHosts().isEmpty() && getAllPlayers().stream().anyMatch(this::isHost));
+		return isGlobal() || !getHosts().isEmpty();
 	}
 
 	/**
