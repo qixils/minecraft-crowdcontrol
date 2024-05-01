@@ -7,13 +7,20 @@ val reflectionsVersion: String by project
 dependencies {
     api("com.google.guava:guava:33.1.0-jre")
     api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
-    api("net.kyori:adventure-api:$adventureVersion")
-    api("net.kyori:adventure-platform-api:$adventurePlatformVersion")
-    api("net.kyori:adventure-text-minimessage:$adventureVersion")
-    api("net.kyori:adventure-text-serializer-plain:$adventureVersion")
-    api("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
+    compileOnly("net.kyori:adventure-api:$adventureVersion")
+    api("net.kyori:adventure-text-minimessage:$adventureVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
+    api("net.kyori:adventure-text-serializer-plain:$adventureVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
+    api("net.kyori:adventure-text-serializer-legacy:$adventureVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
     api("cloud.commandframework:cloud-core:$cloudVersion")
-    api("cloud.commandframework:cloud-minecraft-extras:$cloudVersion")
+    api("cloud.commandframework:cloud-minecraft-extras:$cloudVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
     implementation("org.reflections:reflections:$reflectionsVersion")
 }
 

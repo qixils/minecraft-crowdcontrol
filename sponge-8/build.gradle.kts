@@ -51,3 +51,15 @@ sponge {
         }
     }
 }
+
+tasks {
+    shadowJar {
+        exclude("org/slf4j/")
+        exclude("io/leangen/geantyref/")
+
+        dependencies {
+            exclude("org.slf4j::")
+            exclude("io.leangen.geantyref::")
+        }
+    }
+}

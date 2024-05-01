@@ -20,7 +20,7 @@ useSeoMeta({
     <p>The following steps detail how to manually set up a Minecraft {{ version }} local Paper server with Crowd Control.</p>
 
     <ol>
-      <li>Download and install <a href="https://adoptium.net/">the latest version of Java</a>. Java 17 or later is required.</li>
+      <li>Download and install <a href="https://adoptium.net/">the latest version of Java</a>. Java 21 or later is required.</li>
       <li>Download the latest version of <a :href="`https://papermc.io/downloads/${latest ? 'paper' : 'all'}`">Paper {{ version }}</a>. Spigot is not supported.</li>
       <li>Place the Paper jar in a new, empty folder. This folder will hereafter be referred to as the "root folder."</li>
       <li>Create a new folder named <code>plugins</code> inside the root folder.</li>

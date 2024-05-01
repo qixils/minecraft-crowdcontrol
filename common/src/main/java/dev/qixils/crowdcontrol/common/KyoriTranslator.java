@@ -10,7 +10,6 @@ import net.kyori.adventure.text.renderer.TranslatableComponentRenderer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
-import net.kyori.adventure.util.UTF8ResourceBundleControl;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -108,7 +107,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	}
 
 	private void register(Locale locale) {
-		ResourceBundle bundle = ResourceBundle.getBundle(prefix.replace('/', '.'), locale, pluginClassLoader, UTF8ResourceBundleControl.get());
+		ResourceBundle bundle = ResourceBundle.getBundle(prefix.replace('/', '.'), locale, pluginClassLoader);
 		translator.registerAll(locale, bundle, false);
 		logger.info("Registered locale " + locale);
 	}

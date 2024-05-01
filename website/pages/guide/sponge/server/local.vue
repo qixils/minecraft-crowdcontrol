@@ -7,11 +7,13 @@ if (!version.value || !spongeVersions.has(version.value)) { version.value = spon
 const latest = computed(() => version.value === spongeLatest);
 const api = computed(() => spongeVersions.get(version.value));
 const java = computed(() => {
-  return 8;
+  if (['1.12.2', '1.16.5'].includes(version.value)) return 8;
+  return 21;
 });
 const forge = computed(() => {
   if (version.value === '1.12.2') return '14.23.5.2860';
   if (version.value === '1.16.5') return '36.2.39';
+  if (version.value === '1.19.4') return '41.1.19';
   return 'unknown';
 });
 
@@ -29,8 +31,9 @@ useSeoMeta({
     <p>The following steps detail how to manually set up a Minecraft {{version}} local Forge server with Crowd Control.</p>
 
     <ol>
+      <li>If you're using a modpack, look on their downloads page for a "server pack." If you find one: download it, extract it, and skip to step 6.</li>
       <li>Download and install <a :href="`https://adoptium.net/temurin/releases/?version=${java}`">Java {{java}}</a>.</li>
-      <li>Download and run the latest build ({{forge}}) of <a :href="`https://files.minecraftforge.net/net/minecraftforge/forge/index_${version}.html`">Forge {{version}}</a>.</li>
+      <li>Download and run the latest build (at least {{forge}}) of <a :href="`https://files.minecraftforge.net/net/minecraftforge/forge/index_${version}.html`">Forge {{version}}</a>.</li>
       <li>In the Forge pop-up window, click <code>Install server</code> and then the triple dots in the corner to open
         the directory selector. Find or create a new, empty folder and click Open, then click OK. This
         folder will be important in later steps and will hereafter be referred to as the "root folder".</li>
