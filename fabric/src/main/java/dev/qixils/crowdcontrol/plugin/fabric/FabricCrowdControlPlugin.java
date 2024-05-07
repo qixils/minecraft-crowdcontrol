@@ -109,7 +109,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
-	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(Path.of("config"));
+	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(FabricLoader.getInstance().getConfigDir());
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
 	public FabricCrowdControlPlugin() {
