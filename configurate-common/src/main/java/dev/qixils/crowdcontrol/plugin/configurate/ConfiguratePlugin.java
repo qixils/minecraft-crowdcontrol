@@ -152,7 +152,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 
 		if (!Files.exists(configPath)) {
 			// read the default config
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("assets/crowdcontrol/default.conf");
+			InputStream inputStream = getInputStream("assets/crowdcontrol/default.conf");
 			if (inputStream == null)
 				throw new IllegalStateException("Could not find default config file");
 			// copy the default config to the config path
@@ -164,5 +164,9 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		}
 
 		return HoconConfigurationLoader.builder().path(configPath).build();
+	}
+
+	public InputStream getInputStream(String asset) {
+		return getClass().getClassLoader().getResourceAsStream(asset);
 	}
 }
