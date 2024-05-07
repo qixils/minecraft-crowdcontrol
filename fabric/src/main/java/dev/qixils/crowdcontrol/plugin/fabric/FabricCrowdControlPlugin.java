@@ -24,6 +24,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
@@ -43,6 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -279,5 +282,20 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	public @NotNull net.minecraft.network.chat.Component toNative(ComponentLike text, @NotNull Pointered viewer) {
 		return adventure().toNative(toAdventure(text, viewer));
+	}
+
+	@Override
+	public InputStream getInputStream(String asset) {
+		Optional<Path> path = FabricLoader.getInstance().getModContainer("crowdcontrol").orElseThrow().findPath(asset);
+		if (path.isPresent()) {
+			try {
+				return path.get().getFileSystem()
+					.provider()
+					.newInputStream(path.get());
+			} catch (IOException e) {
+				SLF4JLogger.warn(String.format("Encountered exception while retrieving asset {0}! " + e.getMessage(), asset));
+			}
+		}
+		return null;
 	}
 }
