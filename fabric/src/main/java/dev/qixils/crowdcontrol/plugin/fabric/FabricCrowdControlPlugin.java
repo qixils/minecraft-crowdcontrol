@@ -46,6 +46,7 @@ import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -285,17 +286,19 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
-	public InputStream getInputStream(String asset) {
-		Optional<Path> path = FabricLoader.getInstance().getModContainer("crowdcontrol").orElseThrow().findPath(asset);
-		if (path.isPresent()) {
-			try {
-				return path.get().getFileSystem()
-					.provider()
-					.newInputStream(path.get());
-			} catch (IOException e) {
-				SLF4JLogger.warn(String.format("Encountered exception while retrieving asset {0}! " + e.getMessage(), asset));
-			}
-		}
-		return null;
+	public InputStream getInputStream(@NotNull String asset) {
+		Optional<Path> path = FabricLoader.getInstance()
+			.getModContainer("crowdcontrol")
+			.flatMap(container -> container.findPath(asset));
+
+        if (path.isEmpty())
+            return null;
+
+        try {
+			return Files.newInputStream(path.get());
+        } catch (IOException e) {
+            SLF4JLogger.warn(String.format("Encountered exception while retrieving asset %s", asset), e);
+			return null;
+        }
 	}
 }
