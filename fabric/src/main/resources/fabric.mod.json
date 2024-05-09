@@ -41,7 +41,7 @@
     "cardinal-components-base": ">=6.0.0-",
     "cardinal-components-entity": ">=6.0.0-",
     "cloud": "^1.8.4",
-    "adventure-platform-fabric": ">=5.12.0-",
+    "adventure-platform-fabric": ">=5.13.0",
     "net_kyori_adventure-api": "^4.16.0",
     "cloth-config": ">=14.0.126"
   },

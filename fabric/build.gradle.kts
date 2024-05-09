@@ -42,7 +42,6 @@ repositories {
         name = "Shedaniel"
         url = uri("https://maven.shedaniel.me")
     }
-    mavenLocal() // TODO: adventure-platform-fabric
 }
 
 dependencies {
