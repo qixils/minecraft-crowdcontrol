@@ -4,9 +4,11 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.3.7
 
-- Added support for 1.20.5 on Paper and Fabric
-- Added new Summon Armadillo effect
+- Added support for 1.20.6 on Paper and Fabric
+- Dropped support for Paper and Fabric versions prior to 1.20.6
+- Added new entity summon effects (Armadillo, Bogged, Breeze)
 - Added new effects for controlling the speed of the game (HyperSpeed, HyperSlowSpeed, Freeze Time)
+- Added slow falling potion effect
 - Added support for the upcoming Stop All Effects button in the Crowd Control app
 - Added the permission node `crowdcontrol.use` for fine-grained control over where effects can be used
 - Added support for binding to a specific IP address. Useful for owners of large server networks.
