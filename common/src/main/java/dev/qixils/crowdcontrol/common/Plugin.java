@@ -29,11 +29,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -1328,5 +1330,16 @@ public interface Plugin<P, S> {
 		if (getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).size() > 0)
 			return true;
 		return getSocketManagersFor(player).size() > 0;
+	}
+
+	/**
+	 * Gets one of the mod's resource files.
+	 *
+	 * @param asset filename
+	 * @return input stream if found
+	 */
+	@ApiStatus.Internal
+	default @Nullable InputStream getInputStream(@NotNull String asset) {
+		return getClass().getClassLoader().getResourceAsStream(asset);
 	}
 }

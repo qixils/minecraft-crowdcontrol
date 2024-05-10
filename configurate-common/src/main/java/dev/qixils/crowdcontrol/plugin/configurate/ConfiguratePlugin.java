@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.SoftLockConfig;
+import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurateException;
@@ -75,9 +76,8 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		announce = config.node("announce").getBoolean(announce);
 		adminRequired = config.node("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
-		IP = config.node("ip").getString("");
-		if ("".equals(IP))
-			IP = null;
+		IP = config.node("ip").getString(ExceptionUtil.validateNotNullElse(IP, ""));
+		if (IP.isEmpty()) IP = null;
 		port = config.node("port").getInt(port);
 		password = config.node("password").getString(password);
 		autoDetectIP = config.node("ip-detect").getBoolean(autoDetectIP);
@@ -154,7 +154,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 
 		if (!Files.exists(configPath)) {
 			// read the default config
-			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("assets/crowdcontrol/default.conf");
+			InputStream inputStream = getInputStream("assets/crowdcontrol/default.conf");
 			if (inputStream == null)
 				throw new IllegalStateException("Could not find default config file");
 			// copy the default config to the config path
