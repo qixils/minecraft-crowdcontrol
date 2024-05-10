@@ -1,9 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.GameTypeEffectComponentImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.MovementStatusImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.OriginalDisplayNameImpl;
@@ -11,6 +7,10 @@ import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.ViewerMobImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 
 public final class Components implements EntityComponentInitializer {
 	// DON'T FORGET THESE NEED TO BE DECLARED IN fabric.mod.json

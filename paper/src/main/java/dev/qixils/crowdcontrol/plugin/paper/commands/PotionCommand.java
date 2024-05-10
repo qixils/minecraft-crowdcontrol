@@ -63,7 +63,7 @@ public class PotionCommand extends TimedImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (potionEffectType == PotionEffectType.JUMP
+		if (potionEffectType == PotionEffectType.JUMP_BOOST
 				&& TimedEffect.isActive("disable_jumping", request.getTargets())) {
 			return request.buildResponse()
 					.type(ResultType.RETRY)

@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl;
 
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.OriginalDisplayName;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -21,18 +22,18 @@ public class OriginalDisplayNameImpl implements OriginalDisplayName {
 	}
 
 	@Override
-	public void writeToNbt(@NotNull CompoundTag tag) {
+	public void writeToNbt(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registryLookup) {
 		if (value != null) {
-			tag.putString("value", Component.Serializer.toJson(value));
+			tag.putString("value", Component.Serializer.toJson(value, registryLookup));
 		} else {
 			tag.remove("value");
 		}
 	}
-	
+
 	@Override
-	public void readFromNbt(@NotNull CompoundTag tag) {
+	public void readFromNbt(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registryLookup) {
 		if (tag.contains("value")) {
-			value = Component.Serializer.fromJson(tag.getString("value"));
+			value = Component.Serializer.fromJson(tag.getString("value"), registryLookup);
 		}
 	}
 }

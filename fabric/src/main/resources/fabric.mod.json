@@ -33,16 +33,17 @@
   "mixins": [
     "crowdcontrol.mixins.json"
   ],
+  "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
-    "fabricloader": ">=0.15.0",
-    "fabric": ">=0.91.1+1.20.4",
-    "minecraft": ">=1.20.3- <=1.20.4",
-    "cardinal-components-base": ">=5.4.0",
-    "cardinal-components-entity": ">=5.4.0",
-    "cloud": "^1.8.3",
-    "adventure-platform-fabric": ">=5.11.0-",
-    "net_kyori_adventure-api": "^4.15.0",
-    "cloth-config": ">=13.0.121"
+    "fabricloader": "*",
+    "fabric": ">=0.97.6+1.20.6",
+    "minecraft": ">=1.20.5- <=1.20.6",
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*",
+    "cloud": "*",
+    "adventure-platform-fabric": "*",
+    "net_kyori_adventure-api": "*",
+    "cloth-config": "*"
   },
   "suggests": {
     "modmenu": "*"

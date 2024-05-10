@@ -41,12 +41,12 @@ public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 		}
 		AttributeModifier modifier = null;
 		for (AttributeModifier attributeModifier : attribute.getModifiers()) {
-			if (attributeModifier.getId() == MAX_HEALTH_MODIFIER_UUID) {
+			if (attributeModifier.id() == MAX_HEALTH_MODIFIER_UUID) {
 				modifier = attributeModifier;
 				break;
 			}
 		}
-		return modifier == null ? 0 : modifier.getAmount();
+		return modifier == null ? 0 : modifier.amount();
 	}
 
 	@Override
@@ -57,15 +57,15 @@ public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 			return;
 		}
 		for (AttributeModifier attributeModifier : maxHealthAttr.getModifiers()) {
-			if (attributeModifier.getId() == MAX_HEALTH_MODIFIER_UUID) {
-				maxHealthAttr.removePermanentModifier(attributeModifier.getId());
+			if (attributeModifier.id() == MAX_HEALTH_MODIFIER_UUID) {
+				maxHealthAttr.removePermanentModifier(attributeModifier.id());
 			}
 		}
 		maxHealthAttr.addPermanentModifier(new AttributeModifier(
 				MAX_HEALTH_MODIFIER_UUID,
 				MAX_HEALTH_MODIFIER_NAME,
 				newOffset,
-				AttributeModifier.Operation.ADDITION
+				AttributeModifier.Operation.ADD_VALUE
 		));
 		float computedMaxHealth = (float) (20 + newOffset);
 		health(Math.min(health(), computedMaxHealth));

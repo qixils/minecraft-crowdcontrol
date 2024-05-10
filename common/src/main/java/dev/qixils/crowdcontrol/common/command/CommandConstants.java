@@ -280,11 +280,14 @@ public class CommandConstants {
 	 */
 	public static final @NotNull Set<String> ENTITIES = new HashSet<>(Arrays.asList(
 		"allay",
+		"armadillo",
 		"armor_stand",
 		"axolotl",
 		"bat",
 		"bee",
 		"blaze",
+		"bogged",
+		"breeze",
 		"boat",
 		"chest_boat",
 		"camel",

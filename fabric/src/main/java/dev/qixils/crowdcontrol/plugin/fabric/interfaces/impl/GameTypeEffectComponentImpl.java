@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl;
 
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.GameTypeEffectComponent;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +21,7 @@ public class GameTypeEffectComponentImpl implements GameTypeEffectComponent {
 	}
 
 	@Override
-	public void writeToNbt(@NotNull CompoundTag tag) {
+	public void writeToNbt(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registryLookup) {
 		if (value != null) {
 			tag.putString("value", value.getName());
 		} else {
@@ -29,7 +30,7 @@ public class GameTypeEffectComponentImpl implements GameTypeEffectComponent {
 	}
 
 	@Override
-	public void readFromNbt(CompoundTag tag) {
+	public void readFromNbt(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registryLookup) {
 		if (tag.contains("value")) {
 			value = GameType.byName(tag.getString("value"));
 		}

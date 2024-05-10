@@ -20,7 +20,7 @@ public class AllCommand<P> implements VoidCommand<P> {
 	public void voidExecute(@NotNull List<@NotNull P> players, @NotNull Request request) {
 		// Stop All Effects
 		if (request.getType() == Request.Type.STOP) {
-			if (request.getTargets().length == 0) {
+			if (plugin.isGlobal(request)) {
 				TimedEffect.stopAll(null);
 			} else {
 				for (Request.Target target : request.getTargets()) {

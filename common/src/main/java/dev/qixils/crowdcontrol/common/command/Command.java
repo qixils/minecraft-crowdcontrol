@@ -202,7 +202,7 @@ public interface Command<P> {
 			return;
 		}
 
-		// disallow execution of global commands
+		// disallow execution of global commands | TODO: is this even a valid codepath?
 		if (isGlobal()) {
 			if (!plugin.globalEffectsUsable()) {
 				request.buildResponse()

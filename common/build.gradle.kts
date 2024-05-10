@@ -12,8 +12,8 @@ dependencies {
     api("net.kyori:adventure-text-minimessage:$adventureVersion")
     api("net.kyori:adventure-text-serializer-plain:$adventureVersion")
     api("net.kyori:adventure-text-serializer-legacy:$adventureVersion")
-    api("cloud.commandframework:cloud-core:$cloudVersion")
-    api("cloud.commandframework:cloud-minecraft-extras:$cloudVersion")
+    api("com.github.qixils.cloud:cloud-core:$cloudVersion")
+    api("com.github.qixils.cloud:cloud-minecraft-extras:$cloudVersion")
     implementation("org.reflections:reflections:$reflectionsVersion")
 }
 

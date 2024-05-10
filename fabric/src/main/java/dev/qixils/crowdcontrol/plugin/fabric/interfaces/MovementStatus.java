@@ -1,15 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.Versioned;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 
-public interface MovementStatus extends AutoSyncedComponent, PlayerComponent<MovementStatus> {
+public interface MovementStatus extends AutoSyncedComponent, RespawnableComponent<MovementStatus> {
 	@NotNull
 	Value get(@NotNull Type type);
 	void set(@NotNull Type type, @NotNull Value value);

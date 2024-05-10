@@ -21,7 +21,7 @@ public class ItemUtil {
 		itemClone1.setCount(1);
 		ItemStack itemClone2 = item2.copy();
 		itemClone2.setCount(1);
-		return ItemStack.isSameItemSameTags(itemClone1, itemClone2);
+		return ItemStack.isSameItemSameComponents(itemClone1, itemClone2);
 	}
 
 	@Contract("null -> true; _ -> _")

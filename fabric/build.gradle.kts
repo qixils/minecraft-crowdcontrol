@@ -51,9 +51,9 @@ dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
-    modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
-    modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
+    modImplementation(include("com.github.qixils.cloud:cloud-fabric:$cloudVersion")!!)
+    modApi(include("org.ladysnake.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
+    modImplementation(include("org.ladysnake.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
@@ -79,7 +79,7 @@ tasks.processResources {
 
 // Java 17 boilerplate
 
-val targetJavaVersion = 17
+val targetJavaVersion = 21
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(targetJavaVersion)
 }
@@ -99,6 +99,7 @@ loom {
     mixin {
         defaultRefmapName.set("crowd-control-refmap.json")
     }
+    accessWidenerPath = file("src/main/resources/crowdcontrol.accesswidener")
 }
 
 // configure shadowJar

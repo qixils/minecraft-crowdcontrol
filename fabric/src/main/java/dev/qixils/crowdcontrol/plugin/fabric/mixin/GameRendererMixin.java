@@ -30,9 +30,11 @@ public class GameRendererMixin {
 			ci.cancel();
 	}
 
-	@Inject(method = "cycleEffect", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "shutdownEffect", at = @At("HEAD"), cancellable = true)
 	private void onCycleEffect(CallbackInfo ci) {
 		if (FabricPlatformClient.SHADER_ACTIVE)
 			ci.cancel();
 	}
+
+	// TODO: technically missing a cancel in createReloadListener
 }

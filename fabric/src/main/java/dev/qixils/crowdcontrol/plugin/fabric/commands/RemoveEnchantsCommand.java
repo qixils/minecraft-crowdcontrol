@@ -6,11 +6,11 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Contract;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -41,14 +41,13 @@ public final class RemoveEnchantsCommand extends ImmediateCommand {
 		return result;
 	}
 
-	@Contract
 	private boolean tryRemoveEnchants(ItemStack item) {
 		if (item.isEmpty())
 			return false;
-		ListTag enchantments = item.getEnchantmentTags();
-		if (enchantments.isEmpty())
+		ItemEnchantments enchantments = item.get(DataComponents.ENCHANTMENTS);
+		if (enchantments == null || enchantments.isEmpty())
 			return false;
-		enchantments.clear();
+		item.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
 		return true;
 	}
 }

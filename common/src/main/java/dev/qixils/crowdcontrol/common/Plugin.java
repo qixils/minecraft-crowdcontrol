@@ -617,7 +617,7 @@ public interface Plugin<P, S> {
 	 * @return true if global effects could execute
 	 */
 	default boolean globalEffectsUsable() {
-		return isGlobal() || (!getHosts().isEmpty() && getAllPlayers().stream().anyMatch(this::isHost));
+		return isGlobal() || !getHosts().isEmpty();
 	}
 
 	/**
@@ -1045,6 +1045,7 @@ public interface Plugin<P, S> {
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
 				effects.computeIfAbsent(selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, k -> new HashSet<>()).add(id);
 		}
+		getSLF4JLogger().debug("Setting effects {}", effects);
 		for (Map.Entry<ResultType, Set<String>> entry : effects.entrySet())
 			updateEffectIdStatus(service, entry.getKey(), entry.getValue());
 	}

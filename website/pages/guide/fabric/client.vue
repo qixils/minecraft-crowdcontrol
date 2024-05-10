@@ -19,7 +19,7 @@ useSeoMeta({
     <h1>Fabric {{ version }} Client Setup</h1>
 
     <p class="alert alert-warning" v-if="!supported">
-      The selected Minecraft version is no longer receiving non-critical mod updates.
+      The selected Minecraft version is no longer receiving mod updates.
       Please consider updating to {{ fabricLatest }}.
     </p>
 

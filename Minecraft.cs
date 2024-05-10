@@ -61,6 +61,10 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         // time commands
         new("Set Time to Day", "time_day") { Price = 50, SortName = "Time: Day", Group = "global", Category = "Server", Description = "Jumps the clock ahead to daytime" },
         new("Set Time to Night", "time_night") { Price = 50, SortName = "Time: Night", Group = "global", Category = "Server", Description = "Jumps the clock ahead to nighttime" },
+        // tick commands
+        new("Freeze Time", "tick_freeze") { Price = 250, Duration = 20, Group = "global", Category = "Server", Description = "Freezes everything in place (except for the player)" },
+        new("HyperSpeed", "tick_double") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Doubles the speed of the game's physics" },
+        new("HyperSlowSpeed", "tick_halve") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Halves the speed of the game's physics" },
         // sets the server difficulty (affects how much damage mobs deal)
         new("Peaceful Mode", "difficulty_peaceful") { Price = 200, SortName = "Difficulty: 0", Group = "global", Category = "Server", Description = "Sets the server difficulty to peaceful, removing all hostile mobs and preventing new ones from spawning" },
         new("Easy Mode", "difficulty_easy") { Price = 100, SortName = "Difficulty: 1", Group = "global", Category = "Server", Description = "Sets the server difficulty to easy, reducing the damage dealt by mobs by 50%" },

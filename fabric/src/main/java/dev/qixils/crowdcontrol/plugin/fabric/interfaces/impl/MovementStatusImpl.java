@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl;
 
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -51,13 +52,13 @@ public class MovementStatusImpl implements MovementStatus {
 	}
 
 	@Override
-	public void writeToNbt(@NotNull CompoundTag tag) {
+	public void writeToNbt(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registryLookup) {
 		for (Type type : Type.values())
 			tag.putString(getTypeKey(type), get(type).name());
 	}
 
 	@Override
-	public void readFromNbt(@NotNull CompoundTag tag) {
+	public void readFromNbt(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registryLookup) {
 		for (Type type : Type.values()) {
 			String key = getTypeKey(type);
 			if (tag.contains(key)) {
