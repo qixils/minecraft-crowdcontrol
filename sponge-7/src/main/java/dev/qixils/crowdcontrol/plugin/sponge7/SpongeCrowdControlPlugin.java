@@ -309,6 +309,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		adminRequired = config.getNode("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString(hideNames.getConfigCode()));
 		IP = config.getNode("ip").getString(IP);
+		if ("".equals(IP) || "null".equalsIgnoreCase(IP)) IP = null;
 		port = config.getNode("port").getInt(port);
 		password = config.getNode("password").getString(password);
 		autoDetectIP = config.getNode("ip-detect").getBoolean(autoDetectIP);

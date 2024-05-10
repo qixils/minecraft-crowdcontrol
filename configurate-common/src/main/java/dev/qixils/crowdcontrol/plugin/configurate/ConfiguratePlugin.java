@@ -77,7 +77,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		adminRequired = config.node("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
 		IP = config.node("ip").getString(ExceptionUtil.validateNotNullElse(IP, ""));
-		if (IP.isEmpty()) IP = null;
+		if ("".equals(IP) || "null".equalsIgnoreCase(IP)) IP = null;
 		port = config.node("port").getInt(port);
 		password = config.node("password").getString(password);
 		autoDetectIP = config.node("ip-detect").getBoolean(autoDetectIP);

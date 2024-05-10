@@ -187,6 +187,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
 		port = config.getInt("port", port);
 		IP = config.getString("ip", IP);
+		if ("".equals(IP) || "null".equalsIgnoreCase(IP)) IP = null;
 		password = config.getString("password", password);
 		autoDetectIP = config.getBoolean("ip-detect", autoDetectIP);
 	}
