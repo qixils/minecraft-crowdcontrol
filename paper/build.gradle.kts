@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("cloud.commandframework:cloud-paper:$cloudVersion")
+    implementation("com.github.qixils.cloud:cloud-paper:$cloudVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
     compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }

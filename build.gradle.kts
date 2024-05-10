@@ -33,8 +33,11 @@ subprojects {
             maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
                 name = "sonatype-oss-snapshots"
             }
+            maven {
+                name = "Jitpack"
+                url = uri("https://jitpack.io")
+            }
         }
-        mavenLocal() // TODO: publish cloud
     }
 
     java {
