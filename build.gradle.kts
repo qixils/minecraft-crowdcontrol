@@ -6,6 +6,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.2.3" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("org.spongepowered.gradle.plugin") version "2.2.0" apply false // Generates sponge_plugins.json and runServer task
+    id("io.papermc.paperweight.userdev") version "1.7.0" apply false
 }
 
 repositories {

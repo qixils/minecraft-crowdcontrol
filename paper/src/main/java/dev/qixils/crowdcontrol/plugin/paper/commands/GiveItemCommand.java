@@ -38,7 +38,7 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 	@Blocking
 	public static void giveItemTo(Entity player, ItemStack itemStack) {
 		Location location = player.getLocation();
-		Item item = (Item) player.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);
+		Item item = (Item) player.getWorld().spawnEntity(location, EntityType.ITEM);
 		item.setItemStack(itemStack);
 		item.setOwner(player.getUniqueId());
 		item.setThrower(player.getUniqueId());

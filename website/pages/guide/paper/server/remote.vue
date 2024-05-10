@@ -2,6 +2,7 @@
 const route = useRoute();
 const version = useState('version', () => route.query.v);
 if (!version.value || !paperVersions.includes(version.value)) { version.value = paperLatest; }
+const supported = computed(() => supportedPaperVersions.includes(version.value));
 
 useSeoMeta({
   title: `Paper ${version.value} Remote Server Setup · Minecraft Crowd Control`,
@@ -13,6 +14,11 @@ useSeoMeta({
 <template>
   <div>
     <h1>Paper {{ version }} Remote Server Setup</h1>
+
+    <p class="alert alert-warning" v-if="!supported">
+      The selected Minecraft version is no longer receiving mod updates.
+      Please consider updating to {{ paperLatest }}.
+    </p>
 
     <p>
       The following steps detail how to set up a Minecraft {{ version }} remote Paper server with Crowd Control.
