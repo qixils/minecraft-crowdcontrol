@@ -2,7 +2,7 @@
 
 A list of all changes made to the software in reverse chronological order.
 
-## 3.3.7
+## 3.4.0
 
 - Added support for 1.20.6 on Paper and Fabric
 - Dropped support for Paper and Fabric versions prior to 1.20.6
