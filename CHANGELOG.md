@@ -6,6 +6,7 @@ A list of all changes made to the software in reverse chronological order.
 
 - Ported Fabric's new time effects to Paper
 - Ported Fabric's gravity command refactor to Paper
+- Fixed time effect announcements
 - Fixed issue that forced all Fabric players to install the mod (it's still recommended!)
 
 ## 3.4.0
