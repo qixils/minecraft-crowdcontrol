@@ -75,4 +75,9 @@ public class MovementStatusImpl implements MovementStatus {
 	public boolean shouldSyncWith(ServerPlayer player) {
 		return this.provider == player;
 	}
+
+	@Override
+	public boolean isRequiredOnClient() {
+		return false;
+	}
 }
