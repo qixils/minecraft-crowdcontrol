@@ -29,6 +29,14 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
  */
 public class CommandConstants {
 
+	public static final UUID GRAVITY_MODIFIER_UUID = new UUID(723038618076398311L, -6545840742910585990L);
+	public static final UUID FALL_MODIFIER_UUID = new UUID(7266512121322359285L, -8208555834343603830L);
+	public static final UUID FALL_DMG_MODIFIER_UUID = new UUID(-2464474606488170752L, 8005989740147089956L);
+
+	public static final String GRAVITY_MODIFIER_NAME = "gravity-cc";
+	public static final String FALL_MODIFIER_NAME = "fall-cc";
+	public static final String FALL_DMG_MODIFIER_NAME = "fall-dmg-cc";
+
 	/**
 	 * The default validator which ensures that a given sound is available.
 	 * This should be set when the plugin is enabled.

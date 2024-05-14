@@ -2,6 +2,11 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.4.1
+
+- Ported Fabric's gravity command refactor to Paper
+- Fixed issue that forced all Fabric players to install the mod (it's still recommended!)
+
 ## 3.4.0
 
 - Added support for 1.20.6 on Paper and Fabric

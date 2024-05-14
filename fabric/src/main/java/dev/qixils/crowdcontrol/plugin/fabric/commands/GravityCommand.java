@@ -21,18 +21,10 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.qixils.crowdcontrol.TimedEffect.isActive;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class GravityCommand extends TimedVoidCommand {
-	private final UUID GRAVITY_MODIFIER_UUID = new UUID(723038618076398311L, -6545840742910585990L);
-	private final UUID FALL_MODIFIER_UUID = new UUID(7266512121322359285L, -8208555834343603830L);
-	private final UUID FALL_DMG_MODIFIER_UUID = new UUID(-2464474606488170752L, 8005989740147089956L);
-
-	private final String GRAVITY_MODIFIER_NAME = "gravity-cc";
-	private final String FALL_MODIFIER_NAME = "fall-cc";
-	private final String FALL_DMG_MODIFIER_NAME = "fall-dmg-cc";
-
 	private final double gravityLevel;
 	private final double fallLevel;
 	private final double fallDmgLevel;
@@ -43,6 +35,7 @@ public class GravityCommand extends TimedVoidCommand {
 	private GravityCommand(FabricCrowdControlPlugin plugin, String effectName, double gravityLevel, double fallLevel, double fallDmgLevel) {
 		super(plugin);
 		this.effectName = effectName;
+
 		this.gravityLevel = gravityLevel;
 		this.fallLevel = fallLevel;
 		this.fallDmgLevel = fallDmgLevel;
