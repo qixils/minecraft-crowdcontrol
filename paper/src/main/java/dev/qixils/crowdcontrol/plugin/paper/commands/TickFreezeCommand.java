@@ -1,14 +1,14 @@
-package dev.qixils.crowdcontrol.plugin.fabric.commands;
+package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.Global;
-import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.ServerTickRateManager;
-import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -20,25 +20,23 @@ public class TickFreezeCommand extends TimedVoidCommand {
 	private final Duration defaultDuration = Duration.ofSeconds(20);
 	private final String effectName = "tick_freeze";
 
-	public TickFreezeCommand(FabricCrowdControlPlugin plugin) {
+	public TickFreezeCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public void voidExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		new TimedEffect.Builder()
 			.request(request)
 			.effectGroup("tick_rate")
 			.duration(request.getDuration())
 			.startCallback(effect -> {
-				ServerTickRateManager serverTickRateManager = plugin.server().tickRateManager();
-				serverTickRateManager.setFrozen(true);
+				Bukkit.getServerTickManager().setFrozen(true);
 				playerAnnounce(players, request);
 				return request.buildResponse().type(Response.ResultType.SUCCESS);
 			})
 			.completionCallback(effect -> {
-				ServerTickRateManager serverTickRateManager = plugin.server().tickRateManager();
-				serverTickRateManager.setFrozen(false);
+				Bukkit.getServerTickManager().setFrozen(false);
 			})
 			.build().queue();
 	}
