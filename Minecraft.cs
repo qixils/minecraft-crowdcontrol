@@ -10,7 +10,6 @@ using System.Windows.Forms;
 using ConnectorLib;
 using ConnectorLib.SimpleTCP;
 using CrowdControl.Common;
-using static System.Windows.Forms.AxHost;
 using static CrowdControl.Games.Packs.ISimplePipelinePack;
 using ConnectorType = CrowdControl.Common.ConnectorType;
 
@@ -51,6 +50,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Remove Torches", "dim") { Price = 200, Category = "World", Description = "Removes all nearby torches" },
         new("Replace Area with Gravel", "gravel_hell") { Price = 200, Category = "World", Description = "Replaces all nearby blocks with gravel" },
         new("Respawn Player", "respawn") { Price = 500, Category = "Player", Description = "Sends players to their spawn point" },
+        new("Reunite Players", "unite") { Price = 500, Category = new EffectGrouping("World", "Player"), Description = "Teleports all players in the session to one random player" },
         new("Spawn Ore Veins", "vein") { Price = 100, Category = "World", Description = "Places random ore veins (or lava) near every player" },
         new("Spooky Sound Effect", "sfx") { Price = 100, Category = "World", Description = "Plays a random spoooky sound effect" },
         new("Swap Locations", "swap") { Price = 1000, Category = new EffectGrouping("World", "Player"), Description = "Randomly swaps the locations of all players in the session" },
@@ -63,8 +63,8 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Set Time to Night", "time_night") { Price = 50, SortName = "Time: Night", Group = "global", Category = "Server", Description = "Jumps the clock ahead to nighttime" },
         // tick commands
         new("Freeze Time", "tick_freeze") { Price = 250, Duration = 20, Group = "global", Category = "Server", Description = "Freezes everything in place (except for the player)" },
-        new("HyperSpeed", "tick_double") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Doubles the speed of the game's physics" },
-        new("HyperSlowSpeed", "tick_halve") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Halves the speed of the game's physics" },
+        new("Hyper Speed", "tick_double") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Doubles the speed of the game's physics" },
+        new("Hyper Slow Speed", "tick_halve") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Halves the speed of the player and the game's physics" },
         // sets the server difficulty (affects how much damage mobs deal)
         new("Peaceful Mode", "difficulty_peaceful") { Price = 200, SortName = "Difficulty: 0", Group = "global", Category = "Server", Description = "Sets the server difficulty to peaceful, removing all hostile mobs and preventing new ones from spawning" },
         new("Easy Mode", "difficulty_easy") { Price = 100, SortName = "Difficulty: 1", Group = "global", Category = "Server", Description = "Sets the server difficulty to easy, reducing the damage dealt by mobs by 50%" },
@@ -117,6 +117,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Allow Flight", "flight") { Price = 150, Duration = 20, Category = "Player", Description = "Temporarily allows players to fly" },
         // summons a mob around each player
         new("Summon Allay", "entity_allay") { Price = 100, Inactive = true, Category = "Summon Entity", Description = "Spawns an Allay, a friendly creature who helps you find items" },
+        new("Summon Armadillo", "entity_armadillo") { Price = 100, Inactive = true, Category = "Summon Entity", Description = "Spawns an Armadillo, a passive animal that can be used to get armadillo scutes for wolf armor" },
         new("Summon Armor Stand", "entity_armor_stand") { Price = 150, Category = "Summon Entity", Description = "Spawns an Armor Stand, a decorative entity that has a chance of spawning with valuable armor" },
         new("Summon Axolotl", "entity_axolotl") { Price = 100, Category = "Summon Entity", Description = "Spawns an Axolotl, a cute and friendly amphibian" },
         new("Summon Bat", "entity_bat") { Price = 10, Inactive = true, Category = "Summon Entity", Description = "Spawns a Bat, a passive animal that does little more than fly around and squeak" },
@@ -124,6 +125,8 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Summon Blaze", "entity_blaze") { Price = 300, Category = "Summon Entity", Description = "Spawns a Blaze, an enemy that shoots fireballs at players" },
         new("Summon Boat", "entity_boat") { Price = 50, Inactive = true, Category = "Summon Entity", Description = "Spawns a Boat, a vehicle that can be used to travel across water" },
         new("Summon Boat with Chest", "entity_chest_boat") { Price = 150, Category = "Summon Entity", Description = "Spawns a Boat with Chest, a vehicle that can be used to travel across water and store items. Comes filled with items from a random loot table." },
+        new("Summon Bogged", "entity_bogged") { Price = 500, Category = "Summon Entity", Description = "Spawns a Bogged, a hostile enemy that attacks with a bow and inflicts poison" },
+        new("Summon Breeze", "entity_breeze") { Price = 300, Category = "Summon Entity", Description = "Spawns a Breeze, an enemy that shoots wind charges which launch the player and interfere with redstone" },
         new("Summon Camel", "entity_camel") { Price = 100, Inactive = true, Category = "Summon Entity", Description = "Spawns a Camel, a passive animal that can be tamed and ridden" },
         new("Summon Cat", "entity_cat") { Price = 100, Inactive = true, Category = "Summon Entity", Description = "Spawns a Cat, a passive animal that can be tamed to follow you around" },
         new("Summon Cave Spider", "entity_cave_spider") { Price = 300, Inactive = true, Category = "Summon Entity", Description = "Spawns a Cave Spider, an enemy that inflicts poison when it attacks" },
@@ -188,7 +191,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Summon Tadpole", "entity_tadpole") { Price = 100, Inactive = true, Category = "Summon Entity", Description ="Spawns a Tadpole, a passive animal that grows into a frog" },
         new("Summon Trader Llama", "entity_trader_llama") { Price = 100, Inactive = true, Category = "Summon Entity", Description ="Spawns a Trader Llama, a passive animal that accompanies Wandering Traders" },
         new("Summon Tropical Fish", "entity_tropical_fish") { Price = 100, Inactive = true, Category = "Summon Entity", Description ="Spawns a Tropical Fish, a passive animal that can be used as a source of food" },
-        new("Summon Turtle", "entity_turtle") { Price = 100, Inactive = true, Category = "Summon Entity", Description ="Spawns a Turtle, a passive animal that can be used to get scutes" },
+        new("Summon Turtle", "entity_turtle") { Price = 100, Inactive = true, Category = "Summon Entity", Description ="Spawns a Turtle, a passive animal that can be used to get turtle scutes" },
         new("Summon Vex", "entity_vex") { Price = 300, Category = "Summon Entity", Description ="Spawns a Vex, a small hostile enemy that lunges at players and phases through blocks" },
         new("Summon Villager", "entity_villager") { Price = 150, Category = "Summon Entity", Description ="Spawns a Villager, a passive creature that can be traded with" },
         new("Summon Vindicator", "entity_vindicator") { Price = 500, Category = "Summon Entity", Description ="Spawns a Vindicator, a hostile enemy that attacks with an axe" },
@@ -205,6 +208,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Summon Zombified Piglin", "entity_zombified_piglin") { Price = 200, Category = "Summon Entity", Description ="Spawns a Zombified Piglin, a neutral enemy that attacks with a sword when it or its allies are attacked" },
         // remove nearest entity
         new("Remove Allay", "remove_entity_allay") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
+        new("Remove Armadillo", "remove_entity_armadillo") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Armor Stand", "remove_entity_armor_stand") { Price = 200, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Axolotl", "remove_entity_axolotl") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Bat", "remove_entity_bat") { Price = 1, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
@@ -212,6 +216,8 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Remove Blaze", "remove_entity_blaze") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Boat", "remove_entity_boat") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Boat with Chest", "remove_entity_chest_boat") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
+        new("Remove Bogged", "remove_entity_bogged") { Price = 200, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
+        new("Remove Breeze", "remove_entity_breeze") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Camel", "remove_entity_camel") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Cat", "remove_entity_cat") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },
         new("Remove Cave Spider", "remove_entity_cave_spider") { Price = 150, Inactive = true, Category = "Remove Entity", Description ="Removes a single nearby mob if one is nearby. The effect will try waiting for one to be near but will refund after a few minutes if none are found." },

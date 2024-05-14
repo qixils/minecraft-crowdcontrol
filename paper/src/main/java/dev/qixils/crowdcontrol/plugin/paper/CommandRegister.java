@@ -86,7 +86,9 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> GravityCommand.maximum(plugin),
 			() -> new DeleteRandomItemCommand(plugin),
 			() -> new UniteCommand(plugin),
-			() -> new TickFreezeCommand(plugin)
+			() -> new TickFreezeCommand(plugin),
+			() -> TickRateCommand.doubleRate(plugin),
+			() -> TickRateCommand.halfRate(plugin)
 		));
 
 		// entity commands
