@@ -32,10 +32,12 @@ public class CommandConstants {
 	public static final UUID GRAVITY_MODIFIER_UUID = new UUID(723038618076398311L, -6545840742910585990L);
 	public static final UUID FALL_MODIFIER_UUID = new UUID(7266512121322359285L, -8208555834343603830L);
 	public static final UUID FALL_DMG_MODIFIER_UUID = new UUID(-2464474606488170752L, 8005989740147089956L);
+	public static final UUID SCALE_MODIFIER_UUID = new UUID(-2378341764646484063L, -8318356916108535959L);
 
 	public static final String GRAVITY_MODIFIER_NAME = "gravity-cc";
 	public static final String FALL_MODIFIER_NAME = "fall-cc";
 	public static final String FALL_DMG_MODIFIER_NAME = "fall-dmg-cc";
+	public static final String SCALE_MODIFIER_NAME = "scale-cc";
 
 	/**
 	 * The default validator which ensures that a given sound is available.
@@ -56,9 +58,9 @@ public class CommandConstants {
 	 */
 	public static final @NotNull Component DINNERBONE_COMPONENT = Component.text(DINNERBONE_NAME);
 	/**
-	 * The radius to search for entities to flip upside-down.
+	 * The radius to search for entities to flip upside-down or change in size.
 	 */
-	public static final int DINNERBONE_RADIUS = 15;
+	public static final int ENTITY_SEARCH_RADIUS = 30;
 	/**
 	 * The amount of blocks that a falling block should fall for the Place Falling Block command.
 	 */

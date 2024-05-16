@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_COMPONENT;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_SEARCH_RADIUS;
 import static dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin.COMPONENT_TYPE;
 
 @Getter
@@ -40,7 +40,7 @@ public class DinnerboneCommand extends Command {
 		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
 		sync(() -> {
 			for (Player player : players) {
-				entities.addAll(player.getLocation().getNearbyLivingEntities(DINNERBONE_RADIUS,
+				entities.addAll(player.getLocation().getNearbyLivingEntities(ENTITY_SEARCH_RADIUS,
 						x -> x.getType() != EntityType.PLAYER
 				));
 			}

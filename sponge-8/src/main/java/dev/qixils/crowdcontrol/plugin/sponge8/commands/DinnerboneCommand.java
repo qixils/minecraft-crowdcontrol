@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_COMPONENT;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_SEARCH_RADIUS;
 import static dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin.VIEWER_SPAWNED;
 
 @Getter
@@ -39,7 +39,7 @@ public class DinnerboneCommand extends Command {
 		sync(() -> {
 			Set<Entity> entities = new HashSet<>();
 			for (Player player : players) {
-				List<Entity> toAdd = new ArrayList<>(player.world().nearbyEntities(player.position(), DINNERBONE_RADIUS));
+				List<Entity> toAdd = new ArrayList<>(player.world().nearbyEntities(player.position(), ENTITY_SEARCH_RADIUS));
 				toAdd.removeIf(entity -> entity.type().equals(EntityTypes.PLAYER.get()));
 				entities.addAll(toAdd);
 			}

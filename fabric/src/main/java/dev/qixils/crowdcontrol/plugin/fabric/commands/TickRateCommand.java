@@ -32,7 +32,7 @@ public class TickRateCommand extends TimedVoidCommand {
 		new TimedEffect.Builder()
 			.request(request)
 			.effectGroup("tick_rate")
-			.duration(request.getDuration())
+			.duration(getDuration(request))
 			.startCallback(effect -> {
 				plugin.server().tickRateManager().setTickRate(RATE * multiplier);
 				playerAnnounce(players, request);

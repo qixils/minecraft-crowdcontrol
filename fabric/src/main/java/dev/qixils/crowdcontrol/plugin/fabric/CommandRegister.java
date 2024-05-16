@@ -117,7 +117,11 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			() -> new UniteCommand(plugin),
 			() -> TickRateCommand.doubleRate(plugin),
 			() -> TickRateCommand.halfRate(plugin),
-			() -> new TickFreezeCommand(plugin)
+			() -> new TickFreezeCommand(plugin),
+			() -> PlayerSizeCommand.increase(plugin),
+			() -> PlayerSizeCommand.decrease(plugin),
+			() -> EntitySizeCommand.increase(plugin),
+			() -> EntitySizeCommand.decrease(plugin)
 		));
 
 		// entity commands

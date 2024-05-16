@@ -29,7 +29,7 @@ public class TickFreezeCommand extends TimedVoidCommand {
 		new TimedEffect.Builder()
 			.request(request)
 			.effectGroup("tick_rate")
-			.duration(request.getDuration())
+			.duration(getDuration(request))
 			.startCallback(effect -> {
 				Bukkit.getServerTickManager().setFrozen(true);
 				playerAnnounce(players, request);

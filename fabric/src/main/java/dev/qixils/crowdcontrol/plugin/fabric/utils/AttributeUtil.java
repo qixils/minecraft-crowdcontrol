@@ -5,23 +5,29 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class AttributeUtil {
 	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/AttributeUtil");
 
-	public static void removeModifier(AttributeInstance attr, UUID uuid) {
+	public static Optional<AttributeModifier> getModifier(@Nullable AttributeInstance attr, UUID uuid) {
+		if (attr == null) return Optional.empty();
+		return Optional.ofNullable(attr.getModifier(uuid));
+	}
+
+	public static Optional<AttributeModifier> getModifier(LivingEntity player, Holder<Attribute> attribute, UUID uuid) {
+		return getModifier(player.getAttribute(attribute), uuid);
+	}
+
+	public static void removeModifier(@Nullable AttributeInstance attr, UUID uuid) {
 		if (attr == null) return;
-		for (AttributeModifier attributeModifier : attr.getModifiers()) {
-			if (attributeModifier.id().equals(uuid)) {
-				attr.removePermanentModifier(uuid);
-				break; // avoid CME or whatever it's called
-			}
-		}
+		attr.removeModifier(uuid);
 	}
 
 	public static void removeModifier(LivingEntity player, Holder<Attribute> attribute, UUID uuid) {
