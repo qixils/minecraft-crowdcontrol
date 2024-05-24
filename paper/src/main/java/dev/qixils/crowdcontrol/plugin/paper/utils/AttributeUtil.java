@@ -9,20 +9,25 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class AttributeUtil {
 	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/AttributeUtil");
 
+	public static Optional<AttributeModifier> getModifier(@Nullable AttributeInstance attr, UUID uuid) {
+		if (attr == null) return Optional.empty();
+		return Optional.ofNullable(attr.getModifier(uuid));
+	}
+
+	public static Optional<AttributeModifier> getModifier(Attributable player, Attribute attribute, UUID uuid) {
+		return getModifier(player.getAttribute(attribute), uuid);
+	}
+
 	public static void removeModifier(@Nullable AttributeInstance attr, @NotNull UUID uuid) {
 		if (attr == null) return;
-		for (AttributeModifier attributeModifier : attr.getModifiers()) {
-			if (attributeModifier.getUniqueId().equals(uuid)) {
-				attr.removeModifier(uuid);
-				break; // avoid CME or whatever it's called
-			}
-		}
+		attr.removeModifier(uuid);
 	}
 
 	public static void removeModifier(Attributable player, Attribute attribute, UUID uuid) {

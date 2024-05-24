@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,11 +57,13 @@ public class EntitySizeCommand extends ImmediateCommand {
 				if (entity instanceof Player) continue; // skip players
 				Location entityLoc = new Location(entity);
 				for (Location loc : locations) {
+					if (!Objects.equals(loc.level(), entityLoc.level()))
+						continue;
                     if (loc.squareDistanceTo(entityLoc) > radius)
                         continue;
 					if (AttributeUtil.getModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID).map(AttributeModifier::amount).orElse(0d) == level)
 						continue;
-                    addModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+                    addModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
                     success = true;
                     break;
                 }

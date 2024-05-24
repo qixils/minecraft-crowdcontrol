@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.4.2
+
+- Added new effects for increasing and decreasing the size of players and nearby mobs on Paper and Fabric
+
 ## 3.4.1
 
 - Ported Fabric's new time effects to Paper

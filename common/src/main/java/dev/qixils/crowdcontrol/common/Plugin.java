@@ -502,7 +502,8 @@ public interface Plugin<P, S> {
 					Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
 					@SuppressWarnings("ArraysAsListWithZeroOrOneArgument") // need mutable list
 					List<P> players = Arrays.asList(player);
-					effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build());
+					Executor executor = effect.getExecutor();
+					executor.execute(() -> effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build()));
 				})
 			);
 		}

@@ -6,10 +6,7 @@ import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.paper.utils.MaterialTag;
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -88,7 +85,11 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new UniteCommand(plugin),
 			() -> new TickFreezeCommand(plugin),
 			() -> TickRateCommand.doubleRate(plugin),
-			() -> TickRateCommand.halfRate(plugin)
+			() -> TickRateCommand.halfRate(plugin),
+			() -> PlayerSizeCommand.increase(plugin),
+			() -> PlayerSizeCommand.decrease(plugin),
+			() -> EntitySizeCommand.increase(plugin),
+			() -> EntitySizeCommand.decrease(plugin)
 		));
 
 		// entity commands
@@ -104,7 +105,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// potions
-		for (PotionEffectType potionEffectType : PotionEffectType.values()) {
+		for (PotionEffectType potionEffectType : Registry.POTION_EFFECT_TYPE) {
 			initTo(commands, () -> new PotionCommand(plugin, potionEffectType));
 		}
 
@@ -118,7 +119,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// enchantments
-		for (Enchantment enchantment : Enchantment.values()) {
+		for (Enchantment enchantment : Registry.ENCHANTMENT) {
 			try {
 				commands.add(new EnchantmentCommand(plugin, enchantment));
 			} catch (AbstractMethodError ignored) {
