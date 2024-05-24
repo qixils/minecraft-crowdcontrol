@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
+import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
@@ -23,7 +24,8 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.world.flag.FeatureElement;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -121,20 +123,16 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public void onLoad() {
 		saveDefaultConfig();
 		// init sound validator
-		CommandConstants.SOUND_VALIDATOR = key -> {
-			String asString = key.value();
+		CommandConstants.SOUND_VALIDATOR = _key -> {
+			NamespacedKey key = PaperUtil.toPaper(_key);
+			String asString = key.asMinimalString();
 			Boolean value = VALID_SOUNDS.get(asString);
 			if (value != null)
 				return value;
 
-			try {
-				Sound.valueOf(asString.toUpperCase(Locale.ENGLISH).replace('.', '_'));
-				VALID_SOUNDS.put(asString, true);
-				return true;
-			} catch (IllegalArgumentException e) {
-				VALID_SOUNDS.put(asString, false);
-				return false;
-			}
+			value = Registry.SOUNDS.get(key) != null;
+			VALID_SOUNDS.put(asString, value);
+			return value;
 		};
 	}
 

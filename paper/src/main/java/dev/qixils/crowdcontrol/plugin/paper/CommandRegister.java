@@ -93,7 +93,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		));
 
 		// entity commands
-		for (EntityType entity : EntityType.values()) {
+		for (EntityType entity : Registry.ENTITY_TYPE) {
 			if (!CommandConstants.ENTITIES.contains(entity.name().toLowerCase(Locale.US))) continue;
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));

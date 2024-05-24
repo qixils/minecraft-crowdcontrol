@@ -4,6 +4,8 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 import org.jetbrains.annotations.NotNull;
@@ -119,11 +121,10 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 		for (Entry<Environment, List<String>> entry : KEYED_BIOMES.entrySet()) {
 			List<String> keyedBiomes = entry.getValue();
 			List<Biome> biomes = new ArrayList<>(keyedBiomes.size());
-			for (String biome : keyedBiomes) {
-				try {
-					biomes.add(Biome.valueOf(biome));
-				} catch (IllegalArgumentException ignored) {
-				}
+			for (String biomeName : keyedBiomes) {
+				Biome biome = Registry.BIOME.get(NamespacedKey.minecraft(biomeName.toLowerCase(Locale.ROOT)));
+				if (biome != null)
+					biomes.add(biome);
 			}
 			biomeMap.put(entry.getKey(), biomes);
 		}

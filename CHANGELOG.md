@@ -5,6 +5,7 @@ A list of all changes made to the software in reverse chronological order.
 ## 3.4.2
 
 - Added new effects for increasing and decreasing the size of players and nearby mobs on Paper and Fabric
+- Updated various effects on Paper to use server registries for better plugin compatibility
 
 ## 3.4.1
 
