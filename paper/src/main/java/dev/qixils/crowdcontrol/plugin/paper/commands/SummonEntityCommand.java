@@ -10,10 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -50,7 +47,7 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<Material>> armor = new EnumMap<>(EquipmentSlot.class);
-		for (Material material : Material.values()) {
+		for (Material material : Registry.MATERIAL) {
 			if (!material.isItem()) continue;
 			EquipmentSlot slot = material.getEquipmentSlot();
 			if (slot == EquipmentSlot.HAND) continue;
@@ -65,7 +62,7 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 
 		// --- loot tables --- //
 		EnumSet<LootTables> lootTables = EnumSet.noneOf(LootTables.class);
-		for (LootTables lootTable : LootTables.values()) {
+		for (LootTables lootTable : Registry.LOOT_TABLES) {
 			String key = lootTable.getKey().getKey();
 			if (key.startsWith("chests/"))
 				lootTables.add(lootTable);
@@ -73,8 +70,8 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 		CHEST_LOOT_TABLES = Collections.unmodifiableSet(lootTables);
 
 		// --- blocks --- //
-		EnumSet<Material> blocks = EnumSet.noneOf(Material.class);
-		for (Material material : Material.values()) {
+		Set<Material> blocks = new HashSet<>();
+		for (Material material : Registry.MATERIAL) {
 			if (material.isBlock())
 				blocks.add(material);
 		}

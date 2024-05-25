@@ -14,11 +14,11 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -35,7 +35,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.lootboxIte
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-	private static final List<Material> ITEMS = Arrays.stream(Material.values()).filter(mat -> mat.isItem() && !mat.isAir()).toList();
+	private static final List<Material> ITEMS = Registry.MATERIAL.stream().filter(mat -> mat.isItem() && !mat.isAir()).toList();
 	private static final Set<Material> GOOD_ITEMS = ITEMS.stream().filter(material ->
 			material.getMaxDurability() > 1
 					|| material == Material.GOLDEN_APPLE
@@ -130,7 +130,7 @@ public class LootboxCommand extends ImmediateCommand {
 		for (int i = 0; i <= luck; i++) {
 			enchantments = Math.max(enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
-		List<Enchantment> enchantmentList = Arrays.stream(EnchantmentWrapper.values())
+		List<Enchantment> enchantmentList = Registry.ENCHANTMENT.stream()
 				.filter(enchantment -> enchantment.canEnchantItem(itemStack))
 				.collect(Collectors.toList());
 		if (random.nextDouble() >= (.8d - (luck * .2d)))

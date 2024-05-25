@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEARCH_RADIUS;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEARCH_STEP;
+import static org.bukkit.NamespacedKey.fromString;
 
 @Getter
 public class BiomeCommand extends NearbyLocationCommand<Biome> {
@@ -113,7 +114,7 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 					"END_HIGHLANDS",
 					"END_BARRENS"
 			),
-			Environment.CUSTOM, Arrays.stream(Biome.values()).map(Biome::name).toList()
+			Environment.CUSTOM, Registry.BIOME.stream().map(biome -> biome.key().asString()).toList()
 	);
 
 	static {
@@ -122,7 +123,9 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 			List<String> keyedBiomes = entry.getValue();
 			List<Biome> biomes = new ArrayList<>(keyedBiomes.size());
 			for (String biomeName : keyedBiomes) {
-				Biome biome = Registry.BIOME.get(NamespacedKey.minecraft(biomeName.toLowerCase(Locale.ROOT)));
+				NamespacedKey biomeKey = fromString(biomeName.toLowerCase(Locale.ROOT));
+				if (biomeKey == null) continue;
+				Biome biome = Registry.BIOME.get(biomeKey);
 				if (biome != null)
 					biomes.add(biome);
 			}
