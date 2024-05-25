@@ -43,7 +43,13 @@ public class EnchantmentCommand extends ImmediateCommand {
 			// get the equipped item that supports this enchantment and has the lowest level of it
 			Map<EquipmentSlot, Integer> levelMap = new HashMap<>(EquipmentSlot.values().length);
 			for (EquipmentSlot slot : EquipmentSlot.values()) {
-				ItemStack item = inv.getItem(slot);
+				ItemStack item;
+				try {
+					item = inv.getItem(slot);
+				} catch (Exception e) {
+					plugin.getSLF4JLogger().debug("Failed to get equipment slot item {}", slot);
+					continue;
+				}
 				// ensure this item:
 				// A) isn't null
 				// B) is not empty
