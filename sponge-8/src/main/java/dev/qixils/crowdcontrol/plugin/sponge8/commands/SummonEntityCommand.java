@@ -33,7 +33,6 @@ import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
-import static dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil.csIdOf;
 
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {

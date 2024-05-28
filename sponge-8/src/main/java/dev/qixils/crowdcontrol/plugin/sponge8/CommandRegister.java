@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.*;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.executeorperish.DoOrDieCommand;
-import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.TypedTag;
 import net.kyori.adventure.key.Key;
 import org.spongepowered.api.block.BlockType;
@@ -20,8 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, SpongeCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
@@ -100,8 +98,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Spong
 		Map<String, EntityType<?>> minecraftEntities = new HashMap<>();
 		Map<String, EntityType<?>> moddedEntities = new HashMap<>();
 		plugin.getGame().registry(RegistryTypes.ENTITY_TYPE).streamEntries().forEach(entry -> {
-			String id = SpongeTextUtil.csIdOf(entry.key());
-			if (!CommandConstants.ENTITIES.contains(id)) return;
+			if (!isWhitelistedEntity(entry.key())) return;
+			String id = CommandConstants.csIdOf(entry.key());
 			Map<String, EntityType<?>> entities = entry.key().namespace().equals(Key.MINECRAFT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			entities.put(id, entry.value());
 		});

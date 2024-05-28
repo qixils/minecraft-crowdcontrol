@@ -14,10 +14,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
-import java.util.Locale;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdControlPlugin> {
 	private static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
@@ -94,7 +92,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 
 		// entity commands
 		for (EntityType entity : Registry.ENTITY_TYPE) {
-			if (!CommandConstants.ENTITIES.contains(entity.name().toLowerCase(Locale.US))) continue;
+			if (!isWhitelistedEntity(entity)) continue;
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}

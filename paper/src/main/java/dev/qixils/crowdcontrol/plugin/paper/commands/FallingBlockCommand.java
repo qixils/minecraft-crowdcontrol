@@ -17,7 +17,7 @@ public class FallingBlockCommand extends BlockCommand {
 		super(
 				plugin,
 				block,
-				"falling_block_" + block.name(),
+				"falling_block_" + block.key().value(),
 				Component.translatable("cc.effect.falling_block.name", Component.translatable(block))
 		);
 	}

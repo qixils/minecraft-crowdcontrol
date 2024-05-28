@@ -86,7 +86,7 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 	public SummonEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "entity_" + entityType.name();
+		this.effectName = "entity_" + csIdOf(entityType);
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType));
 		this.mobKey = getMobKey(plugin);
 	}

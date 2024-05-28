@@ -28,7 +28,7 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 		this(
 				plugin,
 				block,
-				"block_" + block.name(),
+				"block_" + block.key().value(),
 				Component.translatable("cc.effect.block.name", Component.translatable(block))
 		);
 	}

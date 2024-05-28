@@ -1027,7 +1027,7 @@ public interface Plugin<P, S> {
 			return;
 		boolean clientVisible = getModdedPlayerCount() > 0;
 		boolean globalVisible = globalEffectsUsable();
-		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
+		getSLF4JLogger().info("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
 		Map<ResultType, Set<String>> effects = new HashMap<>();
 		for (Command<?> effect : commandRegister().getCommands()) {
 			if (effect.getEffectName() == null) continue;
@@ -1046,7 +1046,7 @@ public interface Plugin<P, S> {
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
 				effects.computeIfAbsent(selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, k -> new HashSet<>()).add(id);
 		}
-		getSLF4JLogger().debug("Setting effects {}", effects);
+		getSLF4JLogger().info("Setting effects {}", effects);
 		for (Map.Entry<ResultType, Set<String>> entry : effects.entrySet())
 			updateEffectIdStatus(service, entry.getKey(), entry.getValue());
 	}
@@ -1328,9 +1328,9 @@ public interface Plugin<P, S> {
 	 * @return true if the player has an account linked, false otherwise
 	 */
 	default boolean hasLinkedAccount(@NotNull P player) {
-		if (getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).size() > 0)
+		if (!getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).isEmpty())
 			return true;
-		return getSocketManagersFor(player).size() > 0;
+		return !getSocketManagersFor(player).isEmpty();
 	}
 
 	/**

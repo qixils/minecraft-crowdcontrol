@@ -28,7 +28,7 @@ public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
 	public TakeItemCommand(PaperCrowdControlPlugin plugin, Material item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "take_" + item.name();
+		this.effectName = "take_" + item.key().value();
 		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", Component.translatable(new ItemStack(item)));
 	}
 

@@ -2,11 +2,11 @@ package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.KeyedTag;
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -381,6 +381,15 @@ public class CommandConstants {
 		"zombified_piglin"
 	));
 
+	public static String asMinimalString(Key key) {
+		return key.namespace().equals(MINECRAFT_NAMESPACE) ? key.value() : key.asString();
+	}
+
+	public static boolean isWhitelistedEntity(Keyed keyed) {
+		Key key = keyed.key();
+		return ENTITIES.contains(asMinimalString(key)) || ENTITIES.contains(csIdOf(key));
+	}
+
 	// do-or-die
 	/**
 	 * How long streamers should be given to complete a Do-or-Die task.
@@ -625,7 +634,7 @@ public class CommandConstants {
 	 * @return random double corresponding to X or Z velocity
 	 */
 	private static double randomFlingHoriz() {
-		return (RNG.nextBoolean() ? -1 : 1) * (RandomUtil.nextDouble(1.2, 3));
+		return (RNG.nextBoolean() ? -1 : 1) * (RNG.nextDouble(1.2, 3));
 	}
 
 	/**
@@ -636,9 +645,58 @@ public class CommandConstants {
 	public static double @NotNull [] randomFlingVector() {
 		return new double[]{
 				randomFlingHoriz(),
-				RandomUtil.nextDouble(.4, 1.5),
+				RNG.nextDouble(.4, 1.5),
 				randomFlingHoriz()
 		};
+	}
+
+	/**
+	 * Gets the C# ID of entities and enchantments.
+	 * Usage with items or blocks will cause issues.
+	 *
+	 * @param _id the keyed object
+	 * @return the C# ID
+	 */
+	@NotNull
+	public static String csIdOf(Keyed _id) {
+		Key id = _id.key();
+		if (!id.namespace().equals(MINECRAFT_NAMESPACE))
+			return id.value();
+		String path = id.value();
+        switch (path) {
+            case "lightning_bolt":
+                return "lightning";
+            case "chest_minecart":
+                return "minecart_chest";
+            case "mooshroom":
+                return "mushroom_cow";
+            case "tnt":
+                return "primed_tnt";
+            case "snow_golem":
+                return "snowman";
+            case "binding_curse":
+                return "curse_of_binding";
+            case "vanishing_curse":
+                return "curse_of_vanishing";
+            case "sweeping":
+                return "sweeping_edge";
+			case "villager_golem":
+				return "iron_golem";
+			case "zombie_pigman":
+				return "zombified_piglin";
+			case "illusion_illager":
+				return "illusioner";
+			case "vindication_illager":
+				return "vindicator";
+			case "furnace_minecart":
+				return "minecart_furnace";
+			case "hopper_minecart":
+				return "minecart_hopper";
+			case "tnt_minecart":
+				return "minecart_tnt";
+            default:
+                return path;
+        }
 	}
 
 	/**
