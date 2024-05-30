@@ -13,18 +13,33 @@ public class PermissionWrapper {
 	@Builder.Default
 	private final @Nullable String description = null;
 
+	public int getPermissionLevel() {
+		return defaultPermission.getPermissionLevel();
+	}
+
 	public enum DefaultPermission {
 		/**
 		 * All players
 		 */
-		ALL,
+		ALL(0),
 		/**
 		 * Opped players
 		 */
-		OP,
+		OP(4),
 		/**
 		 * No players
 		 */
-		NONE,
+		NONE(-1),
+		;
+
+		private final int permissionLevel;
+
+		DefaultPermission(int permissionLevel) {
+			this.permissionLevel = permissionLevel;
+		}
+
+		public int getPermissionLevel() {
+			return permissionLevel;
+		}
 	}
 }

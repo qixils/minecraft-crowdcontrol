@@ -15,6 +15,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.common.Plugin.ADMIN_PERMISSION;
+import static dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil.check;
+
 @Getter
 @RequiredArgsConstructor
 public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
@@ -38,6 +41,7 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	@Override
 	public boolean isAdmin(@NotNull ServerPlayer entity) {
 		if (entity.hasPermissions(3)) return true;
+		if (check(entity, ADMIN_PERMISSION)) return true;
 		return PlayerEntityMapper.super.isAdmin(entity);
 	}
 
