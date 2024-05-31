@@ -13,8 +13,12 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.FALLING_BL
 
 @Getter
 public class FallingBlockCommand extends BlockCommand {
+	protected FallingBlockCommand(PaperCrowdControlPlugin plugin, Material block, String effectName, Component displayName) {
+		super(plugin, block, effectName, displayName);
+	}
+
 	public FallingBlockCommand(PaperCrowdControlPlugin plugin, Material block) {
-		super(
+		this(
 				plugin,
 				block,
 				"falling_block_" + block.key().value(),
@@ -31,8 +35,7 @@ public class FallingBlockCommand extends BlockCommand {
 				destination.getY() + FALLING_BLOCK_FALL_DISTANCE,
 				world.getMaxHeight() - 1
 		));
-		// the below for loop does not use <= because the main execute method performs its own
-		// checks
+		// the below for loop does not use <= because the main execute method performs its own checks
 		for (int y = playerLoc.getBlockY()+1; y < destination.getBlockY(); y++) {
 			Block block = world.getBlockAt(destination.getBlockX(), y, destination.getBlockZ());
 			if (!block.isPassable()) {

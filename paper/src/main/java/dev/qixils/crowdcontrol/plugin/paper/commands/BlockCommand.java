@@ -63,9 +63,10 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 			if (location == null)
 				continue;
 			Block block = location.getBlock();
-			if (block.isReplaceable() && block.getType() != material) {
+			Material mat = getMaterial();
+			if (block.isReplaceable() && block.getType() != mat) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> block.setType(material));
+				sync(() -> block.setType(mat));
 			}
 		}
 		return result;

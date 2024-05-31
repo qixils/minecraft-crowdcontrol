@@ -34,7 +34,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
     {
         // miscellaneous
         new("Annoying Pop-Up", "toast") { Price = 50, Category = "Player", Description = "Plays an obnoxious animation and an obnoxious sound" },
-        new("Dig Hole", "dig") { Price = 200, Category = "World", Description = "Digs a small hole underneath players" },
+        new("Dig Hole", "dig") { Price = 150, Category = "World", Description = "Digs a small hole underneath players" },
         new("Do-or-Die", "do_or_die") { Price = 500, Category = new EffectGrouping("Health & Hunger", "Player"), Description = "Gives players a task to complete within 30 seconds or else they die" },
         new("Eat Chorus Fruit", "chorus_fruit") { Price = 75, Category = "World", Description = "Teleports the player to a random nearby block as if they ate a Chorus Fruit" },
         // TODO: disabled because this is killing anyone in the air -- new("Explode", "explode") { Price = 750, Category = "World", Description = "Spawns a harmless TNT-like explosion at players' feet" },
@@ -65,6 +65,11 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Freeze Time", "tick_freeze") { Price = 250, Duration = 20, Group = "global", Category = "Server", Description = "Freezes everything in place (except for the player)" },
         new("Hyper Speed", "tick_double") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Doubles the speed of the game's physics" },
         new("Hyper Slow Speed", "tick_halve") { Price = 200, Duration = 20, Group = "global", Category = "Server", Description = "Halves the speed of the player and the game's physics" },
+        // size commands
+        new("Halve Size of Nearby Mobs", "entity_size_halve") { Price = 100, Category = "World", Description = "Shrinks the size of all nearby (non-player) mobs" },
+        new("Double Size of Nearby Mobs", "entity_size_double") { Price = 100, Category = "World", Description = "Grows the size of all nearby (non-player) mobs" },
+        new("Halve Player Size", "player_size_halve") { Price = 150, Duration = 30, Category = "Player", Description = "Temporarily shrinks the size of the player" },
+        new("Double Player Size", "player_size_double") { Price = 200, Duration = 30, Category = "Player", Description = "Temporarily grows the size of the player" },
         // sets the server difficulty (affects how much damage mobs deal)
         new("Peaceful Mode", "difficulty_peaceful") { Price = 200, SortName = "Difficulty: 0", Group = "global", Category = "Server", Description = "Sets the server difficulty to peaceful, removing all hostile mobs and preventing new ones from spawning" },
         new("Easy Mode", "difficulty_easy") { Price = 100, SortName = "Difficulty: 1", Group = "global", Category = "Server", Description = "Sets the server difficulty to easy, reducing the damage dealt by mobs by 50%" },
@@ -335,7 +340,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         // places a block several blocks above everyone's head
         new("Place Block: Falling Anvil", "falling_block_anvil") { Price = 100, SortName = "Place Z Anvil", Category = "Place Blocks", Description = "Drops a genuine ACME corp. anvil block on every player" },
         new("Place Block: Falling Sand", "falling_block_sand") { Price = 25, SortName = "Place Z Sand", Category = "Place Blocks", Description = "Drops a sand block on every player" }, // TODO: drop random between Sand, Red Sand, and Gravel. and maybe drop a whole column?
-        // TODO: new("Place Block: Random Falling Block", "falling_block_random") { Price = 50, SortName = "Place Z Z", Category = "Place Blocks", Description = "Drops a totally random block on every player" },
+        new("Place Random Falling Block", "falling_block_random") { Price = 75, Category = "Place Blocks", Description = "Drops a random block on every player, dealing a little bit of damage in the process" },
         // apply enchants
         new("Remove Enchantments", "remove_enchants") { Price = 200, SortName = "Enchantment: 0", Category = "Enchantments", Description = "Removes all enchants from the held item or a random piece of armor" },
         new("Enchantment: Aqua Affinity", "enchant_aqua_affinity") { Price = 50, Category = "Enchantments", Description = "Increases underwater mining speed" },
