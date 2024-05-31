@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
@@ -70,15 +71,19 @@ public class RandomFallingBlockCommand extends ImmediateCommand {
 				}
 			}
 
+			Vector3d destination = new Vector3d(position.getX() + 0.5, position.getY(), position.getZ() + 0.5);
+
 			// get block to place
 			BlockType block = getRandomBlock(player.getWorld());
-			FallingBlock entity = (FallingBlock) world.createEntity(EntityTypes.FALLING_BLOCK, position);
+			FallingBlock entity = (FallingBlock) world.createEntity(EntityTypes.FALLING_BLOCK, destination);
+			entity.offer(Keys.FALL_TIME, 1);
 			entity.offer(Keys.FALLING_BLOCK_STATE, block.getDefaultState());
 			entity.offer(Keys.FALL_DAMAGE_PER_BLOCK, 0.75);
 			entity.offer(Keys.MAX_FALL_DAMAGE, 4.0);
 			entity.offer(Keys.CAN_DROP_AS_ITEM, true);
+			entity.offer(Keys.FALLING_BLOCK_CAN_HURT_ENTITIES, true);
 
-			success = true;
+			success |= world.spawnEntity(entity);
 		}
 
 		return success

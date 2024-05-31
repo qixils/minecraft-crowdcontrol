@@ -18,6 +18,7 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
@@ -139,6 +140,11 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	public <T> List<T> registryList(RegistryType<T> registryType) {
 		return registryStream(registryType).collect(Collectors.toList());
+	}
+
+	@Override
+	public @Nullable ServerPlayer asPlayer(@NotNull CommandCause sender) {
+		return objAsPlayer(sender.root());
 	}
 
 	@Override

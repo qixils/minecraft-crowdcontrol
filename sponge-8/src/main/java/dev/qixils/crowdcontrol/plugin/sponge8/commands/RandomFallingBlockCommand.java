@@ -16,9 +16,11 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.FallingBlock;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.util.HashMap;
@@ -71,15 +73,19 @@ public class RandomFallingBlockCommand extends ImmediateCommand {
 				}
 			}
 
+			Vector3d destination = new Vector3d(position.x() + 0.5, position.y(), position.z() + 0.5);
+
 			// get block to place
 			BlockType block = getRandomBlock(player.world());
-			FallingBlock entity = world.createEntity(EntityTypes.FALLING_BLOCK, position);
+			FallingBlock entity = world.createEntity(EntityTypes.FALLING_BLOCK, destination);
+			entity.offer(Keys.FALL_TIME, Ticks.of(1));
 			entity.offer(Keys.BLOCK_STATE, block.defaultState());
 			entity.offer(Keys.DAMAGE_PER_BLOCK, 0.75);
 			entity.offer(Keys.MAX_FALL_DAMAGE, 4.0);
 			entity.offer(Keys.CAN_DROP_AS_ITEM, true);
+			entity.offer(Keys.CAN_HURT_ENTITIES, true);
 
-			success = true;
+			success |= world.spawnEntity(entity);
 		}
 
 		return success

@@ -239,20 +239,33 @@ public interface Plugin<P, S> {
 	Component NO_CC_UNKNOWN_ERROR = error(translatable("cc.error.unknown"));
 
 	/**
+	 * Attempts to cast the provided object as a player.
+	 * This should not be directly extended, instead see {@link #asPlayer(Object)}.
+	 *
+	 * @param obj object to cast
+	 * @return casted player, or null if the object is not a player
+	 */
+	@ApiStatus.Internal
+	@ApiStatus.NonExtendable
+	default @Nullable P objAsPlayer(@NotNull Object obj) {
+		try {
+			Class<P> playerClass = getPlayerClass();
+			if (!playerClass.isInstance(obj))
+				return null;
+			return playerClass.cast(obj);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
 	 * Gets the provided command sender as a player.
 	 *
 	 * @param sender the command sender
 	 * @return the player, or null if the sender is not a player
 	 */
 	default @Nullable P asPlayer(@NotNull S sender) {
-		try {
-			Class<P> playerClass = getPlayerClass();
-			if (!playerClass.isInstance(sender))
-				return null;
-			return playerClass.cast(sender);
-		} catch (Exception e) {
-			return null;
-		}
+		return objAsPlayer(sender);
 	}
 
 	/**
