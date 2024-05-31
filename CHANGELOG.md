@@ -9,7 +9,7 @@ A list of all changes made to the software in reverse chronological order.
 - Paper: Updated various effects to use server registries for better plugin compatibility and future-proofing
 - Paper: Fixed some missing entity effects
 - Paper & Fabric: Mobs spawned by CC ordinarily have a tag for developers denoting that they were viewer-spawned. This tag is now removed when the mob is renamed via name tag.
-- Added `crowdcontrol.use.[EFFECT_NAME]` permissions for server admins
+- Added `crowdcontrol.use.[EFFECT_ID]` permissions for server admins; see [here](Minecraft.cs) for the list of effect IDs
 
 ## 3.4.1
 
