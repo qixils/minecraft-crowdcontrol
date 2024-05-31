@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.BooleanProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
@@ -63,6 +64,10 @@ public final class BlockFinder extends AbstractBlockFinder<Location<World>, Vect
 
 	public static boolean isSolid(BlockState block) {
 		return isProperty(block, SolidCubeProperty.class, true);
+	}
+
+	public static boolean isSolid(BlockType block) {
+		return isSolid(block.getDefaultState());
 	}
 
 	public static boolean isReplaceable(BlockState block) {

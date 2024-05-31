@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.utils;
 import dev.qixils.crowdcontrol.common.util.AbstractBlockFinder;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.MatterType;
@@ -49,6 +50,10 @@ public final class BlockFinder extends AbstractBlockFinder<ServerLocation, Vecto
 
 	public static boolean isSolid(BlockState block) {
 		return isProperty(block, Keys.IS_SOLID, true);
+	}
+
+	public static boolean isSolid(BlockType blockType) {
+		return isSolid(blockType.defaultState());
 	}
 
 	public static boolean isReplaceable(BlockState block) {

@@ -1,2 +1,4 @@
 accessWidener v2 named
 accessible method net/minecraft/world/entity/animal/Wolf setCollarColor (Lnet/minecraft/world/item/DyeColor;)V
+accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageMax I
+accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePerDistance F
