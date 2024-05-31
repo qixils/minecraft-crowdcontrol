@@ -4,10 +4,11 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.4.2
 
-- Added new effects for increasing and decreasing the size of players and nearby mobs on Paper and Fabric
-- Updated various effects on Paper to use server registries for better plugin compatibility and future-proofing
-- Fixed some missing entity effects on Paper
+- Paper & Fabric: Added new effects for increasing and decreasing the size of players and nearby mobs
+- Paper: Updated various effects to use server registries for better plugin compatibility and future-proofing
+- Paper: Fixed some missing entity effects
 - Added `crowdcontrol.use.[EFFECT_NAME]` permissions for server admins
+- Paper & Fabric: Mobs spawned by CC ordinarily have a tag for developers denoting that they were viewer-spawned. This tag is now removed when the mob is renamed via name tag.
 
 ## 3.4.1
 

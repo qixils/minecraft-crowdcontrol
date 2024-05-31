@@ -8,10 +8,14 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
+import io.papermc.paper.event.player.PlayerNameEntityEvent;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +32,7 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
-public class SummonEntityCommand extends Command implements EntityCommand {
+public class SummonEntityCommand extends Command implements EntityCommand, Listener {
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
 	private static final Set<Material> BLOCKS;
@@ -204,5 +208,12 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 
 		entity.getPersistentDataContainer().set(mobKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, true);
 		return entity;
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onNameTag(PlayerNameEntityEvent event) {
+		LivingEntity entity = event.getEntity();
+		if (!isMobViewerSpawned(plugin, entity)) return;
+		entity.getPersistentDataContainer().remove(getMobKey());
 	}
 }
