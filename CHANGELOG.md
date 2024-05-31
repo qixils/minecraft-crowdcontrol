@@ -4,7 +4,7 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.4.2
 
-- Paper: Added new effect for dropping a random block, like a falling anvil
+- Added new effect for dropping a random block, like a falling anvil
 - Paper & Fabric: Added new effects for increasing and decreasing the size of players and nearby mobs
 - Paper: Updated various effects to use server registries for better plugin compatibility and future-proofing
 - Paper: Fixed some missing entity effects
