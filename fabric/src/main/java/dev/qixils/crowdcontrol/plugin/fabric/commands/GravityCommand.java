@@ -53,9 +53,9 @@ public class GravityCommand extends TimedVoidCommand {
 				.startCallback(effect -> {
 					players.set(plugin.getPlayers(request));
 					for (ServerPlayer player : players.get()) {
-						addModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
-						addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
-						addModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_VALUE, false);
+						addModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID, gravityLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+						addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, fallLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+						addModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, fallDmgLevel, AttributeModifier.Operation.ADD_VALUE, false);
 					}
 					playerAnnounce(players.get(), request);
 					return request.buildResponse().type(Response.ResultType.SUCCESS).message("SUCCESS");

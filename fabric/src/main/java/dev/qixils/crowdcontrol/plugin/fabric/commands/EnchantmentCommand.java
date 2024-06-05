@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,24 +16,29 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
+	protected final Holder<Enchantment> enchantmentHolder;
 	protected final Enchantment enchantment;
 	private final String effectName;
 	private final Component displayName;
 
-	public EnchantmentCommand(FabricCrowdControlPlugin plugin, Enchantment enchantment) {
+	public EnchantmentCommand(FabricCrowdControlPlugin plugin, Holder<Enchantment> enchantment) {
 		super(plugin);
-		this.enchantment = enchantment;
-		this.effectName = "enchant_" + csIdOf(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), "Enchantment has no registry name"));
+		this.enchantmentHolder = enchantment;
+		this.enchantment = enchantmentHolder.value();
+		this.effectName = "enchant_" + csIdOf(enchantment.unwrapKey().orElseThrow());
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
-				enchantment.getFullname(enchantment.getMaxLevel()).copy().setStyle(Style.EMPTY)
+				Enchantment.getFullname(enchantment, enchantment.value().getMaxLevel()).copy().setStyle(Style.EMPTY)
 		);
 	}
 
@@ -60,11 +65,11 @@ public class EnchantmentCommand extends ImmediateCommand {
 						&& enchantment.canEnchant(item)
 						&& (
 						enchantment.getMaxLevel() != enchantment.getMinLevel()
-								|| getEnchantmentLevel(item, enchantment) != enchantment.getMaxLevel()
-						&& getEnchantmentLevel(item, enchantment) != 255
+								|| getEnchantmentLevel(item, enchantmentHolder) != enchantment.getMaxLevel()
+						&& getEnchantmentLevel(item, enchantmentHolder) != 255
 				)
 				) {
-					levelMap.put(slot, getEnchantmentLevel(item, enchantment));
+					levelMap.put(slot, getEnchantmentLevel(item, enchantmentHolder));
 				}
 			}
 			EquipmentSlot slot = levelMap.entrySet().stream()
@@ -74,11 +79,11 @@ public class EnchantmentCommand extends ImmediateCommand {
 				continue;
 			// add new enchant
 			ItemStack item = getItem(inv, slot);
-			int curLevel = getEnchantmentLevel(item, enchantment);
+			int curLevel = getEnchantmentLevel(item, enchantmentHolder);
 			if (curLevel >= level)
 				level = curLevel + 1;
 			final int setLevel = level;
-			EnchantmentHelper.updateEnchantments(item, mutable -> mutable.set(enchantment, setLevel));
+			EnchantmentHelper.updateEnchantments(item, mutable -> mutable.set(enchantmentHolder, setLevel));
 			result.type(Response.ResultType.SUCCESS);
 		}
 		return result;
@@ -92,7 +97,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		return inv.armor.get(slot.getIndex());
 	}
 
-	public static int getEnchantmentLevel(ItemStack item, Enchantment enchantment) {
+	public static int getEnchantmentLevel(ItemStack item, Holder<Enchantment> enchantment) {
 		return EnchantmentHelper.getItemEnchantmentLevel(enchantment, item);
 	}
 }

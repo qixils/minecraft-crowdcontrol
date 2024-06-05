@@ -37,7 +37,7 @@ public abstract class ResultSlotMixin extends Slot {
 	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
 		if (player.level().isClientSide)
 			return;
-		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
+		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
@@ -45,7 +45,7 @@ public abstract class ResultSlotMixin extends Slot {
 	public void onQuickCraft(ItemStack result, int i, CallbackInfo ci) {
 		if (player.level().isClientSide)
 			return;
-		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level()).orElse(null);
+		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 

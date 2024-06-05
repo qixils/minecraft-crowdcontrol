@@ -34,7 +34,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -57,6 +61,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
+import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
@@ -69,9 +74,9 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
 	// packet stuff
-	public static ResourceLocation VERSION_REQUEST_ID = new ResourceLocation("crowdcontrol", "version-request");
-	public static ResourceLocation VERSION_RESPONSE_ID = new ResourceLocation("crowdcontrol", "version-response");
-	public static ResourceLocation SHADER_ID = new ResourceLocation("crowdcontrol", "shader");
+	public static ResourceLocation VERSION_REQUEST_ID = fromNamespaceAndPath("crowdcontrol", "version-request");
+	public static ResourceLocation VERSION_RESPONSE_ID = fromNamespaceAndPath("crowdcontrol", "version-response");
+	public static ResourceLocation SHADER_ID = fromNamespaceAndPath("crowdcontrol", "shader");
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -116,7 +121,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	public FabricCrowdControlPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
-		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
+		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(fromNamespaceAndPath(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().registerListeners(softLockResolver);
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
@@ -134,6 +139,22 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			clientVersions.put(context.player().getUUID(), payload.version());
 			updateConditionalEffectVisibility(crowdControl);
 		});
+	}
+
+	public <T> Registry<T> registry(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
+		if (accessor == null) accessor = server().registryAccess();
+		return accessor.registryOrThrow(key);
+	}
+
+	public <T> Iterable<Holder.Reference<T>> registryHolders(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
+		Registry<T> registry = registry(key, accessor);
+		return new Iterable<>() {
+            @NotNull
+            @Override
+            public Iterator<Holder.Reference<T>> iterator() {
+                return registry.holders().iterator();
+            }
+        };
 	}
 
 	@Override

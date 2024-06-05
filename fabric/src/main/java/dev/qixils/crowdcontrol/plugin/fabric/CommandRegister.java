@@ -8,7 +8,9 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -160,7 +162,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			initTo(commands, () -> new FallingBlockCommand(plugin, block));
 
 		// enchantments
-		for (Enchantment enchantment : BuiltInRegistries.ENCHANTMENT)
+		for (Holder<Enchantment> enchantment : plugin.registryHolders(Registries.ENCHANTMENT, null))
 			initTo(commands, () -> new EnchantmentCommand(plugin, enchantment));
 
 		// give/take items

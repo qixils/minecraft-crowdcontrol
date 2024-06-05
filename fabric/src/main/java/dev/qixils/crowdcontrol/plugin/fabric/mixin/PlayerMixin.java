@@ -38,7 +38,7 @@ public abstract class PlayerMixin extends LivingEntity {
 	}
 
 	@Redirect(
-			method = "dropEquipment()V",
+			method = "dropEquipment",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
 	private boolean equipmentKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {
@@ -46,7 +46,7 @@ public abstract class PlayerMixin extends LivingEntity {
 	}
 
 	@Redirect(
-			method = "getExperienceReward()I",
+			method = "getBaseExperienceReward",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
 	private boolean experienceKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {

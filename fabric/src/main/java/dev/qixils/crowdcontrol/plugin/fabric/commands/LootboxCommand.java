@@ -15,8 +15,11 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -44,18 +47,25 @@ import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
+import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.migrateId;
+import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE;
+import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
 	private static final List<Holder<Attribute>> ATTRIBUTES = Arrays.asList(
-			Attributes.MAX_HEALTH,
-			Attributes.KNOCKBACK_RESISTANCE,
-			Attributes.MOVEMENT_SPEED,
-			Attributes.ATTACK_DAMAGE,
-			Attributes.ARMOR,
-			Attributes.ARMOR_TOUGHNESS,
-			Attributes.ATTACK_KNOCKBACK,
-			Attributes.ATTACK_SPEED
+		Attributes.MAX_HEALTH,
+		Attributes.KNOCKBACK_RESISTANCE,
+		Attributes.MOVEMENT_SPEED,
+		Attributes.ATTACK_DAMAGE,
+		Attributes.ARMOR,
+		Attributes.ARMOR_TOUGHNESS,
+		Attributes.ATTACK_KNOCKBACK,
+		Attributes.ATTACK_SPEED
+	);
+	private static final List<DataComponentType<?>> CURSES = List.of(
+		PREVENT_ARMOR_CHANGE,
+		PREVENT_EQUIPMENT_DROP
 	);
 	private static final Map<EquipmentSlot, EquipmentSlotGroup> SLOT_TO_GROUP = Map.of(
 		// can't use reflection cus mappings (probably)
@@ -85,15 +95,15 @@ public class LootboxCommand extends ImmediateCommand {
 		// create item collections
 		allItems = BuiltInRegistries.ITEM.stream().filter(it -> it != Items.AIR).toList();
 		goodItems = allItems.stream()
-				.filter(itemType ->
-						itemType.components().getOrDefault(DataComponents.MAX_DAMAGE, 0) > 1
-								|| itemType == Items.GOLDEN_APPLE
-								|| itemType == Items.ENCHANTED_GOLDEN_APPLE
-								|| itemType == Items.NETHERITE_BLOCK
-								|| itemType == Items.DIAMOND_BLOCK
-								|| itemType == Items.IRON_BLOCK
-								|| itemType == Items.GOLD_BLOCK)
-				.collect(Collectors.toList());
+			.filter(itemType ->
+				itemType.components().getOrDefault(DataComponents.MAX_DAMAGE, 0) > 1
+					|| itemType == Items.GOLDEN_APPLE
+					|| itemType == Items.ENCHANTED_GOLDEN_APPLE
+					|| itemType == Items.NETHERITE_BLOCK
+					|| itemType == Items.DIAMOND_BLOCK
+					|| itemType == Items.IRON_BLOCK
+					|| itemType == Items.GOLD_BLOCK)
+			.collect(Collectors.toList());
 	}
 
 	private boolean isGoodItem(@Nullable Item item) {
@@ -133,7 +143,7 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// create item stack
 		ItemStack itemStack = new ItemStack(item, quantity);
-		randomlyModifyItem(itemStack, luck);
+		randomlyModifyItem(itemStack, luck, null);
 		return itemStack;
 	}
 
@@ -143,9 +153,10 @@ public class LootboxCommand extends ImmediateCommand {
 	 *
 	 * @param itemStack item to modify
 	 * @param luck      zero-indexed level of luck
+	 * @param accessor  registry accessor to load enchants from
 	 */
 	@Contract(mutates = "param1")
-	public void randomlyModifyItem(ItemStack itemStack, int luck) {
+	public void randomlyModifyItem(ItemStack itemStack, int luck, @Nullable RegistryAccess accessor) {
 		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
 		if (random.nextDouble() >= (0.9D - (luck * .15D)))
 			itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
@@ -156,26 +167,31 @@ public class LootboxCommand extends ImmediateCommand {
 			_enchantments = Math.max(_enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		final int enchantments = _enchantments;
-		List<Enchantment> enchantmentList = BuiltInRegistries.ENCHANTMENT.stream()
-				.filter(enchantmentType -> enchantmentType.canEnchant(itemStack)).collect(Collectors.toList());
-		if (random.nextDouble() >= (.8d - (luck * .2d)))
-			enchantmentList.removeIf(Enchantment::isCurse);
+		List<Holder<Enchantment>> enchantmentList = plugin.registry(Registries.ENCHANTMENT, accessor)
+			.holders()
+			.filter(enchantmentHolder -> enchantmentHolder.value().canEnchant(itemStack))
+			.collect(Collectors.toList());
+		if (random.nextDouble() >= (.8d - (luck * .2d))) {
+			for (DataComponentType<?> curse : CURSES) {
+				enchantmentList.removeIf(holder -> holder.value().effects().has(curse));
+			}
+		}
 
 		// add enchantments
-		List<Enchantment> addedEnchantments = new ArrayList<>(enchantments);
+		List<Holder<Enchantment>> addedEnchantments = new ArrayList<>(enchantments);
 		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
-			Enchantment enchantment = enchantmentList.remove(0);
+			Holder<Enchantment> enchantment = enchantmentList.remove(0);
 
 			// block conflicting enchantments (unless the die roll decides otherwise)
-			if (addedEnchantments.stream().anyMatch(x -> !x.isCompatibleWith(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
+			if (addedEnchantments.stream().anyMatch(x -> Enchantment.areCompatible(x, enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
 				continue;
 			addedEnchantments.add(enchantment);
 
 			// determine enchantment level
-			int level = enchantment.getMinLevel();
-			if (enchantment.getMaxLevel() > level) {
+			int level = enchantment.value().getMinLevel();
+			if (enchantment.value().getMaxLevel() > level) {
 				for (int j = 0; j <= luck; j++) {
-					level = Math.max(level, RandomUtil.nextInclusiveInt(enchantment.getMinLevel(), enchantment.getMaxLevel()));
+					level = Math.max(level, RandomUtil.nextInclusiveInt(enchantment.value().getMinLevel(), enchantment.value().getMaxLevel()));
 				}
 				if (random.nextDouble() >= (0.5D - (luck * .07D)))
 					level += random.nextInt(4);
@@ -201,14 +217,13 @@ public class LootboxCommand extends ImmediateCommand {
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
 				Holder<Attribute> attribute = attributeList.get(i);
-				String name = "lootbox_" + attribute.unwrapKey().orElseThrow().location().getPath();
 				// determine percent amount for the modifier
 				double amount = 0d;
 				for (int j = 0; j <= luck; j++) {
 					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
 				}
 				// create & add attribute
-				AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name, amount, Operation.ADD_VALUE);
+				AttributeModifier attributeModifier = new AttributeModifier(migrateId(UUID.randomUUID()), amount, Operation.ADD_VALUE);
 				ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 				modifiers = modifiers.withModifierAdded(attribute, attributeModifier, equipmentSlotGroup);
 				itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
@@ -217,12 +232,12 @@ public class LootboxCommand extends ImmediateCommand {
 			for (EquipmentSlot type : EquipmentSlot.values()) {
 				if (!equipmentSlotGroup.test(type)) continue;
 				itemStack.getItem().getDefaultAttributeModifiers()
-						.forEach(type, (attribute, modifier) -> {
-							// TODO: does any of this make sense (especially the equipmentSlotGroup)
-							ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-							modifiers = modifiers.withModifierAdded(attribute, modifier, equipmentSlotGroup);
-							itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
-						});
+					.forEach(type, (attribute, modifier) -> {
+						// TODO: does any of this make sense (especially the equipmentSlotGroup)
+						ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+						modifiers = modifiers.withModifierAdded(attribute, modifier, equipmentSlotGroup);
+						itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
+					});
 			}
 		}
 	}
@@ -261,8 +276,8 @@ public class LootboxCommand extends ImmediateCommand {
 			// sound & open
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
 			sync(() -> player.openMenu(
-					new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container),
-							plugin.adventure().toNative(buildLootboxTitle(plugin, request)))
+				new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container),
+					plugin.adventure().toNative(buildLootboxTitle(plugin, request)))
 			));
 		}
 		return request.buildResponse().type(Response.ResultType.SUCCESS);

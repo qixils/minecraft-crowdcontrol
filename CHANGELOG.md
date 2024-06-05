@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.4.3
+
+- Fabric: Updated support to 1.21
+
 ## 3.4.2
 
 - Added new effect for dropping a random block, like a falling anvil

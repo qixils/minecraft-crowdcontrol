@@ -24,7 +24,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_SEARCH_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.SCALE_MODIFIER_UUID;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModifier;
 import static java.lang.Math.pow;
 
@@ -63,7 +64,7 @@ public class EntitySizeCommand extends ImmediateCommand {
                         continue;
 					if (AttributeUtil.getModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID).map(AttributeModifier::amount).orElse(0d) == level)
 						continue;
-                    addModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
+                    addModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
                     success = true;
                     break;
                 }
