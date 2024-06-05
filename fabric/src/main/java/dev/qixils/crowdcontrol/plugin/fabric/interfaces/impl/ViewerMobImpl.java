@@ -19,6 +19,11 @@ public class ViewerMobImpl implements ViewerMob {
 	}
 
 	@Override
+	public void setViewerSpawned(boolean value) {
+		this.value = value;
+	}
+
+	@Override
 	public void writeToNbt(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registryLookup) {
 		tag.putBoolean("value", value);
 	}

@@ -3,9 +3,10 @@ plugins {
     id("io.freefair.lombok") version "8.6" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
     id("fabric-loom") version "1.6-SNAPSHOT" apply false
-    id("xyz.jpenilla.run-paper") version "2.2.3" apply false // Adds runServer and runMojangMappedServer tasks for testing
+    id("xyz.jpenilla.run-paper") version "2.3.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("org.spongepowered.gradle.plugin") version "2.2.0" apply false // Generates sponge_plugins.json and runServer task
+    id("io.papermc.paperweight.userdev") version "1.7.1" apply false
 }
 
 repositories {
@@ -33,8 +34,11 @@ subprojects {
             maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
                 name = "sonatype-oss-snapshots"
             }
+            maven {
+                name = "Jitpack"
+                url = uri("https://jitpack.io")
+            }
         }
-        mavenLocal() // TODO: publish cloud
     }
 
     java {
@@ -47,7 +51,6 @@ subprojects {
     }
 
     tasks.shadowJar {
-        relocate("org.reflections", "dev.qixils.relocated.reflections")
         relocate("com.google.guava", "dev.qixils.relocated.google.guava")
         relocate("com.google.common", "dev.qixils.relocated.google.common")
         relocate("com.google.errorprone", "dev.qixils.relocated.google.errorprone")

@@ -16,6 +16,8 @@ import org.joml.Vector3f;
 
 import javax.annotation.CheckReturnValue;
 
+import static java.lang.Math.pow;
+
 @FieldsAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record Location(ServerLevel level, double x, double y, double z, float yaw, float pitch) {
@@ -111,5 +113,9 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 
 	public Location relative(Direction direction) {
 		return new Location(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ(), yaw, pitch);
+	}
+
+	public double squareDistanceTo(Location o) {
+		return pow(x - o.x, 2) + pow(y - o.y, 2) + pow(z - o.z, 2);
 	}
 }

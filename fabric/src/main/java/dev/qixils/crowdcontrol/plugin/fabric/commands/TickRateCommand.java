@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.server.ServerTickRateManager;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,15 +32,14 @@ public class TickRateCommand extends TimedVoidCommand {
 		new TimedEffect.Builder()
 			.request(request)
 			.effectGroup("tick_rate")
-			.duration(request.getDuration())
+			.duration(getDuration(request))
 			.startCallback(effect -> {
-				ServerTickRateManager serverTickRateManager = plugin.server().tickRateManager();
-				serverTickRateManager.setTickRate(RATE * multiplier);
+				plugin.server().tickRateManager().setTickRate(RATE * multiplier);
+				playerAnnounce(players, request);
 				return request.buildResponse().type(Response.ResultType.SUCCESS);
 			})
 			.completionCallback(effect -> {
-				ServerTickRateManager serverTickRateManager = plugin.server().tickRateManager();
-				serverTickRateManager.setTickRate(RATE);
+				plugin.server().tickRateManager().setTickRate(RATE);
 			})
 			.build().queue();
 	}

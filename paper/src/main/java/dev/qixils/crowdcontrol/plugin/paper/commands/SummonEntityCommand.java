@@ -8,13 +8,14 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
+import io.papermc.paper.event.player.PlayerNameEntityEvent;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
+import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +32,7 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
-public class SummonEntityCommand extends Command implements EntityCommand {
+public class SummonEntityCommand extends Command implements EntityCommand, Listener {
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
 	private static final Set<Material> BLOCKS;
@@ -50,7 +51,7 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<Material>> armor = new EnumMap<>(EquipmentSlot.class);
-		for (Material material : Material.values()) {
+		for (Material material : Registry.MATERIAL) {
 			if (!material.isItem()) continue;
 			EquipmentSlot slot = material.getEquipmentSlot();
 			if (slot == EquipmentSlot.HAND) continue;
@@ -65,7 +66,7 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 
 		// --- loot tables --- //
 		EnumSet<LootTables> lootTables = EnumSet.noneOf(LootTables.class);
-		for (LootTables lootTable : LootTables.values()) {
+		for (LootTables lootTable : Registry.LOOT_TABLES) {
 			String key = lootTable.getKey().getKey();
 			if (key.startsWith("chests/"))
 				lootTables.add(lootTable);
@@ -73,8 +74,8 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 		CHEST_LOOT_TABLES = Collections.unmodifiableSet(lootTables);
 
 		// --- blocks --- //
-		EnumSet<Material> blocks = EnumSet.noneOf(Material.class);
-		for (Material material : Material.values()) {
+		Set<Material> blocks = new HashSet<>();
+		for (Material material : Registry.MATERIAL) {
 			if (material.isBlock())
 				blocks.add(material);
 		}
@@ -89,7 +90,7 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 	public SummonEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "entity_" + entityType.name();
+		this.effectName = "entity_" + csIdOf(entityType);
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType));
 		this.mobKey = getMobKey(plugin);
 	}
@@ -207,5 +208,12 @@ public class SummonEntityCommand extends Command implements EntityCommand {
 
 		entity.getPersistentDataContainer().set(mobKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, true);
 		return entity;
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onNameTag(PlayerNameEntityEvent event) {
+		LivingEntity entity = event.getEntity();
+		if (!isMobViewerSpawned(plugin, entity)) return;
+		entity.getPersistentDataContainer().remove(getMobKey());
 	}
 }

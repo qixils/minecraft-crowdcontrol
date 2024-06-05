@@ -1,6 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
+import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -9,29 +11,35 @@ import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil.check;
+
 @Getter
 @AllArgsConstructor
 public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 	private final FabricCrowdControlPlugin plugin;
 
-	@Contract(value = "_ -> param1", mutates = "param1")
-	private @NotNull List<@NotNull ServerPlayer> filter(@NotNull List<ServerPlayer> players) {
+	@Contract(value = "_, _ -> param1", mutates = "param1")
+	private @NotNull List<@NotNull ServerPlayer> filter(@NotNull List<ServerPlayer> players, @Nullable Request request) {
+		PermissionWrapper perm = getEffectPermission(request).orElse(null);
 		players.removeIf(player -> player == null
 						|| player.isDeadOrDying()
 						|| (player.isSpectator() && Components.GAME_TYPE_EFFECT.get(player).getValue() == null)
+						|| !check(player, Plugin.USE_PERMISSION)
+						|| (perm != null && !check(player, perm))
 		);
 		return players;
 	}
 
 	@Override
 	public @NotNull List<@NotNull ServerPlayer> getAllPlayers() {
-		return filter(new ArrayList<>(plugin.server().getPlayerList().getPlayers()));
+		return filter(new ArrayList<>(plugin.server().getPlayerList().getPlayers()), null);
 	}
 
 	@Override
@@ -46,7 +54,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 				players.add(plugin.server().getPlayerList().getPlayer(uuid));
 		}
 
-		return filter(players);
+		return filter(players, request);
 	}
 
 	@Override

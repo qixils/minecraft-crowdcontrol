@@ -43,7 +43,6 @@ repositories {
         name = "Shedaniel"
         url = uri("https://maven.shedaniel.me")
     }
-    mavenLocal() // TODO: adventure-platform-fabric
 }
 
 dependencies {
@@ -55,7 +54,7 @@ dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
-    modImplementation(include("cloud.commandframework:cloud-fabric:$cloudVersion")!!)
+    modImplementation(include("com.github.qixils.cloud:cloud-fabric:$cloudVersion")!!)
     modApi(include("org.ladysnake.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
     modImplementation(include("org.ladysnake.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")

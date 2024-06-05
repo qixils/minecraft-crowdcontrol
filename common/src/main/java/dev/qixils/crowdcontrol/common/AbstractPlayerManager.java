@@ -4,8 +4,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.socket.Request;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -17,7 +19,7 @@ import java.util.*;
 public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
 	private final Multimap<String, UUID> streamToPlayerMap =
-			Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
+		Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
 
 	@Override
 	public boolean linkPlayer(@NotNull UUID uuid, @NotNull String username) {
@@ -69,5 +71,17 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 	public @NotNull Collection<String> getLinkedAccounts(@NotNull UUID uuid) {
 		// TODO: optimize
 		return Multimaps.invertFrom(streamToPlayerMap, HashMultimap.create(streamToPlayerMap.size(), 1)).get(uuid);
+	}
+
+	@NotNull
+	protected Optional<PermissionWrapper> getEffectPermission(@Nullable Request request) {
+		if (request == null) return Optional.empty();
+		String effect = request.getEffect();
+		if (effect == null) return Optional.empty();
+		return Optional.of(PermissionWrapper.builder()
+			.node("crowdcontrol.use." + effect.toLowerCase(Locale.US))
+			.description("Whether a player is allowed to receive the " + effect + " effect")
+			.defaultPermission(PermissionWrapper.DefaultPermission.ALL)
+			.build());
 	}
 }

@@ -7,6 +7,8 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
+import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.addModifier;
+
 public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 	public PaperLivingEntity(LivingEntity entity) {
@@ -56,22 +58,10 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 	@Override
 	public void maxHealthOffset(double newOffset) {
-		AttributeInstance attribute = entity().getAttribute(Attribute.GENERIC_MAX_HEALTH);
-		if (attribute == null) {
-			logger.warn("Player missing GENERIC_MAX_HEALTH attribute");
-			return;
-		}
+		addModifier(entity(), Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH_MODIFIER_UUID, MAX_HEALTH_MODIFIER_NAME, newOffset, AttributeModifier.Operation.ADD_NUMBER, true);
 
-		AttributeModifier modifier = null;
-		for (AttributeModifier attributeModifier : attribute.getModifiers()) {
-			if (attributeModifier.getUniqueId() == MAX_HEALTH_MODIFIER_UUID || attributeModifier.getName().equals(MAX_HEALTH_MODIFIER_NAME)) {
-				if (modifier == null)
-					modifier = attributeModifier;
-				attribute.removeModifier(attributeModifier);
-			}
-		}
-
-		attribute.addModifier(new AttributeModifier(MAX_HEALTH_MODIFIER_UUID, MAX_HEALTH_MODIFIER_NAME, newOffset, AttributeModifier.Operation.ADD_NUMBER));
+		float computedMaxHealth = (float) (20 + newOffset);
+		health(Math.min(health(), computedMaxHealth));
 	}
 
 	@Override

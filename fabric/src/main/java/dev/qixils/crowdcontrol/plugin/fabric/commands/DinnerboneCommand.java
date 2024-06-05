@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.StreamSupport;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_NAME;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_SEARCH_RADIUS;
 
 @Getter
 public class DinnerboneCommand extends Command {
@@ -44,7 +44,7 @@ public class DinnerboneCommand extends Command {
 				entities.addAll(StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
 						.filter(entity -> entity instanceof LivingEntity
 								&& entity.getType() != EntityType.PLAYER
-								&& entity.position().distanceToSqr(player.position()) <= (DINNERBONE_RADIUS * DINNERBONE_RADIUS))
+								&& entity.position().distanceToSqr(player.position()) <= (ENTITY_SEARCH_RADIUS * ENTITY_SEARCH_RADIUS))
 						.map(entity -> (LivingEntity) entity)
 						.toList());
 			}

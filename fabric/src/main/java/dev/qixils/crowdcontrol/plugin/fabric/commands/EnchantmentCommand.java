@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
+
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
 	protected final Enchantment enchantment;

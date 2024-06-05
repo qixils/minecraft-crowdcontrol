@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.CheckReturnValue;
 import java.util.*;
@@ -21,13 +23,15 @@ import java.util.*;
 public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 	private final PaperCrowdControlPlugin plugin;
 
-	@Contract(value = "_ -> param1", mutates = "param1")
-	private @NotNull List<@NotNull Player> filter(@NotNull List<Player> players) {
+	@Contract(value = "_, _ -> param1", mutates = "param1")
+	private @NotNull List<@NotNull Player> filter(@NotNull List<Player> players, @Nullable Request request) {
+		Permission perm = getEffectPermission(request).map(PaperUtil::toPaper).orElse(null);
 		players.removeIf(player -> player == null
-				|| !player.isValid()
-				|| player.isDead()
-				|| (player.getGameMode() == GameMode.SPECTATOR && !GameModeCommand.isEffectActive(plugin, player))
-				|| !player.hasPermission(PaperUtil.USE_PERMISSION)
+			|| !player.isValid()
+			|| player.isDead()
+			|| (player.getGameMode() == GameMode.SPECTATOR && !GameModeCommand.isEffectActive(plugin, player))
+			|| !player.hasPermission(PaperUtil.USE_PERMISSION)
+			|| (perm != null && !player.hasPermission(perm))
 		);
 		return players;
 	}
@@ -35,7 +39,7 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 	@CheckReturnValue
 	@NotNull
 	public List<@NotNull Player> getAllPlayers() {
-		return filter(new ArrayList<>(Bukkit.getOnlinePlayers()));
+		return filter(new ArrayList<>(Bukkit.getOnlinePlayers()), null);
 	}
 
 	@CheckReturnValue
@@ -52,14 +56,14 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 		for (UUID uuid : uuids)
 			players.add(Bukkit.getPlayer(uuid));
 
-		return filter(players);
+		return filter(players, request);
 	}
 
 	@Override
 	public @NotNull Collection<Player> getSpectators() {
 		List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
 		players.removeIf(player -> player.getGameMode() != GameMode.SPECTATOR
-				|| GameModeCommand.isEffectActive(plugin, player));
+			|| GameModeCommand.isEffectActive(plugin, player));
 		return players;
 	}
 }

@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
-import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
+import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
@@ -21,11 +21,15 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.world.flag.FeatureElement;
+import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,7 +40,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -45,10 +48,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.*;
 
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
+	public static final @NotNull SemVer MINECRAFT_MIN_VERSION = new SemVer(1, 20, 6);
 	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
 	public static final @NotNull Set<SemVer> MAPPED_VERSIONS = Set.of(
 		new SemVer(1, 19, 4),
@@ -120,20 +123,16 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public void onLoad() {
 		saveDefaultConfig();
 		// init sound validator
-		CommandConstants.SOUND_VALIDATOR = key -> {
-			String asString = key.value();
+		CommandConstants.SOUND_VALIDATOR = _key -> {
+			NamespacedKey key = PaperUtil.toPaper(_key);
+			String asString = key.asMinimalString();
 			Boolean value = VALID_SOUNDS.get(asString);
 			if (value != null)
 				return value;
 
-			try {
-				Sound.valueOf(asString.toUpperCase(Locale.ENGLISH).replace('.', '_'));
-				VALID_SOUNDS.put(asString, true);
-				return true;
-			} catch (IllegalArgumentException e) {
-				VALID_SOUNDS.put(asString, false);
-				return false;
-			}
+			value = Registry.SOUNDS.get(key) != null;
+			VALID_SOUNDS.put(asString, value);
+			return value;
 		};
 	}
 
@@ -145,10 +144,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		// soft-lock observer
 		ConfigurationSection softLockSection = config.getConfigurationSection("soft-lock-observer");
 		if (softLockSection == null) {
-			getSLF4JLogger().debug("No soft-lock config found, using defaults");
+			LOGGER.debug("No soft-lock config found, using defaults");
 			softLockConfig = new SoftLockConfig();
 		} else {
-			getSLF4JLogger().debug("Loading soft-lock config");
+			LOGGER.debug("Loading soft-lock config");
 			softLockConfig = new SoftLockConfig(
 				softLockSection.getInt("period", DEF_PERIOD),
 				softLockSection.getInt("deaths", DEF_DEATHS),
@@ -169,10 +168,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		// limit config
 		ConfigurationSection limitSection = config.getConfigurationSection("limits");
 		if (limitSection == null) {
-			getSLF4JLogger().debug("No limit config found, using defaults");
+			LOGGER.debug("No limit config found, using defaults");
 			limitConfig = new LimitConfig();
 		} else {
-			getSLF4JLogger().debug("Loading limit config");
+			LOGGER.debug("Loading limit config");
 			boolean hostsBypass = limitSection.getBoolean("hosts-bypass", true);
 			Map<String, Integer> itemLimits = parseLimitConfigSection(limitSection.getConfigurationSection("items"));
 			Map<String, Integer> entityLimits = parseLimitConfigSection(limitSection.getConfigurationSection("entities"));
@@ -186,6 +185,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
 		port = config.getInt("port", port);
 		IP = config.getString("ip", IP);
+		if ("".equals(IP) || "null".equalsIgnoreCase(IP) || "127.0.0.1".equals(IP)) IP = null;
 		password = config.getString("password", password);
 		autoDetectIP = config.getBoolean("ip-detect", autoDetectIP);
 	}
@@ -194,7 +194,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		loadConfig();
 
 		if (password == null || password.isEmpty()) { // TODO: allow empty password if CC allows it
-			getLogger().severe("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
+			LOGGER.error("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
 			return;
 		}
 		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
@@ -226,11 +226,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		if (!PaperLib.isPaper()) {
 			throw new IllegalStateException("The Paper server software is required. Please upgrade from Spigot to Paper, it should be a simple and painless upgrade in 99.99% of cases.");
 		}
-		if (MINECRAFT_VERSION.isLessThan(new SemVer(1, 19, 4))) {
-			throw new IllegalStateException("Versions prior to 1.19.4 are no longer supported.");
-		}
-		if (!MAPPED_VERSIONS.contains(MINECRAFT_VERSION)) {
-			getLogger().warning("This version of Crowd Control has not been confirmed to work with the current version of Minecraft. Please check for updates to the plugin.");
+		if (MINECRAFT_VERSION.isLessThan(MINECRAFT_MIN_VERSION)) {
+			throw new IllegalStateException("Versions prior to " + MINECRAFT_MIN_VERSION + " are no longer supported.");
 		}
 
 		initCrowdControl();
@@ -249,7 +246,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 				commandManager.registerBrigadier();
 				commandManager.registerAsynchronousCompletions();
 			} catch (Exception exception) {
-				getSLF4JLogger().warn("Chat command manager partially failed to initialize, ignoring.");
+				LOGGER.warn("Chat command manager partially failed to initialize, ignoring.");
 			}
 			registerChatCommands();
 		} catch (Exception exception) {
@@ -258,8 +255,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
-	public @NotNull Logger getSLF4JLogger() {
-		return super.getSLF4JLogger();
+	public @NotNull ComponentLogger getSLF4JLogger() {
+		return LOGGER;
 	}
 
 	@Override
@@ -285,9 +282,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			name = name.toLowerCase(Locale.ENGLISH);
 		try {
 			crowdControl.registerHandler(name, command::executeAndNotify);
-			getLogger().fine("Registered CC command '" + name + "'");
+			LOGGER.debug("Registered CC command '" + name + "'");
 		} catch (IllegalArgumentException e) {
-			getSLF4JLogger().warn("Failed to register command: " + name, e);
+			LOGGER.warn("Failed to register command: " + name, e);
 		}
 	}
 
@@ -306,64 +303,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		return new PaperPlayer(player);
 	}
 
-	public static boolean isFeatureEnabled(Object feature) {
-		try {
-			Optional<Object> requiredFeaturesOpt;
-			if (feature instanceof FeatureElementCommand command) {
-				requiredFeaturesOpt = command.requiredFeatures();
-			} else if (isInstance(FEATURE_ELEMENT_CLAZZ, feature)) {
-				requiredFeaturesOpt = ReflectionUtil.invokeMethod(
-						feature,
-						// FeatureElement#requiredFeatures
-						switch (Bukkit.getMinecraftVersion()) {
-							case "1.19.4", "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4" -> "m";
-							default -> throw new IllegalStateException();
-						}
-				);
-			} else if (isInstance(FEATURE_FLAG_SET_CLAZZ, feature)) {
-				requiredFeaturesOpt = Optional.of(feature);
-			} else {
-				LOGGER.warn("Unknown feature type: " + feature.getClass().getName());
-				return true;
-			}
-			return requiredFeaturesOpt.flatMap(requiredFeatures -> ReflectionUtil.invokeMethod(
-					Bukkit.getServer(),
-					// CraftServer#getServer
-					"getServer"
-			).flatMap(server -> ReflectionUtil.invokeMethod(
-					server,
-					// MinecraftServer#getWorldData
-					switch (Bukkit.getMinecraftVersion()) {
-						case "1.19.4" -> "aW";
-						case "1.20", "1.20.1" -> "aU";
-						case "1.20.2" -> "aT";
-						case "1.20.3", "1.20.4" -> "aY";
-						default -> throw new IllegalStateException();
-					}
-			)).flatMap(worldData -> ReflectionUtil.invokeMethod(
-					worldData,
-					// WorldData#enabledFeatures
-					switch (Bukkit.getMinecraftVersion()) {
-						case "1.19.4" -> "L";
-						case "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4" -> "M";
-						default -> throw new IllegalStateException();
-					}
-			)).<Boolean>flatMap(enabledFeatures -> ReflectionUtil.invokeMethod(
-					requiredFeatures,
-					// FeatureFlagSet#isSubsetOf
-					switch (Bukkit.getMinecraftVersion()) {
-						case "1.19.4", "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4" -> "a";
-						default -> throw new IllegalStateException();
-					},
-					enabledFeatures
-			))).orElse(true);
-		} catch (Exception e) {
-			return true;
-		}
+	public static boolean isFeatureEnabled(FeatureFlagSet features) {
+		return ((CraftServer) Bukkit.getServer()).getServer().getWorldData().enabledFeatures().isSubsetOf(features);
 	}
 
-	public static boolean isFeatureDisabled(Object feature) {
-		return !isFeatureEnabled(feature);
+	public static boolean isFeatureEnabled(FeatureElement feature) {
+		return isFeatureEnabled(feature.requiredFeatures());
 	}
 
 	// boilerplate stuff for the data container storage

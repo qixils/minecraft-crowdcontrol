@@ -31,14 +31,14 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 	public GiveItemCommand(PaperCrowdControlPlugin plugin, Material item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "give_" + item.name();
+		this.effectName = "give_" + item.key().value();
 		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", Component.translatable(new ItemStack(item)));
 	}
 
 	@Blocking
 	public static void giveItemTo(Entity player, ItemStack itemStack) {
 		Location location = player.getLocation();
-		Item item = (Item) player.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);
+		Item item = (Item) player.getWorld().spawnEntity(location, EntityType.ITEM);
 		item.setItemStack(itemStack);
 		item.setOwner(player.getUniqueId());
 		item.setThrower(player.getUniqueId());

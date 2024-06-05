@@ -11,16 +11,23 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.NotNull;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.jar.JarFile;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
@@ -30,21 +37,54 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	private final TranslationRegistry translator;
 	private final ClassLoader pluginClassLoader;
 
+	private static @Nullable URL loadFirst(String path, ClassLoader... classLoaders) {
+		for (ClassLoader classLoader : classLoaders) {
+			URL url = classLoader.getResource(path);
+			if (url != null) return url;
+		}
+
+		return null;
+	}
+
+	// Find all the items in the JVM resource path
+	private List<String> listResourcesIn(String path) throws Exception {
+		URL url = loadFirst(path, pluginClassLoader, ClassLoader.getSystemClassLoader());
+		if (url == null) return Collections.emptyList();
+		String urlPath = url.getPath();
+
+		if (url.getProtocol().equals("file")) { // OS dir
+			try (Stream<Path> paths = Files.list(Paths.get(new URI(urlPath)))) {
+				return paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
+			}
+		} else { // packed in jar?
+			int idx = urlPath.indexOf("!");
+			File jarUrl = idx == -1
+				? new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()) // TODO: even this doesn't work on forge omg wtf
+				: new File(urlPath.substring("file:".length(), urlPath.indexOf("!"))); // TODO: url encoder error on sponge 7 AAAAAAAAA
+			try (JarFile jar = new JarFile(jarUrl)) {
+				return Collections.list(jar.entries()).stream()
+					.filter(entry -> entry.getName().startsWith(path))
+					.map(entry -> entry.getName().substring(path.length()))
+					.collect(Collectors.toList());
+			}
+		}
+	}
+
 	/**
 	 * Creates a new translator with the given language file prefix.
-	 * For a prefix like "i18n/MyModName", the translator will load all files matching "i18n/MyModName_*.properties",
+	 * For a prefix like "MyModName", the translator will load all files matching "/i18n/MyModName_*.properties",
 	 * where the asterisk is a language code like "en_US".
 	 *
-	 * @param modId the ID of your mod/plugin
-	 * @param prefix the prefix for language resource files
+	 * @param modId       the ID of your mod/plugin
+	 * @param prefix      the prefix for language resource files
 	 * @param pluginClass the main class of your plugin
-	 * @param locales the locales to load (used only if reflection fails)
+	 * @param locales     the locales to load (used only if reflection fails)
 	 */
 	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Class<?> pluginClass, @NotNull Locale @NotNull ... locales) {
 		this.prefix = prefix;
 		this.pluginClassLoader = pluginClass.getClassLoader();
 
-		Pattern filePattern = Pattern.compile("^/?" + Pattern.quote(prefix) + "_");
+		Pattern filePattern = Pattern.compile(Pattern.quote(prefix) + "_(?<languageTag>\\w{2}(?:_\\w+)*)\\.properties");
 		logger.debug("Registering translator");
 
 		// create translator
@@ -53,25 +93,26 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		translator.defaultLocale(Objects.requireNonNull(Translator.parseLocale("en_US")));
 
 		// load locales
-		// TODO(reflections): workaround Forge's bizarre custom "modjar" URL on Sponge 8
-		String[] pkg = prefix.split("/");
-		pkg = Arrays.copyOfRange(pkg, 0, pkg.length - 1);
-		Reflections reflections = new Reflections(new ConfigurationBuilder()
-				.addClassLoaders(pluginClassLoader)
-				.addScanners(Scanners.Resources)
-				.forPackage(String.join(".", pkg)));
-		Set<String> resources = new HashSet<>(reflections.getResources(".+\\.properties"));
-		resources.removeIf(s -> !filePattern.matcher(s).find()); // ^ reflections regex doesn't actually work
-
 		boolean loaded = false;
-		if (!resources.isEmpty()) {
-			try {
-				logger.debug("Using Reflections to load locales");
-				resources.forEach(this::register);
-				loaded = true;
-			} catch (Exception e) {
-				logger.warn("Failed to load locales with Reflections", e);
+		try {
+			List<String> filenames = listResourcesIn("i18n/");
+			if (!filenames.isEmpty()) {
+				for (String filename : filenames) {
+					Matcher matcher = filePattern.matcher(filename);
+					if (!matcher.find()) continue;
+
+					// tag from filename (e.g. en)
+					String languageTag = matcher.group("languageTag").replace('_', '-');
+					Locale locale = Locale.forLanguageTag(languageTag);
+					register(locale);
+
+					loaded = true;
+				}
+				logger.info("Loaded locales dynamically");
 			}
+		} catch (Exception e) {
+			loaded = false;
+			logger.warn("Failed to load locales dynamically", e);
 		}
 
 		if (!loaded) {
@@ -107,27 +148,9 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	}
 
 	private void register(Locale locale) {
-		ResourceBundle bundle = ResourceBundle.getBundle(prefix.replace('/', '.'), locale, pluginClassLoader);
+		ResourceBundle bundle = ResourceBundle.getBundle("i18n." + prefix, locale, pluginClassLoader);
 		translator.registerAll(locale, bundle, false);
 		logger.info("Registered locale " + locale);
-	}
-
-	private void register(String file) {
-		logger.debug("Processing " + file);
-		String[] seg1 = file.split("/");
-		String[] seg2 = seg1[seg1.length - 1].split("_", 2);
-		if (seg2.length <= 1)
-			return;
-		String[] prefSeg = prefix.split("/");
-		if (!seg2[0].equals(prefSeg[prefSeg.length - 1]))
-			return;
-		if (!seg2[1].endsWith(".properties"))
-			return;
-		String localeStr = seg2[1].replace(".properties", "");
-		Locale locale = Translator.parseLocale(localeStr);
-		if (locale == null)
-			return;
-		register(locale);
 	}
 
 	@Override

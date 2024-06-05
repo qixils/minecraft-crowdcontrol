@@ -2,11 +2,30 @@
 
 A list of all changes made to the software in reverse chronological order.
 
-## 3.3.7
+## 3.4.2
 
-- Added support for 1.20.5 on Paper and Fabric
-- Added new Summon Armadillo effect
+- Added new effect for dropping a random block, like a falling anvil
+- Paper & Fabric: Added new effects for increasing and decreasing the size of players and nearby mobs
+- Paper: Updated various effects to use server registries for better plugin compatibility and future-proofing
+- Paper: Fixed some missing entity effects
+- Paper: Fixed enchant effects always refunding
+- Paper & Fabric: Mobs spawned by CC ordinarily have a tag for developers denoting that they were viewer-spawned. This tag is now removed when the mob is renamed via name tag.
+- Added `crowdcontrol.use.[EFFECT_ID]` permissions for server admins; see [here](Minecraft.cs) for the list of effect IDs
+
+## 3.4.1
+
+- Ported Fabric's new time effects to Paper
+- Ported Fabric's gravity command refactor to Paper
+- Fixed time effect announcements
+- Fixed issue that forced all Fabric players to install the mod (it's still recommended!)
+
+## 3.4.0
+
+- Added support for 1.20.6 on Paper and Fabric
+- Dropped support for Paper and Fabric versions prior to 1.20.6
+- Added new entity summon effects (Armadillo, Bogged, Breeze)
 - Added new effects for controlling the speed of the game (HyperSpeed, HyperSlowSpeed, Freeze Time)
+- Added slow falling potion effect
 - Added support for the upcoming Stop All Effects button in the Crowd Control app
 - Added the permission node `crowdcontrol.use` for fine-grained control over where effects can be used
 - Added support for binding to a specific IP address. Useful for owners of large server networks.

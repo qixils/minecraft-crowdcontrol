@@ -20,7 +20,7 @@ import org.spongepowered.api.registry.RegistryTypes;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil.csIdOf;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {

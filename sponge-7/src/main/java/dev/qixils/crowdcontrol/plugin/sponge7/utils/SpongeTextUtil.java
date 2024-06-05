@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.utils;
 
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -63,40 +64,6 @@ public class SpongeTextUtil extends TextUtilImpl {
 		Key key = asKey(type);
 		if (key == null)
 			return type.getId();
-		String value = key.value();
-
-		if (!key.namespace().equals(Key.MINECRAFT_NAMESPACE))
-			return value;
-
-		switch (value) {
-			case "villager_golem":
-				return "iron_golem";
-			case "mooshroom":
-				return "mushroom_cow";
-			case "tnt":
-				return "primed_tnt";
-			case "zombie_pigman":
-				return "zombified_piglin";
-			case "illusion_illager":
-				return "illusioner";
-			case "vindication_illager":
-				return "vindicator";
-			case "sweeping":
-				return "sweeping_edge";
-			case "chest_minecart":
-				return "minecart_chest";
-			case "furnace_minecart":
-				return "minecart_furnace";
-			case "hopper_minecart":
-				return "minecart_hopper";
-			case "tnt_minecart":
-				return "minecart_tnt";
-			case "binding_curse":
-				return "curse_of_binding";
-			case "vanishing_curse":
-				return "curse_of_vanishing";
-			default:
-				return value;
-		}
+		return CommandConstants.csIdOf(key);
 	}
 }

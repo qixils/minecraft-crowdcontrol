@@ -32,8 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
@@ -115,7 +114,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 			() -> GravityCommand.high(plugin),
 			() -> GravityCommand.maximum(plugin),
 			() -> new DeleteRandomItemCommand(plugin),
-			() -> new UniteCommand(plugin)
+			() -> new UniteCommand(plugin),
+			() -> new RandomFallingBlockCommand(plugin)
 		));
 
 		// entity commands
@@ -124,8 +124,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 		for (EntityType entity : new HashSet<>(plugin.getRegistry().getAllOf(EntityType.class))) {
 			Key key = SpongeTextUtil.asKey(entity);
 			if (key == null) continue;
+			if (!isWhitelistedEntity(key)) continue;
 			String id = SpongeTextUtil.csIdOf(entity);
-			if (!CommandConstants.ENTITIES.contains(id)) continue;
 			Map<String, EntityType> entities = key.namespace().equals(Key.MINECRAFT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			entities.put(id, entity);
 		}

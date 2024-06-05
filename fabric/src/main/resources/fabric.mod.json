@@ -35,15 +35,15 @@
   ],
   "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
-    "fabricloader": ">=0.15.10",
+    "fabricloader": "*",
     "fabric": ">=0.97.6+1.20.6",
     "minecraft": ">=1.20.5- <=1.20.6",
-    "cardinal-components-base": ">=6.0.0-",
-    "cardinal-components-entity": ">=6.0.0-",
-    "cloud": "^1.8.4",
-    "adventure-platform-fabric": ">=5.12.0-",
-    "net_kyori_adventure-api": "^4.16.0",
-    "cloth-config": ">=14.0.126"
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*",
+    "cloud": "*",
+    "adventure-platform-fabric": "*",
+    "net_kyori_adventure-api": "*",
+    "cloth-config": "*"
   },
   "suggests": {
     "modmenu": "*"

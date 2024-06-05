@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8;
 import dev.qixils.crowdcontrol.common.LoginData;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
@@ -39,8 +40,7 @@ class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public boolean isAdmin(@NotNull ServerPlayer entity) {
-		// TODO: better handle permission wrapper
-		if (entity.hasPermission(Plugin.ADMIN_PERMISSION.getNode())) return true;
+		if (SpongeUtil.hasPermission(entity, Plugin.ADMIN_PERMISSION)) return true;
 		return PlayerEntityMapper.super.isAdmin(entity);
 	}
 

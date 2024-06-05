@@ -7,6 +7,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.NotNull;
 
+import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModifier;
+
 public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 
 	public FabricLivingEntity(LivingEntity entity) {
@@ -51,22 +53,8 @@ public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 
 	@Override
 	public void maxHealthOffset(double newOffset) {
-		AttributeInstance maxHealthAttr = entity().getAttribute(Attributes.MAX_HEALTH);
-		if (maxHealthAttr == null) {
-			logger.warn("Player missing GENERIC_MAX_HEALTH attribute");
-			return;
-		}
-		for (AttributeModifier attributeModifier : maxHealthAttr.getModifiers()) {
-			if (attributeModifier.id() == MAX_HEALTH_MODIFIER_UUID) {
-				maxHealthAttr.removePermanentModifier(attributeModifier.id());
-			}
-		}
-		maxHealthAttr.addPermanentModifier(new AttributeModifier(
-				MAX_HEALTH_MODIFIER_UUID,
-				MAX_HEALTH_MODIFIER_NAME,
-				newOffset,
-				AttributeModifier.Operation.ADD_VALUE
-		));
+		addModifier(entity(), Attributes.MAX_HEALTH, MAX_HEALTH_MODIFIER_UUID, MAX_HEALTH_MODIFIER_NAME, newOffset, AttributeModifier.Operation.ADD_VALUE, true);
+
 		float computedMaxHealth = (float) (20 + newOffset);
 		health(Math.min(health(), computedMaxHealth));
 	}

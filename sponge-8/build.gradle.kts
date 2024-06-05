@@ -11,16 +11,11 @@ repositories {
         name = "Sponge"
         url = uri("https://repo.spongepowered.org/")
     }
-
-    maven {
-        name = "Jitpack"
-        url = uri("https://jitpack.io")
-    }
 }
 
 dependencies {
     implementation(project(":configurate-common"))
-    implementation("com.github.qixils.cloud:cloud-sponge:feature~sponge-SNAPSHOT")
+    implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
     compileOnly("org.spongepowered:spongeapi:8.1.0")
     //compileOnly("org.spongepowered:sponge:1.16.5-8.0.0-SNAPSHOT:dev")
 }

@@ -10,6 +10,7 @@
     "InventoryAccessor",
     "LivingEntityAccessor",
     "LivingEntityMixin",
+    "NameTagItemMixin",
     "PlayerListMixin",
     "PlayerMixin",
     "RecipeBookAccessor",

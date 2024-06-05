@@ -20,7 +20,7 @@ public class CompletableFutureUtils {
 	 * @param futures collection of {@link CompletableFuture}s
 	 * @return array of {@link CompletableFuture}s
 	 */
-	public static CompletableFuture<?> @NotNull [] toArray(Collection<CompletableFuture<?>> futures) {
+	public static CompletableFuture<?> @NotNull [] toArray(Collection<? extends CompletableFuture<?>> futures) {
 		CompletableFuture<?>[] array = new CompletableFuture[futures.size()];
 		int i = 0;
 		for (CompletableFuture<?> future : futures) {
@@ -53,7 +53,7 @@ public class CompletableFutureUtils {
 	 */
 	@SuppressWarnings("GrazieInspection")
 	@NotNull
-	public static CompletableFuture<?> allOf(@NotNull Collection<@NotNull CompletableFuture<?>> futures) {
+	public static CompletableFuture<?> allOf(@NotNull Collection<? extends @NotNull CompletableFuture<?>> futures) {
 		return CompletableFuture.allOf(toArray(futures));
 	}
 }

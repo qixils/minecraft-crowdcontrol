@@ -6,10 +6,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.NotNull;
@@ -17,67 +14,29 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.qixils.crowdcontrol.TimedEffect.isActive;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModifier;
+import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.removeModifier;
 
 @Getter
 public class GravityCommand extends TimedVoidCommand {
-	private final UUID GRAVITY_MODIFIER_UUID = new UUID(723038618076398311L, -6545840742910585990L);
-	private final UUID FALL_MODIFIER_UUID = new UUID(7266512121322359285L, -8208555834343603830L);
-	private final UUID FALL_DMG_MODIFIER_UUID = new UUID(-2464474606488170752L, 8005989740147089956L);
-
-	private final String GRAVITY_MODIFIER_NAME = "gravity-cc";
-	private final String FALL_MODIFIER_NAME = "fall-cc";
-	private final String FALL_DMG_MODIFIER_NAME = "fall-dmg-cc";
+	private final Duration defaultDuration = POTION_DURATION;
+	private final String effectName;
 
 	private final double gravityLevel;
 	private final double fallLevel;
 	private final double fallDmgLevel;
 
-	private final Duration defaultDuration = POTION_DURATION;
-	private final String effectName;
-
 	private GravityCommand(FabricCrowdControlPlugin plugin, String effectName, double gravityLevel, double fallLevel, double fallDmgLevel) {
 		super(plugin);
 		this.effectName = effectName;
+
 		this.gravityLevel = gravityLevel;
 		this.fallLevel = fallLevel;
 		this.fallDmgLevel = fallDmgLevel;
-	}
-
-	private static void removeModifier(AttributeInstance attr, UUID uuid) {
-        if (attr == null) return;
-        for (AttributeModifier attributeModifier : attr.getModifiers()) {
-            if (attributeModifier.id().equals(uuid)) {
-                attr.removePermanentModifier(uuid);
-                break; // avoid CME or whatever it's called
-            }
-        }
-    }
-
-	private static void removeModifier(ServerPlayer player, Holder<Attribute> attribute, UUID uuid) {
-		removeModifier(player.getAttribute(attribute), uuid);
-	}
-
-	private void addModifier(ServerPlayer player, Holder<Attribute> attributeHolder, UUID uuid, String name, double level, AttributeModifier.Operation op) {
-		AttributeInstance attr = player.getAttribute(attributeHolder);
-		if (attr == null) {
-			getPlugin().getSLF4JLogger().warn("Player missing {} attribute", attributeHolder.unwrapKey().orElse(null));
-			return;
-		}
-
-		removeModifier(attr, uuid);
-		if (level == 0) return;
-
-		attr.addPermanentModifier(new AttributeModifier(
-			uuid,
-			name,
-			level,
-			op
-		));
 	}
 
 	@Override
@@ -94,9 +53,9 @@ public class GravityCommand extends TimedVoidCommand {
 				.startCallback(effect -> {
 					players.set(plugin.getPlayers(request));
 					for (ServerPlayer player : players.get()) {
-						addModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-						addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-						addModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_VALUE);
+						addModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+						addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+						addModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_VALUE, false);
 					}
 					playerAnnounce(players.get(), request);
 					return request.buildResponse().type(Response.ResultType.SUCCESS).message("SUCCESS");

@@ -2,11 +2,11 @@ package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.KeyedTag;
-import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,6 +29,16 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
  */
 public class CommandConstants {
 
+	public static final UUID GRAVITY_MODIFIER_UUID = new UUID(723038618076398311L, -6545840742910585990L);
+	public static final UUID FALL_MODIFIER_UUID = new UUID(7266512121322359285L, -8208555834343603830L);
+	public static final UUID FALL_DMG_MODIFIER_UUID = new UUID(-2464474606488170752L, 8005989740147089956L);
+	public static final UUID SCALE_MODIFIER_UUID = new UUID(-2378341764646484063L, -8318356916108535959L);
+
+	public static final String GRAVITY_MODIFIER_NAME = "gravity-cc";
+	public static final String FALL_MODIFIER_NAME = "fall-cc";
+	public static final String FALL_DMG_MODIFIER_NAME = "fall-dmg-cc";
+	public static final String SCALE_MODIFIER_NAME = "scale-cc";
+
 	/**
 	 * The default validator which ensures that a given sound is available.
 	 * This should be set when the plugin is enabled.
@@ -48,9 +58,9 @@ public class CommandConstants {
 	 */
 	public static final @NotNull Component DINNERBONE_COMPONENT = Component.text(DINNERBONE_NAME);
 	/**
-	 * The radius to search for entities to flip upside-down.
+	 * The radius to search for entities to flip upside-down or change in size.
 	 */
-	public static final int DINNERBONE_RADIUS = 15;
+	public static final int ENTITY_SEARCH_RADIUS = 30;
 	/**
 	 * The amount of blocks that a falling block should fall for the Place Falling Block command.
 	 */
@@ -280,11 +290,14 @@ public class CommandConstants {
 	 */
 	public static final @NotNull Set<String> ENTITIES = new HashSet<>(Arrays.asList(
 		"allay",
+		"armadillo",
 		"armor_stand",
 		"axolotl",
 		"bat",
 		"bee",
 		"blaze",
+		"bogged",
+		"breeze",
 		"boat",
 		"chest_boat",
 		"camel",
@@ -367,6 +380,15 @@ public class CommandConstants {
 		"zombie_villager",
 		"zombified_piglin"
 	));
+
+	public static String asMinimalString(Key key) {
+		return key.namespace().equals(MINECRAFT_NAMESPACE) ? key.value() : key.asString();
+	}
+
+	public static boolean isWhitelistedEntity(Keyed keyed) {
+		Key key = keyed.key();
+		return ENTITIES.contains(asMinimalString(key)) || ENTITIES.contains(csIdOf(key));
+	}
 
 	// do-or-die
 	/**
@@ -612,7 +634,7 @@ public class CommandConstants {
 	 * @return random double corresponding to X or Z velocity
 	 */
 	private static double randomFlingHoriz() {
-		return (RNG.nextBoolean() ? -1 : 1) * (RandomUtil.nextDouble(1.2, 3));
+		return (RNG.nextBoolean() ? -1 : 1) * (RNG.nextDouble(1.2, 3));
 	}
 
 	/**
@@ -623,9 +645,58 @@ public class CommandConstants {
 	public static double @NotNull [] randomFlingVector() {
 		return new double[]{
 				randomFlingHoriz(),
-				RandomUtil.nextDouble(.4, 1.5),
+				RNG.nextDouble(.4, 1.5),
 				randomFlingHoriz()
 		};
+	}
+
+	/**
+	 * Gets the C# ID of entities and enchantments.
+	 * Usage with items or blocks will cause issues.
+	 *
+	 * @param _id the keyed object
+	 * @return the C# ID
+	 */
+	@NotNull
+	public static String csIdOf(Keyed _id) {
+		Key id = _id.key();
+		if (!id.namespace().equals(MINECRAFT_NAMESPACE))
+			return id.value();
+		String path = id.value();
+        switch (path) {
+            case "lightning_bolt":
+                return "lightning";
+            case "chest_minecart":
+                return "minecart_chest";
+            case "mooshroom":
+                return "mushroom_cow";
+            case "tnt":
+                return "primed_tnt";
+            case "snow_golem":
+                return "snowman";
+            case "binding_curse":
+                return "curse_of_binding";
+            case "vanishing_curse":
+                return "curse_of_vanishing";
+            case "sweeping":
+                return "sweeping_edge";
+			case "villager_golem":
+				return "iron_golem";
+			case "zombie_pigman":
+				return "zombified_piglin";
+			case "illusion_illager":
+				return "illusioner";
+			case "vindication_illager":
+				return "vindicator";
+			case "furnace_minecart":
+				return "minecart_furnace";
+			case "hopper_minecart":
+				return "minecart_hopper";
+			case "tnt_minecart":
+				return "minecart_tnt";
+            default:
+                return path;
+        }
 	}
 
 	/**

@@ -4,6 +4,8 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +16,7 @@ import java.util.Map.Entry;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEARCH_RADIUS;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEARCH_STEP;
+import static org.bukkit.NamespacedKey.fromString;
 
 @Getter
 public class BiomeCommand extends NearbyLocationCommand<Biome> {
@@ -111,7 +114,7 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 					"END_HIGHLANDS",
 					"END_BARRENS"
 			),
-			Environment.CUSTOM, Arrays.stream(Biome.values()).map(Biome::name).toList()
+			Environment.CUSTOM, Registry.BIOME.stream().map(biome -> biome.key().asString()).toList()
 	);
 
 	static {
@@ -119,11 +122,12 @@ public class BiomeCommand extends NearbyLocationCommand<Biome> {
 		for (Entry<Environment, List<String>> entry : KEYED_BIOMES.entrySet()) {
 			List<String> keyedBiomes = entry.getValue();
 			List<Biome> biomes = new ArrayList<>(keyedBiomes.size());
-			for (String biome : keyedBiomes) {
-				try {
-					biomes.add(Biome.valueOf(biome));
-				} catch (IllegalArgumentException ignored) {
-				}
+			for (String biomeName : keyedBiomes) {
+				NamespacedKey biomeKey = fromString(biomeName.toLowerCase(Locale.ROOT));
+				if (biomeKey == null) continue;
+				Biome biome = Registry.BIOME.get(biomeKey);
+				if (biome != null)
+					biomes.add(biome);
 			}
 			biomeMap.put(entry.getKey(), biomes);
 		}

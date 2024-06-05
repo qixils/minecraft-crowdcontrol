@@ -6,10 +6,7 @@ import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.paper.utils.MaterialTag;
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -17,10 +14,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
-import java.util.Locale;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.DAY;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.NIGHT;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdControlPlugin> {
 	private static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
@@ -85,12 +80,20 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> GravityCommand.high(plugin),
 			() -> GravityCommand.maximum(plugin),
 			() -> new DeleteRandomItemCommand(plugin),
-			() -> new UniteCommand(plugin)
+			() -> new UniteCommand(plugin),
+			() -> new TickFreezeCommand(plugin),
+			() -> TickRateCommand.doubleRate(plugin),
+			() -> TickRateCommand.halfRate(plugin),
+			() -> PlayerSizeCommand.increase(plugin),
+			() -> PlayerSizeCommand.decrease(plugin),
+			() -> EntitySizeCommand.increase(plugin),
+			() -> EntitySizeCommand.decrease(plugin),
+			() -> new RandomFallingBlockCommand(plugin)
 		));
 
 		// entity commands
-		for (EntityType entity : EntityType.values()) {
-			if (!CommandConstants.ENTITIES.contains(entity.name().toLowerCase(Locale.US))) continue;
+		for (EntityType entity : Registry.ENTITY_TYPE) {
+			if (!isWhitelistedEntity(entity)) continue;
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}
@@ -101,7 +104,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// potions
-		for (PotionEffectType potionEffectType : PotionEffectType.values()) {
+		for (PotionEffectType potionEffectType : Registry.POTION_EFFECT_TYPE) {
 			initTo(commands, () -> new PotionCommand(plugin, potionEffectType));
 		}
 
@@ -115,7 +118,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// enchantments
-		for (Enchantment enchantment : Enchantment.values()) {
+		for (Enchantment enchantment : Registry.ENCHANTMENT) {
 			try {
 				commands.add(new EnchantmentCommand(plugin, enchantment));
 			} catch (AbstractMethodError ignored) {

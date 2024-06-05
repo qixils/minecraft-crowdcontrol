@@ -2,10 +2,9 @@ val crowdControlVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformVersion: String by project
 val cloudVersion: String by project
-val reflectionsVersion: String by project
 
 dependencies {
-    api("com.google.guava:guava:33.1.0-jre")
+    api("com.google.guava:guava:33.2.0-jre")
     api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
     compileOnly("net.kyori:adventure-api:$adventureVersion")
     api("net.kyori:adventure-text-minimessage:$adventureVersion") {
@@ -17,11 +16,10 @@ dependencies {
     api("net.kyori:adventure-text-serializer-legacy:$adventureVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    api("cloud.commandframework:cloud-core:$cloudVersion")
-    api("cloud.commandframework:cloud-minecraft-extras:$cloudVersion") {
+    api("com.github.qixils.cloud:cloud-core:$cloudVersion")
+    api("com.github.qixils.cloud:cloud-minecraft-extras:$cloudVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    implementation("org.reflections:reflections:$reflectionsVersion")
 }
 
 description = "Minecraft Crowd Control: Common"

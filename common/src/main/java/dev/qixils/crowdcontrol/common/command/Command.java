@@ -157,27 +157,37 @@ public interface Command<P> {
 	}
 
 	/**
-	 * {@link #execute Executes} this command and notifies its targets (if
-	 * {@link Plugin#announceEffects() enabled}).
+	 * Gets the executor to use for this command.
 	 *
-	 * @param request request that prompted the execution of this command
+	 * @return command executor
 	 */
-	default void executeAndNotify(@NotNull Request request) {
+	@NotNull
+	@CheckReturnValue
+	default Executor getExecutor() {
 		ExecuteUsing.Type executeUsing = Optional.ofNullable(getClass().getAnnotation(ExecuteUsing.class))
 			.map(ExecuteUsing::value)
 			.orElse(ExecuteUsing.Type.ASYNC);
 		Executor executor;
 		switch (executeUsing) {
 			case ASYNC:
+			default:
 				executor = Runnable::run;
 				break;
 			case SYNC_GLOBAL:
 				executor = getPlugin().getSyncExecutor(); // TODO: getGlobalExecutor
 				break;
-			default:
-				throw new IllegalStateException("Unknown ExecuteUsing type: " + executeUsing);
 		}
-		executor.execute(() -> wrappedExecuteAndNotify(request));
+		return executor;
+	}
+
+	/**
+	 * {@link #execute Executes} this command and notifies its targets (if
+	 * {@link Plugin#announceEffects() enabled}).
+	 *
+	 * @param request request that prompted the execution of this command
+	 */
+	default void executeAndNotify(@NotNull Request request) {
+		getExecutor().execute(() -> wrappedExecuteAndNotify(request));
 	}
 
 	@ApiStatus.Internal

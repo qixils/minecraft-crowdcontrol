@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 
 @Getter
 public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {

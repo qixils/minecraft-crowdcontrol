@@ -29,11 +29,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -237,20 +239,33 @@ public interface Plugin<P, S> {
 	Component NO_CC_UNKNOWN_ERROR = error(translatable("cc.error.unknown"));
 
 	/**
+	 * Attempts to cast the provided object as a player.
+	 * This should not be directly extended, instead see {@link #asPlayer(Object)}.
+	 *
+	 * @param obj object to cast
+	 * @return casted player, or null if the object is not a player
+	 */
+	@ApiStatus.Internal
+	@ApiStatus.NonExtendable
+	default @Nullable P objAsPlayer(@NotNull Object obj) {
+		try {
+			Class<P> playerClass = getPlayerClass();
+			if (!playerClass.isInstance(obj))
+				return null;
+			return playerClass.cast(obj);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
 	 * Gets the provided command sender as a player.
 	 *
 	 * @param sender the command sender
 	 * @return the player, or null if the sender is not a player
 	 */
 	default @Nullable P asPlayer(@NotNull S sender) {
-		try {
-			Class<P> playerClass = getPlayerClass();
-			if (!playerClass.isInstance(sender))
-				return null;
-			return playerClass.cast(sender);
-		} catch (Exception e) {
-			return null;
-		}
+		return objAsPlayer(sender);
 	}
 
 	/**
@@ -258,7 +273,7 @@ public interface Plugin<P, S> {
 	 */
 	default void registerChatCommands() {
 		try {
-			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "i18n/CrowdControl", getClass(), Locale.US));
+			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", getClass(), Locale.US));
 		} catch (Exception e) {
 			getSLF4JLogger().error("Failed to initialize i18n", e);
 		}
@@ -500,7 +515,8 @@ public interface Plugin<P, S> {
 					Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
 					@SuppressWarnings("ArraysAsListWithZeroOrOneArgument") // need mutable list
 					List<P> players = Arrays.asList(player);
-					effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build());
+					Executor executor = effect.getExecutor();
+					executor.execute(() -> effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build()));
 				})
 			);
 		}
@@ -1024,7 +1040,7 @@ public interface Plugin<P, S> {
 			return;
 		boolean clientVisible = getModdedPlayerCount() > 0;
 		boolean globalVisible = globalEffectsUsable();
-		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
+		getSLF4JLogger().info("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
 		Map<ResultType, Set<String>> effects = new HashMap<>();
 		for (Command<?> effect : commandRegister().getCommands()) {
 			if (effect.getEffectName() == null) continue;
@@ -1043,6 +1059,7 @@ public interface Plugin<P, S> {
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
 				effects.computeIfAbsent(selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, k -> new HashSet<>()).add(id);
 		}
+		getSLF4JLogger().info("Setting effects {}", effects);
 		for (Map.Entry<ResultType, Set<String>> entry : effects.entrySet())
 			updateEffectIdStatus(service, entry.getKey(), entry.getValue());
 	}
@@ -1324,8 +1341,19 @@ public interface Plugin<P, S> {
 	 * @return true if the player has an account linked, false otherwise
 	 */
 	default boolean hasLinkedAccount(@NotNull P player) {
-		if (getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).size() > 0)
+		if (!getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).isEmpty())
 			return true;
-		return getSocketManagersFor(player).size() > 0;
+		return !getSocketManagersFor(player).isEmpty();
+	}
+
+	/**
+	 * Gets one of the mod's resource files.
+	 *
+	 * @param asset filename
+	 * @return input stream if found
+	 */
+	@ApiStatus.Internal
+	default @Nullable InputStream getInputStream(@NotNull String asset) {
+		return getClass().getClassLoader().getResourceAsStream(asset);
 	}
 }

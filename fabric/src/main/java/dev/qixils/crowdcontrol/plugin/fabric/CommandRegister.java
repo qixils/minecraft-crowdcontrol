@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dev.qixils.crowdcontrol.plugin.fabric.Command.csIdOf;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.isWhitelistedEntity;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, FabricCrowdControlPlugin> {
 	private boolean tagsRegistered = false;
@@ -117,15 +118,20 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			() -> new UniteCommand(plugin),
 			() -> TickRateCommand.doubleRate(plugin),
 			() -> TickRateCommand.halfRate(plugin),
-			() -> new TickFreezeCommand(plugin)
+			() -> new TickFreezeCommand(plugin),
+			() -> PlayerSizeCommand.increase(plugin),
+			() -> PlayerSizeCommand.decrease(plugin),
+			() -> EntitySizeCommand.increase(plugin),
+			() -> EntitySizeCommand.decrease(plugin),
+			() -> new RandomFallingBlockCommand(plugin)
 		));
 
 		// entity commands
 		Map<String, EntityType<?>> minecraftEntities = new HashMap<>();
 		Map<String, EntityType<?>> moddedEntities = new HashMap<>();
 		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
-			String id = csIdOf(entry.getKey().location());
-			if (!CommandConstants.ENTITIES.contains(id)) continue;
+			if (!isWhitelistedEntity(entry.getKey())) continue;
+			String id = csIdOf(entry.getKey());
 			Map<String, EntityType<?>> entities = entry.getKey().location().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE) ? minecraftEntities : moddedEntities;
 			entities.put(id, entry.getValue());
 		}

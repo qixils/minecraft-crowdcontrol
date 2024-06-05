@@ -3,22 +3,20 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.plugin.paper.FeatureElementCommand;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
-
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.cbClass;
 
 @Getter
 public class BlockCommand extends ImmediateCommand implements FeatureElementCommand {
@@ -30,7 +28,7 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 		this(
 				plugin,
 				block,
-				"block_" + block.name(),
+				"block_" + block.key().value(),
 				Component.translatable("cc.effect.block.name", Component.translatable(block))
 		);
 	}
@@ -43,15 +41,8 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 	}
 
 	@Override
-	public @NotNull Optional<Object> requiredFeatures() {
-		//return CraftMagicNumbers.getBlock(material).requiredFeatures();
-		return ReflectionUtil.getClazz(cbClass("util.CraftMagicNumbers")).flatMap(clazz -> ReflectionUtil.invokeMethod(
-				(Object) null,
-				clazz,
-				"getBlock",
-				new Class<?>[]{Material.class},
-				material
-		));
+	public @NotNull FeatureFlagSet requiredFeatures() {
+		return CraftMagicNumbers.getBlock(material).requiredFeatures();
 	}
 
 	@Nullable
@@ -72,9 +63,10 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 			if (location == null)
 				continue;
 			Block block = location.getBlock();
-			if (block.isReplaceable() && block.getType() != material) {
+			Material mat = getMaterial();
+			if (block.isReplaceable() && block.getType() != mat) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> block.setType(material));
+				sync(() -> block.setType(mat));
 			}
 		}
 		return result;

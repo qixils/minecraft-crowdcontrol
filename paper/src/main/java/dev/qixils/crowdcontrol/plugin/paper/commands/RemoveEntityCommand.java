@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
@@ -27,7 +28,7 @@ public final class RemoveEntityCommand extends Command implements EntityCommand 
 	public RemoveEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
 		this.entityType = entityType;
-		this.effectName = "remove_entity_" + entityType.name();
+		this.effectName = "remove_entity_" + csIdOf(entityType);
 		this.displayName = Component.translatable("cc.effect.remove_entity.name", Component.translatable(entityType));
 	}
 

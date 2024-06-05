@@ -7,4 +7,6 @@ public interface ViewerMob extends Component {
 	boolean isViewerSpawned();
 
 	void setViewerSpawned();
+
+	void setViewerSpawned(boolean value);
 }

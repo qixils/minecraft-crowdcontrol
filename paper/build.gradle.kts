@@ -9,23 +9,24 @@ description = "Minecraft Crowd Control: Paper"
 
 plugins {
     id("xyz.jpenilla.run-paper") // Adds runServer and runMojangMappedServer tasks for testing
-    id("net.minecrell.plugin-yml.bukkit") // Generates plugin.yml
+    id("net.minecrell.plugin-yml.paper") // Generates plugin.yml
+    id("io.papermc.paperweight.userdev")
 }
 
 repositories {
-    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("cloud.commandframework:cloud-paper:$cloudVersion")
+    implementation("com.github.qixils.cloud:cloud-paper:$cloudVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
-    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
 }
 
 // Java 17 boilerplate
 
-val targetJavaVersion = 17
+val targetJavaVersion = 21
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(targetJavaVersion)
 }
@@ -41,11 +42,11 @@ java {
 }
 
 // plugin.yml generation
-bukkit {
+paper {
     name = "CrowdControl"
     version = project.version.toString() + "+paper"
     main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
-    apiVersion = mcVersionSplit[0] + "." + mcVersionSplit[1]
+    apiVersion = minecraftVersion
     prefix = "CrowdControl"
     authors = listOf("qixils")
     description = "The Ultimate Interactive Experience for Streamers"
@@ -59,7 +60,7 @@ tasks {
         configure(minecraftVersion)
     }
     // create extra runServer tasks for later versions of Minecraft
-    for (mcVersion in listOf("1.20.1", "1.20.2", "1.20.4")) {
+    for (mcVersion in listOf<String>()) {
         register("runServer$mcVersion", RunServer::class.java) {
             configure(mcVersion)
             dependsOn("shadowJar")

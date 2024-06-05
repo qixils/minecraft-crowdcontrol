@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -15,10 +14,11 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -32,12 +32,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.lootboxItemSlots;
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.cbClass;
-import static dev.qixils.crowdcontrol.plugin.paper.utils.ReflectionUtil.getClazz;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
-	private static final List<Material> ITEMS = Arrays.stream(Material.values()).filter(mat -> mat.isItem() && !mat.isAir()).toList();
+	private static final List<Material> ITEMS = Registry.MATERIAL.stream().filter(mat -> mat.isItem() && !mat.isAir()).toList();
 	private static final Set<Material> GOOD_ITEMS = ITEMS.stream().filter(material ->
 			material.getMaxDurability() > 1
 					|| material == Material.GOLDEN_APPLE
@@ -87,12 +85,7 @@ public class LootboxCommand extends ImmediateCommand {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<Material> items = new ArrayList<>(ITEMS);
-//		items.removeIf(item -> PaperCrowdControlPlugin.isFeatureDisabled(CraftMagicNumbers.getItem(item)));
-		items.removeIf(item ->
-				getClazz(cbClass("util.CraftMagicNumbers"))
-						.flatMap(clazz -> ReflectionUtil.invokeMethod((Object) null, clazz, "getItem", new Class<?>[]{Material.class}, item))
-						.map(PaperCrowdControlPlugin::isFeatureDisabled)
-						.orElse(false));
+		items.removeIf(item -> !PaperCrowdControlPlugin.isFeatureEnabled(CraftMagicNumbers.getItem(item)));
 		Collections.shuffle(items, random);
 		Material item = null;
 		for (int i = 0; i <= luck * 5; i++) {
@@ -137,7 +130,7 @@ public class LootboxCommand extends ImmediateCommand {
 		for (int i = 0; i <= luck; i++) {
 			enchantments = Math.max(enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
-		List<Enchantment> enchantmentList = Arrays.stream(EnchantmentWrapper.values())
+		List<Enchantment> enchantmentList = Registry.ENCHANTMENT.stream()
 				.filter(enchantment -> enchantment.canEnchantItem(itemStack))
 				.collect(Collectors.toList());
 		if (random.nextDouble() >= (.8d - (luck * .2d)))
