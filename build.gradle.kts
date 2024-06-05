@@ -51,7 +51,6 @@ subprojects {
     }
 
     tasks.shadowJar {
-        relocate("org.reflections", "dev.qixils.relocated.reflections")
         relocate("com.google.guava", "dev.qixils.relocated.guava")
 
         if (project.name != "fabric-platform") {
