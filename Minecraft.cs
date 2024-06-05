@@ -49,6 +49,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Plant Tree", "plant_tree") { Price = 100, Category = "World", Description = "Plant a tree on top of every player" },
         new("Remove Torches", "dim") { Price = 200, Category = "World", Description = "Removes all nearby torches" },
         new("Replace Area with Gravel", "gravel_hell") { Price = 200, Category = "World", Description = "Replaces all nearby blocks with gravel" },
+        new("Replace Water with Lava", "make_lava") { Price = 400, Category = "World", Description = "Replaces all nearby water blocks with lava" },
         new("Respawn Player", "respawn") { Price = 500, Category = "Player", Description = "Sends players to their spawn point" },
         new("Reunite Players", "unite") { Price = 500, Category = new EffectGrouping("World", "Player"), Description = "Teleports all players in the session to one random player" },
         new("Spawn Ore Veins", "vein") { Price = 100, Category = "World", Description = "Places random ore veins (or lava) near every player" },

@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public class GravelCommand extends ImmediateCommand {
-	private final String effectName = "gravel_hell";
+public class LavaCommand extends ImmediateCommand {
+	private final String effectName = "make_lava";
 
-	public GravelCommand(FabricCrowdControlPlugin plugin) {
+	public LavaCommand(FabricCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
@@ -29,9 +29,9 @@ public class GravelCommand extends ImmediateCommand {
 		for (ServerPlayer player : players)
 			locations.addAll(BlockFinder.builder()
 					.origin(player)
-					.locationValidator(loc -> !loc.block().isAir() && !loc.block().is(Blocks.GRAVEL))
+					.locationValidator(loc -> loc.block().is(Blocks.WATER) || loc.block().is(Blocks.WATER_CAULDRON))
 					.shuffleLocations(false)
-					.maxRadius(7)
+					.maxRadius(10)
 					.build().getAll());
 
 		if (locations.isEmpty())
@@ -39,7 +39,7 @@ public class GravelCommand extends ImmediateCommand {
 					.type(Response.ResultType.RETRY)
 					.message("No replaceable blocks nearby");
 
-		sync(() -> locations.forEach(location -> location.block(Blocks.GRAVEL.defaultBlockState())));
+		sync(() -> locations.forEach(loc -> loc.block((loc.block().is(Blocks.WATER_CAULDRON) ? Blocks.LAVA_CAULDRON : Blocks.LAVA).defaultBlockState())));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }
