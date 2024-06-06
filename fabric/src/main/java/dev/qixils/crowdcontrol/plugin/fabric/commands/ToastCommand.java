@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Tick;
-import dev.qixils.crowdcontrol.plugin.fabric.mixin.RecipeBookAccessor;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -81,7 +80,7 @@ public final class ToastCommand extends ImmediateCommand {
 			// spam recipe toasts
 			ServerRecipeBook book = player.getRecipeBook();
 			RecipeManager recipeManager = player.serverLevel().getRecipeManager();
-			Collection<RecipeHolder<?>> recipes = ((RecipeBookAccessor) book).getKnown()
+			Collection<RecipeHolder<?>> recipes = book.known
 					.stream()
 					.flatMap(location -> recipeManager.byKey(location).stream())
 					.toList();

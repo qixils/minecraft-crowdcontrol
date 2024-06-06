@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.mixin.GameRendererAccessor;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
@@ -66,7 +65,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 			ResourceLocation shader = new ResourceLocation("shaders/post/" + payload.shader() + ".json");
 
 			client.execute(() -> {
-				((GameRendererAccessor) client.gameRenderer).invokeLoadEffect(shader);
+				client.gameRenderer.loadEffect(shader);
 				SHADER_ACTIVE = true;
 			});
 			executor.schedule(() -> client.execute(() -> {

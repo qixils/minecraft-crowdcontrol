@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.KeepInventoryCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Damage;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
-import dev.qixils.crowdcontrol.plugin.fabric.mixin.LivingEntityAccessor;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,7 +35,7 @@ public class EntityUtil {
 	public static void handleDie(LivingEntity entity, final DamageSource cause, final CallbackInfo ci) {
 		if (entity.level().isClientSide) return;
 		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
-		if (((LivingEntityAccessor) entity).getDead()) return;
+		if (entity.dead) return;
 		Death event = new Death(entity, cause);
 		event.fire(FabricCrowdControlPlugin.getInstance());
 		if (event.cancelled()) ci.cancel();

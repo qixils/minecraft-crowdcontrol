@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public final class ConcatenatedList<E> extends AbstractList<E> {
-	private final @NotNull Iterable<@NotNull List<E>> lists;
+	private final @NotNull Iterable<? extends @NotNull List<E>> lists;
 
-	private ConcatenatedList(@NotNull Iterable<@NotNull List<E>> lists) {
+	private ConcatenatedList(@NotNull Iterable<? extends @NotNull List<E>> lists) {
 		this.lists = lists;
 	}
 
@@ -37,7 +37,7 @@ public final class ConcatenatedList<E> extends AbstractList<E> {
 	 * @see #copyOf(Iterable)
 	 */
 	@NotNull
-	public static <E> List<E> of(@NotNull Iterable<List<E>> lists) {
+	public static <E> List<E> of(@NotNull Iterable<? extends List<E>> lists) {
 		return new ConcatenatedList<>(lists);
 	}
 
@@ -72,7 +72,7 @@ public final class ConcatenatedList<E> extends AbstractList<E> {
 		return of(iterableToList(lists));
 	}
 
-	private Stream<List<E>> listStream() {
+	private Stream<? extends List<E>> listStream() {
 		return StreamSupport.stream(lists.spliterator(), false);
 	}
 
