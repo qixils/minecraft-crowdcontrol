@@ -1,4 +1,5 @@
 val cloudVersion: String by project
+val adventureVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 8"
 
@@ -9,7 +10,7 @@ plugins {
 repositories {
     maven {
         name = "Sponge"
-        url = uri("https://repo.spongepowered.org/")
+        url = uri("https://repo.spongepowered.org/repository/maven-public/")
     }
 }
 
@@ -18,6 +19,8 @@ dependencies {
     implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
     compileOnly("org.spongepowered:spongeapi:8.1.0")
     //compileOnly("org.spongepowered:sponge:1.16.5-8.0.0-SNAPSHOT:dev")
+
+    implementation("net.kyori:adventure-api:$adventureVersion") // shade in adventure 4.13.1 to fix text on Forge 1.16.5
 }
 
 sponge {
