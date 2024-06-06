@@ -26,9 +26,10 @@ useSeoMeta({
     <p>The following steps detail how to manually set up a Minecraft {{version}} local Fabric server with Crowd Control.</p>
 
     <ol>
+      <li>If you're using a modpack, look on their downloads page for a "server pack." If you find one: download it, extract it, and skip to step 7.</li>
       <li>Download and run the <a href="https://fabricmc.net/use/installer/">Fabric Loader installer</a>.
         <ul>
-          <li>Users of platforms other than Windows may first need to download and install <a href="https://adoptium.net/temurin/releases/?version=17">Java 17</a>.</li>
+          <li>Users of platforms other than Windows may first need to download and install <a href="https://adoptium.net/temurin/releases/?version=21">Java 21</a>.</li>
         </ul>
       </li>
       <li>In the installer window, click the <code>Server</code> tab and then the triple dots next to the Install Location to open the directory selector. Find or create a new, empty folder and click Open, then click OK. This folder will be important in later steps so don't lose it. From here on, this folder will be referred to as the "root folder".</li>

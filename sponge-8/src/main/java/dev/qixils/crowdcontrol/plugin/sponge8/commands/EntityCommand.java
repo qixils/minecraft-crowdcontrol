@@ -38,10 +38,12 @@ public interface EntityCommand<E extends Entity> extends Command<ServerPlayer> {
 
 	@Override
 	default TriState isSelectable() {
-		if (!isMonster())
+		if (!isMonster()) {
 			return TriState.UNKNOWN;
-		if (!serverIsPeaceful())
+		}
+		if (!serverIsPeaceful()) {
 			return TriState.TRUE;
+		}
 		return TriState.FALSE;
 	}
 
@@ -50,8 +52,8 @@ public interface EntityCommand<E extends Entity> extends Command<ServerPlayer> {
 			for (ServerPlayer player : players) {
 				if (levelIsPeaceful(player.world())) {
 					return request.buildResponse()
-							.type(Response.ResultType.FAILURE)
-							.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+						.type(Response.ResultType.FAILURE)
+						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
 				}
 			}
 		}

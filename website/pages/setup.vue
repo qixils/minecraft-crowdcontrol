@@ -8,6 +8,8 @@ useServerSeoMeta({
 import {computed} from 'vue'
 import {fabricML} from "~/utils/versions";
 
+// TODO: improve suggested articles for sponge
+
 const question = useState('question', () => "gamemode")
 const gamemode_index = useState<number | undefined>('gamemode_index', () => undefined)
 const modloader_index = useState<number | undefined>('modloader_index', () => undefined)

@@ -51,12 +51,24 @@ subprojects {
     }
 
     tasks.shadowJar {
-        relocate("com.google.guava", "dev.qixils.relocated.guava")
+        relocate("com.google.guava", "dev.qixils.relocated.google.guava")
+        relocate("com.google.common", "dev.qixils.relocated.google.common")
+        relocate("com.google.errorprone", "dev.qixils.relocated.google.errorprone")
+        relocate("com.google.gson", "dev.qixils.relocated.google.gson")
+        relocate("com.google.thirdparty", "dev.qixils.relocated.google.thirdparty")
+        relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
+        relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
+        relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")
+        relocate("net.kyori.adventure.serializer", "dev.qixils.relocated.adventure.serializer")
+        relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations")
+        relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
+        relocate("javassist", "dev.qixils.relocated.javassist")
+        relocate("javax", "dev.qixils.relocated.javax")
+        relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
 
         if (project.name != "fabric-platform") {
             relocate("cloud.commandframework", "dev.qixils.relocated.cloud")
         }
-
     }
 
 

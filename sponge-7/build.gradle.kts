@@ -11,7 +11,7 @@ repositories {
 dependencies {
     implementation(project(":base-common"))
     implementation("com.github.qixils.cloud:cloud-sponge7:$cloudVersion")
-    implementation("net.kyori:adventure-platform-spongeapi:$adventurePlatformVersion")
+    implementation("net.kyori:adventure-platform-spongeapi:$adventurePlatformVersion") // this one is allowed to pull in adventure-api since it's not native
     compileOnly("org.spongepowered:spongeapi:7.4.0")
 }
 

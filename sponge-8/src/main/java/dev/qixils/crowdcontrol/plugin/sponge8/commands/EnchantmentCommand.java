@@ -19,8 +19,11 @@ import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
+import static net.kyori.adventure.text.Component.space;
+import static net.kyori.adventure.text.Component.text;
 
 @Getter
 public class EnchantmentCommand extends ImmediateCommand {
@@ -34,10 +37,15 @@ public class EnchantmentCommand extends ImmediateCommand {
 		this.enchantmentType = enchantmentType;
 		this.maxLevel = enchantmentType.maximumLevel();
 		this.effectName = "enchant_" + csIdOf(enchantmentType.key(RegistryTypes.ENCHANTMENT_TYPE));
+		Component enchName = enchantmentType.asComponent().color(null);
+		enchName = enchName.children(enchName.children().stream().map(comp -> comp.color(null)).collect(Collectors.toList()));
+		TranslatableComponent trans = enchName instanceof TranslatableComponent ? (TranslatableComponent) enchName : null;
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
-				((TranslatableComponent) enchantmentType.asComponent()).args(Component.text(enchantmentType.maximumLevel()).color(null))
-		);
+				trans != null
+					? trans.args(text(enchantmentType.maximumLevel()))
+					: enchName.append(space()).append(text(enchantmentType.maximumLevel())
+		));
 	}
 
 	private int getCurrentLevel(ItemStack item) {

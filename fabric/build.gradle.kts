@@ -1,3 +1,4 @@
+val configurateVersion: String by project
 val crowdControlVersion: String by project
 val minecraftVersion: String by project
 val parchmentVersion: String by project
@@ -46,6 +47,8 @@ repositories {
 
 dependencies {
     shade(project(":configurate-common"))
+    shade("org.spongepowered:configurate-hocon:$configurateVersion")
+
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings(loom.officialMojangMappings())
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
@@ -107,11 +110,8 @@ tasks.shadowJar {
     configurations = listOf(shade)
     archiveBaseName.set("shadow-CrowdControl")
     archiveVersion.set("")
-    exclude("net/kyori/adventure/")
 
-    dependencies {
-        exclude("net.kyori:adventure-api:")
-    }
+    relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
 }
 
 tasks.remapJar {
