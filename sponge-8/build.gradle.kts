@@ -17,7 +17,9 @@ repositories {
 dependencies {
     implementation(project(":configurate-common"))
     implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
-    compileOnly("org.spongepowered:spongeapi:8.1.0")
+    compileOnly("org.spongepowered:spongeapi:8.1.0") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
     //compileOnly("org.spongepowered:sponge:1.16.5-8.0.0-SNAPSHOT:dev")
 
     implementation("net.kyori:adventure-api:$adventureVersion") // shade in adventure 4.13.1 to fix text on Forge 1.16.5

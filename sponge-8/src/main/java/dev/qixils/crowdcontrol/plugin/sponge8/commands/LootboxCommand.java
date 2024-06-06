@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.common.command.CommandConstants.AttributeWeights;
 import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
-import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -176,7 +175,9 @@ public class LootboxCommand extends ImmediateCommand {
 					.level(level)
 					.build();
 			itemStack.transform(Keys.APPLIED_ENCHANTMENTS, enchants -> {
-				enchants = ExceptionUtil.validateNotNullElseGet(enchants, ArrayList::new);
+				enchants = enchants == null
+					? new ArrayList<>()
+					: new ArrayList<>(enchants);
 				enchants.add(builtEnchantment);
 				return enchants;
 			});

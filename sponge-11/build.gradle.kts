@@ -65,7 +65,9 @@ repositories {
 dependencies {
     implementation(project(":configurate-common"))
     implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
-    compileOnly("org.spongepowered:spongeapi:11.0.0-SNAPSHOT")
+    compileOnly("org.spongepowered:spongeapi:11.0.0-SNAPSHOT") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
     //compileOnly("org.spongepowered:sponge:1.20.6-11.0.0-SNAPSHOT:dev")
 }
 

@@ -2,6 +2,11 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.4.3
+
+- Added support for 1.20.6 on Sponge(Forge) 🥳
+- Fixed issue where taking max health would successfully activate but refund anyway
+
 ## 3.4.2
 
 - Added new effect for dropping a random block, like a falling anvil

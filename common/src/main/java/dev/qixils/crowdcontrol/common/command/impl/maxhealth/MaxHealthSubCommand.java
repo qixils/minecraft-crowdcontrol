@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common.command.impl.maxhealth;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.ImmediateCommand;
 import dev.qixils.crowdcontrol.common.command.QuantityStyle;
@@ -16,6 +17,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.MIN_MAX_HE
 
 @Getter
 @RequiredArgsConstructor
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class MaxHealthSubCommand<P> implements ImmediateCommand<P> {
 	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND;
 	private final @NotNull String effectName = "max_health_sub";
@@ -32,15 +34,13 @@ public class MaxHealthSubCommand<P> implements ImmediateCommand<P> {
 
 		for (P rawPlayer : players) {
 			CCPlayer player = plugin.getPlayer(rawPlayer);
-			sync(() -> {
-				double current = player.maxHealthOffset();
-				double newVal = Math.max(-MIN_MAX_HEALTH, current - amount);
-				if ((current - newVal) == amount) {
-					result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-					player.maxHealthOffset(newVal);
-					player.health(Math.min(player.health(), player.maxHealth()));
-				}
-			});
+			double current = player.maxHealthOffset();
+			double newVal = Math.max(-MIN_MAX_HEALTH, current - amount);
+			if ((current - newVal) == amount) {
+				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+				player.maxHealthOffset(newVal);
+				player.health(Math.min(player.health(), player.maxHealth()));
+			}
 		}
 
 		return result;

@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -25,6 +26,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
 
 @Getter
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class PotionCommand extends TimedImmediateCommand {
 	private final @NotNull PotionEffectType potionEffectType;
 	private final boolean isMinimal;
