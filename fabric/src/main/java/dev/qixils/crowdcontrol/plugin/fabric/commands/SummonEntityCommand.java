@@ -40,13 +40,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
-import static dev.qixils.crowdcontrol.common.util.RandomUtil.randomElementFrom;
-import static dev.qixils.crowdcontrol.common.util.RandomUtil.weightedRandom;
+import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
+	private static final Set<EquipmentSlot> HANDS = Arrays.stream(EquipmentSlot.values()).filter(slot -> slot.getType() == EquipmentSlot.Type.HAND).collect(Collectors.toSet());
 	private final Map<EquipmentSlot, List<Item>> armor;
 	protected final EntityType<E> entityType;
 	private final String effectName;
@@ -203,6 +204,14 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 						.getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
 				armorStand.setItemSlot(type, item);
+			}
+
+			if (RNG.nextBoolean()) {
+				armorStand.setShowArms(true);
+				for (EquipmentSlot slot : HANDS) {
+					if (!RNG.nextBoolean()) continue;
+					armorStand.setItemSlot(slot, plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(RNG.nextInt(6)));
+				}
 			}
 		}
 

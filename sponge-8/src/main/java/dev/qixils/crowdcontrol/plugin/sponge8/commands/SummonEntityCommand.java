@@ -23,13 +23,13 @@ import org.spongepowered.api.event.CauseStackManager.StackFrame;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.SpawnTypes;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ArmorEquipable;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroups;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
@@ -41,6 +41,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	private final String effectName;
 	private final Component displayName;
 	private final Map<RabbitType, Integer> rabbitVariants;
+	private final Set<EquipmentType> hands;
 
 	public SummonEntityCommand(SpongeCrowdControlPlugin plugin, EntityType<E> entityType) {
 		super(plugin);
@@ -78,6 +79,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		for (Map.Entry<EquipmentType, List<ItemType>> entry : new HashSet<>(armor.entrySet()))
 			armor.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
 		this.armor = Collections.unmodifiableMap(armor);
+
+		this.hands = plugin.registryList(RegistryTypes.EQUIPMENT_TYPE).stream().filter(type -> type.group().equals(EquipmentGroups.HELD.get())).collect(Collectors.toSet());
 	}
 
 	@NotNull
@@ -145,6 +148,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
 			//             (not that this is in API v7 afaik)
+			ArmorStand armorStand = (ArmorStand) entity;
 			List<EquipmentType> slots = new ArrayList<>(armor.keySet());
 			Collections.shuffle(slots, random);
 			// begins as a 1 in 4 chance to add a random item but becomes less likely each time
@@ -158,7 +162,15 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
-				((ArmorEquipable) entity).equip(type, item);
+				armorStand.equip(type, item);
+			}
+
+			if (RNG.nextBoolean()) {
+				entity.offer(Keys.HAS_ARMS, true);
+				for (EquipmentType slot : hands) {
+					if (!RNG.nextBoolean()) continue;
+					armorStand.equip(slot, plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(RNG.nextInt(6)));
+				}
 			}
 		}
 

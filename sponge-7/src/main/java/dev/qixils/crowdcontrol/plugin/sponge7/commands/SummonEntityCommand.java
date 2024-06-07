@@ -19,7 +19,6 @@ import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RabbitTypes;
 import org.spongepowered.api.data.type.TreeType;
-import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.ArmorStand;
@@ -48,12 +47,16 @@ public class SummonEntityCommand extends ImmediateCommand implements EntityComma
 			EquipmentTypes.HELD,
 			EquipmentTypes.EQUIPPED,
 			EquipmentTypes.ANY,
-			EquipmentTypes.WORN // TODO: handle this
+			EquipmentTypes.WORN // TODO: handle this?
 	);
 	protected final EntityType entityType;
 	private final String effectName;
 	private final Component displayName;
 	private static final Map<RabbitType, Integer> RABBIT_VARIANTS;
+	private static final Set<EquipmentType> hands = new HashSet<>(Arrays.asList(
+		EquipmentTypes.MAIN_HAND,
+		EquipmentTypes.OFF_HAND
+	));
 
 	static {
 		Map<RabbitType, Integer> variants = new HashMap<>();
@@ -151,6 +154,7 @@ public class SummonEntityCommand extends ImmediateCommand implements EntityComma
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
 			//             (not that this is in API v7 afaik)
+			ArmorStand armorStand = (ArmorStand) entity;
 			List<EquipmentType> slots = new ArrayList<>(ARMOR.keySet());
 			Collections.shuffle(slots, random);
 			// begins as a 1 in 4 chance to add a random item but becomes less likely each time
@@ -163,7 +167,15 @@ public class SummonEntityCommand extends ImmediateCommand implements EntityComma
 				ItemStack item = ItemStack.of(randomElementFrom(ARMOR.get(type)));
 				plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
-				((ArmorEquipable) entity).equip(type, item);
+				armorStand.equip(type, item);
+			}
+
+			if (RNG.nextBoolean()) {
+				entity.offer(Keys.ARMOR_STAND_HAS_ARMS, true);
+				for (EquipmentType slot : hands) {
+					if (!RNG.nextBoolean()) continue;
+					armorStand.equip(slot, plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(RNG.nextInt(6)));
+				}
 			}
 		}
 

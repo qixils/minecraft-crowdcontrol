@@ -33,6 +33,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
 public class SummonEntityCommand extends Command implements EntityCommand, Listener {
+	private static final Set<EquipmentSlot> HANDS = Set.of(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
 	private static final Set<Material> BLOCKS;
@@ -185,26 +186,32 @@ public class SummonEntityCommand extends Command implements EntityCommand, Liste
 		if (entity instanceof LootableInventory lootable)
 			lootable.setLootTable(randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
 
-		if (entity instanceof ArmorStand) {
+		if (entity instanceof ArmorStand armorStand) {
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
-			EntityEquipment equipment = ((LivingEntity) entity).getEquipment();
-			if (equipment != null) {
-				List<EquipmentSlot> slots = new ArrayList<>(ARMOR.keySet());
-				Collections.shuffle(slots, random);
-				// begins as a 1 in 4 chance to add a random item but becomes less likely each time
-				// an item is added
-				int odds = ENTITY_ARMOR_START;
-				for (EquipmentSlot slot : slots) {
-					if (random.nextInt(odds) > 0)
-						continue;
-					odds += ENTITY_ARMOR_INC;
-					ItemStack item = new ItemStack(randomElementFrom(ARMOR.get(slot)));
-					LootboxCommand.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
-					equipment.setItem(slot, item, true);
+			EntityEquipment equipment = armorStand.getEquipment();
+            List<EquipmentSlot> slots = new ArrayList<>(ARMOR.keySet());
+            Collections.shuffle(slots, random);
+            // begins as a 1 in 4 chance to add a random item but becomes less likely each time
+            // an item is added
+            int odds = ENTITY_ARMOR_START;
+            for (EquipmentSlot slot : slots) {
+                if (random.nextInt(odds) > 0)
+                    continue;
+                odds += ENTITY_ARMOR_INC;
+                ItemStack item = new ItemStack(randomElementFrom(ARMOR.get(slot)));
+                LootboxCommand.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
+                equipment.setItem(slot, item, true);
+            }
+
+			if (RNG.nextBoolean()) {
+				armorStand.setArms(true);
+				for (EquipmentSlot slot : HANDS) {
+					if (!RNG.nextBoolean()) continue;
+					equipment.setItem(slot, LootboxCommand.createRandomItem(RNG.nextInt(6)), true);
 				}
 			}
-		}
+        }
 
 		entity.getPersistentDataContainer().set(mobKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, true);
 		return entity;
