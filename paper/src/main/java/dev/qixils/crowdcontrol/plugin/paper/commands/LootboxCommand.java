@@ -1,14 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.AttributeWeights;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.translation.GlobalTranslator;
@@ -23,7 +24,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.lootboxItemSlots;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
@@ -78,10 +81,11 @@ public class LootboxCommand extends ImmediateCommand {
 	 * Creates a random item that is influenced by the supplied luck value.
 	 * The item may contain enchantments and modifiers if applicable.
 	 *
-	 * @param luck zero-indexed level of luck
+	 * @param luck           zero-indexed level of luck
+	 * @param registryAccess access to a registry
 	 * @return new random item
 	 */
-	public static ItemStack createRandomItem(int luck) {
+	public static ItemStack createRandomItem(int luck, @Nullable RegistryAccess registryAccess) {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<Material> items = new ArrayList<>(ITEMS);
@@ -106,7 +110,7 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// create item stack
 		ItemStack itemStack = new ItemStack(item, quantity);
-		randomlyModifyItem(itemStack, luck);
+		randomlyModifyItem(itemStack, luck, registryAccess);
 		return itemStack;
 	}
 
@@ -114,16 +118,29 @@ public class LootboxCommand extends ImmediateCommand {
 	 * Applies various random modifications to an item including enchantments, attributes, and
 	 * unbreaking.
 	 *
-	 * @param itemStack item to modify
-	 * @param luck      zero-indexed level of luck
+	 * @param itemStack      item to modify
+	 * @param luck           zero-indexed level of luck
+	 * @param registryAccess access to a registry
 	 */
 	@Contract(mutates = "param1")
-	public static void randomlyModifyItem(ItemStack itemStack, int luck) {
+	public static void randomlyModifyItem(ItemStack itemStack, int luck, @Nullable RegistryAccess registryAccess) {
+		// TODO: update usages with real registry accessors ...? seems to not exist yet...
+		if (registryAccess == null)
+			registryAccess = RegistryAccess.registryAccess();
+
 		Material item = itemStack.getType();
 		ItemMeta itemMeta = itemStack.getItemMeta();
-		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
-		if (random.nextDouble() >= (0.9D - (luck * .15D)))
+
+		// make item unbreakable with a default chance of 5% (up to 100% at 10 luck)
+		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
 			itemMeta.setUnbreakable(true);
+
+		if (random.nextInt(ARMOR_TRIM_ODDS) == 0 && itemMeta instanceof ArmorMeta armorMeta) {
+			armorMeta.setTrim(new ArmorTrim(
+				RandomUtil.randomElementFrom(registryAccess.getRegistry(RegistryKey.TRIM_MATERIAL)),
+				RandomUtil.randomElementFrom(registryAccess.getRegistry(RegistryKey.TRIM_PATTERN))
+			));
+		}
 
 		// determine enchantments to add
 		int enchantments = 0;
@@ -206,7 +223,7 @@ public class LootboxCommand extends ImmediateCommand {
 			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(plugin, request));
 			for (int slot : lootboxItemSlots(luck)) {
 				// create item
-				ItemStack randomItem = createRandomItem(luck);
+				ItemStack randomItem = createRandomItem(luck, null);
 				ItemMeta itemMeta = randomItem.getItemMeta();
 				itemMeta.lore(Collections.singletonList(GlobalTranslator.render(CommandConstants.buildLootboxLore(plugin, request), player.locale())));
 				randomItem.setItemMeta(itemMeta);

@@ -8,6 +8,8 @@ A list of all changes made to the software in reverse chronological order.
 - Added support for 1.20.6 on Sponge(Forge) 🥳
 - Updated the Clutter Inventory effect to shuffle around all items instead of just a few
 - Updated the Summon Armor Stand effect to sometimes give the entity arms with random items
+- Updated the Lootbox effects to give unbreakable items a little less often
+- Paper & Fabric: Updated the Lootbox effects to add random trims to armor
 - Fixed issue where taking max health would successfully activate but refund anyway
 
 ## 3.4.2

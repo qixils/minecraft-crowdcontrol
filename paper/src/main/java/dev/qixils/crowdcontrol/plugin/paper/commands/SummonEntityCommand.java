@@ -200,7 +200,7 @@ public class SummonEntityCommand extends Command implements EntityCommand, Liste
                     continue;
                 odds += ENTITY_ARMOR_INC;
                 ItemStack item = new ItemStack(randomElementFrom(ARMOR.get(slot)));
-                LootboxCommand.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
+                LootboxCommand.randomlyModifyItem(item, odds / ENTITY_ARMOR_START, null);
                 equipment.setItem(slot, item, true);
             }
 
@@ -208,7 +208,7 @@ public class SummonEntityCommand extends Command implements EntityCommand, Liste
 				armorStand.setArms(true);
 				for (EquipmentSlot slot : HANDS) {
 					if (!RNG.nextBoolean()) continue;
-					equipment.setItem(slot, LootboxCommand.createRandomItem(RNG.nextInt(6)), true);
+					equipment.setItem(slot, LootboxCommand.createRandomItem(RNG.nextInt(6), null), true);
 				}
 			}
         }

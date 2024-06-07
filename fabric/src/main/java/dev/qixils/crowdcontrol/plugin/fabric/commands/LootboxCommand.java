@@ -2,8 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import com.google.common.collect.Lists;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.AttributeWeights;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
@@ -34,6 +33,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.armortrim.ArmorTrim;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.component.Unbreakable;
@@ -45,8 +45,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.migrateId;
 import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE;
 import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP;
@@ -114,10 +113,11 @@ public class LootboxCommand extends ImmediateCommand {
 	 * Creates a random item that is influenced by the supplied luck value.
 	 * The item may contain enchantments and modifiers if applicable.
 	 *
-	 * @param luck zero-indexed level of luck
+	 * @param luck           zero-indexed level of luck
+	 * @param registryAccess access to a registry
 	 * @return new random item
 	 */
-	public ItemStack createRandomItem(int luck) {
+	public ItemStack createRandomItem(int luck, @Nullable RegistryAccess registryAccess) {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<Item> items = new ArrayList<>(allItems);
@@ -143,7 +143,7 @@ public class LootboxCommand extends ImmediateCommand {
 
 		// create item stack
 		ItemStack itemStack = new ItemStack(item, quantity);
-		randomlyModifyItem(itemStack, luck, null);
+		randomlyModifyItem(itemStack, luck, registryAccess);
 		return itemStack;
 	}
 
@@ -156,10 +156,20 @@ public class LootboxCommand extends ImmediateCommand {
 	 * @param accessor  registry accessor to load enchants from
 	 */
 	@Contract(mutates = "param1")
-	public void randomlyModifyItem(ItemStack itemStack, int luck, @Nullable RegistryAccess accessor) {
-		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
-		if (random.nextDouble() >= (0.9D - (luck * .15D)))
+	public void randomlyModifyItem(ItemStack itemStack, int luck, @Nullable RegistryAccess registryAccess) {
+		if (registryAccess == null)
+			registryAccess = plugin.server().registryAccess();
+
+		// make item unbreakable with a default chance of 5% (up to 100% at 10 luck)
+		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
 			itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
+
+		if (random.nextInt(ARMOR_TRIM_ODDS) == 0) {
+			itemStack.set(DataComponents.TRIM, new ArmorTrim(
+				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_MATERIAL, registryAccess)),
+				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_PATTERN, registryAccess))
+			));
+		}
 
 		// determine enchantments to add
 		int _enchantments = 0;
@@ -167,7 +177,7 @@ public class LootboxCommand extends ImmediateCommand {
 			_enchantments = Math.max(_enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		final int enchantments = _enchantments;
-		List<Holder<Enchantment>> enchantmentList = plugin.registry(Registries.ENCHANTMENT, accessor)
+		List<Holder<Enchantment>> enchantmentList = plugin.registry(Registries.ENCHANTMENT, registryAccess)
 			.holders()
 			.filter(enchantmentHolder -> enchantmentHolder.value().canEnchant(itemStack))
 			.collect(Collectors.toList());
@@ -266,7 +276,7 @@ public class LootboxCommand extends ImmediateCommand {
 			// init container
 			SimpleContainer container = new SimpleContainer(27);
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
-				ItemStack itemStack = createRandomItem(luck);
+				ItemStack itemStack = createRandomItem(luck, player.registryAccess());
 				List<Component> lore = getLore(itemStack);
 				lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), player));
 				setLore(itemStack, lore);

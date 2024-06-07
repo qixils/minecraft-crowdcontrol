@@ -203,7 +203,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				ItemStack item = new ItemStack(randomElementFrom(humanoidArmor.get(type)));
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
-						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START, null);
+						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START, level.registryAccess());
 				armorStand.setItemSlot(type, item);
 			}
 
@@ -211,7 +211,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				armorStand.setShowArms(true);
 				for (EquipmentSlot slot : HANDS) {
 					if (!RNG.nextBoolean()) continue;
-					armorStand.setItemSlot(slot, plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(RNG.nextInt(6)));
+					armorStand.setItemSlot(slot, plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(RNG.nextInt(6), level.registryAccess()));
 				}
 			}
 		}

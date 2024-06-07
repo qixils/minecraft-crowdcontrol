@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.EnchantmentWeights;
+import dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
@@ -35,8 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxLore;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.buildLootboxTitle;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 public class LootboxCommand extends ImmediateCommand {
@@ -123,8 +122,8 @@ public class LootboxCommand extends ImmediateCommand {
 	 */
 	@Contract(mutates = "param1")
 	public void randomlyModifyItem(ItemStack itemStack, int luck) {
-		// make item unbreakable with a default chance of 10% (up to 100% at 6 luck)
-		if (random.nextDouble() >= (0.9D - (luck * .15D)))
+		// make item unbreakable with a default chance of 5% (up to 100% at 10 luck)
+		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
 			itemStack.offer(Keys.UNBREAKABLE, true);
 
 		// determine enchantments to add

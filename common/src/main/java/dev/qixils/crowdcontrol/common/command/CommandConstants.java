@@ -210,6 +210,9 @@ public class CommandConstants {
 	 * The maximum amount of blocks to teleport a player up by when executing the Bucket Clutch command.
 	 */
 	public static final int BUCKET_CLUTCH_MAX = 100;
+	public static final double UNBREAKABLE_BASE = 0.95d;
+	public static final double UNBREAKABLE_DEC = 0.10d;
+	public static final int ARMOR_TRIM_ODDS = 4;
 	/**
 	 * The title to use in the annoying pop-up menu.
 	 */
