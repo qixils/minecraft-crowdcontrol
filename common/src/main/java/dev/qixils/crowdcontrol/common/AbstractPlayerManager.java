@@ -1,8 +1,5 @@
 package dev.qixils.crowdcontrol.common;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -18,26 +15,46 @@ import java.util.*;
  */
 public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
-	private final Multimap<String, UUID> streamToPlayerMap =
-		Multimaps.synchronizedSetMultimap(HashMultimap.create(1, 1));
+	private final Map<String, Set<UUID>> streamToPlayerMap = new HashMap<>();
+	private final Map<UUID, Set<String>> playerToStreamMap = new HashMap<>();
 
 	@Override
 	public boolean linkPlayer(@NotNull UUID uuid, @NotNull String username) {
-		return streamToPlayerMap.put(username.toLowerCase(Locale.ENGLISH), uuid);
+		username = username.toLowerCase(Locale.ENGLISH);
+
+		boolean success = streamToPlayerMap.computeIfAbsent(
+			username,
+			$ -> new HashSet<>()
+		).add(uuid);
+
+		success |= playerToStreamMap.computeIfAbsent(
+			uuid,
+			$ -> new HashSet<>()
+		).add(username);
+
+		return success;
 	}
 
 	@Override
 	public boolean unlinkPlayer(@NotNull UUID uuid, @NotNull String username) {
-		return streamToPlayerMap.remove(username.toLowerCase(Locale.ENGLISH), uuid);
+		username = username.toLowerCase(Locale.ENGLISH);
+
+		boolean success = streamToPlayerMap.containsKey(username)
+			&& streamToPlayerMap.get(username).remove(uuid);
+
+		success |= playerToStreamMap.containsKey(uuid)
+			&& playerToStreamMap.get(uuid).remove(username);
+
+		return success;
 	}
 
 	@Override
 	public @NotNull Set<UUID> getLinkedPlayers(@NotNull Request.Target target) {
 		Set<UUID> uuids = new HashSet<>();
 		if (target.getName() != null)
-			uuids.addAll(streamToPlayerMap.get(target.getName().toLowerCase(Locale.ENGLISH)));
+			uuids.addAll(streamToPlayerMap.getOrDefault(target.getName().toLowerCase(Locale.ENGLISH), Collections.emptySet()));
 		if (target.getLogin() != null)
-			uuids.addAll(streamToPlayerMap.get(target.getLogin().toLowerCase(Locale.ENGLISH)));
+			uuids.addAll(streamToPlayerMap.getOrDefault(target.getLogin().toLowerCase(Locale.ENGLISH), Collections.emptySet()));
 
 		CrowdControl cc = getPlugin().getCrowdControl();
 		if (cc == null)
@@ -69,8 +86,7 @@ public abstract class AbstractPlayerManager<P> implements PlayerManager<P> {
 
 	@Override
 	public @NotNull Collection<String> getLinkedAccounts(@NotNull UUID uuid) {
-		// TODO: optimize
-		return Multimaps.invertFrom(streamToPlayerMap, HashMultimap.create(streamToPlayerMap.size(), 1)).get(uuid);
+		return playerToStreamMap.getOrDefault(uuid, Collections.emptySet());
 	}
 
 	@NotNull

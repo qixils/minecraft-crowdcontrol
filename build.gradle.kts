@@ -51,11 +51,6 @@ subprojects {
     }
 
     tasks.shadowJar {
-        relocate("com.google.guava", "dev.qixils.relocated.google.guava")
-        relocate("com.google.common", "dev.qixils.relocated.google.common")
-        relocate("com.google.errorprone", "dev.qixils.relocated.google.errorprone")
-        relocate("com.google.gson", "dev.qixils.relocated.google.gson")
-        relocate("com.google.thirdparty", "dev.qixils.relocated.google.thirdparty")
         relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
         relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
         relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")

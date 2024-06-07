@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
@@ -16,9 +17,12 @@ import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.property.SlotPos;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 
-import java.util.*;
-
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.CLUTTER_ITEMS;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Getter
 public class ClutterCommand extends ImmediateCommand {
@@ -90,22 +94,20 @@ public class ClutterCommand extends ImmediateCommand {
 						+ " is not an instance of PlayerInventory");
 				continue;
 			}
-			MainPlayerInventory inventory = ((PlayerInventory) player.getInventory()).getMain();
-			Set<SlotPos> swappedSlots = new HashSet<>(CLUTTER_ITEMS);
+			PlayerInventory inventory = (PlayerInventory) player.getInventory();
+			List<ItemStack> original = StreamSupport.stream(inventory.slots().spliterator(), false)
+				.map(slot -> slot.peek().map(ItemStack::copy).orElseGet(ItemStack::empty))
+				.collect(Collectors.toList());
+			List<ItemStack> shuffled = new ArrayList<>(original);
+			Collections.shuffle(shuffled);
 
-			SlotPos heldItemSlot = SlotPos.of(inventory.getHotbar().getSelectedSlotIndex(), 0);
-			swappedSlots.add(heldItemSlot);
-			SlotPos swapItemWith = uniqueSlot(inventory, swappedSlots);
-			swappedSlots.add(swapItemWith);
-			success |= swap(inventory, heldItemSlot, swapItemWith);
+			if (shuffled.equals(original)) continue;
 
-			while (swappedSlots.size() < CLUTTER_ITEMS) {
-				SlotPos newSlot1 = uniqueSlot(inventory, swappedSlots);
-				swappedSlots.add(newSlot1);
-				SlotPos newSlot2 = uniqueSlot(inventory, swappedSlots);
-				swappedSlots.add(newSlot2);
-				success |= swap(inventory, newSlot1, newSlot2);
+			int i = 0;
+			for (Inventory slot : inventory.slots()) {
+				slot.set(shuffled.get(i++));
 			}
+			success = true;
 		}
 		if (success)
 			return request.buildResponse().type(Response.ResultType.SUCCESS);

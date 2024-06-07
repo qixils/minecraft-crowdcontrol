@@ -4,7 +4,6 @@ val adventurePlatformVersion: String by project
 val cloudVersion: String by project
 
 dependencies {
-    api("com.google.guava:guava:33.2.0-jre")
     api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
     compileOnly("net.kyori:adventure-api:$adventureVersion")
     api("net.kyori:adventure-text-minimessage:$adventureVersion") {

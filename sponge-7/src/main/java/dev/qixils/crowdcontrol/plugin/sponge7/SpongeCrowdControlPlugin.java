@@ -118,7 +118,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	@Inject
 	@DefaultConfig(sharedRoot = true)
 	private Path configPath;
-	@Inject
+	//@Inject
 	private SpongeAudiences audiences;
 	@Inject
 	private GameRegistry registry;
@@ -162,6 +162,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	}
 
 	public @NotNull SpongeAudiences adventure() {
+		if (audiences == null)
+			audiences = SpongeAudiences.create(pluginContainer, game);
 		return audiences;
 	}
 

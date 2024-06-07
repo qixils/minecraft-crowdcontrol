@@ -63,7 +63,15 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":configurate-common"))
+    implementation(project(":configurate-common")) {
+        exclude(group = "com.google.code.gson")
+        exclude(group = "com.google.auto.service")
+        exclude(group = "com.google.inject")
+        exclude(group = "com.google.guava")
+        exclude(group = "com.google.errorprone")
+        exclude(group = "com.google.j2objc")
+        exclude(group = "com.google.code.findbugs")
+    }
     implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
     compileOnly("org.spongepowered:spongeapi:11.0.0-SNAPSHOT") {
         exclude(group = "net.kyori", module = "adventure-api")

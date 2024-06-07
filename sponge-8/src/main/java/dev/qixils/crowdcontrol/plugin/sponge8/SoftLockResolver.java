@@ -15,11 +15,9 @@ import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.Collection;
 
-@ParametersAreNonnullByDefault
 public class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 	private @Nullable Collection<BlockType> dangerousBlocks;
 

@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.common;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -14,7 +13,6 @@ import static dev.qixils.crowdcontrol.common.Plugin.output;
  *
  * @param <P> The implementation's player type.
  */
-@ParametersAreNonnullByDefault
 public abstract class SoftLockObserver<P> {
 	protected static final Component ALERT = output(Component.translatable("cc.soft-lock.output"));
 

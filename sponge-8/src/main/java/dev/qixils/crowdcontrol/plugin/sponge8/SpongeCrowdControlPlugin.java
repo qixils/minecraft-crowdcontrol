@@ -52,7 +52,6 @@ import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,7 +59,6 @@ import java.util.stream.Stream;
 
 @Getter
 @Plugin("crowdcontrol")
-@ParametersAreNonnullByDefault
 public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandCause> {
 	// keys
 	public static Key<Value<String>> ORIGINAL_DISPLAY_NAME; // TODO: report inability to serialize components
