@@ -36,8 +36,8 @@
   "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
     "fabricloader": "*",
-    "fabric": ">=0.97.6+1.20.6",
-    "minecraft": ">=1.20.5- <=1.20.6",
+    "fabric": "*",
+    "minecraft": ">=1.21- <=1.21",
     "cardinal-components-base": "*",
     "cardinal-components-entity": "*",
     "cloud": "*",

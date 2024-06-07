@@ -4,6 +4,7 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.4.3
 
+- Fabric: Updated support to 1.21
 - Added support for 1.20.6 on Sponge(Forge) 🥳
 - Updated the Clutter Inventory effect to shuffle around all items instead of just a few
 - Updated the Summon Armor Stand effect to sometimes give the entity arms with random items

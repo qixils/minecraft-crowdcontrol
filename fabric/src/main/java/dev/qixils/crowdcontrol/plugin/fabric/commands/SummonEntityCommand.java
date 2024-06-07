@@ -30,10 +30,7 @@ import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.npc.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
@@ -48,12 +45,12 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
 	private static final Set<EquipmentSlot> HANDS = Arrays.stream(EquipmentSlot.values()).filter(slot -> slot.getType() == EquipmentSlot.Type.HAND).collect(Collectors.toSet());
-	private final Map<EquipmentSlot, List<Item>> armor;
+	private final Map<EquipmentSlot, List<ArmorItem>> humanoidArmor;
 	protected final EntityType<E> entityType;
 	private final String effectName;
 	private final Component displayName;
 	private List<ResourceKey<LootTable>> lootTables = null;
-	private final Map<EntityType<?>, List<Item>> horseArmor = new HashMap<>();
+	private final Map<EntityType<?>, List<ArmorItem>> horseArmor = new HashMap<>();
 	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
 			Rabbit.Variant.BLACK, 16,
 			Rabbit.Variant.BROWN, 16,
@@ -71,20 +68,20 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getDescription());
 
 		// pre-compute the map of valid armor pieces
-		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
+		Map<EquipmentSlot, List<ArmorItem>> armor = new HashMap<>(4);
 		for (Item item : BuiltInRegistries.ITEM) {
 			if (item instanceof ArmorItem armorItem) {
 				EquipmentSlot slot = armorItem.getEquipmentSlot();
-				if (slot.getType() != EquipmentSlot.Type.ARMOR)
+				if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
 					continue;
 				armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(armorItem);
 			}
 		}
 
 		// make collections unmodifiable
-		for (Map.Entry<EquipmentSlot, List<Item>> entry : new HashSet<>(armor.entrySet()))
+		for (Map.Entry<EquipmentSlot, List<ArmorItem>> entry : new HashSet<>(armor.entrySet()))
 			armor.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
-		this.armor = Collections.unmodifiableMap(armor);
+		this.humanoidArmor = Collections.unmodifiableMap(armor);
 	}
 
 	private List<ResourceKey<LootTable>> getLootTables(MinecraftServer server) {
@@ -160,8 +157,12 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
 		if (entity instanceof AbstractHorse horse) {
-			if (horse.canWearBodyArmor() && RandomUtil.RNG.nextBoolean()) {
-				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream().filter(item -> horse.isBodyArmorItem(new ItemStack(item))).toList());
+			if (horse.canUseSlot(EquipmentSlot.BODY) && RandomUtil.RNG.nextBoolean()) {
+				List<ArmorItem> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
+					.map(item -> item instanceof ArmorItem armorItem ? armorItem : null)
+					.filter(Objects::nonNull)
+					.filter(item -> item.getEquipmentSlot().getType() == EquipmentSlot.Type.ANIMAL_ARMOR && horse.isBodyArmorItem(new ItemStack(item)))
+					.toList());
 				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
 			}
 			horse.setOwnerUUID(player.getUUID());
@@ -170,7 +171,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof Sheep sheep) // TODO: jeb
 			sheep.setColor(randomElementFrom(DyeColor.class));
 		if (entity instanceof Saddleable saddleable && RandomUtil.RNG.nextBoolean())
-			saddleable.equipSaddle(null);
+			saddleable.equipSaddle(new ItemStack(Items.SADDLE), null);
 		if (entity instanceof EnderMan enderman)
 			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
 		if (entity instanceof AbstractChestedHorse chested)
@@ -190,7 +191,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof ArmorStand armorStand) {
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
-			List<EquipmentSlot> slots = new ArrayList<>(armor.keySet());
+			List<EquipmentSlot> slots = new ArrayList<>(humanoidArmor.keySet());
 			Collections.shuffle(slots, random);
 			// begins as a 1 in 4 chance to add a random item but becomes less likely each time
 			// an item is added
@@ -199,10 +200,10 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				if (random.nextInt(odds) > 0)
 					continue;
 				odds += ENTITY_ARMOR_INC;
-				ItemStack item = new ItemStack(randomElementFrom(armor.get(type)));
+				ItemStack item = new ItemStack(randomElementFrom(humanoidArmor.get(type)));
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
-						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
+						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START, null);
 				armorStand.setItemSlot(type, item);
 			}
 

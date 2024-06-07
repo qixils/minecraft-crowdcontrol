@@ -15,26 +15,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder.isAir;
-
 @Getter
-public class GravelCommand extends ImmediateCommand {
-	private final String effectName = "gravel_hell";
+public class LavaCommand extends ImmediateCommand {
+	private final String effectName = "make_lava";
 
-	public GravelCommand(SpongeCrowdControlPlugin plugin) {
+	public LavaCommand(SpongeCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
-	@NotNull
+	@SuppressWarnings("unchecked")
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Set<ServerLocation> locations = new HashSet<>(50);
 		for (ServerPlayer player : players)
 			locations.addAll(BlockFinder.builder()
 					.origin(player.serverLocation())
-					.locationValidator(location -> !isAir(location.block()) && !location.blockType().equals(BlockTypes.GRAVEL.get()))
+					.locationValidator(loc -> loc.blockType().isAnyOf(BlockTypes.WATER))
 					.shuffleLocations(false)
-					.maxRadius(7)
+					.maxRadius(10)
 					.build().getAll());
 
 		if (locations.isEmpty())
@@ -42,7 +40,7 @@ public class GravelCommand extends ImmediateCommand {
 					.type(Response.ResultType.RETRY)
 					.message("No replaceable blocks nearby");
 
-		sync(() -> locations.forEach(location -> location.setBlockType(BlockTypes.GRAVEL.get())));
+		sync(() -> locations.forEach(loc -> loc.setBlockType(BlockTypes.LAVA.get())));
 		return request.buildResponse().type(Response.ResultType.SUCCESS);
 	}
 }

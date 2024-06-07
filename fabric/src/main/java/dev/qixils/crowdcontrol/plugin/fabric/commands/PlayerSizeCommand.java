@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.SCALE_MODIFIER_NAME;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.SCALE_MODIFIER_UUID;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModifier;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.removeModifier;
@@ -41,7 +40,7 @@ public class PlayerSizeCommand extends TimedVoidCommand {
 			.duration(getDuration(request))
 			.startCallback(effect -> {
 				for (ServerPlayer player : players) {
-					addModifier(player, Attributes.SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+					addModifier(player, Attributes.SCALE, SCALE_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
 				}
 				playerAnnounce(players, request);
 				return request.buildResponse().type(Response.ResultType.SUCCESS);

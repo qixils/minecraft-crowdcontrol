@@ -24,6 +24,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static net.minecraft.resources.ResourceLocation.withDefaultNamespace;
+
 @Environment(EnvType.CLIENT)
 public final class FabricPlatformClient implements ClientModInitializer {
 	private final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
@@ -62,7 +64,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		});
 		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> {
 			logger.debug("Received shader request from server!");
-			ResourceLocation shader = new ResourceLocation("shaders/post/" + payload.shader() + ".json");
+			ResourceLocation shader = withDefaultNamespace("shaders/post/" + payload.shader() + ".json");
 
 			client.execute(() -> {
 				client.gameRenderer.loadEffect(shader);
