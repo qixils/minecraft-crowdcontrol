@@ -13,6 +13,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +72,7 @@ public class RandomFallingBlockCommand extends RegionalCommand {
 	}
 
 	@Override
-	protected Response.Builder buildFailure(Request request) {
+	protected Response.@NotNull Builder buildFailure(Request request) {
 		return request.buildResponse().type(Response.ResultType.RETRY).message("Unable to find valid spawning location");
 	}
 }

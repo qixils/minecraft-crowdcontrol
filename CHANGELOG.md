@@ -10,6 +10,7 @@ A list of all changes made to the software in reverse chronological order.
 - Updated the Summon Armor Stand effect to sometimes give the entity arms with random items
 - Updated the Lootbox effects to give unbreakable items a little less often
 - Paper & Fabric: Updated the Lootbox effects to add random trims to armor
+- Fixed the Fling effect to prevent execution while in a vehicle (sorry Feinberg!)
 - Fixed issue where taking max health would successfully activate but refund anyway
 
 ## 3.4.2

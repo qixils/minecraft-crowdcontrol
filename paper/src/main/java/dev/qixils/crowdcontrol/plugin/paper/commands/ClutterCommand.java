@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ public class ClutterCommand extends RegionalCommand {
 	}
 
 	@Override
-	protected Response.Builder buildFailure(Request request) {
+	protected Response.@NotNull Builder buildFailure(Request request) {
 		return request.buildResponse().type(Response.ResultType.RETRY).message("Could not find items to swap");
 	}
 }

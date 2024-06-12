@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
@@ -17,6 +18,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 
 @Getter
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class FlingCommand extends ImmediateCommand {
 	private final @NotNull String effectName = "fling";
 
@@ -35,8 +37,17 @@ public class FlingCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		if (isActive("walk", request) || isActive("look", request))
 			return request.buildResponse().type(ResultType.RETRY).message("Cannot fling while frozen");
-		for (ServerPlayer player : players)
-			sync(() -> player.offer(Keys.VELOCITY, randomVector()));
-		return request.buildResponse().type(ResultType.SUCCESS);
+
+		boolean success = false;
+		for (ServerPlayer player : players) {
+			if (player.get(Keys.VEHICLE).orElse(null) != null) continue;
+
+			player.offer(Keys.VELOCITY, randomVector());
+			success = true;
+		}
+
+		return success
+			? request.buildResponse().type(ResultType.SUCCESS)
+			: request.buildResponse().type(ResultType.FAILURE).message("Cannot fling while inside vehicle");
 	}
 }

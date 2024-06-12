@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
@@ -16,6 +17,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 
 @Getter
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class FlingCommand extends ImmediateCommand {
 	private final @NotNull String effectName = "fling";
 
@@ -34,10 +36,18 @@ public class FlingCommand extends ImmediateCommand {
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		if (isActive("walk", request) || isActive("look", request))
 			return request.buildResponse().type(ResultType.RETRY).message("Cannot fling while frozen");
-		for (ServerPlayer player : players) sync(() -> {
+
+		boolean success = false;
+		for (ServerPlayer player : players) {
+			if (player.isPassenger()) continue;
+
 			player.setDeltaMovement(randomVector());
 			player.hurtMarked = true;
-		});
-		return request.buildResponse().type(ResultType.SUCCESS);
+			success = true;
+		}
+
+		return success
+			? request.buildResponse().type(ResultType.SUCCESS)
+			: request.buildResponse().type(ResultType.RETRY).message("Cannot fling while inside vehicle");
 	}
 }

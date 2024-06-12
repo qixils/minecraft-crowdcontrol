@@ -16,12 +16,19 @@ public abstract class RegionalCommand extends Command {
 		super(plugin);
 	}
 
-	protected abstract boolean executeRegionally(Player player, Request request);
+	protected Response.@Nullable Builder precheck(@NotNull Request request) {
+		return null;
+	}
 
-	protected abstract Response.Builder buildFailure(Request request);
+	protected abstract boolean executeRegionally(@NotNull Player player, @NotNull Request request);
+
+	protected abstract Response.@NotNull Builder buildFailure(@NotNull Request request);
 
 	@Override
 	public @NotNull CompletableFuture<Response.@Nullable Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder precheck = precheck(request);
+		if (precheck != null) return CompletableFuture.completedFuture(precheck);
+
 		List<CompletableFuture<Boolean>> futures = new ArrayList<>();
 		for (Player player : players) {
 			CompletableFuture<Boolean> future = new CompletableFuture<>();
@@ -36,7 +43,7 @@ public abstract class RegionalCommand extends Command {
 						return request.buildResponse().type(Response.ResultType.SUCCESS);
 				} catch (Exception ignored) {}
 			}
-			return request.buildResponse().type(Response.ResultType.RETRY).message("Could not find location to place block");
+			return buildFailure(request);
 		});
 	}
 }
