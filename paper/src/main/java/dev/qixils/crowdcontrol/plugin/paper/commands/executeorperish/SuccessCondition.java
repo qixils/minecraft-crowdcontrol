@@ -35,6 +35,6 @@ public interface SuccessCondition {
 	}
 
 	default int getRewardLuck() {
-		return 0;
+		return 1;
 	}
 }
