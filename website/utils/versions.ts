@@ -1,5 +1,5 @@
-export const supportedPaperVersions: string[] = ["1.20.6"]
-export const paperVersions: string[] = ["1.20.6", "1.20.4", "1.20.2", "1.20.1", "1.19.4"];
+export const supportedPaperVersions: string[] = ["1.21", "1.20.6"]
+export const paperVersions: string[] = ["1.21", "1.20.6", "1.20.4", "1.20.2", "1.20.1", "1.19.4"];
 export const paperLatest = paperVersions[0];
 export const supportedFabricVersions: string[] = ["1.21"];
 export const fabricVersions: string[] = ["1.21", "1.20.6", "1.20.4", "1.20.2", "1.20.1", "1.19.4", "1.19.2"];

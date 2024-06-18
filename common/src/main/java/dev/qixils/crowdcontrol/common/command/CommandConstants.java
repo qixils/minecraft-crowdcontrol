@@ -33,11 +33,15 @@ public class CommandConstants {
 	public static final UUID FALL_MODIFIER_UUID = new UUID(7266512121322359285L, -8208555834343603830L);
 	public static final UUID FALL_DMG_MODIFIER_UUID = new UUID(-2464474606488170752L, 8005989740147089956L);
 	public static final UUID SCALE_MODIFIER_UUID = new UUID(-2378341764646484063L, -8318356916108535959L);
+	public static final UUID SCALE_STEP_MODIFIER_UUID = new UUID(8279684539680771938L, -4906911542497939969L);
+	public static final UUID SCALE_JUMP_MODIFIER_UUID = new UUID(7320315186307875087L, -5912984502438606275L);
 
 	public static final String GRAVITY_MODIFIER_NAME = "gravity-cc";
 	public static final String FALL_MODIFIER_NAME = "fall-cc";
 	public static final String FALL_DMG_MODIFIER_NAME = "fall-dmg-cc";
 	public static final String SCALE_MODIFIER_NAME = "scale-cc";
+	public static final String SCALE_STEP_MODIFIER_NAME = "scale-step-cc";
+	public static final String SCALE_JUMP_MODIFIER_NAME = "scale-jump-cc";
 
 	/**
 	 * The default validator which ensures that a given sound is available.

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.SCALE_MODIFIER_UUID;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModifier;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.removeModifier;
 
@@ -36,11 +36,14 @@ public class PlayerSizeCommand extends TimedVoidCommand {
 		// atomic reference stuff is dumb
 		new TimedEffect.Builder()
 			.request(request)
-			.effectGroup("player_size")
+			.effectGroup("gravity") // has some overlapping attributes
 			.duration(getDuration(request))
 			.startCallback(effect -> {
 				for (ServerPlayer player : players) {
 					addModifier(player, Attributes.SCALE, SCALE_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+					addModifier(player, Attributes.STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+					addModifier(player, Attributes.JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+					addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
 				}
 				playerAnnounce(players, request);
 				return request.buildResponse().type(Response.ResultType.SUCCESS);
@@ -48,6 +51,9 @@ public class PlayerSizeCommand extends TimedVoidCommand {
 			.completionCallback(effect -> {
 				for (ServerPlayer player : players) {
 					removeModifier(player, Attributes.SCALE, SCALE_MODIFIER_UUID);
+					removeModifier(player, Attributes.STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID);
+					removeModifier(player, Attributes.JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID);
+					removeModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
 				}
 			})
 			.build().queue();

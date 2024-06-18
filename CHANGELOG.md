@@ -4,15 +4,17 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.5.0
 
-- Fabric: Updated support to 1.21
-- Added support for 1.20.6 on Sponge(Forge) 🥳
+- Paper & Fabric: Updated support to 1.21
+- Added support for 1.20.6 on Sponge(Forge) 🥳 should also work with SF 1.21 when that releases soon™
 - Updated the Clutter Inventory effect to shuffle around all items instead of just a few
 - Updated the Summon Armor Stand effect to sometimes give the entity arms with random items
 - Updated the Lootbox effects to give unbreakable items a little less often
 - Updated the Do-or-Die effect to give better rewards more often
 - Paper & Fabric: Updated the Lootbox effects to add random trims to armor
+- Updated the Player Size effects to adjust more attributes (step amount, jump strength, etc)
 - Fixed the Fling effect to prevent execution while in a vehicle (sorry Feinberg!)
 - Fixed issue where taking max health would successfully activate but refund anyway
+- Fixed compatibility with new Crowd Control client update
 
 ## 3.4.2
 

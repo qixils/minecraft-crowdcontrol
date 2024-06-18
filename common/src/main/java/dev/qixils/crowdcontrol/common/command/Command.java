@@ -192,7 +192,7 @@ public interface Command<P> {
 
 	@ApiStatus.Internal
 	default void wrappedExecuteAndNotify(@NotNull Request request) {
-		if (!request.getType().isEffectType()) return;
+		if (request.getType() == null || !request.getType().isEffectType()) return;
 
 		Plugin<P, ?> plugin = getPlugin();
 		plugin.getSLF4JLogger().debug("Executing " + getDisplayName() + " from " + request);

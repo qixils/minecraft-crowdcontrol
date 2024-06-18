@@ -14,8 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.SCALE_MODIFIER_NAME;
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.SCALE_MODIFIER_UUID;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.addModifier;
 import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.removeModifier;
 
@@ -37,11 +36,14 @@ public class PlayerSizeCommand extends TimedVoidCommand {
 		// atomic reference stuff is dumb
 		new TimedEffect.Builder()
 			.request(request)
-			.effectGroup("player_size")
+			.effectGroup("gravity") // has some overlapping attributes
 			.duration(getDuration(request))
 			.startCallback(effect -> {
 				for (Player player : players) {
 					addModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					addModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID, SCALE_STEP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					addModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, SCALE_JUMP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					addModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
 				}
 				playerAnnounce(players, request);
 				return request.buildResponse().type(Response.ResultType.SUCCESS);
@@ -49,6 +51,9 @@ public class PlayerSizeCommand extends TimedVoidCommand {
 			.completionCallback(effect -> {
 				for (Player player : players) {
 					removeModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID);
+					removeModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID);
+					removeModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID);
+					removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
 				}
 			})
 			.build().queue();
