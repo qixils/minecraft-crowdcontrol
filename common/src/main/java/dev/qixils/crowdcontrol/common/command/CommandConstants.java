@@ -105,15 +105,15 @@ public class CommandConstants {
 	 * The message to display to players when Keep Inventory has been enabled for them.
 	 */
 	public static final @NotNull Component KEEP_INVENTORY_MESSAGE = Component.translatable(
-			"cc.effect.keep_inventory_on.output",
-			NamedTextColor.GREEN
+		"cc.effect.keep_inventory_on.output",
+		NamedTextColor.GREEN
 	);
 	/**
 	 * The message to display to players when Keep Inventory has been disabled for them.
 	 */
 	public static final @NotNull Component LOSE_INVENTORY_MESSAGE = Component.translatable(
-			"cc.effect.keep_inventory_off.output",
-			NamedTextColor.RED
+		"cc.effect.keep_inventory_off.output",
+		NamedTextColor.RED
 	);
 	/**
 	 * The minimum amount of health allowed to be set by the -1 Max Health command.
@@ -140,24 +140,24 @@ public class CommandConstants {
 	 * Collection of blocks to be used in the Place Block command.
 	 */
 	public static final @NotNull KeyedTag SET_BLOCKS = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "tnt"),
-			Key.key(MINECRAFT_NAMESPACE, "fire"),
-			Key.key(MINECRAFT_NAMESPACE, "cobweb"),
-			Key.key(MINECRAFT_NAMESPACE, "redstone_torch"),
-			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
-			Key.key(MINECRAFT_NAMESPACE, "lightning_rod"),
-			Key.key(MINECRAFT_NAMESPACE, "bedrock"),
-			Key.key(MINECRAFT_NAMESPACE, "water"),
-			Key.key(MINECRAFT_NAMESPACE, "sculk_catalyst")
+		Key.key(MINECRAFT_NAMESPACE, "tnt"),
+		Key.key(MINECRAFT_NAMESPACE, "fire"),
+		Key.key(MINECRAFT_NAMESPACE, "cobweb"),
+		Key.key(MINECRAFT_NAMESPACE, "redstone_torch"),
+		Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
+		Key.key(MINECRAFT_NAMESPACE, "lightning_rod"),
+		Key.key(MINECRAFT_NAMESPACE, "bedrock"),
+		Key.key(MINECRAFT_NAMESPACE, "water"),
+		Key.key(MINECRAFT_NAMESPACE, "sculk_catalyst")
 	);
 	/**
 	 * Collection of blocks to be used in the Place Falling Block command.
 	 */
 	public static final @NotNull KeyedTag SET_FALLING_BLOCKS = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "anvil"),
-			Key.key(MINECRAFT_NAMESPACE, "sand"),
-			Key.key(MINECRAFT_NAMESPACE, "red_sand"),
-			Key.key(MINECRAFT_NAMESPACE, "gravel")
+		Key.key(MINECRAFT_NAMESPACE, "anvil"),
+		Key.key(MINECRAFT_NAMESPACE, "sand"),
+		Key.key(MINECRAFT_NAMESPACE, "red_sand"),
+		Key.key(MINECRAFT_NAMESPACE, "gravel")
 	);
 	/**
 	 * The starting denominator for odds when randomly giving armor to summoned entities. A value
@@ -228,67 +228,69 @@ public class CommandConstants {
 	 * Collection of items to be used in the Give Item and Take Item commands.
 	 */
 	public static final @NotNull KeyedTag GIVE_TAKE_ITEMS = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "wooden_pickaxe"),
-			Key.key(MINECRAFT_NAMESPACE, "stone_pickaxe"),
-			Key.key(MINECRAFT_NAMESPACE, "golden_pickaxe"),
-			Key.key(MINECRAFT_NAMESPACE, "iron_pickaxe"),
-			Key.key(MINECRAFT_NAMESPACE, "diamond_pickaxe"),
-			Key.key(MINECRAFT_NAMESPACE, "netherite_pickaxe"),
-			Key.key(MINECRAFT_NAMESPACE, "golden_apple"),
-			Key.key(MINECRAFT_NAMESPACE, "enchanted_golden_apple"),
-			Key.key(MINECRAFT_NAMESPACE, "ender_eye"),
-			Key.key(MINECRAFT_NAMESPACE, "end_portal_frame"),
-			Key.key(MINECRAFT_NAMESPACE, "elytra"),
-			Key.key(MINECRAFT_NAMESPACE, "trident"),
-			Key.key(MINECRAFT_NAMESPACE, "coal"),
-			Key.key(MINECRAFT_NAMESPACE, "iron_ingot"),
-			Key.key(MINECRAFT_NAMESPACE, "gold_ingot"),
-			Key.key(MINECRAFT_NAMESPACE, "diamond"),
-			Key.key(MINECRAFT_NAMESPACE, "netherite_ingot"),
-			Key.key(MINECRAFT_NAMESPACE, "wooden_sword"),
-			Key.key(MINECRAFT_NAMESPACE, "stone_sword"),
-			Key.key(MINECRAFT_NAMESPACE, "golden_sword"),
-			Key.key(MINECRAFT_NAMESPACE, "iron_sword"),
-			Key.key(MINECRAFT_NAMESPACE, "diamond_sword"),
-			Key.key(MINECRAFT_NAMESPACE, "netherite_sword"),
-			Key.key(MINECRAFT_NAMESPACE, "cooked_porkchop"),
-			Key.key(MINECRAFT_NAMESPACE, "recovery_compass")
+		Key.key(MINECRAFT_NAMESPACE, "wooden_pickaxe"),
+		Key.key(MINECRAFT_NAMESPACE, "stone_pickaxe"),
+		Key.key(MINECRAFT_NAMESPACE, "golden_pickaxe"),
+		Key.key(MINECRAFT_NAMESPACE, "iron_pickaxe"),
+		Key.key(MINECRAFT_NAMESPACE, "diamond_pickaxe"),
+		Key.key(MINECRAFT_NAMESPACE, "netherite_pickaxe"),
+		Key.key(MINECRAFT_NAMESPACE, "golden_apple"),
+		Key.key(MINECRAFT_NAMESPACE, "enchanted_golden_apple"),
+		Key.key(MINECRAFT_NAMESPACE, "ender_eye"),
+		Key.key(MINECRAFT_NAMESPACE, "end_portal_frame"),
+		Key.key(MINECRAFT_NAMESPACE, "elytra"),
+		Key.key(MINECRAFT_NAMESPACE, "trident"),
+		Key.key(MINECRAFT_NAMESPACE, "coal"),
+		Key.key(MINECRAFT_NAMESPACE, "iron_ingot"),
+		Key.key(MINECRAFT_NAMESPACE, "gold_ingot"),
+		Key.key(MINECRAFT_NAMESPACE, "diamond"),
+		Key.key(MINECRAFT_NAMESPACE, "netherite_ingot"),
+		Key.key(MINECRAFT_NAMESPACE, "wooden_sword"),
+		Key.key(MINECRAFT_NAMESPACE, "stone_sword"),
+		Key.key(MINECRAFT_NAMESPACE, "golden_sword"),
+		Key.key(MINECRAFT_NAMESPACE, "iron_sword"),
+		Key.key(MINECRAFT_NAMESPACE, "diamond_sword"),
+		Key.key(MINECRAFT_NAMESPACE, "netherite_sword"),
+		Key.key(MINECRAFT_NAMESPACE, "cooked_porkchop"),
+		Key.key(MINECRAFT_NAMESPACE, "recovery_compass"),
+		Key.key(MINECRAFT_NAMESPACE, "stick"),
+		Key.key(MINECRAFT_NAMESPACE, "mace")
 	);
 	/**
 	 * Collection of flower blocks.
 	 */
 	public static final @NotNull KeyedTag FLOWERS = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "poppy"),
-			Key.key(MINECRAFT_NAMESPACE, "dandelion"),
-			Key.key(MINECRAFT_NAMESPACE, "blue_orchid"),
-			Key.key(MINECRAFT_NAMESPACE, "allium"),
-			Key.key(MINECRAFT_NAMESPACE, "azure_bluet"),
-			Key.key(MINECRAFT_NAMESPACE, "orange_tulip"),
-			Key.key(MINECRAFT_NAMESPACE, "red_tulip"),
-			Key.key(MINECRAFT_NAMESPACE, "pink_tulip"),
-			Key.key(MINECRAFT_NAMESPACE, "white_tulip"),
-			Key.key(MINECRAFT_NAMESPACE, "oxeye_daisy"),
-			Key.key(MINECRAFT_NAMESPACE, "cornflower"),
-			Key.key(MINECRAFT_NAMESPACE, "lily_of_the_valley"),
-			Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
-			Key.key(MINECRAFT_NAMESPACE, "brown_mushroom"),
-			Key.key(MINECRAFT_NAMESPACE, "red_mushroom"),
-			Key.key(MINECRAFT_NAMESPACE, "crimson_fungus"),
-			Key.key(MINECRAFT_NAMESPACE, "warped_fungus"),
-			// legacy pre-1.12
-			Key.key(MINECRAFT_NAMESPACE, "red_flower"),
-			Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
+		Key.key(MINECRAFT_NAMESPACE, "poppy"),
+		Key.key(MINECRAFT_NAMESPACE, "dandelion"),
+		Key.key(MINECRAFT_NAMESPACE, "blue_orchid"),
+		Key.key(MINECRAFT_NAMESPACE, "allium"),
+		Key.key(MINECRAFT_NAMESPACE, "azure_bluet"),
+		Key.key(MINECRAFT_NAMESPACE, "orange_tulip"),
+		Key.key(MINECRAFT_NAMESPACE, "red_tulip"),
+		Key.key(MINECRAFT_NAMESPACE, "pink_tulip"),
+		Key.key(MINECRAFT_NAMESPACE, "white_tulip"),
+		Key.key(MINECRAFT_NAMESPACE, "oxeye_daisy"),
+		Key.key(MINECRAFT_NAMESPACE, "cornflower"),
+		Key.key(MINECRAFT_NAMESPACE, "lily_of_the_valley"),
+		Key.key(MINECRAFT_NAMESPACE, "wither_rose"),
+		Key.key(MINECRAFT_NAMESPACE, "brown_mushroom"),
+		Key.key(MINECRAFT_NAMESPACE, "red_mushroom"),
+		Key.key(MINECRAFT_NAMESPACE, "crimson_fungus"),
+		Key.key(MINECRAFT_NAMESPACE, "warped_fungus"),
+		// legacy pre-1.12
+		Key.key(MINECRAFT_NAMESPACE, "red_flower"),
+		Key.key(MINECRAFT_NAMESPACE, "yellow_flower")
 	);
 	/**
 	 * Collection of torch blocks.
 	 */
 	public static final @NotNull KeyedTag TORCHES = new KeyedTag(
-			Key.key(MINECRAFT_NAMESPACE, "torch"),
-			Key.key(MINECRAFT_NAMESPACE, "redstone_torch"),
-			Key.key(MINECRAFT_NAMESPACE, "soul_torch"),
-			Key.key(MINECRAFT_NAMESPACE, "wall_torch"),
-			Key.key(MINECRAFT_NAMESPACE, "redstone_wall_torch"),
-			Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
+		Key.key(MINECRAFT_NAMESPACE, "torch"),
+		Key.key(MINECRAFT_NAMESPACE, "redstone_torch"),
+		Key.key(MINECRAFT_NAMESPACE, "soul_torch"),
+		Key.key(MINECRAFT_NAMESPACE, "wall_torch"),
+		Key.key(MINECRAFT_NAMESPACE, "redstone_wall_torch"),
+		Key.key(MINECRAFT_NAMESPACE, "soul_wall_torch")
 	);
 
 	/**
@@ -415,9 +417,9 @@ public class CommandConstants {
 	 * Message to show to users when they fail a Do-or-Die task.
 	 */
 	public static final @NotNull Title DO_OR_DIE_FAILURE = Title.title(
-			Component.translatable("cc.effect.do_or_die.failure", NamedTextColor.RED),
-			Component.empty(),
-			DO_OR_DIE_TIMES
+		Component.translatable("cc.effect.do_or_die.failure", NamedTextColor.RED),
+		Component.empty(),
+		DO_OR_DIE_TIMES
 	);
 	/**
 	 * The color used at the start of the countdown timer.
@@ -491,9 +493,9 @@ public class CommandConstants {
 	@NotNull
 	public static Title doOrDieSuccess(@NotNull ComponentLike rewardItem) {
 		return Title.title(
-				Component.translatable("cc.effect.do_or_die.title").color(NamedTextColor.GREEN),
-				Component.translatable("cc.effect.do_or_die.subtitle", SUCCESS_SUBTITLE_COLOR, rewardItem),
-				DO_OR_DIE_TIMES
+			Component.translatable("cc.effect.do_or_die.title").color(NamedTextColor.GREEN),
+			Component.translatable("cc.effect.do_or_die.subtitle", SUCCESS_SUBTITLE_COLOR, rewardItem),
+			DO_OR_DIE_TIMES
 		);
 	}
 
@@ -563,8 +565,8 @@ public class CommandConstants {
 	 */
 	public static Component buildLootboxTitle(@NotNull Plugin<?, ?> plugin, @NotNull Request request) {
 		return Component.translatable(
-				"cc.effect.lootbox.title",
-				plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR)
+			"cc.effect.lootbox.title",
+			plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR)
 		);
 	}
 
@@ -577,8 +579,8 @@ public class CommandConstants {
 	 */
 	public static Component buildLootboxLore(@NotNull Plugin<?, ?> plugin, @NotNull Request request) {
 		return Component.translatable(
-				"cc.effect.lootbox.lore",
-				plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR).decorate(TextDecoration.ITALIC)
+			"cc.effect.lootbox.lore",
+			plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR).decorate(TextDecoration.ITALIC)
 		);
 	}
 
@@ -602,10 +604,10 @@ public class CommandConstants {
 	 */
 	public static double explosionPower() {
 		return Math.max(
-				Math.round(RNG.doubles(4, 1, 7)
-						.average()
-						.orElse(5)), // failsafe? shouldn't be necessary though lol
-				2.5
+			Math.round(RNG.doubles(4, 1, 7)
+				.average()
+				.orElse(5)), // failsafe? shouldn't be necessary though lol
+			2.5
 		);
 	}
 
@@ -651,9 +653,9 @@ public class CommandConstants {
 	 */
 	public static double @NotNull [] randomFlingVector() {
 		return new double[]{
-				randomFlingHoriz(),
-				RNG.nextDouble(.4, 1.5),
-				randomFlingHoriz()
+			randomFlingHoriz(),
+			RNG.nextDouble(.4, 1.5),
+			randomFlingHoriz()
 		};
 	}
 
@@ -670,23 +672,23 @@ public class CommandConstants {
 		if (!id.namespace().equals(MINECRAFT_NAMESPACE))
 			return id.value();
 		String path = id.value();
-        switch (path) {
-            case "lightning_bolt":
-                return "lightning";
-            case "chest_minecart":
-                return "minecart_chest";
-            case "mooshroom":
-                return "mushroom_cow";
-            case "tnt":
-                return "primed_tnt";
-            case "snow_golem":
-                return "snowman";
-            case "binding_curse":
-                return "curse_of_binding";
-            case "vanishing_curse":
-                return "curse_of_vanishing";
-            case "sweeping":
-                return "sweeping_edge";
+		switch (path) {
+			case "lightning_bolt":
+				return "lightning";
+			case "chest_minecart":
+				return "minecart_chest";
+			case "mooshroom":
+				return "mushroom_cow";
+			case "tnt":
+				return "primed_tnt";
+			case "snow_golem":
+				return "snowman";
+			case "binding_curse":
+				return "curse_of_binding";
+			case "vanishing_curse":
+				return "curse_of_vanishing";
+			case "sweeping":
+				return "sweeping_edge";
 			case "villager_golem":
 				return "iron_golem";
 			case "zombie_pigman":
@@ -701,9 +703,9 @@ public class CommandConstants {
 				return "minecart_hopper";
 			case "tnt_minecart":
 				return "minecart_tnt";
-            default:
-                return path;
-        }
+			default:
+				return path;
+		}
 	}
 
 	/**
