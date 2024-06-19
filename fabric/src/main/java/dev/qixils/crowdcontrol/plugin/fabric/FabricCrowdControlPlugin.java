@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
+import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
@@ -324,5 +325,17 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
             SLF4JLogger.warn(String.format("Encountered exception while retrieving asset %s", asset), e);
 			return null;
         }
+	}
+
+	@Override
+	public @NotNull VersionMetadata getVersionMetadata() {
+		return new VersionMetadata(
+			server().getServerVersion(),
+			"Fabric",
+			server().getServerModName(),
+			FabricLoader.getInstance().getModContainer("fabricloader")
+				.map(container -> container.getMetadata().getVersion().getFriendlyString())
+				.orElse(null)
+		);
 	}
 }

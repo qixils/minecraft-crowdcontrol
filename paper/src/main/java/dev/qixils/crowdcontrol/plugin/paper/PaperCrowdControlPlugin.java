@@ -13,6 +13,7 @@ import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.ServerBuildInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -53,14 +54,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_MIN_VERSION = new SemVer(1, 20, 6);
 	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
-	public static final @NotNull Set<SemVer> MAPPED_VERSIONS = Set.of(
-		new SemVer(1, 19, 4),
-		new SemVer(1, 20),
-		new SemVer(1, 20, 1),
-		new SemVer(1, 20, 2),
-		new SemVer(1, 20, 3),
-		new SemVer(1, 20, 4)
-	);
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
@@ -301,6 +294,17 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
 		return new PaperPlayer(player);
+	}
+
+	@Override
+	public @NotNull VersionMetadata getVersionMetadata() {
+		OptionalInt build = ServerBuildInfo.buildInfo().buildNumber();
+		return new VersionMetadata(
+			ServerBuildInfo.buildInfo().minecraftVersionId(),
+			"Paper",
+			ServerBuildInfo.buildInfo().brandName(),
+			build.isPresent() ? Integer.toString(build.getAsInt()) : null
+		);
 	}
 
 	public static boolean isFeatureEnabled(FeatureFlagSet features) {

@@ -865,6 +865,7 @@ public interface Plugin<P, S> {
 		Object[] effects = commandRegister().getCommands().stream().filter(c -> c.getEffectName() != null).map(c -> c.getEffectName().toLowerCase(Locale.US)).toArray();
 		service.addLoginListener(connectingService -> getScheduledExecutor().schedule(() -> {
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
+			sendEmbeddedMessagePacket(connectingService, "version", getVersionMetadata().packet());
 			updateConditionalEffectVisibility(connectingService);
 			sendPlayerEvent(connectingService, "playerJoined", false);
 		}, 1, TimeUnit.SECONDS));
@@ -1356,4 +1357,11 @@ public interface Plugin<P, S> {
 	default @Nullable InputStream getInputStream(@NotNull String asset) {
 		return getClass().getClassLoader().getResourceAsStream(asset);
 	}
+
+	/**
+	 * Gets the metadata of the Minecraft server.
+	 *
+	 * @return server version
+	 */
+	@NotNull VersionMetadata getVersionMetadata();
 }

@@ -384,4 +384,14 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
 		return new SpongePlayer(player);
 	}
+
+	@Override
+	public @NotNull VersionMetadata getVersionMetadata() {
+		return new VersionMetadata(
+			game.getPlatform().getMinecraftVersion().getName(),
+			"Sponge",
+			"Sponge", // TODO?
+			null // TODO?
+		);
+	}
 }

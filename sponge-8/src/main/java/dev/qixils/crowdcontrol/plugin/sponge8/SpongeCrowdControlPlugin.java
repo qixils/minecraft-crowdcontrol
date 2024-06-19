@@ -8,6 +8,7 @@ import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
+import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
@@ -251,5 +252,15 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayer player) {
 		return new SpongePlayer(player);
+	}
+
+	@Override
+	public @NotNull VersionMetadata getVersionMetadata() {
+		return new VersionMetadata(
+			game.platform().minecraftVersion().name(),
+			"Sponge",
+			"Sponge", // TODO?
+			null // TODO?
+		);
 	}
 }
