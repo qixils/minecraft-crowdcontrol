@@ -1,8 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
@@ -23,6 +26,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DUR
 @Getter
 public final class FreezeCommand extends TimedVoidCommand {
 	public static final Map<UUID, List<FreezeData>> DATA = new HashMap<>();
+	private static final Map<UUID, TimedEffect> TIMED_EFFECTS = new HashMap<>();
 
 	private final String effectName;
 	private final String effectGroup;
@@ -62,11 +66,13 @@ public final class FreezeCommand extends TimedVoidCommand {
 				.request(request)
 				.effectGroup(effectGroup)
 				.duration(getDuration(request))
-				.startCallback($ -> {
+				.startCallback(timedEffect -> {
 					List<ServerPlayer> players = getPlugin().getPlayers(request);
 					Map<UUID, FreezeData> locations = new HashMap<>();
 					players.forEach(player -> {
-						locations.put(player.getUUID(), new FreezeData(modifier, new Location(player)));
+						UUID uuid = player.getUUID();
+						TIMED_EFFECTS.put(uuid, timedEffect);
+						locations.put(uuid, new FreezeData(modifier, new Location(player)));
 						Components.MOVEMENT_STATUS.get(player).set(freezeType, freezeValue);
 					});
 					atomic.set(locations);
@@ -75,6 +81,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 					return null;
 				})
 				.completionCallback($ -> atomic.get().forEach((uuid, data) -> {
+					TIMED_EFFECTS.remove(uuid);
 					DATA.get(uuid).remove(data);
 					MinecraftServer server = getPlugin().getServer();
 					if (server == null)
@@ -118,5 +125,21 @@ public final class FreezeCommand extends TimedVoidCommand {
 
 	public static FreezeCommand groundCamera(FabricCrowdControlPlugin plugin) {
 		return new FreezeCommand(plugin, "camera_lock_to_ground", "look", (cur, prev) -> cur.withRotation(cur.yaw(), 90), MovementStatus.Type.LOOK, MovementStatus.Value.PARTIAL);
+	}
+
+	@EventListener
+	public static final class Manager {
+		@Listener
+		public void onDeath(Death death) {
+			UUID uuid = death.entity().getUUID();
+			TimedEffect effect = TIMED_EFFECTS.get(uuid);
+			if (effect == null) return;
+
+			try {
+				effect.complete();
+			} catch (Exception e) {
+				FabricCrowdControlPlugin.getInstance().getSLF4JLogger().warn("Failed to stop freeze effect", e);
+			}
+		}
 	}
 }

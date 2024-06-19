@@ -13,6 +13,7 @@ A list of all changes made to the software in reverse chronological order.
 - Paper & Fabric: Updated the Lootbox effects to add random trims to armor
 - Updated the Player Size effects to adjust more attributes (step amount, jump strength, etc)
 - Fixed the Fling effect to prevent execution while in a vehicle (sorry Feinberg!)
+- Fixed the Can't Move effect preventing you from respawning after death (sorry Feinberg?)
 - Fixed issue where taking max health would successfully activate but refund anyway
 - Fixed compatibility with new Crowd Control client update
 

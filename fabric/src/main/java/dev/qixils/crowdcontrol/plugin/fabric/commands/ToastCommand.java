@@ -65,11 +65,6 @@ public final class ToastCommand extends ImmediateCommand {
 		TITLE = plugin.adventure().toNative(POPUP_TITLE);
 	}
 
-	@Override
-	public boolean isEventListener() {
-		return true;
-	}
-
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
