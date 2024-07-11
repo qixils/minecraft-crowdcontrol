@@ -2,6 +2,11 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.5.1
+
+- Fixed Summon Entity erroneously marking effects as Successful even when they fail
+- Fabric: Fixed Summon Minecart & Boat effects
+
 ## 3.5.0
 
 - Paper & Fabric: Updated support to 1.21

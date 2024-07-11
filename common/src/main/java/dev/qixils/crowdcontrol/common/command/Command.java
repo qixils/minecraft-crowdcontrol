@@ -324,6 +324,16 @@ public interface Command<P> {
 	}
 
 	/**
+	 * Whether the specified player is not known to be a server host.
+	 *
+	 * @param player player to check
+	 * @return whether the player is not a server host
+	 */
+	default boolean isNotHost(@NotNull P player) {
+		return !isHost(player);
+	}
+
+	/**
 	 * Announces the {@link #execute(List, Request) execution} of this command.
 	 *
 	 * @param request request that prompted the execution of this command

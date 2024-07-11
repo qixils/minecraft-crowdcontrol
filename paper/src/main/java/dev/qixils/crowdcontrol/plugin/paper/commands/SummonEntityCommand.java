@@ -2,9 +2,8 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.loottable.LootableInventory;
-import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
@@ -25,14 +24,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 @Getter
-public class SummonEntityCommand extends Command implements EntityCommand, Listener {
+public class SummonEntityCommand extends RegionalCommand implements EntityCommand, Listener {
 	private static final Set<EquipmentSlot> HANDS = Set.of(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
@@ -106,45 +103,26 @@ public class SummonEntityCommand extends Command implements EntityCommand, Liste
 	}
 
 	@Override
-	public @NotNull CompletableFuture<Response.@Nullable Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder tryExecute = tryExecute(players, request);
-		if (tryExecute != null) return completedFuture(tryExecute);
+	protected int getPlayerLimit() {
+		return getPlugin().getLimitConfig().getEntityLimit(entityType.getKey().getKey());
+	}
 
-		CompletableFuture<Response.Builder> future = new CompletableFuture<>();
-		LimitConfig config = plugin.getLimitConfig();
-		int maxVictims = config.getEntityLimit(entityType.getKey().getKey());
+	@Override
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.UNAVAILABLE)
+			.message("Failed to spawn entity; likely not supported by this version of Minecraft");
+	}
 
-		sync(() -> {
-			try {
-				int victims = 0;
+	@Override
+	protected Response.@Nullable Builder precheck(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		return tryExecute(players, request); // todo: a bit redundant?
+	}
 
-				// first pass (hosts)
-				for (Player player : players) {
-					if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
-						break;
-					if (!isHost(player))
-						continue;
-					spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
-					victims++;
-				}
-
-				// second pass (guests)
-				for (Player player : players) {
-					if (maxVictims > 0 && victims >= maxVictims)
-						break;
-					if (isHost(player))
-						continue;
-					spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
-					victims++;
-				}
-			} catch (Exception e) {
-				future.complete(request.buildResponse()
-						.type(Response.ResultType.UNAVAILABLE)
-						.message("Failed to spawn entity; likely not supported by this version of Minecraft"));
-			}
-			future.complete(request.buildResponse().type(Response.ResultType.SUCCESS));
-		});
-		return future;
+	@Override
+	protected boolean executeRegionally(@NotNull Player player, @NotNull Request request) {
+		spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
+		return true;
 	}
 
 	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {

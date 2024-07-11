@@ -11,8 +11,7 @@ ip: null
 # This port must be opened in your server's (or router's) firewall.
 port: 58431
 
-# Makes it so that all purchased effects apply to everyone on the server,
-#  even when running in server-mode with individually connected clients.
+# Makes it so that all purchased effects apply to everyone on the server.
 global: false
 
 # The hosts or owners of a server, through which viewers are able to purchase specific universal

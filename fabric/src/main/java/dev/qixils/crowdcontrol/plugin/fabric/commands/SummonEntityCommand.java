@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
@@ -10,6 +11,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -37,11 +39,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
 	private static final Set<EquipmentSlot> HANDS = Arrays.stream(EquipmentSlot.values()).filter(slot -> slot.getType() == EquipmentSlot.Type.HAND).collect(Collectors.toSet());
@@ -87,9 +91,10 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	private List<ResourceKey<LootTable>> getLootTables(MinecraftServer server) {
 		if (lootTables != null)
 			return lootTables;
-		return lootTables = server.registryAccess()
-			.lookupOrThrow(Registries.LOOT_TABLE)
-			.listElements()
+		return lootTables = server.reloadableRegistries().get()
+			.lookup(Registries.LOOT_TABLE)
+			.stream()
+			.flatMap(HolderLookup::listElements)
 			.flatMap(reference -> reference.unwrapKey().stream())
 			.filter(key -> key.location().getPath().startsWith("chests/"))
 			.toList();
@@ -101,33 +106,33 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		Response.Builder tryExecute = tryExecute(players, request);
 		if (tryExecute != null) return tryExecute;
 
+		Component name = plugin.getViewerComponentOrNull(request, false);
+
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+		int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+		if (playerLimit > 0) {
+			boolean hostsBypass = config.hostsBypass();
+			AtomicInteger victims = new AtomicInteger();
+			players = players.stream()
+				.sorted(Comparator.comparing(this::isHost))
+				.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && isHost(player)))
+				.toList();
+		}
 
-		sync(() -> {
-			int victims = 0;
+		boolean success = false;
 
-			// first pass (hosts)
-			for (ServerPlayer player : players) {
-				if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
-					break;
-				if (!isHost(player))
-					continue;
-				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
-				victims++;
+		for (ServerPlayer player : players) {
+			try {
+				spawnEntity(name, player);
+				success = true;
+			} catch (Exception e) {
+				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
+		}
 
-			// second pass (guests)
-			for (ServerPlayer player : players) {
-				if (maxVictims > 0 && victims >= maxVictims)
-					break;
-				if (isHost(player))
-					continue;
-				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
-				victims++;
-			}
-		});
-		return request.buildResponse().type(ResultType.SUCCESS);
+		return success
+			? request.buildResponse().type(ResultType.SUCCESS)
+			: request.buildResponse().type(ResultType.UNAVAILABLE).message("Failed to spawn entity");
 	}
 
 	@Blocking

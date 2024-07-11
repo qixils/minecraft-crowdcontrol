@@ -12,6 +12,8 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 
 @Getter
@@ -29,7 +31,7 @@ public class FlingCommand extends RegionalCommand {
 	}
 
 	@Override
-	protected Response.@Nullable Builder precheck(@NotNull Request request) {
+	protected Response.@Nullable Builder precheck(@NotNull List<@NotNull Player> players, @NotNull Request request) {
 		if (isActive("walk", request) || isActive("look", request))
 			return request.buildResponse().type(ResultType.RETRY).message("Cannot fling while frozen");
 		return null;

@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
@@ -38,6 +39,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARM
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_ARMOR_START;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @Getter
 public class SummonEntityCommand extends ImmediateCommand implements EntityCommand {
 	private static final Map<EquipmentType, List<ItemType>> ARMOR;
@@ -102,33 +104,45 @@ public class SummonEntityCommand extends ImmediateCommand implements EntityComma
 		Response.Builder tryExecute = tryExecute(players, request);
 		if (tryExecute != null) return tryExecute;
 
+		Component name = plugin.getViewerComponentOrNull(request, false);
+
 		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(SpongeTextUtil.csIdOf(entityType));
+		int maxVictims = config.getEntityLimit(SpongeTextUtil.csIdOf(entityType));
+		int victims = 0;
 
-		sync(() -> {
-			int victims = 0;
+		// first pass (hosts)
+		for (Player player : players) {
+			if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
+				break;
+			if (!isHost(player))
+				continue;
 
-			// first pass (hosts)
-			for (Player player : players) {
-				if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
-					break;
-				if (!isHost(player))
-					continue;
-				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
+			try {
+				spawnEntity(name, player);
 				victims++;
+			} catch (Exception e) {
+				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
+		}
 
-			// second pass (guests)
-			for (Player player : players) {
-				if (maxVictims > 0 && victims >= maxVictims)
-					break;
-				if (isHost(player))
-					continue;
-				spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
+		// second pass (guests)
+		for (Player player : players) {
+			if (maxVictims > 0 && victims >= maxVictims)
+				break;
+			if (isHost(player))
+				continue;
+
+			try {
+				spawnEntity(name, player);
 				victims++;
+			} catch (Exception e) {
+				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
-		});
-		return request.buildResponse().type(ResultType.SUCCESS);
+		}
+
+		return victims > 0
+			? request.buildResponse().type(ResultType.SUCCESS)
+			: request.buildResponse().type(ResultType.UNAVAILABLE).message("Failed to spawn entity");
 	}
 
 	@Blocking
