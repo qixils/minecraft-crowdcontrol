@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Getter
-public class ClutterCommand extends RegionalCommand {
+public class ClutterCommand extends RegionalCommandSync {
 	private final String effectName = "clutter";
 
 	public ClutterCommand(PaperCrowdControlPlugin plugin) {
@@ -24,7 +24,7 @@ public class ClutterCommand extends RegionalCommand {
 	}
 
 	@Override
-	protected boolean executeRegionally(Player player, Request request) {
+	protected boolean executeRegionallySync(Player player, Request request) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] items = inventory.getContents();
 		List<ItemStack> list = new ArrayList<>(Arrays.asList(items));

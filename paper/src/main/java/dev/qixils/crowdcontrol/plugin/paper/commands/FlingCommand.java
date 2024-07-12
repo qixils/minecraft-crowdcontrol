@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -17,7 +17,7 @@ import java.util.List;
 import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 
 @Getter
-public class FlingCommand extends RegionalCommand {
+public class FlingCommand extends RegionalCommandSync {
 	private final @NotNull String effectName = "fling";
 
 	public FlingCommand(@NotNull PaperCrowdControlPlugin plugin) {
@@ -38,7 +38,7 @@ public class FlingCommand extends RegionalCommand {
 	}
 
 	@Override
-	protected boolean executeRegionally(Player player, Request request) {
+	protected boolean executeRegionallySync(Player player, Request request) {
 		if (player.isInsideVehicle()) return false;
 
 		player.setVelocity(randomVector());

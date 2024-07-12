@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
@@ -29,7 +29,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
 @Getter
-public class SummonEntityCommand extends RegionalCommand implements EntityCommand, Listener {
+public class SummonEntityCommand extends RegionalCommandSync implements EntityCommand, Listener {
 	private static final Set<EquipmentSlot> HANDS = Set.of(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final Map<EquipmentSlot, List<Material>> ARMOR;
 	private static final Set<LootTables> CHEST_LOOT_TABLES;
@@ -120,7 +120,7 @@ public class SummonEntityCommand extends RegionalCommand implements EntityComman
 	}
 
 	@Override
-	protected boolean executeRegionally(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
 		spawnEntity(plugin.getViewerComponentOrNull(request, false), player);
 		return true;
 	}

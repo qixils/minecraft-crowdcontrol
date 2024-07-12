@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -22,7 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-abstract class NearbyLocationCommand<S> extends Command {
+import static java.util.concurrent.CompletableFuture.completedStage;
+
+abstract class NearbyLocationCommand<S> extends RegionalCommand {
 	protected NearbyLocationCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -86,40 +88,45 @@ abstract class NearbyLocationCommand<S> extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<@Nullable Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		CompletableFuture<Builder> future = new CompletableFuture<>();
-		sync(() -> {
-			Builder response = request.buildResponse().type(ResultType.FAILURE).message("Could not find a location to teleport to");
-			for (Player player : players) {
-				World world = player.getWorld();
-				Location location = player.getLocation();
-				S currentType = currentType(location);
-				List<S> searchTypes = new ArrayList<>(getSearchTypes(world.getEnvironment()));
-				Collections.shuffle(searchTypes, random);
-				for (S searchType : searchTypes) {
-					if (searchType.equals(currentType))
-						continue;
-					Location destination = safeLocation(search(location, searchType));
-					if (destination == null)
-						continue;
-					if (destination.distanceSquared(location) <= 2500) // 50 blocks
-						continue;
-					if (!world.getWorldBorder().isInside(destination))
-						continue;
-					player.teleportAsync(destination).thenAccept(success -> {
-						if (!success)
-							return;
-						player.sendActionBar(Component.translatable(
-								"cc.effect.nearby_location.output",
-								nameOf(searchType).color(NamedTextColor.YELLOW)
-						));
-					});
-					response.type(ResultType.SUCCESS).message("SUCCESS"); // technically this could still fail; unlikely tho.
-					break;
-				}
-			}
-			future.complete(response);
-		});
-		return future;
+	protected @NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse().type(ResultType.FAILURE).message("Could not find a location to teleport to");
+	}
+
+	@Override
+	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull Request request) {
+		World world = player.getWorld();
+		Location location = player.getLocation();
+		S currentType = currentType(location);
+		List<S> searchTypes = new ArrayList<>(getSearchTypes(world.getEnvironment()));
+		Collections.shuffle(searchTypes, random);
+
+		CompletableFuture<Boolean> success = CompletableFuture.completedFuture(false);
+		for (S searchType : searchTypes) {
+			success = success.thenCompose(result -> {
+				if (result) return completedStage(true);
+
+				if (searchType.equals(currentType))
+					return completedStage(false);
+				Location destination = safeLocation(search(location, searchType));
+				if (destination == null)
+					return completedStage(false);
+				if (destination.distanceSquared(location) <= 2500) // 50 blocks
+					return completedStage(false);
+				if (!world.getWorldBorder().isInside(destination))
+					return completedStage(false);
+
+				return player.teleportAsync(destination).thenApply(tpSuccess -> {
+					if (!tpSuccess) return false;
+
+					player.sendActionBar(Component.translatable(
+						"cc.effect.nearby_location.output",
+						nameOf(searchType).color(NamedTextColor.YELLOW)
+					));
+					return true;
+				});
+			});
+		}
+
+		return success;
 	}
 }

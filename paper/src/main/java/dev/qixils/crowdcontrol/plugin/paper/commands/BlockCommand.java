@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.plugin.paper.FeatureElementCommand;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -16,10 +16,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 @Getter
-public class BlockCommand extends ImmediateCommand implements FeatureElementCommand {
+public class BlockCommand extends RegionalCommandSync implements FeatureElementCommand {
 	protected final Material material;
 	private final String effectName;
 	private final Component displayName;
@@ -54,21 +52,24 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse()
-				.type(Response.ResultType.RETRY)
-				.message("No available locations to set blocks");
-		for (Player player : players) {
-			Location location = getLocation(player);
-			if (location == null)
-				continue;
-			Block block = location.getBlock();
-			Material mat = getMaterial();
-			if (block.isReplaceable() && block.getType() != mat) {
-				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> block.setType(mat));
-			}
-		}
-		return result;
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+		Location location = getLocation(player);
+		if (location == null)
+			return false;
+
+		Block block = location.getBlock();
+		Material mat = getMaterial();
+		if (!block.isReplaceable() || block.getType() == mat)
+			return false;
+
+		block.setType(mat);
+		return true;
+	}
+
+	@Override
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("No available locations to set blocks");
 	}
 }

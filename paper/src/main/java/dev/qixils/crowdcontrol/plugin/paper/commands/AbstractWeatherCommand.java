@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.WEATHER_TICKS;
 
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @Global
 public abstract class AbstractWeatherCommand extends ImmediateCommand {
 	protected static final int WEATHER_DURATION = (int) WEATHER_TICKS;
@@ -35,8 +37,8 @@ public abstract class AbstractWeatherCommand extends ImmediateCommand {
 				continue;
 			if (isWeatherActive(world))
 				continue;
+			applyWeather(world);
 			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-			sync(() -> applyWeather(world));
 		}
 		return result;
 	}

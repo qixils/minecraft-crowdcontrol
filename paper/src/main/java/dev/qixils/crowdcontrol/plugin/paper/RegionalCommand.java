@@ -24,17 +24,16 @@ public abstract class RegionalCommand extends Command {
 		return null;
 	}
 
-	protected abstract boolean executeRegionally(@NotNull Player player, @NotNull Request request);
+	protected abstract CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull Request request);
 
 	protected abstract Response.@NotNull Builder buildFailure(@NotNull Request request);
 
-	private boolean executeSafely(@NotNull Player player, @NotNull Request request) {
-		try {
-			return executeRegionally(player, request);
-		} catch (Exception e) {
-			getPlugin().getSLF4JLogger().error(text("Failed to execute ").append(getDisplayName()), e);
+	private CompletableFuture<Boolean> executeSafely(@NotNull Player player, @NotNull Request request) {
+		return executeRegionallyAsync(player, request).handle((success, error) -> {
+			if (success) return true;
+			if (error != null) getPlugin().getSLF4JLogger().error(text("Failed to execute ").append(getDisplayName()), error);
 			return false;
-		}
+		});
 	}
 
 	protected int getPlayerLimit() {
@@ -60,7 +59,7 @@ public abstract class RegionalCommand extends Command {
 		for (Player player : players) {
 			CompletableFuture<Boolean> future = new CompletableFuture<>();
 			futures.add(future);
-			player.getScheduler().run(plugin, $ -> future.complete(executeSafely(player, request)), () -> future.complete(false));
+			player.getScheduler().run(plugin, $ -> executeSafely(player, request).thenApply(future::complete), () -> future.complete(false));
 		}
 
 		return CompletableFutureUtils.allOf(futures).handleAsync(($1, $2) -> {

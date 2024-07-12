@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FALLING_BLOCK_FALL_DISTANCE;
 
-public class RandomFallingBlockCommand extends RegionalCommand {
+public class RandomFallingBlockCommand extends RegionalCommandSync {
 	public RandomFallingBlockCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -42,7 +42,7 @@ public class RandomFallingBlockCommand extends RegionalCommand {
 	}
 
 	@Override
-	protected boolean executeRegionally(Player player, Request request) {
+	protected boolean executeRegionallySync(Player player, Request request) {
 		Location playerLoc = player.getLocation();
 		Location destination = playerLoc.clone();
 		World world = destination.getWorld();
