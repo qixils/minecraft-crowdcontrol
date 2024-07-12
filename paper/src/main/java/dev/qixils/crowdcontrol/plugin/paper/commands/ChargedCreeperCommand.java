@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand {
@@ -21,7 +22,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 	}
 
 	@Override
-	protected Entity spawnEntity(@NotNull Component viewer, @NotNull Player player) {
+	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
 		Creeper creeper = (Creeper) super.spawnEntity(viewer, player);
 		creeper.setPowered(true);
 		Location pos = creeper.getLocation();

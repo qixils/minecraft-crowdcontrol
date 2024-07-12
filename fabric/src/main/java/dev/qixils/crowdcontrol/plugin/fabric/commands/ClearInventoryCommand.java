@@ -33,12 +33,11 @@ public class ClearInventoryCommand extends ImmediateCommand {
 				.message("All inventories are already empty or protected");
 		for (ServerPlayer player : players) {
 			// ensure keep inventory is not enabled
-			if (KeepInventoryCommand.isKeepingInventory(player)) {
-				resp.type(ResultType.FAILURE);
+			if (KeepInventoryCommand.isKeepingInventory(player))
 				continue;
-			}
-			Inventory inv = player.getInventory();
+
 			// ensure inventory is not empty
+			Inventory inv = player.getInventory();
 			boolean hasItems = false;
 			for (ItemStack item : InventoryUtil.viewAllItems(inv)) {
 				if (!item.isEmpty()) {
@@ -46,7 +45,9 @@ public class ClearInventoryCommand extends ImmediateCommand {
 					break;
 				}
 			}
-			if (!hasItems) continue;
+			if (!hasItems)
+				continue;
+
 			// clear inventory
 			resp.type(ResultType.SUCCESS).message("SUCCESS");
 			sync(inv::clearContent);

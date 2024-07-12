@@ -6,6 +6,7 @@ A list of all changes made to the software in reverse chronological order.
 
 - Fixed Summon Entity erroneously marking effects as Successful even when they fail
 - Fabric: Fixed Summon Minecart & Boat effects
+- Fixed incredibly rare issue where certain `/account link` setups or join orders could cause the Clear Inventory effect to randomly erroneously refund viewers while only one player has Keep Inventory active
 
 ## 3.5.0
 
