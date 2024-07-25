@@ -27,4 +27,4 @@ const modVersion = modVersions
 .sort(semverSort)
 .at(-1)!
 
-await fs.writeFile(path.resolve(root, "ccver"), modVersion)
+// await fs.writeFile(path.resolve(root, "ccver"), modVersion)
