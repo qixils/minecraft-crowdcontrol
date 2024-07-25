@@ -6,8 +6,6 @@ import { downloadSponge } from './sponge.js';
 import { downloadJRE } from './java.js';
 import { mkdir, semverSort } from './utils.js';
 
-// TODO: lots of fetches are missing UA headers
-
 const root = await mkdir(path.resolve("output", "Minecraft"))
 
 await downloadJRE(root, 8)

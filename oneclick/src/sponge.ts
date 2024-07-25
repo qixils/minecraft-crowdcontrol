@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs-extra";
-import { downloadFile, isSemverGE, jrePaths, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
+import { downloadFile, jrePaths, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
 import { downloadMod } from "./modrinth.js";
 import child_process from "child_process";
 
@@ -135,6 +135,8 @@ export async function downloadSponge(to: string, api: number) {
 start ..\\java\\${jre}\\bin\\java.exe -Xmx2048M -Xms2048M @libraries/net/minecraftforge/forge/${forgeFull}/win_args.txt nogui %* > log.txt 2> errorlog.txt`)
     }
 
-    const plugins = await mkdir(path.resolve(mods, "plugins"))
+    const plugins = api >= 11
+        ? await mkdir(path.resolve(mods, "plugins"))
+        : mods // backwards compat with old file structure
     return await downloadMod(plugins, "sponge", minecraft)
 }
