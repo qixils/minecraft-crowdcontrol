@@ -154,9 +154,9 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof LivingEntity)
 			Components.VIEWER_MOB.get(entity).setViewerSpawned();
 		if (entity instanceof Boat boat)
-			boat.setVariant(randomElementFrom(Boat.Type.class));
+			boat.setVariant(randomElementFrom(Boat.Type.values()));
 		if (entity instanceof Wolf wolf) {
-			wolf.setCollarColor(randomElementFrom(DyeColor.class));
+			wolf.setCollarColor(randomElementFrom(DyeColor.values()));
 			wolf.setVariant(randomElementFrom(level.registryAccess().registryOrThrow(Registries.WOLF_VARIANT).holders()));
 		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
@@ -174,7 +174,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 			horse.setTamed(true);
 		}
 		if (entity instanceof Sheep sheep) // TODO: jeb
-			sheep.setColor(randomElementFrom(DyeColor.class));
+			sheep.setColor(randomElementFrom(DyeColor.values()));
 		if (entity instanceof Saddleable saddleable && RandomUtil.RNG.nextBoolean())
 			saddleable.equipSaddle(new ItemStack(Items.SADDLE), null);
 		if (entity instanceof EnderMan enderman)
@@ -184,7 +184,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof Frog frog)
 			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT.holders()));
 		if (entity instanceof Axolotl axolotl)
-			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
+			axolotl.setVariant(randomElementFrom(Axolotl.Variant.values()));
 		if (entity instanceof Rabbit rabbit)
 			rabbit.setVariant(weightedRandom(RABBIT_VARIANTS));
 		if (entity instanceof VillagerDataHolder villager)

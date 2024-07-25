@@ -8,7 +8,7 @@ import { mkdir, semverSort } from './utils.js';
 
 // TODO: lots of fetches are missing UA headers
 
-const root = await mkdir(path.resolve("output"))
+const root = await mkdir(path.resolve("output", "Minecraft"))
 
 await downloadJRE(root, 8)
 await downloadJRE(root, 21)

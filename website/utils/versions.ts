@@ -18,7 +18,7 @@ interface Modloader {
 }
 
 export const unsureML: Modloader = {name: "Unsure", id: "unsure", versions: allVersions};
-export const paperML: Modloader = {name: "Paper", id: "paper", versions: paperVersions};
+export const paperML: Modloader = {name: "Paper/Folia", id: "paper", versions: paperVersions};
 export const fabricML: Modloader = {name: "Fabric", id: "fabric", versions: fabricVersions};
 export const spongeML: Modloader = {name: "Sponge/Forge", id: "sponge", versions: spongeVersionsArray};
 export const modloaders: Modloader[] = [unsureML, paperML, fabricML, spongeML];
