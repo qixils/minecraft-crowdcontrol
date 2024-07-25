@@ -138,5 +138,5 @@ start ..\\java\\${jre}\\bin\\java.exe -Xmx2048M -Xms2048M @libraries/net/minecra
     const plugins = api >= 11
         ? await mkdir(path.resolve(mods, "plugins"))
         : mods // backwards compat with old file structure
-    return await downloadMod(plugins, "sponge", minecraft)
+    return await downloadMod(plugins, "sponge", minecraft, { filename: `CrowdControl-Sponge${api}.jar` })
 }

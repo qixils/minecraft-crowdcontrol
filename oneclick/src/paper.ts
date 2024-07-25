@@ -72,5 +72,5 @@ export async function downloadPaper(to: string) {
 
     await writeRun(serverJar, 21)
     
-    return await downloadMod(plugins, "paper", version)
+    return await downloadMod(plugins, "paper", version, { filename: "CrowdControl-Paper.jar" })
 }
