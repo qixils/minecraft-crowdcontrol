@@ -73,14 +73,14 @@ dependencies {
         exclude(group = "com.google.code.findbugs")
     }
     implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
-    compileOnly("org.spongepowered:spongeapi:11.0.0-SNAPSHOT") {
+    compileOnly("org.spongepowered:spongeapi:11.0.0") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    //compileOnly("org.spongepowered:sponge:1.20.6-11.0.0-SNAPSHOT:dev")
+    //compileOnly("org.spongepowered:sponge:1.20.6-11.0.0:dev")
 }
 
 sponge {
-    apiVersion("11.0.0-SNAPSHOT")
+    apiVersion("11.0.0")
     loader {
         name(org.spongepowered.gradle.plugin.config.PluginLoaders.JAVA_PLAIN)
         version("1.0")
