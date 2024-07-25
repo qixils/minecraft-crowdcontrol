@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs-extra";
-import { downloadFile, isSemverGE, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
+import { downloadFile, isSemverGE, jrePaths, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
 import { downloadMod } from "./modrinth.js";
 import child_process from "child_process";
 
@@ -104,15 +104,17 @@ export async function downloadSponge(to: string, api: number) {
     const spongeJar = path.resolve(mods, "SpongeForge.jar")
     await downloadFile(spongeJar, spongeUrl)
 
-    console.info(`Downloading Forge ${minecraft} ${forge} installer`)
     const forgeFull = api === 7
-        ? `${minecraft}-14.23.5.${forge}` // todo: improve hack
-        : `${minecraft}-${forge}`
+        ? `${minecraft}-14.23.5.2859` // update to fix uhh
+        : api === 8
+            ? `${minecraft}-36.2.34` // update to fix issue with new JREs
+            : `${minecraft}-${forge}`
+    console.info(`Downloading Forge ${forgeFull} installer`)
     const installerJar = path.resolve(to, `forge-${forgeFull}.jar`)
     const installerUrl = `https://maven.minecraftforge.net/net/minecraftforge/forge/${forgeFull}/forge-${forgeFull}-installer.jar`
     await downloadFile(installerJar, installerUrl)
 
-    console.info(`Running Forge ${minecraft} ${forge} installer`)
+    console.info(`Running Forge ${forgeFull} installer`)
     const child = child_process.spawn("java", ["-jar", installerJar, "--installServer"], {
         cwd: root,
     })
@@ -123,15 +125,16 @@ export async function downloadSponge(to: string, api: number) {
 
     if (api < 11) {
         const serverJar = (await fs.readdir(root)).find(file => file.startsWith("forge") && path.extname(file) === ".jar")
-        if (!serverJar) throw new Error(`Could not find server jar for Forge ${minecraft} ${forge}`);
+        if (!serverJar) throw new Error(`Could not find server jar for Forge ${forgeFull}`);
         const resolved = path.join(root, serverJar)
         await writeRun(resolved, 8)
     } else {
+        const jre = jrePaths[21]
         const batFile = path.resolve(root, "run.bat")
         await fs.writeFile(batFile, `@echo off
-start ..\\java\\jre21\\bin\\java.exe -Xmx2048M -Xms2048M @libraries/net/minecraftforge/forge/${forgeFull}/win_args.txt nogui %* > log.txt 2> errorlog.txt`)
+start ..\\java\\${jre}\\bin\\java.exe -Xmx2048M -Xms2048M @libraries/net/minecraftforge/forge/${forgeFull}/win_args.txt nogui %* > log.txt 2> errorlog.txt`)
     }
 
-    const plugins = await mkdir(path.resolve(root, "plugins"))
+    const plugins = await mkdir(path.resolve(mods, "plugins"))
     return await downloadMod(plugins, "sponge", minecraft)
 }

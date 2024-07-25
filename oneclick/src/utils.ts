@@ -125,5 +125,5 @@ export async function writeRun(
   const jarName = path.basename(jar)
   const batFile = path.resolve(path.dirname(jar), "run.bat")
   await fs.writeFile(batFile, `@echo off
-start ..\\java\\jre${java}\\bin\\java.exe -Xmx2048M -Xms2048M -jar ${jarName} nogui > log.txt 2> errorlog.txt`)
+start ..\\java\\${jre}\\bin\\java.exe -Xmx2048M -Xms2048M -jar ${jarName} nogui > log.txt 2> errorlog.txt`)
 }
