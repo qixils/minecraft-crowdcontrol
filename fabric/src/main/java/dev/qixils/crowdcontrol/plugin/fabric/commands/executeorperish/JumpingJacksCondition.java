@@ -14,7 +14,7 @@ public final class JumpingJacksCondition extends AbstractListeningCondition<Inte
 	private final @NotNull Component component;
 
 	public JumpingJacksCondition(int goal) {
-		super(1, 0, null);
+		super(2, 0, null);
 		this.goal = goal;
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.jump",

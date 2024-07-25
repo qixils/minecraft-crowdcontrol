@@ -13,8 +13,8 @@ import java.util.List;
 @Getter
 public enum Condition {
 	// stand on...
-	STAND_ON_COBBLESTONE(new StandOnBlockCondition(1, "generic", Material.COBBLESTONE)),
-	STAND_ON_A_PLANK(new StandOnBlockCondition(1, "plank",
+	STAND_ON_COBBLESTONE(new StandOnBlockCondition(2, "generic", Material.COBBLESTONE)),
+	STAND_ON_A_PLANK(new StandOnBlockCondition(2, "plank",
 			Material.OAK_PLANKS,
 			Material.BIRCH_PLANKS,
 			Material.ACACIA_PLANKS,
@@ -24,7 +24,7 @@ public enum Condition {
 			Material.DARK_OAK_PLANKS,
 			Material.SPRUCE_PLANKS
 	)),
-	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(4, "stripped_log",
+	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(5, "stripped_log",
 			Material.STRIPPED_OAK_LOG,
 			Material.STRIPPED_BIRCH_LOG,
 			Material.STRIPPED_ACACIA_LOG,
@@ -43,17 +43,17 @@ public enum Condition {
 			Material.STRIPPED_WARPED_HYPHAE
 	)),
 	// obtain...
-	OBTAIN_STONE(new ObtainItemCondition(3, "generic_block", Material.STONE)),
+	OBTAIN_STONE(new ObtainItemCondition(4, "generic_block", Material.STONE)),
 	// craft...
-	CRAFT_STONE_HOE(new CraftItemCondition(2, "generic", Material.STONE_HOE)),
-	CRAFT_WOODEN_HOE(new CraftItemCondition(1, "generic", Material.WOODEN_HOE)),
+	CRAFT_STONE_HOE(new CraftItemCondition(3, "generic", Material.STONE_HOE)),
+	CRAFT_WOODEN_HOE(new CraftItemCondition(2, "generic", Material.WOODEN_HOE)),
 
 	//// overworld-only ////
 	// stand on...
-	STAND_ON_DIRT(new StandOnBlockCondition(1, "generic", ConditionFlags.OVERWORLD, Material.DIRT)),
-	STAND_ON_STONE(new StandOnBlockCondition(1, "generic", ConditionFlags.OVERWORLD, Material.STONE)),
-	STAND_ON_SAND(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Material.SAND)),
-	STAND_ON_A_BED(new StandOnBlockCondition(3, "bed", ConditionFlags.OVERWORLD,
+	STAND_ON_DIRT(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Material.DIRT)),
+	STAND_ON_STONE(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Material.STONE)),
+	STAND_ON_SAND(new StandOnBlockCondition(3, "generic", ConditionFlags.OVERWORLD, Material.SAND)),
+	STAND_ON_A_BED(new StandOnBlockCondition(4, "bed", ConditionFlags.OVERWORLD,
 			Material.WHITE_BED,
 			Material.ORANGE_BED,
 			Material.MAGENTA_BED,
@@ -72,20 +72,20 @@ public enum Condition {
 			Material.BLACK_BED
 	)),
 	// obtain...
-	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(1, "generic_alt", ConditionFlags.OVERWORLD, Material.WHEAT_SEEDS)),
+	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(2, "generic_alt", ConditionFlags.OVERWORLD, Material.WHEAT_SEEDS)),
 	// craft...
-	CRAFT_SANDSTONE(new CraftItemCondition(1, "generic_block", Material.SANDSTONE, ConditionFlags.OVERWORLD)),
+	CRAFT_SANDSTONE(new CraftItemCondition(2, "generic_block", Material.SANDSTONE, ConditionFlags.OVERWORLD)),
 
 	//// nether-only ////
 	// stand on...
-	STAND_ON_FIRE(new StandOnBlockCondition(1, "generic", ConditionFlags.NETHER, Material.FIRE)),
+	STAND_ON_FIRE(new StandOnBlockCondition(2, "generic", ConditionFlags.NETHER, Material.FIRE)),
 	// obtain...
-	OBTAIN_NETHER_BRICK(new ObtainItemCondition(3, "generic", ConditionFlags.NETHER, Material.NETHER_BRICK)),
-	OBTAIN_OBSIDIAN(new ObtainItemCondition(3, "generic_alt", ConditionFlags.NETHER, Material.OBSIDIAN)),
+	OBTAIN_NETHER_BRICK(new ObtainItemCondition(4, "generic", ConditionFlags.NETHER, Material.NETHER_BRICK)),
+	OBTAIN_OBSIDIAN(new ObtainItemCondition(4, "generic_alt", ConditionFlags.NETHER, Material.OBSIDIAN)),
 	// craft...
-	CRAFT_QUARTZ(new CraftItemCondition(1, "generic", Material.QUARTZ_BLOCK, ConditionFlags.NETHER)),
-	CRAFT_GOLD_INGOT(new CraftItemCondition(1, "generic", Material.GOLD_INGOT, ConditionFlags.NETHER)),
-	CRAFT_GLOWSTONE(new CraftItemCondition(1, "generic_block", Material.GLOWSTONE, ConditionFlags.NETHER)),
+	CRAFT_QUARTZ(new CraftItemCondition(2, "generic", Material.QUARTZ_BLOCK, ConditionFlags.NETHER)),
+	CRAFT_GOLD_INGOT(new CraftItemCondition(2, "generic", Material.GOLD_INGOT, ConditionFlags.NETHER)),
+	CRAFT_GLOWSTONE(new CraftItemCondition(2, "generic_block", Material.GLOWSTONE, ConditionFlags.NETHER)),
 
 	//// miscellaneous ////
 	JUMP(new JumpingJacksCondition(49)),

@@ -13,8 +13,8 @@ import java.util.List;
 @Getter
 public enum Condition {
 	// stand on...
-	STAND_ON_COBBLESTONE(new StandOnBlockCondition(1, "generic", Blocks.COBBLESTONE)),
-	STAND_ON_A_PLANK(new StandOnBlockCondition(1, "plank",
+	STAND_ON_COBBLESTONE(new StandOnBlockCondition(2, "generic", Blocks.COBBLESTONE)),
+	STAND_ON_A_PLANK(new StandOnBlockCondition(2, "plank",
 			Blocks.OAK_PLANKS,
 			Blocks.BIRCH_PLANKS,
 			Blocks.ACACIA_PLANKS,
@@ -24,7 +24,7 @@ public enum Condition {
 			Blocks.DARK_OAK_PLANKS,
 			Blocks.SPRUCE_PLANKS
 	)),
-	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(4, "stripped_log",
+	STAND_ON_A_STRIPPED_LOG(new StandOnBlockCondition(5, "stripped_log",
 			Blocks.STRIPPED_OAK_LOG,
 			Blocks.STRIPPED_BIRCH_LOG,
 			Blocks.STRIPPED_ACACIA_LOG,
@@ -43,17 +43,17 @@ public enum Condition {
 			Blocks.STRIPPED_WARPED_HYPHAE
 	)),
 	// obtain...
-	OBTAIN_STONE(new ObtainItemCondition(3, "generic_block", Items.STONE)),
+	OBTAIN_STONE(new ObtainItemCondition(4, "generic_block", Items.STONE)),
 	// craft...
-	CRAFT_STONE_HOE(new CraftItemCondition(2, "generic", Items.STONE_HOE)),
-	CRAFT_WOODEN_HOE(new CraftItemCondition(1, "generic", Items.WOODEN_HOE)),
+	CRAFT_STONE_HOE(new CraftItemCondition(3, "generic", Items.STONE_HOE)),
+	CRAFT_WOODEN_HOE(new CraftItemCondition(2, "generic", Items.WOODEN_HOE)),
 
 	//// overworld-only ////
 	// stand on...
-	STAND_ON_DIRT(new StandOnBlockCondition(1, "generic", ConditionFlags.OVERWORLD, Blocks.DIRT)),
-	STAND_ON_STONE(new StandOnBlockCondition(1, "generic", ConditionFlags.OVERWORLD, Blocks.STONE)),
-	STAND_ON_SAND(new StandOnBlockCondition(1, "generic", ConditionFlags.OVERWORLD, Blocks.SAND)),
-	STAND_ON_A_BED(new StandOnBlockCondition(3, "bed", ConditionFlags.OVERWORLD,
+	STAND_ON_DIRT(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Blocks.DIRT)),
+	STAND_ON_STONE(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Blocks.STONE)),
+	STAND_ON_SAND(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Blocks.SAND)),
+	STAND_ON_A_BED(new StandOnBlockCondition(4, "bed", ConditionFlags.OVERWORLD,
 			Blocks.WHITE_BED,
 			Blocks.ORANGE_BED,
 			Blocks.MAGENTA_BED,
@@ -72,20 +72,20 @@ public enum Condition {
 			Blocks.BLACK_BED
 	)),
 	// obtain...
-	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(1, "generic_alt", ConditionFlags.OVERWORLD, Items.WHEAT_SEEDS)),
+	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(2, "generic_alt", ConditionFlags.OVERWORLD, Items.WHEAT_SEEDS)),
 	// craft...
-	CRAFT_SANDSTONE(new CraftItemCondition(1, "generic_block", Items.SANDSTONE, ConditionFlags.OVERWORLD)),
+	CRAFT_SANDSTONE(new CraftItemCondition(2, "generic_block", Items.SANDSTONE, ConditionFlags.OVERWORLD)),
 
 	//// nether-only ////
 	// stand on...
-	STAND_ON_FIRE(new StandOnBlockCondition(1, "generic", ConditionFlags.NETHER, Blocks.FIRE)),
+	STAND_ON_FIRE(new StandOnBlockCondition(2, "generic", ConditionFlags.NETHER, Blocks.FIRE)),
 	// obtain...
-	OBTAIN_NETHER_BRICK(new ObtainItemCondition(3, "generic", ConditionFlags.NETHER, Items.NETHER_BRICK)),
-	OBTAIN_OBSIDIAN(new ObtainItemCondition(3, "generic_alt", ConditionFlags.NETHER, Items.OBSIDIAN)),
+	OBTAIN_NETHER_BRICK(new ObtainItemCondition(4, "generic", ConditionFlags.NETHER, Items.NETHER_BRICK)),
+	OBTAIN_OBSIDIAN(new ObtainItemCondition(4, "generic_alt", ConditionFlags.NETHER, Items.OBSIDIAN)),
 	// craft...
-	CRAFT_QUARTZ(new CraftItemCondition(1, "generic", Items.QUARTZ_BLOCK, ConditionFlags.NETHER)),
-	CRAFT_GOLD_INGOT(new CraftItemCondition(1, "generic", Items.GOLD_INGOT, ConditionFlags.NETHER)),
-	CRAFT_GLOWSTONE(new CraftItemCondition(1, "generic_block", Items.GLOWSTONE, ConditionFlags.NETHER)),
+	CRAFT_QUARTZ(new CraftItemCondition(2, "generic", Items.QUARTZ_BLOCK, ConditionFlags.NETHER)),
+	CRAFT_GOLD_INGOT(new CraftItemCondition(2, "generic", Items.GOLD_INGOT, ConditionFlags.NETHER)),
+	CRAFT_GLOWSTONE(new CraftItemCondition(2, "generic_block", Items.GLOWSTONE, ConditionFlags.NETHER)),
 
 	//// miscellaneous ////
 	JUMP(new JumpingJacksCondition(49)),
