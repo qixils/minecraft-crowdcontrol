@@ -58,9 +58,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
 	@Getter
-	private final Executor syncExecutor = runnable -> Bukkit.getScheduler().runTask(this, runnable);
+	private final Executor syncExecutor = runnable -> Bukkit.getGlobalRegionScheduler().execute(this, runnable);
 	@Getter
-	private final Executor asyncExecutor = runnable -> Bukkit.getScheduler().runTaskAsynchronously(this, runnable);
+	private final Executor asyncExecutor = runnable -> Bukkit.getAsyncScheduler().runNow(this, $ -> runnable.run());
 	@Getter
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
@@ -293,7 +293,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
-		return new PaperPlayer(player);
+		return new PaperPlayer(this, player);
 	}
 
 	@Override

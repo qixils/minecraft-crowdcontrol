@@ -58,7 +58,7 @@ public class EntitySizeCommand extends ImmediateCommand {
 						continue;
 					if (AttributeUtil.getModifier(living, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID).map(AttributeModifier::getAmount).orElse(0d) == level)
 						continue;
-					addModifier(living, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, true);
+					entity.getScheduler().run(plugin, $ -> addModifier(living, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, true), null);
 					success = true;
 					break;
 				}

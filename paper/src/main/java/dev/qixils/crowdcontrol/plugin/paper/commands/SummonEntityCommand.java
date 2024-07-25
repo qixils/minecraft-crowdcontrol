@@ -4,10 +4,12 @@ import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
+import dev.qixils.crowdcontrol.plugin.paper.utils.RegistryUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
 import io.papermc.paper.event.player.PlayerNameEntityEvent;
+import io.papermc.paper.registry.RegistryKey;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -126,7 +128,8 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 	}
 
 	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
-		Entity entity = player.getWorld().spawnEntity(player.getLocation(), entityType);
+		World world = player.getWorld();
+		Entity entity = world.spawnEntity(player.getLocation(), entityType);
 		if (viewer != null) {
 			entity.customName(viewer);
 			entity.setCustomNameVisible(true);
@@ -134,9 +137,9 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
 		if (entity instanceof Boat boat)
-			boat.setBoatType(randomElementFrom(Boat.Type.class));
+			boat.setBoatType(randomElementFrom(Boat.Type.values()));
 		if (entity instanceof CollarColorable colorable)
-			colorable.setCollarColor(randomElementFrom(DyeColor.class));
+			colorable.setCollarColor(randomElementFrom(DyeColor.values()));
 		if (entity instanceof MushroomCow mooshroom && RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.Variant.BROWN);
 		if (entity instanceof Horse horse && RNG.nextBoolean())
@@ -144,7 +147,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		if (entity instanceof Llama llama && RNG.nextBoolean())
 			llama.getInventory().setDecor(new ItemStack(randomElementFrom(Tag.WOOL_CARPETS.getValues())));
 		if (entity instanceof Sheep sheep)
-			sheep.setColor(randomElementFrom(DyeColor.class));
+			sheep.setColor(randomElementFrom(DyeColor.values()));
 		if (entity instanceof Steerable steerable)
 			steerable.setSaddle(RNG.nextBoolean());
 		if (entity instanceof Enderman enderman)
@@ -152,17 +155,21 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		if (entity instanceof ChestedHorse horse)
 			horse.setCarryingChest(RNG.nextBoolean());
 		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(Frog.Variant.class));
+			frog.setVariant(RegistryUtil.random(RegistryKey.FROG_VARIANT));
 		if (entity instanceof Axolotl axolotl)
-			axolotl.setVariant(randomElementFrom(Axolotl.Variant.class));
+			axolotl.setVariant(randomElementFrom(Axolotl.Variant.values()));
 		if (entity instanceof Rabbit rabbit)
 			rabbit.setRabbitType(weightedRandom(RABBIT_VARIANTS));
 		if (entity instanceof Villager villager)
-			villager.setVillagerType(randomElementFrom(Villager.Type.class));
+			villager.setVillagerType(RegistryUtil.random(RegistryKey.VILLAGER_TYPE));
 		if (entity instanceof ZombieVillager villager)
-			villager.setVillagerType(randomElementFrom(Villager.Type.class));
+			villager.setVillagerType(RegistryUtil.random(RegistryKey.VILLAGER_TYPE));
 		if (entity instanceof LootableInventory lootable)
 			lootable.setLootTable(randomElementFrom(CHEST_LOOT_TABLES).getLootTable());
+		if (entity instanceof Cat cat)
+			cat.setCatType(RegistryUtil.random(RegistryKey.CAT_VARIANT));
+		if (entity instanceof Wolf wolf)
+			wolf.setVariant(RegistryUtil.random(RegistryKey.WOLF_VARIANT));
 
 		if (entity instanceof ArmorStand armorStand) {
 			// could add some chaos (GH#64) here eventually

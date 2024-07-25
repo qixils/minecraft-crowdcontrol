@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -82,12 +83,24 @@ public class RandomUtil {
 	 * @param <T>  type of enum
 	 * @return randomly selected enum constant
 	 * @throws IllegalArgumentException if the class is not an enum
+	 * @deprecated may not work well with dynamically-injected `values` methods from ex-enums; directly calling `values` is preferred
 	 */
 	@NotNull
+	@Deprecated
 	public static <T extends Enum<T>> T randomElementFrom(@NotNull Class<T> from) {
 		T[] constants = from.getEnumConstants();
-		if (constants == null)
-			throw new IllegalArgumentException("Class is not an enum");
+		if (constants == null) {
+			try {
+				//noinspection unchecked
+				constants = (T[]) Arrays.stream(from.getMethods())
+					.filter(method -> "values".equals(method.getName()) && method.getReturnType().isArray() && Modifier.isStatic(method.getModifiers()))
+					.findAny()
+					.orElseThrow(() -> new IllegalArgumentException("Class is not an enum"))
+					.invoke(null);
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Class is not an enum");
+			}
+		}
 		return randomElementFrom(constants);
 	}
 

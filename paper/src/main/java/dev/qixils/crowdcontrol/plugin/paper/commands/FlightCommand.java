@@ -48,10 +48,10 @@ public class FlightCommand extends TimedVoidCommand implements Listener {
 						if (player.isFlying())
 							continue;
 						response.type(ResultType.SUCCESS).message("SUCCESS");
-						sync(() -> {
+						player.getScheduler().run(plugin, $$ -> {
 							player.setAllowFlight(true);
 							player.setFlying(true);
-						});
+						}, null);
 					}
 					if (response.type() == ResultType.SUCCESS)
 						announce(players, request);
@@ -59,10 +59,10 @@ public class FlightCommand extends TimedVoidCommand implements Listener {
 				})
 				.completionCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
-					sync(() -> players.forEach(player -> {
+					players.forEach(player -> player.getScheduler().run(plugin, $$ -> {
 						player.setFlying(false);
 						player.setAllowFlight(false);
-					}));
+					}, null));
 				})
 				.build().queue();
 	}

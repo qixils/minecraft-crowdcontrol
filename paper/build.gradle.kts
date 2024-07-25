@@ -52,12 +52,17 @@ paper {
     description = "The Ultimate Interactive Experience for Streamers"
     website = "https://github.com/qixils/minecraft-crowdcontrol"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+
+    foliaSupported = true
 }
 
 // configure runServer task
 tasks {
     runServer {
         configure(minecraftVersion)
+    }
+    runPaper.folia.registerTask {
+        configure("1.20.6")
     }
     // create extra runServer tasks for later versions of Minecraft
     for (mcVersion in listOf<String>("1.21")) {

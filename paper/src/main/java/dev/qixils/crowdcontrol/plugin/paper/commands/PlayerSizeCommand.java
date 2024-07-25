@@ -40,20 +40,24 @@ public class PlayerSizeCommand extends TimedVoidCommand {
 			.duration(getDuration(request))
 			.startCallback(effect -> {
 				for (Player player : players) {
-					addModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
-					addModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID, SCALE_STEP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
-					addModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, SCALE_JUMP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
-					addModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					player.getScheduler().run(plugin, $ -> {
+						addModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+						addModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID, SCALE_STEP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+						addModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, SCALE_JUMP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+						addModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					}, null);
 				}
 				playerAnnounce(players, request);
 				return request.buildResponse().type(Response.ResultType.SUCCESS);
 			})
 			.completionCallback(effect -> {
 				for (Player player : players) {
-					removeModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID);
-					removeModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID);
-					removeModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID);
-					removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
+					player.getScheduler().run(plugin, $ -> {
+						removeModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID);
+						removeModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID);
+						removeModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID);
+						removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
+					}, null);
 				}
 			})
 			.build().queue();

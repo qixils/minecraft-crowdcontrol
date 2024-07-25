@@ -52,20 +52,18 @@ public class GravityCommand extends TimedVoidCommand {
 				.duration(getDuration(request))
 				.startCallback(effect -> {
 					players.set(plugin.getPlayers(request));
-					for (Player player : players.get()) {
+					players.get().forEach(player -> player.getScheduler().run(plugin, $ -> {
 						addModifier(player, Attribute.GENERIC_GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_SCALAR, false);
 						addModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_SCALAR, false);
 						addModifier(player, Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_NUMBER, false);
-					}
+					}, null));
 					playerAnnounce(players.get(), request);
 					return request.buildResponse().type(Response.ResultType.SUCCESS).message("SUCCESS");
 				})
-				.completionCallback(effect -> {
-					for (Player player : players.get()) {
-						removeModifier(player, Attribute.GENERIC_GRAVITY, GRAVITY_MODIFIER_UUID);
-						removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
-					}
-				})
+				.completionCallback(effect -> players.get().forEach(player -> player.getScheduler().run(plugin, $ -> {
+					removeModifier(player, Attribute.GENERIC_GRAVITY, GRAVITY_MODIFIER_UUID);
+					removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
+				}, null)))
 				.build().queue();
 	}
 

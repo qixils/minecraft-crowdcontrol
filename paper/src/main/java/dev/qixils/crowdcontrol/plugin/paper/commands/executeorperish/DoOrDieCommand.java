@@ -37,6 +37,8 @@ public class DoOrDieCommand extends VoidCommand {
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
+		// TODO: folia
+
 		new TimedEffect.Builder()
 				.request(request)
 				.duration(DO_OR_DIE_COOLDOWN)
@@ -55,7 +57,7 @@ public class DoOrDieCommand extends VoidCommand {
 					int startedAt = Bukkit.getCurrentTick();
 
 					AtomicInteger pastValue = new AtomicInteger(0);
-					Bukkit.getScheduler().runTaskTimer(plugin, task -> {
+					Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> {
 						int ticksElapsed = Bukkit.getCurrentTick() - startedAt;
 						int secondsLeft = (int) DO_OR_DIE_DURATION.getSeconds() - (int) Math.ceil(ticksElapsed / 20f);
 						boolean isNewValue = secondsLeft != pastValue.getAndSet(secondsLeft);

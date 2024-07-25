@@ -40,15 +40,13 @@ public class DifficultyCommand extends ImmediateCommand {
 		if (difficulty.equals(getCurrentDifficulty()))
 			return request.buildResponse().type(ResultType.FAILURE).message("Server difficulty is already on " + plugin.getTextUtil().asPlain(displayName));
 		sync(() -> plugin.getServer().getWorlds().forEach(world -> world.setDifficulty(difficulty)));
-		async(() -> {
-			for (Difficulty dif : Difficulty.values())
-				plugin.updateEffectStatus(plugin.getCrowdControl(), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE, effectNameOf(dif));
-			for (EntityCommand command : plugin.commandRegister().getCommands(EntityCommand.class)) {
-				TriState state = command.isSelectable();
-				if (state != TriState.UNKNOWN)
-					plugin.updateEffectStatus(plugin.getCrowdControl(), state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, command);
-			}
-		});
+		for (Difficulty dif : Difficulty.values())
+			plugin.updateEffectStatus(plugin.getCrowdControl(), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE, effectNameOf(dif));
+		for (EntityCommand command : plugin.commandRegister().getCommands(EntityCommand.class)) {
+			TriState state = command.isSelectable();
+			if (state != TriState.UNKNOWN)
+				plugin.updateEffectStatus(plugin.getCrowdControl(), state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, command);
+		}
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 

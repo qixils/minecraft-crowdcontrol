@@ -27,7 +27,7 @@ import java.util.*;
 @Getter
 @EventListener
 public class DisableJumpingCommand extends TimedVoidCommand {
-	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>(1);
+	private final Map<UUID, Integer> jumpsBlockedUntil = new HashMap<>(1);
 	private final String effectName = "disable_jumping";
 
 	public DisableJumpingCommand(SpongeCrowdControlPlugin plugin) {
@@ -41,8 +41,10 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		new TimedEffect.Builder().request(request)
-				.duration(getDuration(request))
+		Duration duration = getDuration(request);
+		new TimedEffect.Builder()
+				.request(request)
+				.duration(duration)
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					if (players.isEmpty())
@@ -52,7 +54,7 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 
 					int tick = plugin.getGame().getServer().getRunningTimeTicks();
 					for (Player player : players)
-						jumpsBlockedAt.put(player.getUniqueId(), tick);
+						jumpsBlockedUntil.put(player.getUniqueId(), tick + (int) (duration.toMillis() / 50.0));
 					playerAnnounce(players, request);
 
 					return null; // success
@@ -64,13 +66,13 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 	public void onMoveEvent(MoveEntityEvent.Position event) {
 		Entity entity = event.getTargetEntity();
 		UUID uuid = entity.getUniqueId();
-		if (!jumpsBlockedAt.containsKey(uuid))
+		if (!jumpsBlockedUntil.containsKey(uuid))
 			return;
 
-		int blockedAt = jumpsBlockedAt.get(uuid);
+		int blockedUntil = jumpsBlockedUntil.get(uuid);
 		// if this effect has expired then remove its data from the map
-		if ((blockedAt + CommandConstants.DISABLE_JUMPING_TICKS) < plugin.getGame().getServer().getRunningTimeTicks()) {
-			jumpsBlockedAt.remove(uuid, blockedAt);
+		if (blockedUntil < plugin.getGame().getServer().getRunningTimeTicks()) {
+			jumpsBlockedUntil.remove(uuid, blockedUntil);
 			return;
 		}
 

@@ -29,9 +29,9 @@ public class UniteCommand extends ImmediateCommand {
 
 		// the player list passed into this function is already a unique instance and already shuffled
 		// so we can just pop the first player off the list and teleport everyone else to them
-		Player target = players.remove(0);
+		Player target = players.removeFirst();
 		Location destination = target.getLocation();
-		sync(() -> players.forEach(player -> player.teleportAsync(destination)));
+		players.forEach(player -> player.getScheduler().run(plugin, $ -> player.teleportAsync(destination), null)); // TODO: better return/folia
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 

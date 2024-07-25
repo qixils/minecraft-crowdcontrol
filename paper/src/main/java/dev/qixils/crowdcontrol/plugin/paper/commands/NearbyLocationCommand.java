@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -54,6 +55,7 @@ abstract class NearbyLocationCommand<S> extends RegionalCommand {
 
 	@Nullable
 	private static Location safeLocation(final @Nullable Location origin) {
+		// TODO: getRegionScheduler
 		// get the highest solid block with 2+ air blocks above it
 		Location location = highestLocation(origin);
 		if (location == null)
@@ -107,23 +109,31 @@ abstract class NearbyLocationCommand<S> extends RegionalCommand {
 
 				if (searchType.equals(currentType))
 					return completedStage(false);
-				Location destination = safeLocation(search(location, searchType));
-				if (destination == null)
-					return completedStage(false);
-				if (destination.distanceSquared(location) <= 2500) // 50 blocks
-					return completedStage(false);
-				if (!world.getWorldBorder().isInside(destination))
+
+				Location search = search(location, searchType);
+				if (search == null)
 					return completedStage(false);
 
-				return player.teleportAsync(destination).thenApply(tpSuccess -> {
-					if (!tpSuccess) return false;
+				return CompletableFuture
+					.supplyAsync(() -> safeLocation(search), runnable -> Bukkit.getRegionScheduler().run(plugin, search, $ -> runnable.run()))
+					.thenCompose(destination -> {
+						if (destination == null)
+							return completedStage(false);
+						if (destination.distanceSquared(location) <= 2500) // 50 blocks
+							return completedStage(false);
+						if (!world.getWorldBorder().isInside(destination))
+							return completedStage(false);
 
-					player.sendActionBar(Component.translatable(
-						"cc.effect.nearby_location.output",
-						nameOf(searchType).color(NamedTextColor.YELLOW)
-					));
-					return true;
-				});
+						return player.teleportAsync(destination).thenApply(tpSuccess -> {
+							if (!tpSuccess) return false;
+
+							player.sendActionBar(Component.translatable(
+								"cc.effect.nearby_location.output",
+								nameOf(searchType).color(NamedTextColor.YELLOW)
+							));
+							return true;
+						});
+					});
 			});
 		}
 

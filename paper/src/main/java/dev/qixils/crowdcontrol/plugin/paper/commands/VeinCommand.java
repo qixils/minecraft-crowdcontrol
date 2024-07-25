@@ -2,8 +2,8 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil.BlockFinder;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -24,7 +24,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_COUNT
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIUS;
 
 @Getter
-public class VeinCommand extends ImmediateCommand {
+public class VeinCommand extends RegionalCommandSync {
 	private final String effectName = "vein";
 
 	public VeinCommand(PaperCrowdControlPlugin plugin) {
@@ -56,46 +56,52 @@ public class VeinCommand extends ImmediateCommand {
 		Collections.shuffle(blockLocations, random);
 		int maxBlocks = 1 + random.nextInt(blockLocations.size());
 		while (blockLocations.size() > maxBlocks)
-			blockLocations.remove(0);
+			blockLocations.removeFirst();
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Could not find any blocks to replace");
-		for (Player player : players) {
-			BlockFinder finder = BlockFinder.builder()
-					.origin(player.getLocation())
-					.maxRadius(VEIN_RADIUS)
-					.locationValidator(loc -> !loc.getBlock().isEmpty())
-					.build();
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("Could not find any blocks to replace");
+	}
 
-			for (int iter = 0; iter < VEIN_COUNT; iter++) {
-				Ores ore = RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS);
+	@Override
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+		BlockFinder finder = BlockFinder.builder()
+			.origin(player.getLocation())
+			.maxRadius(VEIN_RADIUS)
+			.locationValidator(loc -> !loc.getBlock().isEmpty())
+			.build();
 
-				List<Location> setBlocks = new ArrayList<>(8);
-				List<Location> setDeepslateBlocks = new ArrayList<>(8);
-				Location oreLocation = finder.next();
-				if (oreLocation == null)
-					continue;
+		boolean success = false;
 
-				// get 2x2 chunk of blocks
-				addOreVein(setDeepslateBlocks, setBlocks, oreLocation);
+		for (int iter = 0; iter < VEIN_COUNT; iter++) {
+			Ores ore = RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS);
 
-				// if we didn't find viable blocks, exit
-				if (setBlocks.isEmpty() && setDeepslateBlocks.isEmpty())
-					continue;
+			List<Location> setBlocks = new ArrayList<>(8);
+			List<Location> setDeepslateBlocks = new ArrayList<>(8);
+			Location oreLocation = finder.next();
+			if (oreLocation == null)
+				continue;
 
-				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				randomlyShrinkOreVein(setBlocks);
-				randomlyShrinkOreVein(setDeepslateBlocks);
+			// get 2x2 chunk of blocks
+			addOreVein(setDeepslateBlocks, setBlocks, oreLocation);
 
-				if (!setBlocks.isEmpty())
-					sync(() -> setBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getBlock())));
-				if (!setDeepslateBlocks.isEmpty())
-					sync(() -> setDeepslateBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getDeepslateBlock())));
-			}
+			// if we didn't find viable blocks, exit
+			if (setBlocks.isEmpty() && setDeepslateBlocks.isEmpty())
+				continue;
+
+			randomlyShrinkOreVein(setBlocks);
+			randomlyShrinkOreVein(setDeepslateBlocks);
+
+			setBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getBlock()));
+			setDeepslateBlocks.forEach(blockPos -> blockPos.getBlock().setType(ore.getDeepslateBlock()));
+
+			success = true;
 		}
-		return result;
+
+		return success;
 	}
 
 	@Getter

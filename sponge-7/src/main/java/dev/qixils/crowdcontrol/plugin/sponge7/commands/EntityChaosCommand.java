@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
@@ -17,7 +18,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCAL_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_CHAOS_MIN;
 
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {
 	private static final Predicate<Entity> IS_NOT_PLAYER = entity -> !entity.getType().equals(EntityTypes.PLAYER);
@@ -43,14 +46,20 @@ public class EntityChaosCommand extends ImmediateCommand {
 			}
 		}
 
-		sync(() -> {
-			int i = 0;
-			for (Entity entity : entities) {
-				entity.clearPassengers();
-				entity.setLocation(players.get((i++) % players.size()).getLocation());
-			}
-		});
+		if (entities.size() < ENTITY_CHAOS_MIN)
+			return request.buildResponse()
+				.type(Response.ResultType.RETRY)
+				.message("Not enough entities found to teleport");
 
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		int i = 0;
+		boolean success = false;
+		for (Entity entity : entities) {
+			entity.clearPassengers();
+			success |= entity.setLocation(players.get((i++) % players.size()).getLocation());
+		}
+
+		return success
+			? request.buildResponse().type(Response.ResultType.SUCCESS)
+			: request.buildResponse().type(Response.ResultType.RETRY).message("Could not teleport entities");
 	}
 }

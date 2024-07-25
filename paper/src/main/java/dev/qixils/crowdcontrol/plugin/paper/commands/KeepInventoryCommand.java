@@ -55,11 +55,9 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	private void updateEffectVisibility(@Nullable Respondable respondable) {
-		async(() -> {
-			plugin.updateEffectStatus(respondable, ResultType.NOT_SELECTABLE, effectName);
-			plugin.updateEffectStatus(respondable, ResultType.SELECTABLE, "keep_inventory_" + (!enable ? "on" : "off"));
-			plugin.updateEffectStatus(respondable, enable ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE, "clear_inventory");
-		});
+		plugin.updateEffectStatus(respondable, ResultType.NOT_SELECTABLE, effectName);
+		plugin.updateEffectStatus(respondable, ResultType.SELECTABLE, "keep_inventory_" + (!enable ? "on" : "off"));
+		plugin.updateEffectStatus(respondable, enable ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE, "clear_inventory");
 	}
 
 	@Override

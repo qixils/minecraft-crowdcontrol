@@ -1,13 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.paper.mc;
 
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class PaperPlayer extends PaperLivingEntity implements CCPlayer {
 
-	public PaperPlayer(Player player) {
-		super(player);
+	public PaperPlayer(@NotNull PaperCrowdControlPlugin plugin, @NotNull Player player) {
+		super(plugin, player);
 	}
 
 	@Override
@@ -22,7 +23,7 @@ public class PaperPlayer extends PaperLivingEntity implements CCPlayer {
 
 	@Override
 	public void foodLevel(int foodLevel) {
-		entity().setFoodLevel(foodLevel);
+		execute(() -> entity().setFoodLevel(foodLevel));
 	}
 
 	@Override
@@ -32,7 +33,7 @@ public class PaperPlayer extends PaperLivingEntity implements CCPlayer {
 
 	@Override
 	public void saturation(double saturation) {
-		entity().setSaturation((float) saturation);
+		execute(() -> entity().setSaturation((float) saturation));
 	}
 
 	@Override
@@ -42,11 +43,11 @@ public class PaperPlayer extends PaperLivingEntity implements CCPlayer {
 
 	@Override
 	public void xpLevel(int xpLevel) {
-		entity().setLevel(xpLevel);
+		execute(() -> entity().setLevel(xpLevel));
 	}
 
 	@Override
 	public void addXpLevel(int xpLevel) {
-		entity().giveExpLevels(xpLevel);
+		execute(() -> entity().giveExpLevels(xpLevel));
 	}
 }

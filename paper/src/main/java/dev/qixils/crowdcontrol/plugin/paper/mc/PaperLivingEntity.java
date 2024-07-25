@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.mc;
 
 import dev.qixils.crowdcontrol.common.mc.CCLivingEntity;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -11,8 +12,8 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.addModifi
 
 public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
-	public PaperLivingEntity(LivingEntity entity) {
-		super(entity);
+	public PaperLivingEntity(@NotNull PaperCrowdControlPlugin plugin, @NotNull LivingEntity entity) {
+		super(plugin, entity);
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 	@Override
 	public void health(double health) {
-		entity().setHealth(health);
+		execute(() -> entity().setHealth(health));
 	}
 
 	@Override
@@ -58,24 +59,26 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 	@Override
 	public void maxHealthOffset(double newOffset) {
-		addModifier(entity(), Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH_MODIFIER_UUID, MAX_HEALTH_MODIFIER_NAME, newOffset, AttributeModifier.Operation.ADD_NUMBER, true);
+		execute(() -> {
+			addModifier(entity(), Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH_MODIFIER_UUID, MAX_HEALTH_MODIFIER_NAME, newOffset, AttributeModifier.Operation.ADD_NUMBER, true);
 
-		float computedMaxHealth = (float) (20 + newOffset);
-		health(Math.min(health(), computedMaxHealth));
+			float computedMaxHealth = (float) (20 + newOffset);
+			health(Math.min(health(), computedMaxHealth));
+		});
 	}
 
 	@Override
 	public void damage(double damage) {
-		entity().damage(damage);
+		execute(() -> entity().damage(damage));
 	}
 
 	@Override
 	public void heal(double amount) {
-		health(health() + amount);
+		execute(() -> health(health() + amount));
 	}
 
 	@Override
 	public void kill() {
-		health(0);
+		execute(() -> health(0));
 	}
 }

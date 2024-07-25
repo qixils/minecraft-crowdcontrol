@@ -125,7 +125,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Fabri
 			() -> PlayerSizeCommand.decrease(plugin),
 			() -> EntitySizeCommand.increase(plugin),
 			() -> EntitySizeCommand.decrease(plugin),
-			() -> new RandomFallingBlockCommand(plugin)
+			() -> new RandomFallingBlockCommand(plugin),
+			() -> new LavaCommand(plugin)
 		));
 
 		// entity commands

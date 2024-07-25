@@ -1,11 +1,10 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.registry.RegistryAccess;
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
-public class LootboxCommand extends ImmediateCommand {
+public class LootboxCommand extends RegionalCommandSync {
 	private static final List<Material> ITEMS = Registry.MATERIAL.stream().filter(mat -> mat.isItem() && !mat.isAir()).toList();
 	private static final Set<Material> GOOD_ITEMS = ITEMS.stream().filter(material ->
 			material.getMaxDurability() > 1
@@ -218,24 +217,28 @@ public class LootboxCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		for (Player player : players) {
-			Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(plugin, request));
-			for (int slot : lootboxItemSlots(luck)) {
-				// create item
-				ItemStack randomItem = createRandomItem(luck, null);
-				ItemMeta itemMeta = randomItem.getItemMeta();
-				itemMeta.lore(Collections.singletonList(GlobalTranslator.render(CommandConstants.buildLootboxLore(plugin, request), player.locale())));
-				randomItem.setItemMeta(itemMeta);
-				lootbox.setItem(slot, randomItem);
-			}
-			// display lootbox
-			sync(() -> player.openInventory(lootbox));
-			player.playSound(
-					Sounds.LOOTBOX_CHIME.get(luck),
-					Sound.Emitter.self()
-			);
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("Unable to spawn items");
+	}
+
+	@Override
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+		Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(plugin, request));
+		for (int slot : lootboxItemSlots(luck)) {
+			// create item
+			ItemStack randomItem = createRandomItem(luck, null);
+			ItemMeta itemMeta = randomItem.getItemMeta();
+			itemMeta.lore(Collections.singletonList(GlobalTranslator.render(CommandConstants.buildLootboxLore(plugin, request), player.locale())));
+			randomItem.setItemMeta(itemMeta);
+			lootbox.setItem(slot, randomItem);
 		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		// display lootbox
+		player.playSound(
+			Sounds.LOOTBOX_CHIME.get(luck),
+			Sound.Emitter.self()
+		);
+		return player.openInventory(lootbox) != null;
 	}
 }

@@ -35,6 +35,7 @@ public class PotionCommand extends TimedImmediateCommand {
 	}
 
 	private static String nameOf(PotionEffectType type) {
+		// TODO: migrate getName
 		return switch (type.getName()) {
 			case "SLOW" -> "SLOWNESS";
 			case "FAST_DIGGING" -> "HASTE";
@@ -73,27 +74,26 @@ public class PotionCommand extends TimedImmediateCommand {
 		Duration duration = getDuration(request);
 		int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
-		sync(() -> {
-			for (Player player : players) {
-				boolean overridden = false;
-				for (PotionEffect existingEffect : new ArrayList<>(player.getActivePotionEffects())) {
-					if (existingEffect.getType().equals(potionEffectType)) {
-						overridden = true;
-						player.removePotionEffect(potionEffectType);
-						int oldDuration = existingEffect.getDuration();
-						int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
-						int newAmplifier = existingEffect.getAmplifier() + 1;
-						if (potionEffectType == PotionEffectType.LEVITATION && newAmplifier > 127)
-							newAmplifier -= 1; // don't mess with gravity effects
-						PotionEffect newEffect = potionEffectType.createEffect(newDuration, newAmplifier);
-						player.addPotionEffect(newEffect);
-						break;
-					}
+		// TODO: improve folia...
+		for (Player player : players) {
+			boolean overridden = false;
+			for (PotionEffect existingEffect : new ArrayList<>(player.getActivePotionEffects())) {
+				if (existingEffect.getType().equals(potionEffectType)) {
+					overridden = true;
+					player.getScheduler().run(plugin, $ -> player.removePotionEffect(potionEffectType), null);
+					int oldDuration = existingEffect.getDuration();
+					int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
+					int newAmplifier = existingEffect.getAmplifier() + 1;
+					if (potionEffectType == PotionEffectType.LEVITATION && newAmplifier > 127)
+						newAmplifier -= 1; // don't mess with gravity effects
+					PotionEffect newEffect = potionEffectType.createEffect(newDuration, newAmplifier);
+					player.getScheduler().run(plugin, $ -> player.addPotionEffect(newEffect), null);
+					break;
 				}
-				if (!overridden)
-					player.addPotionEffect(potionEffectType.createEffect(durationTicks, 0));
 			}
-		});
+			if (!overridden)
+				player.getScheduler().run(plugin, $ -> player.addPotionEffect(potionEffectType.createEffect(durationTicks, 0)), null);
+		}
 
 		Response.Builder response = request.buildResponse().type(Response.ResultType.SUCCESS);
 		if (!isMinimal)

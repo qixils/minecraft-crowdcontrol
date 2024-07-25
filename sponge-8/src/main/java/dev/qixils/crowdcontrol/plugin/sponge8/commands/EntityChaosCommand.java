@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCAL_RADIUS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_CHAOS_MIN;
 
 @Getter
 public class EntityChaosCommand extends ImmediateCommand {
@@ -49,14 +50,20 @@ public class EntityChaosCommand extends ImmediateCommand {
 			}
 		}
 
-		sync(() -> {
-			int i = 0;
-			for (Entity entity : entities) {
-				entity.offer(Keys.PASSENGERS, Collections.emptyList());
-				entity.setLocation(players.get((i++) % players.size()).serverLocation());
-			}
-		});
+		if (entities.size() < ENTITY_CHAOS_MIN)
+			return request.buildResponse()
+				.type(Response.ResultType.RETRY)
+				.message("Not enough entities found to teleport");
 
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		int i = 0;
+		boolean success = false;
+		for (Entity entity : entities) {
+			entity.offer(Keys.PASSENGERS, Collections.emptyList());
+			success |= entity.setLocation(players.get((i++) % players.size()).serverLocation());
+		}
+
+		return success
+			? request.buildResponse().type(Response.ResultType.SUCCESS)
+			: request.buildResponse().type(Response.ResultType.RETRY).message("Could not teleport entities");
 	}
 }

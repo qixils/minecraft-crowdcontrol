@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
@@ -15,12 +15,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 @Getter
-public class TorchCommand extends ImmediateCommand {
+public class TorchCommand extends RegionalCommandSync {
 	protected static final BlockFace[] BLOCK_FACES = new BlockFace[]{
 			BlockFace.DOWN,
 			BlockFace.EAST,
@@ -37,29 +35,42 @@ public class TorchCommand extends ImmediateCommand {
 		this.effectName = placeTorches ? "lit" : "dim";
 	}
 
-	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Predicate<Location> predicate = placeTorches ? loc -> loc.getBlock().isReplaceable() : BlockUtil.TORCHES::contains;
-		List<Location> nearbyBlocks = new ArrayList<>();
-		players.forEach(player -> nearbyBlocks.addAll(BlockUtil.blockFinderBuilder()
-				.origin(player.getLocation())
-				.maxRadius(5)
-				.locationValidator(predicate)
-				.shuffleLocations(false)
-				.build().getAll()));
-		if (nearbyBlocks.isEmpty())
-			return request.buildResponse().type(Response.ResultType.RETRY).message("No available blocks to place/remove");
+	protected boolean isValidBlock(Location location) {
+		// TODO: this should probably be an abstract class/method
+		if (placeTorches)
+			return location.getBlock().isReplaceable();
+		else
+			return BlockUtil.TORCHES.contains(location);
+	}
 
-		sync(() -> {
-			for (Location location : nearbyBlocks) {
-				Block block = location.getBlock();
-				if (placeTorches)
-					placeTorch(location);
-				else
-					block.setType(Material.AIR, false);
-			}
-		});
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+	@Override
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("No available blocks to place/remove");
+	}
+
+	@Override
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+		List<Location> nearbyBlocks = BlockUtil.blockFinderBuilder()
+			.origin(player.getLocation())
+			.maxRadius(5)
+			.locationValidator(this::isValidBlock)
+			.shuffleLocations(false)
+			.build().getAll();
+
+		if (nearbyBlocks.isEmpty())
+			return false;
+
+		for (Location location : nearbyBlocks) {
+			Block block = location.getBlock();
+			if (placeTorches)
+				placeTorch(location);
+			else
+				block.setType(Material.AIR, false);
+		}
+
+		return true;
 	}
 
 	protected void placeTorch(Location location) {

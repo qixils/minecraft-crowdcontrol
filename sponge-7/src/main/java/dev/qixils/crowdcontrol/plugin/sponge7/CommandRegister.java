@@ -115,7 +115,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 			() -> GravityCommand.maximum(plugin),
 			() -> new DeleteRandomItemCommand(plugin),
 			() -> new UniteCommand(plugin),
-			() -> new RandomFallingBlockCommand(plugin)
+			() -> new RandomFallingBlockCommand(plugin),
+			() -> new LavaCommand(plugin)
 		));
 
 		// entity commands

@@ -4,11 +4,11 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -34,7 +34,7 @@ public final class CameraLockCommand extends TimedVoidCommand {
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		AtomicReference<BukkitTask> task = new AtomicReference<>();
+		AtomicReference<ScheduledTask> task = new AtomicReference<>();
 
 		new TimedEffect.Builder()
 				.request(request)
@@ -45,7 +45,7 @@ public final class CameraLockCommand extends TimedVoidCommand {
 					Map<UUID, Location> locations = new HashMap<>(players.size());
 					for (Player player : players)
 						locations.put(player.getUniqueId(), player.getLocation());
-					task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
+					task.set(Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, $$ -> players.forEach(player -> player.getScheduler().run(plugin, $$$ -> {
 						if (!locations.containsKey(player.getUniqueId()))
 							return;
 
@@ -55,8 +55,8 @@ public final class CameraLockCommand extends TimedVoidCommand {
 							return;
 
 						if (location.getPitch() != playerLoc.getPitch() || location.getYaw() != playerLoc.getYaw())
-							player.teleport(new Location(location.getWorld(), playerLoc.getX(), playerLoc.getY(), playerLoc.getZ(), location.getYaw(), location.getPitch()));
-					}), 1, 1));
+							player.teleportAsync(new Location(location.getWorld(), playerLoc.getX(), playerLoc.getY(), playerLoc.getZ(), location.getYaw(), location.getPitch()));
+					}, null)), 1, 1));
 					announce(players, request);
 					return null;
 				})

@@ -29,7 +29,7 @@ import java.util.*;
 @Getter
 @EventListener
 public class DisableJumpingCommand extends TimedVoidCommand {
-	private final Map<UUID, Long> jumpsBlockedAt = new HashMap<>(1);
+	private final Map<UUID, Long> jumpsBlockedUntil = new HashMap<>(1);
 	private final String effectName = "disable_jumping";
 
 	public DisableJumpingCommand(SpongeCrowdControlPlugin plugin) {
@@ -43,8 +43,9 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
+		Duration duration = getDuration(request);
 		new TimedEffect.Builder().request(request)
-				.duration(getDuration(request))
+				.duration(duration)
 				.startCallback($ -> {
 					List<ServerPlayer> players = plugin.getPlayers(request);
 					if (players.isEmpty())
@@ -54,7 +55,7 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 
 					long tick = plugin.getGame().server().runningTimeTicks().ticks();
 					for (Player player : players)
-						jumpsBlockedAt.put(player.uniqueId(), tick);
+						jumpsBlockedUntil.put(player.uniqueId(), tick + (int) (duration.toMillis() / 50.0));
 					playerAnnounce(players, request);
 
 					return null; // success
@@ -66,13 +67,13 @@ public class DisableJumpingCommand extends TimedVoidCommand {
 	public void onMoveEvent(MoveEntityEvent event) {
 		Entity entity = event.entity();
 		UUID uuid = entity.uniqueId();
-		if (!jumpsBlockedAt.containsKey(uuid))
+		if (!jumpsBlockedUntil.containsKey(uuid))
 			return;
 
-		long blockedAt = jumpsBlockedAt.get(uuid);
+		long blockedUntil = jumpsBlockedUntil.get(uuid);
 		// if this effect has expired then remove its data from the map
-		if ((blockedAt + CommandConstants.DISABLE_JUMPING_TICKS) < plugin.getGame().server().runningTimeTicks().ticks()) {
-			jumpsBlockedAt.remove(uuid, blockedAt);
+		if (blockedUntil < plugin.getGame().server().runningTimeTicks().ticks()) {
+			jumpsBlockedUntil.remove(uuid, blockedUntil);
 			return;
 		}
 

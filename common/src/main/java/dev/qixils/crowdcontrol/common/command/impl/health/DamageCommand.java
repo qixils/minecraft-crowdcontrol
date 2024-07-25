@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.common.command.impl.health;
 
+import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.ImmediateCommand;
 import dev.qixils.crowdcontrol.common.command.QuantityStyle;
@@ -12,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @RequiredArgsConstructor
 @Getter
 public class DamageCommand<P> implements ImmediateCommand<P> {
@@ -21,6 +24,11 @@ public class DamageCommand<P> implements ImmediateCommand<P> {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
+		if (TimedEffect.isActive("health_modifiers", request.getTargets()))
+			return request.buildResponse()
+				.type(Response.ResultType.RETRY)
+				.message("Players would have been killed by this command");
+
 		int amount = request.getQuantityOrDefault() * 2;
 		boolean success = false;
 
@@ -31,18 +39,16 @@ public class DamageCommand<P> implements ImmediateCommand<P> {
 			double appliedDamage = oldHealth - newHealth;
 			// don't apply effect unless it is 100% utilized
 			if (appliedDamage == amount) {
+				player.damage(appliedDamage);
 				success = true;
-				sync(() -> player.damage(appliedDamage));
 			}
 		}
 
-		if (success)
-			return request.buildResponse()
-					.type(Response.ResultType.SUCCESS);
-		else
-			return request.buildResponse()
-					.type(Response.ResultType.RETRY)
-					.message("Players would have been killed by this command");
+		return success
+			? request.buildResponse().type(Response.ResultType.SUCCESS)
+			: request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("Players would have been killed by this command");
 	}
 }
 

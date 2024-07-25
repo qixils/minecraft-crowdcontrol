@@ -1,9 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.command.QuantityStyle;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -19,10 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 @Getter
-public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
+public class GiveItemCommand extends RegionalCommandSync implements ItemCommand {
 	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Material item;
 	private final String effectName;
@@ -36,7 +33,7 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 	}
 
 	@Blocking
-	public static void giveItemTo(Entity player, ItemStack itemStack) {
+	public static boolean giveItemTo(Entity player, ItemStack itemStack) {
 		Location location = player.getLocation();
 		Item item = (Item) player.getWorld().spawnEntity(location, EntityType.ITEM);
 		item.setItemStack(itemStack);
@@ -45,40 +42,25 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 		item.setCanMobPickup(false);
 		item.setCanPlayerPickup(true);
 		item.setPickupDelay(0);
+		return true;
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("Failed to spawn item");
+	}
+
+	@Override
+	protected int getPlayerLimit() {
+		return getPlugin().getLimitConfig().getItemLimit(item.getKey().getKey());
+	}
+
+	@Override
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
 		int amount = request.getQuantityOrDefault();
 		ItemStack itemStack = new ItemStack(item, amount);
-
-		sync(() -> {
-			LimitConfig config = getPlugin().getLimitConfig();
-			int recipients = 0;
-			int maxRecipients = config.getItemLimit(item.getKey().getKey());
-
-			// first pass (hosts)
-			for (Player player : players) {
-				if (!config.hostsBypass() && maxRecipients > 0 && recipients >= maxRecipients)
-					break;
-				if (!isHost(player))
-					continue;
-
-				giveItemTo(player, itemStack);
-				recipients++;
-			}
-
-			// second pass (guests)
-			for (Player player : players) {
-				if (maxRecipients > 0 && recipients >= maxRecipients)
-					break;
-				if (isHost(player))
-					continue;
-
-				giveItemTo(player, itemStack);
-				recipients++;
-			}
-		});
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		return giveItemTo(player, itemStack);
 	}
 }

@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @Getter
 public class DisableJumpingCommand extends TimedVoidCommand implements Listener {
-	private final Map<UUID, Integer> jumpsBlockedAt = new HashMap<>();
+	private final Map<UUID, Integer> jumpsBlockedUntil = new HashMap<>();
 	private final String effectName = "disable_jumping";
 
 	public DisableJumpingCommand(PaperCrowdControlPlugin plugin) {
@@ -37,8 +37,9 @@ public class DisableJumpingCommand extends TimedVoidCommand implements Listener 
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
+		Duration duration = getDuration(request);
 		new TimedEffect.Builder().request(request)
-				.duration(getDuration(request))
+				.duration(duration)
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
 					if (players.isEmpty())
@@ -46,9 +47,12 @@ public class DisableJumpingCommand extends TimedVoidCommand implements Listener 
 								.type(ResultType.FAILURE)
 								.message("No players online");
 
-					int tick = Bukkit.getCurrentTick();
 					for (Player player : players)
-						jumpsBlockedAt.put(player.getUniqueId(), tick);
+						player.getScheduler().run(
+							plugin,
+							$$ -> jumpsBlockedUntil.put(player.getUniqueId(), Bukkit.getCurrentTick() + (int) (duration.toMillis() / 50.0)),
+							null
+						);
 					announce(players, request);
 
 					return null; // success
@@ -58,11 +62,11 @@ public class DisableJumpingCommand extends TimedVoidCommand implements Listener 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onJumpEvent(PlayerJumpEvent event) {
 		UUID uuid = event.getPlayer().getUniqueId();
-		if (!jumpsBlockedAt.containsKey(uuid)) return;
-		int blockedAt = jumpsBlockedAt.get(uuid);
-		if ((blockedAt + CommandConstants.DISABLE_JUMPING_TICKS) >= Bukkit.getCurrentTick())
+		if (!jumpsBlockedUntil.containsKey(uuid)) return;
+		int blockedUntil = jumpsBlockedUntil.get(uuid);
+		if (blockedUntil >= Bukkit.getCurrentTick())
 			event.setCancelled(true);
 		else
-			jumpsBlockedAt.remove(uuid, blockedAt);
+			jumpsBlockedUntil.remove(uuid, blockedUntil);
 	}
 }

@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -20,14 +20,17 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
 
 @Getter
-public class ToastCommand extends ImmediateCommand implements Listener {
+public class ToastCommand extends RegionalCommandSync implements Listener {
 	private static final Material[] MATERIALS = new Material[]{
 			Material.BROWN_STAINED_GLASS_PANE,
 			Material.RED_STAINED_GLASS_PANE,
@@ -55,40 +58,44 @@ public class ToastCommand extends ImmediateCommand implements Listener {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		sync(() -> {
-			for (Player player : players) {
-				player.playSound(Sounds.ANNOYING.get(), player);
-				Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
-				player.undiscoverRecipes(recipes);
-				player.discoverRecipes(recipes);
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("Unable to open window");
+	}
 
-				// actual pop-up
-				Inventory inv = Bukkit.getServer().createInventory(player, INVENTORY_SIZE, POPUP_TITLE);
-				openInventories.put(player.getUniqueId(), inv);
-				sync(() -> player.openInventory(inv));
+	@Override
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+		player.playSound(Sounds.ANNOYING.get(), player);
+		Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
+		player.undiscoverRecipes(recipes);
+		player.discoverRecipes(recipes);
 
-				AtomicInteger atomicIndex = new AtomicInteger(random.nextInt(MATERIALS.length));
-				// future ensures the task doesn't get cancelled before the inventory is opened
-				CompletableFuture<Void> hasStarted = new CompletableFuture<>();
+		// actual pop-up
+		Inventory inv = Bukkit.getServer().createInventory(player, INVENTORY_SIZE, POPUP_TITLE);
+		openInventories.put(player.getUniqueId(), inv);
+		player.openInventory(inv);
 
-				Bukkit.getScheduler().runTaskTimer(plugin, task -> {
-					if (!hasStarted.complete(null) && inv.getViewers().isEmpty()) {
-						task.cancel();
-						openInventories.remove(player.getUniqueId(), inv);
-						return;
-					}
-					int index = atomicIndex.getAndIncrement();
-					Material material = MATERIALS[index % MATERIALS.length];
-					ItemStack[] contents = new ItemStack[INVENTORY_SIZE];
-					for (int i = 0; i < INVENTORY_SIZE; i++) {
-						contents[i] = new ItemStack(material);
-					}
-					inv.setStorageContents(contents);
-				}, 0, 2);
+		AtomicInteger atomicIndex = new AtomicInteger(random.nextInt(MATERIALS.length));
+		// future ensures the task doesn't get cancelled before the inventory is opened
+		CompletableFuture<Void> hasStarted = new CompletableFuture<>();
+
+		Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> {
+			if (!hasStarted.complete(null) && inv.getViewers().isEmpty()) {
+				task.cancel();
+				openInventories.remove(player.getUniqueId(), inv);
+				return;
 			}
-		});
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+			int index = atomicIndex.getAndIncrement();
+			Material material = MATERIALS[index % MATERIALS.length];
+			ItemStack[] contents = new ItemStack[INVENTORY_SIZE];
+			for (int i = 0; i < INVENTORY_SIZE; i++) {
+				contents[i] = new ItemStack(material);
+			}
+			inv.setStorageContents(contents);
+		}, 1, 2);
+
+		return true;
 	}
 
 	// prevent users from taking items from the pop-up inventory

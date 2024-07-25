@@ -4,9 +4,13 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.5.1
 
-- Fixed Summon Entity erroneously marking effects as Successful even when they fail
-- Fabric: Fixed Summon Minecart & Boat effects
-- Fixed incredibly rare issue where certain `/account link` setups or join orders could cause the Clear Inventory effect to randomly erroneously refund viewers while only one player has Keep Inventory active
+- Added experimental support for [Folia](https://papermc.io/software/folia). Many issues are to be expected!
+- Added new effect Replace Water with Lava
+- Improved state checks for various effects to prevent marking them as Successful even when they fail
+- Fixed ability to Damage Players while under the effects of Invincibility or OHKO
+- Fixed incredibly rare multiplayer issue where certain join orders could cause the Clear Inventory effect to randomly erroneously refund viewers
+- Paper & Fabric: Fixed various Summon effects
+- Paper & Sponge: Fixed Disable Jumping effect duration not being respected
 
 ## 3.5.0
 

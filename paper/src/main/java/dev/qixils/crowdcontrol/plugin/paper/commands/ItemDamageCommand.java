@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,9 +24,17 @@ import java.util.function.BiFunction;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ITEM_DAMAGE_PERCENTAGE;
 
 @Getter
-public class ItemDamageCommand extends ImmediateCommand {
+public class ItemDamageCommand extends RegionalCommandSync {
 	private final BiFunction<Integer, Material, Integer> handleItem;
 	private final String effectName;
+	private final EquipmentSlot[] slots = new EquipmentSlot[] {
+		EquipmentSlot.HAND,
+		EquipmentSlot.OFF_HAND,
+		EquipmentSlot.CHEST,
+		EquipmentSlot.LEGS,
+		EquipmentSlot.FEET,
+		EquipmentSlot.HEAD
+	};
 
 	public ItemDamageCommand(PaperCrowdControlPlugin plugin, boolean repair) {
 		super(plugin);
@@ -36,40 +45,42 @@ public class ItemDamageCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Player(s) not holding a damaged item");
+	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
+		return request.buildResponse()
+			.type(Response.ResultType.RETRY)
+			.message("Player(s) not holding a damaged item");
+	}
 
+	@Override
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
 		// create list of random equipment slots
-		List<EquipmentSlot> slots = Arrays.asList(EquipmentSlot.values());
+		List<EquipmentSlot> slots = new ArrayList<>(Arrays.asList(this.slots));
 		Collections.shuffle(slots);
 
-		// loop through all players and all slots, and apply the durability change
-		for (Player player : players) {
-			PlayerInventory inv = player.getInventory();
-			for (EquipmentSlot slot : slots) {
-				ItemStack item = inv.getItem(slot);
-				if (item.getType().isEmpty())
-					continue;
-				if (item.getAmount() < 1)
-					continue;
-				if (item.getType().getMaxDurability() <= 1)
-					continue;
-				ItemMeta meta = item.getItemMeta();
-				if (meta.isUnbreakable())
-					continue;
-				if (!(meta instanceof Damageable damageable))
-					continue;
-				Material type = item.getType();
-				int curDamage = damageable.getDamage();
-				int newDamage = handleItem.apply(damageable.getDamage(), type);
-				if (CommandConstants.canApplyDamage(curDamage, newDamage, type.getMaxDurability())) {
-					result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-					damageable.setDamage(newDamage);
-					item.setItemMeta(damageable);
-					break;
-				}
+		PlayerInventory inv = player.getInventory();
+		for (EquipmentSlot slot : slots) {
+			ItemStack item = inv.getItem(slot);
+			if (item.getType().isEmpty())
+				continue;
+			if (item.getAmount() < 1)
+				continue;
+			if (item.getType().getMaxDurability() <= 1)
+				continue;
+			ItemMeta meta = item.getItemMeta();
+			if (meta.isUnbreakable())
+				continue;
+			if (!(meta instanceof Damageable damageable))
+				continue;
+			Material type = item.getType();
+			int curDamage = damageable.getDamage();
+			int newDamage = handleItem.apply(damageable.getDamage(), type);
+			if (CommandConstants.canApplyDamage(curDamage, newDamage, type.getMaxDurability())) {
+				damageable.setDamage(newDamage);
+				item.setItemMeta(damageable);
+				return true;
 			}
 		}
-		return result;
+
+		return false;
 	}
 }

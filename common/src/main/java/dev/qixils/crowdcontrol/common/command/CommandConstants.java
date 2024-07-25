@@ -78,10 +78,6 @@ public class CommandConstants {
 	 */
 	public static final @NotNull Duration DISABLE_JUMPING_DURATION = Duration.ofSeconds(10);
 	/**
-	 * The amount of time to disable jumping for in ticks.
-	 */
-	public static final long DISABLE_JUMPING_TICKS = DISABLE_JUMPING_DURATION.getSeconds() * 20;
-	/**
 	 * The amount of time to invert controls for.
 	 */
 	public static final @NotNull Duration INVERT_CONTROLS_DURATION = Duration.ofSeconds(15);
@@ -466,6 +462,10 @@ public class CommandConstants {
 	 * The maximum radius to teleport from the Eat Chorus Fruit command. Vanilla is 8.
 	 */
 	public static final int EAT_CHORUS_FRUIT_MAX_RADIUS = 16;
+	/**
+	 * The minimum number of entities required for Entity Chaos to succeed.
+	 */
+	public static final int ENTITY_CHAOS_MIN = 10;
 
 	private CommandConstants() {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");

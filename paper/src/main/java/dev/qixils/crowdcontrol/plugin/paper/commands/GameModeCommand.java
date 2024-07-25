@@ -72,15 +72,13 @@ public class GameModeCommand extends TimedVoidCommand {
 	private void setGameMode(@Nullable Request request,
 							 @NotNull List<@NotNull Player> players,
 							 @NotNull GameMode gamemode) {
-		if (players.isEmpty())
-			return;
-		sync(() -> players.forEach(player -> {
+		players.forEach(player -> player.getScheduler().run(plugin, $ -> {
 			player.setGameMode(gamemode);
 			player.getPersistentDataContainer().set(gamemodeKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, request != null);
 			if (request != null) {
 				announce(players, request);
 			}
-		}));
+		}, null));
 	}
 
 	public static final class Manager implements Listener {

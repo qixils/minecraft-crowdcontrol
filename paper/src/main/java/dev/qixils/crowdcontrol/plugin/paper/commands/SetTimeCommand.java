@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Getter
 @Global
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class SetTimeCommand extends ImmediateCommand {
 	private final @NotNull String effectName;
 	private final long time;
@@ -29,10 +31,8 @@ public class SetTimeCommand extends ImmediateCommand {
 	@NotNull
 	@Override
 	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		sync(() -> {
-			for (World world : Bukkit.getWorlds())
-				world.setTime(time);
-		});
+		for (World world : Bukkit.getWorlds())
+			world.setTime(time);
 		return request.buildResponse().type(ResultType.SUCCESS);
 	}
 }

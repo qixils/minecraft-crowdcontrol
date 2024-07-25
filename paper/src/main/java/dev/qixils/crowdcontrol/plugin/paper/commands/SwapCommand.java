@@ -8,7 +8,6 @@ import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,14 +31,14 @@ public class SwapCommand extends ImmediateCommand {
 		// create a list offset by one
 		List<Player> offset = new ArrayList<>(players.size());
 		offset.addAll(players.subList(1, players.size()));
-		offset.add(players.get(0));
+		offset.add(players.getFirst());
 		// get teleport destinations
 		Map<Player, Location> destinations = new HashMap<>(players.size());
 		for (int i = 0; i < players.size(); ++i)
 			destinations.put(players.get(i), offset.get(i).getLocation());
 		// teleport
-		sync(() -> destinations.forEach(Entity::teleportAsync));
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		destinations.forEach((player, location) -> player.getScheduler().run(plugin, $ -> player.teleportAsync(location), null));
+		return request.buildResponse().type(Response.ResultType.SUCCESS); // TODO: safer return / folia
 	}
 
 	@Override

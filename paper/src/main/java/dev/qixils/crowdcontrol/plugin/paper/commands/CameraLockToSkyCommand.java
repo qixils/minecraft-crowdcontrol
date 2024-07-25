@@ -4,11 +4,11 @@ import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
 import dev.qixils.crowdcontrol.socket.Request;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -31,7 +31,7 @@ public final class CameraLockToSkyCommand extends TimedVoidCommand {
 
 	@Override
 	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		AtomicReference<BukkitTask> task = new AtomicReference<>();
+		AtomicReference<ScheduledTask> task = new AtomicReference<>();
 
 		new TimedEffect.Builder()
 				.request(request)
@@ -39,13 +39,13 @@ public final class CameraLockToSkyCommand extends TimedVoidCommand {
 				.duration(getDuration(request))
 				.startCallback($ -> {
 					List<Player> players = plugin.getPlayers(request);
-					task.set(Bukkit.getScheduler().runTaskTimer(plugin, () -> players.forEach(player -> {
+					task.set(Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, $$ -> players.forEach(player -> player.getScheduler().run(plugin, $$$ -> {
 						Location playerLoc = player.getLocation();
 						if (playerLoc.getPitch() > -89.99) {
 							playerLoc.setPitch(-90);
-							player.teleport(playerLoc);
+							player.teleportAsync(playerLoc);
 						}
-					}), 1, 1));
+					}, null)), 1, 1));
 					announce(players, request);
 					return null;
 				})
