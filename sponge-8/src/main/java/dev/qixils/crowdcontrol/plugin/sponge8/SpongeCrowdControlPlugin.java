@@ -106,6 +106,9 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		registerChatCommands();
 		// register event listeners
 		game.eventManager().registerListeners(pluginContainer, softLockResolver);
+
+		// sponge 11 addon
+		new SpongeAddon(this);
 	}
 
 	public static void spawnPlayerParticles(Entity entity, ParticleEffect particle) {
@@ -242,11 +245,6 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Listener
 	public void onConnection(ServerSideConnectionEvent.Join event) {
 		onPlayerJoin(event.player());
-	}
-
-	@Listener
-	public void onQuit(ServerSideConnectionEvent.Leave event) {
-		onPlayerLeave(event.player());
 	}
 
 	@Override

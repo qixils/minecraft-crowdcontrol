@@ -7,11 +7,12 @@ import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
-import dev.qixils.crowdcontrol.common.packets.VersionRequestPacket;
+import dev.qixils.crowdcontrol.common.packets.ShaderPacketS2C;
+import dev.qixils.crowdcontrol.common.packets.VersionRequestPacketS2C;
+import dev.qixils.crowdcontrol.common.packets.VersionResponsePacketC2S;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
-import dev.qixils.crowdcontrol.plugin.paper.utils.PacketUtils;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
@@ -60,9 +61,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
-	public static final String VERSION_REQUEST_ID = VERSION_REQUEST_KEY.asString();
-	public static final String VERSION_RESPONSE_ID = VERSION_RESPONSE_KEY.asString();
-	public static final String SHADER_ID = SHADER_KEY.asString();
 
 	@Getter
 	private final Executor syncExecutor = runnable -> Bukkit.getGlobalRegionScheduler().execute(this, runnable);
@@ -134,6 +132,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public void onLoad() {
 		saveDefaultConfig();
+
 		// init sound validator
 		CommandConstants.SOUND_VALIDATOR = _key -> {
 			NamespacedKey key = PaperUtil.toPaper(_key);
@@ -146,15 +145,16 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			VALID_SOUNDS.put(asString, value);
 			return value;
 		};
+
 		// init plugin channels
-		pluginChannel.registerOutgoingPluginChannel(VERSION_REQUEST_ID);
-		pluginChannel.registerIncomingPluginChannel(VERSION_RESPONSE_ID, (player, message) -> {
-			SemVer version = new SemVer(PacketUtils.readUtf8(message, VERSION_RESPONSE_SIZE));
+		pluginChannel.registerOutgoingPluginChannel(VersionRequestPacketS2C.METADATA);
+		pluginChannel.registerIncomingPluginChannel(VersionResponsePacketC2S.METADATA, (player, message) -> {
+			SemVer version = message.version();
 			getSLF4JLogger().info("Received version {} from client {}", version, player.getUniqueId());
 			clientVersions.put(player.getUniqueId(), version);
 			updateConditionalEffectVisibility(crowdControl);
 		});
-		pluginChannel.registerOutgoingPluginChannel(SHADER_ID);
+		pluginChannel.registerOutgoingPluginChannel(ShaderPacketS2C.METADATA);
 	}
 
 	@Override
@@ -321,7 +321,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		// Spigot docs allege you have to add a delay before sending plugin channel messages
 		// This seems true, so we add a 5 tick delay, but ideally this is short enough to come before the effect visibility update
 		if (!clientVersions.containsKey(player.getUniqueId())) {
-			player.getScheduler().execute(this, () -> pluginChannel.sendMessage(player, VersionRequestPacket.INSTANCE), null, 5);
+			player.getScheduler().execute(this, () -> pluginChannel.sendMessage(player, VersionRequestPacketS2C.INSTANCE), null, 5);
 		}
 	}
 

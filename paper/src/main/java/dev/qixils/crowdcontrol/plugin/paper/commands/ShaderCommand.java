@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.command.impl.Shader;
-import dev.qixils.crowdcontrol.common.packets.ShaderPacket;
+import dev.qixils.crowdcontrol.common.packets.ShaderPacketS2C;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.TimedImmediateCommand;
@@ -42,7 +42,7 @@ public class ShaderCommand extends TimedImmediateCommand {
 
 		// create byte buf
 		Duration duration = getDuration(request);
-		ShaderPacket packet = new ShaderPacket(shader, duration);
+		ShaderPacketS2C packet = new ShaderPacketS2C(shader, duration);
 
 		// send packet
 		for (Player player : players) {

@@ -1,27 +1,20 @@
 package dev.qixils.crowdcontrol.plugin.fabric.packets;
 
+import dev.qixils.crowdcontrol.common.packets.VersionResponsePacketC2S;
 import dev.qixils.crowdcontrol.common.util.SemVer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
-import static dev.qixils.crowdcontrol.common.Plugin.VERSION_RESPONSE_SIZE;
 import static dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin.VERSION_RESPONSE_ID;
 
-public record ResponseVersionC2S(@NotNull SemVer version) implements CustomPacketPayload {
+public class ResponseVersionC2S extends VersionResponsePacketC2S implements CustomPacketPayload {
 	// boilerplate
-	public static final StreamCodec<RegistryFriendlyByteBuf, ResponseVersionC2S> PACKET_CODEC = ByteBufCodecs.stringUtf8(VERSION_RESPONSE_SIZE).map(ResponseVersionC2S::new, ResponseVersionC2S::versionString).cast();
+	public static final StreamCodec<RegistryFriendlyByteBuf, ResponseVersionC2S> PACKET_CODEC = CustomPacketPayload.codec(ResponseVersionC2S::write, ResponseVersionC2S::new);
 	public static final Type<ResponseVersionC2S> PACKET_ID = new Type<>(VERSION_RESPONSE_ID);
 	public @Override @NotNull Type<ResponseVersionC2S> type() { return PACKET_ID; }
-
-	// util
-	public ResponseVersionC2S(@NotNull String version) {
-		this(new SemVer(version));
-	}
-
-	public @NotNull String versionString() {
-		return version.toString();
-	}
+	public ResponseVersionC2S(@NotNull FriendlyByteBuf buf) { super(buf); }
+	public ResponseVersionC2S(@NotNull SemVer version) { super(version); }
 }

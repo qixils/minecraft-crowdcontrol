@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.packets;
 
+import dev.qixils.crowdcontrol.common.packets.ShaderPacketS2C;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -10,14 +11,11 @@ import java.time.Duration;
 
 import static dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin.SHADER_ID;
 
-public record SetShaderS2C(@NotNull String shader, @NotNull Duration duration) implements CustomPacketPayload {
+public class SetShaderS2C extends ShaderPacketS2C implements CustomPacketPayload {
 	// boilerplate
 	public static final StreamCodec<RegistryFriendlyByteBuf, SetShaderS2C> PACKET_CODEC = CustomPacketPayload.codec(SetShaderS2C::write, SetShaderS2C::new);
 	public static final Type<SetShaderS2C> PACKET_ID = new Type<>(SHADER_ID);
 	public @Override @NotNull Type<SetShaderS2C> type() { return PACKET_ID; }
-	public SetShaderS2C(FriendlyByteBuf buf) { this(buf.readUtf(64), Duration.ofMillis(buf.readLong())); }
-	public void write(FriendlyByteBuf buf) {
-		buf.writeUtf(shader, 64);
-		buf.writeLong(duration.toMillis());
-	}
+	public SetShaderS2C(FriendlyByteBuf buf) { super(buf); }
+	public SetShaderS2C(String shader, Duration duration) { super(shader, duration); }
 }

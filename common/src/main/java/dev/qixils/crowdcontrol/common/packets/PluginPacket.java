@@ -1,17 +1,19 @@
 package dev.qixils.crowdcontrol.common.packets;
 
 import io.netty.buffer.ByteBuf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 public interface PluginPacket {
-	Logger LOGGER = LoggerFactory.getLogger("CrowdControl/PluginPacket");
-	Map<String, Function<ByteBuf, PluginPacket>> REGISTRY = new HashMap<>();
+	Metadata<?> metadata();
+	void write(ByteBuf buf);
 
-	String channel();
-	ByteBuf message();
+	@Data
+	@Accessors(fluent = true)
+	class Metadata<T extends PluginPacket> {
+		private final String channel;
+		private final Function<ByteBuf, T> factory;
+	}
 }

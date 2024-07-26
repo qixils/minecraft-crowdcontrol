@@ -1,10 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.packets.PluginPacket;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
@@ -17,16 +20,17 @@ public class PluginChannel implements PluginMessageListener {
 	private final PaperCrowdControlPlugin plugin;
 	private final Map<String, BiConsumer<Player, byte[]>> incomingMessageHandlers = new HashMap<>();
 
-	public void registerIncomingPluginChannel(String channel, BiConsumer<Player, byte[]> handler) {
-		incomingMessageHandlers.put(channel, handler);
-		Bukkit.getMessenger().registerIncomingPluginChannel(plugin, channel, this);
+	public <T extends PluginPacket> void registerIncomingPluginChannel(PluginPacket.Metadata<T> type, BiConsumer<Player, T> handler) {
+		incomingMessageHandlers.put(type.channel(), ((player, bytes) -> handler.accept(player, type.factory().apply(Unpooled.wrappedBuffer(bytes)))));
+		Bukkit.getMessenger().registerIncomingPluginChannel(plugin, type.channel(), this);
 	}
 
-	public void registerOutgoingPluginChannel(String channel) {
-		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, channel);
+	public void registerOutgoingPluginChannel(PluginPacket.Metadata<?> type) {
+		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, type.channel());
 	}
 
 	@Override
+	@ApiStatus.Internal
 	public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte @NotNull [] message) {
 		plugin.getSLF4JLogger().debug("Received message {} from {}: {}", channel, player.getUniqueId(), new String(message, StandardCharsets.UTF_8));
 		var handler = incomingMessageHandlers.get(channel);
@@ -35,6 +39,8 @@ public class PluginChannel implements PluginMessageListener {
 	}
 
 	public void sendMessage(Player player, PluginPacket packet) {
-		player.sendPluginMessage(plugin, packet.channel(), packet.message().copy().array());
+		ByteBuf buf = Unpooled.buffer();
+		packet.write(buf);
+		player.sendPluginMessage(plugin, packet.metadata().channel(), buf.copy().array());
 	}
 }
