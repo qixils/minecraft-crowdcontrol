@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import com.google.common.collect.Lists;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
@@ -257,6 +256,7 @@ public class LootboxCommand extends ImmediateCommand {
 		ItemLore itemLore = itemStack.get(DataComponents.LORE);
 		if (itemLore == null || itemLore.lines().isEmpty())
 			return new ArrayList<>();
+		// TODO: migrate to toAdventure prolly
 		return itemLore.lines().stream().map(ComponentLike::asComponent).collect(Collectors.toList());
 	}
 

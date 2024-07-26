@@ -30,7 +30,7 @@ public class GameModeCommand extends TimedVoidCommand {
 		super(plugin);
 		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = gamemode.getLongDisplayName().asComponent();
+		this.displayName = plugin.toAdventure(gamemode.getLongDisplayName());
 		this.effectName = gamemode.getName() + "_mode";
 	}
 

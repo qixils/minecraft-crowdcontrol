@@ -302,8 +302,15 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		return isEnabled(feature) == TriState.FALSE;
 	}
 
+	@SuppressWarnings("removal")
+	public @NotNull Component toAdventure(ComponentLike text) {
+		return text instanceof net.minecraft.network.chat.Component vanilla
+			? adventure().toAdventure(vanilla)
+			: text.asComponent();
+	}
+
 	public @NotNull Component toAdventure(ComponentLike text, @NotNull Pointered viewer) {
-		return adventure().renderer().render(text.asComponent(), viewer);
+		return adventure().renderer().render(toAdventure(text), viewer);
 	}
 
 	public @NotNull net.minecraft.network.chat.Component toNative(ComponentLike text, @NotNull Pointered viewer) {

@@ -44,6 +44,6 @@ public class MojmapTextUtil implements TextUtil {
 	// helper methods for native objects
 
 	public @NotNull String asPlain(@NotNull Component component) {
-		return asPlain(component.asComponent());
+		return asPlain(plugin.toAdventure(component));
 	}
 }
