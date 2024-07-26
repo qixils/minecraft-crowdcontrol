@@ -22,6 +22,7 @@ import dev.qixils.crowdcontrol.socket.Response.PacketType;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -85,6 +86,36 @@ public interface Plugin<P, S> {
 	 * The prefix to use in command output.
 	 */
 	String PREFIX = "CrowdControl";
+
+	/**
+	 * The mod ID / namespace to use in {@link net.kyori.adventure.key.Key Key}s.
+	 */
+	String NAMESPACE = "crowdcontrol";
+
+	/**
+	 * Key for the Version Request packet.
+	 */
+	Key VERSION_REQUEST_KEY = Key.key(NAMESPACE, "version-request");
+
+	/**
+	 * Key for the Version Response packet.
+	 */
+	Key VERSION_RESPONSE_KEY = Key.key(NAMESPACE, "version-response");
+
+	/**
+	 * Key for the Version Response packet.
+	 */
+	Key SHADER_KEY = Key.key(NAMESPACE, "shader");
+
+	/**
+	 * Size of the Version Response packet.
+	 */
+	int VERSION_RESPONSE_SIZE = 32;
+
+	/**
+	 * Size of the Shader packet.
+	 */
+	int SHADER_SIZE = 64;
 
 	/**
 	 * The prefix to use in command output as a {@link Component}.
@@ -458,18 +489,14 @@ public interface Plugin<P, S> {
 			.handler(ctx -> {
 				Audience audience = mapper.asAudience(ctx.getSender());
 				Component message = output(translatable("cc.command.crowdcontrol.version.server", text(SemVer.MOD.toString())));
-				if (canGetModVersion()) {
-					audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.header")));
-					for (P player : getAllPlayers()) { // TODO: get all players real
-						Optional<SemVer> version = getModVersion(player);
-						if (version.isPresent()) {
-							String key = "cc.command.crowdcontrol.version.client." + (version.get().equals(SemVer.MOD) ? "match" : "mismatch");
-							audience.sendMessage(translatable(key, text(playerMapper().getUsername(player)), text(version.get().toString())));
-						} else
-							audience.sendMessage(translatable("cc.command.crowdcontrol.version.client.unknown", text(playerMapper().getUsername(player))));
-					}
-				} else {
-					audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.unknown")));
+				audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.header")));
+				for (P player : getAllPlayers()) { // TODO: get all players real
+					Optional<SemVer> version = getModVersion(player);
+					if (version.isPresent()) {
+						String key = "cc.command.crowdcontrol.version.client." + (version.get().equals(SemVer.MOD) ? "match" : "mismatch");
+						audience.sendMessage(translatable(key, text(playerMapper().getUsername(player)), text(version.get().toString())));
+					} else
+						audience.sendMessage(translatable("cc.command.crowdcontrol.version.client.unknown", text(playerMapper().getUsername(player))));
 				}
 			}));
 		// execute command
@@ -514,7 +541,7 @@ public interface Plugin<P, S> {
 					}
 					Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
 					@SuppressWarnings("ArraysAsListWithZeroOrOneArgument") // need mutable list
-					List<P> players = Arrays.asList(player);
+					List<P> players = new ArrayList<>(Arrays.asList(player));
 					Executor executor = effect.getExecutor();
 					executor.execute(() -> effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build()));
 				})
@@ -980,15 +1007,6 @@ public interface Plugin<P, S> {
 	}
 
 	/**
-	 * Whether this plugin implementation supports {@link ClientOnly} effects.
-	 *
-	 * @return whether client effects are supported
-	 */
-	default boolean supportsClientOnly() {
-		return false;
-	}
-
-	/**
 	 * Gets the plugin's {@link CommandManager}.
 	 *
 	 * @return command manager instance
@@ -1239,16 +1257,6 @@ public interface Plugin<P, S> {
 	@NotNull
 	static Component getViewerComponent(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
 		return ExceptionUtil.validateNotNullElse(getViewerComponentOrNull(hidesNames, request, chat), VIEWER_NAME);
-	}
-
-	/**
-	 * Returns whether {@link #getModVersion(Object)} is expected to be able to produce a value.
-	 * This is {@code false} on mod implementations that do not support mod version checking and client-side effects.
-	 *
-	 * @return whether {@link #getModVersion(Object)} is expected to be able to produce a value
-	 */
-	default boolean canGetModVersion() {
-		return false;
 	}
 
 	/**

@@ -21,7 +21,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
-import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.fabricmc.api.ModInitializer;
@@ -61,8 +60,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullElseGet;
 import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
+import static net.minecraft.resources.ResourceLocation.parse;
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
@@ -75,9 +74,9 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
 	// packet stuff
-	public static ResourceLocation VERSION_REQUEST_ID = fromNamespaceAndPath("crowdcontrol", "version-request");
-	public static ResourceLocation VERSION_RESPONSE_ID = fromNamespaceAndPath("crowdcontrol", "version-response");
-	public static ResourceLocation SHADER_ID = fromNamespaceAndPath("crowdcontrol", "shader");
+	public static ResourceLocation VERSION_REQUEST_ID = parse(VERSION_REQUEST_KEY.asString());
+	public static ResourceLocation VERSION_RESPONSE_ID = parse(VERSION_RESPONSE_KEY.asString());
+	public static ResourceLocation SHADER_ID = parse(SHADER_KEY.asString());
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -116,7 +115,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			.build()
 	);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
-	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(FabricLoader.getInstance().getConfigDir());
 	private static @MonotonicNonNull FabricCrowdControlPlugin instance;
 
@@ -136,8 +134,10 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
 		PacketUtil.registerPackets();
 		ServerPlayNetworking.registerGlobalReceiver(ResponseVersionC2S.PACKET_ID, (payload, context) -> {
-			getSLF4JLogger().debug("Received version response from client!");
-			clientVersions.put(context.player().getUUID(), payload.version());
+			UUID uuid = context.player().getUUID();
+			SemVer version = payload.version();
+			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
+			clientVersions.put(uuid, version);
 			updateConditionalEffectVisibility(crowdControl);
 		});
 	}
@@ -182,16 +182,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	 */
 	public static boolean isInstanceAvailable() {
 		return instance != null;
-	}
-
-	public boolean isClientAvailable(@Nullable List<ServerPlayer> possiblePlayers, @NotNull Request request) {
-		final List<ServerPlayer> players = validateNotNullElseGet(possiblePlayers, () -> getPlayers(request));
-		return players.stream().anyMatch(player -> clientVersions.containsKey(player.getUUID()));
-	}
-
-	@Override
-	public boolean supportsClientOnly() {
-		return true;
 	}
 
 	@Override
@@ -249,21 +239,6 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
-	public boolean canGetModVersion() {
-		return true;
-	}
-
-	@Override
-	public @NotNull Optional<SemVer> getModVersion(@NotNull ServerPlayer player) {
-		return Optional.ofNullable(clientVersions.get(player.getUUID()));
-	}
-
-	@Override
-	public int getModdedPlayerCount() {
-		return clientVersions.size();
-	}
-
-	@Override
 	public void onPlayerJoin(ServerPlayer player) {
 		// put client version
 		if (CLIENT_AVAILABLE) {
@@ -274,17 +249,11 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		}
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
-			getSLF4JLogger().debug("Sending version request to " + player.getUUID());
+			getSLF4JLogger().debug("Sending version request to {}", player.getUUID());
 			ServerPlayNetworking.send(player, RequestVersionS2C.INSTANCE);
 		}
 		// super
 		super.onPlayerJoin(player);
-	}
-
-	@Override
-	public void onPlayerLeave(ServerPlayer player) {
-		clientVersions.remove(player.getUUID());
-		super.onPlayerLeave(player);
 	}
 
 	@Override

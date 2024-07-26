@@ -2,7 +2,9 @@ package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EventListener;
-import dev.qixils.crowdcontrol.common.*;
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
+import dev.qixils.crowdcontrol.common.Global;
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -195,7 +197,7 @@ public interface Command<P> {
 		if (request.getType() == null || !request.getType().isEffectType()) return;
 
 		Plugin<P, ?> plugin = getPlugin();
-		plugin.getSLF4JLogger().debug("Executing " + getDisplayName() + " from " + request);
+		plugin.getSLF4JLogger().debug("Executing {} from {}", getDisplayName(), request);
 		List<P> players = plugin.getPlayers(request);
 
 		// remove players on older version of the mod
@@ -229,23 +231,6 @@ public interface Command<P> {
 			}
 		}
 
-		// disallow execution of client commands
-		if (isClientOnly()) {
-			if (!getPlugin().supportsClientOnly()) {
-				request.buildResponse()
-					.type(ResultType.UNAVAILABLE)
-					.message("Client-side effects are not supported by this setup")
-					.send();
-				return;
-			} else if (!isClientAvailable(players, request)) {
-				request.buildResponse()
-					.type(ResultType.FAILURE)
-					.message("Client-side effects are currently unavailable or cannot be used on this streamer")
-					.send();
-				return;
-			}
-		}
-
 		// create shuffled copy of players so that the recipients of limited effects are random
 		List<P> shuffledPlayers = new ArrayList<>(players);
 		Collections.shuffle(shuffledPlayers);
@@ -259,23 +244,6 @@ public interface Command<P> {
 			if (response.getResultType() == Response.ResultType.SUCCESS)
 				announce(plugin.playerMapper().asAudience(players), request);
 		}, plugin.getAsyncExecutor());
-	}
-
-	/**
-	 * Whether a {@link ClientOnly} effect with the provided arguments would be able to successfully
-	 * execute. For example, this will return false if {@link Plugin#supportsClientOnly()} returns
-	 * {@code false} or if no connected players have the client mod installed.
-	 *
-	 * @param players list of players targeted by the effect
-	 * @param request request that triggered this effect
-	 * @return whether a client-only effect could execute
-	 */
-	default boolean isClientAvailable(@Nullable List<P> players, @NotNull Request request) {
-		if (getPlugin().supportsClientOnly())
-			throw new UnsupportedOperationException(
-					"Plugin reports that it supports client-only effects but has no implementation for #isClientAvailable"
-			);
-		return false;
 	}
 
 	/**
@@ -425,7 +393,7 @@ public interface Command<P> {
 	 * @return whether this effect is client-side
 	 */
 	default boolean isClientOnly() {
-		return getClass().isAnnotationPresent(ClientOnly.class) || getMinimumModVersion().isGreaterThan(SemVer.ZERO);
+		return getMinimumModVersion().isGreaterThan(SemVer.ZERO);
 	}
 
 	/**

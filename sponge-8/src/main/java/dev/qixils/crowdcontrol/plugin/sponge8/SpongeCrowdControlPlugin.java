@@ -152,11 +152,6 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@Override
-	public boolean supportsClientOnly() {
-		return true;
-	}
-
-	@Override
 	public @NotNull Collection<String> getHosts() {
 		Collection<String> confHosts = super.getHosts();
 		if (!Sponge.isClientAvailable()) {
@@ -247,6 +242,11 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Listener
 	public void onConnection(ServerSideConnectionEvent.Join event) {
 		onPlayerJoin(event.player());
+	}
+
+	@Listener
+	public void onQuit(ServerSideConnectionEvent.Leave event) {
+		onPlayerLeave(event.player());
 	}
 
 	@Override

@@ -19,6 +19,7 @@ dependencies {
     api("com.github.qixils.cloud:cloud-minecraft-extras:$cloudVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
+    api("io.netty:netty-buffer:4.1.112.Final")
 }
 
 description = "Minecraft Crowd Control: Common"

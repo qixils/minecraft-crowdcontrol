@@ -2,6 +2,11 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.6.1
+
+- Added support for client-side effects on all server-side backends
+- Paper: Fixed [experimental features](https://minecraft.wiki/w/Experiments) support on 1.21+
+
 ## 3.6.0
 
 - Added experimental support for [Folia](https://papermc.io/software/folia). Many issues are to be expected!

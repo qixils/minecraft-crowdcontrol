@@ -30,6 +30,12 @@ public final class SemVer implements Comparable<SemVer> {
 	@NotNull
 	public static final SemVer ZERO = new SemVer(0, 0, 0);
 
+	/**
+	 * The lowest possible semantic version.
+	 */
+	@NotNull
+	public static final SemVer MIN = new SemVer(0, 0, 1);
+
 	static {
 		// load version from resources (mccc-version.txt)
 		InputStream inputStream = SemVer.class.getClassLoader().getResourceAsStream("mccc-version.txt");

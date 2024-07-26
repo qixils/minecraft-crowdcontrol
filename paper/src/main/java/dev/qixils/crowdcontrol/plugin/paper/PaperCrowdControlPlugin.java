@@ -7,9 +7,11 @@ import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.packets.VersionRequestPacket;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
+import dev.qixils.crowdcontrol.plugin.paper.utils.PacketUtils;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
@@ -35,6 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -57,6 +60,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
+	public static final String VERSION_REQUEST_ID = VERSION_REQUEST_KEY.asString();
+	public static final String VERSION_RESPONSE_ID = VERSION_RESPONSE_KEY.asString();
+	public static final String SHADER_ID = SHADER_KEY.asString();
+
 	@Getter
 	private final Executor syncExecutor = runnable -> Bukkit.getGlobalRegionScheduler().execute(this, runnable);
 	@Getter
@@ -79,11 +86,14 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final Class<CommandSender> commandSenderClass = CommandSender.class;
 	FileConfiguration config = getConfig();
 	// actual stuff
-	@Getter @Setter
+	@Getter
+	@Setter
 	private @Nullable String password = DEFAULT_PASSWORD;
-	@Getter @Setter
+	@Getter
+	@Setter
 	private String IP = null;
-	@Getter @Setter
+	@Getter
+	@Setter
 	private int port = DEFAULT_PORT;
 	@Getter
 	CrowdControl crowdControl = null;
@@ -91,7 +101,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private PaperCommandManager<CommandSender> commandManager;
 	@Getter
 	private boolean global = false;
-	@Getter @Setter @NotNull
+	@Getter
+	@Setter
+	@NotNull
 	private HideNames hideNames = HideNames.NONE;
 	@Getter
 	private Collection<String> hosts = Collections.emptyList();
@@ -102,15 +114,22 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private boolean autoDetectIP = true;
 	@Getter
 	private LimitConfig limitConfig = new LimitConfig();
-	@Getter @NotNull
+	@Getter
+	@NotNull
 	private SoftLockConfig softLockConfig = new SoftLockConfig();
 	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
-	@Getter @NotNull
+	@Getter
+	@NotNull
 	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-	@Getter @NotNull
+	@Getter
+	@NotNull
 	private final Map<String, List<SocketManager>> sentEvents = new HashMap<>();
+	@Getter
+	@NotNull
+	private final PluginChannel pluginChannel = new PluginChannel(this);
+	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
 
 	@Override
 	public void onLoad() {
@@ -127,6 +146,15 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			VALID_SOUNDS.put(asString, value);
 			return value;
 		};
+		// init plugin channels
+		pluginChannel.registerOutgoingPluginChannel(VERSION_REQUEST_ID);
+		pluginChannel.registerIncomingPluginChannel(VERSION_RESPONSE_ID, (player, message) -> {
+			SemVer version = new SemVer(PacketUtils.readUtf8(message, VERSION_RESPONSE_SIZE));
+			getSLF4JLogger().info("Received version {} from client {}", version, player.getUniqueId());
+			clientVersions.put(player.getUniqueId(), version);
+			updateConditionalEffectVisibility(crowdControl);
+		});
+		pluginChannel.registerOutgoingPluginChannel(SHADER_ID);
 	}
 
 	@Override
@@ -230,10 +258,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 		try {
 			commandManager = new PaperCommandManager<>(this,
-					AsynchronousCommandExecutionCoordinator.<CommandSender>builder()
-							.withAsynchronousParsing().build(),
-					Function.identity(),
-					Function.identity()
+				AsynchronousCommandExecutionCoordinator.<CommandSender>builder()
+					.withAsynchronousParsing().build(),
+				Function.identity(),
+				Function.identity()
 			);
 			try {
 				commandManager.registerBrigadier();
@@ -275,9 +303,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			name = name.toLowerCase(Locale.ENGLISH);
 		try {
 			crowdControl.registerHandler(name, command::executeAndNotify);
-			LOGGER.debug("Registered CC command '" + name + "'");
+			LOGGER.debug("Registered CC command '{}'", name);
 		} catch (IllegalArgumentException e) {
-			LOGGER.warn("Failed to register command: " + name, e);
+			LOGGER.warn("Failed to register command: {}", name, e);
 		}
 	}
 
@@ -288,12 +316,34 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		onPlayerJoin(event.getPlayer());
+		Player player = event.getPlayer();
+		onPlayerJoin(player);
+		// Spigot docs allege you have to add a delay before sending plugin channel messages
+		// This seems true, so we add a 5 tick delay, but ideally this is short enough to come before the effect visibility update
+		if (!clientVersions.containsKey(player.getUniqueId())) {
+			player.getScheduler().execute(this, () -> pluginChannel.sendMessage(player, VersionRequestPacket.INSTANCE), null, 5);
+		}
+	}
+
+	@EventHandler
+	public void onLeave(PlayerQuitEvent event) {
+		clientVersions.remove(event.getPlayer().getUniqueId());
+		onPlayerLeave(event.getPlayer());
 	}
 
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
 		return new PaperPlayer(this, player);
+	}
+
+	@Override
+	public @NotNull Optional<SemVer> getModVersion(@NotNull Player player) {
+		return Optional.ofNullable(clientVersions.get(player.getUniqueId()));
+	}
+
+	@Override
+	public int getModdedPlayerCount() {
+		return clientVersions.size();
 	}
 
 	@Override
@@ -312,7 +362,12 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	public static boolean isFeatureEnabled(FeatureElement feature) {
-		return isFeatureEnabled(feature.requiredFeatures());
+		try {
+			return isFeatureEnabled(feature.requiredFeatures());
+		} catch (Exception e) {
+			LOGGER.warn("Failed to determine if {} is enabled", feature, e);
+			return true;
+		}
 	}
 
 	// boilerplate stuff for the data container storage

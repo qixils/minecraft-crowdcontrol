@@ -1,15 +1,14 @@
-package dev.qixils.crowdcontrol.plugin.fabric.commands;
+package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.command.impl.Shader;
+import dev.qixils.crowdcontrol.common.packets.ShaderPacket;
 import dev.qixils.crowdcontrol.common.util.SemVer;
-import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedImmediateCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.paper.TimedImmediateCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -27,7 +26,7 @@ public class ShaderCommand extends TimedImmediateCommand {
 	private final @NotNull SemVer minimumModVersion;
 	private final @NotNull Duration defaultDuration = Duration.ofSeconds(30);
 
-	public ShaderCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull Shader shader) {
+	public ShaderCommand(@NotNull PaperCrowdControlPlugin plugin, @NotNull Shader shader) {
 		super(plugin);
 		this.effectName = shader.getEffectId();
 		this.minimumModVersion = shader.getMinVersion();
@@ -36,24 +35,25 @@ public class ShaderCommand extends TimedImmediateCommand {
 
 	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		players.removeIf(player -> ACTIVE_SHADERS.contains(player.getUUID()));
+	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		players.removeIf(player -> ACTIVE_SHADERS.contains(player.getUniqueId()));
 		if (players.isEmpty())
 			return request.buildResponse().type(Response.ResultType.RETRY).message("All players already have an active screen effect");
 
 		// create byte buf
 		Duration duration = getDuration(request);
-		SetShaderS2C packet = new SetShaderS2C(shader, duration);
+		ShaderPacket packet = new ShaderPacket(shader, duration);
 
 		// send packet
-		for (ServerPlayer player : players) {
-			ACTIVE_SHADERS.add(player.getUUID());
-			ServerPlayNetworking.send(player, packet);
+		for (Player player : players) {
+			ACTIVE_SHADERS.add(player.getUniqueId());
+			plugin.getPluginChannel().sendMessage(player, packet);
 		}
 
 		// schedule removal
 		plugin.getScheduledExecutor().schedule(
-				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), duration.toMillis(), TimeUnit.MILLISECONDS);
+			() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUniqueId())), duration.toMillis(), TimeUnit.MILLISECONDS);
+
 		return request.buildResponse().type(Response.ResultType.SUCCESS).timeRemaining(duration);
 	}
 }

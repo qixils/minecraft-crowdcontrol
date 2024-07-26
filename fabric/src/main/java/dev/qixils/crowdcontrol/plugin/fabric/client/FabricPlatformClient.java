@@ -59,7 +59,7 @@ public final class FabricPlatformClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
 		PacketUtil.registerPackets();
 		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> {
-			logger.debug("Received version request from server!");
+			logger.info("Received version request from server!");
 			context.responseSender().sendPacket(new ResponseVersionC2S(SemVer.MOD));
 		});
 		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> {

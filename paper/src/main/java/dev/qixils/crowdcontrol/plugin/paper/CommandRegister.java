@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.impl.Shader;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.paper.utils.MaterialTag;
@@ -137,6 +138,10 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		for (GameMode gamemode : GameMode.values()) {
 			if (gamemode == GameMode.SURVIVAL) continue;
 			initTo(commands, () -> new GameModeCommand(plugin, gamemode, gamemode == GameMode.SPECTATOR ? 8L : 15L));
+		}
+
+		for (Shader shader : Shader.values()) {
+			initTo(commands, () -> new ShaderCommand(plugin, shader));
 		}
 	}
 

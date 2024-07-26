@@ -372,12 +372,17 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	}
 
 	@Listener
-	public void onConnection(ClientConnectionEvent.Join event) {
+	public void onJoin(ClientConnectionEvent.Join event) {
 		Platform platform = game.getPlatform();
 		if ((platform.getType().isClient() || platform.getExecutionType().isClient()) && clientHost == null) {
 			clientHost = event.getTargetEntity().getUniqueId().toString().toLowerCase(Locale.ENGLISH);
 		}
 		onPlayerJoin(event.getTargetEntity());
+	}
+
+	@Listener
+	public void onQuit(ClientConnectionEvent.Disconnect event) {
+		onPlayerLeave(event.getTargetEntity());
 	}
 
 	@Override
