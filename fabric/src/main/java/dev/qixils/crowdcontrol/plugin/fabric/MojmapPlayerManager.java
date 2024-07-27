@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import lombok.AllArgsConstructor;
@@ -30,7 +29,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 		PermissionWrapper perm = getEffectPermission(request).orElse(null);
 		players.removeIf(player -> player == null
 						|| player.isDeadOrDying()
-						|| (player.isSpectator() && Components.GAME_TYPE_EFFECT.get(player).getValue() == null)
+						|| (player.isSpectator() && player.cc$getGameTypeEffect() == null)
 						|| !check(player, Plugin.USE_PERMISSION)
 						|| (perm != null && !check(player, perm))
 		);
@@ -60,8 +59,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 	@Override
 	public @NotNull Collection<@NotNull ServerPlayer> getSpectators() {
 		List<ServerPlayer> players = new ArrayList<>(plugin.server().getPlayerList().getPlayers());
-		players.removeIf(player -> !player.isSpectator()
-				|| Components.GAME_TYPE_EFFECT.get(player).getValue() != null);
+		players.removeIf(player -> !player.isSpectator() || player.cc$getGameTypeEffect() != null);
 		return players;
 	}
 }

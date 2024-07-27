@@ -2,12 +2,12 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
+import dev.qixils.crowdcontrol.common.components.MovementStatusType;
+import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.AllArgsConstructor;
@@ -31,10 +31,10 @@ public final class FreezeCommand extends TimedVoidCommand {
 	private final String effectName;
 	private final String effectGroup;
 	private final LocationModifier modifier;
-	private final MovementStatus.Type freezeType;
-	private final MovementStatus.Value freezeValue;
+	private final MovementStatusType freezeType;
+	private final MovementStatusValue freezeValue;
 
-	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, LocationModifier modifier, MovementStatus.Type freezeType, MovementStatus.Value freezeValue) {
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, LocationModifier modifier, MovementStatusType freezeType, MovementStatusValue freezeValue) {
 		super(plugin);
 		this.effectName = effectName;
 		this.effectGroup = effectGroup;
@@ -43,15 +43,15 @@ public final class FreezeCommand extends TimedVoidCommand {
 		this.freezeValue = freezeValue;
 	}
 
-	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatus.Type freezeType, MovementStatus.Value freezeValue) {
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatusType freezeType, MovementStatusValue freezeValue) {
 		this(plugin, effectName, effectName, modifier, freezeType, freezeValue);
 	}
 
-	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, LocationModifier modifier, MovementStatus.Type freezeType) {
-		this(plugin, effectName, effectGroup, modifier, freezeType, MovementStatus.Value.DENIED);
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, LocationModifier modifier, MovementStatusType freezeType) {
+		this(plugin, effectName, effectGroup, modifier, freezeType, MovementStatusValue.DENIED);
 	}
 
-	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatus.Type freezeType) {
+	public FreezeCommand(FabricCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatusType freezeType) {
 		this(plugin, effectName, effectName, modifier, freezeType);
 	}
 
@@ -73,7 +73,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 						UUID uuid = player.getUUID();
 						TIMED_EFFECTS.put(uuid, timedEffect);
 						locations.put(uuid, new FreezeData(modifier, new Location(player)));
-						Components.MOVEMENT_STATUS.get(player).set(freezeType, freezeValue);
+						player.cc$setMovementStatus(freezeType, freezeValue);
 					});
 					atomic.set(locations);
 					locations.forEach((uuid, data) -> DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data));
@@ -89,7 +89,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 					ServerPlayer player = server.getPlayerList().getPlayer(uuid);
 					if (player == null)
 						return;
-					Components.MOVEMENT_STATUS.get(player).set(freezeType, MovementStatus.Value.ALLOWED);
+					player.cc$setMovementStatus(freezeType, MovementStatusValue.ALLOWED);
 				}))
 				.build().queue();
 	}
@@ -112,19 +112,19 @@ public final class FreezeCommand extends TimedVoidCommand {
 
 	public static FreezeCommand feet(FabricCrowdControlPlugin plugin) {
 		// TODO: smoother client-side freeze (stop mid-air jitter)
-		return new FreezeCommand(plugin, "freeze", "walk", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation), MovementStatus.Type.WALK);
+		return new FreezeCommand(plugin, "freeze", "walk", (newLocation, previousLocation) -> previousLocation.withRotationOf(newLocation), MovementStatusType.WALK);
 	}
 
 	public static FreezeCommand camera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock", "look", Location::withRotationOf, MovementStatus.Type.LOOK); // (cur, prev) -> cur.withRotationOf(prev)
+		return new FreezeCommand(plugin, "camera_lock", "look", Location::withRotationOf, MovementStatusType.LOOK); // (cur, prev) -> cur.withRotationOf(prev)
 	}
 
 	public static FreezeCommand skyCamera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock_to_sky", "look", (cur, prev) -> cur.withRotation(cur.yaw(), -90), MovementStatus.Type.LOOK, MovementStatus.Value.PARTIAL);
+		return new FreezeCommand(plugin, "camera_lock_to_sky", "look", (cur, prev) -> cur.withRotation(cur.yaw(), -90), MovementStatusType.LOOK, MovementStatusValue.PARTIAL);
 	}
 
 	public static FreezeCommand groundCamera(FabricCrowdControlPlugin plugin) {
-		return new FreezeCommand(plugin, "camera_lock_to_ground", "look", (cur, prev) -> cur.withRotation(cur.yaw(), 90), MovementStatus.Type.LOOK, MovementStatus.Value.PARTIAL);
+		return new FreezeCommand(plugin, "camera_lock_to_ground", "look", (cur, prev) -> cur.withRotation(cur.yaw(), 90), MovementStatusType.LOOK, MovementStatusValue.PARTIAL);
 	}
 
 	@EventListener

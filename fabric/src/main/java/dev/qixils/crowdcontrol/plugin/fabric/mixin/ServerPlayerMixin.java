@@ -1,16 +1,26 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
+import com.mojang.authlib.GameProfile;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand.FreezeData;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.GameTypeEffectComponent;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameRules.BooleanValue;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -23,7 +33,37 @@ import java.util.UUID;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInventoryRedirect;
 
 @Mixin(ServerPlayer.class)
-public abstract class ServerPlayerMixin {
+public abstract class ServerPlayerMixin extends Player implements GameTypeEffectComponent {
+
+	public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
+		super(level, blockPos, f, gameProfile);
+	}
+
+	@Unique
+	GameType gameTypeEffect;
+
+	@Nullable
+	@Override
+	public GameType cc$getGameTypeEffect() {
+		return gameTypeEffect;
+	}
+
+	@Override
+	public void cc$setGameTypeEffect(GameType gameTypeEffect) {
+		this.gameTypeEffect = gameTypeEffect;
+	}
+
+	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
+		if (tag.contains(Components.GAME_TYPE_EFFECT))
+			gameTypeEffect = GameType.byName(tag.getString(Components.GAME_TYPE_EFFECT), null);
+	}
+
+	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+	void onAddAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
+		if (gameTypeEffect != null)
+			tag.putString(Components.GAME_TYPE_EFFECT, gameTypeEffect.getName());
+	}
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	void onTick(CallbackInfo ci) {

@@ -1,30 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.GameTypeEffectComponentImpl;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.MovementStatusImpl;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.OriginalDisplayNameImpl;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.impl.ViewerMobImpl;
-import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
-import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
-import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 
 import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
 
-public final class Components implements EntityComponentInitializer {
-	// DON'T FORGET THESE NEED TO BE DECLARED IN fabric.mod.json
-	public static final @NotNull ComponentKey<ViewerMob> VIEWER_MOB = ComponentRegistry.getOrCreate(fromNamespaceAndPath("crowdcontrol", "viewer-mob"), ViewerMob.class);
-	public static final @NotNull ComponentKey<OriginalDisplayName> ORIGINAL_DISPLAY_NAME = ComponentRegistry.getOrCreate(fromNamespaceAndPath("crowdcontrol", "original-display-name"), OriginalDisplayName.class);
-	public static final @NotNull ComponentKey<GameTypeEffectComponent> GAME_TYPE_EFFECT = ComponentRegistry.getOrCreate(fromNamespaceAndPath("crowdcontrol", "game-type-effect"), GameTypeEffectComponent.class);
-	public static final @NotNull ComponentKey<MovementStatus> MOVEMENT_STATUS = ComponentRegistry.getOrCreate(fromNamespaceAndPath("crowdcontrol", "movement-status"), MovementStatus.class);
-
-	@Override
-	public void registerEntityComponentFactories(@NotNull EntityComponentFactoryRegistry registry) {
-		registry.registerFor(LivingEntity.class, VIEWER_MOB, entity -> new ViewerMobImpl());
-		registry.registerFor(LivingEntity.class, ORIGINAL_DISPLAY_NAME, entity -> new OriginalDisplayNameImpl());
-		registry.registerForPlayers(GAME_TYPE_EFFECT, player -> new GameTypeEffectComponentImpl());
-		registry.registerForPlayers(MOVEMENT_STATUS, MovementStatusImpl::new);
-	}
+public final class Components {
+	public static final @NotNull String VIEWER_MOB = fromNamespaceAndPath("crowdcontrol", "viewer-mob").asString();
+	public static final @NotNull String ORIGINAL_DISPLAY_NAME = fromNamespaceAndPath("crowdcontrol", "original-display-name").asString();
+	public static final @NotNull String GAME_TYPE_EFFECT = fromNamespaceAndPath("crowdcontrol", "game-type-effect").asString();
 }

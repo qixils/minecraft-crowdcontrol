@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,6 +21,6 @@ public abstract class NameTagItemMixin extends Item {
 
 	@Inject(method = "interactLivingEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"))
 	private void onInteractLivingEntity(ItemStack itemStack, Player player, LivingEntity livingEntity, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
-		Components.VIEWER_MOB.maybeGet(livingEntity).ifPresent(mob -> mob.setViewerSpawned(false));
+		livingEntity.cc$setViewerSpawned(false);
 	}
 }

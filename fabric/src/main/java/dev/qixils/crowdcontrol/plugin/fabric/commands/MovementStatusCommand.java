@@ -1,15 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.components.MovementStatusType;
+import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.util.ComparableUtil;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -24,17 +23,19 @@ import java.util.concurrent.atomic.AtomicReference;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DISABLE_JUMPING_DURATION;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.INVERT_CONTROLS_DURATION;
 
+// TODO: paper impl
+
 @Getter
 public class MovementStatusCommand extends TimedVoidCommand {
 	private final String effectName;
 	private final String effectGroup;
 	private final Duration defaultDuration;
-	private final MovementStatus.Type type;
-	private final MovementStatus.Value value;
+	private final MovementStatusType type;
+	private final MovementStatusValue value;
 	private final boolean clientOnly;
 	private final SemVer minimumModVersion;
 
-	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientOnly) {
+	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatusType type, MovementStatusValue value, boolean clientOnly) {
 		super(plugin);
 		this.effectName = effectName;
 		this.effectGroup = effectGroup;
@@ -48,7 +49,7 @@ public class MovementStatusCommand extends TimedVoidCommand {
 			this.minimumModVersion = SemVer.ZERO;
 	}
 
-	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, Duration defaultDuration, MovementStatus.Type type, MovementStatus.Value value, boolean clientOnly) {
+	public MovementStatusCommand(FabricCrowdControlPlugin plugin, String effectName, Duration defaultDuration, MovementStatusType type, MovementStatusValue value, boolean clientOnly) {
 		this(plugin, effectName, effectName, defaultDuration, type, value, clientOnly);
 	}
 
@@ -71,45 +72,36 @@ public class MovementStatusCommand extends TimedVoidCommand {
 								.message("No targetable players online");
 
 					for (Player player : players)
-						Components.MOVEMENT_STATUS.get(player).set(type, value);
+						player.cc$setMovementStatus(type, value);
 					playerAnnounce(players, request);
 
 					return null; // success
 				})
 				.completionCallback($ -> {
 					for (Player player : atomicPlayers.get())
-						Components.MOVEMENT_STATUS.get(player).set(type, MovementStatus.Value.ALLOWED);
+						player.cc$setMovementStatus(type, MovementStatusValue.ALLOWED);
 				})
 				.build().queue();
 	}
 
 	public static MovementStatusCommand disableJumping(FabricCrowdControlPlugin plugin) {
-		return new MovementStatusCommand(plugin, "disable_jumping", DISABLE_JUMPING_DURATION, MovementStatus.Type.JUMP, MovementStatus.Value.DENIED, false);
+		return new MovementStatusCommand(plugin, "disable_jumping", DISABLE_JUMPING_DURATION, MovementStatusType.JUMP, MovementStatusValue.DENIED, false);
 	}
 
 	public static MovementStatusCommand invertControls(FabricCrowdControlPlugin plugin) {
-		return new MovementStatusCommand(plugin, "invert_wasd", "walk", INVERT_CONTROLS_DURATION, MovementStatus.Type.WALK, MovementStatus.Value.INVERTED, true);
+		return new MovementStatusCommand(plugin, "invert_wasd", "walk", INVERT_CONTROLS_DURATION, MovementStatusType.WALK, MovementStatusValue.INVERTED, true);
 	}
 
 	public static MovementStatusCommand invertCamera(FabricCrowdControlPlugin plugin) {
-		return new MovementStatusCommand(plugin, "invert_look", "look", INVERT_CONTROLS_DURATION, MovementStatus.Type.LOOK, MovementStatus.Value.INVERTED, true);
+		return new MovementStatusCommand(plugin, "invert_look", "look", INVERT_CONTROLS_DURATION, MovementStatusType.LOOK, MovementStatusValue.INVERTED, true);
 	}
 
 	public static final class Manager {
 		@Listener
-		public void onJoin(Join event) {
-			MovementStatus data = Components.MOVEMENT_STATUS.get(event.player());
-			for (MovementStatus.Type type : MovementStatus.Type.values())
-				data.rawSet(type, MovementStatus.Value.ALLOWED);
-			data.sync();
-		}
-
-		@Listener
 		public void onJump(Jump event) {
 			Player player = event.player();
-			MovementStatus status = Components.MOVEMENT_STATUS.get(player);
-			boolean cantJump = status.get(MovementStatus.Type.JUMP) == MovementStatus.Value.DENIED;
-			boolean cantWalk = status.get(MovementStatus.Type.WALK) == MovementStatus.Value.DENIED;
+			boolean cantJump = player.cc$getMovementStatus(MovementStatusType.JUMP) == MovementStatusValue.DENIED;
+			boolean cantWalk = player.cc$getMovementStatus(MovementStatusType.WALK) == MovementStatusValue.DENIED;
 			if (cantJump || cantWalk) {
 				event.cancel();
 				if (!event.isClientSide() && player instanceof ServerPlayer sPlayer /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {

@@ -3,10 +3,14 @@ package dev.qixils.crowdcontrol.common.packets;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Function;
 
 public interface PluginPacket {
+	Logger LOGGER = LoggerFactory.getLogger("CrowdControl/PluginPacket");
+
 	Metadata<?> metadata();
 	void write(ByteBuf buf);
 

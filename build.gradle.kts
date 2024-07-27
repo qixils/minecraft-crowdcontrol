@@ -58,7 +58,7 @@ subprojects {
         relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations")
         relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
         relocate("javassist", "dev.qixils.relocated.javassist")
-        relocate("javax", "dev.qixils.relocated.javax")
+        relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
         relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
 
         if (project.name != "fabric-platform") {

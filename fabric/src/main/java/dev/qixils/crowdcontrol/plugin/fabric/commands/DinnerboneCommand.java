@@ -2,9 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.Command;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.OriginalDisplayName;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -50,17 +47,15 @@ public class DinnerboneCommand extends Command {
 			}
 			successFuture.complete(!entities.isEmpty());
 			entities.forEach(entity -> {
-				OriginalDisplayName nameData = Components.ORIGINAL_DISPLAY_NAME.get(entity);
-				ViewerMob viewerData = Components.VIEWER_MOB.get(entity);
-				final @Nullable Component oldName = nameData.getValue();
+				final @Nullable Component oldName = entity.cc$getOriginalDisplayName();
 				final @Nullable Component currentName = entity.getCustomName();
 				if (Objects.equals(currentName, DINNERBONE_COMPONENT)) {
 					entity.setCustomName(oldName);
-					nameData.setValue(null);
-					if (viewerData.isViewerSpawned())
+					entity.cc$setOriginalDisplayName(null);
+					if (entity.cc$isViewerSpawned())
 						entity.setCustomNameVisible(true);
 				} else {
-					nameData.setValue(currentName);
+					entity.cc$setOriginalDisplayName(currentName);
 					entity.setCustomName(DINNERBONE_COMPONENT.copy());
 					entity.setCustomNameVisible(false);
 				}

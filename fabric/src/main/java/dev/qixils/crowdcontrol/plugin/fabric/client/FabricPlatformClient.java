@@ -2,10 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -74,6 +71,10 @@ public final class FabricPlatformClient implements ClientModInitializer {
 				SHADER_ACTIVE = false;
 				client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
 			}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
+		});
+		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (payload, context) -> {
+			if (payload.statusType() == null || payload.statusValue() == null) return;
+			context.player().cc$setMovementStatus(payload.statusType(), payload.statusValue());
 		});
 	}
 

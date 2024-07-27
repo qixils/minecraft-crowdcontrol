@@ -3,9 +3,14 @@ package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-public interface OriginalDisplayName extends org.ladysnake.cca.api.v3.component.Component {
+public interface OriginalDisplayName {
 
-	@Nullable Component getValue();
+	@Nullable
+	default Component cc$getOriginalDisplayName() {
+		return null;
+	}
 
-	void setValue(@Nullable Component value);
+	default void cc$setOriginalDisplayName(@Nullable Component value) {
+
+	}
 }

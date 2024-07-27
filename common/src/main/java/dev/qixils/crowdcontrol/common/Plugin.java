@@ -103,19 +103,14 @@ public interface Plugin<P, S> {
 	Key VERSION_RESPONSE_KEY = Key.key(NAMESPACE, "version-response");
 
 	/**
-	 * Key for the Version Response packet.
+	 * Key for the Shader packet.
 	 */
 	Key SHADER_KEY = Key.key(NAMESPACE, "shader");
 
 	/**
-	 * Size of the Version Response packet.
+	 * Key for the Movement Status packet.
 	 */
-	int VERSION_RESPONSE_SIZE = 32;
-
-	/**
-	 * Size of the Shader packet.
-	 */
-	int SHADER_SIZE = 64;
+	Key MOVEMENT_STATUS_KEY = Key.key(NAMESPACE, "movement-status");
 
 	/**
 	 * The prefix to use in command output as a {@link Component}.

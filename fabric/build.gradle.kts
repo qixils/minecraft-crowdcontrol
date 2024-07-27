@@ -55,8 +55,6 @@ dependencies {
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
     modImplementation(include("com.github.qixils.cloud:cloud-fabric:$cloudVersion")!!)
-    modApi(include("org.ladysnake.cardinal-components-api:cardinal-components-base:$cardinalComponentsVersion")!!)
-    modImplementation(include("org.ladysnake.cardinal-components-api:cardinal-components-entity:$cardinalComponentsVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")

@@ -1,12 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 
-import org.ladysnake.cca.api.v3.component.Component;
+public interface ViewerMob {
 
-public interface ViewerMob extends Component {
+	default boolean cc$isViewerSpawned() {
+		return false;
+	}
 
-	boolean isViewerSpawned();
+	default void cc$setViewerSpawned() {
+		cc$setViewerSpawned(true);
+	}
 
-	void setViewerSpawned();
+	default void cc$setViewerSpawned(boolean value) {
 
-	void setViewerSpawned(boolean value);
+	}
 }

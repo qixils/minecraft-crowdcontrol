@@ -5,8 +5,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.GameTypeEffectComponent;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -58,12 +56,11 @@ public class GameModeCommand extends TimedVoidCommand {
 		if (players.isEmpty())
 			return;
 		sync(() -> players.forEach(player -> {
-			GameTypeEffectComponent data = Components.GAME_TYPE_EFFECT.get(player);
 			player.setGameMode(gamemode);
 			if (request == null)
-				data.setValue(null);
+				player.cc$setGameTypeEffect(null);
 			else {
-				data.setValue(gamemode);
+				player.cc$setGameTypeEffect(gamemode);
 				playerAnnounce(players, request);
 			}
 		}));
@@ -73,10 +70,9 @@ public class GameModeCommand extends TimedVoidCommand {
 		@Listener
 		public void onJoin(Join event) {
 			ServerPlayer player = event.player();
-			GameTypeEffectComponent data = Components.GAME_TYPE_EFFECT.get(player);
-			GameType gameMode = data.getValue();
+			GameType gameMode = player.cc$getGameTypeEffect();
 			if (gameMode == null) return;
-			data.setValue(null);
+			player.cc$setGameTypeEffect(null);
 			player.setGameMode(GameType.SURVIVAL);
 		}
 	}

@@ -2,11 +2,15 @@ package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 
 import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 
-public interface GameTypeEffectComponent extends RespawnableComponent<GameTypeEffectComponent> {
+public interface GameTypeEffectComponent {
 
-	@Nullable GameType getValue();
+	@Nullable
+	default GameType cc$getGameTypeEffect() {
+		return null;
+	}
 
-	void setValue(@Nullable GameType value);
+	default void cc$setGameTypeEffect(@Nullable GameType value) {
+
+	}
 }

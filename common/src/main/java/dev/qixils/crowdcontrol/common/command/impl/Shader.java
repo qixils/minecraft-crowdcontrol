@@ -1,15 +1,18 @@
 package dev.qixils.crowdcontrol.common.command.impl;
 
 import dev.qixils.crowdcontrol.common.util.SemVer;
+import dev.qixils.crowdcontrol.common.util.Versioned;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
 @Getter
+@Accessors(fluent = true)
 @RequiredArgsConstructor
-public enum Shader {
+public enum Shader implements Versioned {
 	BUMPY(new SemVer("3.3.0")),
 	GREEN(new SemVer("3.3.0")),
 	NTSC(new SemVer("3.3.0")),
@@ -26,7 +29,7 @@ public enum Shader {
 	;
 
 	@NotNull
-	private final SemVer minVersion;
+	private final SemVer addedIn;
 
 	@NotNull
 	public String getShaderId() {

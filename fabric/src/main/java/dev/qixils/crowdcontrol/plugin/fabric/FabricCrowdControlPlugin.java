@@ -77,6 +77,7 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	public static ResourceLocation VERSION_REQUEST_ID = parse(VERSION_REQUEST_KEY.asString());
 	public static ResourceLocation VERSION_RESPONSE_ID = parse(VERSION_RESPONSE_KEY.asString());
 	public static ResourceLocation SHADER_ID = parse(SHADER_KEY.asString());
+	public static ResourceLocation MOVEMENT_STATUS_ID = parse(MOVEMENT_STATUS_KEY.asString());
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();

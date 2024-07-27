@@ -30,7 +30,7 @@ public class ShaderCommand extends TimedImmediateCommand {
 	public ShaderCommand(@NotNull FabricCrowdControlPlugin plugin, @NotNull Shader shader) {
 		super(plugin);
 		this.effectName = shader.getEffectId();
-		this.minimumModVersion = shader.getMinVersion();
+		this.minimumModVersion = shader.addedIn();
 		this.shader = shader.getShaderId();
 	}
 

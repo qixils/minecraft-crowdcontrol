@@ -1,9 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
+import dev.qixils.crowdcontrol.common.components.MovementStatusType;
+import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
-import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.Input;
@@ -27,28 +27,28 @@ public abstract class KeyboardInputMixin extends Input {
 	private Options options;
 
 	@Unique
-	private boolean handleIsDown(@NotNull KeyMapping key, @Nullable KeyMapping inverse, MovementStatus.@NotNull Type type) {
+	private boolean handleIsDown(@NotNull KeyMapping key, @Nullable KeyMapping inverse, @NotNull MovementStatusType type) {
 		if (!FabricCrowdControlPlugin.CLIENT_INITIALIZED)
 			return key.isDown();
 		Optional<LocalPlayer> player = FabricPlatformClient.get().player();
 		if (player.isEmpty())
 			return key.isDown();
-		MovementStatus.Value status = Components.MOVEMENT_STATUS.get(player.get()).get(type);
-		if (status == MovementStatus.Value.DENIED)
+		MovementStatusValue status = player.get().cc$getMovementStatus(type);
+		if (status == MovementStatusValue.DENIED)
 			return false;
-		if (status == MovementStatus.Value.INVERTED && inverse != null)
+		if (status == MovementStatusValue.INVERTED && inverse != null)
 			return inverse.isDown();
 		return key.isDown();
 	}
 
 	@Unique
 	private boolean handleIsDown(@NotNull KeyMapping key, @Nullable KeyMapping inverse) {
-		return handleIsDown(key, inverse, MovementStatus.Type.WALK);
+		return handleIsDown(key, inverse, MovementStatusType.WALK);
 	}
 
 	@SuppressWarnings("SameParameterValue")
 	@Unique
-	private boolean handleIsDown(@NotNull KeyMapping key, MovementStatus.@NotNull Type type) {
+	private boolean handleIsDown(@NotNull KeyMapping key, @NotNull MovementStatusType type) {
 		return handleIsDown(key, null, type);
 	}
 
