@@ -42,8 +42,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new LootboxCommand(plugin, 10),
 			() -> new TeleportCommand(plugin),
 			() -> new ToastCommand(plugin),
-			() -> new FreezeCommand(plugin),
-			() -> new CameraLockCommand(plugin),
 			() -> new FlowerCommand(plugin),
 			() -> new FlingCommand(plugin),
 			() -> new TorchCommand(plugin, true),
@@ -58,10 +56,14 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new DropItemCommand(plugin),
 			() -> new DeleteItemCommand(plugin),
 			() -> new BucketClutchCommand(plugin),
-			() -> new DisableJumpingCommand(plugin),
+			() -> MovementStatusCommand.disableJumping(plugin),
+			() -> MovementStatusCommand.invertCamera(plugin),
+			() -> MovementStatusCommand.invertControls(plugin),
+			() -> FreezeCommand.feet(plugin),
+			() -> FreezeCommand.camera(plugin),
+			() -> FreezeCommand.skyCamera(plugin),
+			() -> FreezeCommand.groundCamera(plugin),
 			() -> new EntityChaosCommand(plugin),
-			() -> new CameraLockToSkyCommand(plugin),
-			() -> new CameraLockToGroundCommand(plugin),
 			() -> new FlightCommand(plugin),
 			() -> new KeepInventoryCommand(plugin, true),
 			() -> new KeepInventoryCommand(plugin, false),
@@ -153,6 +155,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 	@Override
 	protected void onFirstRegistry() {
 		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
+		Bukkit.getPluginManager().registerEvents(new MovementStatusCommand.Manager(), plugin);
+		Bukkit.getPluginManager().registerEvents(new FreezeCommand.Manager(plugin), plugin);
 		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(plugin), plugin);
 		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), plugin);
 	}

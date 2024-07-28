@@ -6,7 +6,9 @@ import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.packets.MovementStatusPacketS2C;
 import dev.qixils.crowdcontrol.common.packets.ShaderPacketS2C;
 import dev.qixils.crowdcontrol.common.packets.VersionRequestPacketS2C;
 import dev.qixils.crowdcontrol.common.packets.VersionResponsePacketC2S;
@@ -24,7 +26,6 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -38,7 +39,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
@@ -60,6 +60,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private static final Map<String, Boolean> VALID_SOUNDS = new HashMap<>();
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
+	public static final PersistentDataType<String, MovementStatusValue> MOVEMENT_STATUS_VALUE_TYPE = new EnumDataType<>(MovementStatusValue.class, o -> o.orElse(MovementStatusValue.ALLOWED));
 
 	@Getter
 	private final Executor syncExecutor = runnable -> Bukkit.getGlobalRegionScheduler().execute(this, runnable);
@@ -154,6 +155,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			updateConditionalEffectVisibility(crowdControl);
 		});
 		pluginChannel.registerOutgoingPluginChannel(ShaderPacketS2C.METADATA);
+		pluginChannel.registerOutgoingPluginChannel(MovementStatusPacketS2C.METADATA);
 	}
 
 	@Override
@@ -320,7 +322,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		// Spigot docs allege you have to add a delay before sending plugin channel messages
 		// This seems true, so we add a 5 tick delay, but ideally this is short enough to come before the effect visibility update
 		if (!clientVersions.containsKey(player.getUniqueId())) {
-			player.getScheduler().execute(this, () -> pluginChannel.sendMessage(player, VersionRequestPacketS2C.INSTANCE), null, 5);
+			player.getScheduler().execute(this, () -> pluginChannel.sendMessage(player, VersionRequestPacketS2C.INSTANCE), null, 10);
 		}
 	}
 
@@ -366,56 +368,5 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 	public static boolean isFeatureEnabled(EntityType entityType) {
 		return Bukkit.getWorlds().stream().allMatch(entityType::isEnabledByFeature);
-	}
-
-	// boilerplate stuff for the data container storage
-
-	private static final class BooleanDataType implements PersistentDataType<Byte, Boolean> {
-		private static final byte TRUE = 1;
-		private static final byte FALSE = 0;
-
-		@NotNull
-		public Class<Byte> getPrimitiveType() {
-			return Byte.class;
-		}
-
-		@NotNull
-		public Class<Boolean> getComplexType() {
-			return Boolean.class;
-		}
-
-		@NotNull
-		public Byte toPrimitive(@NotNull Boolean complex, @NotNull PersistentDataAdapterContext context) {
-			return complex ? TRUE : FALSE;
-		}
-
-		@NotNull
-		public Boolean fromPrimitive(@NotNull Byte primitive, @NotNull PersistentDataAdapterContext context) {
-			return primitive != FALSE;
-		}
-	}
-
-	private static final class ComponentDataType implements PersistentDataType<String, Component> {
-		private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
-
-		@Override
-		public @NotNull Class<String> getPrimitiveType() {
-			return String.class;
-		}
-
-		@Override
-		public @NotNull Class<Component> getComplexType() {
-			return Component.class;
-		}
-
-		@Override
-		public @NotNull String toPrimitive(@NotNull Component complex, @NotNull PersistentDataAdapterContext context) {
-			return serializer.serialize(complex);
-		}
-
-		@Override
-		public @NotNull Component fromPrimitive(@NotNull String primitive, @NotNull PersistentDataAdapterContext context) {
-			return serializer.deserialize(primitive);
-		}
 	}
 }

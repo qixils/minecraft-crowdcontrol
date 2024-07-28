@@ -55,6 +55,16 @@ public abstract class PlayerMixin extends LivingEntity implements MovementStatus
 	@Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
 	public void jumpFromGround(CallbackInfo ci) {
 		Jump event = new Jump((Player) (Object) this, this.level().isClientSide);
+
+		boolean cantJump = cc$getMovementStatus(MovementStatusType.JUMP) == MovementStatusValue.DENIED;
+		boolean cantWalk = cc$getMovementStatus(MovementStatusType.WALK) == MovementStatusValue.DENIED;
+		if (cantJump || cantWalk) {
+			event.cancel();
+			if (!event.isClientSide() && ((Object)this) instanceof ServerPlayer sPlayer /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {
+				sPlayer.connection.teleport(getX(), getY(), getZ(), getYRot(), getXRot());
+			}
+		}
+
 		event.fire();
 		if (event.cancelled())
 			ci.cancel();

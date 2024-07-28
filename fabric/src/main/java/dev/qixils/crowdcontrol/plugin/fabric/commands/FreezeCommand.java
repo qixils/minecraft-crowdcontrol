@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -128,7 +129,10 @@ public final class FreezeCommand extends TimedVoidCommand {
 	}
 
 	@EventListener
+	@RequiredArgsConstructor
 	public static final class Manager {
+		private final FabricCrowdControlPlugin plugin;
+
 		@Listener
 		public void onDeath(Death death) {
 			UUID uuid = death.entity().getUUID();
@@ -138,7 +142,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 			try {
 				effect.complete();
 			} catch (Exception e) {
-				FabricCrowdControlPlugin.getInstance().getSLF4JLogger().warn("Failed to stop freeze effect", e);
+				plugin.getSLF4JLogger().warn("Failed to stop freeze effect", e);
 			}
 		}
 	}

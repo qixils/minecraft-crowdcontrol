@@ -7,8 +7,6 @@ import dev.qixils.crowdcontrol.common.util.ComparableUtil;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
-import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
@@ -22,8 +20,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DISABLE_JUMPING_DURATION;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.INVERT_CONTROLS_DURATION;
-
-// TODO: paper impl
 
 @Getter
 public class MovementStatusCommand extends TimedVoidCommand {
@@ -94,20 +90,5 @@ public class MovementStatusCommand extends TimedVoidCommand {
 
 	public static MovementStatusCommand invertCamera(FabricCrowdControlPlugin plugin) {
 		return new MovementStatusCommand(plugin, "invert_look", "look", INVERT_CONTROLS_DURATION, MovementStatusType.LOOK, MovementStatusValue.INVERTED, true);
-	}
-
-	public static final class Manager {
-		@Listener
-		public void onJump(Jump event) {
-			Player player = event.player();
-			boolean cantJump = player.cc$getMovementStatus(MovementStatusType.JUMP) == MovementStatusValue.DENIED;
-			boolean cantWalk = player.cc$getMovementStatus(MovementStatusType.WALK) == MovementStatusValue.DENIED;
-			if (cantJump || cantWalk) {
-				event.cancel();
-				if (!event.isClientSide() && player instanceof ServerPlayer sPlayer /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {
-					sPlayer.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
-				}
-			}
-		}
 	}
 }
