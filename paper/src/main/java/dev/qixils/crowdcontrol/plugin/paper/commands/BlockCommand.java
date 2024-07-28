@@ -7,11 +7,10 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +38,8 @@ public class BlockCommand extends RegionalCommandSync implements FeatureElementC
 	}
 
 	@Override
-	public @NotNull FeatureFlagSet requiredFeatures() {
-		return CraftMagicNumbers.getBlock(material).requiredFeatures();
+	public boolean isFeatureEnabled(@NotNull World world) {
+		return material.isEnabledByFeature(world);
 	}
 
 	@Nullable

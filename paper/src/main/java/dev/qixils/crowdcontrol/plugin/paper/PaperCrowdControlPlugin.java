@@ -25,15 +25,14 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.world.flag.FeatureElement;
-import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -357,17 +356,16 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		);
 	}
 
-	public static boolean isFeatureEnabled(FeatureFlagSet features) {
-		return ((CraftServer) Bukkit.getServer()).getServer().getWorldData().enabledFeatures().isSubsetOf(features);
+	public static boolean isFeatureEnabled(FeatureElementCommand feature) {
+		return Bukkit.getWorlds().stream().allMatch(feature::isFeatureEnabled);
 	}
 
-	public static boolean isFeatureEnabled(FeatureElement feature) {
-		try {
-			return isFeatureEnabled(feature.requiredFeatures());
-		} catch (Exception e) {
-			LOGGER.warn("Failed to determine if {} is enabled", feature, e);
-			return true;
-		}
+	public static boolean isFeatureEnabled(Material material) {
+		return Bukkit.getWorlds().stream().allMatch(material::isEnabledByFeature);
+	}
+
+	public static boolean isFeatureEnabled(EntityType entityType) {
+		return Bukkit.getWorlds().stream().allMatch(entityType::isEnabledByFeature);
 	}
 
 	// boilerplate stuff for the data container storage

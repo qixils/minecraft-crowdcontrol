@@ -2,15 +2,14 @@ package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.Command;
-import net.minecraft.world.flag.FeatureElement;
-import net.minecraft.world.flag.FeatureFlagSet;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public interface FeatureElementCommand extends Command<Player>, FeatureElement {
-	@Override
-	default @NotNull FeatureFlagSet requiredFeatures() {
-		return FeatureFlagSet.of();
+public interface FeatureElementCommand extends Command<Player> {
+
+	default boolean isFeatureEnabled(@NotNull World world) {
+		return true;
 	}
 
 	@Override

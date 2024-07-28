@@ -5,11 +5,9 @@ import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.paper.FeatureElementCommand;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
-import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.entity.CraftEntityType;
 import org.bukkit.entity.Enemy;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -27,9 +25,8 @@ public interface EntityCommand extends FeatureElementCommand {
 	}
 
 	@Override
-	default @NotNull FeatureFlagSet requiredFeatures() {
-		// TODO: API for this is finally available in 1.21 but it's weird
-		return CraftEntityType.bukkitToMinecraft(getEntityType()).requiredFeatures();
+	default boolean isFeatureEnabled(@NotNull World world) {
+		return getEntityType().isEnabledByFeature(world);
 	}
 
 	default boolean isMonster() {

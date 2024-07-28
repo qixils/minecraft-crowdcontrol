@@ -17,7 +17,6 @@ import org.bukkit.Material;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -88,7 +87,7 @@ public class LootboxCommand extends RegionalCommandSync {
 		// determine the item used in the stack
 		// "good" items have a higher likelihood of being picked with positive luck
 		List<Material> items = new ArrayList<>(ITEMS);
-		items.removeIf(item -> !PaperCrowdControlPlugin.isFeatureEnabled(CraftMagicNumbers.getItem(item)));
+		items.removeIf(item -> !PaperCrowdControlPlugin.isFeatureEnabled(item));
 		Collections.shuffle(items, random);
 		Material item = null;
 		for (int i = 0; i <= luck * 5; i++) {

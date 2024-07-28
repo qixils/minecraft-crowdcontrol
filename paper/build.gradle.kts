@@ -10,7 +10,7 @@ description = "Minecraft Crowd Control: Paper"
 plugins {
     id("xyz.jpenilla.run-paper") // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.paper") // Generates plugin.yml
-    id("io.papermc.paperweight.userdev")
+    //id("io.papermc.paperweight.userdev")
 }
 
 repositories {
@@ -21,7 +21,9 @@ dependencies {
     implementation(project(":base-common"))
     implementation("com.github.qixils.cloud:cloud-paper:$cloudVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
-    paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
+
+    //paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
+    implementation("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
 // Java 17 boilerplate
