@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
@@ -18,9 +19,14 @@ import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -56,6 +62,7 @@ public class LootboxCommand extends RegionalCommandSync {
 			Attribute.GENERIC_ATTACK_KNOCKBACK,
 			Attribute.GENERIC_ATTACK_SPEED
 	);
+	private static final Map<UUID, Inventory> OPEN_LOOTBOXES = new HashMap<>();
 	private final String effectName;
 	private final int luck;
 
@@ -69,6 +76,16 @@ public class LootboxCommand extends RegionalCommandSync {
 		if (luck > 0)
 			effectName.append('_').append(luck);
 		this.effectName = effectName.toString();
+	}
+
+	private static boolean isLootboxOpen(@NotNull UUID uuid) {
+		if (!OPEN_LOOTBOXES.containsKey(uuid)) return false;
+		Inventory inv = OPEN_LOOTBOXES.get(uuid);
+		if (inv.isEmpty() || inv.getViewers().isEmpty()) {
+			OPEN_LOOTBOXES.remove(uuid);
+			return false;
+		}
+		return true;
 	}
 
 	private static boolean isGoodItem(@Nullable Material item) {
@@ -219,11 +236,14 @@ public class LootboxCommand extends RegionalCommandSync {
 	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
 		return request.buildResponse()
 			.type(Response.ResultType.RETRY)
-			.message("Unable to spawn items");
+			.message("Player already has a lootbox open");
 	}
 
 	@Override
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+		if (isLootboxOpen(player.getUniqueId()))
+			return false;
+
 		Inventory lootbox = Bukkit.createInventory(null, 27, CommandConstants.buildLootboxTitle(plugin, request));
 		for (int slot : lootboxItemSlots(luck)) {
 			// create item
@@ -233,11 +253,41 @@ public class LootboxCommand extends RegionalCommandSync {
 			randomItem.setItemMeta(itemMeta);
 			lootbox.setItem(slot, randomItem);
 		}
+
 		// display lootbox
+		InventoryView view = player.openInventory(lootbox);
+		if (view == null)
+			return false;
+
 		player.playSound(
 			Sounds.LOOTBOX_CHIME.get(luck),
 			Sound.Emitter.self()
 		);
-		return player.openInventory(lootbox) != null;
+
+		OPEN_LOOTBOXES.put(player.getUniqueId(), lootbox);
+
+		return true;
+	}
+
+	@RequiredArgsConstructor
+	public static final class Manager implements Listener {
+		private final PaperCrowdControlPlugin plugin;
+
+		@EventHandler
+		public void onCloseInventory(InventoryCloseEvent event) {
+			HumanEntity player = event.getPlayer();
+			UUID uuid = player.getUniqueId();
+
+			if (event.getReason() != InventoryCloseEvent.Reason.PLAYER) {
+				OPEN_LOOTBOXES.remove(uuid);
+				return;
+			}
+
+			if (!isLootboxOpen(uuid))
+				return;
+
+			Inventory lootbox = OPEN_LOOTBOXES.get(uuid);
+			player.getScheduler().run(plugin, $ -> player.openInventory(lootbox), null);
+		}
 	}
 }

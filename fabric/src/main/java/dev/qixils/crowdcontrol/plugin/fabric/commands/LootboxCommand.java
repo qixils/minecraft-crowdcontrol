@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import com.google.common.collect.Lists;
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
@@ -11,7 +12,6 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentType;
@@ -27,6 +27,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
@@ -50,6 +51,7 @@ import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.P
 import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP;
 
 @Getter
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 public class LootboxCommand extends ImmediateCommand {
 	private static final List<Holder<Attribute>> ATTRIBUTES = Arrays.asList(
 		Attributes.MAX_HEALTH,
@@ -74,6 +76,8 @@ public class LootboxCommand extends ImmediateCommand {
 		EquipmentSlot.LEGS, EquipmentSlotGroup.LEGS,
 		EquipmentSlot.FEET, EquipmentSlotGroup.FEET
 	);
+	public static final Map<UUID, ChestMenu> OPEN_LOOTBOXES = new HashMap<>();
+	public static final Map<UUID, net.minecraft.network.chat.Component> TITLES = new HashMap<>();
 	private final List<Item> allItems;
 	private final List<Item> goodItems;
 	private final String effectName;
@@ -102,6 +106,34 @@ public class LootboxCommand extends ImmediateCommand {
 					|| itemType == Items.IRON_BLOCK
 					|| itemType == Items.GOLD_BLOCK)
 			.collect(Collectors.toList());
+	}
+
+	private static boolean isLootboxOpen(@NotNull Player player) {
+		UUID uuid = player.getUUID();
+		if (!OPEN_LOOTBOXES.containsKey(uuid)) return false;
+		ChestMenu inv = OPEN_LOOTBOXES.get(uuid);
+		if (inv.getContainer().isEmpty() || !inv.stillValid(player) || player.containerMenu != inv) {
+			OPEN_LOOTBOXES.remove(uuid);
+			return false;
+		}
+		return true;
+	}
+
+	public static void onInventoryClose(ServerPlayer player) {
+		if (!FabricCrowdControlPlugin.isInstanceAvailable()) return;
+		FabricCrowdControlPlugin plugin = FabricCrowdControlPlugin.getInstance();
+
+		UUID uuid = player.getUUID();
+
+		if (!isLootboxOpen(player))
+			return;
+
+		ChestMenu lootbox = OPEN_LOOTBOXES.get(uuid);
+		plugin.getSyncExecutor().execute(() -> {
+			OptionalInt status = player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, lootbox.getContainer()), TITLES.get(uuid)));
+			if (status.isEmpty()) OPEN_LOOTBOXES.remove(uuid);
+			OPEN_LOOTBOXES.put(uuid, (ChestMenu) player.containerMenu);
+		});
 	}
 
 	private boolean isGoodItem(@Nullable Item item) {
@@ -150,9 +182,9 @@ public class LootboxCommand extends ImmediateCommand {
 	 * Applies various random modifications to an item including enchantments, attributes, and
 	 * unbreaking.
 	 *
-	 * @param itemStack item to modify
-	 * @param luck      zero-indexed level of luck
-	 * @param accessor  registry accessor to load enchants from
+	 * @param itemStack      item to modify
+	 * @param luck           zero-indexed level of luck
+	 * @param registryAccess registry accessor to load enchants from
 	 */
 	@Contract(mutates = "param1")
 	public void randomlyModifyItem(ItemStack itemStack, int luck, @Nullable RegistryAccess registryAccess) {
@@ -252,12 +284,11 @@ public class LootboxCommand extends ImmediateCommand {
 	}
 
 	// lore getter
-	private static List<net.kyori.adventure.text.Component> getLore(ItemStack itemStack) {
+	private List<net.kyori.adventure.text.Component> getLore(ItemStack itemStack) {
 		ItemLore itemLore = itemStack.get(DataComponents.LORE);
 		if (itemLore == null || itemLore.lines().isEmpty())
 			return new ArrayList<>();
-		// TODO: migrate to toAdventure prolly
-		return itemLore.lines().stream().map(ComponentLike::asComponent).collect(Collectors.toList());
+		return itemLore.lines().stream().map(plugin::toAdventure).collect(Collectors.toList());
 	}
 
 	// lore setter
@@ -272,7 +303,10 @@ public class LootboxCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		boolean success = false;
 		for (ServerPlayer player : players) {
+			if (isLootboxOpen(player)) continue;
+
 			// init container
 			SimpleContainer container = new SimpleContainer(27);
 			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
@@ -284,12 +318,19 @@ public class LootboxCommand extends ImmediateCommand {
 			}
 
 			// sound & open
+			var title = plugin.adventure().toNative(buildLootboxTitle(plugin, request));
+
+			OptionalInt val = player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container), title));
+			if (val.isEmpty()) continue;
+
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
-			sync(() -> player.openMenu(
-				new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container),
-					plugin.adventure().toNative(buildLootboxTitle(plugin, request)))
-			));
+			OPEN_LOOTBOXES.put(player.getUUID(), (ChestMenu) player.containerMenu);
+			TITLES.put(player.getUUID(), title);
+
+			success = true;
 		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		return success
+			? request.buildResponse().type(Response.ResultType.SUCCESS)
+			: request.buildResponse().type(Response.ResultType.RETRY).message("Player has another lootbox open");
 	}
 }

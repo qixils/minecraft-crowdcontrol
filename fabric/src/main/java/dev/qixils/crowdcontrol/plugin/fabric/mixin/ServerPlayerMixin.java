@@ -11,8 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameRules.BooleanValue;
@@ -98,16 +96,16 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
 	private boolean restoreFromRedirectKeepInventory(GameRules gameRules, GameRules.Key<BooleanValue> key) {
-		return keepInventoryRedirect((Entity) (Object) this, gameRules, key);
+		return keepInventoryRedirect(this, gameRules, key);
 	}
 
 	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
 	private void callDeathEvent(final DamageSource source, final CallbackInfo ci) {
-		EntityUtil.handleDie((LivingEntity) (Object) this, source, ci);
+		EntityUtil.handleDie(this, source, ci);
 	}
 
 	@Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
 	private void callDamageEvent(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
-		EntityUtil.handleDamage((Entity) (Object) this, source, amount, cir);
+		EntityUtil.handleDamage(this, source, amount, cir);
 	}
 }

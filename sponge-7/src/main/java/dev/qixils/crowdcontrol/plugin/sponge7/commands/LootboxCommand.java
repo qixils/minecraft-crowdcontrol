@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
@@ -18,25 +18,24 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.*;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @Getter
 public class LootboxCommand extends ImmediateCommand {
 	private static final InventoryArchetype ARCHETYPE = InventoryArchetype.builder()
@@ -44,6 +43,8 @@ public class LootboxCommand extends ImmediateCommand {
 			.title(Text.of("Lootbox"))
 			.property(InventoryCapacity.of(27))
 			.build("crowdcontrol:lootbox", "Lootbox");
+	private static final Map<UUID, Inventory> OPEN_LOOTBOXES = new HashMap<>();
+	private static final Map<UUID, Container> CONTAINERS = new HashMap<>();
 	private final List<ItemType> allItems;
 	private final List<ItemType> goodItems;
 	private final String effectName;
@@ -71,6 +72,17 @@ public class LootboxCommand extends ImmediateCommand {
 								|| itemType.equals(ItemTypes.IRON_BLOCK)
 								|| itemType.equals(ItemTypes.GOLD_BLOCK))
 				.collect(Collectors.toList());
+	}
+
+	private static boolean isLootboxOpen(@NotNull UUID uuid) {
+		if (!OPEN_LOOTBOXES.containsKey(uuid)) return false;
+		Inventory inventory = OPEN_LOOTBOXES.get(uuid);
+		Container container = CONTAINERS.get(uuid);
+		if (inventory.size() == 0 || !container.hasViewers()) {
+			OPEN_LOOTBOXES.remove(uuid);
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isGoodItem(@Nullable ItemType item) {
@@ -172,7 +184,10 @@ public class LootboxCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		boolean success = false;
 		for (Player player : players) {
+			if (isLootboxOpen(player.getUniqueId())) continue;
+
 			Inventory lootbox = Inventory.builder()
 					.of(ARCHETYPE)
 					.property(new InventoryTitle(spongeSerializer.serialize(GlobalTranslator.render(buildLootboxTitle(plugin, request), player.getLocale()))))
@@ -199,9 +214,38 @@ public class LootboxCommand extends ImmediateCommand {
 
 			// sound & open
 			Vector3d pos = player.getPosition();
+			Container container = player.openInventory(lootbox).orElse(null);
+			if (container == null) continue;
+
 			plugin.asAudience(player).playSound(Sounds.LOOTBOX_CHIME.get(luck), pos.getX(), pos.getY(), pos.getZ());
-			sync(() -> player.openInventory(lootbox));
+			OPEN_LOOTBOXES.put(player.getUniqueId(), lootbox);
+			CONTAINERS.put(player.getUniqueId(), container);
+
+			success = true;
 		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		return success
+			? request.buildResponse().type(Response.ResultType.SUCCESS)
+			: request.buildResponse().type(Response.ResultType.RETRY).message("Player has another lootbox open");
+	}
+
+	public static final class Manager {
+		@Listener
+		public void onInventoryClose(InteractInventoryEvent.Close event) {
+			Set<Player> viewers = event.getTargetInventory().getViewers();
+			if (viewers.isEmpty()) return;
+			Player player = viewers.iterator().next();
+			UUID uuid = player.getUniqueId();
+
+			if (event.getCause().containsType(PluginContainer.class)) {
+				OPEN_LOOTBOXES.remove(uuid);
+				return;
+			}
+
+			if (!isLootboxOpen(uuid))
+				return;
+
+			Inventory lootbox = OPEN_LOOTBOXES.get(uuid);
+			player.openInventory(lootbox).ifPresent(container -> CONTAINERS.put(uuid, container));
+		}
 	}
 }

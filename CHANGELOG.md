@@ -4,7 +4,8 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.6.1
 
-- Added support for client-side effects on all server-side backends
+- Added support for client-side effects on Paper servers
+- Updated the _Lootbox_ effects to prevent the inventory from being closed while it still contains items
 - Paper: Fixed [experimental features](https://minecraft.wiki/w/Experiments) support on 1.21+
 
 ## 3.6.0

@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.qixils.crowdcontrol.plugin.fabric.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityMixin",
     "LivingEntityMixin",
@@ -10,6 +10,7 @@
     "PlayerListMixin",
     "PlayerMixin",
     "ResultSlotMixin",
+    "ServerGamePacketListenerImplMixin",
     "ServerPlayerMixin",
     "TickMixin"
   ],

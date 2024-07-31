@@ -194,5 +194,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, SpongeCrowd
 		plugin.getGame().getEventManager().registerListeners(plugin, new KeepInventoryCommand.Manager());
 		plugin.getGame().getEventManager().registerListeners(plugin, new GameModeCommand.Manager());
 		plugin.getGame().getEventManager().registerListeners(plugin, new HealthModifierManager());
+		plugin.getGame().getEventManager().registerListeners(plugin, new LootboxCommand.Manager());
 	}
 }

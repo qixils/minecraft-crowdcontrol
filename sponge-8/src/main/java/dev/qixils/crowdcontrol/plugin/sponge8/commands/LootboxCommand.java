@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
+import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
@@ -9,7 +9,9 @@ import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -20,10 +22,13 @@ import org.spongepowered.api.entity.attribute.AttributeOperations;
 import org.spongepowered.api.entity.attribute.type.AttributeType;
 import org.spongepowered.api.entity.attribute.type.AttributeTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.item.inventory.container.InteractContainerEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
+import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -31,15 +36,14 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.plugin.PluginContainer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
+@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @Getter
 public class LootboxCommand extends ImmediateCommand {
 	private static final @NotNull EquipmentType MAIN_HAND = EquipmentTypes.MAIN_HAND.get();
@@ -54,6 +58,10 @@ public class LootboxCommand extends ImmediateCommand {
 			AttributeTypes.GENERIC_ATTACK_KNOCKBACK.get(),
 			AttributeTypes.GENERIC_ATTACK_SPEED.get()
 	);
+	// some @Data class would make more sense than 3 hashmaps lol
+	private static final Map<UUID, ViewableInventory> OPEN_LOOTBOXES = new HashMap<>();
+	private static final Map<UUID, Component> TITLES = new HashMap<>();
+	private static final Map<UUID, Container> CONTAINERS = new HashMap<>();
 	private final List<ItemType> allItems;
 	private final List<ItemType> goodItems;
 	private final String effectName;
@@ -82,6 +90,17 @@ public class LootboxCommand extends ImmediateCommand {
 								|| itemType.equals(ItemTypes.IRON_BLOCK.get())
 								|| itemType.equals(ItemTypes.GOLD_BLOCK.get()))
 				.collect(Collectors.toList());
+	}
+
+	private static boolean isLootboxOpen(@NotNull UUID uuid, boolean fromClose) {
+		if (!OPEN_LOOTBOXES.containsKey(uuid)) return false;
+		Inventory inventory = OPEN_LOOTBOXES.get(uuid);
+		Container container = CONTAINERS.get(uuid);
+		if (inventory.totalQuantity() == 0 || (!container.isOpen() && !fromClose)) {
+			OPEN_LOOTBOXES.remove(uuid);
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isGoodItem(@Nullable ItemType item) {
@@ -224,7 +243,10 @@ public class LootboxCommand extends ImmediateCommand {
 
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		boolean success = false;
 		for (ServerPlayer player : players) {
+			if (isLootboxOpen(player.uniqueId(), false)) continue;
+
 			Inventory baseInventory = Inventory.builder()
 					.grid(9, 3)
 					.completeStructure()
@@ -253,9 +275,42 @@ public class LootboxCommand extends ImmediateCommand {
 			}
 
 			// sound & open
+			Component title = buildLootboxTitle(plugin, request);
+			Container container = player.openInventory(inventory, title).orElse(null);
+			if (container == null) continue;
+
 			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
-			sync(() -> player.openInventory(inventory, buildLootboxTitle(plugin, request)));
+			TITLES.put(player.uniqueId(), title);
+			OPEN_LOOTBOXES.put(player.uniqueId(), inventory);
+			CONTAINERS.put(player.uniqueId(), container);
+
+			success = true;
 		}
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+		return success
+			? request.buildResponse().type(Response.ResultType.SUCCESS)
+			: request.buildResponse().type(Response.ResultType.RETRY).message("Player has another lootbox open");
+	}
+
+	@RequiredArgsConstructor
+	public static final class Manager {
+		private final SpongeCrowdControlPlugin plugin;
+
+		@Listener
+		public void onInventoryClose(InteractContainerEvent.Close event) {
+			ServerPlayer player = event.container().viewer();
+			UUID uuid = player.uniqueId();
+
+			if (event.cause().containsType(PluginContainer.class)) {
+				OPEN_LOOTBOXES.remove(uuid);
+				return;
+			}
+
+			if (!isLootboxOpen(uuid, true))
+				return;
+
+			ViewableInventory lootbox = OPEN_LOOTBOXES.get(uuid);
+			Component title = TITLES.get(uuid);
+			plugin.getSyncExecutor().execute(() -> player.openInventory(lootbox, title).ifPresent(inv -> CONTAINERS.put(uuid, inv)));
+		}
 	}
 }

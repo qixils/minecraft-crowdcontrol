@@ -71,6 +71,7 @@ dependencies {
         exclude(group = "com.google.errorprone")
         exclude(group = "com.google.j2objc")
         exclude(group = "com.google.code.findbugs")
+        exclude(group = "io.netty")
     }
     implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
     compileOnly("org.spongepowered:spongeapi:11.0.0") {
