@@ -43,7 +43,8 @@
     "net_kyori_adventure-api": "*",
     "cloth-config": "*"
   },
-  "suggests": {
+  "recommends": {
+    "languagereload": "*",
     "modmenu": "*"
   },
   "breaks": {

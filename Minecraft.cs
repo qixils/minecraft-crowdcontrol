@@ -8,10 +8,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ConnectorLib;
+using ConnectorLib.JSON;
 using ConnectorLib.SimpleTCP;
 using CrowdControl.Common;
 using static CrowdControl.Games.Packs.ISimplePipelinePack;
 using ConnectorType = CrowdControl.Common.ConnectorType;
+using EffectStatus = CrowdControl.Common.EffectStatus;
 
 namespace CrowdControl.Games.Packs.Minecraft;
 
@@ -23,6 +25,10 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
     public override AuthenticationType AuthenticationMode => AuthenticationType.SendKey;
 
     public override DigestAlgorithm AuthenticationHashMode => DigestAlgorithm.SHA_512;
+
+    private readonly Version VERSION_MIN_GAMESTATE = new("3.5.0.0");
+    private readonly HashSet<RequestType> _allowed_request_types = [RequestType.Test, RequestType.Start, RequestType.Stop, RequestType.GenericEvent, RequestType.RpcResponse, RequestType.Login, RequestType.PlayerInfo, RequestType.KeepAlive];
+    public override HashSet<RequestType>? AllowedRequestTypes => _allowed_request_types;
 
     public Minecraft(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
     {
@@ -42,6 +48,7 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
         new("Flip Mobs Upside-Down", "dinnerbone") { Price = 50, Category = "World", Description = "Flips nearby mobs upside-down by naming them after the iconic Minecraft developer Dinnerbone" },
         new("Invert Camera", "invert_look") { Price = 200, Duration = 15, Group = "clientside", Category = "Movement", Description = "Temporarily inverts mouse movement" },
         new("Invert Controls", "invert_wasd") { Price = 200, Duration = 15, Group = "clientside", Category = "Movement", Description = "Temporarily inverts WASD movement" },
+        new("Language Shuffle", "language_random") { Price = 50, Duration = 30, Group = "clientside", Category = "Player", Description = "Randomizes the language of the game for a short time" },
         new("Open Lootbox", "lootbox") { Price = 100, Category = new EffectGrouping("Inventory", "Give Items"), Description = "Gifts a completely random item with varying enchants and modifiers" },
         new("Open Lucky Lootbox", "lootbox_5") { Price = 500, Category = new EffectGrouping("Inventory", "Give Items"), Description = "Gifts two random items with vastly higher odds of having beneficial enchantments and modifiers" },
         new("Place Flowers", "flowers") { Price = 25, Category = "World", Description = "Randomly places flowers nearby, possibly including the toxic Wither Rose" },
@@ -468,6 +475,20 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
 
     public override FunctionSet RemoteFunctions => new Dictionary<string, FunctionSet.Callback>()
     {
+        {
+            "version", args =>
+            {
+                if (args?.Length == 0) return false;
+                if (args![0] is not string version) return false;
+                Version pluginVersion = new(version);
+                if (pluginVersion >= VERSION_MIN_GAMESTATE)
+                {
+                    _allowed_request_types.Add(RequestType.GameUpdate);
+                    Connector.AllowedRequestTypes = _allowed_request_types;
+                }
+                return true;
+            }
+        },
         {
             "known_effects", args =>
             {

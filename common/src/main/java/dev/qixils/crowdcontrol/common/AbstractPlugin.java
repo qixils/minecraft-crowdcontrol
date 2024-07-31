@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.common;
 
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import lombok.Getter;
@@ -54,6 +55,7 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	@Getter @NotNull
 	protected final Map<String, List<SocketManager>> sentEvents = new HashMap<>();
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
+	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
 
 	protected AbstractPlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;
@@ -95,13 +97,25 @@ public abstract class AbstractPlugin<P, S> implements Plugin<P, S> {
 	}
 
 	@Override
+	public @NotNull Set<ExtraFeature> getExtraFeatures(@NotNull P player) {
+		return extraFeatures.get(playerMapper().getUniqueId(player));
+	}
+
+	@Override
 	public int getModdedPlayerCount() {
 		return clientVersions.size();
 	}
 
 	@Override
+	public boolean isFeatureAvailable(@NotNull ExtraFeature feature) {
+		return extraFeatures.values().stream().anyMatch(set -> set.contains(feature));
+	}
+
+	@Override
 	public void onPlayerLeave(P player) {
-		clientVersions.remove(playerMapper().getUniqueId(player));
+		UUID uuid = playerMapper().getUniqueId(player);
+		clientVersions.remove(uuid);
+		extraFeatures.remove(uuid);
 		Plugin.super.onPlayerLeave(player);
 	}
 }

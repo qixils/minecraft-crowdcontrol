@@ -43,6 +43,17 @@ repositories {
         name = "Shedaniel"
         url = uri("https://maven.shedaniel.me")
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = uri("https://api.modrinth.com/maven")
+            }
+        }
+        filter {
+            includeGroup("maven.modrinth")
+        }
+    }
 }
 
 dependencies {
@@ -59,6 +70,7 @@ dependencies {
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
     }
+    modImplementation("maven.modrinth:language-reload:1.6.1+1.21")
 
 
     // misc includes

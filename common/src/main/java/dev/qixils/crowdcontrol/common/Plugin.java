@@ -11,6 +11,7 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
@@ -111,6 +112,16 @@ public interface Plugin<P, S> {
 	 * Key for the Movement Status packet.
 	 */
 	Key MOVEMENT_STATUS_KEY = Key.key(NAMESPACE, "movement-status");
+
+	/**
+	 * Key for the Extra Features packet.
+	 */
+	Key EXTRA_FEATURE_KEY = Key.key(NAMESPACE, "extra-feature");
+
+	/**
+	 * Key for the Set Language packet.
+	 */
+	Key SET_LANGUAGE_KEY = Key.key(NAMESPACE, "set-language");
 
 	/**
 	 * The prefix to use in command output as a {@link Component}.
@@ -492,6 +503,7 @@ public interface Plugin<P, S> {
 						audience.sendMessage(translatable(key, text(playerMapper().getUsername(player)), text(version.get().toString())));
 					} else
 						audience.sendMessage(translatable("cc.command.crowdcontrol.version.client.unknown", text(playerMapper().getUsername(player))));
+					// TODO: extra features
 				}
 			}));
 		// execute command
@@ -1061,9 +1073,10 @@ public interface Plugin<P, S> {
 			String id = effect.getEffectName().toLowerCase(Locale.ENGLISH);
 			TriState visibility = effect.isVisible();
 			if (visibility != TriState.FALSE) {
-				if (effect.isClientOnly())
-					visibility = TriState.fromBoolean(clientVisible);
-				else if (effect.isGlobal())
+				if (effect.isClientOnly()) {
+					boolean available = clientVisible && (effect.requiredExtraFeatures().isEmpty() || effect.requiredExtraFeatures().stream().allMatch(this::isFeatureAvailable));
+					visibility = TriState.fromBoolean(available);
+				} else if (effect.isGlobal())
 					visibility = TriState.fromBoolean(globalVisible);
 			}
 			if (visibility != TriState.UNKNOWN)
@@ -1266,12 +1279,31 @@ public interface Plugin<P, S> {
 	}
 
 	/**
+	 * Returns the extra features of the mod that the provided player supports.
+	 *
+	 * @param player the player to check
+	 * @return the supported features
+	 */
+	default @NotNull Set<ExtraFeature> getExtraFeatures(@NotNull P player) {
+		return EnumSet.noneOf(ExtraFeature.class);
+	}
+
+	/**
 	 * Returns the number of players that are currently using the mod.
 	 *
 	 * @return the number of players that are currently using the mod
 	 */
 	default int getModdedPlayerCount() {
 		return 0;
+	}
+
+	/**
+	 * Returns whether the provided feature is currently available.
+	 *
+	 * @return whether the feature is supported
+	 */
+	default boolean isFeatureAvailable(@NotNull ExtraFeature feature) {
+		return false;
 	}
 
 	/**

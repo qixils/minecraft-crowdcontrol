@@ -92,7 +92,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> EntitySizeCommand.increase(plugin),
 			() -> EntitySizeCommand.decrease(plugin),
 			() -> new RandomFallingBlockCommand(plugin),
-			() -> new LavaCommand(plugin)
+			() -> new LavaCommand(plugin),
+			() -> new LanguageCommand(plugin)
 		));
 
 		// entity commands

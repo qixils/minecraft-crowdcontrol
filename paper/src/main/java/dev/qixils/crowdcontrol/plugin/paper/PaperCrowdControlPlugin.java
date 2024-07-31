@@ -8,10 +8,8 @@ import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
-import dev.qixils.crowdcontrol.common.packets.MovementStatusPacketS2C;
-import dev.qixils.crowdcontrol.common.packets.ShaderPacketS2C;
-import dev.qixils.crowdcontrol.common.packets.VersionRequestPacketS2C;
-import dev.qixils.crowdcontrol.common.packets.VersionResponsePacketC2S;
+import dev.qixils.crowdcontrol.common.packets.*;
+import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
@@ -128,6 +126,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@NotNull
 	private final PluginChannel pluginChannel = new PluginChannel(this);
 	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
+	private final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
 
 	@Override
 	public void onLoad() {
@@ -148,14 +147,23 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 		// init plugin channels
 		pluginChannel.registerOutgoingPluginChannel(VersionRequestPacketS2C.METADATA);
-		pluginChannel.registerIncomingPluginChannel(VersionResponsePacketC2S.METADATA, (player, message) -> {
-			SemVer version = message.version();
-			getSLF4JLogger().info("Received version {} from client {}", version, player.getUniqueId());
-			clientVersions.put(player.getUniqueId(), version);
-			updateConditionalEffectVisibility(crowdControl);
-		});
 		pluginChannel.registerOutgoingPluginChannel(ShaderPacketS2C.METADATA);
 		pluginChannel.registerOutgoingPluginChannel(MovementStatusPacketS2C.METADATA);
+		pluginChannel.registerOutgoingPluginChannel(SetLanguagePacketS2C.METADATA);
+		pluginChannel.registerIncomingPluginChannel(VersionResponsePacketC2S.METADATA, (player, message) -> {
+			UUID uuid = player.getUniqueId();
+			SemVer version = message.version();
+			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
+			clientVersions.put(uuid, version);
+			updateConditionalEffectVisibility(crowdControl);
+		});
+		pluginChannel.registerIncomingPluginChannel(ExtraFeaturePacketC2S.METADATA, (player, message) -> {
+			UUID uuid = player.getUniqueId();
+			Set<ExtraFeature> features = message.features();
+			getSLF4JLogger().info("Received features {} from client {}", features, uuid);
+			extraFeatures.put(uuid, features);
+			updateConditionalEffectVisibility(crowdControl);
+		});
 	}
 
 	@Override
@@ -328,7 +336,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 	@EventHandler
 	public void onLeave(PlayerQuitEvent event) {
-		clientVersions.remove(event.getPlayer().getUniqueId());
+		Player player = event.getPlayer();
+		UUID uuid = player.getUniqueId();
+		clientVersions.remove(uuid);
+		extraFeatures.remove(uuid);
 		onPlayerLeave(event.getPlayer());
 	}
 
@@ -343,8 +354,18 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
+	public @NotNull Set<ExtraFeature> getExtraFeatures(@NotNull Player player) {
+		return extraFeatures.get(player.getUniqueId());
+	}
+
+	@Override
 	public int getModdedPlayerCount() {
 		return clientVersions.size();
+	}
+
+	@Override
+	public boolean isFeatureAvailable(@NotNull ExtraFeature feature) {
+		return extraFeatures.values().stream().anyMatch(set -> set.contains(feature));
 	}
 
 	@Override

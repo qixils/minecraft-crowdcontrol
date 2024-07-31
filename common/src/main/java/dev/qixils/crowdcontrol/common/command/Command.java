@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Request.Target;
@@ -82,6 +83,15 @@ public interface Command<P> {
 	@CheckReturnValue
 	default SemVer getMinimumModVersion() {
 		return SemVer.ZERO;
+	}
+
+	/**
+	 * Gets the {@link ExtraFeature}s required for clients to use this effect.
+	 *
+	 * @return required extra features
+	 */
+	default @NotNull Set<ExtraFeature> requiredExtraFeatures() {
+		return EnumSet.noneOf(ExtraFeature.class);
 	}
 
 	/**
@@ -204,6 +214,11 @@ public interface Command<P> {
 		SemVer minVersion = getMinimumModVersion();
 		if (minVersion.isGreaterThan(SemVer.ZERO))
 			players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
+
+		// remove players missing extra features
+		Set<ExtraFeature> extraFeatures = requiredExtraFeatures();
+		if (!extraFeatures.isEmpty())
+			players.removeIf(player -> extraFeatures.stream().anyMatch(feature -> !plugin.getExtraFeatures(player).contains(feature)));
 
 		// ensure targets are online / available
 		if (players.isEmpty()) {
@@ -393,7 +408,7 @@ public interface Command<P> {
 	 * @return whether this effect is client-side
 	 */
 	default boolean isClientOnly() {
-		return getMinimumModVersion().isGreaterThan(SemVer.ZERO);
+		return getMinimumModVersion().isGreaterThan(SemVer.ZERO) || !requiredExtraFeatures().isEmpty();
 	}
 
 	/**

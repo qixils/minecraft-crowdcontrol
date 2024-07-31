@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.FabricPlatformClient;
@@ -17,6 +18,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ExtraFeatureC2S;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
@@ -139,6 +141,13 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 			SemVer version = payload.version();
 			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
 			clientVersions.put(uuid, version);
+			updateConditionalEffectVisibility(crowdControl);
+		});
+		ServerPlayNetworking.registerGlobalReceiver(ExtraFeatureC2S.PACKET_ID, (payload, context) -> {
+			UUID uuid = context.player().getUUID();
+			Set<ExtraFeature> features = payload.features();
+			getSLF4JLogger().info("Received features {} from client {}", features, uuid);
+			extraFeatures.put(uuid, features);
 			updateConditionalEffectVisibility(crowdControl);
 		});
 	}

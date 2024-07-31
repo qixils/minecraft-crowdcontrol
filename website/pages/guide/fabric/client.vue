@@ -48,6 +48,11 @@ useSeoMeta({
       <li>Create a new folder called <code>mods</code>.</li>
       <li>Download the latest build of the <a :href="`https://modrinth.com/mod/fabric-api/versions?g=${version}&c=release`">Fabric API</a> and place it in the <code>mods</code> folder.</li>
       <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=${version}`">Crowd Control for Fabric</a> and place it in the <code>mods</code> folder.</li>
+      <li>(Recommended) For the best experience and extra effects, we also suggest downloading and installing the following mods to the <code>mods</code> folder:
+        <ul>
+          <li><a :href="`https://modrinth.com/mod/language-reload/versions?l=fabric&g=${version}`">Language Reload</a></li>
+        </ul>
+      </li>
       <li>(Optional) Copy all the other Fabric {{ version }} mods that you want to play with into the <code>mods</code> folder.</li>
     </ol>
 
