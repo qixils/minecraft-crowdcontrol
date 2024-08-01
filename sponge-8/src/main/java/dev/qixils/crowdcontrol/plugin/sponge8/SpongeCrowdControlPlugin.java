@@ -11,6 +11,9 @@ import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.packets.*;
+import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
+import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.mc.SpongePlayer;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeTextUtil;
@@ -45,7 +48,9 @@ import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Scheduler;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scheduler.TaskExecutorService;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -76,6 +81,7 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	private final EntityMapper<CommandCause> commandSenderMapper = new CommandCauseMapper(this);
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<ServerPlayer> playerMapper = new ServerPlayerMapper(this);
+	private final PluginChannel pluginChannel = new PluginChannelImpl();
 	private final GsonComponentSerializer serializer = GsonComponentSerializer.gson();
 	private final SpongeCommandManager<CommandCause> commandManager;
 	private final HoconConfigurationLoader configLoader;
@@ -106,6 +112,27 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 		registerChatCommands();
 		// register event listeners
 		game.eventManager().registerListeners(pluginContainer, softLockResolver);
+		game.eventManager().registerListeners(pluginContainer, pluginChannel);
+
+		// init plugin channels
+		pluginChannel.registerOutgoingPluginChannel(VersionRequestPacketS2C.METADATA);
+		pluginChannel.registerOutgoingPluginChannel(ShaderPacketS2C.METADATA);
+		pluginChannel.registerOutgoingPluginChannel(MovementStatusPacketS2C.METADATA);
+		pluginChannel.registerOutgoingPluginChannel(SetLanguagePacketS2C.METADATA);
+		pluginChannel.registerIncomingPluginChannel(VersionResponsePacketC2S.METADATA, (player, message) -> {
+			UUID uuid = player.uniqueId();
+			SemVer version = message.version();
+			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
+			clientVersions.put(uuid, version);
+			updateConditionalEffectVisibility(crowdControl);
+		});
+		pluginChannel.registerIncomingPluginChannel(ExtraFeaturePacketC2S.METADATA, (player, message) -> {
+			UUID uuid = player.uniqueId();
+			Set<ExtraFeature> features = message.features();
+			getSLF4JLogger().info("Received features {} from client {}", features, uuid);
+			extraFeatures.put(uuid, features);
+			updateConditionalEffectVisibility(crowdControl);
+		});
 
 		// sponge 11 addon
 		new SpongeAddon(this);
@@ -244,7 +271,17 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 
 	@Listener
 	public void onConnection(ServerSideConnectionEvent.Join event) {
-		onPlayerJoin(event.player());
+		ServerPlayer player = event.player();
+		if (!clientVersions.containsKey(player.uniqueId())) {
+			getSLF4JLogger().info("Sending version request to {}", player.uniqueId());
+			// TODO: schedule?
+			getSyncScheduler().submit(Task.builder()
+					.plugin(pluginContainer)
+					.delay(Ticks.of(10))
+					.execute(() -> getPluginChannel().sendMessage(player, VersionRequestPacketS2C.INSTANCE))
+					.build());
+		}
+		onPlayerJoin(player);
 	}
 
 	@Override

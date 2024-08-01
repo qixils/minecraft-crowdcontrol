@@ -2,6 +2,7 @@ val crowdControlVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformVersion: String by project
 val cloudVersion: String by project
+val nettyVersion: String by project
 
 dependencies {
     api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
@@ -19,7 +20,7 @@ dependencies {
     api("com.github.qixils.cloud:cloud-minecraft-extras:$cloudVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    api("io.netty:netty-buffer:4.1.112.Final")
+    api("io.netty:netty-buffer:$nettyVersion")
 }
 
 description = "Minecraft Crowd Control: Common"

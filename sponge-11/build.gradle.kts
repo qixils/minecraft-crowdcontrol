@@ -1,4 +1,5 @@
 val cloudVersion: String by project
+val nettyVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 11"
 
@@ -77,6 +78,7 @@ dependencies {
     compileOnly("org.spongepowered:spongeapi:11.0.0") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
+    compileOnly("io.netty:netty-buffer:$nettyVersion")
     //compileOnly("org.spongepowered:sponge:1.20.6-11.0.0:dev")
 }
 
