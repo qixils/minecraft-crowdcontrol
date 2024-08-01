@@ -70,6 +70,11 @@ useServerSeoMeta({
     box-shadow: var(--alert-bg-color, black) 0 0 0.4rem;
   }
 
+  .alert-info {
+    --alert-bg-color: #31b5e1;
+    --alert-fg-color: #09242d;
+  }
+
   .alert-warning {
     --alert-bg-color: #fbbd23;
     --alert-fg-color: #382800;

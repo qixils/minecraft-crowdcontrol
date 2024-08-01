@@ -38,7 +38,15 @@ useSeoMeta({
           <li>(Optional) Pre-generating chunks using a plugin like <a :href="`https://modrinth.com/plugin/chunky/versions?g=${version}&l=paper`">Chunky</a> is recommended for optimal performance.</li>
         </ul>
       </li>
-      <li>In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.</li>
+      <li>
+        In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.
+        <p class="alert alert-info">
+          If you aren't paying for a dedicated IP address then you will likely will be unable to choose a specific port to open and instead get assigned a random one.
+          You will have to update the plugin's config file, as described below, to use your assigned port.
+          You should also be sure to use your assigned port in the Crowd Control app at the end of the host field,
+          i.e. for IP `1.2.3.4` and port `5678`, you would connect to `1.2.3.4:5678`.
+        </p>
+      </li>
       <li>Run the Minecraft server.</li>
       <li>(Optional) To edit the plugin's config file, you must first shut down the server using <code>/stop</code>. The config file can be found at <code>&lt;root&gt;/plugins/CrowdControl/config.yml</code>.</li>
     </ol>
