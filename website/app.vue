@@ -62,12 +62,23 @@ useServerSeoMeta({
   }
 
   .alert {
-    background-color: var(--alert-bg-color, black);
-    color: var(--alert-fg-color, white);
+    background-color: var(--alert-bg-color, white);
+    color: var(--alert-fg-color, black);
     padding: 0.75rem 1.25rem;
     margin: 1rem 0;
     border-radius: 0.25rem;
-    box-shadow: var(--alert-bg-color, black) 0 0 0.4rem;
+    box-shadow: var(--alert-bg-color, white) 0 0 0.4rem;
+  }
+
+  .alert.alert-hollow {
+    background-color: var(--alert-fg-color, black);
+    color: white;
+    border: 2px solid var(--alert-bg-color);
+  }
+
+  .alert.alert-small {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
   }
 
   .alert-info {

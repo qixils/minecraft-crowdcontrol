@@ -44,12 +44,10 @@ useSeoMeta({
       </li>
       <li>
         In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.
-        <p class="alert alert-info">
-          If you aren't paying for a dedicated IP address then you will likely will be unable to choose a specific port to open and instead get assigned a random one.
-          You will have to update the mod's config file, as described below, to use your assigned port.
-          You should also be sure to use your assigned port in the Crowd Control app at the end of the host field,
-          i.e. for IP `1.2.3.4` and port `5678`, you would connect to `1.2.3.4:5678`.
-        </p>
+        <br />ℹ️ If you aren't paying for a dedicated IP address then you will likely will be unable to choose a specific port to open and instead get assigned a random one.
+        You will have to update the plugin's config file, as described below, to use your assigned port.
+        You should also be sure to use your assigned port in the Crowd Control app at the end of the host field,
+        i.e. for IP <code>1.2.3.4</code> and port <code>5678</code>, you would connect to <code>1.2.3.4:5678</code>.
       </li>
       <li>Run the Minecraft server.</li>
       <li>(Optional) To edit the plugin's config file, you must first shut down the server using <code>/stop</code>. The config file can be found at <code>&lt;root&gt;/config/crowdcontrol.conf</code>.</li>
