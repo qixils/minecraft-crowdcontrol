@@ -42,19 +42,29 @@ public class PluginChannelImpl implements PluginChannel {
 	}
 
 	public <T extends PluginPacket> void registerIncomingPluginChannel(PluginPacket.Metadata<T> type, BiConsumer<ServerPlayer, T> consumer) {
+		if (true) return;
+
 		if (!canRegister) throw new IllegalStateException("Too late to register channels");
 		pendingChannels.put(ResourceKey.resolve(type.channel()), (player, buf) -> consumer.accept(player, type.factory().apply((ByteBuf) buf)));
 	}
 
 	public void registerOutgoingPluginChannel(PluginPacket.Metadata<?> type) {
+		if (true) return;
+
 		if (!canRegister) throw new IllegalStateException("Too late to register channels");
 		pendingChannels.put(ResourceKey.resolve(type.channel()), null);
 	}
 
 	public void sendMessage(ServerPlayer player, PluginPacket packet) {
+		if (true) return;
+
 		RawDataChannel channel = channels.get(ResourceKey.resolve(packet.metadata().channel()));
 		if (channel == null) throw new IllegalArgumentException("Unknown packet " + packet.metadata().channel());
-		log.info("Sending message {} to {}", packet.metadata().channel(), player.uniqueId());
-		channel.play().sendTo(player, buf -> packet.write((ByteBuf) buf));
+		try {
+			channel.play().sendTo(player, buf -> packet.write((ByteBuf) buf));
+			log.info("Sending message {} to {}", packet.metadata().channel(), player.uniqueId());
+		} catch (Exception e) {
+			log.warn("Failed to send message {} to {}", packet.metadata().channel(), player.uniqueId());
+		}
 	}
 }

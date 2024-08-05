@@ -48,9 +48,7 @@ import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scheduler.TaskExecutorService;
-import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -272,15 +270,15 @@ public class SpongeCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	@Listener
 	public void onConnection(ServerSideConnectionEvent.Join event) {
 		ServerPlayer player = event.player();
-		if (!clientVersions.containsKey(player.uniqueId())) {
-			getSLF4JLogger().info("Sending version request to {}", player.uniqueId());
-			// TODO: schedule?
-			getSyncScheduler().submit(Task.builder()
-					.plugin(pluginContainer)
-					.delay(Ticks.of(10))
-					.execute(() -> getPluginChannel().sendMessage(player, VersionRequestPacketS2C.INSTANCE))
-					.build());
-		}
+//		if (!clientVersions.containsKey(player.uniqueId())) {
+//			getSLF4JLogger().info("Sending version request to {}", player.uniqueId());
+//			// TODO: schedule?
+//			getSyncScheduler().submit(Task.builder()
+//					.plugin(pluginContainer)
+//					.delay(Ticks.of(10))
+//					.execute(() -> getPluginChannel().sendMessage(player, VersionRequestPacketS2C.INSTANCE))
+//					.build());
+//		}
 		onPlayerJoin(player);
 	}
 

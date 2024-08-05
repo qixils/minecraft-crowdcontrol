@@ -5,7 +5,7 @@ A list of all changes made to the software in reverse chronological order.
 ## 3.6.1
 
 - Added new client-side effect _Language Shuffle_ which randomizes your language for 30s (requires Fabric client mod and [Language Reload](https://modrinth.com/mod/language-reload))
-- Added support for sending Fabric client-side effects from all server-side backends (1.20.6+)
+- Added support for sending Fabric client-side effects from Paper
 - Updated the _Lootbox_ effects to prevent the inventory from being closed while it still contains items
 - Paper: Fixed [experimental features](https://minecraft.wiki/w/Experiments) support on 1.21+
 
