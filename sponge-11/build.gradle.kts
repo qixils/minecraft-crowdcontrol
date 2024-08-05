@@ -72,13 +72,11 @@ dependencies {
         exclude(group = "com.google.errorprone")
         exclude(group = "com.google.j2objc")
         exclude(group = "com.google.code.findbugs")
-        exclude(group = "io.netty")
     }
     implementation("com.github.qixils.cloud:cloud-sponge:$cloudVersion")
     compileOnly("org.spongepowered:spongeapi:11.0.0") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    compileOnly("io.netty:netty-buffer:$nettyVersion")
     //compileOnly("org.spongepowered:sponge:1.20.6-11.0.0:dev")
 }
 

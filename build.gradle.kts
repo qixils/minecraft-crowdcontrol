@@ -1,3 +1,5 @@
+val nettyVersion: String by project
+
 plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "8.6" apply false
@@ -39,6 +41,10 @@ subprojects {
                 url = uri("https://jitpack.io")
             }
         }
+    }
+
+    dependencies {
+        compileOnly("io.netty:netty-buffer:$nettyVersion")
     }
 
     java {

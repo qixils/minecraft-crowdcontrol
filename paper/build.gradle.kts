@@ -23,7 +23,7 @@ dependencies {
     implementation("io.papermc:paperlib:$paperlibVersion")
 
     //paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
-    implementation("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
 // Java 17 boilerplate
