@@ -124,11 +124,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 
 		// enchantments
 		for (Enchantment enchantment : Registry.ENCHANTMENT) {
-			try {
-				commands.add(new EnchantmentCommand(plugin, enchantment));
-			} catch (AbstractMethodError ignored) {
-				plugin.getSLF4JLogger().warn("Enchantment " + enchantment.key() + " does not implement the Adventure/Paper API. Ignoring.");
-			}
+			initTo(commands, () -> new EnchantmentCommand(plugin, enchantment), e -> plugin.getSLF4JLogger().warn("Enchantment {} does not implement the Adventure/Paper API. Ignoring.", enchantment.getKey()));
 		}
 
 		// give/take items

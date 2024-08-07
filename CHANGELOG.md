@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.6.2
+
+- Paper: Fixed error handling for custom enchantments added by Spigot plugins
+
 ## 3.6.1
 
 - Added new client-side effect _Language Shuffle_ which randomizes your language for 30s (requires Fabric client mod and [Language Reload](https://modrinth.com/mod/language-reload))
