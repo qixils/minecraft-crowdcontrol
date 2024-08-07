@@ -44,7 +44,8 @@ function set(value: any) {
       break;
     case "version":
       version_index.value = value;
-      question.value = (((modloader.value?.id === "unsure" && fabricVersions.includes(allVersions[value])) || modloader.value?.id === "fabric") && gamemode.value === "Singleplayer") ? "experience" : "done";
+      console.log(allVersions[value])
+      question.value = (((modloader.value?.id === "unsure" && fabricVersions.includes(allVersions[value])) || modloader.value?.id === "fabric" || (modloader.value?.id === "sponge" && spongeVersionsArray[value] !== "1.12.2")) && gamemode.value === "Singleplayer") ? "experience" : "done";
       break;
     case "experience":
       experience.value = value;
@@ -87,7 +88,7 @@ const guide = computed(() => {
   let page: string;
   if (gmval === "Multiplayer on a remote server") {
     page = "server/remote";
-  } else if (mlval.id === "fabric" && gmval === "Singleplayer" && expval === true) {
+  } else if (expval) {
     page = "client";
   } else if (verval === mlval.versions[0]) {
     page = "automatic";
@@ -126,7 +127,7 @@ const guide = computed(() => {
       </div>
     </div>
     <div v-else-if="question === 'version'">
-      <p>What version of Minecraft are you playing?</p>
+      <p>What version of Minecraft are you playing? <span class="subtext">Any version not listed is unsupported.</span></p>
       <div class="buttons">
         <button v-for="(value, index) in modloader!.versions" :key="index" @click="set(index)">
           <span v-if="value === allVersions[0]">Latest ({{ value }})</span>
@@ -167,6 +168,9 @@ const guide = computed(() => {
   border-radius: 0.3rem;
   box-shadow: var(--accent-color) 0 0 0.2rem;
   cursor: pointer;
+}
+.subtext {
+  opacity: 50%;
 }
 @media (max-width: 40em) {
   .buttons {
