@@ -2,7 +2,7 @@ val nettyVersion: String by project
 
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "8.6" apply false
+    id("io.freefair.lombok") version "8.7.1" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
     id("fabric-loom") version "1.7-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
