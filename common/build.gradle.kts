@@ -2,6 +2,7 @@ val crowdControlVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformVersion: String by project
 val cloudVersion: String by project
+val cloudExtrasVersion: String by project
 val nettyVersion: String by project
 
 dependencies {
@@ -16,8 +17,8 @@ dependencies {
     api("net.kyori:adventure-text-serializer-legacy:$adventureVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    api("com.github.qixils.cloud:cloud-core:$cloudVersion")
-    api("com.github.qixils.cloud:cloud-minecraft-extras:$cloudVersion") {
+    api("org.incendo:cloud-core:$cloudVersion")
+    api("org.incendo:cloud-minecraft-extras:$cloudExtrasVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
 }

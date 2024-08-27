@@ -1,96 +1,95 @@
-val configurateVersion: String by project
-val crowdControlVersion: String by project
-val minecraftVersion: String by project
-val parchmentVersion: String by project
-val loaderVersion: String by project
-val fabricVersion: String by project
-val cloudVersion: String by project
 val adventureVersion: String by project
-val adventurePlatformFabricVersion: String by project
-val cardinalComponentsVersion: String by project
-val modMenuVersion: String by project
+val adventurePlatformModVersion: String by project
+val architecturyApiVersion: String by project
 val clothConfigVersion: String by project
-
-val isMinecraftRelease = Regex("^\\d+\\.\\d+\\.\\d+$").matches(minecraftVersion)
-
-// shading configuration
-val shade: Configuration by configurations.creating {
-    configurations.implementation.get().extendsFrom(this)
-}
+val cloudMojmapVersion: String by project
+val crowdControlVersion: String by project
+val fabricVersion: String by project
+val loaderVersion: String by project
+val modMenuVersion: String by project
+val mojmapVersion: String by project
+val parchmentVersion: String by project
+val configurateVersion: String by project
 
 plugins {
-    id("fabric-loom")
+    id("architectury-plugin")
+    id("dev.architectury.loom")
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+//// dependency configuration
+
+// architectury
+val common: Configuration by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
+// Files in this configuration will be bundled into your mod using the Shadow plugin.
+// Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
+val shadowBundle: Configuration by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
+configurations {
+    compileClasspath.get().extendsFrom(common)
+    runtimeClasspath.get().extendsFrom(common)
+    implementation.get().extendsFrom(shadowBundle)
+    getByName("developmentFabric").extendsFrom(common)
 }
 
 repositories {
     maven {
-        name = "Sonatype Snapshots"
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-    }
-    maven {
+        // todo: neoforge? idk i think it's deprecated
         name = "Ladysnake Mods"
         url = uri("https://maven.ladysnake.org/releases")
-    }
-    maven {
-        name = "Parchment"
-        url = uri("https://maven.parchmentmc.org")
     }
     maven {
         name = "TerraformersMC"
         url = uri("https://maven.terraformersmc.com")
     }
-    maven {
-        name = "Shedaniel"
-        url = uri("https://maven.shedaniel.me")
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = uri("https://api.modrinth.com/maven")
-            }
-        }
-        filter {
-            includeGroup("maven.modrinth")
-        }
-    }
 }
 
 dependencies {
-    shade(project(":configurate-common"))
-    shade("org.spongepowered:configurate-hocon:$configurateVersion")
-
-    minecraft("com.mojang:minecraft:$minecraftVersion")
+    minecraft("com.mojang:minecraft:$mojmapVersion")
     mappings(loom.officialMojangMappings())
+
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
-    modImplementation(include("com.github.qixils.cloud:cloud-fabric:$cloudVersion")!!)
+    modImplementation("dev.architectury:architectury-fabric:$architecturyApiVersion")
+    // TODO(1.21.2): modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
+    modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
-    modImplementation("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
+    modImplementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
-    }
+    })
     modImplementation("maven.modrinth:language-reload:1.6.1+1.21")
-
 
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
-    include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
-        exclude(group = "net.fabricmc.fabric-api")
-    }
+
+    shadowBundle(project(":configurate-common"))
+    common(project(path = ":mojmap-common", configuration = "namedElements")) // { isTransitive = false }
+    shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
+    shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion")
 }
 
 tasks.processResources {
     inputs.property("version", project.version)
-    inputs.property("minecraftVersion", minecraftVersion)
+    inputs.property("minecraftVersion", mojmapVersion)
     filteringCharset = "UTF-8"
 
     filesMatching("fabric.mod.json") {
-        expand("version" to project.version.toString() + "+fabric-$minecraftVersion")
+        expand("version" to project.version.toString() + "+fabric-$mojmapVersion")
     }
 }
 
-// Java 17 boilerplate
+// Java 21 boilerplate
 
 val targetJavaVersion = 21
 tasks.withType<JavaCompile>().configureEach {
@@ -112,12 +111,12 @@ loom {
     mixin {
         defaultRefmapName.set("crowd-control-refmap.json")
     }
-    accessWidenerPath = file("src/main/resources/crowdcontrol.accesswidener")
+    accessWidenerPath = project(":mojmap-common").projectDir.resolve("src/main/resources/crowdcontrol.accesswidener")
 }
 
 // configure shadowJar
 tasks.shadowJar {
-    configurations = listOf(shade)
+    configurations = listOf(shadowBundle)
     archiveBaseName.set("shadow-CrowdControl")
     archiveVersion.set("")
 
@@ -127,7 +126,7 @@ tasks.shadowJar {
 tasks.remapJar {
     // configure remapJar to use output of shadowJar
     dependsOn(tasks.shadowJar)
-    inputFile.set(project.buildDir.resolve("libs/shadow-CrowdControl.jar"))
-    archiveBaseName.set("CrowdControl-Fabric+$minecraftVersion")
+    inputFile.set(tasks.shadowJar.get().archiveFile)
+    archiveBaseName.set("CrowdControl-Fabric+$mojmapVersion")
     archiveClassifier.set("")
 }

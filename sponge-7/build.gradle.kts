@@ -1,4 +1,4 @@
-val cloudVersion: String by project
+val cloudSpongeVersion: String by project
 val adventurePlatformVersion: String by project
 
 description = "Minecraft Crowd Control: Sponge 7"
@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("com.github.qixils.cloud:cloud-sponge7:$cloudVersion")
+    implementation("org.incendo:cloud-sponge7:$cloudSpongeVersion")
     implementation("net.kyori:adventure-platform-spongeapi:$adventurePlatformVersion") // this one is allowed to pull in adventure-api since it's not native
     compileOnly("org.spongepowered:spongeapi:7.4.0")
 }

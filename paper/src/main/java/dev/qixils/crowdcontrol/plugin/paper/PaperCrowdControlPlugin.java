@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.paper.PaperCommandManager;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
@@ -17,6 +15,7 @@ import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -28,7 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -39,6 +37,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.paper.PaperCommandManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,11 +47,10 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Function;
 
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 
-public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
+public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSourceStack> {
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_MIN_VERSION = new SemVer(1, 20, 6);
 	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
@@ -69,7 +68,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
 	@Getter
 	@Accessors(fluent = true)
-	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);
+	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(new CommandSenderMapper<>(this));
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
@@ -79,7 +78,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	private final Class<Player> playerClass = Player.class;
 	@Getter
-	private final Class<CommandSender> commandSenderClass = CommandSender.class;
+	private final Class<CommandSourceStack> commandSenderClass = CommandSourceStack.class;
 	FileConfiguration config = getConfig();
 	// actual stuff
 	@Getter
@@ -94,7 +93,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	CrowdControl crowdControl = null;
 	@Getter
-	private PaperCommandManager<CommandSender> commandManager;
+	private PaperCommandManager<CommandSourceStack> commandManager;
 	@Getter
 	private boolean global = false;
 	@Getter
@@ -266,18 +265,9 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		Bukkit.getPluginManager().registerEvents(softLockResolver, this);
 
 		try {
-			commandManager = new PaperCommandManager<>(this,
-				AsynchronousCommandExecutionCoordinator.<CommandSender>builder()
-					.withAsynchronousParsing().build(),
-				Function.identity(),
-				Function.identity()
-			);
-			try {
-				commandManager.registerBrigadier();
-				commandManager.registerAsynchronousCompletions();
-			} catch (Exception exception) {
-				LOGGER.warn("Chat command manager partially failed to initialize, ignoring.");
-			}
+			commandManager = PaperCommandManager.builder()
+				.executionCoordinator(ExecutionCoordinator.asyncCoordinator())
+				.buildOnEnable(this);
 			registerChatCommands();
 		} catch (Exception exception) {
 			throw new IllegalStateException("The command manager was unable to load. Please ensure you are using the latest version of Paper.", exception);

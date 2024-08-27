@@ -23,9 +23,6 @@
     "main": [
       "dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin"
     ],
-    "cardinal-components": [
-      "dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components"
-    ],
     "modmenu": [
       "dev.qixils.crowdcontrol.plugin.fabric.client.ModMenuIntegration"
     ]
@@ -52,14 +49,6 @@
     "extrasounds": "*"
   },
   "custom": {
-    "loom:injected_interfaces": {
-      "net/minecraft/class_3222": ["dev/qixils/crowdcontrol/plugin/fabric/interfaces/GameTypeEffectComponent"],
-      "net/minecraft/class_1657": ["dev/qixils/crowdcontrol/plugin/fabric/interfaces/MovementStatus"],
-      "net/minecraft/class_1309": [
-        "dev/qixils/crowdcontrol/plugin/fabric/interfaces/ViewerMob",
-        "dev/qixils/crowdcontrol/plugin/fabric/interfaces/OriginalDisplayName"
-      ]
-    },
     "modmenu": {
       "links": {
         "modmenu.discord": "https://discord.gg/warpworld"

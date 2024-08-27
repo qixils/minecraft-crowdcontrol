@@ -1,0 +1,39 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+issueTrackerURL = "https://github.com/qixils/minecraft-crowdcontrol/issues"
+license = "MIT"
+# TODO: more links
+
+[[mods]]
+modId = "crowdcontrol"
+version = "${version}"
+displayName = "Crowd Control"
+authors = "qixils"
+description = '''
+The Ultimate Interactive Experience for Streamers
+'''
+logoFile = "assets/crowdcontrol/icon.png"
+
+[[dependencies.crowdcontrol]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.crowdcontrol]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21,1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.crowdcontrol]]
+modId = "architectury"
+type = "required"
+versionRange = "[13.0.6,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "crowdcontrol.mixins.json"

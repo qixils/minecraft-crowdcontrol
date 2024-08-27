@@ -1,11 +1,5 @@
 package dev.qixils.crowdcontrol.common;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Command.Builder;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
@@ -31,6 +25,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.incendo.cloud.Command.Builder;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
+import org.incendo.cloud.parser.standard.StringParser;
+import org.incendo.cloud.parser.standard.StringParser.StringMode;
+import org.incendo.cloud.permission.PredicatePermission;
+import org.incendo.cloud.suggestion.Suggestion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +41,7 @@ import javax.annotation.CheckReturnValue;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +50,8 @@ import java.util.stream.Collectors;
 import static java.util.Optional.ofNullable;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
+import static org.incendo.cloud.description.Description.description;
+import static org.incendo.cloud.suggestion.Suggestion.suggestion;
 
 /**
  * The main class used by a Crowd Control implementation which defines numerous methods for
@@ -326,23 +330,22 @@ public interface Plugin<P, S> {
 
 		// base command
 		Builder<S> account = manager.commandBuilder("account")
-			.meta(CommandMeta.DESCRIPTION, "Manage your connected stream account(s)")
-			.permission(sender -> !isAdminRequired() || mapper.isAdmin(sender));
+			.commandDescription(description("Manage your connected stream account(s)"))
+			.permission(PredicatePermission.of(sender -> !isAdminRequired() || mapper.isAdmin(sender)));
 
 		// link command
 		manager.command(account.literal("link")
-			.meta(CommandMeta.DESCRIPTION, "Link a stream account to your Minecraft account")
+			.commandDescription(description("Link a stream account to your Minecraft account"))
 			.argument(
-				StringArgument.<S>builder("username")
-					.single()
-					.asRequired()
-					.manager(manager)
-					.build(),
-				ArgumentDescription.of("The username of the stream account to link")
+				StringParser.stringComponent(StringMode.SINGLE)
+					.name("username")
+					.description(description("The username of the stream account to link"))
+					.required()
+					.build()
 			)
 			.handler(commandContext -> {
 				String username = commandContext.get("username");
-				S sender = commandContext.getSender();
+				S sender = commandContext.sender();
 				Audience audience = mapper.asAudience(sender);
 				UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
 					new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
@@ -365,35 +368,33 @@ public interface Plugin<P, S> {
 			}));
 		// unlink command
 		manager.command(account.literal("unlink")
-			.meta(CommandMeta.DESCRIPTION, "Unlink a stream account from your Minecraft account")
+			.commandDescription(description("Unlink a stream account from your Minecraft account"))
 			.argument(
-				StringArgument.<S>builder("username")
-					.single()
-					.asRequired()
-					.manager(manager)
-					.withSuggestionsProvider((ctx, input) -> {
-						Optional<UUID> uuid = mapper.tryGetUniqueId(ctx.getSender());
+				StringParser.<S>stringComponent(StringMode.SINGLE)
+					.name("username")
+					.description(description("The username of the stream account to unlink"))
+					.required()
+					.suggestionProvider((ctx, input) -> CompletableFuture.supplyAsync(() -> {
+						Optional<UUID> uuid = mapper.tryGetUniqueId((S) ctx.sender());
 						if (!uuid.isPresent()) return Collections.emptyList();
 						Collection<String> linkedAccounts = getPlayerManager().getLinkedAccounts(uuid.get());
 						if (linkedAccounts.isEmpty()) return Collections.emptyList();
-						String lowerInput = input.toLowerCase(Locale.ENGLISH);
-						Set<String> suggestions = new LinkedHashSet<>();
+						String lowerInput = input.input().toLowerCase(Locale.ENGLISH);
+						Set<Suggestion> suggestions = new LinkedHashSet<>();
 						for (String acc : linkedAccounts) {
 							if (acc.startsWith(lowerInput))
-								suggestions.add(acc);
+								suggestions.add(suggestion(acc));
 						}
 						for (String acc : linkedAccounts) {
 							if (acc.contains(lowerInput))
-								suggestions.add(acc);
+								suggestions.add(suggestion(acc));
 						}
 						return new ArrayList<>(suggestions);
-					})
-					.build(),
-				ArgumentDescription.of("The username of the stream account to unlink")
+					}))
 			)
 			.handler(commandContext -> {
 				String username = commandContext.get("username");
-				S sender = commandContext.getSender();
+				S sender = commandContext.sender();
 				Audience audience = mapper.asAudience(sender);
 				UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
 					new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
@@ -416,14 +417,14 @@ public interface Plugin<P, S> {
 
 		// base command
 		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
-			.meta(CommandMeta.DESCRIPTION, "View information about and manage the Crowd Control service");
+			.commandDescription(description("View information about and manage the Crowd Control service"));
 
 		// connect command
 		manager.command(ccCmd.literal("connect")
-			.meta(CommandMeta.DESCRIPTION, "Connect to the Crowd Control service")
-			.permission(mapper::isAdmin)
+			.commandDescription(description("Connect to the Crowd Control service"))
+			.permission(PredicatePermission.of(mapper::isAdmin))
 			.handler(commandContext -> {
-				Audience sender = mapper.asAudience(commandContext.getSender());
+				Audience sender = mapper.asAudience(commandContext.sender());
 				if (getCrowdControl() != null)
 					sender.sendMessage(output(translatable("cc.command.crowdcontrol.connect.error", NamedTextColor.RED)));
 				else {
@@ -433,10 +434,10 @@ public interface Plugin<P, S> {
 			}));
 		// disconnect command
 		manager.command(ccCmd.literal("disconnect")
-			.meta(CommandMeta.DESCRIPTION, "Disconnect from the Crowd Control service")
-			.permission(mapper::isAdmin)
+			.commandDescription(description("Disconnect from the Crowd Control service"))
+			.permission(PredicatePermission.of(mapper::isAdmin))
 			.handler(commandContext -> {
-				Audience sender = mapper.asAudience(commandContext.getSender());
+				Audience sender = mapper.asAudience(commandContext.sender());
 				if (getCrowdControl() == null)
 					sender.sendMessage(output(translatable("cc.command.crowdcontrol.disconnect.error", NamedTextColor.RED)));
 				else {
@@ -447,10 +448,10 @@ public interface Plugin<P, S> {
 			}));
 		// reconnect command
 		manager.command(ccCmd.literal("reconnect")
-			.meta(CommandMeta.DESCRIPTION, "Reconnect to the Crowd Control service")
-			.permission(mapper::isAdmin)
+			.commandDescription(description("Reconnect to the Crowd Control service"))
+			.permission(PredicatePermission.of(mapper::isAdmin))
 			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.getSender());
+				Audience audience = mapper.asAudience(commandContext.sender());
 				CrowdControl cc = getCrowdControl();
 				if (cc != null)
 					cc.shutdown("Reconnect issued by server administrator");
@@ -460,10 +461,10 @@ public interface Plugin<P, S> {
 			}));
 		// status command
 		manager.command(ccCmd.literal("status")
-			.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-			.permission(mapper::isAdmin)
+			.commandDescription(description("Get the status of the Crowd Control service"))
+			.permission(PredicatePermission.of(mapper::isAdmin))
 			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.getSender());
+				Audience audience = mapper.asAudience(commandContext.sender());
 				CrowdControl cc = getCrowdControl();
 				if (cc == null) {
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
@@ -491,9 +492,9 @@ public interface Plugin<P, S> {
 			}));
 		// version command
 		manager.command(ccCmd.literal("version")
-			.meta(CommandMeta.DESCRIPTION, "Get the version of the server's and players' Crowd Control mod")
+			.commandDescription(description("Get the version of the server's and players' Crowd Control mod"))
 			.handler(ctx -> {
-				Audience audience = mapper.asAudience(ctx.getSender());
+				Audience audience = mapper.asAudience(ctx.sender());
 				Component message = output(translatable("cc.command.crowdcontrol.version.server", text(SemVer.MOD.toString())));
 				audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.header")));
 				for (P player : getAllPlayers()) { // TODO: get all players real
@@ -509,37 +510,35 @@ public interface Plugin<P, S> {
 		// execute command
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")
-				.meta(CommandMeta.DESCRIPTION, "Executes the effect with the given ID")
-				.permission(mapper::isAdmin)
+				.commandDescription(description("Executes the effect with the given ID"))
+				.permission(PredicatePermission.of(mapper::isAdmin))
 				.argument(
-					StringArgument.<S>builder("effect")
-						.single()
-						.asRequired()
-						.manager(manager)
-						.withSuggestionsProvider((ctx, input) -> {
+					StringParser.<S>stringComponent(StringMode.SINGLE)
+						.name("effect")
+						.description(description("The username of the stream account to unlink"))
+						.required()
+						.suggestionProvider((ctx, input) -> CompletableFuture.supplyAsync(() -> {
 							List<Command<P>> effects = commandRegister().getCommands();
-							String lowerInput = input.toLowerCase(Locale.ENGLISH);
-							Set<String> suggestions = new LinkedHashSet<>();
+							String lowerInput = input.input().toLowerCase(Locale.ENGLISH);
+							Set<Suggestion> suggestions = new LinkedHashSet<>();
 							for (Command<P> effect : effects) {
 								if (effect.getEffectName() == null) continue;
 								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
 								if (effectName.startsWith(lowerInput))
-									suggestions.add(effectName);
+									suggestions.add(suggestion(effectName));
 							}
 							for (Command<P> effect : effects) {
 								if (effect.getEffectName() == null) continue;
 								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
 								if (effectName.contains(lowerInput))
-									suggestions.add(effectName);
+									suggestions.add(suggestion(effectName));
 							}
 							return new ArrayList<>(suggestions);
-						})
-						.build(),
-					ArgumentDescription.of("The username of the stream account to unlink")
+						}))
 				)
 				.handler(commandContext -> {
 					// TODO: allow targeting multiple players
-					S sender = commandContext.getSender();
+					S sender = commandContext.sender();
 					Audience audience = mapper.asAudience(sender);
 					P player = asPlayer(sender);
 					if (player == null) {
@@ -557,11 +556,11 @@ public interface Plugin<P, S> {
 
 		//// Password Command ////
 		manager.command(manager.commandBuilder("password")
-			.meta(CommandMeta.DESCRIPTION, "Sets the password required for Crowd Control clients to connect to the server")
-			.permission(mapper::isAdmin)
-			.argument(StringArgument.<S>builder("password").greedy().asRequired())
+			.commandDescription(description("Sets the password required for Crowd Control clients to connect to the server"))
+			.permission(PredicatePermission.of(mapper::isAdmin))
+			.argument(StringParser.stringComponent(StringMode.GREEDY).name("password").required())
 			.handler(commandContext -> {
-				Audience sender = mapper.asAudience(commandContext.getSender());
+				Audience sender = mapper.asAudience(commandContext.sender());
 				String password = commandContext.get("password");
 				setPassword(password);
 				sender.sendMessage(output(translatable(
@@ -577,10 +576,10 @@ public interface Plugin<P, S> {
 			})
 		);
 
-		new MinecraftExceptionHandler<S>()
-			.withDefaultHandlers()
-			.withDecorator(component -> output(component).color(NamedTextColor.RED))
-			.apply(manager, mapper::asAudience);
+		MinecraftExceptionHandler.<S>create(mapper::asAudience)
+			.defaultHandlers()
+			.decorator(component -> output(component).color(NamedTextColor.RED))
+			.registerTo(manager);
 	}
 
 	/**

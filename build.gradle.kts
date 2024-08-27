@@ -1,14 +1,16 @@
 val nettyVersion: String by project
+val mojmapVersion: String by project
 
 plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "8.6" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
-    id("fabric-loom") version "1.7-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("org.spongepowered.gradle.plugin") version "2.2.0" apply false // Generates sponge_plugins.json and runServer task
     id("io.papermc.paperweight.userdev") version "1.7.1" apply false
+    id("architectury-plugin") version "3.4-SNAPSHOT" apply true
 }
 
 repositories {
@@ -18,6 +20,10 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+architectury {
+    minecraft = mojmapVersion
 }
 
 subprojects {
@@ -33,12 +39,14 @@ subprojects {
             maven(url = "https://files.minecraftforge.net/maven/") {
                 name = "Minecraft Forge"
             }
+            maven(url = "https://maven.neoforged.net/releases") {
+                name = "NeoForged"
+            }
             maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
                 name = "sonatype-oss-snapshots"
             }
-            maven {
+            maven(url = "https://jitpack.io") {
                 name = "Jitpack"
-                url = uri("https://jitpack.io")
             }
         }
     }
@@ -56,6 +64,9 @@ subprojects {
         options.encoding = Charsets.UTF_8.name()
     }
 
+    val isPlatform = project.name.endsWith("-platform")
+    val isModded = listOf("mojmap-common", "fabric-platform", "neoforge-platform").contains(project.name)
+
     tasks.shadowJar {
         relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
         relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
@@ -67,14 +78,12 @@ subprojects {
         relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
         relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
 
-        if (project.name != "fabric-platform") {
-            relocate("cloud.commandframework", "dev.qixils.relocated.cloud")
+        if (!isModded) {
+            relocate("org.incendo.cloud", "dev.qixils.relocated.cloud")
         }
     }
 
-
-
-    if (project.name.endsWith("-platform")) {
+    if (isPlatform) {
         // inherit resources from common module
         sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
 
@@ -96,6 +105,31 @@ subprojects {
             tasks {
                 build {
                     dependsOn(shadowJar)
+                }
+            }
+        }
+    }
+
+    if (isModded) {
+        repositories {
+            maven(url = "https://oss.sonatype.org/content/repositories/snapshots") {
+                name = "Sonatype Snapshots"
+            }
+            maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots") {
+                name = "Sonatype Snapshots 2"
+            }
+            maven(url = "https://maven.shedaniel.me") {
+                name = "Shedaniel"
+            }
+
+            exclusiveContent {
+                forRepository {
+                    maven(url = "https://api.modrinth.com/maven") {
+                        name = "Modrinth"
+                    }
+                }
+                filter {
+                    includeGroup("maven.modrinth")
                 }
             }
         }
