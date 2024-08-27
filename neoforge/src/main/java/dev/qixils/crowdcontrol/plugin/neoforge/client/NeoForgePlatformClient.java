@@ -8,11 +8,9 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @Mod(value = "crowdcontrol", dist = Dist.CLIENT)
 public class NeoForgePlatformClient extends ModdedPlatformClient {
-	private final ModContainer container;
 
 	public NeoForgePlatformClient(ModContainer container) {
 		super();
-		this.container = container;
 		onInitializeClient();
 		container.registerExtensionPoint(IConfigScreenFactory.class, (cont, screen) -> createConfigScreen(screen));
 	}
