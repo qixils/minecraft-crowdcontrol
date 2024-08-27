@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import javax.annotation.CheckReturnValue;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -314,7 +316,7 @@ public interface Plugin<P, S> {
 	 */
 	default void registerChatCommands() {
 		try {
-			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", getClass(), Locale.US));
+			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US));
 		} catch (Exception e) {
 			getSLF4JLogger().error("Failed to initialize i18n", e);
 		}
@@ -1380,6 +1382,22 @@ public interface Plugin<P, S> {
 		if (!getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).isEmpty())
 			return true;
 		return !getSocketManagersFor(player).isEmpty();
+	}
+
+	/**
+	 * Gets a Path for one of the mod's resource files.
+	 *
+	 * @param asset filename
+	 * @return path if found
+	 */
+	@ApiStatus.Internal
+	default @Nullable Path getPath(@NotNull String asset) {
+		try {
+			//noinspection DataFlowIssue
+			return Paths.get(getClass().getClassLoader().getResource(asset).toURI());
+		} catch (Exception ignored) {
+			return null;
+		}
 	}
 
 	/**

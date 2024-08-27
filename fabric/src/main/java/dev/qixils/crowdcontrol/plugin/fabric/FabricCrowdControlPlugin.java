@@ -9,12 +9,12 @@ import net.minecraft.commands.CommandSourceStack;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.fabric.FabricServerCommandManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 @Getter
 public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin {
@@ -23,16 +23,22 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin {
 	private final PermissionUtil permissionUtil = new FabricPermissionUtil();
 
 	@Override
-	public InputStream getInputStream(@NotNull String asset) {
-		Optional<Path> path = FabricLoader.getInstance()
+	public @Nullable Path getPath(@NotNull String asset) {
+		return FabricLoader.getInstance()
 			.getModContainer("crowdcontrol")
-			.flatMap(container -> container.findPath(asset));
+			.flatMap(container -> container.findPath(asset))
+			.orElse(null);
+	}
 
-		if (path.isEmpty())
+	@Override
+	public InputStream getInputStream(@NotNull String asset) {
+		Path path = getPath(asset);
+
+		if (path == null)
 			return null;
 
 		try {
-			return Files.newInputStream(path.get());
+			return Files.newInputStream(path);
 		} catch (IOException e) {
 			getSLF4JLogger().warn("Encountered exception while retrieving asset {}", asset, e);
 			return null;
