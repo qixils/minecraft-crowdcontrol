@@ -67,7 +67,7 @@ tasks {
         configure("1.20.6")
     }
     // create extra runServer tasks for later versions of Minecraft
-    for (mcVersion in listOf<String>("1.21")) {
+    for (mcVersion in listOf<String>("1.21.1")) {
         register("runServer$mcVersion", RunServer::class.java) {
             configure(mcVersion)
             dependsOn("shadowJar")

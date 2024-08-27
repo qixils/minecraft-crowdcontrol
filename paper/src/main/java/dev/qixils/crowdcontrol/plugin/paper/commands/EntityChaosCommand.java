@@ -67,7 +67,7 @@ public class EntityChaosCommand extends Command {
 			int player = (i++) % players.size();
 			entity.getScheduler().run(plugin, $ -> {
 				entity.getPassengers().forEach(entity::removePassenger);
-				entity.teleportAsync((players.get(player)).getLocation()).handle((result, error) -> success.complete(error != null && result));
+				entity.teleportAsync((players.get(player)).getLocation()).handle((result, error) -> success.complete(error == null && result));
 			}, () -> success.complete(false));
 			successes.add(success);
 		}
