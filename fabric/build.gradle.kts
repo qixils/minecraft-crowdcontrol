@@ -73,7 +73,16 @@ dependencies {
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
 
-    shadowBundle(project(":configurate-common"))
+    shadowBundle(project(":configurate-common")) {
+        exclude(group = "com.google.code.gson")
+        exclude(group = "com.google.auto.service")
+        exclude(group = "com.google.inject")
+        exclude(group = "com.google.guava")
+        exclude(group = "com.google.errorprone")
+        exclude(group = "com.google.j2objc")
+        exclude(group = "com.google.code.findbugs")
+        exclude(group = "org.incendo", module = "cloud-core")
+    }
     common(project(path = ":mojmap-common", configuration = "namedElements")) // { isTransitive = false }
     shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
     shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion")

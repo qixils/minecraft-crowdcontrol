@@ -8,18 +8,17 @@ import lombok.Getter;
 import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLLoader;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-// TODO: screen effects dysfunctional
 // TODO: improve pause checks
 
 @Getter
@@ -30,14 +29,9 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 	private final PermissionUtil permissionUtil = new NeoForgePermissionUtil();
 	private final ModContainer container;
 
-	static {
-		LoggerFactory.getLogger("CrowdControl").info("Static loaded");
-	}
-
 	public NeoForgeCrowdControlPlugin(ModContainer container) {
 		super();
 		this.container = container;
-		getSLF4JLogger().info("Loaded");
 		onInitialize();
 	}
 
@@ -67,7 +61,7 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 			server().getServerVersion(),
 			"NeoForge",
 			server().getServerModName(),
-			null // TODO: FML version
+			FMLLoader.versionInfo().neoForgeVersion()
 		);
 	}
 }

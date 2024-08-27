@@ -112,14 +112,14 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 
 	@Override
 	public void onInitialize() {
-		getSLF4JLogger().info("Initializing");
+		getSLF4JLogger().debug("Initializing");
 		registerChatCommands();
 		ServerLifecycleEvents.SERVER_STARTING.register(newServer -> {
-			getSLF4JLogger().info("Server starting");
+			getSLF4JLogger().debug("Server starting");
 			setServer(newServer);
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register($ -> {
-			getSLF4JLogger().info("Server stopping");
+			getSLF4JLogger().debug("Server stopping");
 			setServer(null);
 		});
 		PacketUtil.registerPackets();

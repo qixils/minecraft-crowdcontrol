@@ -900,8 +900,10 @@ public interface Plugin<P, S> {
 	default void postInitCrowdControl(@NotNull CrowdControl service) {
 		Object[] effects = commandRegister().getCommands().stream().filter(c -> c.getEffectName() != null).map(c -> c.getEffectName().toLowerCase(Locale.US)).toArray();
 		service.addLoginListener(connectingService -> getScheduledExecutor().schedule(() -> {
+			VersionMetadata versionMetadata = getVersionMetadata();
+			getSLF4JLogger().debug("Version Metadata: {}", versionMetadata);
 			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
-			sendEmbeddedMessagePacket(connectingService, "version", getVersionMetadata().packet());
+			sendEmbeddedMessagePacket(connectingService, "version", versionMetadata.packet());
 			updateConditionalEffectVisibility(connectingService);
 			sendPlayerEvent(connectingService, "playerJoined", false);
 		}, 1, TimeUnit.SECONDS));
