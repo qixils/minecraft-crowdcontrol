@@ -65,10 +65,12 @@ public class EntityChaosCommand extends ImmediateCommand {
 		int i = 0;
 		boolean success = false;
 		for (Entity entity : entities) {
-			entity.ejectPassengers();
-			ServerPlayer target = players.get((i++) % players.size());
-			Vec3 dest = target.position();
-			success |= entity.teleportTo(target.serverLevel(), dest.x, dest.y, dest.z, emptySet(), entity.getYRot(), entity.getXRot());
+			try {
+				entity.ejectPassengers();
+				ServerPlayer target = players.get((i++) % players.size());
+				Vec3 dest = target.position();
+				success |= entity.teleportTo(target.serverLevel(), dest.x, dest.y, dest.z, emptySet(), entity.getYRot(), entity.getXRot());
+			} catch (Exception ignored) {}
 		}
 
 		return success
