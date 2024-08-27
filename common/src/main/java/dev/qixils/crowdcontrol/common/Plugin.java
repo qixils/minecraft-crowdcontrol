@@ -325,6 +325,7 @@ public interface Plugin<P, S> {
 		EntityMapper<S> mapper = commandSenderMapper();
 
 		// TODO: support i18n in cloud command descriptions
+		// TODO: suggestions are broken (on neoforge)
 
 		//// Account Command ////
 
@@ -375,7 +376,7 @@ public interface Plugin<P, S> {
 					.description(description("The username of the stream account to unlink"))
 					.required()
 					.suggestionProvider((ctx, input) -> CompletableFuture.supplyAsync(() -> {
-						Optional<UUID> uuid = mapper.tryGetUniqueId((S) ctx.sender());
+						Optional<UUID> uuid = mapper.tryGetUniqueId(ctx.sender());
 						if (!uuid.isPresent()) return Collections.emptyList();
 						Collection<String> linkedAccounts = getPlayerManager().getLinkedAccounts(uuid.get());
 						if (linkedAccounts.isEmpty()) return Collections.emptyList();

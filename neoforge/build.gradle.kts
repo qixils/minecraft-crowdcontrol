@@ -64,7 +64,7 @@ dependencies {
         exclude(group = "com.google.errorprone")
         exclude(group = "com.google.j2objc")
         exclude(group = "com.google.code.findbugs")
-        exclude(group = "org.incendo")
+        exclude(group = "org.incendo", module = "cloud-core")
     }
     common(project(path = ":mojmap-common", configuration = "namedElements")) { isTransitive = false }
     shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
@@ -98,12 +98,14 @@ java {
 //    withSourcesJar()
 }
 
-loom {
+//loom {
 //    mixin {
 //        defaultRefmapName.set("crowd-control-refmap.json")
 //    }
-    accessWidenerPath = project(":mojmap-common").projectDir.resolve("src/main/resources/crowdcontrol.accesswidener")
-}
+//    accessWidenerPath = project(":mojmap-common").projectDir.resolve("src/main/resources/crowdcontrol.accesswidener")
+//}
+
+// loom.neoForge {}
 
 tasks.shadowJar {
     configurations = listOf(shadowBundle)

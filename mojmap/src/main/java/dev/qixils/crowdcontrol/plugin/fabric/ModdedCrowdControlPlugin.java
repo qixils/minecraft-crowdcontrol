@@ -37,7 +37,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.flag.FeatureElement;
@@ -56,7 +55,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
-import static net.minecraft.resources.ResourceLocation.parse;
 
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
@@ -68,11 +66,6 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
-	// packet stuff
-	public static ResourceLocation VERSION_REQUEST_ID = parse(VERSION_REQUEST_KEY.asString());
-	public static ResourceLocation VERSION_RESPONSE_ID = parse(VERSION_RESPONSE_KEY.asString());
-	public static ResourceLocation SHADER_ID = parse(SHADER_KEY.asString());
-	public static ResourceLocation MOVEMENT_STATUS_ID = parse(MOVEMENT_STATUS_KEY.asString());
 	// variables
 	@NotNull
 	private final EventManager eventManager = new EventManager();
@@ -119,9 +112,16 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 
 	@Override
 	public void onInitialize() {
+		getSLF4JLogger().info("Initializing");
 		registerChatCommands();
-		ServerLifecycleEvents.SERVER_STARTING.register(this::setServer);
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> setServer(null));
+		ServerLifecycleEvents.SERVER_STARTING.register(newServer -> {
+			getSLF4JLogger().info("Server starting");
+			setServer(newServer);
+		});
+		ServerLifecycleEvents.SERVER_STOPPED.register($ -> {
+			getSLF4JLogger().info("Server stopping");
+			setServer(null);
+		});
 		PacketUtil.registerPackets();
 		ServerPlayNetworking.registerGlobalReceiver(ResponseVersionC2S.PACKET_ID, (payload, context) -> {
 			UUID uuid = context.player().getUUID();

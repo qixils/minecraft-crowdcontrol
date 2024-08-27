@@ -10,9 +10,10 @@ import net.neoforged.fml.common.Mod;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 // TODO: access transformers
-// TODO: joins throw exception, mod not loading?? weh...
+// TODO: `crowdcontrol-client` "mod" ?
 
 @Getter
 @Mod("crowdcontrol")
@@ -20,6 +21,16 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 	private final NeoForgeServerCommandManager<CommandSourceStack> commandManager
 		= NeoForgeServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
 	private final PermissionUtil permissionUtil = new NeoForgePermissionUtil();
+
+	static {
+		LoggerFactory.getLogger("CrowdControl").info("Static loaded");
+	}
+
+	public NeoForgeCrowdControlPlugin() {
+		super();
+		getSLF4JLogger().info("Loaded");
+		onInitialize();
+	}
 
 	// TODO: getInputStream?
 
