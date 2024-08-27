@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.7.0
+
+- Added support for [NeoForge](https://neoforged.net/) 🥳
+
 ## 3.6.2
 
 - Paper: Fixed error handling for custom enchantments added by Spigot plugins
