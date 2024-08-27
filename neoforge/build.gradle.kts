@@ -6,6 +6,7 @@ val clothConfigVersion: String by project
 val cloudMojmapVersion: String by project
 val fabricForgifiedVersion: String by project
 val configurateVersion: String by project
+val luckPermsVersion: String by project
 
 plugins {
     id("com.github.johnrengelman.shadow")
@@ -55,6 +56,7 @@ dependencies {
     modImplementation(include("net.kyori:adventure-platform-neoforge:6.0.0")!!)
     modImplementation(include("org.incendo:cloud-neoforge:$cloudMojmapVersion")!!)
     modImplementation(include("me.shedaniel.cloth:cloth-config-neoforge:$clothConfigVersion")!!)
+    modCompileOnly("net.luckperms:api:$luckPermsVersion")
 
     shadowBundle(project(":configurate-common")) {
         exclude(group = "com.google.code.gson")

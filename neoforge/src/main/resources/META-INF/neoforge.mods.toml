@@ -35,5 +35,12 @@ versionRange = "[13.0.6,)"
 ordering = "AFTER"
 side = "BOTH"
 
+[[dependencies.crowdcontrol]]
+modId = "luckperms"
+type = "optional"
+ordering = "AFTER"
+side = "SERVER"
+referralUrl = "https://luckperms.net/download"
+
 [[mixins]]
 config = "crowdcontrol.mixins.json"

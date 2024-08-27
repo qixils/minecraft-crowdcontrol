@@ -7,7 +7,6 @@ import net.minecraft.world.entity.Entity;
 public class NeoForgePermissionUtil extends PermissionUtil {
 	@Override
 	public boolean check(Entity entity, PermissionWrapper permission) {
-		// TODO: node API support
 		return entity.hasPermissions(permission.getPermissionLevel());
 	}
 }
