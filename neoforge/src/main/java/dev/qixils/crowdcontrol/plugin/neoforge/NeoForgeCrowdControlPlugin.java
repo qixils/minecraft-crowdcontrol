@@ -9,7 +9,6 @@ import lombok.Getter;
 import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLLoader;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
@@ -22,10 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 // TODO: improve pause checks
-// TODO: ConfiguratePlugin.createConfigLoader(ConfiguratePlugin.java:157) crash from null this.container
 
 @Getter
-@Mod("crowdcontrol")
 public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 	private final NeoForgeServerCommandManager<CommandSourceStack> commandManager
 		= NeoForgeServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
@@ -47,7 +44,7 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 
 	@Override
 	public @Nullable Path getPath(@NotNull String asset) {
-		return container.getModInfo().getOwningFile().getFile().findResource(asset);
+		return NeoForgeInitializer.container.getModInfo().getOwningFile().getFile().findResource(asset);
 	}
 
 	@Override

@@ -8,15 +8,26 @@ import net.luckperms.api.util.Tristate;
 import net.minecraft.world.entity.Entity;
 
 public class LuckPermsPermissionUtil extends NeoForgePermissionUtil {
-	private final LuckPerms api = LuckPermsProvider.get();
+	private LuckPerms api;
+
+	private void initializeApi() {
+		try {
+			api = LuckPermsProvider.get();
+		} catch (Exception ignored) {}
+	}
 
 	@Override
 	public boolean check(Entity entity, PermissionWrapper permission) {
+		boolean fallback = super.check(entity, permission);
+
+		initializeApi();
+		if (api == null) return fallback;
+
 		User user = api.getUserManager().getUser(entity.getUUID());
-		if (user == null) return super.check(entity, permission);
+		if (user == null) return fallback;
 
 		Tristate state = user.getCachedData().getPermissionData().checkPermission(permission.getNode());
-		if (state == Tristate.UNDEFINED) return super.check(entity, permission);
+		if (state == Tristate.UNDEFINED) return fallback;
 
 		return state.asBoolean();
 	}
