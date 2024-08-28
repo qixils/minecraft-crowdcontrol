@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import {computed} from 'vue';
+import { computed } from 'vue';
+import { neoForgeVersions as versions, supportedNeoForgeVersions as supportedVersions, neoForgeLatest as latestVersion } from '../../../utils/versions'
 
 const route = useRoute();
 const version = useState('version', () => route.query.v);
-if (!version.value || !fabricVersions.includes(version.value)) { version.value = fabricLatest; }
-const supported = computed(() => supportedFabricVersions.includes(version.value));
-const latest = computed(() => version.value === fabricLatest);
+if (!version.value || !versions.includes(version.value)) { version.value = latestVersion; }
+const supported = computed(() => supportedVersions.includes(version.value));
+const latest = computed(() => version.value === latestVersion);
 
 useSeoMeta({
-  title: `Fabric ${version.value} Client Setup · Minecraft Crowd Control`,
-  description: `Fabric ${version.value} Client Setup Guide`,
-  ogDescription: `Fabric ${version.value} Client Setup Guide`,
+  title: `NeoForge ${version.value} Client Setup · Minecraft Crowd Control`,
+  description: `NeoForge ${version.value} Client Setup Guide`,
+  ogDescription: `NeoForge ${version.value} Client Setup Guide`,
 })
 </script>
 
 <template>
   <div>
-    <h1>Fabric {{ version }} Client Setup</h1>
+    <h1>NeoForge {{ version }} Client Setup</h1>
 
     <p class="alert alert-warning" v-if="!supported">
       The selected Minecraft version is no longer receiving mod updates.
-      Please consider updating to {{ fabricLatest }}.
+      Please consider updating to {{ latestVersion }}.
     </p>
 
     <h2>Installing the Mod</h2>
@@ -34,7 +35,7 @@ useSeoMeta({
     </p>
 
     <ol>
-      <li>Download and run the <a href="https://fabricmc.net/use/installer/">Fabric Loader installer</a>.
+      <li>Download and run the <a href="https://neoforged.net/">NeoForge installer</a>.
         <ul>
           <li>You may first need to download and install <a href="https://adoptium.net/temurin/releases/">Java</a>.</li>
         </ul>
@@ -46,19 +47,14 @@ useSeoMeta({
         </ul>
       </li>
       <li>Create a new folder called <code>mods</code>.</li>
-      <li>Download the latest build of the <a :href="`https://modrinth.com/mod/fabric-api/versions?g=${version}&c=release`">Fabric API</a> and place it in the <code>mods</code> folder.</li>
-      <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=fabric&g=${version}`">Crowd Control for Fabric</a> and place it in the <code>mods</code> folder.</li>
-      <li>(Recommended) For the best experience and extra effects, we also suggest downloading and installing the following mods to the <code>mods</code> folder:
-        <ul>
-          <li><a :href="`https://modrinth.com/mod/language-reload/versions?l=fabric&g=${version}`">Language Reload</a></li>
-        </ul>
-      </li>
-      <li>(Optional) Copy all the other Fabric {{ version }} mods that you want to play with into the <code>mods</code> folder.</li>
+      <li>Download the latest build of the <a :href="`https://modrinth.com/mod/forgified-fabric-api/versions?l=neoforge&g=${version}&c=release`">Forgified Fabric API</a> and place it in the <code>mods</code> folder.</li>
+      <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=neoforge&g=${version}`">Crowd Control for NeoForge</a> and place it in the <code>mods</code> folder.</li>
+      <li>(Optional) Copy all the other NeoForge {{ version }} mods that you want to play with into the <code>mods</code> folder.</li>
     </ol>
 
     <p>
-      The mod is now installed! Open your Minecraft Launcher and select the <code>fabric-loader-{{version}}</code> profile to play.
-      You may now <NuxtLink :to="`/guide/fabric/join?v=${version}`">join a Crowd Control server</NuxtLink>
+      The mod is now installed! Open your Minecraft Launcher and select the <code>NeoForge</code> profile to play.
+      You may now <NuxtLink :to="`/guide/neoforge/join?v=${version}`">join a Crowd Control server</NuxtLink>
       or <a href="#starting">start a single player session</a>.
     </p>
 

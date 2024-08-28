@@ -86,7 +86,6 @@ useSeoMeta({
       <li>In the <strong>Game Library</strong> tab, select <strong>Minecraft</strong>.</li>
       <li>Select <strong>Configure Minecraft</strong>.</li>
       <li>Enter your Minecraft username and click next.</li>
-      <li>Select <strong>Sponge {{api}}</strong> and click next.</li>
       <li>Select <strong>Remote</strong>.</li>
       <li>Enter in <code>localhost</code> as the host and click next.</li>
       <li>Accept the default password <code>crowdcontrol</code> by clicking next.</li>
