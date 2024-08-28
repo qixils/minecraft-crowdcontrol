@@ -41,7 +41,7 @@ useSeoMeta({
       <li>(Optional) Copy any other Fabric {{version}} mods that you want to play with into the <code>mods</code> folder.</li>
       <li>Run the Minecraft server using the <code>start.bat</code> file on Windows or <code>start.sh</code> on Linux to initialize the plugin's configuration files. You will have to run it twice, as the first will prompt you to accept Minecraft's End User License Agreement.</li>
       <li>To change the plugin's configuration file, you must first shut down the server by typing <code>stop</code> in the server window. The config file is located at <code>&lt;root&gt;/config/crowdcontrol.conf</code>.</li>
-      <li>Ensure the ports 25565 and 58431 are open so that users may connect to the Minecraft server and the Crowd Control server.</li>
+      <li>Ensure the ports 25565 and 58431 are open in your router's firewall so that users may connect to the Minecraft server and its Crowd Control server.</li>
     </ol>
 
     <p>Users may now connect using the <NuxtLink :to="`/guide/fabric/join?v=${version}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide your public IP address and the password used in the config file to your streamers.</p>

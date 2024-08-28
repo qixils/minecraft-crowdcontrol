@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, h } from 'vue';
-import { neoForgeVersions as versions, supportedNeoForgeVersions as supportedVersions, neoForgeLatest as latestVersion } from '../../../../utils/versions'
+import { computed } from 'vue';
+import { neoForgeVersions as versions, supportedNeoForgeVersions as supportedVersions, neoForgeLatest as latestVersion } from '~/utils/versions'
+import PortInstructions from '~/components/PortInstructions.vue'
 
 const route = useRoute();
 const version = useState('version', () => route.query.v);
@@ -44,33 +45,7 @@ useSeoMeta({
         </ul>
       </li>
       <li>
-        <div class="mb-1">In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.</div>
-        <UAccordion
-          color="primary"
-          variant="soft"
-          size="sm"
-          :items="[{
-            label: 'Setup for non-dedicated IPs',
-            icon: 'i-heroicons-information-circle',
-            slot: 'nondedicated',
-          }, {
-            label: 'Setup for free server hosts (Aternos)',
-            icon: 'i-heroicons-information-circle',
-            slot: 'free',
-          }]"
-        >
-          <template #nondedicated>
-            If you aren't paying for a dedicated IP address then you will likely will be unable to choose a specific port to open and instead get assigned a random one.
-            You will have to update the plugin's config file, as described below, to use your assigned port.
-            You should also be sure to use your assigned port in the Crowd Control app at the end of the host field,
-            i.e. for IP <code>1.2.3.4</code> and port <code>5678</code>, you would connect to <code>1.2.3.4:5678</code>.
-          </template>
-          <template #free>
-            No free hosts that we are aware of, including Aternos, support the firewall features necessary to use Crowd Control.
-            If you need a free host, <a :href="`/guide/neoforge/server/local?v=${version}`">use your computer</a>.
-            Otherwise, you can rent a server from a service like <a href="https://bloom.host">bloom.host</a>.
-          </template>
-        </UAccordion>
+        <PortInstructions :localLink="`/guide/neoforge/server/local?v=${version}`" />
       </li>
       <li>Run the Minecraft server.</li>
       <li>(Optional) To edit the plugin's config file, you must first shut down the server using <code>/stop</code>. The config file can be found at <code>&lt;root&gt;/config/crowdcontrol.conf</code>.</li>
