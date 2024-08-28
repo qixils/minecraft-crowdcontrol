@@ -43,7 +43,7 @@ useSeoMeta({
         </ul>
       </li>
       <li>
-        <span class="mb-1">In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.</span>
+        <div class="mb-1">In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.</div>
         <UAccordion
           color="primary"
           variant="soft"
