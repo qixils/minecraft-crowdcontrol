@@ -61,7 +61,7 @@ dependencies {
 
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    // TODO modImplementation("dev.architectury:architectury-fabric:$architecturyApiVersion")
+    modImplementation("dev.architectury:architectury-fabric:$architecturyApiVersion")
     // TODO(1.21.2): modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
     modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")

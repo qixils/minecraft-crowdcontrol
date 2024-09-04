@@ -28,12 +28,12 @@ versionRange = "[1.21,1.21.1]"
 ordering = "NONE"
 side = "BOTH"
 
-#[[dependencies.crowdcontrol]]
-#modId = "architectury"
-#type = "required"
-#versionRange = "[13.0.6,)"
-#ordering = "AFTER"
-#side = "BOTH"
+[[dependencies.crowdcontrol]]
+modId = "architectury"
+type = "required"
+versionRange = "[13.0.6,)"
+ordering = "AFTER"
+side = "BOTH"
 
 [[dependencies.crowdcontrol]]
 modId = "luckperms"
