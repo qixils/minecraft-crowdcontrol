@@ -8,7 +8,10 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.6.2
 
+- Fixed missing name and conditions for the _Language Shuffle_ effect
+- Fixed missing name for the _Replace Water with Lava_ effect
 - Paper: Fixed error handling for custom enchantments added by Spigot plugins
+- Paper: Added workaround for upstream issue which broke Max Health effects
 
 ## 3.6.1
 
@@ -16,6 +19,7 @@ A list of all changes made to the software in reverse chronological order.
 - Added support for sending Fabric client-side effects from Paper
 - Updated the _Lootbox_ effects to prevent the inventory from being closed while it still contains items
 - Paper: Fixed [experimental features](https://minecraft.wiki/w/Experiments) support on 1.21+
+- [Hotfix 1] Paper: Fixed large mod file size
 
 ## 3.6.0
 

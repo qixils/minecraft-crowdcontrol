@@ -8,10 +8,10 @@ export const ua = "qixils/minecraft-crowdcontrol/1.0.0";
 export const uaheader = { "User-Agent": ua };
 export const uaheaderfull = { "headers": uaheader };
 
-export const jreMode: "static" | "dynamic" = "dynamic"
+export const jreMode: "static" | "dynamic" = "static"
 export const jrePaths = {
-  8: "jre8",
-  21: "jre21",
+  8: "jdk8u422-b05",
+  21: "jdk-21.0.4-7",
 }
 
 export async function mkdir(dir: string, {

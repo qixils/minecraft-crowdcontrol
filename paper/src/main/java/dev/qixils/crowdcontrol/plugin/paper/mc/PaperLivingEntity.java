@@ -48,7 +48,7 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 		AttributeModifier modifier = null;
 		for (AttributeModifier attributeModifier : attribute.getModifiers()) {
-			if (attributeModifier.getUniqueId() == MAX_HEALTH_MODIFIER_UUID || attributeModifier.getName().equals(MAX_HEALTH_MODIFIER_NAME)) {
+			if (attributeModifier.getName().equals(MAX_HEALTH_MODIFIER_NAME) || attributeModifier.getName().equals(MAX_HEALTH_MODIFIER_UUID.toString())) {
 				modifier = attributeModifier;
 				break;
 			}

@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
@@ -8,15 +9,13 @@ import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -24,13 +23,12 @@ public class LanguageCommand extends TimedImmediateCommand {
 	private static final @NotNull Set<UUID> ACTIVE = new HashSet<>();
 	private final @NotNull String effectName = "language_random";
 	private final @NotNull Duration defaultDuration = Duration.ofSeconds(30);
+	private final @NotNull SemVer minimumModVersion = LanguageState.RANDOM.addedIn();
+	@Accessors(fluent = true)
+	private final @NotNull Set<ExtraFeature> requiredExtraFeatures = EnumSet.of(ExtraFeature.LANGUAGE_RELOAD);
 
 	public LanguageCommand(@NotNull ModdedCrowdControlPlugin plugin) {
 		super(plugin);
-	}
-
-	public @NotNull SemVer getMinimumModVersion() {
-		return LanguageState.RANDOM.addedIn();
 	}
 
 	@NotNull
