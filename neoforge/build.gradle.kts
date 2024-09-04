@@ -52,7 +52,7 @@ dependencies {
     neoForge("net.neoforged:neoforge:$neoforgeVersion")
 
     modImplementation("org.sinytra.forgified-fabric-api:forgified-fabric-api:$fabricForgifiedVersion")
-    modImplementation("dev.architectury:architectury-neoforge:$architecturyApiVersion")
+    // TODO modImplementation("dev.architectury:architectury-neoforge:$architecturyApiVersion")
     modImplementation(include("net.kyori:adventure-platform-neoforge:6.0.0")!!)
     modImplementation(include("org.incendo:cloud-neoforge:$cloudMojmapVersion")!!)
     modImplementation(include("me.shedaniel.cloth:cloth-config-neoforge:$clothConfigVersion")!!)

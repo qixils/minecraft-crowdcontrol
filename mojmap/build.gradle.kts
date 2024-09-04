@@ -31,7 +31,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
 
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation("dev.architectury:architectury:$architecturyApiVersion")
+    // TODO modImplementation("dev.architectury:architectury:$architecturyApiVersion")
     modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:$adventurePlatformModVersion")
     modCompileOnly("org.incendo:cloud-minecraft-modded-common-fabric-repack:$cloudMojmapVersion")
     modCompileOnly("me.shedaniel.cloth:cloth-config:$clothConfigVersion")
