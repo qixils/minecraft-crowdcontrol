@@ -1,8 +1,8 @@
-export const supportedPaperVersions: string[] = ["1.21", "1.20.6"]
-export const paperVersions: string[] = ["1.21", "1.20.6", "1.20.4", "1.20.2", "1.20.1", "1.19.4"];
+export const supportedPaperVersions: string[] = ["1.21.1", "1.20.6"]
+export const paperVersions: string[] = ["1.21.1", "1.20.6", "1.20.4", "1.20.2", "1.20.1", "1.19.4"];
 export const paperLatest = paperVersions[0];
-export const supportedFabricVersions: string[] = ["1.21"];
-export const fabricVersions: string[] = ["1.21", "1.20.6", "1.20.4", "1.20.2", "1.20.1", "1.19.4", "1.19.2"];
+export const supportedFabricVersions: string[] = ["1.21.1"];
+export const fabricVersions: string[] = ["1.21.1", "1.20.6", "1.20.4", "1.20.2", "1.20.1", "1.19.4", "1.19.2"];
 export const fabricLatest = fabricVersions[0];
 export const spongeVersions: Map<string, number> = new Map([["1.20.6", 11], ["1.16.5", 8], ["1.12.2", 7]]);
 export const spongeVersionsArray: string[] = Array.from(spongeVersions.keys());
