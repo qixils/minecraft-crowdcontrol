@@ -39,7 +39,6 @@ public class MaxHealthSubCommand<P> implements ImmediateCommand<P> {
 			if ((current - newVal) == amount) {
 				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 				player.maxHealthOffset(newVal);
-				player.health(Math.min(player.health(), player.maxHealth()));
 			}
 		}
 
