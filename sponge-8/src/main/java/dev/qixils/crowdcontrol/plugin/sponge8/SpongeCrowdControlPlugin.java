@@ -1,8 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.sponge8;
 
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.sponge.CloudInjectionModule;
-import cloud.commandframework.sponge.SpongeCommandManager;
+import org.incendo.cloud.execution.CommandExecutionCoordinator;
+import org.incendo.cloud.sponge.CloudInjectionModule;
+import org.incendo.cloud.sponge.SpongeCommandManager;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;

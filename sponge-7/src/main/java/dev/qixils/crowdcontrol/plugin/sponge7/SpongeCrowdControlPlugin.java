@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.sponge7;
 
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.sponge7.SpongeCommandManager;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
@@ -23,6 +21,9 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.incendo.cloud.SenderMapper;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.sponge7.SpongeCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.spongepowered.api.CatalogType;
@@ -66,7 +67,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
@@ -355,10 +355,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		initCrowdControl();
 		commandManager = new SpongeCommandManager<>(
 				pluginContainer,
-				AsynchronousCommandExecutionCoordinator.<CommandSource>builder()
-						.withAsynchronousParsing().withExecutor(asyncExecutor).build(),
-				Function.identity(),
-				Function.identity()
+				ExecutionCoordinator.asyncCoordinator(),
+				SenderMapper.identity()
 		);
 		registerChatCommands();
 	}

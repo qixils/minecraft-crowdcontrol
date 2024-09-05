@@ -54,8 +54,10 @@ public class EntityChaosCommand extends ImmediateCommand {
 		int i = 0;
 		boolean success = false;
 		for (Entity entity : entities) {
-			entity.clearPassengers();
-			success |= entity.setLocation(players.get((i++) % players.size()).getLocation());
+			try {
+				entity.clearPassengers();
+				success |= entity.setLocation(players.get((i++) % players.size()).getLocation());
+			} catch (Exception ignored) {}
 		}
 
 		return success

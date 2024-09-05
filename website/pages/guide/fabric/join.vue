@@ -17,7 +17,6 @@ useSeoMeta({
       <li>In the <strong>Game Selection</strong> tab, select <strong>Minecraft</strong>.</li>
       <li>Select <strong>Configure Minecraft</strong>.</li>
       <li>Enter your Minecraft username and click next.</li>
-      <li>Select <strong>Fabric</strong> and click next.</li>
       <li>Select <strong>Remote</strong>.</li>
       <li>Enter the IP address of the server (usually the same as the one you connect to in Minecraft) and click next.</li>
       <li>If you were provided a secret passphrase by the server administrator, enter it here. Otherwise, leave the default value of <code>crowdcontrol</code>. Click next.</li>

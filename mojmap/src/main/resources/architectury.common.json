@@ -1,0 +1,30 @@
+{
+  "injected_interfaces": {
+    "net/minecraft/class_3222": [
+      "dev/qixils/crowdcontrol/plugin/fabric/interfaces/GameTypeEffectComponent",
+      "net/kyori/adventure/audience/Audience"
+    ],
+    "net/minecraft/class_1657": [
+      "dev/qixils/crowdcontrol/plugin/fabric/interfaces/MovementStatus",
+      "net/kyori/adventure/platform/modcommon/IdentifiedAtRuntime"
+    ],
+    "net/minecraft/class_1309": [
+      "dev/qixils/crowdcontrol/plugin/fabric/interfaces/ViewerMob",
+      "dev/qixils/crowdcontrol/plugin/fabric/interfaces/OriginalDisplayName"
+    ],
+    "net/minecraft/class_1297": [
+      "net/kyori/adventure/sound/Sound$Emitter",
+      "net/kyori/adventure/platform/modcommon/EntityHoverEventSource"
+    ],
+    "net/minecraft/class_2168": [ "net/kyori/adventure/platform/modcommon/AdventureCommandSourceStack" ],
+    "net/minecraft/server/MinecraftServer": [ "net/kyori/adventure/audience/Audience" ],
+    "net/minecraft/class_3350": [ "net/kyori/adventure/audience/Audience" ],
+    "net/minecraft/class_746": [ "net/kyori/adventure/audience/Audience" ],
+    "net/minecraft/class_2960": [ "net/kyori/adventure/key/Key" ],
+    "net/minecraft/class_3414": [ "net/kyori/adventure/sound/Sound$Type" ],
+    "net/minecraft/class_5321": [ "net/kyori/adventure/key/Keyed" ],
+    "net/minecraft/class_1799": [ "net/kyori/adventure/text/event/HoverEventSource<Lnet/kyori/adventure/text/event/HoverEvent$ShowItem;>" ],
+    "net/minecraft/class_7469": [ "net/kyori/adventure/chat/SignedMessage$Signature" ]
+  },
+  "accessWidener": "crowdcontrol.accesswidener"
+}

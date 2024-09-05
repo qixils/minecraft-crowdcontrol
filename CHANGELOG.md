@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.7.0
+
+- Added support for [NeoForge](https://neoforged.net/) 🥳
+
 ## 3.6.2
 
 - Fixed missing name and conditions for the _Language Shuffle_ effect

@@ -1,6 +1,6 @@
 import xyz.jpenilla.runpaper.task.RunServer
 
-val cloudVersion: String by project
+val cloudPaperVersion: String by project
 val minecraftVersion: String by project
 val paperlibVersion: String by project
 
@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("com.github.qixils.cloud:cloud-paper:$cloudVersion")
+    implementation("org.incendo:cloud-paper:$cloudPaperVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
 
     //paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
