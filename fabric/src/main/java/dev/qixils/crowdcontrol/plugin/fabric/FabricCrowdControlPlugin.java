@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.plugin.fabric.util.FabricPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import org.incendo.cloud.execution.ExecutionCoordinator;
@@ -18,15 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Getter
-public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implements ModInitializer {
+public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin {
 	private final FabricServerCommandManager<CommandSourceStack> commandManager
 		= FabricServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
 	private final PermissionUtil permissionUtil = new FabricPermissionUtil();
-
-	@Override
-	public void onInitialize() {
-		super.onInitialize();
-	}
 
 	@Override
 	public @Nullable Path getPath(@NotNull String asset) {

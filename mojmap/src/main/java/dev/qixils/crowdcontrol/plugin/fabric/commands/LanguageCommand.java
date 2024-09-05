@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.architectury.networking.NetworkManager;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -11,6 +10,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +45,7 @@ public class LanguageCommand extends TimedImmediateCommand {
 		// send packet
 		for (ServerPlayer player : players) {
 			ACTIVE.add(player.getUUID());
-			NetworkManager.sendToPlayer(player, packet);
+			ServerPlayNetworking.send(player, packet);
 		}
 
 		// schedule removal

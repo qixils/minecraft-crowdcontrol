@@ -30,6 +30,7 @@ dependencies {
     // Do NOT use other classes from Fabric Loader.
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
 
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation("dev.architectury:architectury:$architecturyApiVersion")
     modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:$adventurePlatformModVersion")
     modCompileOnly("org.incendo:cloud-minecraft-modded-common-fabric-repack:$cloudMojmapVersion")

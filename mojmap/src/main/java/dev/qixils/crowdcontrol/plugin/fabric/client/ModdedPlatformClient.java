@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
-import dev.architectury.event.events.client.ClientLifecycleEvent;
-import dev.architectury.networking.NetworkManager;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
@@ -11,8 +9,11 @@ import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -35,7 +36,7 @@ import static dev.qixils.crowdcontrol.common.Plugin.DEFAULT_PORT;
 import static net.minecraft.resources.ResourceLocation.withDefaultNamespace;
 
 @Environment(EnvType.CLIENT)
-public abstract class ModdedPlatformClient {
+public abstract class ModdedPlatformClient implements ClientModInitializer {
 	protected final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
 	protected final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	protected static @Nullable ModdedPlatformClient INSTANCE = null;
@@ -64,20 +65,19 @@ public abstract class ModdedPlatformClient {
 		return EnumSet.noneOf(ExtraFeature.class);
 	}
 
+	@Override
 	public void onInitializeClient() {
 		INSTANCE = this;
 		ModdedCrowdControlPlugin.CLIENT_INITIALIZED = true;
-		ClientLifecycleEvent.CLIENT_STARTED.register(this::setClient);
-		ClientLifecycleEvent.CLIENT_STOPPING.register(client -> setClient(null));
-
-		// PayloadTypeRegistry.playC2S().register(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC);
-		// PayloadTypeRegistry.playC2S().register(ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC);
-		NetworkManager.registerReceiver(NetworkManager.Side.S2C, RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC, (payload, context) -> {
+		ClientLifecycleEvents.CLIENT_STARTED.register(this::setClient);
+		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> setClient(null));
+		PacketUtil.registerPackets();
+		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> {
 			logger.info("Received version request from server!");
-			NetworkManager.sendToServer(new ResponseVersionC2S(SemVer.MOD));
-			NetworkManager.sendToServer(new ExtraFeatureC2S(getExtraFeatures()));
+			context.responseSender().sendPacket(new ResponseVersionC2S(SemVer.MOD));
+			context.responseSender().sendPacket(new ExtraFeatureC2S(getExtraFeatures()));
 		});
-		NetworkManager.registerReceiver(NetworkManager.Side.S2C, SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC, (payload, context) -> {
+		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> {
 			logger.debug("Received shader request from server!");
 			ResourceLocation shader = withDefaultNamespace("shaders/post/" + payload.shader() + ".json");
 
@@ -90,9 +90,9 @@ public abstract class ModdedPlatformClient {
 				client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
 			}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
 		});
-		NetworkManager.registerReceiver(NetworkManager.Side.S2C, MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC, (payload, context) -> {
+		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (payload, context) -> {
 			if (payload.statusType() == null || payload.statusValue() == null) return;
-			context.getPlayer().cc$setMovementStatus(payload.statusType(), payload.statusValue());
+			context.player().cc$setMovementStatus(payload.statusType(), payload.statusValue());
 		});
 	}
 

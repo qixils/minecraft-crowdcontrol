@@ -1,12 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import dev.architectury.networking.NetworkManager;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -48,7 +48,7 @@ public abstract class PlayerMixin extends LivingEntity implements MovementStatus
 		else
 			prohibited.put(type, value);
 		if (((Object) this) instanceof ServerPlayer serverPlayer) {
-			NetworkManager.sendToPlayer(serverPlayer, new MovementStatusS2C(type, value));
+			ServerPlayNetworking.send(serverPlayer, new MovementStatusS2C(type, value));
 		}
 	}
 

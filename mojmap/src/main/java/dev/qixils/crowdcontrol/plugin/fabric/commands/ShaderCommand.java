@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.architectury.networking.NetworkManager;
 import dev.qixils.crowdcontrol.common.command.impl.Shader;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
@@ -9,6 +8,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +48,7 @@ public class ShaderCommand extends TimedImmediateCommand {
 		// send packet
 		for (ServerPlayer player : players) {
 			ACTIVE_SHADERS.add(player.getUUID());
-			NetworkManager.sendToPlayer(player, packet);
+			ServerPlayNetworking.send(player, packet);
 		}
 
 		// schedule removal

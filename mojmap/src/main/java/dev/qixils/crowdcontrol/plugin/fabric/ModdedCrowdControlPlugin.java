@@ -1,9 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
-import dev.architectury.event.events.common.LifecycleEvent;
-import dev.architectury.networking.NetworkManager;
-import dev.architectury.platform.Platform;
-import dev.architectury.utils.Env;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
@@ -19,11 +15,17 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ExtraFeatureC2S;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
@@ -62,7 +64,7 @@ import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
  * {@link Command Commands}.
  */
 @Getter
-public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> {
+public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> implements ModInitializer {
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
@@ -110,34 +112,28 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		getEventManager().register(Leave.class, leave -> onPlayerLeave(leave.player()));
 	}
 
+	@Override
 	public void onInitialize() {
 		getSLF4JLogger().debug("Initializing");
 		registerChatCommands();
-		LifecycleEvent.SERVER_STARTING.register(newServer -> {
+		ServerLifecycleEvents.SERVER_STARTING.register(newServer -> {
 			getSLF4JLogger().debug("Server starting");
 			setServer(newServer);
 		});
-		LifecycleEvent.SERVER_STOPPED.register($ -> {
+		ServerLifecycleEvents.SERVER_STOPPED.register($ -> {
 			getSLF4JLogger().debug("Server stopping");
 			setServer(null);
 		});
-
-		if (Platform.getEnvironment() != Env.CLIENT) {
-			// annoyingly these get duplicated if this runs on the client
-			NetworkManager.registerS2CPayloadType(SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC);
-			NetworkManager.registerS2CPayloadType(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
-			NetworkManager.registerS2CPayloadType(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
-			NetworkManager.registerS2CPayloadType(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);
-		}
-		NetworkManager.registerReceiver(NetworkManager.Side.C2S, ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC, (payload, context) -> {
-			UUID uuid = context.getPlayer().getUUID();
+		PacketUtil.registerPackets();
+		ServerPlayNetworking.registerGlobalReceiver(ResponseVersionC2S.PACKET_ID, (payload, context) -> {
+			UUID uuid = context.player().getUUID();
 			SemVer version = payload.version();
 			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
 			clientVersions.put(uuid, version);
 			updateConditionalEffectVisibility(crowdControl);
 		});
-		NetworkManager.registerReceiver(NetworkManager.Side.C2S, ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC, (payload, context) -> {
-			UUID uuid = context.getPlayer().getUUID();
+		ServerPlayNetworking.registerGlobalReceiver(ExtraFeatureC2S.PACKET_ID, (payload, context) -> {
+			UUID uuid = context.player().getUUID();
 			Set<ExtraFeature> features = payload.features();
 			getSLF4JLogger().info("Received features {} from client {}", features, uuid);
 			extraFeatures.put(uuid, features);
@@ -253,7 +249,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
 			getSLF4JLogger().debug("Sending version request to {}", player.getUUID());
-			NetworkManager.sendToPlayer(player, RequestVersionS2C.INSTANCE);
+			ServerPlayNetworking.send(player, RequestVersionS2C.INSTANCE);
 		}
 		// super
 		super.onPlayerJoin(player);
