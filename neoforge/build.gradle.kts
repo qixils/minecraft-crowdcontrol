@@ -4,7 +4,6 @@ val mojmapVersion: String by project
 val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
 val cloudMojmapVersion: String by project
-val fabricForgifiedVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
 
@@ -51,7 +50,6 @@ dependencies {
 
     neoForge("net.neoforged:neoforge:$neoforgeVersion")
 
-    modImplementation("org.sinytra.forgified-fabric-api:forgified-fabric-api:$fabricForgifiedVersion")
     modImplementation("dev.architectury:architectury-neoforge:$architecturyApiVersion")
     modImplementation(include("net.kyori:adventure-platform-neoforge:6.0.0")!!)
     modImplementation(include("org.incendo:cloud-neoforge:$cloudMojmapVersion")!!)
