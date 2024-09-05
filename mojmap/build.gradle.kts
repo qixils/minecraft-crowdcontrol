@@ -1,6 +1,5 @@
 val mojmapVersion: String by project
 val loaderVersion: String by project
-val architecturyApiVersion: String by project
 val configurateVersion: String by project
 val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
@@ -31,7 +30,6 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
 
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation("dev.architectury:architectury:$architecturyApiVersion")
     modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:$adventurePlatformModVersion")
     modCompileOnly("org.incendo:cloud-minecraft-modded-common-fabric-repack:$cloudMojmapVersion")
     modCompileOnly("me.shedaniel.cloth:cloth-config:$clothConfigVersion")
