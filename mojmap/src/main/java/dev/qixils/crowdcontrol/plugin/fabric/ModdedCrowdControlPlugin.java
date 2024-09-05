@@ -54,6 +54,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
 
+// TODO: can no longer connect to paper servers
+
 /**
  * The main class used by a Crowd Control implementation based on the decompiled code of Minecraft
  * for managing Crowd Control server/client connections and handling

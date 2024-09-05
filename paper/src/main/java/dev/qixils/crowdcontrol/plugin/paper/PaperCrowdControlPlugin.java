@@ -50,6 +50,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 
+@SuppressWarnings("UnstableApiUsage")
 public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSourceStack> {
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_MIN_VERSION = new SemVer(1, 20, 6);
@@ -336,6 +337,11 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Override
 	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
 		return new PaperPlayer(this, player);
+	}
+
+	@Override
+	public @Nullable Player asPlayer(@NotNull CommandSourceStack sender) {
+		return objAsPlayer(sender.getSender());
 	}
 
 	@Override

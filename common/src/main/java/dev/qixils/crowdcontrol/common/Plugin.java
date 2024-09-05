@@ -382,7 +382,7 @@ public interface Plugin<P, S> {
 						if (!uuid.isPresent()) return Collections.emptyList();
 						Collection<String> linkedAccounts = getPlayerManager().getLinkedAccounts(uuid.get());
 						if (linkedAccounts.isEmpty()) return Collections.emptyList();
-						String lowerInput = input.input().toLowerCase(Locale.ENGLISH);
+						String lowerInput = input.lastRemainingToken().toLowerCase(Locale.ENGLISH);
 						Set<Suggestion> suggestions = new LinkedHashSet<>();
 						for (String acc : linkedAccounts) {
 							if (acc.startsWith(lowerInput))
@@ -522,7 +522,7 @@ public interface Plugin<P, S> {
 						.required()
 						.suggestionProvider((ctx, input) -> CompletableFuture.supplyAsync(() -> {
 							List<Command<P>> effects = commandRegister().getCommands();
-							String lowerInput = input.input().toLowerCase(Locale.ENGLISH);
+							String lowerInput = input.lastRemainingToken().toLowerCase(Locale.ENGLISH);
 							Set<Suggestion> suggestions = new LinkedHashSet<>();
 							for (Command<P> effect : effects) {
 								if (effect.getEffectName() == null) continue;
