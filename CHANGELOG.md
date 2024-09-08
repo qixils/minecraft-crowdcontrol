@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 3.6.3
+
+- Fixed the global effects warning message displaying to non-administrators
+
 ## 3.6.2
 
 - Fixed missing name and conditions for the _Language Shuffle_ effect

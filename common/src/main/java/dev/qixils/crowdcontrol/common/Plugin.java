@@ -1116,7 +1116,7 @@ public interface Plugin<P, S> {
 			audience.sendMessage(JOIN_MESSAGE_1);
 			if (!isGlobal() && !hasLinkedAccount(joiningPlayer) && (!isAdminRequired() || playerMapper().isAdmin(player)))
 				audience.sendMessage(JOIN_MESSAGE_2);
-			if (!globalEffectsUsable())
+			if (!globalEffectsUsable() && mapper.isAdmin(player))
 				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
 			CrowdControl cc = getCrowdControl();
 			if (cc == null) {
