@@ -8,10 +8,13 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.slot.EquipmentSlot;
@@ -19,6 +22,7 @@ import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +44,8 @@ public class BucketClutchCommand extends ImmediateCommand {
 				.message("No players are on the surface");
 		for (Player player : players) {
 			ItemType material = player.getWorld().getDimension().getType().equals(DimensionTypes.NETHER) ? ItemTypes.WEB : ItemTypes.WATER_BUCKET;
+			ItemStack giveItem = ItemStack.of(material);
+			giveItem.offer(Keys.ITEM_ENCHANTMENTS, Collections.singletonList(Enchantment.of(EnchantmentTypes.VANISHING_CURSE, 1)));
 
 			Location<World> curr = player.getLocation();
 			int offset = BUCKET_CLUTCH_MAX - 1;
@@ -79,7 +85,7 @@ public class BucketClutchCommand extends ImmediateCommand {
                             DropItemCommand.dropItem(plugin, player);
                     }
                 }
-                player.setItemInHand(HandTypes.MAIN_HAND, ItemStack.of(material));
+                player.setItemInHand(HandTypes.MAIN_HAND, giveItem);
             });
         }
 		return result;

@@ -7,11 +7,13 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -30,10 +32,15 @@ public class BucketClutchCommand extends ImmediateCommand {
 	@Override
 	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
 		Response.Builder result = request.buildResponse()
-				.type(Response.ResultType.RETRY)
-				.message("No players are on the surface");
+			.type(Response.ResultType.RETRY)
+			.message("No players are on the surface");
+
 		for (ServerPlayer player : players) {
 			Item material = player.serverLevel().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
+			ItemStack giveItem = new ItemStack(material);
+			player.registryAccess().registry(Registries.ENCHANTMENT)
+				.flatMap(registry -> registry.getHolder(Enchantments.VANISHING_CURSE))
+				.ifPresent(enchantment -> giveItem.enchant(enchantment, 1));
 
 			Location curr = new Location(player);
 			int offset = BUCKET_CLUTCH_MAX - 1;
@@ -47,33 +54,33 @@ public class BucketClutchCommand extends ImmediateCommand {
 				continue;
 			Location dest = curr.add(0, offset, 0);
 
-            result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+			result.type(Response.ResultType.SUCCESS).message("SUCCESS");
 
-            sync(() -> {
-                player.teleportTo(dest.x(), dest.y(), dest.z());
-                ItemStack hand = player.getMainHandItem();
-                if (!hand.isEmpty() && hand.getItem() != material) {
-                    ItemStack offhand = player.getOffhandItem();
-                    if (offhand.isEmpty()) {
-                        player.setItemInHand(InteractionHand.OFF_HAND, hand);
-                    } else {
-                        boolean slotFound = false;
-                        for (int i = 0; i < 36; i++) {
-                            List<ItemStack> items = player.getInventory().items;
-                            ItemStack item = items.get(i);
-                            if (item.isEmpty()) {
-                                slotFound = true;
-                                items.set(i, hand);
-                                break;
-                            }
-                        }
-                        if (!slotFound)
-                            player.drop(true);
-                    }
-                }
-                player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(material));
-            });
-        }
+			sync(() -> {
+				player.teleportTo(dest.x(), dest.y(), dest.z());
+				ItemStack hand = player.getMainHandItem();
+				if (!hand.isEmpty() && hand.getItem() != material) {
+					ItemStack offhand = player.getOffhandItem();
+					if (offhand.isEmpty()) {
+						player.setItemInHand(InteractionHand.OFF_HAND, hand);
+					} else {
+						boolean slotFound = false;
+						for (int i = 0; i < 36; i++) {
+							List<ItemStack> items = player.getInventory().items;
+							ItemStack item = items.get(i);
+							if (item.isEmpty()) {
+								slotFound = true;
+								items.set(i, hand);
+								break;
+							}
+						}
+						if (!slotFound)
+							player.drop(true);
+					}
+				}
+				player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(material));
+			});
+		}
 		return result;
 	}
 }

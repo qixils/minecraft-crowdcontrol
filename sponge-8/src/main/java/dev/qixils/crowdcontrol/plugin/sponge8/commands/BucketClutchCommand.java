@@ -8,16 +8,20 @@ import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.slot.EquipmentSlot;
 import org.spongepowered.api.world.WorldTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 
+import java.util.Collections;
 import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.BUCKET_CLUTCH_MAX;
@@ -38,6 +42,8 @@ public class BucketClutchCommand extends ImmediateCommand {
 				.message("No players are on the surface");
 		for (ServerPlayer player : players) {
 			ItemType material = (player.world().worldType().equals(WorldTypes.THE_NETHER.get()) ? ItemTypes.COBWEB : ItemTypes.WATER_BUCKET).get(); // TODO API?: ultrawarm
+			ItemStack giveItem = ItemStack.of(material);
+			giveItem.offer(Keys.APPLIED_ENCHANTMENTS, Collections.singletonList(Enchantment.of(EnchantmentTypes.VANISHING_CURSE, 1)));
 
 			ServerLocation curr = player.serverLocation();
 			int offset = BUCKET_CLUTCH_MAX - 1;
@@ -77,7 +83,7 @@ public class BucketClutchCommand extends ImmediateCommand {
                             DropItemCommand.dropItem(plugin, player);
                     }
                 }
-                player.setItemInHand(HandTypes.MAIN_HAND, ItemStack.of(material));
+                player.setItemInHand(HandTypes.MAIN_HAND, giveItem);
             });
         }
 		return result;

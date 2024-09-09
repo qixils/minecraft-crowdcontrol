@@ -4,6 +4,7 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 3.6.3
 
+- Added _Curse of Vanishing_ enchantment to the item given by the _Water Bucket Clutch_ effect
 - Fixed the global effects warning message displaying to non-administrators
 
 ## 3.6.2
