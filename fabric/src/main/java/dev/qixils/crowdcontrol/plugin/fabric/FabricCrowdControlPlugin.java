@@ -33,7 +33,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Holder;
@@ -282,17 +281,19 @@ public class FabricCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, Co
 	}
 
 	@SuppressWarnings("removal")
-	public @NotNull Component toAdventure(ComponentLike text) {
-		return text instanceof net.minecraft.network.chat.Component vanilla
-			? adventure().toAdventure(vanilla)
-			: text.asComponent();
+	public @NotNull Component toAdventure(net.minecraft.network.chat.Component text) {
+		return adventure().toAdventure(text);
 	}
 
-	public @NotNull Component toAdventure(ComponentLike text, @NotNull Pointered viewer) {
-		return adventure().renderer().render(toAdventure(text), viewer);
+	public @NotNull Component toAdventure(net.minecraft.network.chat.Component text, @NotNull Pointered viewer) {
+		return toAdventure(toAdventure(text), viewer);
 	}
 
-	public @NotNull net.minecraft.network.chat.Component toNative(ComponentLike text, @NotNull Pointered viewer) {
+	public @NotNull Component toAdventure(Component text, @NotNull Pointered viewer) {
+		return adventure().renderer().render(text, viewer);
+	}
+
+	public @NotNull net.minecraft.network.chat.Component toNative(Component text, @NotNull Pointered viewer) {
 		return adventure().toNative(toAdventure(text, viewer));
 	}
 

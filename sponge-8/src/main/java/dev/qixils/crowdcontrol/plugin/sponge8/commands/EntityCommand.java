@@ -10,7 +10,9 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityCategories;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.WorldTypes;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.server.ServerWorld;
 
@@ -48,15 +50,23 @@ public interface EntityCommand<E extends Entity> extends Command<ServerPlayer> {
 	}
 
 	default Response.@Nullable Builder tryExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (isMonster()) {
-			for (ServerPlayer player : players) {
-				if (levelIsPeaceful(player.world())) {
-					return request.buildResponse()
-						.type(Response.ResultType.FAILURE)
-						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
-				}
+		Response.Builder error = null;
+		for (ServerPlayer player : players) {
+			ServerWorld world = player.world();
+			if (isMonster() && levelIsPeaceful(world)) {
+				error = request.buildResponse()
+					.type(Response.ResultType.FAILURE)
+					.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+			}
+			else if (getEntityType() == EntityTypes.ENDER_DRAGON && world.worldType() == WorldTypes.THE_END.get()) {
+				error = request.buildResponse()
+					.type(Response.ResultType.FAILURE)
+					.message("Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
+			}
+			else {
+				return null;
 			}
 		}
-		return null;
+		return error;
 	}
 }

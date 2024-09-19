@@ -15,6 +15,8 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.WorldTypes;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
@@ -44,8 +46,11 @@ public class RemoveEntityCommand<E extends Entity> extends ImmediateCommand impl
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
+		ServerWorld world = player.world();
+		if (entityType == EntityTypes.ENDER_DRAGON && world.worldType() == WorldTypes.THE_END.get()) return false;
+
 		Vector3d playerPosition = player.position();
-		List<Entity> entities = new ArrayList<>(player.world().nearbyEntities(player.position(), REMOVE_ENTITY_RADIUS));
+		List<Entity> entities = new ArrayList<>(world.nearbyEntities(player.position(), REMOVE_ENTITY_RADIUS));
 		entities.removeIf(entity -> !entity.type().equals(entityType));
 
 		if (entities.isEmpty())

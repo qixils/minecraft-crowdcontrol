@@ -38,7 +38,7 @@ public class EnchantmentCommand extends ImmediateCommand {
 		this.effectName = "enchant_" + csIdOf(enchantment.unwrapKey().orElseThrow());
 		this.displayName = Component.translatable(
 				"cc.effect.enchant.name",
-				Enchantment.getFullname(enchantment, enchantment.value().getMaxLevel()).copy().setStyle(Style.EMPTY)
+				plugin.toAdventure(Enchantment.getFullname(enchantment, enchantment.value().getMaxLevel()).copy().setStyle(Style.EMPTY))
 		);
 	}
 

@@ -32,7 +32,7 @@ public class DifficultyCommand extends ImmediateCommand {
 		super(plugin);
 		this.difficulty = difficulty;
 		this.effectName = effectNameOf(difficulty);
-		this.displayName = Component.translatable("cc.effect.difficulty.name", difficulty.getDisplayName());
+		this.displayName = Component.translatable("cc.effect.difficulty.name", plugin.toAdventure(difficulty.getDisplayName()));
 	}
 
 	@NotNull

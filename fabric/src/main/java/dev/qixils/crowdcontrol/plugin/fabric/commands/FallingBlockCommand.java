@@ -19,7 +19,7 @@ public class FallingBlockCommand extends BlockCommand {
 				plugin,
 				blockType,
 				"falling_block_" + BuiltInRegistries.BLOCK.getKey(blockType).getPath(),
-				Component.translatable("cc.effect.falling_block.name", blockType.getName())
+				Component.translatable("cc.effect.falling_block.name", plugin.toAdventure(blockType.getName()))
 		);
 	}
 

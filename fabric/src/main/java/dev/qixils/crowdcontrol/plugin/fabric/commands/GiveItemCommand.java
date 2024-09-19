@@ -31,7 +31,7 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 		super(plugin);
 		this.item = item;
 		this.effectName = "give_" + BuiltInRegistries.ITEM.getKey(item).getPath();
-		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", item.getName(new ItemStack(item)));
+		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", plugin.toAdventure(item.getName(new ItemStack(item))));
 	}
 
 	@Blocking

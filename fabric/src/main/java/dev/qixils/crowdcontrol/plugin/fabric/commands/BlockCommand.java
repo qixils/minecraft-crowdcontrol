@@ -32,7 +32,7 @@ public class BlockCommand extends ImmediateCommand implements FeatureElementComm
 				plugin,
 				blockType,
 				"block_" + BuiltInRegistries.BLOCK.getKey(blockType).getPath(),
-				Component.translatable("cc.effect.block.name", blockType.getName())
+				Component.translatable("cc.effect.block.name", plugin.toAdventure(blockType.getName()))
 		);
 	}
 

@@ -33,7 +33,7 @@ public class PotionCommand extends TimedImmediateCommand {
 		this.potionEffectType = potionEffectType;
 		this.effectName = "potion_" + potionEffectType.unwrapKey().orElseThrow().location().getPath();
 		this.isMinimal = potionEffectType.value().isInstantenous();
-		this.displayName = Component.translatable("cc.effect.potion.name", potionEffectType.value().getDisplayName());
+		this.displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
 	}
 
 	public @NotNull Duration getDefaultDuration() {

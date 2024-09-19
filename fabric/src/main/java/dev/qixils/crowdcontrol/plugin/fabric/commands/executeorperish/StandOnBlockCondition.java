@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
+import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -25,7 +26,7 @@ public final class StandOnBlockCondition extends AbstractCondition {
 		this.blocks = List.of(blocks);
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.stand." + key,
-				blocks[0].getName().withStyle(ChatFormatting.GREEN)
+				FabricCrowdControlPlugin.getInstance().toAdventure(blocks[0].getName().withStyle(ChatFormatting.GREEN))
 		);
 	}
 

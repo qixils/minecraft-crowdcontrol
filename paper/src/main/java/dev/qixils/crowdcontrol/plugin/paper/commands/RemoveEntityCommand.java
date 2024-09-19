@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -56,6 +57,7 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 
 	@Override
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+		if (entityType == EntityType.ENDER_DRAGON && player.getWorld().getEnvironment() == World.Environment.THE_END) return false;
 		for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
 			entity.remove();
 			return true;

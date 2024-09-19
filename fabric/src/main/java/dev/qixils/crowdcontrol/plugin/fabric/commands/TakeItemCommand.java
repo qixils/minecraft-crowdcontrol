@@ -32,7 +32,7 @@ public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
 		super(plugin);
 		this.item = item;
 		this.effectName = "take_" + BuiltInRegistries.ITEM.getKey(item).getPath();
-		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", item.getName(new ItemStack(item)));
+		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", plugin.toAdventure(item.getName(new ItemStack(item))));
 	}
 
 	private boolean takeItemFrom(Player player, int amount) {

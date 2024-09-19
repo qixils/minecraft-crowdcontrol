@@ -43,6 +43,7 @@ public interface EntityCommand extends FeatureElementCommand {
 
 	@Override
 	default TriState isSelectable() {
+		// TODO: dragon check?
 		if (!isMonster())
 			return TriState.UNKNOWN;
 		if (!serverIsPeaceful())
@@ -51,18 +52,28 @@ public interface EntityCommand extends FeatureElementCommand {
 	}
 
 	default Response.@Nullable Builder tryExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+		Response.Builder error = null;
 		for (Player player : players) {
-			if (isMonster() && levelIsPeaceful(player.getWorld())) {
-				return request.buildResponse()
+			World world = player.getWorld();
+			if (isMonster() && levelIsPeaceful(world)) {
+				error = request.buildResponse()
 						.type(Response.ResultType.FAILURE)
 						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
 			}
-//			if (!isEnabled(((CraftWorld) player.getWorld()).getHandle().enabledFeatures())) {
-//				return request.buildResponse()
-//						.type(Response.ResultType.UNAVAILABLE)
-//						.message("Mob is not available in this version of Minecraft");
-//			}
+			else if (getEntityType() == EntityType.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END) {
+				error = request.buildResponse()
+					.type(Response.ResultType.FAILURE)
+					.message("Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
+			}
+			else if (!getEntityType().isEnabledByFeature(world)) {
+				error = request.buildResponse()
+						.type(Response.ResultType.UNAVAILABLE)
+						.message("Mob is not available in this version of Minecraft");
+			}
+			else {
+				return null;
+			}
 		}
-		return null;
+		return error;
 	}
 }

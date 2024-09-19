@@ -68,7 +68,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		super(plugin);
 		this.entityType = entityType;
 		this.effectName = "entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
-		this.displayName = Component.translatable("cc.effect.summon_entity.name", entityType.getDescription());
+		this.displayName = Component.translatable("cc.effect.summon_entity.name", plugin.toAdventure(entityType.getDescription()));
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<ArmorItem>> armor = new HashMap<>(4);
@@ -122,8 +122,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 
 		for (ServerPlayer player : players) {
 			try {
-				spawnEntity(name, player);
-				success = true;
+				success |= spawnEntity(name, player) != null;
 			} catch (Exception e) {
 				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
@@ -137,9 +136,12 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 	@Blocking
 	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
+		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return null;
+
 		E entity = entityType.create(player.serverLevel());
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
+
 		// set variables
 		entity.setPos(player.position());
 		if (viewer != null) {

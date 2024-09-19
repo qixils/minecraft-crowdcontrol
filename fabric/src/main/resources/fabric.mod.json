@@ -23,9 +23,6 @@
     "main": [
       "dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin"
     ],
-    "cardinal-components": [
-      "dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components"
-    ],
     "modmenu": [
       "dev.qixils.crowdcontrol.plugin.fabric.client.ModMenuIntegration"
     ]

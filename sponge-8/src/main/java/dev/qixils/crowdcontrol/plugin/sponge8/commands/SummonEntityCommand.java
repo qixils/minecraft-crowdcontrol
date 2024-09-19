@@ -18,6 +18,7 @@ import org.spongepowered.api.data.type.MooshroomTypes;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
@@ -28,6 +29,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroups;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.WorldTypes;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -105,8 +108,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				continue;
 
 			try {
-				spawnEntity(name, player);
-				victims++;
+				if (spawnEntity(name, player) != null)
+					victims++;
 			} catch (Exception e) {
 				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
@@ -120,8 +123,8 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 				continue;
 
 			try {
-				spawnEntity(name, player);
-				victims++;
+				if (spawnEntity(name, player) != null)
+					victims++;
 			} catch (Exception e) {
 				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
@@ -134,6 +137,9 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 
 	@Blocking
 	protected Entity spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
+		ServerWorld world = player.world();
+		if (entityType == EntityTypes.ENDER_DRAGON && world.worldType() == WorldTypes.THE_END.get()) return null;
+
 		Entity entity = player.world().createEntity(entityType, player.position());
 		// set variables
 		if (viewer != null) {

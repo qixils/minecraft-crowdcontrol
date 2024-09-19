@@ -39,6 +39,7 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 
 	@Override
 	default TriState isSelectable() {
+		// TODO: dragon check?
 		if (!isMonster())
 			return TriState.UNKNOWN;
 		if (!serverIsPeaceful())
@@ -47,18 +48,28 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 	}
 
 	default Response.@Nullable Builder tryExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+		Response.Builder error = null;
 		for (ServerPlayer player : players) {
-			if (isMonster() && levelIsPeaceful(player.serverLevel())) {
-				return request.buildResponse()
+			ServerLevel level = player.serverLevel();
+			if (isMonster() && levelIsPeaceful(level)) {
+				error = request.buildResponse()
 						.type(Response.ResultType.FAILURE)
 						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
 			}
-			if (!isEnabled(player.serverLevel().enabledFeatures())) {
-				return request.buildResponse()
+			else if (getEntityType() == EntityType.ENDER_DRAGON && level.getDragonFight() != null) {
+				error = request.buildResponse()
+					.type(Response.ResultType.FAILURE)
+					.message("Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
+			}
+			else if (!isEnabled(player.serverLevel().enabledFeatures())) {
+				error = request.buildResponse()
 						.type(Response.ResultType.UNAVAILABLE)
 						.message("Mob is not available in this version of Minecraft");
 			}
+			else {
+				return null;
+			}
 		}
-		return null;
+		return error;
 	}
 }

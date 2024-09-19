@@ -22,6 +22,7 @@ import org.spongepowered.api.data.type.RabbitTypes;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
@@ -32,6 +33,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.World;
 
 import java.util.*;
 
@@ -118,8 +121,8 @@ public class SummonEntityCommand extends ImmediateCommand implements EntityComma
 				continue;
 
 			try {
-				spawnEntity(name, player);
-				victims++;
+				if (spawnEntity(name, player) != null)
+					victims++;
 			} catch (Exception e) {
 				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
@@ -133,8 +136,8 @@ public class SummonEntityCommand extends ImmediateCommand implements EntityComma
 				continue;
 
 			try {
-				spawnEntity(name, player);
-				victims++;
+				if (spawnEntity(name, player) != null)
+					victims++;
 			} catch (Exception e) {
 				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
 			}
@@ -147,7 +150,11 @@ public class SummonEntityCommand extends ImmediateCommand implements EntityComma
 
 	@Blocking
 	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
+		World world = player.getWorld();
+		if (entityType == EntityTypes.ENDER_DRAGON && world.getDimension().getType() == DimensionTypes.THE_END) return null;
+
 		Entity entity = player.getLocation().createEntity(entityType);
+
 		// set variables
 		if (viewer != null) {
 			entity.offer(Keys.DISPLAY_NAME, plugin.getSpongeSerializer().serialize(GlobalTranslator.render(viewer, player.getLocale())));

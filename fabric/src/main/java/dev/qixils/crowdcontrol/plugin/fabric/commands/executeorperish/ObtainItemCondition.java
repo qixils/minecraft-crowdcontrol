@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
+import dev.qixils.crowdcontrol.plugin.fabric.FabricCrowdControlPlugin;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.ChatFormatting;
@@ -23,7 +24,7 @@ public final class ObtainItemCondition extends AbstractCondition {
 		this.stack = new ItemStack(item);
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.obtain." + key,
-				item.getName(stack).copy().withStyle(ChatFormatting.GREEN)
+				FabricCrowdControlPlugin.getInstance().toAdventure(item.getName(stack).copy().withStyle(ChatFormatting.GREEN))
 		);
 	}
 

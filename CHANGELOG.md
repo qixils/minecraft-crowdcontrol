@@ -5,7 +5,9 @@ A list of all changes made to the software in reverse chronological order.
 ## 3.6.3
 
 - Added _Curse of Vanishing_ enchantment to the item given by the _Water Bucket Clutch_ effect
+- Disabled ability to spawn or kill dragons in The End (to mitigate fight corruption issues)
 - Fixed the global effects warning message displaying to non-administrators
+- Fixed various mod incompatibility issues
 
 ## 3.6.2
 
