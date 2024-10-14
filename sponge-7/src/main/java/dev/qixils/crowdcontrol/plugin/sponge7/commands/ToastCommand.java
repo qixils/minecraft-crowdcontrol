@@ -5,7 +5,7 @@ import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.translation.GlobalTranslator;

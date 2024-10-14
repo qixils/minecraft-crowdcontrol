@@ -2,8 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.plugin.paper.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.attribute.Attribute;
@@ -19,7 +18,7 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.addModifi
 import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.removeModifier;
 
 @Getter
-public class PlayerSizeCommand extends TimedVoidCommand {
+public class PlayerSizeCommand extends VoidCommand implements TimedCommand<Player> {
 	private final Duration defaultDuration = Duration.ofSeconds(30);
 	private final String effectName;
 

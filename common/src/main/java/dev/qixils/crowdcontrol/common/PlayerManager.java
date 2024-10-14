@@ -1,16 +1,17 @@
 package dev.qixils.crowdcontrol.common;
 
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.CheckReturnValue;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Stream;
+
+import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
 
 /**
- * Maps a {@link Request} to the players that should receive it.
+ * Maps a {@link PublicEffectPayload} to the players that should receive it.
  *
  * @param <P> class used to represent online players
  */
@@ -26,14 +27,48 @@ public interface PlayerManager<P> {
 	Plugin<P, ?> getPlugin();
 
 	/**
-	 * Fetches all online players that should be affected by the provided {@link Request}.
+	 * Determines whether a player can have effects applied to them.
+	 *
+	 * @param player player to test
+	 * @param request initiating request for context
+	 * @return whether effects can be applied or not
+	 */
+	boolean canApply(@NotNull P player, @Nullable PublicEffectPayload request);
+
+	/**
+	 * Determines whether a player is a spectator.
+	 *
+	 * @param player player to test
+	 * @return player is spectator
+	 */
+	boolean isSpectator(@NotNull P player);
+
+	/**
+	 * Gets the raw list of players on the server, including spectators.
+	 *
+	 * @return full player list
+	 */
+	@CheckReturnValue
+	@NotNull
+	List<@NotNull P> getAllPlayersFull();
+
+	/**
+	 * Fetches all online players that should be affected by the provided {@link PublicEffectPayload}.
 	 *
 	 * @param request the request to be processed
 	 * @return a list of online players
 	 */
 	@CheckReturnValue
 	@NotNull
-	List<@NotNull P> getPlayers(final @NotNull Request request);
+	default Stream<@NotNull P> getPlayers(final @NotNull PublicEffectPayload request) {
+		if (getPlugin().isGlobal())
+			return getAllPlayers(request);
+
+		return stream(getPlugin().optionalCrowdControl())
+			.flatMap(cc -> cc.getPlayerIds(request.getTarget().getId()).stream())
+			.flatMap(uuid -> stream(getPlugin().playerMapper().getPlayer(uuid)))
+			.filter(player -> canApply(player, request));
+	}
 
 	/**
 	 * Fetches all online players that should be affected by global requests.
@@ -42,7 +77,9 @@ public interface PlayerManager<P> {
 	 */
 	@CheckReturnValue
 	@NotNull
-	List<@NotNull P> getAllPlayers();
+	default Stream<@NotNull P> getAllPlayers(@Nullable PublicEffectPayload request) {
+		return getAllPlayersFull().stream().filter(player -> canApply(player, request));
+	}
 
 	/**
 	 * Gets all the spectators in the server.
@@ -50,43 +87,7 @@ public interface PlayerManager<P> {
 	 * @return spectators
 	 */
 	@NotNull
-	Collection<@NotNull P> getSpectators();
-
-	/**
-	 * Links a stream account to a Minecraft account. Account links are not exclusive.
-	 *
-	 * @param uuid the UUID of the Minecraft account
-	 * @param username the streamer's username
-	 * @return whether a new link was created
-	 */
-	boolean linkPlayer(@NotNull UUID uuid, @NotNull String username);
-
-	/**
-	 * Unlinks a stream account from a Minecraft account.
-	 *
-	 * @param uuid the UUID of the Minecraft account
-	 * @param username the streamer's username
-	 * @return whether a link was deleted
-	 */
-	boolean unlinkPlayer(@NotNull UUID uuid, @NotNull String username);
-
-	/**
-	 * Returns the stream accounts linked to a Minecraft account.
-	 *
-	 * @param uuid the UUID of the Minecraft account
-	 * @return a collection of stream accounts
-	 */
-	@CheckReturnValue
-	@NotNull
-	Collection<@NotNull String> getLinkedAccounts(@NotNull UUID uuid);
-
-	/**
-	 * Returns the Minecraft accounts linked to a Target.
-	 *
-	 * @param target the target
-	 * @return a collection of Minecraft accounts
-	 */
-	@CheckReturnValue
-	@NotNull
-	Set<@NotNull UUID> getLinkedPlayers(Request.@NotNull Target target);
+	default Stream<@NotNull P> getSpectators() {
+		return getAllPlayersFull().stream().filter(this::isSpectator);
+	}
 }

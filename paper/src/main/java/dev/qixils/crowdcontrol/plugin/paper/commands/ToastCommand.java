@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;

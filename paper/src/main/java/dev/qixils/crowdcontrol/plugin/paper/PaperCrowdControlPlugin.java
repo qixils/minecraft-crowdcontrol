@@ -1,11 +1,10 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.*;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -16,6 +15,7 @@ import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import live.crowdcontrol.cc4j.CrowdControl;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -51,7 +51,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 
 @SuppressWarnings("UnstableApiUsage")
-public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSourceStack> {
+public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceStack> implements Listener {
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_MIN_VERSION = new SemVer(1, 20, 6);
 	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
@@ -80,6 +80,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final Class<Player> playerClass = Player.class;
 	@Getter
 	private final Class<CommandSourceStack> commandSenderClass = CommandSourceStack.class;
+	@Getter
+	private final JavaPlugin paperPlugin;
 	FileConfiguration config = getConfig();
 	// actual stuff
 	@Getter
@@ -127,6 +129,10 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	private final PluginChannel pluginChannel = new PluginChannel(this);
 	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	private final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
+
+	public PaperCrowdControlPlugin(@NotNull JavaPlugin paperPlugin) {
+		this.paperPlugin = paperPlugin;
+	}
 
 	@Override
 	public void onLoad() {
@@ -218,19 +224,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		if ("".equals(IP) || "null".equalsIgnoreCase(IP) || "127.0.0.1".equals(IP)) IP = null;
 		password = config.getString("password", password);
 		autoDetectIP = config.getBoolean("ip-detect", autoDetectIP);
-	}
-
-	public void initCrowdControl() {
-		loadConfig();
-
-		if (password == null || password.isEmpty()) { // TODO: allow empty password if CC allows it
-			LOGGER.error("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
-			return;
-		}
-		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
-
-		commandRegister().register();
-		postInitCrowdControl(crowdControl);
 	}
 
 	@Override
@@ -335,7 +328,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
-	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
+	public @NotNull MCCCPlayer getPlayer(@NotNull Player player) {
 		return new PaperPlayer(this, player);
 	}
 

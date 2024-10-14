@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.common.util.ComparableUtil;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,8 +27,7 @@ public class MovementStatusCommand extends TimedVoidCommand {
 	private final Duration defaultDuration;
 	private final MovementStatusType type;
 	private final MovementStatusValue value;
-	private final boolean clientOnly;
-	private final SemVer minimumModVersion;
+    private final SemVer minimumModVersion;
 
 	public MovementStatusCommand(ModdedCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatusType type, MovementStatusValue value, boolean clientOnly) {
 		super(plugin);

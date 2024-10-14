@@ -1,9 +1,9 @@
 package dev.qixils.crowdcontrol.common;
 
 import net.kyori.adventure.identity.Identity;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.CheckReturnValue;
 import java.net.InetAddress;
 import java.util.Optional;
 import java.util.UUID;

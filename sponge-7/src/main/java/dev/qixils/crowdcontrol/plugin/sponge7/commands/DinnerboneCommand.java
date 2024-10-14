@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 import dev.qixils.crowdcontrol.plugin.sponge7.Command;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.OriginalDisplayNameData;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;

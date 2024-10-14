@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.VoidCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.commands.LootboxCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;

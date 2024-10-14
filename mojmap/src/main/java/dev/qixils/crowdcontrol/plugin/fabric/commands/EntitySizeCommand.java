@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.server.MinecraftServer;

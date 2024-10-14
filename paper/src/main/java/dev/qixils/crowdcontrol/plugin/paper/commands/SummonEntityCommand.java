@@ -5,7 +5,7 @@ import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.plugin.paper.utils.RegistryUtil;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
 import io.papermc.paper.event.player.PlayerNameEntityEvent;

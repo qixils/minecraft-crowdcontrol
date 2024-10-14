@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;

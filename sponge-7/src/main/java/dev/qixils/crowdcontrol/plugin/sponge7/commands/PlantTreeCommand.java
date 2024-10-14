@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.common.util.CompletableFutureUtils;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.Command;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;

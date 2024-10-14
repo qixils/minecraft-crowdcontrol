@@ -3,8 +3,11 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.plugin.paper.FeatureElementCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -51,7 +54,7 @@ public class BlockCommand extends RegionalCommandSync implements FeatureElementC
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		Location location = getLocation(player);
 		if (location == null)
 			return false;
@@ -66,9 +69,7 @@ public class BlockCommand extends RegionalCommandSync implements FeatureElementC
 	}
 
 	@Override
-	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(Response.ResultType.RETRY)
-			.message("No available locations to set blocks");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No available locations to set blocks");
 	}
 }

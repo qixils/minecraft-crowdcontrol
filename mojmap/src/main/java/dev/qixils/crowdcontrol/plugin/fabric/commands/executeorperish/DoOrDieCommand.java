@@ -1,15 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
+import dev.qixils.crowdcontrol.plugin.fabric.Command;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.VoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Tick;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Data;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
@@ -21,13 +21,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 @EventListener
-public class DoOrDieCommand extends VoidCommand {
+public class DoOrDieCommand extends Command {
 	private final String effectName = "do_or_die";
 	private final List<Task> tasks = new ArrayList<>();
 
@@ -53,34 +54,25 @@ public class DoOrDieCommand extends VoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
-		new TimedEffect.Builder()
-				.request(request)
-				.duration(DO_OR_DIE_COOLDOWN)
-				.startCallback(effect -> {
-					List<ServerPlayer> players = plugin.getPlayers(request);
-					List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
-					Collections.shuffle(conditions, random);
-					SuccessCondition condition = conditions.stream()
-							.filter(cond -> cond.canApply(players))
-							.findAny()
-							.orElseThrow(() -> new IllegalStateException("Could not find a condition that can be applied to all targets"));
-					players.forEach(condition::track);
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		// TODO: cooldown
+		List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
+		Collections.shuffle(conditions, random);
+		SuccessCondition condition = conditions.stream()
+			.filter(cond -> cond.canApply(playerSupplier))
+			.findAny()
+			.orElseThrow(() -> new IllegalStateException("Could not find a condition that can be applied to all targets"));
+		playerSupplier.forEach(condition::track);
 
-					Task task = new Task(
-							plugin,
-							plugin.server().getTickCount(),
-							players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
-							condition,
-							condition.getComponent()
-					);
-					if (!task.run(null))
-						task.register();
-
-					announce(players, request);
-					return null;
-				})
-				.build().queue();
+		Task task = new Task(
+			plugin,
+			plugin.server().getTickCount(),
+			playerSupplier.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
+			condition,
+			condition.getComponent()
+		);
+		if (!task.run(null))
+			task.register();
 	}
 
 	@Data

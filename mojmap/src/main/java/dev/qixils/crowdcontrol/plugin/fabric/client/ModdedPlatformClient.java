@@ -31,8 +31,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static dev.qixils.crowdcontrol.common.Plugin.DEFAULT_PASSWORD;
-import static dev.qixils.crowdcontrol.common.Plugin.DEFAULT_PORT;
 import static net.minecraft.resources.ResourceLocation.withDefaultNamespace;
 
 @Environment(EnvType.CLIENT)
@@ -120,18 +118,6 @@ public abstract class ModdedPlatformClient implements ClientModInitializer {
 			.setSavingRunnable(plugin::saveConfig);
 		ConfigCategory category = builder.getOrCreateCategory(Component.translatable("config.crowdcontrol.category.general"));
 		ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-		category.addEntry(entryBuilder.startStrField(Component.translatable("config.crowdcontrol.password.name"), plugin.getPasswordOrEmpty())
-			.setDefaultValue(DEFAULT_PASSWORD)
-			.setTooltip(Component.translatable("config.crowdcontrol.password.description"))
-			.setSaveConsumer(plugin::setPassword)
-			.build());
-		category.addEntry(entryBuilder.startIntField(Component.translatable("config.crowdcontrol.port.name"), plugin.getPort())
-			.setDefaultValue(DEFAULT_PORT)
-			.setMin(0) // 0 is treated as a random port
-			.setMax(65535)
-			.setTooltip(Component.translatable("config.crowdcontrol.port.description"))
-			.setSaveConsumer(plugin::setPort)
-			.build());
 		category.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.crowdcontrol.announce.name"), plugin.announceEffects())
 			.setDefaultValue(true)
 			.setTooltip(Component.translatable("config.crowdcontrol.announce.description"))

@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.VoidCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.commands.LootboxCommand;
-import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;

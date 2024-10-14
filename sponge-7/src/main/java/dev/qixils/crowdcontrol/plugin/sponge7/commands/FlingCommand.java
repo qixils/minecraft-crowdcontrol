@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -14,8 +13,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.List;
-
-import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 
 @Getter
 @ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)

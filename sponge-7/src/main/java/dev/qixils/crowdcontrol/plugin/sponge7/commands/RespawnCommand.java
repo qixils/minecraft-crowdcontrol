@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 
 @Getter
 public class RespawnCommand extends ImmediateCommand {

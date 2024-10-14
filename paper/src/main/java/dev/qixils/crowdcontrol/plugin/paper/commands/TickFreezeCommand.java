@@ -3,8 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.plugin.paper.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -16,7 +15,7 @@ import java.util.List;
 
 @Global
 @Getter
-public class TickFreezeCommand extends TimedVoidCommand {
+public class TickFreezeCommand extends VoidCommand implements TimedCommand<Player> {
 	private final Duration defaultDuration = Duration.ofSeconds(20);
 	private final String effectName = "tick_freeze";
 

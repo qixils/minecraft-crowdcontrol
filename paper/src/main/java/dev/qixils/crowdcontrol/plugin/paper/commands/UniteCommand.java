@@ -1,9 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TriState;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Getter
-public class UniteCommand extends ImmediateCommand {
+public class UniteCommand extends Command implements dev.qixils.crowdcontrol.common.command.ImmediateCommand<Player> {
 	private final String effectName = "unite";
 
 	public UniteCommand(PaperCrowdControlPlugin plugin) {

@@ -5,7 +5,7 @@ import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
@@ -155,7 +155,7 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 		if (entity instanceof Boat boat)
 			boat.setVariant(randomElementFrom(Boat.Type.values()));
 		if (entity instanceof Wolf wolf) {
-			wolf.setCollarColor(randomElementFrom(DyeColor.values()));
+			wolf.setCollarColor(randomElementFrom(DyeColor.values())); // TODO: crash
 			wolf.setVariant(randomElementFrom(level.registryAccess().registryOrThrow(Registries.WOLF_VARIANT).holders()));
 		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)

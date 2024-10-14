@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.plugin.fabric.Command;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;

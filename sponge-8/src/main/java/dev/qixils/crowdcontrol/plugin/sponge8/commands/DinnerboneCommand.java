@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 
 import dev.qixils.crowdcontrol.plugin.sponge8.Command;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response.Builder;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;

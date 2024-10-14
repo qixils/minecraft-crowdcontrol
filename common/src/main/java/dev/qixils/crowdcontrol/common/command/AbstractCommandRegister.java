@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.command.impl.AllCommand;
 import dev.qixils.crowdcontrol.common.command.impl.HalfHealthCommand;
 import dev.qixils.crowdcontrol.common.command.impl.HealthModifierCommand;
 import dev.qixils.crowdcontrol.common.command.impl.exp.ExpAddCommand;
@@ -89,7 +88,6 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 
 	protected void createCommands(List<Command<PLAYER>> commands) {
 		commands.addAll(this.<Command<PLAYER>>initAll(
-			() -> new AllCommand<>(plugin),
 			() -> new HalfHealthCommand<>(plugin),
 			() -> new MaxHealthSubCommand<>(plugin),
 			() -> new MaxHealthAddCommand<>(plugin),
@@ -119,8 +117,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		List<Command<PLAYER>> commands = new ArrayList<>();
 		createCommands(commands);
 		for (Command<PLAYER> command : commands) {
-			String effectName = command.getEffectName();
-			if (effectName != null) effectName = effectName.toLowerCase(Locale.ENGLISH);
+			String effectName = command.getEffectName().toLowerCase(Locale.ENGLISH);
 			registeredCommandMap.put(effectName, command);
 
 			//noinspection unchecked
@@ -152,8 +149,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	public final void register() {
 		boolean firstRegistry = registeredCommands == null;
 		for (Command<PLAYER> command : getCommands()) {
-			String name = command.getEffectName();
-			if (name != null) name = name.toLowerCase(Locale.ENGLISH);
+			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
 			plugin.registerCommand(name, command);
 
 			if (firstRegistry && command.isEventListener()) {

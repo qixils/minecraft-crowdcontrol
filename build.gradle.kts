@@ -49,6 +49,7 @@ subprojects {
                 name = "Jitpack"
             }
         }
+        mavenLocal()
     }
 
     dependencies {

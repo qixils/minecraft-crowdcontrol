@@ -4,7 +4,6 @@ import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;

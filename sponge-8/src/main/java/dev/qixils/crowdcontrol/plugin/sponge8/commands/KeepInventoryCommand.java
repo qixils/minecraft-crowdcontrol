@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.sponge8.commands;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Respondable;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;

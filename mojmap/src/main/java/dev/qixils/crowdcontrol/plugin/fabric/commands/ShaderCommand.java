@@ -5,7 +5,7 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.TimedImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

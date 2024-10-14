@@ -1,9 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
@@ -18,11 +21,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.toPlayers;
 
 @Getter
-public class GameModeCommand extends TimedVoidCommand {
+public class GameModeCommand extends Command implements CCTimedEffect {
+	private final Map<UUID, List<UUID>> activeRequests = new HashMap<>();
 	private final Duration defaultDuration;
 	private final GameMode gamemode;
 	private final Component displayName;
@@ -31,7 +40,7 @@ public class GameModeCommand extends TimedVoidCommand {
 
 	public GameModeCommand(PaperCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
 		super(plugin);
-		this.gamemodeKey = getGamemodeKey(plugin);
+		this.gamemodeKey = getGamemodeKey(plugin.getPaperPlugin());
 		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
 		this.displayName = Component.translatable(gamemode);
@@ -52,32 +61,24 @@ public class GameModeCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		List<Player> players = new ArrayList<>();
-
-		new TimedEffect.Builder()
-				.request(request)
-				.effectGroup("gamemode")
-				.duration(getDuration(request))
-				.startCallback($ -> {
-					List<Player> curPlayers = plugin.getPlayers(request);
-					players.addAll(curPlayers);
-					setGameMode(request, curPlayers, gamemode);
-					return null;
-				})
-				.completionCallback($ -> setGameMode(null, players, GameMode.SURVIVAL))
-				.build().queue();
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		activeRequests.put(request.getRequestId(), playerSupplier.stream().map(Player::getUniqueId).toList());
+		setGameMode(playerSupplier, gamemode, true);
+		ccPlayer.sendResponse(new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L));
 	}
 
-	private void setGameMode(@Nullable Request request,
-							 @NotNull List<@NotNull Player> players,
-							 @NotNull GameMode gamemode) {
-		players.forEach(player -> player.getScheduler().run(plugin, $ -> {
+	@Override
+	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		List<Player> players = toPlayers(activeRequests.remove(request.getRequestId()));
+		setGameMode(players, GameMode.SURVIVAL, false);
+	}
+
+	private void setGameMode(@NotNull List<@NotNull Player> players,
+							 @NotNull GameMode gamemode,
+							 boolean enabling) {
+		players.forEach(player -> player.getScheduler().run(plugin.getPaperPlugin(), $ -> {
 			player.setGameMode(gamemode);
-			player.getPersistentDataContainer().set(gamemodeKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, request != null);
-			if (request != null) {
-				announce(players, request);
-			}
+			player.getPersistentDataContainer().set(gamemodeKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, enabling);
 		}, null));
 	}
 

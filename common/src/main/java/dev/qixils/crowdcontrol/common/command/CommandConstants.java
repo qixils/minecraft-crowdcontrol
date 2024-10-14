@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.common.command;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.KeyedTag;
 import dev.qixils.crowdcontrol.common.util.Weighted;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
@@ -563,7 +563,7 @@ public class CommandConstants {
 	 * @param request request that caused the execution of the lootbox command
 	 * @return text component for the inventory title
 	 */
-	public static Component buildLootboxTitle(@NotNull Plugin<?, ?> plugin, @NotNull Request request) {
+	public static Component buildLootboxTitle(@NotNull Plugin<?, ?> plugin, @NotNull PublicEffectPayload request) {
 		return Component.translatable(
 			"cc.effect.lootbox.title",
 			plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR)
@@ -577,7 +577,7 @@ public class CommandConstants {
 	 * @param request request that caused the execution of the lootbox command
 	 * @return text component for the item's lore
 	 */
-	public static Component buildLootboxLore(@NotNull Plugin<?, ?> plugin, @NotNull Request request) {
+	public static Component buildLootboxLore(@NotNull Plugin<?, ?> plugin, @NotNull PublicEffectPayload request) {
 		return Component.translatable(
 			"cc.effect.lootbox.lore",
 			plugin.getViewerComponent(request, false).color(Plugin.USER_COLOR).decorate(TextDecoration.ITALIC)

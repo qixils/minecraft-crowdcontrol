@@ -3,8 +3,11 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.paper.FeatureElementCommand;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -50,18 +53,14 @@ public interface EntityCommand extends FeatureElementCommand {
 		return TriState.FALSE;
 	}
 
-	default Response.@Nullable Builder tryExecute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	default @Nullable CCEffectResponse tryExecute(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		for (Player player : players) {
 			if (isMonster() && levelIsPeaceful(player.getWorld())) {
-				return request.buildResponse()
-						.type(Response.ResultType.FAILURE)
-						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
 			}
-//			if (!isEnabled(((CraftWorld) player.getWorld()).getHandle().enabledFeatures())) {
-//				return request.buildResponse()
-//						.type(Response.ResultType.UNAVAILABLE)
-//						.message("Mob is not available in this version of Minecraft");
-//			}
+			if (!isFeatureEnabled(player.getWorld())) {
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
+			}
 		}
 		return null;
 	}

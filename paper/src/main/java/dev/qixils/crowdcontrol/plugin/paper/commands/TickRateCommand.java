@@ -3,8 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.plugin.paper.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -16,7 +15,7 @@ import java.util.List;
 
 @Global
 @Getter
-public class TickRateCommand extends TimedVoidCommand {
+public class TickRateCommand extends VoidCommand implements TimedCommand<Player> {
 	private static final float RATE = 20f;
 	private final Duration defaultDuration = Duration.ofSeconds(20);
 	private final String effectName;

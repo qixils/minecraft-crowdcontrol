@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -16,8 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-
-import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 
 @Getter
 public class RespawnCommand extends RegionalCommand {

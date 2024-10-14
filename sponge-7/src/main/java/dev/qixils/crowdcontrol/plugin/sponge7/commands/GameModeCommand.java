@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.GameModeEffectData;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
-import dev.qixils.crowdcontrol.socket.Request;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;

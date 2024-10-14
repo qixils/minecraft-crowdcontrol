@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.plugin.sponge8.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge8.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.TypedTag;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

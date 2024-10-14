@@ -7,7 +7,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.core.registries.BuiltInRegistries;

@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.configurate;
 
-import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.SoftLockConfig;
-import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -13,16 +13,18 @@ import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
 
-import javax.annotation.CheckReturnValue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 
-public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.common.AbstractPlugin<P, S> {
+public abstract class ConfiguratePlugin<P, S> extends Plugin<P, S> {
+
+	protected @NotNull Path dataFolder = Paths.get("config", "CrowdControlData");
 
 	public ConfiguratePlugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		super(playerClass, commandSenderClass);
@@ -74,12 +76,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		// misc
 		global = config.node("global").getBoolean(global);
 		announce = config.node("announce").getBoolean(announce);
-		adminRequired = config.node("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
-		IP = config.node("ip").getString(ExceptionUtil.validateNotNullElse(IP, ""));
-		if ("".equals(IP) || "null".equalsIgnoreCase(IP) || "127.0.0.1".equals(IP)) IP = null;
-		port = config.node("port").getInt(port);
-		password = config.node("password").getString(password);
 		autoDetectIP = config.node("ip-detect").getBoolean(autoDetectIP);
 	}
 
@@ -95,11 +92,7 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 			config.node("limits", "entities").set(limitToken, limitConfig.entityLimits());
 			config.node("global").set(global);
 			config.node("announce").set(announce);
-			config.node("admin-required").set(adminRequired);
 			config.node("hide-names").set(hideNames.getConfigCode());
-			config.node("ip").set(IP);
-			config.node("port").set(port);
-			config.node("password").set(password);
 			config.node("ip-detect").set(autoDetectIP);
 			getConfigLoader().save(config);
 		} catch (ConfigurateException e) {
@@ -107,18 +100,10 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		}
 	}
 
-	@Override
-	public void initCrowdControl() {
-		loadConfig();
-
-		if (password == null || password.isEmpty()) { // TODO: allow empty password if CC allows it
-			getSLF4JLogger().error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
-			return;
-		}
-		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
-
-		commandRegister().register();
-		postInitCrowdControl(crowdControl);
+	protected @NotNull Path fixConfigDirectory(@NotNull Path configDirectory) {
+		if (configDirectory.getFileName().toString().equals("crowdcontrol.conf"))
+			configDirectory = configDirectory.getParent();
+		return configDirectory;
 	}
 
 	/**
@@ -130,8 +115,8 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 	 */
 	@CheckReturnValue
 	protected HoconConfigurationLoader createConfigLoader(@NotNull Path configDirectory) throws IllegalStateException {
-		if (configDirectory.getFileName().toString().equals("crowdcontrol.conf"))
-			configDirectory = configDirectory.getParent();
+		configDirectory = fixConfigDirectory(configDirectory);
+		dataFolder = configDirectory.resolve("CrowdControlData");
 
 		if (!Files.exists(configDirectory)) {
 			try {
@@ -166,5 +151,10 @@ public abstract class ConfiguratePlugin<P, S> extends dev.qixils.crowdcontrol.co
 		}
 
 		return HoconConfigurationLoader.builder().path(configPath).build();
+	}
+
+	@Override
+	public @NotNull Path getDataFolder() {
+		return dataFolder;
 	}
 }

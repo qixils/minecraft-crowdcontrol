@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.sponge7.mc;
 
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 
-public class SpongePlayer extends SpongeLivingEntity implements CCPlayer {
+public class SpongePlayer extends SpongeLivingEntity implements MCCCPlayer {
 
 	public SpongePlayer(Player player) {
 		super(player);

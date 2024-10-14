@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
@@ -158,7 +158,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	}
 
 	@Override
-	public @NotNull CCPlayer getPlayer(@NotNull ServerPlayer player) {
+	public @NotNull MCCCPlayer getPlayer(@NotNull ServerPlayer player) {
 		return new FabricPlayer(player);
 	}
 

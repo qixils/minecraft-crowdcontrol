@@ -6,7 +6,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Tick;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;

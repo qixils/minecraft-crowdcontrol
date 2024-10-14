@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.plugin.sponge8.utils.SpongeUtil;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Request.Target;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

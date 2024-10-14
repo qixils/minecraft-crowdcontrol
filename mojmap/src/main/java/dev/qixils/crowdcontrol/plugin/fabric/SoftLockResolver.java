@@ -16,11 +16,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.List;
 
-@ParametersAreNonnullByDefault
 public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 
 	private final @NotNull Collection<Block> dangerousBlocks = List.of(

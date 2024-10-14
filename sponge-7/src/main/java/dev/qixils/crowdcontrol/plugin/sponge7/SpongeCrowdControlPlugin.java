@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.plugin.sponge7.data.entity.*;
 import dev.qixils.crowdcontrol.plugin.sponge7.mc.SpongePlayer;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
@@ -71,6 +71,7 @@ import java.util.*;
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 
+@SuppressWarnings("UnstableApiUsage")
 @Plugin(
 		id = "crowdcontrol",
 		name = "Crowd Control",
@@ -79,7 +80,7 @@ import static net.kyori.adventure.key.Key.MINECRAFT_NAMESPACE;
 		authors = {"qixils"}
 )
 @Getter
-public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSource> {
+public class SpongeCrowdControlPlugin extends dev.qixils.crowdcontrol.common.Plugin<Player, CommandSource> {
 	// keys (though they don't really work)
 	public static Key<Value<Text>> ORIGINAL_DISPLAY_NAME = DummyObjectProvider.createExtendedFor(Key.class, "ORIGINAL_DISPLAY_NAME");
 	public static Key<Value<Boolean>> VIEWER_SPAWNED = DummyObjectProvider.createExtendedFor(Key.class, "VIEWER_SPAWNED");
@@ -308,28 +309,8 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 		// misc
 		global = config.getNode("global").getBoolean(global);
 		announce = config.getNode("announce").getBoolean(announce);
-		adminRequired = config.getNode("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.getNode("hide-names").getString(hideNames.getConfigCode()));
-		IP = config.getNode("ip").getString(IP);
-		if ("".equals(IP) || "null".equalsIgnoreCase(IP) || "127.0.0.1".equals(IP)) IP = null;
-		port = config.getNode("port").getInt(port);
-		password = config.getNode("password").getString(password);
 		autoDetectIP = config.getNode("ip-detect").getBoolean(autoDetectIP);
-	}
-
-	@Override
-	public void initCrowdControl() {
-		loadConfig();
-
-		if (password == null || password.isEmpty()) {
-			logger.error("No password has been set in the plugin's config file. Please set one by editing config/crowdcontrol.conf or set a temporary password using the /password command.");
-			return;
-		}
-		getSLF4JLogger().info("Starting server on {}:{} with password {}", IP, port, password);
-		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
-
-		commandRegister.register();
-		postInitCrowdControl(crowdControl);
 	}
 
 	@SneakyThrows(IOException.class)
@@ -363,10 +344,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 
 	@Listener
 	public void onServerStop(GameStoppingServerEvent event) {
-		if (crowdControl != null) {
-			crowdControl.shutdown("Minecraft server is shutting down");
-			crowdControl = null;
-		}
+		destroyCrowdControl();
 	}
 
 	@Listener
@@ -384,7 +362,7 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 	}
 
 	@Override
-	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
+	public @NotNull MCCCPlayer getPlayer(@NotNull Player player) {
 		return new SpongePlayer(player);
 	}
 
@@ -396,5 +374,10 @@ public class SpongeCrowdControlPlugin extends AbstractPlugin<Player, CommandSour
 			"Sponge", // TODO?
 			null // TODO?
 		);
+	}
+
+	@Override
+	public @NotNull Path getDataFolder() {
+		return configPath.getParent().resolve("CrowdControlData");
 	}
 }

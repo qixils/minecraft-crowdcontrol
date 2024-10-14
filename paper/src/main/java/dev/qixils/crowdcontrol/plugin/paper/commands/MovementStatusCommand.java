@@ -8,8 +8,7 @@ import dev.qixils.crowdcontrol.common.packets.MovementStatusPacketS2C;
 import dev.qixils.crowdcontrol.common.util.ComparableUtil;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import dev.qixils.crowdcontrol.plugin.paper.VoidCommand;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;
@@ -26,14 +25,13 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.DISABLE_JU
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.INVERT_CONTROLS_DURATION;
 
 @Getter
-public class MovementStatusCommand extends TimedVoidCommand {
+public class MovementStatusCommand extends VoidCommand implements TimedCommand<Player> {
 	private final String effectName;
 	private final String effectGroup;
 	private final Duration defaultDuration;
 	private final MovementStatusType type;
 	private final MovementStatusValue value;
-	private final boolean clientOnly;
-	private final SemVer minimumModVersion;
+    private final SemVer minimumModVersion;
 
 	public MovementStatusCommand(PaperCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatusType type, MovementStatusValue value, boolean clientOnly) {
 		super(plugin);

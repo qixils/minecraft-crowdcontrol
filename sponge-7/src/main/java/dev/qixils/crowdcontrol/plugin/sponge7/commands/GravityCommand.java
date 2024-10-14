@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +15,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
 
 @Getter

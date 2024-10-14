@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.sponge7.commands;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

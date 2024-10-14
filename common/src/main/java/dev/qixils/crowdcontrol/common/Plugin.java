@@ -1,21 +1,26 @@
 package dev.qixils.crowdcontrol.common;
 
-import dev.qixils.crowdcontrol.CrowdControl;
+import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Respondable;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.PacketType;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
-import dev.qixils.crowdcontrol.socket.SocketManager;
+import live.crowdcontrol.cc4j.CCEventType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CrowdControl;
+import live.crowdcontrol.cc4j.websocket.UserToken;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
+import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
+import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.CCUserRecord;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
+import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -28,32 +33,27 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import org.incendo.cloud.Command.Builder;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
-import org.incendo.cloud.parser.standard.StringParser;
-import org.incendo.cloud.parser.standard.StringParser.StringMode;
 import org.incendo.cloud.permission.PredicatePermission;
-import org.incendo.cloud.suggestion.Suggestion;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.CheckReturnValue;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
+import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static org.incendo.cloud.description.Description.description;
-import static org.incendo.cloud.suggestion.Suggestion.suggestion;
 
 /**
  * The main class used by a Crowd Control implementation which defines numerous methods for
@@ -62,77 +62,77 @@ import static org.incendo.cloud.suggestion.Suggestion.suggestion;
  * @param <P> class used to represent online players
  * @param <S> class used to represent command senders in Cloud Command Framework
  */
-public interface Plugin<P, S> {
+public abstract class Plugin<P, S> {
 
 	/**
 	 * The color to use for basic messages rendered to players when joining the server.
 	 */
-	TextColor JOIN_MESSAGE_COLOR = TextColor.color(0xFCE9D4);
+	public static final TextColor JOIN_MESSAGE_COLOR = TextColor.color(0xFCE9D4);
 
 	/**
 	 * Text color to use for usernames.
 	 */
-	TextColor USER_COLOR = TextColor.color(0x9f44db);
+	public static final TextColor USER_COLOR = TextColor.color(0x9f44db);
 
 	/**
 	 * Text color to use for command names.
 	 */
-	TextColor CMD_COLOR = TextColor.color(0xb15be3);
+	public static final TextColor CMD_COLOR = TextColor.color(0xb15be3);
 
 	/**
 	 * A less saturated version of {@link #CMD_COLOR}.
 	 */
-	TextColor DIM_CMD_COLOR = TextColor.color(0xA982C2);
+	public static final TextColor DIM_CMD_COLOR = TextColor.color(0xA982C2);
 
 	/**
 	 * The color used for displaying error messages on join.
 	 */
-	TextColor _ERROR_COLOR = TextColor.color(0xF78080);
+	public static final TextColor _ERROR_COLOR = TextColor.color(0xF78080);
 
 	/**
 	 * The prefix to use in command output.
 	 */
-	String PREFIX = "CrowdControl";
+	public static final String PREFIX = "CrowdControl";
 
 	/**
 	 * The mod ID / namespace to use in {@link net.kyori.adventure.key.Key Key}s.
 	 */
-	String NAMESPACE = "crowdcontrol";
+	public static final String NAMESPACE = "crowdcontrol";
 
 	/**
 	 * Key for the Version Request packet.
 	 */
-	Key VERSION_REQUEST_KEY = Key.key(NAMESPACE, "version-request");
+	public static final Key VERSION_REQUEST_KEY = Key.key(NAMESPACE, "version-request");
 
 	/**
 	 * Key for the Version Response packet.
 	 */
-	Key VERSION_RESPONSE_KEY = Key.key(NAMESPACE, "version-response");
+	public static final Key VERSION_RESPONSE_KEY = Key.key(NAMESPACE, "version-response");
 
 	/**
 	 * Key for the Shader packet.
 	 */
-	Key SHADER_KEY = Key.key(NAMESPACE, "shader");
+	public static final Key SHADER_KEY = Key.key(NAMESPACE, "shader");
 
 	/**
 	 * Key for the Movement Status packet.
 	 */
-	Key MOVEMENT_STATUS_KEY = Key.key(NAMESPACE, "movement-status");
+	public static final Key MOVEMENT_STATUS_KEY = Key.key(NAMESPACE, "movement-status");
 
 	/**
 	 * Key for the Extra Features packet.
 	 */
-	Key EXTRA_FEATURE_KEY = Key.key(NAMESPACE, "extra-feature");
+	public static final Key EXTRA_FEATURE_KEY = Key.key(NAMESPACE, "extra-feature");
 
 	/**
 	 * Key for the Set Language packet.
 	 */
-	Key SET_LANGUAGE_KEY = Key.key(NAMESPACE, "set-language");
+	public static final Key SET_LANGUAGE_KEY = Key.key(NAMESPACE, "set-language");
 
 	/**
 	 * The prefix to use in command output as a {@link Component}.
 	 */
-	Component PREFIX_COMPONENT = text()
+	public static final Component PREFIX_COMPONENT = text()
 		.append(text('[', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
 		.append(text(PREFIX, NamedTextColor.YELLOW))
 		.append(text(']', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
@@ -142,12 +142,12 @@ public interface Plugin<P, S> {
 	/**
 	 * The default name of a viewer.
 	 */
-	Component VIEWER_NAME = translatable("cc.effect.viewer");
+	public static final Component VIEWER_NAME = translatable("cc.effect.viewer");
 
 	/**
 	 * The permission node required to receive effects.
 	 */
-	PermissionWrapper USE_PERMISSION = PermissionWrapper.builder()
+	public static final PermissionWrapper USE_PERMISSION = PermissionWrapper.builder()
 		.node("crowdcontrol.use")
 		.description("Whether a player is allowed to receive effects")
 		.defaultPermission(PermissionWrapper.DefaultPermission.ALL)
@@ -156,21 +156,11 @@ public interface Plugin<P, S> {
 	/**
 	 * The permission node required to use administrative commands.
 	 */
-	PermissionWrapper ADMIN_PERMISSION = PermissionWrapper.builder()
+	public static final PermissionWrapper ADMIN_PERMISSION = PermissionWrapper.builder()
 		.node("crowdcontrol.admin")
 		.description("Whether a player is allowed to use administrative commands")
 		.defaultPermission(PermissionWrapper.DefaultPermission.OP)
 		.build();
-
-	/**
-	 * Port that the {@link CrowdControl} service connects to or listen on.
-	 */
-	int DEFAULT_PORT = 58431;
-
-	/**
-	 * Default password that clients must enter to connect to the {@link CrowdControl} service.
-	 */
-	String DEFAULT_PASSWORD = "crowdcontrol";
 
 	/**
 	 * Formats the provided text as an error message.
@@ -178,7 +168,7 @@ public interface Plugin<P, S> {
 	 * @param text text to format
 	 * @return formatted text
 	 */
-	static @NotNull Component error(@NotNull Component text) {
+	public static @NotNull Component error(@NotNull Component text) {
 		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
 			text = text.decoration(TextDecoration.BOLD, false);
 		return translatable(
@@ -195,7 +185,7 @@ public interface Plugin<P, S> {
 	 * @param text text to format
 	 * @return formatted text
 	 */
-	static @NotNull Component warning(@NotNull Component text) {
+	public static @NotNull Component warning(@NotNull Component text) {
 		if (text.decoration(TextDecoration.BOLD) == TextDecoration.State.NOT_SET)
 			text = text.decoration(TextDecoration.BOLD, false);
 		return translatable(
@@ -212,14 +202,14 @@ public interface Plugin<P, S> {
 	 * @param text text to format
 	 * @return formatted text
 	 */
-	static @NotNull Component output(@NotNull Component text) {
+	public static @NotNull Component output(@NotNull Component text) {
 		return PREFIX_COMPONENT.append(text);
 	}
 
 	/**
 	 * The message to send to a player when they join the server.
 	 */
-	Component JOIN_MESSAGE_1 = translatable(
+	public static final Component JOIN_MESSAGE = translatable(
 		"cc.join.info",
 		JOIN_MESSAGE_COLOR,
 		// TODO: move these args back into the i18n file?
@@ -234,52 +224,276 @@ public interface Plugin<P, S> {
 	/**
 	 * A warning message sent to players when they join the server if they have no stream account linked.
 	 */
-	Component JOIN_MESSAGE_2 = translatable(
+	public static final Component LINK_MESSAGE = translatable(
 		"cc.join.link.text",
 		TextColor.color(0xF1D4FC)
 	)
-		.hoverEvent(translatable("cc.join.link.hover"))
-		.clickEvent(ClickEvent.suggestCommand("/account link "));
+		.hoverEvent(translatable("cc.join.link.hover"));
 
 	/**
 	 * A warning message sent to players when they join the server if global effects are
 	 * completely unavailable.
 	 */
-	Component NO_GLOBAL_EFFECTS_MESSAGE = warning(translatable(
+	public static final Component NO_GLOBAL_EFFECTS_MESSAGE = warning(translatable(
 		"cc.error.no-global-effects",
 		text("global", TextColor.color(0xF9AD9E)),
 		text("true", TextColor.color(0xF9AD9E)),
 		text("hosts", TextColor.color(0xF9AD9E))
 	));
 
-	/**
-	 * Error message displayed to non-admins when the service is not enabled.
-	 */
-	Component NO_CC_USER_ERROR = translatable(
-		"cc.error.prefix.critical",
-		NamedTextColor.RED,
-		translatable(
-			"cc.error.user-error",
-			_ERROR_COLOR
-		)
-	);
+	@NotNull
+	protected final Class<P> playerClass;
+	@NotNull
+	protected final Class<S> commandSenderClass;
+	@Nullable
+	protected CrowdControl crowdControl = null;
+	protected boolean global = false;
+	protected boolean announce = true;
+	@Getter
+	protected boolean autoDetectIP = true;
+	@NotNull
+	protected HideNames hideNames = HideNames.NONE;
+	@NotNull
+	protected Collection<String> hosts = Collections.emptySet();
+	@NotNull
+	protected LimitConfig limitConfig = new LimitConfig();
+	@NotNull
+	protected SoftLockConfig softLockConfig = new SoftLockConfig();
+	@NotNull
+	protected final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
+	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
+	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
+
+	protected Plugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
+		this.playerClass = playerClass;
+		this.commandSenderClass = commandSenderClass;
+	}
 
 	/**
-	 * Error message displayed to admins when the password is not set.
+	 * Gets the {@link CrowdControl} instance.
+	 *
+	 * @return crowd control instance
 	 */
-	Component NO_CC_OP_ERROR_NO_PASSWORD = warning(translatable(
-			"cc.error.no-password.text",
-			text("/password <password>", NamedTextColor.GOLD),
-			text("/crowdcontrol reconnect", NamedTextColor.GOLD)
-		)
-			.clickEvent(ClickEvent.suggestCommand("/password "))
-			.hoverEvent(translatable("cc.error.no-password.hover"))
-	);
+	@Nullable
+	@CheckReturnValue
+	public CrowdControl getCrowdControl() {
+		return crowdControl;
+	}
 
 	/**
-	 * Error message displayed to admins when the error is unknown.
+	 * Gets the player class utilized by this implementation.
+	 *
+	 * @return player class
 	 */
-	Component NO_CC_UNKNOWN_ERROR = error(translatable("cc.error.unknown"));
+	@NotNull
+	@CheckReturnValue
+	public Class<P> getPlayerClass() {
+		return playerClass;
+	}
+
+	/**
+	 * Gets the command sender class utilized by this implementation.
+	 *
+	 * @return command sender class
+	 */
+	@NotNull
+	@CheckReturnValue
+	public Class<S> getCommandSenderClass() {
+		return commandSenderClass;
+	}
+
+	/**
+	 * Fetches the config variable which determines if all requests should be treated as global.
+	 *
+	 * @return true if all requests should be treated as global
+	 */
+	@CheckReturnValue
+	public boolean isGlobal() {
+		return global;
+	}
+
+	/**
+	 * Returns a collection of strings representing the names of hosts.
+	 * <p>
+	 * "Hosts" are defined as streamers whose incoming requests should apply to all online players
+	 * instead of just that streamer.
+	 *
+	 * @return a collection of strings possibly containing stream usernames, IDs, Minecraft
+	 * usernames, or Minecraft UUIDs
+	 */
+	@CheckReturnValue
+	@NotNull
+	public Collection<String> getHosts() {
+		return hosts;
+	}
+
+	/**
+	 * Whether to announce the execution of effects in chat.
+	 *
+	 * @return true if the plugin should announce the execution of effects in chat
+	 */
+	@CheckReturnValue
+	public boolean announceEffects() {
+		return announce;
+	}
+
+	/**
+	 * Sets whether to announce the execution of effects in chat.
+	 *
+	 * @param announceEffects true if the plugin should announce the execution of effects in chat
+	 */
+	public void setAnnounceEffects(boolean announceEffects) {
+		this.announce = announceEffects;
+	}
+
+	/**
+	 * Gets the {@link ScheduledExecutorService} used by the plugin.
+	 *
+	 * @return the executor service
+	 */
+	@NotNull
+	public ScheduledExecutorService getScheduledExecutor() {
+		return scheduledExecutor;
+	}
+
+	/**
+	 * Gets the {@link HideNames} config.
+	 *
+	 * @return hide names config
+	 */
+	@NotNull
+	public HideNames getHideNames() {
+		return hideNames;
+	}
+
+	/**
+	 * Sets the {@link HideNames} config.
+	 *
+	 * @param hideNames hide names config
+	 */
+	public void setHideNames(@NotNull HideNames hideNames) {
+		this.hideNames = hideNames;
+	}
+
+	/**
+	 * Gets the plugin's {@link LimitConfig}.
+	 *
+	 * @return limit config parsed from the plugin's config file
+	 */
+	@NotNull
+	public LimitConfig getLimitConfig() {
+		return limitConfig;
+	}
+
+	/**
+	 * Gets the plugin's {@link SoftLockConfig}.
+	 *
+	 * @return soft-lock config parsed from the plugin's config file
+	 */
+	@NotNull
+	public SoftLockConfig getSoftLockConfig() {
+		return softLockConfig;
+	}
+
+	/**
+	 * Gets the {@link EntityMapper} for this implementation's player object.
+	 *
+	 * @return player entity mapper
+	 */
+	public abstract PlayerEntityMapper<P> playerMapper();
+
+	/**
+	 * Gets the {@link EntityMapper} for this implementation's command sender object.
+	 *
+	 * @return command sender mapper
+	 */
+	public abstract EntityMapper<S> commandSenderMapper();
+
+	/**
+	 * Gets the object that maps {@link PublicEffectPayload}s to the players it should affect.
+	 *
+	 * @return mapper object
+	 */
+	@NotNull
+	@CheckReturnValue
+	public abstract PlayerManager<P> getPlayerManager();
+
+	/**
+	 * Returns the plugin's text utility class.
+	 */
+	@CheckReturnValue
+	@NotNull
+	public abstract TextUtil getTextUtil();
+
+	/**
+	 * Returns the object that manages the registering of effects/commands.
+	 * Not to be confused with the {@link #getCommandManager() chat command manager}.
+	 *
+	 * @return command registry manager
+	 */
+	@NotNull
+	public abstract AbstractCommandRegister<P, ?> commandRegister();
+
+	public abstract @NotNull Path getDataFolder();
+
+	/**
+	 * Gets the plugin's {@link CommandManager}.
+	 *
+	 * @return command manager instance
+	 */
+	@Nullable
+	@CheckReturnValue
+	public abstract CommandManager<S> getCommandManager();
+
+	/**
+	 * Gets the plugin's SLF4J logger.
+	 *
+	 * @return slf4j logger
+	 */
+	@NotNull
+	public abstract Logger getSLF4JLogger();
+
+	/**
+	 * Gets the executor which runs code synchronously (i.e. on the server's main thread).
+	 *
+	 * @return synchronous executor
+	 */
+	@NotNull
+	public abstract Executor getSyncExecutor();
+
+	/**
+	 * Gets the executor which runs code asynchronously (i.e. off the server's main thread).
+	 *
+	 * @return asynchronous executor
+	 */
+	@NotNull
+	public abstract Executor getAsyncExecutor();
+
+	/**
+	 * Gets the server's console {@link Audience}.
+	 *
+	 * @return console audience
+	 */
+	@NotNull
+	public abstract Audience getConsole();
+
+	/**
+	 * Gets the metadata of the Minecraft server.
+	 *
+	 * @return server version
+	 */
+	@NotNull
+	public abstract VersionMetadata getVersionMetadata();
+
+	/**
+	 * Gets the plugin's {@link MCCCPlayer wrapper} for a player.
+	 *
+	 * @param player player to get the wrapper for
+	 * @return wrapper for the player
+	 */
+	@NotNull
+	public abstract MCCCPlayer getPlayer(@NotNull P player);
 
 	/**
 	 * Attempts to cast the provided object as a player.
@@ -290,7 +504,7 @@ public interface Plugin<P, S> {
 	 */
 	@ApiStatus.Internal
 	@ApiStatus.NonExtendable
-	default @Nullable P objAsPlayer(@NotNull Object obj) {
+	public @Nullable P objAsPlayer(@NotNull Object obj) {
 		try {
 			Class<P> playerClass = getPlayerClass();
 			if (!playerClass.isInstance(obj))
@@ -307,14 +521,14 @@ public interface Plugin<P, S> {
 	 * @param sender the command sender
 	 * @return the player, or null if the sender is not a player
 	 */
-	default @Nullable P asPlayer(@NotNull S sender) {
+	public @Nullable P asPlayer(@NotNull S sender) {
 		return objAsPlayer(sender);
 	}
 
 	/**
 	 * Registers the plugin's basic chat commands.
 	 */
-	default void registerChatCommands() {
+	public void registerChatCommands() {
 		try {
 			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US));
 		} catch (Exception e) {
@@ -331,145 +545,19 @@ public interface Plugin<P, S> {
 
 		//// Account Command ////
 
-		// base command
-		Builder<S> account = manager.commandBuilder("account")
-			.commandDescription(description("Manage your connected stream account(s)"))
-			.permission(PredicatePermission.of(sender -> !isAdminRequired() || mapper.isAdmin(sender)));
-
-		// link command
-		manager.command(account.literal("link")
-			.commandDescription(description("Link a stream account to your Minecraft account"))
-			.argument(
-				StringParser.stringComponent(StringMode.SINGLE)
-					.name("username")
-					.description(description("The username of the stream account to link"))
-					.required()
-					.build()
-			)
-			.handler(commandContext -> {
-				String username = commandContext.get("username");
-				S sender = commandContext.sender();
-				Audience audience = mapper.asAudience(sender);
-				UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
-					new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-				if (getPlayerManager().linkPlayer(uuid, username)) {
-					updateConditionalEffectVisibility(getCrowdControl());
-					P player = asPlayer(sender);
-					if (player != null)
-						sendPlayerEvent(player, "playerJoined");
-					audience.sendMessage(output(translatable(
-						"cc.command.account.link.output",
-						text(username, NamedTextColor.AQUA)
-					)));
-				} else {
-					audience.sendMessage(output(translatable(
-						"cc.command.account.link.error",
-						NamedTextColor.RED,
-						text(username, NamedTextColor.AQUA)
-					)));
-				}
-			}));
-		// unlink command
-		manager.command(account.literal("unlink")
-			.commandDescription(description("Unlink a stream account from your Minecraft account"))
-			.argument(
-				StringParser.<S>stringComponent(StringMode.SINGLE)
-					.name("username")
-					.description(description("The username of the stream account to unlink"))
-					.required()
-					.suggestionProvider((ctx, input) -> CompletableFuture.supplyAsync(() -> {
-						Optional<UUID> uuid = mapper.tryGetUniqueId(ctx.sender());
-						if (!uuid.isPresent()) return Collections.emptyList();
-						Collection<String> linkedAccounts = getPlayerManager().getLinkedAccounts(uuid.get());
-						if (linkedAccounts.isEmpty()) return Collections.emptyList();
-						String lowerInput = input.lastRemainingToken().toLowerCase(Locale.ENGLISH);
-						Set<Suggestion> suggestions = new LinkedHashSet<>();
-						for (String acc : linkedAccounts) {
-							if (acc.startsWith(lowerInput))
-								suggestions.add(suggestion(acc));
-						}
-						for (String acc : linkedAccounts) {
-							if (acc.contains(lowerInput))
-								suggestions.add(suggestion(acc));
-						}
-						return new ArrayList<>(suggestions);
-					}))
-			)
-			.handler(commandContext -> {
-				String username = commandContext.get("username");
-				S sender = commandContext.sender();
-				Audience audience = mapper.asAudience(sender);
-				UUID uuid = mapper.tryGetUniqueId(sender).orElseThrow(() ->
-					new IllegalArgumentException("Your UUID cannot be found. Please ensure you are running this command in-game."));
-				if (getPlayerManager().unlinkPlayer(uuid, username)) {
-					updateConditionalEffectVisibility(getCrowdControl());
-					audience.sendMessage(output(translatable(
-						"cc.command.account.unlink.output",
-						text(username, NamedTextColor.AQUA)
-					)));
-				} else {
-					audience.sendMessage(output(translatable(
-						"cc.command.account.unlink.error",
-						NamedTextColor.RED,
-						text(username, NamedTextColor.AQUA)
-					)));
-				}
-			}));
-
 		//// CrowdControl Command ////
 
 		// base command
 		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
 			.commandDescription(description("View information about and manage the Crowd Control service"));
 
-		// connect command
-		manager.command(ccCmd.literal("connect")
-			.commandDescription(description("Connect to the Crowd Control service"))
-			.permission(PredicatePermission.of(mapper::isAdmin))
-			.handler(commandContext -> {
-				Audience sender = mapper.asAudience(commandContext.sender());
-				if (getCrowdControl() != null)
-					sender.sendMessage(output(translatable("cc.command.crowdcontrol.connect.error", NamedTextColor.RED)));
-				else {
-					initCrowdControl();
-					sender.sendMessage(output(translatable("cc.command.crowdcontrol.connect.output")));
-				}
-			}));
-		// disconnect command
-		manager.command(ccCmd.literal("disconnect")
-			.commandDescription(description("Disconnect from the Crowd Control service"))
-			.permission(PredicatePermission.of(mapper::isAdmin))
-			.handler(commandContext -> {
-				Audience sender = mapper.asAudience(commandContext.sender());
-				if (getCrowdControl() == null)
-					sender.sendMessage(output(translatable("cc.command.crowdcontrol.disconnect.error", NamedTextColor.RED)));
-				else {
-					getCrowdControl().shutdown("Disconnected issued by server administrator");
-					updateCrowdControl(null);
-					sender.sendMessage(output(translatable("cc.command.crowdcontrol.disconnect.output")));
-				}
-			}));
-		// reconnect command
-		manager.command(ccCmd.literal("reconnect")
-			.commandDescription(description("Reconnect to the Crowd Control service"))
-			.permission(PredicatePermission.of(mapper::isAdmin))
-			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.sender());
-				CrowdControl cc = getCrowdControl();
-				if (cc != null)
-					cc.shutdown("Reconnect issued by server administrator");
-				initCrowdControl();
-
-				audience.sendMessage(output(translatable("cc.command.crowdcontrol.reconnect.output")));
-			}));
 		// status command
 		manager.command(ccCmd.literal("status")
 			.commandDescription(description("Get the status of the Crowd Control service"))
 			.permission(PredicatePermission.of(mapper::isAdmin))
 			.handler(commandContext -> {
 				Audience audience = mapper.asAudience(commandContext.sender());
-				CrowdControl cc = getCrowdControl();
-				if (cc == null) {
+				if (crowdControl == null) {
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
 					return;
 				}
@@ -477,19 +565,25 @@ public interface Plugin<P, S> {
 					.append(PREFIX_COMPONENT)
 					.append(translatable("cc.command.crowdcontrol.status.online"))
 					.appendSpace();
-				Set<Request.Source> sources = cc.getSources();
-				if (sources.isEmpty())
-					msg.append(translatable("cc.command.crowdcontrol.status.sources.none"));
-				else {
-					msg.append(translatable("cc.command.crowdcontrol.status.sources.header"));
-					Component unknown = translatable("cc.command.crowdcontrol.status.sources.unknown", NamedTextColor.GRAY);
-					for (Request.Source source : sources) {
-						Component ip = ofNullable(source.ip()).map(InetAddress::toString).<Component>map(Component::text).orElse(unknown);
-						Component login = ofNullable(source.login()).<Component>map(Component::text).orElse(unknown);
-						Component service = ofNullable(source.target()).map(Request.Target::getService).<Component>map(Component::text).orElse(unknown);
-						Component name = ofNullable(source.target()).map(Request.Target::getName).<Component>map(Component::text).orElse(unknown);
-						msg.appendNewline().append(translatable("cc.command.crowdcontrol.status.sources.entry", ip, login, service, name));
-					}
+				boolean added = false;
+				for (P player : getPlayerManager().getAllPlayersFull()) {
+					CCPlayer ccPlayer = optionalCCPlayer(player).orElse(null);
+					if (ccPlayer == null) continue;
+					UserToken user = ccPlayer.getUserToken();
+					if (user == null) continue;
+
+					if (!added)
+						msg.append(translatable("cc.command.crowdcontrol.status.sources.header"));
+					added = true;
+
+					msg.appendNewline().append(translatable(
+						String.format(
+							"cc.command.crowdcontrol.status.sources.%s",
+							ccPlayer.getGameSessionId() == null ? "offline" : "live"
+						),
+						text(playerMapper().getUsername(player)),
+						text(user.getName())
+					));
 				}
 				audience.sendMessage(msg);
 			}));
@@ -500,7 +594,7 @@ public interface Plugin<P, S> {
 				Audience audience = mapper.asAudience(ctx.sender());
 				Component message = output(translatable("cc.command.crowdcontrol.version.server", text(SemVer.MOD.toString())));
 				audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.header")));
-				for (P player : getAllPlayers()) { // TODO: get all players real
+				for (P player : getPlayerManager().getAllPlayersFull()) {
 					Optional<SemVer> version = getModVersion(player);
 					if (version.isPresent()) {
 						String key = "cc.command.crowdcontrol.version.client." + (version.get().equals(SemVer.MOD) ? "match" : "mismatch");
@@ -511,6 +605,7 @@ public interface Plugin<P, S> {
 				}
 			}));
 		// execute command
+		/*
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")
 				.commandDescription(description("Executes the effect with the given ID"))
@@ -556,28 +651,7 @@ public interface Plugin<P, S> {
 				})
 			);
 		}
-
-		//// Password Command ////
-		manager.command(manager.commandBuilder("password")
-			.commandDescription(description("Sets the password required for Crowd Control clients to connect to the server"))
-			.permission(PredicatePermission.of(mapper::isAdmin))
-			.argument(StringParser.stringComponent(StringMode.GREEDY).name("password").required())
-			.handler(commandContext -> {
-				Audience sender = mapper.asAudience(commandContext.sender());
-				String password = commandContext.get("password");
-				setPassword(password);
-				sender.sendMessage(output(translatable(
-						"cc.command.password.output",
-						text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
-					)
-						.hoverEvent(translatable(
-							"cc.command.password.output.hover",
-							text("/crowdcontrol reconnect", NamedTextColor.YELLOW)
-						))
-						.clickEvent(ClickEvent.runCommand("/crowdcontrol reconnect"))
-				));
-			})
-		);
+		 */
 
 		MinecraftExceptionHandler.<S>create(mapper::asAudience)
 			.defaultHandlers()
@@ -586,112 +660,43 @@ public interface Plugin<P, S> {
 	}
 
 	/**
-	 * Gets the {@link EntityMapper} for this implementation's player object.
-	 *
-	 * @return player entity mapper
-	 */
-	PlayerEntityMapper<P> playerMapper();
-
-	/**
-	 * Gets the {@link EntityMapper} for this implementation's command sender object.
-	 *
-	 * @return command sender mapper
-	 */
-	EntityMapper<S> commandSenderMapper();
-
-	/**
-	 * Gets the player class utilized by this implementation.
-	 *
-	 * @return player class
-	 */
-	@NotNull
-	@CheckReturnValue
-	Class<P> getPlayerClass();
-
-	/**
-	 * Gets the command sender class utilized by this implementation.
-	 *
-	 * @return command sender class
-	 */
-	@NotNull
-	@CheckReturnValue
-	Class<S> getCommandSenderClass();
-
-	/**
-	 * Gets the object that maps {@link Request}s to the players it should affect.
-	 *
-	 * @return mapper object
-	 */
-	@NotNull
-	@CheckReturnValue
-	PlayerManager<P> getPlayerManager();
-
-	/**
-	 * Fetches all online players that should be affected by the provided {@link Request}.
-	 *
-	 * @param request the request to be processed
-	 * @return a list of online players
-	 */
-	@CheckReturnValue
-	default @NotNull List<P> getPlayers(@NotNull Request request) {
-		return getPlayerManager().getPlayers(request);
-	}
-
-	/**
-	 * Fetches all online players that should be affected by global requests.
-	 *
-	 * @return a list of online players
-	 */
-	@CheckReturnValue
-	@NotNull
-	default List<@NotNull P> getAllPlayers() {
-		return getPlayerManager().getAllPlayers();
-	}
-
-	/**
 	 * Loads the configuration file.
 	 */
-	void loadConfig();
+	public abstract void loadConfig();
 
 	/**
-	 * Fetches the config variable which determines if all requests should be treated as global.
+	 * Determines whether it's possible for global effects to execute for the specified player.
 	 *
-	 * @return true if all requests should be treated as global
-	 */
-	@CheckReturnValue
-	boolean isGlobal();
-
-	/**
-	 * Determines whether it's possible for global effects to execute.
-	 *
+	 * @param player player to check
 	 * @return true if global effects could execute
 	 */
-	default boolean globalEffectsUsable() {
-		return isGlobal() || !getHosts().isEmpty();
-	}
+	public boolean globalEffectsUsableFor(@NotNull P player) {
+		if (isGlobal()) return true;
 
-	/**
-	 * Determines if a request should apply to all online players or only a select few.
-	 *
-	 * @param request the request to be processed
-	 * @return true if the request should apply to all online players
-	 */
-	@CheckReturnValue
-	default boolean isGlobal(@NotNull Request request) {
-		return isGlobal() || request.isGlobal();
-	}
+		Collection<String> hosts = getHosts();
+		if (hosts.isEmpty()) return false;
 
-	/**
-	 * Returns a collection of strings representing the names of hosts.
-	 * <p>
-	 * "Hosts" are defined as streamers whose incoming requests should apply to all online players
-	 * instead of just that streamer.
-	 *
-	 * @return a collection of strings possibly containing stream usernames, IDs, Minecraft
-	 * usernames, or Minecraft UUIDs
-	 */
-	@CheckReturnValue
-	@NotNull Collection<String> getHosts();
+		Optional<UUID> optUuid = playerMapper().tryGetUniqueId(player);
+		if (optUuid.isPresent()) {
+			String uuidStr = optUuid.get().toString().replace("-", "");
+			if (hosts.stream().anyMatch(host -> host.replace("-", "").equalsIgnoreCase(uuidStr))) return true;
+		}
+
+		String name = playerMapper().getUsername(player);
+		if (hosts.stream().anyMatch(host -> host.equalsIgnoreCase(name))) return true;
+
+		UserToken userToken = optUuid.flatMap(this::optionalCCPlayer).map(CCPlayer::getUserToken).orElse(null);
+		if (userToken == null) return false;
+
+		String userId = userToken.getId().replaceFirst("^ccuid-", "");
+		if (hosts.stream().anyMatch(host -> host.replaceFirst("^ccuid-", "").equalsIgnoreCase(userId))) return true;
+
+		String ccName = userToken.getName();
+		if (hosts.stream().anyMatch(host -> host.equalsIgnoreCase(ccName))) return true;
+
+		String platformId = userToken.getOriginId();
+		return hosts.stream().anyMatch(host -> host.equalsIgnoreCase(platformId));
+	}
 
 	/**
 	 * Whether the specified player is known to be a server host.
@@ -699,65 +704,11 @@ public interface Plugin<P, S> {
 	 * @param player player to check
 	 * @return whether the player is a server host
 	 */
-	default boolean isHost(@NotNull P player) {
-		Collection<String> hosts = getHosts();
-		getSLF4JLogger().debug("Checking if {} matches a host known in {}", playerMapper().getUsername(player), hosts);
-		if (hosts.isEmpty())
-			return false;
-
-		PlayerEntityMapper<P> mapper = playerMapper();
-		Optional<UUID> uuid = mapper.tryGetUniqueId(player);
-		if (uuid.isPresent()) {
-			String uuidStr = uuid.get().toString().toLowerCase(Locale.ENGLISH);
-			getSLF4JLogger().debug("Checking for UUID {}", uuidStr);
-			if (hosts.contains(uuidStr) || hosts.contains(uuidStr.replace("-", "")))
-				return true;
-		}
-
-		String username = mapper.getUsername(player).toLowerCase(Locale.ENGLISH);
-		getSLF4JLogger().debug("Checking for username {}", username);
-		if (hosts.contains(username))
-			return true;
-
-		if (uuid.isPresent()) {
-			getSLF4JLogger().debug("Checking accounts linked to player");
-			PlayerManager<P> manager = getPlayerManager();
-			return manager.getLinkedAccounts(uuid.get()).stream().anyMatch(hosts::contains);
-		}
-
-		getSLF4JLogger().debug("No matches found");
-		return false;
+	@Deprecated
+	@ApiStatus.ScheduledForRemoval
+	public boolean isHost(@NotNull P player) {
+		return globalEffectsUsableFor(player);
 	}
-
-	/**
-	 * Determines whether a player must be an {@link EntityMapper#isAdmin(Object) admin} to use the
-	 * {@code /account} command.
-	 *
-	 * @return true if the player must be an admin to use the /account command
-	 */
-	@CheckReturnValue
-	boolean isAdminRequired();
-
-	/**
-	 * Whether to announce the execution of effects in chat.
-	 *
-	 * @return true if the plugin should announce the execution of effects in chat
-	 */
-	@CheckReturnValue
-	boolean announceEffects();
-
-	/**
-	 * Sets whether to announce the execution of effects in chat.
-	 *
-	 * @param announceEffects true if the plugin should announce the execution of effects in chat
-	 */
-	void setAnnounceEffects(boolean announceEffects);
-
-	/**
-	 * Returns the plugin's text utility class.
-	 */
-	@CheckReturnValue
-	@NotNull TextUtil getTextUtil();
 
 	/**
 	 * Registers a {@link Command} with the plugin.
@@ -765,334 +716,163 @@ public interface Plugin<P, S> {
 	 * @param name    the name of the command
 	 * @param command the command to register
 	 */
-	void registerCommand(@Nullable String name, @NotNull Command<P> command);
+	public void registerCommand(@NotNull String name, @NotNull Command<P> command) {
+		name = name.toLowerCase(Locale.ENGLISH);
+		if (crowdControl == null)
+			throw new IllegalStateException("CrowdControl is not initialized");
+		try {
+			if (crowdControl.addEffect(name, command))
+				getSLF4JLogger().debug("Registered CC command '{}'", name);
+			else
+				getSLF4JLogger().warn("Command '{}' rejected, duplicate?", name);
+		} catch (IllegalArgumentException e) {
+			getSLF4JLogger().warn("Failed to register command '{}'", name, e);
+		}
+	}
+
+	public void trackEffect(@NotNull UUID requestId, @NotNull TrackedEffect effect) {
+		trackedEffects.put(requestId, effect);
+	}
 
 	/**
-	 * Returns the object that manages the registering of effects/commands.
-	 * Not to be confused with the {@link #getCommandManager() chat command manager}.
-	 *
-	 * @return command registry manager
-	 */
-	@NotNull
-	AbstractCommandRegister<P, ?> commandRegister();
-
-	/**
-	 * Gets the {@link ScheduledExecutorService} used by the plugin.
-	 *
-	 * @return the executor service
-	 */
-	@NotNull
-	ScheduledExecutorService getScheduledExecutor();
-
-	/**
-	 * Gets the {@link CrowdControl} instance.
+	 * Gets the {@link CrowdControl} instance as an optional.
 	 *
 	 * @return crowd control instance
 	 */
-	@Nullable
+	@NotNull
 	@CheckReturnValue
-	CrowdControl getCrowdControl();
+	public Optional<CrowdControl> optionalCrowdControl() {
+		return Optional.ofNullable(crowdControl);
+	}
+
+	/**
+	 * Gets the {@link CCPlayer} for the provided player.
+	 *
+	 * @param player player id
+	 * @return crowd control player
+	 */
+	@NotNull
+	@CheckReturnValue
+	public Optional<CCPlayer> optionalCCPlayer(@NotNull UUID player) {
+		return optionalCrowdControl().map(cc -> cc.getPlayer(player));
+	}
+
+	/**
+	 * Gets the {@link CCPlayer} for the provided player.
+	 *
+	 * @param player player
+	 * @return crowd control player
+	 */
+	@NotNull
+	@CheckReturnValue
+	public Optional<CCPlayer> optionalCCPlayer(@NotNull P player) {
+		return optionalCCPlayer(playerMapper().getUniqueId(player));
+	}
 
 	/**
 	 * (Re)initializes the {@link CrowdControl} instance.
 	 */
-	void initCrowdControl();
+	public void initCrowdControl() {
+		loadConfig();
+		crowdControl = new CrowdControl("Minecraft", "Minecraft", getDataFolder());
+		commandRegister().register();
+		// re-trigger player join for any missed players
+		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerJoin);
+	}
 
-	/**
-	 * Sends a packet to trigger a remote function on the Crowd Control service.
-	 *
-	 * @param service the service to send the packet to
-	 * @param method  the name of the remote function to call
-	 * @param args    the arguments to pass to the remote function
-	 */
-	default void sendEmbeddedMessagePacket(@Nullable SocketManager service, @NotNull String method, @Nullable Object @Nullable ... args) {
-		if (service == null)
-			service = getCrowdControl();
-		if (service == null) {
-			getSLF4JLogger().warn("Attempted to send embedded message packet but the service is unavailable");
-			return;
-		}
-		try {
-			getSLF4JLogger().debug("sending packet {} {} to {}", method, Arrays.toString(args), service);
-			Response response = service.buildResponse()
-				.packetType(PacketType.REMOTE_FUNCTION)
-				.method(method)
-				.addArguments(args)
-				.build();
-			getSLF4JLogger().debug("final packet: {}", response.toJSON());
-			response.send();
-		} catch (Exception e) {
-			getSLF4JLogger().error("Failed to send embedded message packet", e);
-		}
+	public void destroyCrowdControl() {
+		if (crowdControl == null) return;
+		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerLeave);
+		// just in case:
+		new ArrayList<>(crowdControl.getPlayers()).forEach(player -> crowdControl.removePlayer(player.getUuid()));
+		crowdControl = null;
 	}
 
 	/**
-	 * Sends a packet to trigger a remote function on the Crowd Control service.
+	 * Gets the visibility of conditional effects (i.e. client effects & global effects).
 	 *
-	 * @param method the name of the remote function to call
-	 * @param args   the arguments to pass to the remote function
+	 * @param player the player to generate the packets for
 	 */
-	default void sendEmbeddedMessagePacket(@NotNull String method, @Nullable Object @Nullable ... args) {
-		sendEmbeddedMessagePacket(null, method, args);
-	}
-
-	/**
-	 * Gets a map of event types to the {@link SocketManager}s that have received the event.
-	 *
-	 * @return the map of event types to {@link SocketManager}s
-	 */
-	Map<String, List<SocketManager>> getSentEvents();
-
-	/**
-	 * Sends a player event packet.
-	 *
-	 * @param service   the service to send the packet to
-	 * @param eventType the type of event to send
-	 * @param force     whether to send the event even if the player is not necessarily connected
-	 */
-	default void sendPlayerEvent(@Nullable SocketManager service, @NotNull String eventType, boolean force) {
-		if (service == null) {
-			getSLF4JLogger().warn("Attempted to send player event packet but the service is unavailable");
-			return;
-		}
-		if (getSentEvents().getOrDefault(eventType, Collections.emptyList()).contains(service))
-			return;
-		String login = ofNullable(service.getSource()).map(Request.Source::login).orElse(null);
-		Response.Builder builder = service.buildResponse()
-			.packetType(PacketType.GENERIC_EVENT)
-			.eventType(eventType)
-			.internal(true);
-		boolean success = force;
-		if (force) {
-			getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, login, service.getDisplayName());
-			builder.putData("player", login).send();
-		} else {
-			getSLF4JLogger().info("Sources for service {}: {}", service.getDisplayName(), service.getSources());
-			Optional<P> optPlayer = ofNullable(login).flatMap(playerMapper()::getPlayerByLogin);
-			if (optPlayer.isPresent()) {
-				success = true;
-				P player = optPlayer.get();
-				getSLF4JLogger().info("Sending {} packet for {} to {}", eventType, playerMapper().getUsername(player), service.getDisplayName());
-				builder.putData("player", playerMapper().getUniqueId(player).toString().replace("-", "").toLowerCase(Locale.ENGLISH)).send();
-			}
-		}
-		if (success)
-			getSentEvents().computeIfAbsent(eventType, key -> new ArrayList<>()).add(service);
-	}
-
-	/**
-	 * Finds the {@link SocketManager}s for a player and sends a player event packet to each.
-	 *
-	 * @param player    the player to send the event for
-	 * @param eventType the type of event to send
-	 */
-	default void sendPlayerEvent(@NotNull P player, @NotNull String eventType) {
-		for (SocketManager service : getSocketManagersFor(player)) {
-			sendPlayerEvent(service, eventType, true);
-		}
-	}
-
-	/**
-	 * Performs actions that are reliant on the initialization of a {@link CrowdControl} instance.
-	 *
-	 * @param service the initialized {@link CrowdControl} instance
-	 */
-	default void postInitCrowdControl(@NotNull CrowdControl service) {
-		Object[] effects = commandRegister().getCommands().stream().filter(c -> c.getEffectName() != null).map(c -> c.getEffectName().toLowerCase(Locale.US)).toArray();
-		service.addLoginListener(connectingService -> getScheduledExecutor().schedule(() -> {
-			VersionMetadata versionMetadata = getVersionMetadata();
-			getSLF4JLogger().debug("Version Metadata: {}", versionMetadata);
-			sendEmbeddedMessagePacket(connectingService, "known_effects", effects);
-			sendEmbeddedMessagePacket(connectingService, "version", versionMetadata.packet());
-			updateConditionalEffectVisibility(connectingService);
-			sendPlayerEvent(connectingService, "playerJoined", false);
-		}, 1, TimeUnit.SECONDS));
-	}
-
-	/**
-	 * Updates the status of effects.
-	 *
-	 * @param respondable an object that can be responded to
-	 * @param status      the new status
-	 * @param ids         the IDs to update
-	 */
-	default void updateEffectStatus(@Nullable Respondable respondable, @NotNull ResultType status, @NotNull String @NotNull ... ids) {
-		if (!status.isStatus())
-			throw new IllegalArgumentException("status must be a status type (not a result type)");
-		if (respondable == null)
-			return;
-		getSLF4JLogger().debug("Updating status of effects {} to {}", Arrays.toString(ids), status);
-		Response response = respondable.buildResponse()
-			.packetType(PacketType.EFFECT_STATUS)
-			.ids(Arrays.stream(ids).map(id -> id.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList()))
-			.type(status)
-			.build();
-		response.send();
-	}
-
-	/**
-	 * Updates the status of effects.
-	 *
-	 * @param respondable an object that can be responded to
-	 * @param status      the new status
-	 * @param ids         the IDs to update
-	 */
-	default void updateEffectStatus(Respondable respondable, @NotNull ResultType status, @NotNull Command<?> @NotNull ... ids) {
-		updateEffectStatus(respondable, status, Arrays.stream(ids).map(Command::getEffectName).filter(Objects::nonNull).toArray(String[]::new));
-	}
-
-	/**
-	 * Updates the status of effects.
-	 *
-	 * @param respondable an object that can be responded to
-	 * @param status      the new status
-	 * @param ids         the IDs to update
-	 */
-	default void updateEffectIdStatus(Respondable respondable, @NotNull ResultType status, @NotNull Collection<String> ids) {
-		updateEffectStatus(respondable, status, ids.toArray(new String[0]));
-	}
-
-	/**
-	 * Updates the visibility of a collection of {@link Command effect} IDs.
-	 *
-	 * @param respondable an object that can be responded to
-	 * @param visible     effects' new visibility
-	 * @param ids         the IDs to update
-	 */
-	default void updateEffectIdVisibility(Respondable respondable, boolean visible, @NotNull Collection<String> ids) {
-		updateEffectStatus(respondable, visible ? ResultType.VISIBLE : ResultType.NOT_VISIBLE, ids.toArray(new String[0]));
-	}
-
-	/**
-	 * Updates the visibility of an {@link Command effect} ID.
-	 *
-	 * @param respondable an object that can be responded to
-	 * @param visible     effect's new visibility
-	 * @param ids         the IDs to update
-	 */
-	default void updateEffectIdVisibility(Respondable respondable, boolean visible, @NotNull String @NotNull ... ids) {
-		updateEffectIdVisibility(respondable, visible, Arrays.asList(ids));
-	}
-
-	/**
-	 * Updates the visibility of a collection of {@link Command effects}.
-	 *
-	 * @param respondable an object that can be responded to
-	 * @param visible     effects' new visibility
-	 * @param ids         the IDs to update
-	 */
-	default void updateEffectVisibility(Respondable respondable, boolean visible, @NotNull Collection<Command<?>> ids) {
-		updateEffectIdVisibility(respondable, visible, ids.stream().map(Command::getEffectName).filter(Objects::nonNull).collect(Collectors.toList()));
-	}
-
-	/**
-	 * Updates the visibility of an {@link Command effect}.
-	 *
-	 * @param respondable an object that can be responded to
-	 * @param visible     effect's new visibility
-	 * @param ids         the IDs to update
-	 */
-	default void updateEffectVisibility(Respondable respondable, boolean visible, @NotNull Command<?> @NotNull ... ids) {
-		updateEffectVisibility(respondable, visible, Arrays.asList(ids));
-	}
-
-	/**
-	 * Updates the {@link CrowdControl} instance.
-	 * <p>
-	 * You must first ensure that you have shut down the existing
-	 * {@link CrowdControl} {@link #getCrowdControl() instance}.
-	 *
-	 * @param crowdControl the new {@link CrowdControl} instance
-	 */
-	void updateCrowdControl(@Nullable CrowdControl crowdControl);
-
-	/**
-	 * Restarts the {@link CrowdControl} instance.
-	 */
-	default void restartCrowdControl() {
-		CrowdControl cc = getCrowdControl();
-		if (cc != null)
-			cc.shutdown("Service is restarting");
-		updateCrowdControl(null);
-		initCrowdControl();
-	}
-
-	/**
-	 * Gets the plugin's {@link CommandManager}.
-	 *
-	 * @return command manager instance
-	 */
-	@Nullable
 	@CheckReturnValue
-	CommandManager<S> getCommandManager();
+	public @NotNull CCEffectReport @NotNull [] getConditionalEffectVisibility(P player) {
+		if (player == null) return new CCEffectReport[]{};
+		if (crowdControl == null) return new CCEffectReport[]{};
 
-	/**
-	 * Gets the password required for clients to connect to the server.
-	 * <p>
-	 * If the password is not set, this will return null.
-	 *
-	 * @return unencrypted password
-	 */
-	@Nullable
-	@CheckReturnValue
-	String getPassword();
+		SemVer clientVersion = getModVersion(player).orElse(SemVer.ZERO);
+		boolean globalVisible = globalEffectsUsableFor(player);
+		getSLF4JLogger().debug("Updating conditional effects: clientVersion={}, globalVisible={}", clientVersion, globalVisible);
+		Map<ReportStatus, List<String>> effects = new HashMap<>();
 
-	/**
-	 * Gets the password required for clients to connect to the server.
-	 * <p>
-	 * If the password is not set, this will return an empty string.
-	 *
-	 * @return unencrypted password
-	 */
-	@NotNull
-	@CheckReturnValue
-	default String getPasswordOrEmpty() {
-		return ExceptionUtil.validateNotNullElse(getPassword(), "");
-	}
+		// TODO: probably don't need to recompute this every time!
+		//  this would be a great case for AbstractPlugin
+		List<Command<P>> registeredEffects = commandRegister().getCommands();
+		List<String> registeredEffectIds = registeredEffects.stream()
+			.map(Command::getEffectName)
+			.map(name -> name.toLowerCase(Locale.ENGLISH))
+			.collect(Collectors.toList());
+		List<String> unknownEffects = stream(
+			Optional.ofNullable(crowdControl.getGamePack())
+			.map(pack -> pack.getEffects().getGame())
+		)
+			.flatMap(map -> map.keySet().stream())
+			.filter(id -> !registeredEffectIds.contains(id))
+			.collect(Collectors.toList());
 
-	/**
-	 * Sets the password required for clients to connect to the server.
-	 * <p>
-	 * {@link #restartCrowdControl()} must be called for this to take effect.
-	 *
-	 * @param password unencrypted password
-	 * @throws IllegalArgumentException if the password is null
-	 */
-	void setPassword(@NotNull String password) throws IllegalArgumentException;
+		if (!unknownEffects.isEmpty()) {
+			effects.put(ReportStatus.MENU_HIDDEN, unknownEffects);
+		}
 
-	/**
-	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
-	 *
-	 * @param service the service to send the packets to
-	 */
-	default void updateConditionalEffectVisibility(@Nullable SocketManager service) {
-		if (service == null)
-			return;
-		boolean clientVisible = getModdedPlayerCount() > 0;
-		boolean globalVisible = globalEffectsUsable();
-		getSLF4JLogger().debug("Updating conditional effects: clientVisible={}, globalVisible={}", clientVisible, globalVisible);
-		Map<ResultType, Set<String>> effects = new HashMap<>();
-		for (Command<?> effect : commandRegister().getCommands()) {
-			if (effect.getEffectName() == null) continue;
+		for (Command<P> effect : commandRegister().getCommands()) {
 			String id = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-			TriState visibility = effect.isVisible();
+			TriState visibility = effect.isVisible(); // TODO: accept player
 			if (visibility != TriState.FALSE) {
-				if (effect.isClientOnly()) {
-					boolean available = clientVisible && (effect.requiredExtraFeatures().isEmpty() || effect.requiredExtraFeatures().stream().allMatch(this::isFeatureAvailable));
+				Set<ExtraFeature> extraFeatures;
+				SemVer minVersion;
+				// this assumes that if a player has a feature available then they also have a client available
+				if (!(extraFeatures = effect.requiredExtraFeatures()).isEmpty()) {
+					boolean available = extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player));
 					visibility = TriState.fromBoolean(available);
+				} else if ((minVersion = effect.getMinimumModVersion()).isAtLeast(SemVer.ZERO)) {
+					visibility = TriState.fromBoolean(clientVersion.isAtLeast(minVersion));
 				} else if (effect.isGlobal())
 					visibility = TriState.fromBoolean(globalVisible);
 			}
 			if (visibility != TriState.UNKNOWN)
-				effects.computeIfAbsent(visibility == TriState.TRUE ? ResultType.VISIBLE : ResultType.NOT_VISIBLE, k -> new HashSet<>()).add(id);
+				effects.computeIfAbsent(visibility == TriState.TRUE ? ReportStatus.MENU_VISIBLE : ReportStatus.MENU_HIDDEN, k -> new ArrayList<>()).add(id);
 
-			TriState selectable = effect.isSelectable();
+			TriState selectable = effect.isSelectable(); // TODO: accept player
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
-				effects.computeIfAbsent(selectable == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, k -> new HashSet<>()).add(id);
+				effects.computeIfAbsent(selectable == TriState.TRUE ? ReportStatus.MENU_AVAILABLE : ReportStatus.MENU_UNAVAILABLE, k -> new ArrayList<>()).add(id);
 		}
-		getSLF4JLogger().debug("Setting effects {}", effects);
-		for (Map.Entry<ResultType, Set<String>> entry : effects.entrySet())
-			updateEffectIdStatus(service, entry.getKey(), entry.getValue());
+
+		CCEffectReport[] reports = new CCEffectReport[effects.size()];
+		int i = 0;
+		for (Map.Entry<ReportStatus, List<String>> entry : effects.entrySet()) {
+			reports[i++] = new CCEffectReport(
+				IdentifierType.EFFECT,
+				entry.getKey(),
+				entry.getValue()
+			);
+		}
+
+		return reports;
+	}
+
+	/**
+	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
+	 *
+	 * @param player the player to send the packets to
+	 */
+	public void updateConditionalEffectVisibility(P player) {
+		CCPlayer ccPlayer = optionalCCPlayer(player).orElse(null);
+		if (ccPlayer == null) return;
+		if (ccPlayer.getGameSessionId() == null) return;
+		if (ccPlayer.getToken() == null) return;
+
+		CCEffectReport[] reports = getConditionalEffectVisibility(player);
+		if (reports.length == 0) return;
+
+		ccPlayer.sendReport(reports);
 	}
 
 	/**
@@ -1101,40 +881,87 @@ public interface Plugin<P, S> {
 	 *
 	 * @param joiningPlayer player to send messages to
 	 */
-	default void onPlayerJoin(P joiningPlayer) {
+	public void onPlayerJoin(P joiningPlayer) {
+		CrowdControl cc = getCrowdControl();
+		if (cc == null) return;
+
 		PlayerEntityMapper<P> mapper = playerMapper();
 		UUID uuid = mapper.tryGetUniqueId(joiningPlayer).orElse(null);
 		if (uuid == null) {
-			getSLF4JLogger().warn("Player {} has no UUID", mapper.getUsername(joiningPlayer));
+			getSLF4JLogger().warn("Joining player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
 		}
-		sendPlayerEvent(joiningPlayer, "playerJoined");
-		getScheduledExecutor().schedule(() -> {
+		mapper.asAudience(joiningPlayer).sendMessage(JOIN_MESSAGE);
+
+		CCPlayer ccPlayer = cc.addPlayer(uuid);
+		ccPlayer.getEventManager().registerEventConsumer(CCEventType.IDENTIFIED, payload -> {
 			// ensure player is still online
 			Optional<P> optPlayer = mapper.getPlayer(uuid);
-			if (!optPlayer.isPresent())
-				return;
+			if (!optPlayer.isPresent()) return;
 			P player = optPlayer.get();
 			// send messages
 			Audience audience = mapper.asAudience(player);
-			audience.sendMessage(JOIN_MESSAGE_1);
-			if (!isGlobal() && !hasLinkedAccount(joiningPlayer) && (!isAdminRequired() || playerMapper().isAdmin(player)))
-				audience.sendMessage(JOIN_MESSAGE_2);
-			if (!globalEffectsUsable())
-				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
-			CrowdControl cc = getCrowdControl();
-			if (cc == null) {
-				if (mapper.isAdmin(player)) {
-					if (getPasswordOrEmpty().isEmpty())
-						audience.sendMessage(NO_CC_OP_ERROR_NO_PASSWORD);
-					else
-						audience.sendMessage(NO_CC_UNKNOWN_ERROR);
-				} else
-					audience.sendMessage(NO_CC_USER_ERROR);
+			if (ccPlayer.getUserToken() == null) {
+				audience.sendMessage(LINK_MESSAGE.clickEvent(ClickEvent.openUrl(String.format(
+					"https://auth.crowdcontrol.live/?connectionID=%s",
+					payload.getConnectionId()
+				))));
 			}
-			// update conditional effects
-			updateConditionalEffectVisibility(cc);
-		}, 1, TimeUnit.SECONDS);
+			// TODO: restore? maybe go for less of a warning angle and more of an informational angle,
+			//  like hey some effects can't be used because you aren't a host / aren't a client
+//			if (!globalEffectsUsable())
+//				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
+		});
+		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTHENTICATED, () -> {
+			if (ccPlayer.getGameSessionId() != null) return;
+			// ensure player is still online
+			Optional<P> optPlayer = mapper.getPlayer(uuid);
+			if (!optPlayer.isPresent()) return;
+			P player = optPlayer.get();
+			// start session
+			ccPlayer.startSession(getConditionalEffectVisibility(player));
+		});
+		ccPlayer.getEventManager().registerEventConsumer(CCEventType.EFFECT_RESPONSE, response -> {
+			UUID requestId = response.getRequestId();
+			ResponseStatus status = response.getStatus();
+			TrackedEffect effect = trackedEffects.get(requestId);
+			if (effect == null) return;
+
+			Command<?> command;
+			try {
+				command = commandRegister().getCommandByName(effect.getRequest().getEffect().getEffectId());
+			} catch (IllegalArgumentException e) {
+				trackedEffects.remove(requestId);
+				return;
+			}
+
+			switch (status) {
+				case SUCCESS:
+				case TIMED_BEGIN:
+					List<Audience> audiences = new ArrayList<>(3);
+					audiences.add(getConsole());
+					if (announce) {
+						audiences.add(playerMapper().asAudience(getPlayerManager().getSpectators().collect(Collectors.toList())));
+						audiences.add(effect.getAudience());
+					}
+
+					try {
+						Audience.audience(audiences).sendMessage(Component.translatable(
+							"cc.effect.used",
+							getViewerComponent(effect.getRequest(), true).color(Plugin.USER_COLOR),
+							command.getProcessedDisplayName(effect.getRequest()).colorIfAbsent(Plugin.CMD_COLOR)
+						));
+					} catch (Exception e) {
+						LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
+					}
+					if (status == ResponseStatus.TIMED_BEGIN) break;
+				case FAIL_TEMPORARY:
+				case FAIL_PERMANENT:
+				case TIMED_END:
+				case UNKNOWN:
+					trackedEffects.remove(requestId);
+			}
+		});
 	}
 
 	/**
@@ -1143,81 +970,20 @@ public interface Plugin<P, S> {
 	 *
 	 * @param player player that left
 	 */
-	default void onPlayerLeave(P player) {
-		updateConditionalEffectVisibility(getCrowdControl());
+	public void onPlayerLeave(P player) {
+		PlayerEntityMapper<P> mapper = playerMapper();
+		UUID uuid = mapper.tryGetUniqueId(player).orElse(null);
+		if (uuid == null) {
+			getSLF4JLogger().warn("Departing player {} has no UUID", mapper.getUsername(player));
+			return;
+		}
+		clientVersions.remove(uuid);
+		extraFeatures.remove(uuid);
+
+		if (crowdControl == null) return;
+
+		crowdControl.removePlayer(uuid);
 	}
-
-	/**
-	 * Gets the plugin's SLF4J logger.
-	 *
-	 * @return slf4j logger
-	 */
-	@NotNull
-	Logger getSLF4JLogger();
-
-	/**
-	 * Gets the executor which runs code synchronously (i.e. on the server's main thread).
-	 *
-	 * @return synchronous executor
-	 */
-	@NotNull
-	Executor getSyncExecutor();
-
-	/**
-	 * Gets the executor which runs code asynchronously (i.e. off the server's main thread).
-	 *
-	 * @return asynchronous executor
-	 */
-	@NotNull
-	Executor getAsyncExecutor();
-
-	/**
-	 * Gets the plugin's {@link LimitConfig}.
-	 *
-	 * @return limit config parsed from the plugin's config file
-	 */
-	@NotNull
-	LimitConfig getLimitConfig();
-
-	/**
-	 * Gets the plugin's {@link SoftLockConfig}.
-	 *
-	 * @return soft-lock config parsed from the plugin's config file
-	 */
-	@NotNull
-	SoftLockConfig getSoftLockConfig();
-
-	/**
-	 * Gets the server's console {@link Audience}.
-	 *
-	 * @return console audience
-	 */
-	@NotNull
-	Audience getConsole();
-
-	/**
-	 * Gets the plugin's {@link CCPlayer wrapper} for a player.
-	 *
-	 * @param player player to get the wrapper for
-	 * @return wrapper for the player
-	 */
-	@NotNull
-	CCPlayer getPlayer(@NotNull P player);
-
-	/**
-	 * Gets the {@link HideNames} config.
-	 *
-	 * @return hide names config
-	 */
-	@NotNull
-	HideNames getHideNames();
-
-	/**
-	 * Sets the {@link HideNames} config.
-	 *
-	 * @param hideNames hide names config
-	 */
-	void setHideNames(@NotNull HideNames hideNames);
 
 	/**
 	 * Gets the viewer who triggered an effect as a component, or null if names are hidden.
@@ -1227,8 +993,14 @@ public interface Plugin<P, S> {
 	 * @return the viewer as a component, or null if names are hidden
 	 */
 	@Nullable
-	default Component getViewerComponentOrNull(@NotNull Request request, boolean chat) {
-		return getViewerComponentOrNull(getHideNames(), request, chat);
+	public Component getViewerComponentOrNull(@NotNull PublicEffectPayload request, boolean chat) {
+		if (request.isAnonymous()) return null;
+		CCUserRecord viewer = request.getRequester();
+		if (viewer == null) return null;
+		String name = viewer.getName();
+		if (name.isEmpty()) return null;
+		if ((!chat && hideNames.isHideOther()) || (chat && hideNames.isHideChat())) return null;
+		return text(name);
 	}
 
 	/**
@@ -1239,36 +1011,8 @@ public interface Plugin<P, S> {
 	 * @return the viewer as a component
 	 */
 	@NotNull
-	default Component getViewerComponent(@NotNull Request request, boolean chat) {
-		return getViewerComponent(getHideNames(), request, chat);
-	}
-
-	/**
-	 * Gets the viewer who triggered an effect as a component, or null if names are hidden.
-	 *
-	 * @param hidesNames the {@link HideNames} config
-	 * @param request    the effect request
-	 * @param chat       whether the returned component will be used in chat
-	 * @return the viewer as a component, or null if names are hidden
-	 */
-	@Nullable
-	static Component getViewerComponentOrNull(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
-		if ((!chat && hidesNames.isHideOther()) || (chat && hidesNames.isHideChat()))
-			return null;
-		return text(request.getViewer());
-	}
-
-	/**
-	 * Gets the viewer who triggered an effect as a component.
-	 *
-	 * @param hidesNames the {@link HideNames} config
-	 * @param request    the effect request
-	 * @param chat       whether the returned component will be used in chat
-	 * @return the viewer as a component
-	 */
-	@NotNull
-	static Component getViewerComponent(@NotNull HideNames hidesNames, @NotNull Request request, boolean chat) {
-		return ExceptionUtil.validateNotNullElse(getViewerComponentOrNull(hidesNames, request, chat), VIEWER_NAME);
+	public Component getViewerComponent(@NotNull PublicEffectPayload request, boolean chat) {
+		return ExceptionUtil.validateNotNullElse(getViewerComponentOrNull(request, chat), VIEWER_NAME);
 	}
 
 	/**
@@ -1278,8 +1022,8 @@ public interface Plugin<P, S> {
 	 * @param player the player to check
 	 * @return the version of the mod that the player is using
 	 */
-	default @NotNull Optional<SemVer> getModVersion(@NotNull P player) {
-		return Optional.empty();
+	public @NotNull Optional<SemVer> getModVersion(@NotNull P player) {
+		return Optional.ofNullable(clientVersions.get(playerMapper().getUniqueId(player)));
 	}
 
 	/**
@@ -1288,102 +1032,18 @@ public interface Plugin<P, S> {
 	 * @param player the player to check
 	 * @return the supported features
 	 */
-	default @NotNull Set<ExtraFeature> getExtraFeatures(@NotNull P player) {
-		return EnumSet.noneOf(ExtraFeature.class);
+	public @NotNull Set<ExtraFeature> getExtraFeatures(@NotNull P player) {
+		return extraFeatures.get(playerMapper().getUniqueId(player));
 	}
 
 	/**
-	 * Returns the number of players that are currently using the mod.
+	 * Returns whether the provided feature is currently available to the specified player.
 	 *
-	 * @return the number of players that are currently using the mod
-	 */
-	default int getModdedPlayerCount() {
-		return 0;
-	}
-
-	/**
-	 * Returns whether the provided feature is currently available.
-	 *
+	 * @param player player
 	 * @return whether the feature is supported
 	 */
-	default boolean isFeatureAvailable(@NotNull ExtraFeature feature) {
-		return false;
-	}
-
-	/**
-	 * Gets whether to try auto-linking accounts based on IP address.
-	 *
-	 * @return whether to try auto-linking accounts based on IP address
-	 */
-	default boolean isAutoDetectIP() {
-		return true;
-	}
-
-	/**
-	 * Gets the SocketManager associated with the provided player.
-	 *
-	 * @param player the player to get the SocketManager for
-	 * @return the SocketManager associated with the provided player
-	 */
-	default @NotNull List<SocketManager> getSocketManagersFor(@NotNull P player) {
-		CrowdControl cc = getCrowdControl();
-		if (cc == null) return Collections.emptyList();
-		// get player info
-		UUID uuid = playerMapper().getUniqueId(player);
-		String username = playerMapper().getUsername(player);
-		InetAddress ip = playerMapper().getIP(player).orElse(null);
-		// find managers
-		List<SocketManager> managers = new ArrayList<>();
-		for (SocketManager manager : cc.getConnections()) {
-			// check for source
-			Request.Source source = manager.getSource();
-			if (source == null) {
-				getSLF4JLogger().debug("Skipping SocketManager {} in search for player {}'s sockets for lack of source", manager, username);
-				continue;
-			}
-			boolean found = false;
-			// search for matching data from the app (user-provided name or app-guessed UUID)
-			if (source.login() != null) {
-				LoginData data = new LoginData(source.login());
-				if (uuid.equals(data.getId()) || username.equalsIgnoreCase(data.getName()))
-					found = true;
-			}
-			// else search for matching data from the game (user-provided stream account)
-			if (!found && source.target() != null) {
-				String name = source.target().getName();
-				String login = source.target().getLogin();
-				for (String account : getPlayerManager().getLinkedAccounts(uuid)) {
-					if (account.equalsIgnoreCase(name) || account.equalsIgnoreCase(login)) {
-						found = true;
-						break;
-					}
-				}
-			}
-			// else check if CC app client's IP matches the player's IP
-			if (!found && isAutoDetectIP() && source.ip() != null && source.ip().equals(ip)) {
-				found = true;
-			}
-			// add manager if found
-			if (found) {
-				getSLF4JLogger().debug("Found SocketManager {} for player {}", manager, username);
-				managers.add(manager);
-			} else {
-				getSLF4JLogger().debug("Skipping SocketManager {} in search for player {}'s sockets for lack of matching data", manager, username);
-			}
-		}
-		return managers;
-	}
-
-	/**
-	 * Determines if the provided player has an account linked.
-	 *
-	 * @param player the player to check
-	 * @return true if the player has an account linked, false otherwise
-	 */
-	default boolean hasLinkedAccount(@NotNull P player) {
-		if (!getPlayerManager().getLinkedAccounts(playerMapper().getUniqueId(player)).isEmpty())
-			return true;
-		return !getSocketManagersFor(player).isEmpty();
+	public boolean isFeatureAvailable(@NotNull ExtraFeature feature, @NotNull P player) {
+		return getExtraFeatures(player).contains(feature);
 	}
 
 	/**
@@ -1393,7 +1053,7 @@ public interface Plugin<P, S> {
 	 * @return path if found
 	 */
 	@ApiStatus.Internal
-	default @Nullable Path getPath(@NotNull String asset) {
+	public @Nullable Path getPath(@NotNull String asset) {
 		try {
 			//noinspection DataFlowIssue
 			return Paths.get(getClass().getClassLoader().getResource(asset).toURI());
@@ -1409,14 +1069,7 @@ public interface Plugin<P, S> {
 	 * @return input stream if found
 	 */
 	@ApiStatus.Internal
-	default @Nullable InputStream getInputStream(@NotNull String asset) {
+	public @Nullable InputStream getInputStream(@NotNull String asset) {
 		return getClass().getClassLoader().getResourceAsStream(asset);
 	}
-
-	/**
-	 * Gets the metadata of the Minecraft server.
-	 *
-	 * @return server version
-	 */
-	@NotNull VersionMetadata getVersionMetadata();
 }

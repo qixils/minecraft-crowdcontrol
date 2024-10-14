@@ -1,10 +1,10 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mc;
 
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
-public class FabricPlayer extends FabricLivingEntity implements CCPlayer {
+public class FabricPlayer extends FabricLivingEntity implements MCCCPlayer {
 
 	public FabricPlayer(ServerPlayer entity) {
 		super(entity);

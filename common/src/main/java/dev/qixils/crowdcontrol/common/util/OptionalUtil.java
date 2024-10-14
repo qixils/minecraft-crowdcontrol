@@ -4,8 +4,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class OptionalUtil {
+
+	public static <T> Stream<T> stream(Optional<T> optional) {
+		return optional.map(Stream::of).orElseGet(Stream::empty);
+	}
 
 	@SafeVarargs
 	public static <T> Optional<T> or(@NotNull Optional<T>... optionals) {

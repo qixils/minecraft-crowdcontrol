@@ -10,11 +10,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
-
-import javax.annotation.CheckReturnValue;
 
 import static java.lang.Math.pow;
 

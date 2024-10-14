@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.common.mc;
 /**
  * A player in the game.
  */
-public interface CCPlayer extends CCLivingEntity {
+public interface MCCCPlayer extends CCLivingEntity {
 
 	/**
 	 * Gets the entity's current food level.

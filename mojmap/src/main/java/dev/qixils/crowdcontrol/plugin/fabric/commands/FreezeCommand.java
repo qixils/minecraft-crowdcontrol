@@ -9,7 +9,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import dev.qixils.crowdcontrol.socket.Request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

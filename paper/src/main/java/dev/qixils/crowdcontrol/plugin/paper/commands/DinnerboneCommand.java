@@ -2,9 +2,11 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response.Builder;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
@@ -24,18 +26,16 @@ public class DinnerboneCommand extends RegionalCommandSync {
 
 	public DinnerboneCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
-		this.key = new NamespacedKey(plugin, "original_name");
+		this.key = new NamespacedKey(plugin.getPaperPlugin(), "original_name");
 	}
 
 	@Override
-	protected @NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(ResultType.RETRY)
-			.message("No nearby entities");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No nearby entities");
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		boolean success = false;
 		for (Entity entity : player.getLocation().getNearbyLivingEntities(ENTITY_SEARCH_RADIUS)) {
 			PersistentDataContainer data = entity.getPersistentDataContainer();

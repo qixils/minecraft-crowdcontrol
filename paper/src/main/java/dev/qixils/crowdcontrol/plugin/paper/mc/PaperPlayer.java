@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.paper.mc;
 
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PaperPlayer extends PaperLivingEntity implements CCPlayer {
+public class PaperPlayer extends PaperLivingEntity implements MCCCPlayer {
 
 	public PaperPlayer(@NotNull PaperCrowdControlPlugin plugin, @NotNull Player player) {
 		super(plugin, player);

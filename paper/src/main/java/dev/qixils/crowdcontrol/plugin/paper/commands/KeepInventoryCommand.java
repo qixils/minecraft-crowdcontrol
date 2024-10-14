@@ -1,9 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.TriState;
-import dev.qixils.crowdcontrol.plugin.paper.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.paper.Command;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Request;
 import dev.qixils.crowdcontrol.socket.Respondable;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
@@ -28,7 +27,7 @@ import static dev.qixils.crowdcontrol.common.util.sound.Sounds.LOSE_INVENTORY_AL
 // TODO most of this code is duplicated across all the plugins
 
 @Getter
-public class KeepInventoryCommand extends ImmediateCommand {
+public class KeepInventoryCommand extends Command implements dev.qixils.crowdcontrol.common.command.ImmediateCommand<Player> {
 	private static final Set<UUID> keepingInventory = Collections.synchronizedSet(new HashSet<>(1));
 	private final boolean enable;
 	private final String effectName;
