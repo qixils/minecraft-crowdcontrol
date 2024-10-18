@@ -16,10 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -38,7 +35,7 @@ public class EntityChaosCommand extends PaperCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> CompletableFuture.<List<CompletableFuture<Boolean>>>supplyAsync(() -> {
 			List<Player> players = playerSupplier.get();
 			Set<Entity> entities = new HashSet<>();
 			if (players.stream().anyMatch(plugin::globalEffectsUsableFor)) {
@@ -59,7 +56,7 @@ public class EntityChaosCommand extends PaperCommand {
 			}
 
 			if (entities.size() < ENTITY_CHAOS_MIN)
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Not enough entities found to teleport");
+				return Collections.emptyList();
 
 			int i = 0;
 			List<CompletableFuture<Boolean>> successes = new ArrayList<>();
@@ -73,10 +70,12 @@ public class EntityChaosCommand extends PaperCommand {
 				successes.add(success);
 			}
 
-			return CompletableFutureUtils.allOf(successes)
-				.thenApply($ -> successes.stream().anyMatch(future -> future.state() == Future.State.SUCCESS && future.resultNow() )
-					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not teleport entities")).join();
-		}));
+			return successes;
+		}, plugin.getSyncExecutor()).thenCompose(successes -> successes.isEmpty()
+			? CompletableFuture.completedFuture(new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Not enough entities found to teleport"))
+			: CompletableFutureUtils.allOf(successes)
+			.thenApply($ -> successes.stream().anyMatch(future -> future.state() == Future.State.SUCCESS && future.resultNow())
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not teleport entities"))).join()));
 	}
 }

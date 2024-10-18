@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.sponge7;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
-import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.*;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
@@ -344,7 +343,7 @@ public class SpongeCrowdControlPlugin extends dev.qixils.crowdcontrol.common.Plu
 
 	@Listener
 	public void onServerStop(GameStoppingServerEvent event) {
-		destroyCrowdControl();
+		shutdown();
 	}
 
 	@Listener

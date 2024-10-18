@@ -219,7 +219,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	}
 
 	public void onDisable() {
-		destroyCrowdControl();
+		shutdown();
 	}
 
 	@Override

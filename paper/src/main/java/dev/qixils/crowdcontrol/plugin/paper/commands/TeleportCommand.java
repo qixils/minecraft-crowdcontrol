@@ -93,13 +93,13 @@ public class TeleportCommand extends RegionalCommand {
 		while (dest.getY() > world.getMinHeight()) {
 			Block block = world.getBlockAt(dest.clone().subtract(0, 1, 0));
 			if (block.isCollidable()) {
-				player.teleportAsync(dest);
+				player.teleport(dest); // TODO: folia
 				BoundingBox bb = player.getBoundingBox();
 				if (!world.hasCollisionsIn(bb) && !containsAnyLiquid(world, bb)) {
 					player.playEffect(EntityEffect.TELEPORT_ENDER);
 					return true;
 				}
-				player.teleportAsync(loc);
+				player.teleport(loc); // TODO: folia
 			}
 			dest.subtract(0, 1, 0);
 		}

@@ -43,6 +43,9 @@ public class FlightCommand extends PaperCommand implements Listener, CCTimedEffe
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray()))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
+
 			List<Player> players = playerSupplier.get();
 			uuids.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 			boolean success = false;

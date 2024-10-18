@@ -22,8 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 
 /**
  * Manages the registry of commands (aka effects).
@@ -41,40 +42,6 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 
 	protected AbstractCommandRegister(@NotNull PLUGIN plugin) {
 		this.plugin = plugin;
-	}
-
-	@Nullable
-	protected final <T> T init(@NotNull Supplier<T> supplier, @Nullable Consumer<Exception> onError) {
-		try {
-			return supplier.get();
-		} catch (Exception e) {
-			if (onError != null) {
-				try {
-					onError.accept(e);
-				} catch (Exception e2) {
-					plugin.getSLF4JLogger().error("Failed to initialize {}...", supplier.getClass().getName(), e);
-					plugin.getSLF4JLogger().error("...and failed to call onError", e2);
-				}
-			} else {
-				plugin.getSLF4JLogger().error("Failed to initialize {}", supplier.getClass().getName(), e);
-			}
-			return null;
-		}
-	}
-
-	@Nullable
-	protected final <T> T init(@NotNull Supplier<T> supplier) {
-		return init(supplier, null);
-	}
-
-	protected final <T> void initTo(@NotNull Collection<T> collection, @NotNull Supplier<? extends T> supplier, @Nullable Consumer<Exception> onError) {
-		T t = init(supplier, onError);
-		if (t != null)
-			collection.add(t);
-	}
-
-	protected final <T> void initTo(@NotNull Collection<T> collection, @NotNull Supplier<? extends T> supplier) {
-		initTo(collection, supplier, null);
 	}
 
 	@SafeVarargs

@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 
 public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdControlPlugin> {
 	private static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);

@@ -231,6 +231,12 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	}
 
 	@Override
+	public void shutdown() {
+		super.shutdown();
+		asyncExecutor.shutdown();
+	}
+
+	@Override
 	public @NotNull Audience getConsole() {
 		return adventure().console();
 	}

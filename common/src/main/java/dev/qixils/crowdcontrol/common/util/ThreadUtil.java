@@ -41,8 +41,7 @@ public class ThreadUtil {
 			if (resp != null && (resp.getStatus() == ResponseStatus.SUCCESS || resp.getStatus() == ResponseStatus.FAIL_PERMANENT || resp.getStatus() == ResponseStatus.TIMED_BEGIN)) break;
 			if (i++ > 0 && !sleep()) break;
 		}
-		assert resp != null;
-		return resp;
+		return resp; // if resp is null then cc4j will handle the fail response for us (eventually...)
 	}
 
 	@CheckReturnValue

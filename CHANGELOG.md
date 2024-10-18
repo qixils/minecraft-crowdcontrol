@@ -6,6 +6,7 @@ A list of all changes made to the software in reverse chronological order.
 
 - Redesigned the mod to directly authenticate to Crowd Control and manage your session without needing the app or opened ports
 - Implemented workaround for issue with LuckPerms on Paper
+- Paper: Fixed *Eat Chorus Fruit* teleporting you into blocks
 
 ## 3.7.0
 

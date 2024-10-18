@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
@@ -22,10 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.toPlayers;
@@ -38,6 +36,9 @@ public class GameModeCommand extends PaperCommand implements CCTimedEffect {
 	private final Component displayName;
 	private final String effectName;
 	private final NamespacedKey gamemodeKey;
+
+	private final String effectGroup = "gamemode";
+	private final List<String> effectGroups = Collections.singletonList(effectGroup);
 
 	public GameModeCommand(PaperCrowdControlPlugin plugin, GameMode gamemode, long seconds) {
 		super(plugin);
@@ -64,6 +65,8 @@ public class GameModeCommand extends PaperCommand implements CCTimedEffect {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray()))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
 			List<Player> players = playerSupplier.get();
 			activeRequests.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 			setGameMode(players, gamemode, true);

@@ -359,4 +359,10 @@ public interface Command<P> extends CCEffect {
 	default List<String> getEffectGroups() {
 		return Collections.emptyList();
 	}
+
+	default String[] getEffectArray() {
+		List<String> list = new ArrayList<>(getEffectGroups());
+		list.add(getEffectName().toLowerCase(Locale.US));
+		return list.toArray(new String[0]);
+	}
 }

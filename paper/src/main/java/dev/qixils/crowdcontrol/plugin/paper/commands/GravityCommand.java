@@ -25,7 +25,8 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.removeMod
 import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.toPlayers;
 
 @Getter
-public class GravityCommand extends PaperCommand implements CCTimedEffect {
+public class
+GravityCommand extends PaperCommand implements CCTimedEffect {
 	private final Duration defaultDuration = POTION_DURATION;
 	private final String effectName;
 	private final String effectGroup = "gravity";
@@ -48,10 +49,10 @@ public class GravityCommand extends PaperCommand implements CCTimedEffect {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			List<Player> players = playerSupplier.get();
-
 			if (isActive(ccPlayer, "freeze", effectGroup))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
+
+			List<Player> players = playerSupplier.get();
 
 			playerMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 

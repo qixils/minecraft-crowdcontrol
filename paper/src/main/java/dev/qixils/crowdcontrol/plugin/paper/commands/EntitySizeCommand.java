@@ -71,7 +71,7 @@ public class EntitySizeCommand extends PaperCommand {
 			return success
 				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find entities to resize");
-		}));
+		}, plugin.getSyncExecutor()));
 	}
 
 	public static EntitySizeCommand increase(PaperCrowdControlPlugin plugin) {

@@ -50,6 +50,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
+import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
@@ -777,12 +778,13 @@ public abstract class Plugin<P, S> {
 		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerJoin);
 	}
 
-	public void destroyCrowdControl() {
-		if (crowdControl == null) return;
-		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerLeave);
-		// just in case:
-		new ArrayList<>(crowdControl.getPlayers()).forEach(player -> crowdControl.removePlayer(player.getUuid()));
-		crowdControl = null;
+	public void shutdown() {
+		if (crowdControl != null) {
+			getPlayerManager().getAllPlayersFull().forEach(this::onPlayerLeave);
+			crowdControl.close();
+			crowdControl = null;
+		}
+		scheduledExecutor.shutdown();
 	}
 
 	/**
@@ -948,7 +950,6 @@ public abstract class Plugin<P, S> {
 			TrackedEffect effect = trackedEffects.get(requestId);
 			if (effect == null) return;
 
-
 			getSLF4JLogger().info("Effect response still {}", requestId);
 
 			Command<?> command;
@@ -959,7 +960,6 @@ public abstract class Plugin<P, S> {
 				return;
 			}
 
-
 			getSLF4JLogger().info("Effect response still {} command {}", requestId, command.getEffectName());
 
 			switch (status) {
@@ -967,10 +967,11 @@ public abstract class Plugin<P, S> {
 				case TIMED_BEGIN:
 					getSLF4JLogger().info("Beginning {}", requestId);
 					List<Audience> audiences = new ArrayList<>(3);
-					audiences.add(getConsole());
+
+					initTo(audiences, this::getConsole);
 					if (announce) {
-						audiences.add(playerMapper().asAudience(getPlayerManager().getSpectators().collect(Collectors.toList())));
-						audiences.add(effect.getAudience());
+						initTo(audiences, effect::getAudience);
+						initTo(audiences, () -> playerMapper().asAudience(getPlayerManager().getSpectators().collect(Collectors.toList())));
 					}
 
 					try {

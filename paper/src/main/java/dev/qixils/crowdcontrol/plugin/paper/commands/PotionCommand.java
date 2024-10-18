@@ -98,8 +98,8 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 			}
 
 			return request.getEffect().getDuration() > 0
-				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-				: new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, duration.toMillis());
+				? new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, duration.toMillis())
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 		}));
 	}
 }
