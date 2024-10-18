@@ -2,8 +2,10 @@ package dev.qixils.crowdcontrol.common.command.impl;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 public class HealthModifierCommand<P> implements Command<P>, CCTimedEffect {
 	public static final @NotNull Map<UUID, Modifier> ACTIVE_MODIFIERS = new HashMap<>();
 	private final @NotNull Duration defaultDuration = Duration.ofSeconds(15);
+	private final @NotNull String effectGroup = "health_modifiers";
+	private final @NotNull List<String> effectGroups = Collections.singletonList(effectGroup);
 	private final @NotNull Modifier type;
 	private final @NotNull Plugin<P, ?> plugin;
 	private final @NotNull String effectName;
@@ -32,14 +36,19 @@ public class HealthModifierCommand<P> implements Command<P>, CCTimedEffect {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		playerMap.put(request.getRequestId(), playerSupplier.stream().map(p -> plugin.playerMapper().getUniqueId(p)).collect(Collectors.toSet()));
-		for (P player : playerSupplier)
-			ACTIVE_MODIFIERS.put(plugin.playerMapper().getUniqueId(player), type);
-		ccPlayer.sendResponse(new CCTimedEffectResponse(
-			request.getRequestId(),
-			ResponseStatus.TIMED_BEGIN,
-			request.getEffect().getDuration() * 1000L
-		));
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, effectGroup))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot run two health modifiers at once");
+			List<P> players = playerSupplier.get();
+			playerMap.put(request.getRequestId(), players.stream().map(p -> plugin.playerMapper().getUniqueId(p)).collect(Collectors.toSet()));
+			for (P player : players)
+				ACTIVE_MODIFIERS.put(plugin.playerMapper().getUniqueId(player), type);
+			return new CCTimedEffectResponse(
+				request.getRequestId(),
+				ResponseStatus.TIMED_BEGIN,
+				request.getEffect().getDuration() * 1000L
+			);
+		}));
 	}
 
 	@Override

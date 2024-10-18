@@ -4,8 +4,8 @@ import com.flowpowered.math.vector.Vector3d;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.IUserRecord;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,7 +38,7 @@ public class UniteCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public TriState isSelectable() {
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		return plugin.getPlayerManager().getAllPlayers().size() <= 1 ? TriState.FALSE : TriState.TRUE;
 	}
 }

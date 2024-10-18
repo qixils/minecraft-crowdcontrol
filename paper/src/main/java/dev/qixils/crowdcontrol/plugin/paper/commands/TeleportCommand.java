@@ -1,11 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
+import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -16,14 +18,13 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MAX_RADIUS;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS_FRUIT_MIN_RADIUS;
 
 @Getter
-@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
-public class TeleportCommand extends RegionalCommandSync {
+public class TeleportCommand extends RegionalCommand {
 	private final String effectName = "chorus_fruit";
 
 	public TeleportCommand(PaperCrowdControlPlugin plugin) {
@@ -47,38 +48,38 @@ public class TeleportCommand extends RegionalCommandSync {
 	}
 
 	@Override
-	protected Response.@Nullable Builder precheck(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		if (isActive("walk", request) || isActive("look", request))
-			return request.buildResponse().type(Response.ResultType.RETRY).message("Cannot fling while frozen");
+	protected @Nullable CCEffectResponse precheck(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		if (isActive(ccPlayer, "walk", "look"))
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot fling while frozen");
 		return null;
 	}
 
 	@Override
-	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(Response.ResultType.RETRY)
-			.message("No teleportation destinations were available");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No teleportation destinations were available");
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
-		// TODO: passengers
-		Location loc = player.getLocation();
-		World level = loc.getWorld();
-		double x = loc.getX();
-		double y = loc.getY();
-		double z = loc.getZ();
-		for (int i = 0; i < 16; ++i) {
-			double destX = x + nextDoubleOffset();
-			double destY = Math.clamp(y + nextIntOffset(), level.getMinHeight(), level.getMinHeight() + level.getLogicalHeight() - 1);
-			double destZ = z + nextDoubleOffset();
-			if (!randomTeleport(player, destX, destY, destZ)) continue;
-			// play sound
-			level.playSound(loc, Sound.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			player.playSound(player, Sound.ITEM_CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);
-			return true;
-		}
-		return false;
+	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return CompletableFuture.supplyAsync(() -> {
+			// TODO: passengers
+			Location loc = player.getLocation();
+			World level = loc.getWorld();
+			double x = loc.getX();
+			double y = loc.getY();
+			double z = loc.getZ();
+			for (int i = 0; i < 16; ++i) {
+				double destX = x + nextDoubleOffset();
+				double destY = Math.clamp(y + nextIntOffset(), level.getMinHeight(), level.getMinHeight() + level.getLogicalHeight() - 1);
+				double destZ = z + nextDoubleOffset();
+				if (!randomTeleport(player, destX, destY, destZ)) continue;
+				// play sound
+				level.playSound(loc, Sound.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.playSound(player, Sound.ITEM_CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);
+				return true;
+			}
+			return false;
+		}, getPlugin().getSyncExecutor());
 	}
 
 	public boolean randomTeleport(Player player, double destX, double destY, double destZ) {

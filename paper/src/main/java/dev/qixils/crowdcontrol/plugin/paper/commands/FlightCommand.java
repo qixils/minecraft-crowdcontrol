@@ -1,10 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
@@ -21,7 +23,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 @Getter
-public class FlightCommand extends Command implements Listener, CCTimedEffect {
+public class FlightCommand extends PaperCommand implements Listener, CCTimedEffect {
 	private final String effectName = "flight";
 	private final Duration defaultDuration = Duration.ofSeconds(15);
 	private final Map<UUID, List<UUID>> uuids = new HashMap<>();
@@ -40,24 +42,27 @@ public class FlightCommand extends Command implements Listener, CCTimedEffect {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		uuids.put(request.getRequestId(), playerSupplier.stream().map(Player::getUniqueId).toList());
-		boolean success = false;
-		for (Player player : playerSupplier) {
-			GameMode gameMode = player.getGameMode();
-			if (gameMode == GameMode.CREATIVE)
-				continue;
-			if (gameMode == GameMode.SPECTATOR)
-				continue;
-			if (player.getAllowFlight())
-				continue;
-			if (player.isFlying())
-				continue;
-			success = true;
-			setFlying(player, true);
-		}
-		ccPlayer.sendResponse(success
-			? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-			: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Target is already flying or able to fly"));
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<Player> players = playerSupplier.get();
+			uuids.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
+			boolean success = false;
+			for (Player player : players) {
+				GameMode gameMode = player.getGameMode();
+				if (gameMode == GameMode.CREATIVE)
+					continue;
+				if (gameMode == GameMode.SPECTATOR)
+					continue;
+				if (player.getAllowFlight())
+					continue;
+				if (player.isFlying())
+					continue;
+				success = true;
+				setFlying(player, true);
+			}
+			return success
+				? new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Target is already flying or able to fly");
+		}));
 	}
 
 	@Override

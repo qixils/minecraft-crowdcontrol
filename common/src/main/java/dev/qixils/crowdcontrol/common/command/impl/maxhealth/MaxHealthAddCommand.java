@@ -27,7 +27,8 @@ public class MaxHealthAddCommand<P> implements Command<P> {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		int amount = request.getQuantity();
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			for (P rawPlayer : playerSupplier) {
+			List<P> players = playerSupplier.get();
+			for (P rawPlayer : players) {
 				MCCCPlayer player = plugin.getPlayer(rawPlayer);
 				sync(() -> {
 					player.maxHealthOffset(player.maxHealthOffset() + amount);

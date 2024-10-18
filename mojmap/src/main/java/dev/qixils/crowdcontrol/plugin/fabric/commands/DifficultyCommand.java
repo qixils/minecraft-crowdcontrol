@@ -50,7 +50,7 @@ public class DifficultyCommand extends ImmediateCommand {
 			for (Command<ServerPlayer> command : plugin.commandRegister().getCommands()) {
 				if (!(command instanceof EntityCommand<?>))
 					continue;
-				TriState state = command.isSelectable();
+				TriState state = command.isSelectable(ccPlayer, );
 				if (state != TriState.UNKNOWN)
 					plugin.updateEffectStatus(plugin.getCrowdControl(), state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, command);
 			}

@@ -146,16 +146,20 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 
 	@Override
 	protected void registerListener(Command<Player> command) {
-		Bukkit.getPluginManager().registerEvents((Listener) command, plugin);
+		if (command instanceof Listener listener)
+			Bukkit.getPluginManager().registerEvents(listener, plugin.getPaperPlugin());
+		else
+			plugin.getSLF4JLogger().warn("Could not register listener for command {}", command.getEffectName());
 	}
 
 	@Override
 	protected void onFirstRegistry() {
-		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
-		Bukkit.getPluginManager().registerEvents(new MovementStatusCommand.Manager(), plugin);
-		Bukkit.getPluginManager().registerEvents(new LootboxCommand.Manager(plugin), plugin);
-		Bukkit.getPluginManager().registerEvents(new FreezeCommand.Manager(plugin), plugin);
-		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(plugin), plugin);
-		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), plugin);
+		PaperLoader paperPlugin = plugin.getPaperPlugin();
+		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new MovementStatusCommand.Manager(), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new LootboxCommand.Manager(plugin), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new FreezeCommand.Manager(plugin), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(paperPlugin), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), paperPlugin);
 	}
 }

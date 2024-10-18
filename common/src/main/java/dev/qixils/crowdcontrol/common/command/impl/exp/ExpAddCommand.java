@@ -23,8 +23,9 @@ public class ExpAddCommand<P> implements Command<P> {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		List<P> players = playerSupplier.get();
 		int amount = Math.max(1, request.getQuantity());
-		sync(() -> playerSupplier.stream().map(plugin::getPlayer).forEach(player -> player.addXpLevel(amount)));
+		sync(() -> players.stream().map(plugin::getPlayer).forEach(player -> player.addXpLevel(amount)));
 		ccPlayer.sendResponse(new CCInstantEffectResponse(
 			request.getRequestId(),
 			ResponseStatus.SUCCESS

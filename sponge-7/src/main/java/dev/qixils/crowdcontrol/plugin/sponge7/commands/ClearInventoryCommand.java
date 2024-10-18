@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.IUserRecord;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.living.player.Player;
@@ -41,7 +42,7 @@ public class ClearInventoryCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public TriState isSelectable() {
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		if (!plugin.isGlobal())
 			return TriState.TRUE;
 		return globalKeepInventory ? TriState.FALSE : TriState.TRUE;

@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.fabric.FeatureElementCommand;
 import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.IUserRecord;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
@@ -37,7 +38,7 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 	}
 
 	@Override
-	default TriState isSelectable() {
+	default TriState isSelectable(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
 		if (!isMonster())
 			return TriState.UNKNOWN;
 		if (!serverIsPeaceful())

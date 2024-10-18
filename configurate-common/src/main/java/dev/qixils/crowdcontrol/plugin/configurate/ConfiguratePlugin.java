@@ -77,7 +77,6 @@ public abstract class ConfiguratePlugin<P, S> extends Plugin<P, S> {
 		global = config.node("global").getBoolean(global);
 		announce = config.node("announce").getBoolean(announce);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
-		autoDetectIP = config.node("ip-detect").getBoolean(autoDetectIP);
 	}
 
 	public void saveConfig() {
@@ -93,7 +92,6 @@ public abstract class ConfiguratePlugin<P, S> extends Plugin<P, S> {
 			config.node("global").set(global);
 			config.node("announce").set(announce);
 			config.node("hide-names").set(hideNames.getConfigCode());
-			config.node("ip-detect").set(autoDetectIP);
 			getConfigLoader().save(config);
 		} catch (ConfigurateException e) {
 			throw new RuntimeException("Could not save plugin config", e);

@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.common.command.impl.health;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.Command;
-import dev.qixils.crowdcontrol.common.command.CommandGroups;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import live.crowdcontrol.cc4j.CCPlayer;
@@ -16,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static dev.qixils.crowdcontrol.common.util.ArrayUtil.concat;
-
 @RequiredArgsConstructor
 @Getter
 public class KillCommand<P> implements Command<P> {
@@ -27,14 +24,15 @@ public class KillCommand<P> implements Command<P> {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			if (isActive(ccPlayer, concat(CommandGroups.HEALTH_MODIFIERS, CommandGroups.FREEZE_MODIFIERS))) {
+			List<P> players = playerSupplier.get();
+			if (isActive(ccPlayer, "health_modifiers", "freeze")) {
 				return new CCInstantEffectResponse(
 					request.getRequestId(),
 					ResponseStatus.FAIL_TEMPORARY,
 					"Cannot kill players under the effects of health or location modifiers"
 				);
 			}
-			sync(() -> playerSupplier.stream().map(plugin::getPlayer).forEach(MCCCPlayer::kill));
+			sync(() -> players.stream().map(plugin::getPlayer).forEach(MCCCPlayer::kill));
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 		}));
 	}

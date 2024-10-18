@@ -27,8 +27,9 @@ public class FoodSubCommand<P> implements Command<P> {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		int amount = request.getQuantity() * 2;
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<P> players = playerSupplier.get();
 			boolean success = false;
-			for (P rawPlayer : playerSupplier) {
+			for (P rawPlayer : players) {
 				MCCCPlayer player = plugin.getPlayer(rawPlayer);
 				int currFood = player.foodLevel();
 				double currSaturation = player.saturation();

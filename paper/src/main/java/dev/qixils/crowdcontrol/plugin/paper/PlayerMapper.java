@@ -35,7 +35,7 @@ class PlayerMapper extends CommandSenderMapper<Player> implements PlayerEntityMa
 
 	@Override
 	public @NotNull Optional<Player> getPlayer(@NotNull UUID uuid) {
-		return Optional.ofNullable(plugin.getServer().getPlayer(uuid));
+		return Optional.ofNullable(Bukkit.getServer().getPlayer(uuid));
 	}
 
 	@Override

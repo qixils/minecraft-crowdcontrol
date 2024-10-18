@@ -1,10 +1,9 @@
 package dev.qixils.crowdcontrol.common.util;
 
-import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import live.crowdcontrol.cc4j.CrowdControl;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
-import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,7 @@ public class ThreadUtil {
 		return !Thread.interrupted();
 	}
 
+	@CheckReturnValue
 	public static @NotNull CCEffectResponse waitForSuccess(Supplier<CCEffectResponse> supplier) {
 		CCEffectResponse resp = null;
 		long time = System.currentTimeMillis();
@@ -45,6 +45,7 @@ public class ThreadUtil {
 		return resp;
 	}
 
+	@CheckReturnValue
 	public static @NotNull CCEffectResponse waitForSuccess(Supplier<CCEffectResponse> supplier, @NotNull Executor executor) {
 		return waitForSuccess(() -> CompletableFuture.supplyAsync(supplier, executor).join());
 	}

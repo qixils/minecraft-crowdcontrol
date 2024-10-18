@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import dev.qixils.crowdcontrol.plugin.paper.FeatureElementCommand;
 import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
@@ -45,7 +46,7 @@ public interface EntityCommand extends FeatureElementCommand {
 	}
 
 	@Override
-	default TriState isSelectable() {
+	default TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		if (!isMonster())
 			return TriState.UNKNOWN;
 		if (!serverIsPeaceful())

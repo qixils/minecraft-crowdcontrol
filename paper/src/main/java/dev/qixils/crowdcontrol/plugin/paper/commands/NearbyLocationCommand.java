@@ -117,7 +117,7 @@ abstract class NearbyLocationCommand<S> extends RegionalCommand {
 					return completedStage(false);
 
 				return CompletableFuture
-					.supplyAsync(() -> safeLocation(search), runnable -> Bukkit.getRegionScheduler().run(plugin, search, $ -> runnable.run()))
+					.supplyAsync(() -> safeLocation(search), runnable -> Bukkit.getRegionScheduler().run(plugin.getPaperPlugin(), search, $ -> runnable.run()))
 					.thenCompose(destination -> {
 						if (destination == null)
 							return completedStage(false);

@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
+import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +53,17 @@ public interface PlayerManager<P> {
 	@NotNull
 	List<@NotNull P> getAllPlayersFull();
 
+	default Stream<P> getPotentialPlayers(final @NotNull IUserRecord user) {
+		// TODO: filter specs? would need gamemode change checks >.<
+
+		if (getPlugin().isGlobal())
+			return getAllPlayersFull().stream();
+
+		return stream(getPlugin().optionalCrowdControl())
+			.flatMap(cc -> cc.getPlayerIds(user.getId()).stream())
+			.flatMap(uuid -> stream(getPlugin().playerMapper().getPlayer(uuid)));
+	}
+
 	/**
 	 * Fetches all online players that should be affected by the provided {@link PublicEffectPayload}.
 	 *
@@ -61,13 +73,7 @@ public interface PlayerManager<P> {
 	@CheckReturnValue
 	@NotNull
 	default Stream<@NotNull P> getPlayers(final @NotNull PublicEffectPayload request) {
-		if (getPlugin().isGlobal())
-			return getAllPlayers(request);
-
-		return stream(getPlugin().optionalCrowdControl())
-			.flatMap(cc -> cc.getPlayerIds(request.getTarget().getId()).stream())
-			.flatMap(uuid -> stream(getPlugin().playerMapper().getPlayer(uuid)))
-			.filter(player -> canApply(player, request));
+		return getPotentialPlayers(request.getTarget()).filter(player -> canApply(player, request));
 	}
 
 	/**

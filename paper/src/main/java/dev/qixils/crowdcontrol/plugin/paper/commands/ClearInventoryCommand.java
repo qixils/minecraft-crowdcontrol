@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
@@ -12,6 +13,8 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import static dev.qixils.crowdcontrol.plugin.paper.commands.KeepInventoryCommand.globalKeepInventory;
 
@@ -42,7 +45,7 @@ public class ClearInventoryCommand extends RegionalCommandSync {
 	}
 
 	@Override
-	public TriState isSelectable() {
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		if (!plugin.isGlobal())
 			return TriState.TRUE;
 		return globalKeepInventory ? TriState.FALSE : TriState.TRUE;

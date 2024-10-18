@@ -28,8 +28,9 @@ public class ExpSubCommand<P> implements Command<P> {
 		int amount = request.getQuantity();
 
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<P> players = playerSupplier.get();
 			boolean success = false;
-			for (P rawPlayer : playerSupplier) {
+			for (P rawPlayer : players) {
 				MCCCPlayer player = plugin.getPlayer(rawPlayer);
 				int curLevel = player.xpLevel();
 				int newLevel = curLevel - amount;

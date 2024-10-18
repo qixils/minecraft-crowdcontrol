@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.common.command.impl.health;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.Command;
-import dev.qixils.crowdcontrol.common.command.CommandGroups;
 import dev.qixils.crowdcontrol.common.command.QuantityStyle;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
@@ -28,15 +27,16 @@ public class HealCommand<P> implements Command<P> {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		int amount = request.getQuantity() * 2;
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			if (isActive(ccPlayer, CommandGroups.HEALTH_MODIFIERS)) {
+			if (isActive(ccPlayer, "health_modifier")) {
 				return new CCInstantEffectResponse(
 					request.getRequestId(),
 					ResponseStatus.FAIL_TEMPORARY,
 					"Cannot heal players under the effects of health modifiers"
 				);
 			}
+			List<P> players = playerSupplier.get();
 			boolean success = false;
-			for (P rawPlayer : playerSupplier) {
+			for (P rawPlayer : players) {
 				MCCCPlayer player = plugin.getPlayer(rawPlayer);
 				double oldHealth = player.health();
 				double maxHealth = player.maxHealth();

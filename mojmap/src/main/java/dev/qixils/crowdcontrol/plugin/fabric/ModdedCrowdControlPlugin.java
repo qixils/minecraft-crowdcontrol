@@ -52,7 +52,6 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
 
@@ -92,7 +91,6 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		}
 	};
 	private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
-	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	private final Logger SLF4JLogger = LoggerFactory.getLogger("CrowdControl");
 	private final PlayerManager<ServerPlayer> playerManager = new MojmapPlayerManager(this);
 	@Accessors(fluent = true)

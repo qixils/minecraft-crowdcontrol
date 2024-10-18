@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.WEATHER_TICKS;
 
 @Global
-public abstract class AbstractWeatherCommand extends Command {
+public abstract class AbstractWeatherCommand extends PaperCommand {
 	protected static final int WEATHER_DURATION = (int) WEATHER_TICKS;
 
 	public AbstractWeatherCommand(PaperCrowdControlPlugin plugin) {
@@ -32,7 +32,7 @@ public abstract class AbstractWeatherCommand extends Command {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			boolean success = false;
 			for (World world : Bukkit.getWorlds()) {
 				if (world.getEnvironment() != World.Environment.NORMAL)
@@ -45,6 +45,6 @@ public abstract class AbstractWeatherCommand extends Command {
 			return success
 				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "This weather is already applied");
-		}, plugin.getSyncExecutor());
+		}, plugin.getSyncExecutor()));
 	}
 }

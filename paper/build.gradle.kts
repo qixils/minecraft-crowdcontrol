@@ -47,7 +47,7 @@ java {
 paper {
     name = "CrowdControl"
     version = project.version.toString() + "+paper"
-    main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
+    main = "dev.qixils.crowdcontrol.plugin.paper.PaperLoader"
     apiVersion = minecraftVersion
     prefix = "CrowdControl"
     authors = listOf("qixils")

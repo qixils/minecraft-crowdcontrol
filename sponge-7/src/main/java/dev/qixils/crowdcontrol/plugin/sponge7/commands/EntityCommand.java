@@ -4,6 +4,7 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.IUserRecord;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.EntityType;
@@ -33,7 +34,7 @@ public interface EntityCommand extends Command<Player> {
 	}
 
 	@Override
-	default TriState isSelectable() {
+	default TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		if (!isMonster())
 			return TriState.UNKNOWN;
 		if (!serverIsPeaceful())

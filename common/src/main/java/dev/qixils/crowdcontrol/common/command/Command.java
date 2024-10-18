@@ -13,6 +13,7 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import live.crowdcontrol.cc4j.CCEffect;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CrowdControl;
+import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
@@ -321,7 +322,7 @@ public interface Command<P> extends CCEffect {
 	 *
 	 * @return whether this effect is selectable
 	 */
-	default TriState isSelectable() {
+	default TriState isSelectable(@NotNull IUserRecord user, @NotNull List<P> potentialPlayers) {
 		return TriState.UNKNOWN;
 	}
 
@@ -330,7 +331,7 @@ public interface Command<P> extends CCEffect {
 	 *
 	 * @return whether this effect is visible
 	 */
-	default TriState isVisible() {
+	default TriState isVisible(@NotNull IUserRecord user, @NotNull List<P> potentialPlayers) {
 		return TriState.UNKNOWN;
 	}
 
@@ -350,6 +351,12 @@ public interface Command<P> extends CCEffect {
 		CrowdControl cc = getPlugin().getCrowdControl();
 		if (cc == null) return false;
 		UUID uuid = player.getUuid();
-		return Arrays.stream(effectIDs).anyMatch(effectID -> cc.isPlayerEffectActive(effectID, uuid));
+		return Arrays.stream(effectIDs)
+			.flatMap(effectID -> Stream.concat(Stream.of(effectID), getPlugin().commandRegister().getEffectsByGroup(effectID).stream()))
+			.anyMatch(effectID -> cc.isPlayerEffectActive(effectID, uuid));
+	}
+
+	default List<String> getEffectGroups() {
+		return Collections.emptyList();
 	}
 }

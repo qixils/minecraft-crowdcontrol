@@ -2,7 +2,8 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
@@ -28,7 +29,7 @@ import java.util.function.Supplier;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public class FreezeCommand extends Command implements CCTimedEffect {
+public class FreezeCommand extends PaperCommand implements CCTimedEffect {
 	public static final Map<UUID, List<FreezeData>> DATA = new HashMap<>();
 	private static final Map<UUID, Map<UUID, FreezeData>> TIMED_EFFECTS = new HashMap<>();
 
@@ -65,16 +66,19 @@ public class FreezeCommand extends Command implements CCTimedEffect {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		Map<UUID, FreezeData> locations = new HashMap<>();
-		playerSupplier.forEach(player -> {
-			UUID uuid = player.getUniqueId();
-			FreezeData data = new FreezeData(modifier, player.getLocation());
-			locations.put(uuid, data);
-			DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data);
-			MovementStatusCommand.setValue(plugin, player, freezeType, freezeValue);
-		});
-		TIMED_EFFECTS.put(request.getRequestId(), locations);
-		ccPlayer.sendResponse(new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L));
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<Player> players = playerSupplier.get();
+			Map<UUID, FreezeData> locations = new HashMap<>();
+			players.forEach(player -> {
+				UUID uuid = player.getUniqueId();
+				FreezeData data = new FreezeData(modifier, player.getLocation());
+				locations.put(uuid, data);
+				DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data);
+				MovementStatusCommand.setValue(plugin, player, freezeType, freezeValue);
+			});
+			TIMED_EFFECTS.put(request.getRequestId(), locations);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
 	}
 
 	@Override

@@ -41,6 +41,6 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 
 	@Override
 	public boolean isSpectator(@NotNull Player player) {
-		return player.getGameMode() == GameMode.SPECTATOR && !GameModeCommand.isEffectActive(plugin, player);
+		return player.getGameMode() == GameMode.SPECTATOR && !GameModeCommand.isEffectActive(plugin.getPaperPlugin(), player);
 	}
 }

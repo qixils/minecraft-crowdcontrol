@@ -3,13 +3,11 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
-import live.crowdcontrol.cc4j.CrowdControl;
-import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
+import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
-import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
@@ -23,13 +21,12 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Getter
 @Global
-public class DifficultyCommand extends Command {
+public class DifficultyCommand extends PaperCommand {
 	private static final Logger log = LoggerFactory.getLogger(DifficultyCommand.class);
 	private final Difficulty difficulty;
 	private final String effectName;
@@ -48,32 +45,15 @@ public class DifficultyCommand extends Command {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			if (difficulty.equals(getCurrentDifficulty()))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Server difficulty is already on " + plugin.getTextUtil().asPlain(displayName));
 			sync(() -> Bukkit.getServer().getWorlds().forEach(world -> world.setDifficulty(difficulty)));
 
-			// effect report update
-			CrowdControl cc = plugin.getCrowdControl();
-			if (cc == null) {
-				log.warn("getCrowdControl undefined!?");
-			} else {
-				Map<ReportStatus, List<String>> reports = new HashMap<>();
-				reports.put(ReportStatus.MENU_AVAILABLE, Arrays.stream(Difficulty.values()).filter(dif -> dif != difficulty).map(dif -> effectNameOf(difficulty)).collect(Collectors.toList()));
-				reports.put(ReportStatus.MENU_UNAVAILABLE, Collections.singletonList(effectName));
-				// TODO: this is a cute idea but it would make more sense to just store the state of every sent report for every player and just update from that
-				//  probably add some smart logic for this to cc4j
-				for (EntityCommand command : plugin.commandRegister().getCommands(EntityCommand.class)) {
-					TriState state = command.isSelectable();
-					if (state != TriState.UNKNOWN)
-						reports.get(state == TriState.TRUE ? ReportStatus.MENU_AVAILABLE : ReportStatus.MENU_UNAVAILABLE).add(command.getEffectName().toLowerCase(Locale.US));
-				}
-				CCEffectReport[] reportList = reports.entrySet().stream().map((entry) -> new CCEffectReport(entry.getKey(), entry.getValue())).toArray(CCEffectReport[]::new);
-				cc.getPlayers().forEach(ccp -> ccp.sendReport(reportList));
-			}
+			plugin.optionalCrowdControl().ifPresent(cc -> cc.getPlayers().forEach(plugin::updateConditionalEffectVisibility));
 
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
-		});
+		}));
 	}
 
 	@Nullable
@@ -89,7 +69,7 @@ public class DifficultyCommand extends Command {
 	}
 
 	@Override
-	public TriState isSelectable() {
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		return difficulty.equals(getCurrentDifficulty()) ? TriState.FALSE : TriState.TRUE;
 	}
 }

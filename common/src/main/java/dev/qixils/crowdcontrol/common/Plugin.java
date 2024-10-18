@@ -13,6 +13,7 @@ import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import live.crowdcontrol.cc4j.CCEventType;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CrowdControl;
+import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.UserToken;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
 import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
@@ -20,7 +21,6 @@ import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.CCUserRecord;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -222,13 +222,12 @@ public abstract class Plugin<P, S> {
 	);
 
 	/**
-	 * A warning message sent to players when they join the server if they have no stream account linked.
+	 * A message sent to players when they join the server if they have no stream account linked.
 	 */
 	public static final Component LINK_MESSAGE = translatable(
 		"cc.join.link.text",
 		TextColor.color(0xF1D4FC)
-	)
-		.hoverEvent(translatable("cc.join.link.hover"));
+	);
 
 	/**
 	 * A warning message sent to players when they join the server if global effects are
@@ -249,8 +248,6 @@ public abstract class Plugin<P, S> {
 	protected CrowdControl crowdControl = null;
 	protected boolean global = false;
 	protected boolean announce = true;
-	@Getter
-	protected boolean autoDetectIP = true;
 	@NotNull
 	protected HideNames hideNames = HideNames.NONE;
 	@NotNull
@@ -260,7 +257,7 @@ public abstract class Plugin<P, S> {
 	@NotNull
 	protected SoftLockConfig softLockConfig = new SoftLockConfig();
 	@NotNull
-	protected final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	protected final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
 	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
@@ -791,15 +788,19 @@ public abstract class Plugin<P, S> {
 	/**
 	 * Gets the visibility of conditional effects (i.e. client effects & global effects).
 	 *
-	 * @param player the player to generate the packets for
+	 * @param user the player to generate the packets for
 	 */
 	@CheckReturnValue
-	public @NotNull CCEffectReport @NotNull [] getConditionalEffectVisibility(P player) {
-		if (player == null) return new CCEffectReport[]{};
-		if (crowdControl == null) return new CCEffectReport[]{};
+	public @NotNull CCEffectReport @NotNull [] getConditionalEffectVisibility(IUserRecord user) {
+		// TODO: some scenarios here we might want to return a full UNAVAILABLE ? or stop session or something?
+		if (user == null) return new CCEffectReport[0];
+		if (crowdControl == null) return new CCEffectReport[0];
 
-		SemVer clientVersion = getModVersion(player).orElse(SemVer.ZERO);
-		boolean globalVisible = globalEffectsUsableFor(player);
+		List<P> potentialPlayers = getPlayerManager().getPotentialPlayers(user).collect(Collectors.toList());
+		if (potentialPlayers.isEmpty()) return new CCEffectReport[0];
+
+		SemVer clientVersion = potentialPlayers.stream().map(player -> getModVersion(player).orElse(SemVer.ZERO)).max(SemVer::compareTo).orElse(SemVer.ZERO);
+		boolean globalVisible = potentialPlayers.stream().anyMatch(this::globalEffectsUsableFor);
 		getSLF4JLogger().debug("Updating conditional effects: clientVersion={}, globalVisible={}", clientVersion, globalVisible);
 		Map<ReportStatus, List<String>> effects = new HashMap<>();
 
@@ -824,13 +825,13 @@ public abstract class Plugin<P, S> {
 
 		for (Command<P> effect : commandRegister().getCommands()) {
 			String id = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-			TriState visibility = effect.isVisible(); // TODO: accept player
+			TriState visibility = effect.isVisible(user, potentialPlayers);
 			if (visibility != TriState.FALSE) {
 				Set<ExtraFeature> extraFeatures;
 				SemVer minVersion;
 				// this assumes that if a player has a feature available then they also have a client available
 				if (!(extraFeatures = effect.requiredExtraFeatures()).isEmpty()) {
-					boolean available = extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player));
+					boolean available = potentialPlayers.stream().anyMatch(player -> extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player)));
 					visibility = TriState.fromBoolean(available);
 				} else if ((minVersion = effect.getMinimumModVersion()).isAtLeast(SemVer.ZERO)) {
 					visibility = TriState.fromBoolean(clientVersion.isAtLeast(minVersion));
@@ -840,7 +841,7 @@ public abstract class Plugin<P, S> {
 			if (visibility != TriState.UNKNOWN)
 				effects.computeIfAbsent(visibility == TriState.TRUE ? ReportStatus.MENU_VISIBLE : ReportStatus.MENU_HIDDEN, k -> new ArrayList<>()).add(id);
 
-			TriState selectable = effect.isSelectable(); // TODO: accept player
+			TriState selectable = effect.isSelectable(user, potentialPlayers);
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
 				effects.computeIfAbsent(selectable == TriState.TRUE ? ReportStatus.MENU_AVAILABLE : ReportStatus.MENU_UNAVAILABLE, k -> new ArrayList<>()).add(id);
 		}
@@ -861,18 +862,26 @@ public abstract class Plugin<P, S> {
 	/**
 	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
 	 *
-	 * @param player the player to send the packets to
+	 * @param ccPlayer the player to send the packets to
 	 */
-	public void updateConditionalEffectVisibility(P player) {
-		CCPlayer ccPlayer = optionalCCPlayer(player).orElse(null);
+	public void updateConditionalEffectVisibility(CCPlayer ccPlayer) {
 		if (ccPlayer == null) return;
 		if (ccPlayer.getGameSessionId() == null) return;
-		if (ccPlayer.getToken() == null) return;
+		if (ccPlayer.getUserToken() == null) return;
 
-		CCEffectReport[] reports = getConditionalEffectVisibility(player);
+		CCEffectReport[] reports = getConditionalEffectVisibility(ccPlayer.getUserToken());
 		if (reports.length == 0) return;
 
 		ccPlayer.sendReport(reports);
+	}
+
+	/**
+	 * Updates the visibility of conditional effects (i.e. client effects & global effects).
+	 *
+	 * @param player the player to send the packets to
+	 */
+	public void updateConditionalEffectVisibility(P player) {
+		updateConditionalEffectVisibility(optionalCCPlayer(player).orElse(null));
 	}
 
 	/**
@@ -914,18 +923,33 @@ public abstract class Plugin<P, S> {
 		});
 		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTHENTICATED, () -> {
 			if (ccPlayer.getGameSessionId() != null) return;
-			// ensure player is still online
-			Optional<P> optPlayer = mapper.getPlayer(uuid);
-			if (!optPlayer.isPresent()) return;
-			P player = optPlayer.get();
+			if (ccPlayer.getUserToken() == null) return; // !?
+			playerMapper().getPlayer(ccPlayer.getUuid()).ifPresent(p -> playerMapper().asAudience(p)
+				.sendMessage(PREFIX_COMPONENT.append(translatable("cc.join.authenticated").args(text(ccPlayer.getUserToken().getName())))));
 			// start session
-			ccPlayer.startSession(getConditionalEffectVisibility(player));
+			ccPlayer.startSession(getConditionalEffectVisibility(ccPlayer.getUserToken()));
+		});
+		ccPlayer.getEventManager().registerEventRunnable(CCEventType.SESSION_STARTED, () -> {
+			UserToken user = ccPlayer.getUserToken();
+			if (user == null) return;
+			playerMapper().getPlayer(ccPlayer.getUuid()).ifPresent(p -> playerMapper().asAudience(p)
+				.sendMessage(PREFIX_COMPONENT
+					.append(translatable("cc.join.session"))
+					.clickEvent(ClickEvent.copyToClipboard(
+						String.format("https://interact.crowdcontrol.live/#/%s/%s", user.getProfile().getValue(), user.getOriginId())))));
+		});
+		ccPlayer.getEventManager().registerEventConsumer(CCEventType.EFFECT_REQUEST, request -> {
+			getSLF4JLogger().info("New request {}", request.getRequestId());
 		});
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.EFFECT_RESPONSE, response -> {
 			UUID requestId = response.getRequestId();
+			getSLF4JLogger().info("Effect response {}", requestId);
 			ResponseStatus status = response.getStatus();
 			TrackedEffect effect = trackedEffects.get(requestId);
 			if (effect == null) return;
+
+
+			getSLF4JLogger().info("Effect response still {}", requestId);
 
 			Command<?> command;
 			try {
@@ -935,9 +959,13 @@ public abstract class Plugin<P, S> {
 				return;
 			}
 
+
+			getSLF4JLogger().info("Effect response still {} command {}", requestId, command.getEffectName());
+
 			switch (status) {
 				case SUCCESS:
 				case TIMED_BEGIN:
+					getSLF4JLogger().info("Beginning {}", requestId);
 					List<Audience> audiences = new ArrayList<>(3);
 					audiences.add(getConsole());
 					if (announce) {
@@ -951,6 +979,7 @@ public abstract class Plugin<P, S> {
 							getViewerComponent(effect.getRequest(), true).color(Plugin.USER_COLOR),
 							command.getProcessedDisplayName(effect.getRequest()).colorIfAbsent(Plugin.CMD_COLOR)
 						));
+						getSLF4JLogger().info("Begun {}", requestId);
 					} catch (Exception e) {
 						LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
 					}
@@ -959,8 +988,11 @@ public abstract class Plugin<P, S> {
 				case FAIL_PERMANENT:
 				case TIMED_END:
 				case UNKNOWN:
+					getSLF4JLogger().info("Byebye {}", requestId);
 					trackedEffects.remove(requestId);
 			}
+
+			getSLF4JLogger().info("Cya {}", requestId);
 		});
 	}
 
@@ -1033,7 +1065,7 @@ public abstract class Plugin<P, S> {
 	 * @return the supported features
 	 */
 	public @NotNull Set<ExtraFeature> getExtraFeatures(@NotNull P player) {
-		return extraFeatures.get(playerMapper().getUniqueId(player));
+		return extraFeatures.getOrDefault(playerMapper().getUniqueId(player), Collections.emptySet());
 	}
 
 	/**

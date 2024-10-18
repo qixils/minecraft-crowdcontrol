@@ -36,6 +36,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	protected final @NotNull Set<Class<? extends Command<PLAYER>>> registeredCommandClasses = new HashSet<>();
 	protected final @NotNull Map<Class<? extends Command<PLAYER>>, Command<PLAYER>> singleCommandInstances = new HashMap<>();
 	protected final @NotNull Map<@Nullable String, Command<PLAYER>> registeredCommandMap = new HashMap<>();
+	protected final @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> effectGroupMap = new HashMap<>();
 	protected @MonotonicNonNull List<Command<PLAYER>> registeredCommands;
 
 	protected AbstractCommandRegister(@NotNull PLUGIN plugin) {
@@ -119,6 +120,9 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		for (Command<PLAYER> command : commands) {
 			String effectName = command.getEffectName().toLowerCase(Locale.ENGLISH);
 			registeredCommandMap.put(effectName, command);
+
+			for (String effectGroup : command.getEffectGroups())
+				effectGroupMap.computeIfAbsent(effectGroup, $ -> new ArrayList<>()).add(effectName);
 
 			//noinspection unchecked
 			Class<Command<PLAYER>> clazz = (Class<Command<PLAYER>>) command.getClass();
@@ -214,5 +218,9 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				+ ", not " + command.getClass().getSimpleName());
 		//noinspection unchecked
 		return (T) command;
+	}
+
+	public final List<String> getEffectsByGroup(@NotNull String effectGroup) {
+		return Collections.unmodifiableList(effectGroupMap.getOrDefault(effectGroup, Collections.emptyList()));
 	}
 }

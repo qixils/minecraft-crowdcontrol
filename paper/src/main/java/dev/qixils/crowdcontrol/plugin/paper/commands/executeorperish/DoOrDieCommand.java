@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.paper.commands.LootboxCommand;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
-public class DoOrDieCommand extends Command implements CCTimedEffect {
+public class DoOrDieCommand extends PaperCommand implements CCTimedEffect {
 	private final String effectName = "do_or_die";
 
 	public DoOrDieCommand(@NotNull PaperCrowdControlPlugin plugin) {
@@ -45,7 +45,7 @@ public class DoOrDieCommand extends Command implements CCTimedEffect {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			List<Player> players = playerSupplier.get();
 			List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
 			Collections.shuffle(conditions, random);
@@ -108,6 +108,6 @@ public class DoOrDieCommand extends Command implements CCTimedEffect {
 			}, 1, tickRate);
 
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
-		});
+		}));
 	}
 }

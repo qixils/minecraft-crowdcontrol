@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 import static net.kyori.adventure.text.Component.text;
 
-public abstract class RegionalCommand extends Command {
+public abstract class RegionalCommand extends PaperCommand {
 	protected RegionalCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -47,7 +47,7 @@ public abstract class RegionalCommand extends Command {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			List<Player> players = playerSupplier.get();
 			CCEffectResponse precheck = precheck(players, request, ccPlayer);
 			if (precheck != null) return precheck;
@@ -78,6 +78,6 @@ public abstract class RegionalCommand extends Command {
 				}
 				return buildFailure(request, ccPlayer);
 			}).join();
-		});
+		}));
 	}
 }

@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.sponge7.utils.SpongeTextUtil;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.IUserRecord;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +46,7 @@ public class DifficultyCommand extends ImmediateCommand {
 			for (Difficulty dif : plugin.getRegistry().getAllOf(Difficulty.class))
 				plugin.updateEffectStatus(plugin.getCrowdControl(), dif.equals(difficulty) ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE, effectNameOf(dif));
 			for (EntityCommand command : plugin.commandRegister().getCommands(EntityCommand.class)) {
-				TriState state = command.isSelectable();
+				TriState state = command.isSelectable(ccPlayer, );
 				if (state != TriState.UNKNOWN)
 					plugin.updateEffectStatus(plugin.getCrowdControl(), state == TriState.TRUE ? ResultType.SELECTABLE : ResultType.NOT_SELECTABLE, command);
 			}
@@ -66,7 +67,7 @@ public class DifficultyCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public TriState isSelectable() {
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		return difficulty.equals(getCurrentDifficulty()) ? TriState.FALSE : TriState.TRUE;
 	}
 }

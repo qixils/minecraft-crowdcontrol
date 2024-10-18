@@ -22,11 +22,11 @@ public class PluginChannel implements PluginMessageListener {
 
 	public <T extends PluginPacket> void registerIncomingPluginChannel(PluginPacket.Metadata<T> type, BiConsumer<Player, T> handler) {
 		incomingMessageHandlers.put(type.channel(), ((player, bytes) -> handler.accept(player, type.factory().apply(Unpooled.wrappedBuffer(bytes)))));
-		Bukkit.getMessenger().registerIncomingPluginChannel(plugin, type.channel(), this);
+		Bukkit.getMessenger().registerIncomingPluginChannel(plugin.getPaperPlugin(), type.channel(), this);
 	}
 
 	public void registerOutgoingPluginChannel(PluginPacket.Metadata<?> type) {
-		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, type.channel());
+		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin.getPaperPlugin(), type.channel());
 	}
 
 	@Override
@@ -41,6 +41,6 @@ public class PluginChannel implements PluginMessageListener {
 	public void sendMessage(Player player, PluginPacket packet) {
 		ByteBuf buf = Unpooled.buffer();
 		packet.write(buf);
-		player.sendPluginMessage(plugin, packet.metadata().channel(), buf.copy().array());
+		player.sendPluginMessage(plugin.getPaperPlugin(), packet.metadata().channel(), buf.copy().array());
 	}
 }

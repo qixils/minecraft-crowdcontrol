@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.util.CompletableFutureUtils;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
@@ -28,7 +28,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCA
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_CHAOS_MIN;
 
 @Getter
-public class EntityChaosCommand extends Command {
+public class EntityChaosCommand extends PaperCommand {
 	private static final int R = CHAOS_LOCAL_RADIUS;
 	private final String effectName = "entity_chaos";
 
@@ -38,9 +38,10 @@ public class EntityChaosCommand extends Command {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<Player> players = playerSupplier.get();
 			Set<Entity> entities = new HashSet<>();
-			if (playerSupplier.stream().anyMatch(plugin::globalEffectsUsableFor)) {
+			if (players.stream().anyMatch(plugin::globalEffectsUsableFor)) {
 				for (World world : Bukkit.getWorlds()) {
 					for (Entity entity : world.getEntities()) {
 						if (entity.getType() == EntityType.PLAYER) continue;
@@ -48,7 +49,7 @@ public class EntityChaosCommand extends Command {
 					}
 				}
 			} else {
-				for (Player player : playerSupplier) {
+				for (Player player : players) {
 					// TODO: folia ...?
 					for (Entity entity : player.getNearbyEntities(R, R, R)) {
 						if (entity.getType() == EntityType.PLAYER) continue;
@@ -64,10 +65,10 @@ public class EntityChaosCommand extends Command {
 			List<CompletableFuture<Boolean>> successes = new ArrayList<>();
 			for (Entity entity : entities) {
 				CompletableFuture<Boolean> success = new CompletableFuture<>();
-				int player = (i++) % playerSupplier.size();
+				int player = (i++) % players.size();
 				entity.getScheduler().run(plugin.getPaperPlugin(), $ -> {
 					entity.getPassengers().forEach(entity::removePassenger);
-					entity.teleportAsync((playerSupplier.get(player)).getLocation()).handle((result, error) -> success.complete(error == null && result));
+					entity.teleportAsync((players.get(player)).getLocation()).handle((result, error) -> success.complete(error == null && result));
 				}, () -> success.complete(false));
 				successes.add(success);
 			}
@@ -76,6 +77,6 @@ public class EntityChaosCommand extends Command {
 				.thenApply($ -> successes.stream().anyMatch(future -> future.state() == Future.State.SUCCESS && future.resultNow() )
 					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not teleport entities")).join();
-		});
+		}));
 	}
 }

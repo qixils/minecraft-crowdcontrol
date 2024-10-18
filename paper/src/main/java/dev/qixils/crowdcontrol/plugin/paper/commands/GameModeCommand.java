@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
@@ -30,7 +31,7 @@ import java.util.function.Supplier;
 import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.toPlayers;
 
 @Getter
-public class GameModeCommand extends Command implements CCTimedEffect {
+public class GameModeCommand extends PaperCommand implements CCTimedEffect {
 	private final Map<UUID, List<UUID>> activeRequests = new HashMap<>();
 	private final Duration defaultDuration;
 	private final GameMode gamemode;
@@ -62,9 +63,12 @@ public class GameModeCommand extends Command implements CCTimedEffect {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		activeRequests.put(request.getRequestId(), playerSupplier.stream().map(Player::getUniqueId).toList());
-		setGameMode(playerSupplier, gamemode, true);
-		ccPlayer.sendResponse(new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L));
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<Player> players = playerSupplier.get();
+			activeRequests.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
+			setGameMode(players, gamemode, true);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
 	}
 
 	@Override

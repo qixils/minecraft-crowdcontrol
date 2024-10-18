@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
-import dev.qixils.crowdcontrol.plugin.paper.Command;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil;
 import live.crowdcontrol.cc4j.CCPlayer;
@@ -31,7 +31,7 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.addModifi
 import static java.lang.Math.pow;
 
 @Getter
-public class EntitySizeCommand extends Command {
+public class EntitySizeCommand extends PaperCommand {
 	private final Duration defaultDuration = Duration.ofSeconds(30);
 	private final String effectName;
 
@@ -46,8 +46,9 @@ public class EntitySizeCommand extends Command {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ThreadUtil.waitForSuccess(() -> {
-			Set<Location> locations = playerSupplier.stream().map(Player::getLocation).collect(Collectors.toSet());
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<Player> players = playerSupplier.get();
+			Set<Location> locations = players.stream().map(Player::getLocation).collect(Collectors.toSet());
 			boolean success = false;
 			for (World world : Bukkit.getServer().getWorlds()) {
 				for (Entity entity : world.getEntities()) {
@@ -70,7 +71,7 @@ public class EntitySizeCommand extends Command {
 			return success
 				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find entities to resize");
-		});
+		}));
 	}
 
 	public static EntitySizeCommand increase(PaperCrowdControlPlugin plugin) {

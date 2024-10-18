@@ -4,9 +4,9 @@ import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.sponge7.ImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
-import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.IUserRecord;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.entity.Entity;
@@ -46,7 +46,7 @@ public class SwapCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public TriState isSelectable() {
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		return plugin.getPlayerManager().getAllPlayers().size() <= 1 ? TriState.FALSE : TriState.TRUE;
 	}
 }

@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.sponge7.SpongeCrowdControlPlugin;
 import dev.qixils.crowdcontrol.socket.Respondable;
 import dev.qixils.crowdcontrol.socket.Response;
 import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.IUserRecord;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
@@ -102,7 +103,7 @@ public class KeepInventoryCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public TriState isSelectable() {
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		if (!plugin.isGlobal())
 			return TriState.TRUE;
 		if (globalKeepInventory == enable)
