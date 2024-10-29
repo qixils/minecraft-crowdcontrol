@@ -33,6 +33,7 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import org.incendo.cloud.Command.Builder;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
+import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.permission.PredicatePermission;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
@@ -602,6 +603,22 @@ public abstract class Plugin<P, S> {
 					// TODO: extra features
 				}
 			}));
+		// link command
+		manager.command(ccCmd.literal("link")
+			.commandDescription(description("Authorize your Crowd Control account"))
+			.argument(StringParser.stringComponent(StringParser.StringMode.SINGLE).name("code").description(description("Link code")).required())
+			.handler(ctx -> {
+				String code = ctx.get("code");
+				P player = asPlayer(ctx.sender());
+				if (player == null) return;
+				Optional<CCPlayer> ccPlayerOpt = optionalCCPlayer(player);
+				if (!ccPlayerOpt.isPresent()) return;
+				CCPlayer ccPlayer = ccPlayerOpt.get();
+				if (ccPlayer.getUserToken() != null) return;
+				Audience audience = mapper.asAudience(ctx.sender());
+				audience.sendMessage(Component.text("Logging in..."));
+				ccPlayer.authenticate(code);
+			}));
 		// execute command
 		/*
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
@@ -772,7 +789,7 @@ public abstract class Plugin<P, S> {
 	 */
 	public void initCrowdControl() {
 		loadConfig();
-		crowdControl = new CrowdControl("Minecraft", "Minecraft", getDataFolder());
+		crowdControl = new CrowdControl("Minecraft", "Minecraft", "app-01jbazzkrjbw7y60kw5f9c82nh", getDataFolder());
 		commandRegister().register();
 		// re-trigger player join for any missed players
 		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerJoin);
@@ -886,6 +903,11 @@ public abstract class Plugin<P, S> {
 		updateConditionalEffectVisibility(optionalCCPlayer(player).orElse(null));
 	}
 
+	public void updateConditionalEffectVisibility() {
+		if (crowdControl == null) return;
+		crowdControl.getPlayers().forEach(this::updateConditionalEffectVisibility);
+	}
+
 	/**
 	 * Renders messages to a player. This should be called by an event handler that listens for
 	 * players joining the server.
@@ -906,6 +928,8 @@ public abstract class Plugin<P, S> {
 
 		CCPlayer ccPlayer = cc.addPlayer(uuid);
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.IDENTIFIED, payload -> {
+			String url = ccPlayer.getAuthUrl();
+			if (url == null) return; // eh?
 			// ensure player is still online
 			Optional<P> optPlayer = mapper.getPlayer(uuid);
 			if (!optPlayer.isPresent()) return;
@@ -913,15 +937,16 @@ public abstract class Plugin<P, S> {
 			// send messages
 			Audience audience = mapper.asAudience(player);
 			if (ccPlayer.getUserToken() == null) {
-				audience.sendMessage(LINK_MESSAGE.clickEvent(ClickEvent.openUrl(String.format(
-					"https://auth.crowdcontrol.live/?connectionID=%s",
-					payload.getConnectionId()
-				))));
+				audience.sendMessage(LINK_MESSAGE.clickEvent(ClickEvent.openUrl(ccPlayer.getAuthUrl())));
 			}
 			// TODO: restore? maybe go for less of a warning angle and more of an informational angle,
 			//  like hey some effects can't be used because you aren't a host / aren't a client
 //			if (!globalEffectsUsable())
 //				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
+		});
+		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTH_PROGRESS, () -> {
+			playerMapper().getPlayer(ccPlayer.getUuid()).ifPresent(p -> playerMapper().asAudience(p)
+				.sendMessage(Component.text("run command `/crowdcontrol link`")));
 		});
 		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTHENTICATED, () -> {
 			if (ccPlayer.getGameSessionId() != null) return;
