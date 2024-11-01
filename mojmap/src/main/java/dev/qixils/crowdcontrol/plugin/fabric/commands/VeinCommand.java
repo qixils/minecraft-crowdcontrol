@@ -1,13 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.common.util.Weighted;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
@@ -20,12 +23,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_COUNT;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIUS;
 
 @Getter
-public class VeinCommand extends ImmediateCommand {
+public class VeinCommand extends ModdedCommand {
 	private final String effectName = "vein";
 
 	public VeinCommand(ModdedCrowdControlPlugin plugin) {
@@ -57,46 +61,50 @@ public class VeinCommand extends ImmediateCommand {
 		Collections.shuffle(blockLocations, random);
 		int maxBlocks = 1 + random.nextInt(blockLocations.size());
 		while (blockLocations.size() > maxBlocks)
-			blockLocations.remove(0);
+			blockLocations.removeFirst();
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse().type(Response.ResultType.RETRY).message("Could not find any blocks to replace");
-		for (ServerPlayer player : players) {
-			BlockFinder finder = BlockFinder.builder()
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			boolean success = false;
+			for (ServerPlayer player : playerSupplier.get()) {
+				BlockFinder finder = BlockFinder.builder()
 					.origin(new Location(player))
 					.maxRadius(VEIN_RADIUS)
 					.locationValidator(loc -> !loc.block().isAir())
 					.build();
 
-			for (int iter = 0; iter < VEIN_COUNT; iter++) {
-				Ores ore = RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS);
+				for (int iter = 0; iter < VEIN_COUNT; iter++) {
+					Ores ore = RandomUtil.weightedRandom(Ores.values(), Ores.TOTAL_WEIGHTS);
 
-				List<Location> setBlocks = new ArrayList<>(8);
-				List<Location> setDeepslateBlocks = new ArrayList<>(8);
-				Location oreLocation = finder.next();
-				if (oreLocation == null)
-					continue;
+					List<Location> setBlocks = new ArrayList<>(8);
+					List<Location> setDeepslateBlocks = new ArrayList<>(8);
+					Location oreLocation = finder.next();
+					if (oreLocation == null)
+						continue;
 
-				// get 2x2 chunk of blocks
-				addOreVein(setDeepslateBlocks, setBlocks, oreLocation);
+					// get 2x2 chunk of blocks
+					addOreVein(setDeepslateBlocks, setBlocks, oreLocation);
 
-				// if we didn't find viable blocks, exit
-				if (setBlocks.isEmpty() && setDeepslateBlocks.isEmpty())
-					continue;
+					// if we didn't find viable blocks, exit
+					if (setBlocks.isEmpty() && setDeepslateBlocks.isEmpty())
+						continue;
 
-				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
-				randomlyShrinkOreVein(setBlocks);
-				randomlyShrinkOreVein(setDeepslateBlocks);
+					success = true;
+					randomlyShrinkOreVein(setBlocks);
+					randomlyShrinkOreVein(setDeepslateBlocks);
 
-				sync(() -> {
-					setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().defaultBlockState()));
-					setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().defaultBlockState()));
-				});
+					sync(() -> {
+						setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().defaultBlockState()));
+						setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().defaultBlockState()));
+					});
+				}
 			}
-		}
-		return result;
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find any blocks to replace");
+		}));
 	}
 
 	@Getter

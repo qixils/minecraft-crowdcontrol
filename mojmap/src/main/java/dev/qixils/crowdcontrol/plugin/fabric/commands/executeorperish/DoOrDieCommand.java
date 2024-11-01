@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
-import dev.qixils.crowdcontrol.plugin.fabric.Command;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.GiveItemCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.LootboxCommand;
@@ -28,7 +28,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 
 @Getter
 @EventListener
-public class DoOrDieCommand extends Command {
+public class DoOrDieCommand extends ModdedCommand {
 	private final String effectName = "do_or_die";
 	private final List<Task> tasks = new ArrayList<>();
 
@@ -56,18 +56,19 @@ public class DoOrDieCommand extends Command {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		// TODO: cooldown
+		List<ServerPlayer> players = playerSupplier.get();
 		List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
 		Collections.shuffle(conditions, random);
 		SuccessCondition condition = conditions.stream()
-			.filter(cond -> cond.canApply(playerSupplier))
+			.filter(cond -> cond.canApply(players))
 			.findAny()
 			.orElseThrow(() -> new IllegalStateException("Could not find a condition that can be applied to all targets"));
-		playerSupplier.forEach(condition::track);
+		players.forEach(condition::track);
 
 		Task task = new Task(
 			plugin,
 			plugin.server().getTickCount(),
-			playerSupplier.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
+			players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
 			condition,
 			condition.getComponent()
 		);

@@ -1130,4 +1130,13 @@ public abstract class Plugin<P, S> {
 	public @Nullable InputStream getInputStream(@NotNull String asset) {
 		return getClass().getClassLoader().getResourceAsStream(asset);
 	}
+
+	/**
+	 * Gets whether the game is currently paused.
+	 *
+	 * @return is game paused
+	 */
+	public boolean isPaused() {
+		return false;
+	}
 }

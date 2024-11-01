@@ -27,6 +27,7 @@ import java.util.Map;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.isWhitelistedEntity;
+import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 
 public class CommandRegister extends AbstractCommandRegister<ServerPlayer, ModdedCrowdControlPlugin> {
 	private boolean tagsRegistered = false;

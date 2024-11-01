@@ -2,12 +2,14 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.command.QuantityStyle;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.InventoryUtil;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -19,10 +21,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 @Getter
-public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
+public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Item item;
 	private final String effectName;
@@ -59,41 +64,29 @@ public class TakeItemCommand extends ImmediateCommand implements ItemCommand {
 		return true;
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		int amount = request.getQuantityOrDefault();
-		Response.Builder response = request.buildResponse()
-				.type(ResultType.RETRY)
-				.message("Item could not be found in target inventories");
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<ServerPlayer> players = playerSupplier.get();
+			LimitConfig config = getPlugin().getLimitConfig();
+			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+			if (playerLimit > 0) {
+				boolean hostsBypass = config.hostsBypass();
+				AtomicInteger victims = new AtomicInteger();
+				players = players.stream()
+					.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
+					.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
+					.toList();
+			}
 
-		LimitConfig config = getPlugin().getLimitConfig();
-		int maxVictims = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
-		int victims = 0;
+			int amount = request.getQuantity();
+			boolean success = false;
+			for (ServerPlayer player : players)
+				success |= takeItemFrom(player, amount);
 
-		// first pass (hosts)
-		for (ServerPlayer player : players) {
-			if (!config.hostsBypass() && maxVictims > 0 && victims >= maxVictims)
-				break;
-			if (!isHost(player))
-				continue;
-			if (takeItemFrom(player, amount))
-				victims++;
-		}
-
-		// second pass (guests)
-		for (ServerPlayer player : players) {
-			if (maxVictims > 0 && victims >= maxVictims)
-				break;
-			if (isHost(player))
-				continue;
-			if (takeItemFrom(player, amount))
-				victims++;
-		}
-
-		if (victims > 0)
-			response.type(ResultType.SUCCESS).message("SUCCESS");
-
-		return response;
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Item could not be found in target inventories");
+		}));
 	}
 }

@@ -1,10 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.plugin.fabric.Command;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import dev.qixils.crowdcontrol.socket.Response.Builder;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.level.ServerLevel;
@@ -20,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
-abstract class NearbyLocationCommand<S> extends Command {
+abstract class NearbyLocationCommand<S> extends ModdedCommand {
 	protected NearbyLocationCommand(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -86,11 +89,10 @@ abstract class NearbyLocationCommand<S> extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<@Nullable Builder> execute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		CompletableFuture<Builder> future = new CompletableFuture<>();
-		sync(() -> {
-			Builder response = request.buildResponse().type(ResultType.FAILURE).message("Could not find a location to teleport to");
-			for (ServerPlayer player : players) {
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			boolean success = false;
+			for (ServerPlayer player : playerSupplier.get()) {
 				ServerLevel world = player.serverLevel();
 				Location location = new Location(player);
 				S currentType = currentType(location);
@@ -114,15 +116,16 @@ abstract class NearbyLocationCommand<S> extends Command {
 						continue;
 					player.teleportTo(destination.x(), destination.y(), destination.z());
 					player.sendActionBar(Component.translatable(
-							"cc.effect.nearby_location.output",
-							nameOf(searchType).color(NamedTextColor.YELLOW)
+						"cc.effect.nearby_location.output",
+						nameOf(searchType).color(NamedTextColor.YELLOW)
 					));
-					response.type(ResultType.SUCCESS).message("SUCCESS"); // technically this could still fail; unlikely tho.
+					success = true; // technically this could still fail; unlikely tho.
 					break;
 				}
 			}
-			future.complete(response);
-		});
-		return future;
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find a location to teleport to");
+		}, plugin.getSyncExecutor()));
 	}
 }

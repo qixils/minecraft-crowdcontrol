@@ -1,13 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.HolderLookup;
@@ -39,14 +41,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 
-@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
 @Getter
-public class SummonEntityCommand<E extends Entity> extends ImmediateCommand implements EntityCommand<E> {
+public class SummonEntityCommand<E extends Entity> extends ModdedCommand implements EntityCommand<E> {
 	private static final Set<EquipmentSlot> HANDS = Arrays.stream(EquipmentSlot.values()).filter(slot -> slot.getType() == EquipmentSlot.Type.HAND).collect(Collectors.toSet());
 	private final Map<EquipmentSlot, List<ArmorItem>> humanoidArmor;
 	protected final EntityType<E> entityType;
@@ -99,39 +101,39 @@ public class SummonEntityCommand<E extends Entity> extends ImmediateCommand impl
 			.toList();
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Response.Builder tryExecute = tryExecute(players, request);
-		if (tryExecute != null) return tryExecute;
-
-		Component name = plugin.getViewerComponentOrNull(request, false);
-
-		LimitConfig config = getPlugin().getLimitConfig();
-		int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
-		if (playerLimit > 0) {
-			boolean hostsBypass = config.hostsBypass();
-			AtomicInteger victims = new AtomicInteger();
-			players = players.stream()
-				.sorted(Comparator.comparing(this::isHost))
-				.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && isHost(player)))
-				.toList();
-		}
-
-		boolean success = false;
-
-		for (ServerPlayer player : players) {
-			try {
-				spawnEntity(name, player);
-				success = true;
-			} catch (Exception e) {
-				plugin.getSLF4JLogger().error("Failed to spawn entity", e);
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<ServerPlayer> players = playerSupplier.get();
+			LimitConfig config = getPlugin().getLimitConfig();
+			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+			if (playerLimit > 0) {
+				boolean hostsBypass = config.hostsBypass();
+				AtomicInteger victims = new AtomicInteger();
+				players = players.stream()
+					.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
+					.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
+					.toList();
 			}
-		}
 
-		return success
-			? request.buildResponse().type(ResultType.SUCCESS)
-			: request.buildResponse().type(ResultType.UNAVAILABLE).message("Failed to spawn entity");
+			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
+			if (tryExecute != null) return tryExecute;
+
+			boolean success = false;
+			Component name = plugin.getViewerComponentOrNull(request, false);
+
+			for (ServerPlayer player : players) {
+				try {
+					success |= spawnEntity(name, player) != null;
+				} catch (Exception e) {
+					plugin.getSLF4JLogger().error("Failed to spawn entity", e);
+				}
+			}
+
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to spawn entity"); // TODO: hide?
+		}, plugin.getSyncExecutor()));
 	}
 
 	@Blocking

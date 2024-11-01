@@ -2,9 +2,13 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.common.command.QuantityStyle;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -17,10 +21,13 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 @Getter
-public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
+public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Item item;
 	private final String effectName;
@@ -43,38 +50,26 @@ public class GiveItemCommand extends ImmediateCommand implements ItemCommand {
 		entity.setPickUpDelay(0);
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		int amount = request.getQuantityOrDefault();
-		ItemStack itemStack = new ItemStack(item, amount);
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			LimitConfig config = getPlugin().getLimitConfig();
+			boolean hostsBypass = config.hostsBypass();
+			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
 
-		LimitConfig config = getPlugin().getLimitConfig();
-		int maxRecipients = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+			AtomicInteger victims = new AtomicInteger();
+			List<ServerPlayer> players = playerSupplier.get().stream()
+				.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
+				.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
+				.toList();
 
-		sync(() -> {
-			int recipients = 0;
+			int amount = request.getQuantity();
+			ItemStack itemStack = new ItemStack(item, amount);
 
-			// first pass (hosts)
-			for (ServerPlayer player : players) {
-				if (!config.hostsBypass() && maxRecipients > 0 && recipients >= maxRecipients)
-					break;
-				if (!isHost(player))
-					continue;
-				giveItemTo(player, itemStack);
-				recipients++;
-			}
+			for (ServerPlayer player : players)
+				sync(() -> giveItemTo(player, itemStack));
 
-			// second pass (guests)
-			for (ServerPlayer player : players) {
-				if (maxRecipients > 0 && recipients >= maxRecipients)
-					break;
-				if (config.hostsBypass() && isHost(player))
-					continue;
-				giveItemTo(player, itemStack);
-				recipients++;
-			}
-		});
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+		}));
 	}
 }

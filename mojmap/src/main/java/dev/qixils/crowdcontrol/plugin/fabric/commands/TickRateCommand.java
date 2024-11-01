@@ -1,25 +1,31 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.Global;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Global
 @Getter
-public class TickRateCommand extends TimedVoidCommand {
+public class TickRateCommand extends ModdedCommand implements CCTimedEffect {
 	private static final float RATE = 20f;
-	private final Duration defaultDuration = Duration.ofSeconds(20);
 	private final String effectName;
 	private final float multiplier;
+	private final String effectGroup = "tick_rate";
+	private final List<String> effectGroups = Collections.singletonList(effectGroup);
 
 	private TickRateCommand(ModdedCrowdControlPlugin plugin, String effectName, float multiplier) {
 		super(plugin);
@@ -28,20 +34,32 @@ public class TickRateCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		new TimedEffect.Builder()
-			.request(request)
-			.effectGroup("tick_rate")
-			.duration(getDuration(request))
-			.startCallback(effect -> {
-				plugin.server().tickRateManager().setTickRate(RATE * multiplier);
-				playerAnnounce(players, request);
-				return request.buildResponse().type(Response.ResultType.SUCCESS);
-			})
-			.completionCallback(effect -> {
-				plugin.server().tickRateManager().setTickRate(RATE);
-			})
-			.build().queue();
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isArrayActive(ccPlayer))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
+			onResume(request, ccPlayer);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
+	}
+
+	private void set(float value) {
+		plugin.server().tickRateManager().setTickRate(value);
+	}
+
+	@Override
+	public void onPause(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		set(RATE);
+	}
+
+	@Override
+	public void onResume(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		set(RATE * multiplier);
+	}
+
+	@Override
+	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		onPause(request, source);
 	}
 
 	public static TickRateCommand doubleRate(ModdedCrowdControlPlugin plugin) {

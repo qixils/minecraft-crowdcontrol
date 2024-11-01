@@ -1,10 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedImmediateCommand;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
@@ -16,11 +20,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.List;
-
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
+import java.util.function.Supplier;
 
 @Getter
-public class PotionCommand extends TimedImmediateCommand {
+public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 	private final @NotNull Holder<MobEffect> potionEffectType;
 	private final boolean isMinimal;
 	private final @NotNull String effectName;
@@ -35,59 +38,44 @@ public class PotionCommand extends TimedImmediateCommand {
 		this.displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
 	}
 
-	public @NotNull Duration getDefaultDuration() {
-		return POTION_DURATION;
-	}
-
 	@Override
-	public @NotNull Duration getDuration(@NotNull Request request) {
-		if (isMinimal)
-			return Duration.ZERO;
-		return super.getDuration(request);
-	}
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (potionEffectType == MobEffects.JUMP && isActive(ccPlayer, "disable_jumping"))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot apply jump boost while Disable Jump is active");
 
-	@NotNull
-	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		if (potionEffectType == MobEffects.JUMP
-				&& TimedEffect.isActive("disable_jumping", request.getTargets())) {
-			return request.buildResponse()
-					.type(ResultType.RETRY)
-					.message("Cannot apply jump boost while Disable Jump is active");
-		}
+			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
-		Duration duration = getDuration(request);
-		int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
-
-		sync(() -> {
-			for (ServerPlayer player : players) {
-				MobEffectInstance effect = new MobEffectInstance(potionEffectType, durationTicks);
-				MobEffectInstance existingEffect = player.getEffect(potionEffectType);
-				if (existingEffect == null) {
-					plugin.getSLF4JLogger().debug("Adding new effect");
-					player.addEffect(effect);
-				} else {
-					plugin.getSLF4JLogger().debug("Updating existing effect");
-					int oldDuration = existingEffect.getDuration();
-					int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
-					int newAmplifier = existingEffect.getAmplifier() + 1;
-					if (potionEffectType == MobEffects.LEVITATION && newAmplifier > 127)
-						newAmplifier -= 1;
-					player.forceAddEffect(new MobEffectInstance(
+			sync(() -> {
+				for (ServerPlayer player : playerSupplier.get()) {
+					MobEffectInstance effect = new MobEffectInstance(potionEffectType, durationTicks);
+					MobEffectInstance existingEffect = player.getEffect(potionEffectType);
+					if (existingEffect == null) {
+						plugin.getSLF4JLogger().debug("Adding new effect");
+						player.addEffect(effect);
+					} else {
+						plugin.getSLF4JLogger().debug("Updating existing effect");
+						int oldDuration = existingEffect.getDuration();
+						int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
+						int newAmplifier = existingEffect.getAmplifier() + 1;
+						if (potionEffectType == MobEffects.LEVITATION && newAmplifier > 127)
+							newAmplifier -= 1;
+						player.forceAddEffect(new MobEffectInstance(
 							potionEffectType,
 							newDuration,
 							newAmplifier,
 							existingEffect.isAmbient(),
 							existingEffect.isVisible(),
 							existingEffect.showIcon()
-					), null);
+						), null);
+					}
 				}
-			}
-		});
+			});
 
-		Response.Builder response = request.buildResponse().type(Response.ResultType.SUCCESS);
-		if (!isMinimal)
-			response.timeRemaining(duration);
-		return response;
+			return isMinimal
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
 	}
 }

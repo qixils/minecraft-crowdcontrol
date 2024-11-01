@@ -1,14 +1,21 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.CrowdControl;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +25,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public final class FreezeCommand extends TimedVoidCommand {
+public final class FreezeCommand extends ModdedCommand implements CCTimedEffect {
 	public static final Map<UUID, List<FreezeData>> DATA = new HashMap<>();
-	private static final Map<UUID, TimedEffect> TIMED_EFFECTS = new HashMap<>();
+	private static final Map<UUID, Map<UUID, FreezeData>> TIMED_EFFECTS = new HashMap<>();
 
 	private final String effectName;
 	private final String effectGroup;
+	private final List<String> effectGroups;
 	private final LocationModifier modifier;
 	private final MovementStatusType freezeType;
 	private final MovementStatusValue freezeValue;
@@ -38,6 +47,7 @@ public final class FreezeCommand extends TimedVoidCommand {
 		super(plugin);
 		this.effectName = effectName;
 		this.effectGroup = effectGroup;
+		this.effectGroups = Collections.singletonList(effectGroup);
 		this.modifier = modifier;
 		this.freezeType = freezeType;
 		this.freezeValue = freezeValue;
@@ -60,38 +70,38 @@ public final class FreezeCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
-		AtomicReference<Map<UUID, FreezeData>> atomic = new AtomicReference<>();
-		new TimedEffect.Builder()
-				.request(request)
-				.effectGroup(effectGroup)
-				.duration(getDuration(request))
-				.startCallback(timedEffect -> {
-					List<ServerPlayer> players = getPlugin().getPlayers(request);
-					Map<UUID, FreezeData> locations = new HashMap<>();
-					players.forEach(player -> {
-						UUID uuid = player.getUUID();
-						TIMED_EFFECTS.put(uuid, timedEffect);
-						locations.put(uuid, new FreezeData(modifier, new Location(player)));
-						player.cc$setMovementStatus(freezeType, freezeValue);
-					});
-					atomic.set(locations);
-					locations.forEach((uuid, data) -> DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data));
-					playerAnnounce(players, request);
-					return null;
-				})
-				.completionCallback($ -> atomic.get().forEach((uuid, data) -> {
-					TIMED_EFFECTS.remove(uuid);
-					DATA.get(uuid).remove(data);
-					MinecraftServer server = getPlugin().getServer();
-					if (server == null)
-						return;
-					ServerPlayer player = server.getPlayerList().getPlayer(uuid);
-					if (player == null)
-						return;
-					player.cc$setMovementStatus(freezeType, MovementStatusValue.ALLOWED);
-				}))
-				.build().queue();
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray()))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
+			List<ServerPlayer> players = playerSupplier.get();
+			Map<UUID, FreezeData> locations = new HashMap<>();
+			players.forEach(player -> {
+				UUID uuid = player.getUUID();
+				FreezeData data = new FreezeData(modifier, new Location(player));
+				locations.put(uuid, data);
+				DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data);
+				player.cc$setMovementStatus(freezeType, freezeValue);
+			});
+			TIMED_EFFECTS.put(request.getRequestId(), locations);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
+	}
+
+	@Override
+	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		Map<UUID, FreezeData> locations = TIMED_EFFECTS.remove(request.getRequestId());
+		if (locations == null) return;
+		MinecraftServer server = getPlugin().getServer();
+		if (server == null)
+			return;
+		locations.forEach((uuid, data) -> {
+			DATA.get(uuid).remove(data);
+			ServerPlayer player = server.getPlayerList().getPlayer(uuid);
+			if (player == null)
+				return;
+			player.cc$setMovementStatus(freezeType, MovementStatusValue.ALLOWED);
+		});
 	}
 
 	@FunctionalInterface
@@ -134,15 +144,15 @@ public final class FreezeCommand extends TimedVoidCommand {
 
 		@Listener
 		public void onDeath(Death death) {
-			UUID uuid = death.entity().getUUID();
-			TimedEffect effect = TIMED_EFFECTS.get(uuid);
-			if (effect == null) return;
+			CrowdControl cc = plugin.getCrowdControl();
+			if (cc == null) return;
 
-			try {
-				effect.complete();
-			} catch (Exception e) {
-				plugin.getSLF4JLogger().warn("Failed to stop freeze effect", e);
-			}
+			UUID uuid = death.entity().getUUID();
+			Set<UUID> requestIds = TIMED_EFFECTS.entrySet().stream()
+				.filter(entry -> entry.getValue().containsKey(uuid))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toSet());
+			requestIds.forEach(cc::cancelByRequestId);
 		}
 	}
 }

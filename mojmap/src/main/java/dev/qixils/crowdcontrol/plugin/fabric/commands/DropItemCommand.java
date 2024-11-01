@@ -1,30 +1,34 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Getter
-public class DropItemCommand extends ImmediateCommand {
+public class DropItemCommand extends ModdedCommand {
 	private final String effectName = "drop_item";
 
 	public DropItemCommand(@NotNull ModdedCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Response.Builder result = request.buildResponse()
-				.type(Response.ResultType.RETRY)
-				.message("No players were holding items");
-		for (ServerPlayer player : players) {
-			if (!player.getInventory().getSelected().isEmpty()) {
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			boolean success = false;
+			for (ServerPlayer player : playerSupplier.get()) {
+				if (player.getInventory().getSelected().isEmpty()) continue;
+
 				sync(() -> {
 					player.drop(true);
 					// for some reason the player's inventory is not getting updated
@@ -33,9 +37,11 @@ public class DropItemCommand extends ImmediateCommand {
 					// either way, this workaround is fine
 					player.containerMenu.sendAllDataToRemote();
 				});
-				result.type(Response.ResultType.SUCCESS).message("SUCCESS");
+				success = true;
 			}
-		}
-		return result;
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No players were holding items");
+		}));
 	}
 }

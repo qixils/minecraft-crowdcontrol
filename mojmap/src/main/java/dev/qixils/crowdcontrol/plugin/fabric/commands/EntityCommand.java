@@ -2,8 +2,12 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.plugin.fabric.FeatureElementCommand;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.IUserRecord;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
@@ -46,17 +50,13 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 		return TriState.FALSE;
 	}
 
-	default Response.@Nullable Builder tryExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
+	default @Nullable CCEffectResponse tryExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		for (ServerPlayer player : players) {
 			if (isMonster() && levelIsPeaceful(player.serverLevel())) {
-				return request.buildResponse()
-						.type(Response.ResultType.FAILURE)
-						.message("Hostile mobs cannot be spawned while on Peaceful difficulty");
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
 			}
 			if (!isEnabled(player.serverLevel().enabledFeatures())) {
-				return request.buildResponse()
-						.type(Response.ResultType.UNAVAILABLE)
-						.message("Mob is not available in this version of Minecraft");
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
 			}
 		}
 		return null;

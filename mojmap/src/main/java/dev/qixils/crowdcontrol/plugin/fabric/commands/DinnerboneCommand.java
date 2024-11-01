@@ -1,9 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.plugin.fabric.Command;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Response.Builder;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,14 +19,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_NAME;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_SEARCH_RADIUS;
 
 @Getter
-public class DinnerboneCommand extends Command {
+public class DinnerboneCommand extends ModdedCommand {
 	private static final Component DINNERBONE_COMPONENT = Component.literal(DINNERBONE_NAME);
 	private final String effectName = "dinnerbone";
 
@@ -32,20 +35,20 @@ public class DinnerboneCommand extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<Builder> execute(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		CompletableFuture<Boolean> successFuture = new CompletableFuture<>();
-		sync(() -> {
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			Set<LivingEntity> entities = new HashSet<>();
-			for (ServerPlayer player : players) {
+			for (ServerPlayer player : playerSupplier.get()) {
 				entities.addAll(StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
-						.filter(entity -> entity instanceof LivingEntity
-								&& entity.getType() != EntityType.PLAYER
-								&& entity.position().distanceToSqr(player.position()) <= (ENTITY_SEARCH_RADIUS * ENTITY_SEARCH_RADIUS))
-						.map(entity -> (LivingEntity) entity)
-						.toList());
+					.filter(entity -> entity instanceof LivingEntity
+						&& entity.getType() != EntityType.PLAYER
+						&& entity.position().distanceToSqr(player.position()) <= (ENTITY_SEARCH_RADIUS * ENTITY_SEARCH_RADIUS))
+					.map(entity -> (LivingEntity) entity)
+					.toList());
 			}
-			successFuture.complete(!entities.isEmpty());
-			entities.forEach(entity -> {
+			if (entities.isEmpty())
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No nearby entities");
+			for (LivingEntity entity : entities) {
 				final @Nullable Component oldName = entity.cc$getOriginalDisplayName();
 				final @Nullable Component currentName = entity.getCustomName();
 				if (Objects.equals(currentName, DINNERBONE_COMPONENT)) {
@@ -58,10 +61,8 @@ public class DinnerboneCommand extends Command {
 					entity.setCustomName(DINNERBONE_COMPONENT.copy());
 					entity.setCustomNameVisible(false);
 				}
-			});
-		});
-		return successFuture.thenApply(success -> success
-				? request.buildResponse().type(ResultType.SUCCESS)
-				: request.buildResponse().type(ResultType.RETRY).message("No nearby entities"));
+			}
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+		}, plugin.getSyncExecutor()));
 	}
 }

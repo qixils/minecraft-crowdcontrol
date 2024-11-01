@@ -2,30 +2,33 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.command.impl.Shader;
 import dev.qixils.crowdcontrol.common.util.SemVer;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedImmediateCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Getter
-public class ShaderCommand extends TimedImmediateCommand {
-	private static final @NotNull Set<UUID> ACTIVE_SHADERS = new HashSet<>();
+public class ShaderCommand extends ModdedCommand implements CCTimedEffect {
 	private final @NotNull String effectName;
 	private final @NotNull String shader;
 	private final @NotNull SemVer minimumModVersion;
-	private final @NotNull Duration defaultDuration = Duration.ofSeconds(30);
+	private final @NotNull String effectGroup = "shaders";
+	private final @NotNull List<String> effectGroups = Collections.singletonList(effectGroup);
 
 	public ShaderCommand(@NotNull ModdedCrowdControlPlugin plugin, @NotNull Shader shader) {
 		super(plugin);
@@ -34,26 +37,21 @@ public class ShaderCommand extends TimedImmediateCommand {
 		this.shader = shader.getShaderId();
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		players.removeIf(player -> ACTIVE_SHADERS.contains(player.getUUID()));
-		if (players.isEmpty())
-			return request.buildResponse().type(Response.ResultType.RETRY).message("All players already have an active screen effect");
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray()))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "All players already have an active screen effect");
 
-		// create byte buf
-		Duration duration = getDuration(request);
-		SetShaderS2C packet = new SetShaderS2C(shader, duration);
+			// create byte buf
+			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			SetShaderS2C packet = new SetShaderS2C(shader, duration);
 
-		// send packet
-		for (ServerPlayer player : players) {
-			ACTIVE_SHADERS.add(player.getUUID());
-			ServerPlayNetworking.send(player, packet);
-		}
+			// send packet
+			for (ServerPlayer player : playerSupplier.get())
+				ServerPlayNetworking.send(player, packet);
 
-		// schedule removal
-		plugin.getScheduledExecutor().schedule(
-				() -> players.forEach(player -> ACTIVE_SHADERS.remove(player.getUUID())), duration.toMillis(), TimeUnit.MILLISECONDS);
-		return request.buildResponse().type(Response.ResultType.SUCCESS).timeRemaining(duration);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, duration.toMillis());
+		}));
 	}
 }

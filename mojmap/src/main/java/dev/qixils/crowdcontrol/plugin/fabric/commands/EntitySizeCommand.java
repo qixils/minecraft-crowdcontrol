@@ -1,11 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.common.ExecuteUsing;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +24,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_SEARCH_RADIUS;
@@ -29,8 +33,7 @@ import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModif
 import static java.lang.Math.pow;
 
 @Getter
-@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
-public class EntitySizeCommand extends ImmediateCommand {
+public class EntitySizeCommand extends ModdedCommand {
 	private final Duration defaultDuration = Duration.ofSeconds(30);
 	private final String effectName;
 
@@ -43,35 +46,36 @@ public class EntitySizeCommand extends ImmediateCommand {
 		this.level = level;
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		MinecraftServer server = plugin.getServer();
-		if (server == null)
-			return request.buildResponse().type(Response.ResultType.FAILURE).message("Server not active");
-		Set<Location> locations = players.stream().map(Location::new).collect(Collectors.toSet());
-		boolean success = false;
-		for (ServerLevel world : plugin.getServer().getAllLevels()) {
-			for (Entity entity : world.getAllEntities()) {
-				if (!(entity instanceof LivingEntity living)) continue;
-				if (entity instanceof Player) continue; // skip players
-				Location entityLoc = new Location(entity);
-				for (Location loc : locations) {
-					if (!Objects.equals(loc.level(), entityLoc.level()))
-						continue;
-                    if (loc.squareDistanceTo(entityLoc) > radius)
-                        continue;
-					if (AttributeUtil.getModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID).map(AttributeModifier::amount).orElse(0d) == level)
-						continue;
-                    addModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
-                    success = true;
-                    break;
-                }
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			MinecraftServer server = plugin.getServer();
+			if (server == null)
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Server not active");
+			Set<Location> locations = playerSupplier.get().stream().map(Location::new).collect(Collectors.toSet());
+			boolean success = false;
+			for (ServerLevel world : plugin.getServer().getAllLevels()) {
+				for (Entity entity : world.getAllEntities()) {
+					if (!(entity instanceof LivingEntity living)) continue;
+					if (entity instanceof Player) continue; // skip players
+					Location entityLoc = new Location(entity);
+					for (Location loc : locations) {
+						if (!Objects.equals(loc.level(), entityLoc.level()))
+							continue;
+						if (loc.squareDistanceTo(entityLoc) > radius)
+							continue;
+						if (AttributeUtil.getModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID).map(AttributeModifier::amount).orElse(0d) == level)
+							continue;
+						addModifier(living, Attributes.SCALE, SCALE_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
+						success = true;
+						break;
+					}
+				}
 			}
-		}
-		if (!success)
-			return request.buildResponse().type(Response.ResultType.FAILURE).message("Could not find entities to resize");
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+			if (!success)
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find entities to resize");
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+		}, plugin.getSyncExecutor()));
 	}
 
 	public static EntitySizeCommand increase(ModdedCrowdControlPlugin plugin) {

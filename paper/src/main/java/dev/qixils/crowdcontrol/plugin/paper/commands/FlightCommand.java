@@ -47,7 +47,6 @@ public class FlightCommand extends PaperCommand implements Listener, CCTimedEffe
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
 
 			List<Player> players = playerSupplier.get();
-			uuids.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 			boolean success = false;
 			for (Player player : players) {
 				GameMode gameMode = player.getGameMode();
@@ -62,9 +61,10 @@ public class FlightCommand extends PaperCommand implements Listener, CCTimedEffe
 				success = true;
 				setFlying(player, true);
 			}
-			return success
-				? new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L)
-				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Target is already flying or able to fly");
+			if (!success)
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Target is already flying or able to fly");
+			uuids.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
 		}));
 	}
 

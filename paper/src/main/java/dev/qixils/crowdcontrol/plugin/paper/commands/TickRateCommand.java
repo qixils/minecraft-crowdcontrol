@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -24,7 +23,6 @@ import java.util.function.Supplier;
 @Getter
 public class TickRateCommand extends PaperCommand implements CCTimedEffect {
 	private static final float RATE = 20f;
-	private final Duration defaultDuration = Duration.ofSeconds(20);
 	private final String effectName;
 	private final float multiplier;
 
@@ -40,21 +38,25 @@ public class TickRateCommand extends PaperCommand implements CCTimedEffect {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			if (isActive(ccPlayer, getEffectArray()))
+			if (isArrayActive(ccPlayer))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
 			onResume(request, ccPlayer);
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
 		}));
 	}
 
+	private void set(float value) {
+		Bukkit.getServerTickManager().setTickRate(value);
+	}
+
 	@Override
 	public void onPause(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
-		Bukkit.getServerTickManager().setTickRate(RATE);
+		set(RATE);
 	}
 
 	@Override
 	public void onResume(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
-		Bukkit.getServerTickManager().setTickRate(RATE * multiplier);
+		set(RATE * multiplier);
 	}
 
 	@Override

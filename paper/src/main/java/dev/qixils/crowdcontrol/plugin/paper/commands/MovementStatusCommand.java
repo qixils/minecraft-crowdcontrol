@@ -99,13 +99,11 @@ public class MovementStatusCommand extends PaperCommand implements CCTimedEffect
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Unable to stack movement statuses");
 
 			List<Player> players = playerSupplier.get();
-			if (minimumModVersion.isGreaterThan(SemVer.ZERO))
-				players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minimumModVersion));
-
-			idMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 
 			if (players.isEmpty())
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No targetable players online");
+
+			idMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 
 			for (Player player : players)
 				setValue(plugin, player, type, value);

@@ -1,33 +1,39 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.util.ComparableUtil;
 import dev.qixils.crowdcontrol.common.util.SemVer;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DISABLE_JUMPING_DURATION;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.INVERT_CONTROLS_DURATION;
 
 @Getter
-public class MovementStatusCommand extends TimedVoidCommand {
+public class MovementStatusCommand extends ModdedCommand implements CCTimedEffect {
 	private final String effectName;
 	private final String effectGroup;
 	private final Duration defaultDuration;
 	private final MovementStatusType type;
 	private final MovementStatusValue value;
     private final SemVer minimumModVersion;
+	private final Map<UUID, Set<UUID>> idMap = new HashMap<>();
 
 	public MovementStatusCommand(ModdedCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatusType type, MovementStatusValue value, boolean clientOnly) {
 		super(plugin);
@@ -36,7 +42,6 @@ public class MovementStatusCommand extends TimedVoidCommand {
 		this.defaultDuration = defaultDuration;
 		this.type = type;
 		this.value = value;
-		this.clientOnly = clientOnly;
 		if (clientOnly)
 			this.minimumModVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
 		else
@@ -48,34 +53,21 @@ public class MovementStatusCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
-		AtomicReference<List<ServerPlayer>> atomicPlayers = new AtomicReference<>();
-		new TimedEffect.Builder()
-				.request(request)
-				.effectGroup(effectGroup)
-				.duration(getDuration(request))
-				.startCallback($ -> {
-					List<ServerPlayer> players = plugin.getPlayers(request);
-					if (clientOnly)
-						players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minimumModVersion));
-					atomicPlayers.set(players);
+	public void execute(@NotNull Supplier<List<ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<ServerPlayer> players = playerSupplier.get();
+			idMap.put(request.getRequestId(), players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()));
 
-					if (players.isEmpty())
-						return request.buildResponse()
-								.type(Response.ResultType.FAILURE)
-								.message("No targetable players online");
+			for (Player player : players)
+				player.cc$setMovementStatus(type, value);
 
-					for (Player player : players)
-						player.cc$setMovementStatus(type, value);
-					playerAnnounce(players, request);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
+	}
 
-					return null; // success
-				})
-				.completionCallback($ -> {
-					for (Player player : atomicPlayers.get())
-						player.cc$setMovementStatus(type, MovementStatusValue.ALLOWED);
-				})
-				.build().queue();
+	@Override
+	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		plugin.toPlayerStream(idMap.remove(request.getRequestId())).forEach(player -> player.cc$setMovementStatus(type, MovementStatusValue.ALLOWED));
 	}
 
 	public static MovementStatusCommand disableJumping(ModdedCrowdControlPlugin plugin) {

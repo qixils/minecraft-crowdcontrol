@@ -10,6 +10,7 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
@@ -22,7 +23,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 
 	@Override
 	@Blocking
-	protected Creeper spawnEntity(@NotNull Component viewer, @NotNull ServerPlayer player) {
+	protected Creeper spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
 		Creeper creeper = super.spawnEntity(viewer, player);
 		creeper.getEntityData().set(Creeper.DATA_IS_POWERED, true);
 		Vec3 pos = creeper.position();

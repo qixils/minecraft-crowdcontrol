@@ -1,9 +1,14 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -11,23 +16,24 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
+import java.util.function.Supplier;
 
-import static dev.qixils.crowdcontrol.TimedEffect.isActive;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModifier;
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.removeModifier;
 
 @Getter
-public class GravityCommand extends TimedVoidCommand {
+public class GravityCommand extends ModdedCommand implements CCTimedEffect {
 	private final Duration defaultDuration = POTION_DURATION;
 	private final String effectName;
 
 	private final double gravityLevel;
 	private final double fallLevel;
 	private final double fallDmgLevel;
+
+	private final List<String> effectGroups = Arrays.asList("gravity", "walk");
+	private final Map<UUID, List<UUID>> idMap = new HashMap<>();
 
 	private GravityCommand(ModdedCrowdControlPlugin plugin, String effectName, double gravityLevel, double fallLevel, double fallDmgLevel) {
 		super(plugin);
@@ -39,33 +45,28 @@ public class GravityCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull ServerPlayer> ignored, @NotNull Request request) {
-		if (isActive("walk", request)) {
-			request.buildResponse().type(Response.ResultType.RETRY).message("Cannot change gravity while frozen").send();
-			return;
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray())) {
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot change gravity while frozen");
+			}
+			List<ServerPlayer> players = playerSupplier.get();
+			idMap.put(request.getRequestId(), players.stream().map(ServerPlayer::getUUID).toList());
+			for (ServerPlayer player : players) {
+				addModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID, gravityLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+				addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, fallLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+				addModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, fallDmgLevel, AttributeModifier.Operation.ADD_VALUE, false);
+			}
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
+	}
+
+	@Override
+	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		for (ServerPlayer player : plugin.toPlayerList(idMap.remove(request.getRequestId()))) {
+			removeModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID);
+			removeModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
 		}
-		AtomicReference<List<ServerPlayer>> players = new AtomicReference<>(new ArrayList<>());
-		new TimedEffect.Builder()
-				.request(request)
-				.effectGroup("gravity")
-				.duration(getDuration(request))
-				.startCallback(effect -> {
-					players.set(plugin.getPlayers(request));
-					for (ServerPlayer player : players.get()) {
-						addModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID, gravityLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
-						addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, fallLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
-						addModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, fallDmgLevel, AttributeModifier.Operation.ADD_VALUE, false);
-					}
-					playerAnnounce(players.get(), request);
-					return request.buildResponse().type(Response.ResultType.SUCCESS).message("SUCCESS");
-				})
-				.completionCallback(effect -> {
-					for (ServerPlayer player : players.get()) {
-						removeModifier(player, Attributes.GRAVITY, GRAVITY_MODIFIER_UUID);
-						removeModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
-					}
-				})
-				.build().queue();
 	}
 
 	@NotNull

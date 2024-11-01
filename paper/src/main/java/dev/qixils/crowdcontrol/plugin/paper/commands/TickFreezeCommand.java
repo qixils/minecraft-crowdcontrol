@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -23,7 +22,6 @@ import java.util.function.Supplier;
 @Global
 @Getter
 public class TickFreezeCommand extends PaperCommand implements CCTimedEffect {
-	private final Duration defaultDuration = Duration.ofSeconds(20);
 	private final String effectName = "tick_freeze";
 
 	private final String effectGroup = "tick_rate";
@@ -43,14 +41,18 @@ public class TickFreezeCommand extends PaperCommand implements CCTimedEffect {
 		}));
 	}
 
+	private void set(boolean value) {
+		Bukkit.getServerTickManager().setFrozen(value);
+	}
+
 	@Override
 	public void onPause(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
-		Bukkit.getServerTickManager().setFrozen(false);
+		set(false);
 	}
 
 	@Override
 	public void onResume(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
-		Bukkit.getServerTickManager().setFrozen(true);
+		set(true);
 	}
 
 	@Override

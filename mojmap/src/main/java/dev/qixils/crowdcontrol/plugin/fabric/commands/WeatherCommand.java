@@ -1,23 +1,26 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.Global;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
 import lombok.Getter;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.WEATHER_TICKS;
 
 @Getter
 @Global
-public class WeatherCommand extends ImmediateCommand {
+public class WeatherCommand extends ModdedCommand {
 	private final int ticks = (int) WEATHER_TICKS;
 	private final String effectName;
 	private final boolean rain;
@@ -32,26 +35,29 @@ public class WeatherCommand extends ImmediateCommand {
 			throw new IllegalArgumentException("Storms can only be used with rain");
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Response.Builder builder = request.buildResponse().type(ResultType.FAILURE).message("Requested weather is already active");
-		for (ServerLevel world : plugin.server().getAllLevels()) {
-			if (!world.dimension().location().getPath().equals("overworld"))
-				continue;
-			if (storm && world.isThundering())
-				continue;
-			if (rain && world.isRaining())
-				continue;
-			if (!rain && !world.isRaining() && !world.isThundering())
-				continue;
-			if (!rain)
-				sync(() -> world.setWeatherParameters(ticks, 0, false, false));
-			else
-				sync(() -> world.setWeatherParameters(0, ticks, true, storm));
-			builder.type(ResultType.SUCCESS).message("SUCCESS");
-		}
-		return builder;
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			boolean success = false;
+			for (ServerLevel world : plugin.server().getAllLevels()) {
+				if (!world.dimension().location().getPath().equals("overworld"))
+					continue;
+				if (storm && world.isThundering())
+					continue;
+				if (rain && world.isRaining())
+					continue;
+				if (!rain && !world.isRaining() && !world.isThundering())
+					continue;
+				if (!rain)
+					sync(() -> world.setWeatherParameters(ticks, 0, false, false));
+				else
+					sync(() -> world.setWeatherParameters(0, ticks, true, storm));
+				success = true;
+			}
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Requested weather is already active");
+		}));
 	}
 
 	public static WeatherCommand clear(ModdedCrowdControlPlugin plugin) {

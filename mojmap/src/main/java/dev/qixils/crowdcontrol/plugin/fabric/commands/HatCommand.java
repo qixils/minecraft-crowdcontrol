@@ -1,9 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -12,39 +15,39 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.ItemUtil.isSimilar;
 
 @Getter
-public class HatCommand extends ImmediateCommand {
+public class HatCommand extends ModdedCommand {
 	private final String effectName = "hat";
 
 	public HatCommand(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Response.Builder response = request.buildResponse()
-				.type(ResultType.RETRY)
-				.message("Held item(s) and hat are the same");
-
-		for (ServerPlayer player : players) {
-			ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
-			for (InteractionHand handType : InteractionHand.values()) {
-				ItemStack hand = player.getItemInHand(handType);
-				if (isSimilar(hand, head))
-					continue;
-				response.type(ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> {
-					player.setItemSlot(EquipmentSlot.HEAD, hand);
-					player.setItemInHand(handType, head);
-				});
-				break;
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			boolean success = false;
+			for (ServerPlayer player : playerSupplier.get()) {
+				ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
+				for (InteractionHand handType : InteractionHand.values()) {
+					ItemStack hand = player.getItemInHand(handType);
+					if (isSimilar(hand, head))
+						continue;
+					success = true;
+					sync(() -> {
+						player.setItemSlot(EquipmentSlot.HEAD, hand);
+						player.setItemInHand(handType, head);
+					});
+					break;
+				}
 			}
-		}
-
-		return response;
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Held item(s) and hat are the same");
+		}));
 	}
 }

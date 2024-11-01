@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.common.command;
 import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EventListener;
-import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
@@ -26,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -201,7 +201,9 @@ public interface Command<P> extends CCEffect {
 	 */
 	@NotNull
 	@CheckReturnValue
+	@Deprecated
 	default Executor getExecutor() {
+		/*
 		ExecuteUsing.Type executeUsing = Optional.ofNullable(getClass().getAnnotation(ExecuteUsing.class))
 			.map(ExecuteUsing::value)
 			.orElse(ExecuteUsing.Type.ASYNC);
@@ -216,23 +218,34 @@ public interface Command<P> extends CCEffect {
 				break;
 		}
 		return executor;
+		 */
+		return Runnable::run;
 	}
 
 	@Override
 	default void onTrigger(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		Plugin<P, ?> plugin = getPlugin();
 
-		if (isExclusive() && request.getEffect().getDuration() > 0 && isActive(ccPlayer, request.getEffect().getEffectId())) {
-			ccPlayer.sendResponse(new CCInstantEffectResponse(
-				request.getRequestId(),
-				ResponseStatus.FAIL_TEMPORARY,
-				"Timed effect is already running"
-			));
-			return;
-		}
-
 		plugin.getSLF4JLogger().debug("Executing {} from {}", getDisplayName(), request);
-		Supplier<List<P>> playerSupplier = () -> {
+		Function<Boolean, List<P>> playerSupplier = (_force) -> {
+			boolean force = _force;
+
+			if (isExclusive() && isArrayActive(ccPlayer) && !force) {
+				throw new CCResponseException(new CCInstantEffectResponse(
+					request.getRequestId(),
+					ResponseStatus.FAIL_TEMPORARY,
+					"Conflicting effects were already active"
+				));
+			}
+
+			if (getPlugin().isPaused() && !force) {
+				throw new CCResponseException(new CCInstantEffectResponse(
+					request.getRequestId(),
+					ResponseStatus.FAIL_TEMPORARY,
+					"Cannot run effects whilst game is paused"
+				));
+			}
+
 			Stream<P> playerStream = plugin.getPlayerManager().getPlayers(request);
 
 			// remove players on older version of the mod
@@ -247,7 +260,7 @@ public interface Command<P> extends CCEffect {
 
 			List<P> playerList = playerStream.collect(Collectors.toList());
 
-			if (isGlobal() && playerList.stream().noneMatch(plugin::globalEffectsUsableFor)) {
+			if (isGlobal() && playerList.stream().noneMatch(plugin::globalEffectsUsableFor) && !force) {
 				throw new CCResponseException(new CCInstantEffectResponse(
 					request.getRequestId(),
 					ResponseStatus.FAIL_PERMANENT,
@@ -256,7 +269,7 @@ public interface Command<P> extends CCEffect {
 			}
 
 			// ensure targets are online / available
-			if (playerList.isEmpty()) {
+			if (playerList.isEmpty() && !force) {
 				throw new CCResponseException(new CCInstantEffectResponse(
 					request.getRequestId(),
 					ResponseStatus.FAIL_TEMPORARY,
@@ -273,7 +286,7 @@ public interface Command<P> extends CCEffect {
 		plugin.trackEffect(
 			request.getRequestId(),
 			new TrackedEffect(
-				new DynamicForwardingAudience(() -> plugin.playerMapper().asAudience(playerSupplier.get())),
+				new DynamicForwardingAudience(() -> plugin.playerMapper().asAudience(playerSupplier.apply(true))),
 				request,
 				ccPlayer
 			)
@@ -281,7 +294,7 @@ public interface Command<P> extends CCEffect {
 
 		getExecutor().execute(() -> {
 			try {
-				execute(playerSupplier, request, ccPlayer);
+				execute(() -> playerSupplier.apply(false), request, ccPlayer);
 			} catch (CCResponseException e) {
 				ccPlayer.sendResponse(e.getResponse());
 			}
@@ -354,6 +367,10 @@ public interface Command<P> extends CCEffect {
 		return Arrays.stream(effectIDs)
 			.flatMap(effectID -> Stream.concat(Stream.of(effectID), getPlugin().commandRegister().getEffectsByGroup(effectID).stream()))
 			.anyMatch(effectID -> cc.isPlayerEffectActive(effectID, uuid));
+	}
+
+	default boolean isArrayActive(@NotNull CCPlayer player) {
+		return isActive(player, getEffectArray());
 	}
 
 	default List<String> getEffectGroups() {

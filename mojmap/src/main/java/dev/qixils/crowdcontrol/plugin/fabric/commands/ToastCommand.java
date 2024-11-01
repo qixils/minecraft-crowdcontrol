@@ -1,13 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.EventListener;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Tick;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.minecraft.network.chat.Component;
@@ -31,12 +34,13 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITLE;
 
 @Getter
 @EventListener
-public final class ToastCommand extends ImmediateCommand {
+public final class ToastCommand extends ModdedCommand {
 	private static final Item[] MATERIALS = new Item[]{
 			Items.BROWN_STAINED_GLASS_PANE,
 			Items.RED_STAINED_GLASS_PANE,
@@ -65,31 +69,32 @@ public final class ToastCommand extends ImmediateCommand {
 		TITLE = plugin.adventure().asNative(POPUP_TITLE);
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		sync(() -> players.forEach(player -> {
-			// annoying sound
-			player.playSound(Sounds.ANNOYING.get(), Sound.Emitter.self());
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			for (ServerPlayer player : playerSupplier.get()) {
+				// annoying sound
+				player.playSound(Sounds.ANNOYING.get(), Sound.Emitter.self());
 
-			// spam recipe toasts
-			ServerRecipeBook book = player.getRecipeBook();
-			RecipeManager recipeManager = player.serverLevel().getRecipeManager();
-			Collection<RecipeHolder<?>> recipes = book.known
+				// spam recipe toasts
+				ServerRecipeBook book = player.getRecipeBook();
+				RecipeManager recipeManager = player.serverLevel().getRecipeManager();
+				Collection<RecipeHolder<?>> recipes = book.known
 					.stream()
 					.flatMap(location -> recipeManager.byKey(location).stream())
 					.toList();
-			book.removeRecipes(recipes, player);
-			book.addRecipes(recipes, player);
+				book.removeRecipes(recipes, player);
+				book.addRecipes(recipes, player);
 
-			// pop-up inventory
-			Container container = new SimpleContainer(INVENTORY_SIZE);
-			ToastInventory toastInv = new ToastInventory(container);
-			toastInv.tick();
-			player.openMenu(new ToastMenuProvider(container));
-			OPEN_INVENTORIES.put(player.getUUID(), toastInv);
-		}));
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+				// pop-up inventory
+				Container container = new SimpleContainer(INVENTORY_SIZE);
+				ToastInventory toastInv = new ToastInventory(container);
+				toastInv.tick();
+				player.openMenu(new ToastMenuProvider(container));
+				OPEN_INVENTORIES.put(player.getUUID(), toastInv);
+			}
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+		}, plugin.getSyncExecutor()));
 	}
 
 	@Listener

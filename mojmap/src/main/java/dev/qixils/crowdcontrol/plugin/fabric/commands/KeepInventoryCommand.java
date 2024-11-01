@@ -1,20 +1,23 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TriState;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Respondable;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.IUserRecord;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.KEEP_INVENTORY_MESSAGE;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.LOSE_INVENTORY_MESSAGE;
@@ -22,7 +25,7 @@ import static dev.qixils.crowdcontrol.common.util.sound.Sounds.KEEP_INVENTORY_AL
 import static dev.qixils.crowdcontrol.common.util.sound.Sounds.LOSE_INVENTORY_ALERT;
 
 @Getter
-public class KeepInventoryCommand extends ImmediateCommand {
+public class KeepInventoryCommand extends ModdedCommand {
 	private static final Set<UUID> keepingInventory = Collections.synchronizedSet(new HashSet<>(1));
 	public static boolean globalKeepInventory = false;
 	private final boolean enable;
@@ -48,57 +51,54 @@ public class KeepInventoryCommand extends ImmediateCommand {
 		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get(), Sound.Emitter.self());
 	}
 
-	private void updateEffectVisibility(@Nullable Respondable respondable) {
-		async(() -> {
-			plugin.updateEffectStatus(respondable, ResultType.NOT_SELECTABLE, effectName);
-			plugin.updateEffectStatus(respondable, ResultType.SELECTABLE, "keep_inventory_" + (!enable ? "on" : "off"));
-			plugin.updateEffectStatus(respondable, enable ? ResultType.NOT_SELECTABLE : ResultType.SELECTABLE, "clear_inventory");
-		});
-	}
-
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Response.Builder resp = request.buildResponse();
-
-		if (plugin.isGlobal()) {
-			if (globalKeepInventory == enable) {
-				return resp.type(ResultType.FAILURE).message("Keep Inventory is already " + (enable ? "enabled" : "disabled"));
+	public void execute(@NotNull Supplier<List<ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<ServerPlayer> players = playerSupplier.get();
+			if (plugin.isGlobal()) {
+				if (globalKeepInventory == enable) {
+					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Keep Inventory is already " + (enable ? "enabled" : "disabled"));
+				}
+				globalKeepInventory = enable;
+				alert(players);
+				plugin.updateConditionalEffectVisibility();
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 			}
-			globalKeepInventory = enable;
-			alert(players);
-			updateEffectVisibility(plugin.getCrowdControl());
-			return resp.type(ResultType.SUCCESS);
-		}
 
-		List<UUID> uuids = new ArrayList<>(players.size());
-		for (ServerPlayer player : players)
-			uuids.add(player.getUUID());
+			List<UUID> uuids = new ArrayList<>(players.size());
+			for (ServerPlayer player : players)
+				uuids.add(player.getUUID());
 
-		if (enable) {
-			if (keepingInventory.addAll(uuids)) {
-				alert(players);
-				//updateEffectVisibility(request);
-				return resp.type(ResultType.SUCCESS);
-			} else
-				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory enabled");
-		} else {
-			if (keepingInventory.removeAll(uuids)) {
-				alert(players);
-				//updateEffectVisibility(request);
-				return resp.type(ResultType.SUCCESS);
-			} else
-				return resp.type(ResultType.FAILURE).message("Streamer(s) already have Keep Inventory disabled");
-		}
+			if (enable) {
+				if (keepingInventory.addAll(uuids)) {
+					alert(players);
+					players.forEach(plugin::updateConditionalEffectVisibility);
+					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+				} else
+					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Streamer(s) already have Keep Inventory enabled");
+			} else {
+				if (keepingInventory.removeAll(uuids)) {
+					alert(players);
+					players.forEach(plugin::updateConditionalEffectVisibility);
+					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+				} else
+					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Streamer(s) already have Keep Inventory disabled");
+			}
+		}));
 	}
 
 	@Override
-	public TriState isSelectable() {
-		if (!plugin.isGlobal())
-			return TriState.TRUE;
-		if (globalKeepInventory == enable)
-			return TriState.FALSE;
-		return TriState.TRUE;
+	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
+		if (plugin.isGlobal())
+			return globalKeepInventory == enable ? TriState.FALSE : TriState.TRUE;
+
+		TriState state = potentialPlayers.stream().map(player -> TriState.fromBoolean(enable != keepingInventory.contains(player.getUUID()))).reduce((prev, next) -> {
+			if (prev != next) return TriState.UNKNOWN;
+			return prev;
+		}).orElse(TriState.UNKNOWN);
+
+		if (state == TriState.FALSE) return state;
+		return TriState.TRUE; // fixing UNKNOWN essentially
 	}
 
 	// management of this command is handled by mixins

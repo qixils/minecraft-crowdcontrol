@@ -7,9 +7,7 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CrowdControl;
 import live.crowdcontrol.cc4j.IUserRecord;
-import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
-import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
@@ -59,15 +57,6 @@ public class KeepInventoryCommand extends PaperCommand {
 		audience.playSound((enable ? KEEP_INVENTORY_ALERT : LOSE_INVENTORY_ALERT).get(), Sound.Emitter.self());
 	}
 
-	private void updateEffectVisibility(@NotNull CCPlayer ccPlayer) {
-		// TODO: optimize
-		ccPlayer.sendReport(
-			new CCEffectReport(ReportStatus.MENU_UNAVAILABLE, effectName),
-			new CCEffectReport(ReportStatus.MENU_AVAILABLE, "keep_inventory_" + (!enable ? "on" : "off")),
-			new CCEffectReport(enable ? ReportStatus.MENU_UNAVAILABLE : ReportStatus.MENU_AVAILABLE, "clear_inventory")
-		);
-	}
-
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
@@ -81,7 +70,7 @@ public class KeepInventoryCommand extends PaperCommand {
 				}
 				globalKeepInventory = enable;
 				alert(players);
-				cc.getPlayers().forEach(this::updateEffectVisibility);
+				plugin.updateConditionalEffectVisibility();
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 			}
 
@@ -92,14 +81,14 @@ public class KeepInventoryCommand extends PaperCommand {
 			if (enable) {
 				if (keepingInventory.addAll(uuids)) {
 					alert(players);
-					updateEffectVisibility(ccPlayer);
+					players.forEach(plugin::updateConditionalEffectVisibility);
 					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 				} else
 					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Streamer(s) already have Keep Inventory enabled");
 			} else {
 				if (keepingInventory.removeAll(uuids)) {
 					alert(players);
-					updateEffectVisibility(ccPlayer);
+					players.forEach(plugin::updateConditionalEffectVisibility);
 					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 				} else
 					return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Streamer(s) already have Keep Inventory disabled");
@@ -109,11 +98,16 @@ public class KeepInventoryCommand extends PaperCommand {
 
 	@Override
 	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
-		if (!plugin.isGlobal())
-			return TriState.TRUE;
-		if (globalKeepInventory == enable)
-			return TriState.FALSE;
-		return TriState.TRUE;
+		if (plugin.isGlobal())
+			return globalKeepInventory == enable ? TriState.FALSE : TriState.TRUE;
+
+		TriState state = potentialPlayers.stream().map(player -> TriState.fromBoolean(enable != keepingInventory.contains(player.getUniqueId()))).reduce((prev, next) -> {
+			if (prev != next) return TriState.UNKNOWN;
+			return prev;
+		}).orElse(TriState.UNKNOWN);
+
+		if (state == TriState.FALSE) return state;
+		return TriState.TRUE; // fixing UNKNOWN essentially
 	}
 
 	public static final class Manager implements Listener {

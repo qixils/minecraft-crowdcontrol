@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import dev.qixils.crowdcontrol.TimedEffect;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import live.crowdcontrol.cc4j.CrowdControl;
 import net.minecraft.client.Minecraft;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,10 +17,15 @@ public class MinecraftClientMixin {
 
 	@Inject(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;pause:Z", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
 	private void injected(CallbackInfo ci) {
-		if (pause) {
-			TimedEffect.pauseAll();
-		} else {
-			TimedEffect.resumeAll();
-		}
+		if (!ModdedCrowdControlPlugin.isInstanceAvailable()) return;
+		ModdedCrowdControlPlugin plugin = ModdedCrowdControlPlugin.getInstance();
+		CrowdControl cc = plugin.getCrowdControl();
+		if (cc == null) return;
+
+		plugin.setPaused(pause);
+		if (pause)
+			cc.pauseAll();
+		else
+			cc.resumeAll();
 	}
 }

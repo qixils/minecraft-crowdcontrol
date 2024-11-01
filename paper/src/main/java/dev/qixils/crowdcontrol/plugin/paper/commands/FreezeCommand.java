@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.CrowdControl;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
@@ -26,6 +27,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
@@ -36,6 +38,7 @@ public class FreezeCommand extends PaperCommand implements CCTimedEffect {
 
 	private final String effectName;
 	private final String effectGroup;
+	private final List<String> effectGroups;
 	private final LocationModifier modifier;
 	private final MovementStatusType freezeType;
 	private final MovementStatusValue freezeValue;
@@ -44,6 +47,7 @@ public class FreezeCommand extends PaperCommand implements CCTimedEffect {
 		super(plugin);
 		this.effectName = effectName;
 		this.effectGroup = effectGroup;
+		this.effectGroups = Collections.singletonList(effectGroup);
 		this.modifier = modifier;
 		this.freezeType = freezeType;
 		this.freezeValue = freezeValue;
@@ -170,10 +174,15 @@ public class FreezeCommand extends PaperCommand implements CCTimedEffect {
 
 		@EventHandler
 		public void onDeath(PlayerDeathEvent death) {
-			UUID uuid = death.getEntity().getUniqueId();
-			// end effect by removing player from tracking
-			DATA.remove(uuid);
-			TIMED_EFFECTS.values().forEach(map -> map.remove(uuid));
+			CrowdControl cc = plugin.getCrowdControl();
+			if (cc == null) return;
+
+			UUID uuid = death.getPlayer().getUniqueId();
+			Set<UUID> requestIds = TIMED_EFFECTS.entrySet().stream()
+				.filter(entry -> entry.getValue().containsKey(uuid))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toSet());
+			requestIds.forEach(cc::cancelByRequestId);
 		}
 
 		@EventHandler

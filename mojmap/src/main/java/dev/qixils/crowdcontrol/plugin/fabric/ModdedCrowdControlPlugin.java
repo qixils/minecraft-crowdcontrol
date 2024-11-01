@@ -22,6 +22,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -52,6 +53,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
 
@@ -100,6 +102,8 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(Path.of("config"));
 	private static @MonotonicNonNull ModdedCrowdControlPlugin instance;
+	@Getter @Setter
+	private boolean paused = false;
 
 	public ModdedCrowdControlPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
@@ -128,14 +132,14 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 			SemVer version = payload.version();
 			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
 			clientVersions.put(uuid, version);
-			updateConditionalEffectVisibility(crowdControl);
+			updateConditionalEffectVisibility(context.player());
 		});
 		ServerPlayNetworking.registerGlobalReceiver(ExtraFeatureC2S.PACKET_ID, (payload, context) -> {
 			UUID uuid = context.player().getUUID();
 			Set<ExtraFeature> features = payload.features();
 			getSLF4JLogger().info("Received features {} from client {}", features, uuid);
 			extraFeatures.put(uuid, features);
-			updateConditionalEffectVisibility(crowdControl);
+			updateConditionalEffectVisibility(context.player());
 		});
 	}
 
@@ -218,8 +222,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 			this.adventure = null;
 			this.syncExecutor = Runnable::run;
 			if (this.crowdControl != null) {
-				this.crowdControl.shutdown("Server is shutting down");
-				this.crowdControl = null;
+				shutdown();
 			}
 		} else {
 			this.server = server;
@@ -291,4 +294,14 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	}
 
 	public abstract PermissionUtil getPermissionUtil();
+
+	public @NotNull Stream<ServerPlayer> toPlayerStream(@Nullable Collection<UUID> uuids) {
+		MinecraftServer _server = server;
+		if (uuids == null || _server == null) return Stream.empty();
+		return uuids.stream().map(id -> _server.getPlayerList().getPlayer(id)).filter(Objects::nonNull);
+	}
+
+	public @NotNull List<ServerPlayer> toPlayerList(@Nullable Collection<UUID> uuids) {
+		return toPlayerStream(uuids).toList();
+	}
 }

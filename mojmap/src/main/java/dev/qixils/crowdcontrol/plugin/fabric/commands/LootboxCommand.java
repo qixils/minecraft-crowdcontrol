@@ -1,13 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import com.google.common.collect.Lists;
-import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -42,6 +45,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
@@ -50,8 +54,7 @@ import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.P
 import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP;
 
 @Getter
-@ExecuteUsing(ExecuteUsing.Type.SYNC_GLOBAL)
-public class LootboxCommand extends ImmediateCommand {
+public class LootboxCommand extends ModdedCommand {
 	private static final List<Holder<Attribute>> ATTRIBUTES = Arrays.asList(
 		Attributes.MAX_HEALTH,
 		Attributes.KNOCKBACK_RESISTANCE,
@@ -301,35 +304,38 @@ public class LootboxCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		boolean success = false;
-		for (ServerPlayer player : players) {
-			if (isLootboxOpen(player)) continue;
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			boolean success = false;
+			List<ServerPlayer> players = playerSupplier.get();
+			for (ServerPlayer player : players) {
+				if (isLootboxOpen(player)) continue;
 
-			// init container
-			SimpleContainer container = new SimpleContainer(27);
-			for (int slot : CommandConstants.lootboxItemSlots(luck)) {
-				ItemStack itemStack = createRandomItem(luck, player.registryAccess());
-				List<Component> lore = getLore(itemStack);
-				lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), player));
-				setLore(itemStack, lore);
-				container.setItem(slot, itemStack);
+				// init container
+				SimpleContainer container = new SimpleContainer(27);
+				for (int slot : CommandConstants.lootboxItemSlots(luck)) {
+					ItemStack itemStack = createRandomItem(luck, player.registryAccess());
+					List<Component> lore = getLore(itemStack);
+					lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), player));
+					setLore(itemStack, lore);
+					container.setItem(slot, itemStack);
+				}
+
+				// sound & open
+				var title = plugin.adventure().asNative(buildLootboxTitle(plugin, request));
+
+				OptionalInt val = player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container), title));
+				if (val.isEmpty()) continue;
+
+				player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
+				OPEN_LOOTBOXES.put(player.getUUID(), (ChestMenu) player.containerMenu);
+				TITLES.put(player.getUUID(), title);
+
+				success = true;
 			}
-
-			// sound & open
-			var title = plugin.adventure().asNative(buildLootboxTitle(plugin, request));
-
-			OptionalInt val = player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container), title));
-			if (val.isEmpty()) continue;
-
-			player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
-			OPEN_LOOTBOXES.put(player.getUUID(), (ChestMenu) player.containerMenu);
-			TITLES.put(player.getUUID(), title);
-
-			success = true;
-		}
-		return success
-			? request.buildResponse().type(Response.ResultType.SUCCESS)
-			: request.buildResponse().type(Response.ResultType.RETRY).message("Player has another lootbox open");
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Player has another lootbox open");
+		}, plugin.getSyncExecutor()));
 	}
 }

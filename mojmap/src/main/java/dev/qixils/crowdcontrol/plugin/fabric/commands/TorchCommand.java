@@ -1,13 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.plugin.fabric.ImmediateCommand;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
-import dev.qixils.crowdcontrol.socket.Response;
 import lombok.Getter;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,9 +24,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Getter
-public class TorchCommand extends ImmediateCommand {
+public class TorchCommand extends ModdedCommand {
 	protected static final Direction[] BLOCK_FACES = new Direction[]{
 			Direction.DOWN,
 			Direction.EAST,
@@ -43,31 +47,33 @@ public class TorchCommand extends ImmediateCommand {
 	}
 
 	@Override
-	public Response.@NotNull Builder executeImmediately(@NotNull List<@NotNull ServerPlayer> players, @NotNull Request request) {
-		Predicate<Location> predicate = placeTorches
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			Predicate<Location> predicate = placeTorches
 				? loc -> BlockFinder.isReplaceable(loc.block())
 				: loc -> torches.contains(loc.block().getBlock());
 
-		List<Location> nearbyBlocks = new ArrayList<>();
-		players.forEach(player -> nearbyBlocks.addAll(BlockFinder.builder()
+			List<Location> nearbyBlocks = new ArrayList<>();
+			playerSupplier.get().forEach(player -> nearbyBlocks.addAll(BlockFinder.builder()
 				.origin(player)
 				.maxRadius(5)
 				.locationValidator(predicate)
 				.shuffleLocations(false)
 				.build().getAll()));
 
-		if (nearbyBlocks.isEmpty())
-			return request.buildResponse().type(Response.ResultType.RETRY).message("No available blocks to place/remove");
+			if (nearbyBlocks.isEmpty())
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No available blocks to place/remove");
 
-		sync(() -> {
-			for (Location location : nearbyBlocks) {
-				if (placeTorches)
-					placeTorch(location);
-				else
-					location.block(Blocks.AIR.defaultBlockState());
-			}
-		});
-		return request.buildResponse().type(Response.ResultType.SUCCESS);
+			sync(() -> {
+				for (Location location : nearbyBlocks) {
+					if (placeTorches)
+						placeTorch(location);
+					else
+						location.block(Blocks.AIR.defaultBlockState());
+				}
+			});
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+		}));
 	}
 
 	protected void placeTorch(Location location) {
