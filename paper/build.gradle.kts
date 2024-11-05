@@ -13,10 +13,6 @@ plugins {
     //id("io.papermc.paperweight.userdev")
 }
 
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
-}
-
 dependencies {
     implementation(project(":base-common"))
     implementation("org.incendo:cloud-paper:$cloudPaperVersion")

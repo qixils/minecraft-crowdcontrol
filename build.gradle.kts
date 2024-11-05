@@ -34,21 +34,22 @@ subprojects {
     }
 
     repositories {
-        mavenCentral()
-        repositories {
-            maven(url = "https://files.minecraftforge.net/maven/") {
-                name = "Minecraft Forge"
-            }
-            maven(url = "https://maven.neoforged.net/releases") {
-                name = "NeoForged"
-            }
-            maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-                name = "sonatype-oss-snapshots"
-            }
-            maven(url = "https://jitpack.io") {
-                name = "Jitpack"
-            }
+        maven("https://repo.papermc.io/repository/maven-public/") {
+            name = "PaperMC"
         }
+        maven("https://files.minecraftforge.net/maven/") {
+            name = "Minecraft Forge"
+        }
+        maven("https://maven.neoforged.net/releases") {
+            name = "NeoForged"
+        }
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+            name = "sonatype-oss-snapshots"
+        }
+        maven("https://jitpack.io") {
+            name = "Jitpack"
+        }
+        mavenCentral()
         mavenLocal()
     }
 
