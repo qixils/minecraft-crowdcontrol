@@ -13,6 +13,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -31,9 +32,9 @@ import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.npc.VillagerDataHolder;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +56,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	private final String effectName;
 	private final Component displayName;
 	private List<ResourceKey<LootTable>> lootTables = null;
-	private final Map<EntityType<?>, List<ArmorItem>> horseArmor = new HashMap<>();
+	private final Map<EntityType<?>, List<Item>> horseArmor = new HashMap<>();
 	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
 			Rabbit.Variant.BLACK, 16,
 			Rabbit.Variant.BROWN, 16,
@@ -76,7 +77,9 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		Map<EquipmentSlot, List<ArmorItem>> armor = new HashMap<>(4);
 		for (Item item : BuiltInRegistries.ITEM) {
 			if (item instanceof ArmorItem armorItem) {
-				EquipmentSlot slot = armorItem.getEquipmentSlot();
+				Equippable equippable = armorItem.components().get(DataComponents.EQUIPPABLE);
+				if (equippable == null) continue;
+				EquipmentSlot slot = equippable.slot();
 				if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
 					continue;
 				armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(armorItem);
@@ -92,11 +95,9 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	private List<ResourceKey<LootTable>> getLootTables(MinecraftServer server) {
 		if (lootTables != null)
 			return lootTables;
-		return lootTables = server.reloadableRegistries().get()
-			.lookup(Registries.LOOT_TABLE)
-			.stream()
-			.flatMap(HolderLookup::listElements)
-			.flatMap(reference -> reference.unwrapKey().stream())
+		return lootTables = ((HolderLookup.Provider) server.reloadableRegistries().lookup())
+			.lookupOrThrow(Registries.LOOT_TABLE)
+			.listElementIds()
 			.filter(key -> key.location().getPath().startsWith("chests/"))
 			.toList();
 	}
@@ -139,7 +140,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	@Blocking
 	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
-		E entity = entityType.create(player.serverLevel());
+		E entity = entityType.create(player.serverLevel(), EntitySpawnReason.COMMAND);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
@@ -149,25 +150,28 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			entity.setCustomNameVisible(true);
 		}
 		if (entity instanceof Mob mob)
-			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
+			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
 		if (entity instanceof LivingEntity livingEntity)
 			livingEntity.cc$setViewerSpawned();
-		if (entity instanceof Boat boat)
-			boat.setVariant(randomElementFrom(Boat.Type.values()));
+		// TODO
+//		if (entity instanceof AbstractBoat boat)
+//			boat.setVariant(randomElementFrom(Boat.Type.values()));
 		if (entity instanceof Wolf wolf) {
 			wolf.setCollarColor(randomElementFrom(DyeColor.values())); // TODO: crash
-			wolf.setVariant(randomElementFrom(level.registryAccess().registryOrThrow(Registries.WOLF_VARIANT).holders()));
+			wolf.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.WOLF_VARIANT).listElements()));
 		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
-			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
+			mooshroom.setVariant(MushroomCow.Variant.BROWN);
 		if (entity instanceof AbstractHorse horse) {
 			if (horse.canUseSlot(EquipmentSlot.BODY) && RandomUtil.RNG.nextBoolean()) {
-				List<ArmorItem> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
-					.map(item -> item instanceof ArmorItem armorItem ? armorItem : null)
-					.filter(Objects::nonNull)
-					.filter(item -> item.getEquipmentSlot().getType() == EquipmentSlot.Type.ANIMAL_ARMOR && horse.isBodyArmorItem(new ItemStack(item)))
+				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
+					.filter(item -> {
+						Equippable equippable = item.components().get(DataComponents.EQUIPPABLE);
+						if (equippable == null) return false;
+						return equippable.slot().getType() == EquipmentSlot.Type.ANIMAL_ARMOR;
+					})
 					.toList());
 				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
 			}
@@ -183,7 +187,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
 		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT.holders()));
+			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT.listElements()));
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.values()));
 		if (entity instanceof Rabbit rabbit)
@@ -191,7 +195,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		if (entity instanceof VillagerDataHolder villager)
 			villager.setVariant(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE));
 		if (entity instanceof ContainerEntity container)
-			container.setLootTable(randomElementFrom(getLootTables(level.getServer())));
+			container.setContainerLootTable(randomElementFrom(getLootTables(level.getServer())));
 
 		// add random armor to armor stands
 		if (entity instanceof ArmorStand armorStand) {

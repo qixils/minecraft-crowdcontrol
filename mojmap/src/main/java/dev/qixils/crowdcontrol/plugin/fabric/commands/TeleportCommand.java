@@ -62,7 +62,7 @@ public class TeleportCommand extends ModdedCommand {
 				double z = player.getZ();
 				for (int i = 0; i < 16; ++i) {
 					double destX = x + nextDoubleOffset();
-					double destY = Mth.clamp(y + nextIntOffset(), level.getMinBuildHeight(), level.getMinBuildHeight() + level.getLogicalHeight() - 1);
+					double destY = Mth.clamp(y + nextIntOffset(), level.getMinY(), level.getMinY() + level.getLogicalHeight() - 1);
 					double destZ = z + nextDoubleOffset();
 					if (!player.randomTeleport(destX, destY, destZ, true)) continue;
 					level.playSound(null, x, y, z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);

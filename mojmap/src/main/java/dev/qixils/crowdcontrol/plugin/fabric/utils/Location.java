@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Contract;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
+import java.util.Collections;
+
 import static java.lang.Math.pow;
 
 @FieldsAreNonnullByDefault
@@ -53,7 +55,7 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	}
 
 	public void teleportHere(ServerPlayer player) {
-		player.teleportTo(level, x, y, z, yaw, pitch);
+		player.teleportTo(level, x, y, z, Collections.emptySet(), yaw, pitch, false); // boolean is unused?
 	}
 
 	@CheckReturnValue

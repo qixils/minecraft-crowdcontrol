@@ -141,7 +141,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			initTo(commands, () -> new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		BuiltInRegistries.MOB_EFFECT.holders()
+		BuiltInRegistries.MOB_EFFECT.listElements()
 			.forEach(potion -> initTo(commands, () -> new PotionCommand(plugin, potion)));
 
 		// block sets

@@ -31,15 +31,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.armortrim.ArmorTrim;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -211,7 +210,7 @@ public class LootboxCommand extends ModdedCommand {
 		}
 		final int enchantments = _enchantments;
 		List<Holder<Enchantment>> enchantmentList = plugin.registry(Registries.ENCHANTMENT, registryAccess)
-			.holders()
+			.listElements()
 			.filter(enchantmentHolder -> enchantmentHolder.value().canEnchant(itemStack))
 			.collect(Collectors.toList());
 		if (random.nextDouble() >= (.8d - (luck * .2d))) {
@@ -223,7 +222,7 @@ public class LootboxCommand extends ModdedCommand {
 		// add enchantments
 		List<Holder<Enchantment>> addedEnchantments = new ArrayList<>(enchantments);
 		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
-			Holder<Enchantment> enchantment = enchantmentList.remove(0);
+			Holder<Enchantment> enchantment = enchantmentList.removeFirst();
 
 			// block conflicting enchantments (unless the die roll decides otherwise)
 			if (addedEnchantments.stream().anyMatch(x -> Enchantment.areCompatible(x, enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
@@ -251,10 +250,6 @@ public class LootboxCommand extends ModdedCommand {
 		}
 		// add attributes
 		if (attributes > 0) {
-			// get equipment slot(s)
-			EquipmentSlot equipmentSlot = itemStack.getItem() instanceof ArmorItem armorItem ? armorItem.getEquipmentSlot() : null;
-			EquipmentSlotGroup _equipmentSlotGroup = equipmentSlot == null ? null : SLOT_TO_GROUP.get(equipmentSlot);
-			final EquipmentSlotGroup equipmentSlotGroup = _equipmentSlotGroup == null ? EquipmentSlotGroup.HAND : _equipmentSlotGroup;
 			// add custom attributes
 			List<Holder<Attribute>> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
@@ -268,20 +263,21 @@ public class LootboxCommand extends ModdedCommand {
 				// create & add attribute
 				AttributeModifier attributeModifier = new AttributeModifier(migrateId(UUID.randomUUID()), amount, Operation.ADD_VALUE);
 				ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-				modifiers = modifiers.withModifierAdded(attribute, attributeModifier, equipmentSlotGroup);
+				modifiers = modifiers.withModifierAdded(attribute, attributeModifier, EquipmentSlotGroup.ANY);
 				itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
 			}
 			// add default attributes
-			for (EquipmentSlot type : EquipmentSlot.values()) {
-				if (!equipmentSlotGroup.test(type)) continue;
-				itemStack.getItem().getDefaultAttributeModifiers()
-					.forEach(type, (attribute, modifier) -> {
-						// TODO: does any of this make sense (especially the equipmentSlotGroup)
-						ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-						modifiers = modifiers.withModifierAdded(attribute, modifier, equipmentSlotGroup);
-						itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
-					});
-			}
+			// TODO: maybe these aren't needed anymore? feel like i recall a snapshot to that effect
+//			for (EquipmentSlot type : EquipmentSlot.values()) {
+//				if (!equipmentSlotGroup.test(type)) continue;
+//				itemStack.getItem().getDefaultAttributeModifiers()
+//					.forEach(type, (attribute, modifier) -> {
+//						// TODO: does any of this make sense (especially the equipmentSlotGroup)
+//						ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+//						modifiers = modifiers.withModifierAdded(attribute, modifier, equipmentSlotGroup);
+//						itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
+//					});
+//			}
 		}
 	}
 

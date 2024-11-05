@@ -145,7 +145,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 
 	public <T> Registry<T> registry(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
 		if (accessor == null) accessor = server().registryAccess();
-		return accessor.registryOrThrow(key);
+		return accessor.lookupOrThrow(key);
 	}
 
 	public <T> Iterable<Holder.Reference<T>> registryHolders(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
@@ -154,7 +154,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
             @NotNull
             @Override
             public Iterator<Holder.Reference<T>> iterator() {
-                return registry.holders().iterator();
+                return registry.listElements().iterator();
             }
         };
 	}

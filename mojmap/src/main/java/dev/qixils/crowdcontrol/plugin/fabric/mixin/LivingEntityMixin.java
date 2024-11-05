@@ -26,48 +26,54 @@ public abstract class LivingEntityMixin extends Entity implements ViewerMob, Ori
 	}
 
 	@Unique
-	boolean isViewerSpawned;
+	boolean cc$isViewerSpawned;
 	@Unique
-	Component originalDisplayName;
+	Component cc$originalDisplayName;
 
 	@Override
 	public boolean cc$isViewerSpawned() {
-		return isViewerSpawned;
+		return cc$isViewerSpawned;
 	}
 
 	@Override
 	public void cc$setViewerSpawned(boolean isViewerSpawned) {
-		this.isViewerSpawned = isViewerSpawned;
+		this.cc$isViewerSpawned = isViewerSpawned;
 	}
 
 	@Override
 	public @Nullable Component cc$getOriginalDisplayName() {
-		return originalDisplayName;
+		return cc$originalDisplayName;
 	}
 
 	@Override
 	public void cc$setOriginalDisplayName(@Nullable Component originalDisplayName) {
-		this.originalDisplayName = originalDisplayName;
+		this.cc$originalDisplayName = originalDisplayName;
 	}
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
 	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
 		if (tag.contains(Components.VIEWER_MOB))
-			isViewerSpawned = tag.getBoolean(Components.VIEWER_MOB);
+			cc$isViewerSpawned = tag.getBoolean(Components.VIEWER_MOB);
 		if (tag.contains(Components.ORIGINAL_DISPLAY_NAME))
-			originalDisplayName = Component.Serializer.fromJson(tag.getString(Components.ORIGINAL_DISPLAY_NAME), registryAccess());
+			cc$originalDisplayName = Component.Serializer.fromJson(tag.getString(Components.ORIGINAL_DISPLAY_NAME), registryAccess());
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
 	void onAddAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
-		if (isViewerSpawned)
+		if (cc$isViewerSpawned)
 			tag.putBoolean(Components.VIEWER_MOB, true);
-		if (originalDisplayName != null)
-			tag.putString(Components.ORIGINAL_DISPLAY_NAME, Component.Serializer.toJson(originalDisplayName, registryAccess()));
+		if (cc$originalDisplayName != null)
+			tag.putString(Components.ORIGINAL_DISPLAY_NAME, Component.Serializer.toJson(cc$originalDisplayName, registryAccess()));
 	}
 
 	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
 	private void callDeathEvent(final DamageSource cause, final CallbackInfo ci) {
 		EntityUtil.handleDie((LivingEntity) (Object) this, cause, ci);
+	}
+
+	// player stuff
+
+	@Inject(method = "jumpFromGround", at = @At("HEAD"), cancellable = true)
+	public void jumpFromGround(CallbackInfo ci) {
 	}
 }

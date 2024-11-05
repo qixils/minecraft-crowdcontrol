@@ -15,10 +15,10 @@
     "TickMixin"
   ],
   "client": [
-    "EffectInstanceMixin",
     "GameRendererMixin",
     "KeyboardInputMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "UniformMixin"
   ],
   "injectors": {
     "defaultRequire": 1

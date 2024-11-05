@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
@@ -38,29 +39,29 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 	}
 
 	@Unique
-	GameType gameTypeEffect;
+	GameType cc$gameTypeEffect;
 
 	@Nullable
 	@Override
 	public GameType cc$getGameTypeEffect() {
-		return gameTypeEffect;
+		return cc$gameTypeEffect;
 	}
 
 	@Override
 	public void cc$setGameTypeEffect(GameType gameTypeEffect) {
-		this.gameTypeEffect = gameTypeEffect;
+		this.cc$gameTypeEffect = gameTypeEffect;
 	}
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
 	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
 		if (tag.contains(Components.GAME_TYPE_EFFECT))
-			gameTypeEffect = GameType.byName(tag.getString(Components.GAME_TYPE_EFFECT), null);
+			cc$gameTypeEffect = GameType.byName(tag.getString(Components.GAME_TYPE_EFFECT), null);
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
 	void onAddAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
-		if (gameTypeEffect != null)
-			tag.putString(Components.GAME_TYPE_EFFECT, gameTypeEffect.getName());
+		if (cc$gameTypeEffect != null)
+			tag.putString(Components.GAME_TYPE_EFFECT, cc$gameTypeEffect.getName());
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"))
@@ -104,8 +105,8 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 		EntityUtil.handleDie(this, source, ci);
 	}
 
-	@Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
-	private void callDamageEvent(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
+	@Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
+	private void callDamageEvent(ServerLevel serverLevel, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		EntityUtil.handleDamage(this, source, amount, cir);
 	}
 }

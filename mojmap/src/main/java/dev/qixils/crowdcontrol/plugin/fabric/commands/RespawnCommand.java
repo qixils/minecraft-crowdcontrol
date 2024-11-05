@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -27,7 +28,7 @@ public class RespawnCommand extends ModdedCommand {
 	}
 
 	private void teleport(ServerPlayer player, ServerLevel level, BlockPos pos, float angle) {
-		sync(() -> player.teleportTo(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, angle, 0));
+		sync(() -> player.teleportTo(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, Collections.emptySet(), angle, 0, false)); // boolean is unused?
 	}
 
 	@Override

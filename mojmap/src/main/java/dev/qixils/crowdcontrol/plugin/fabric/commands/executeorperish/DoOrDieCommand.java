@@ -109,7 +109,7 @@ public class DoOrDieCommand extends ModdedCommand {
 				} else if (isTimeUp) {
 					condition.reset(player);
 					player.showTitle(DO_OR_DIE_FAILURE);
-					player.kill();
+					player.kill(player.serverLevel());
 				} else {
 					Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
 					player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));

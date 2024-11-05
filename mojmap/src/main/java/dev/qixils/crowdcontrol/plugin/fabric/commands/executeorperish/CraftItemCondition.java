@@ -1,13 +1,13 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.common.EventListener;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Craft;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -27,7 +27,7 @@ public final class CraftItemCondition extends AbstractBooleanListeningCondition 
 		this.item = item;
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.craft." + key,
-				Component.translatable(new ItemStack(item).getDescriptionId(), NamedTextColor.GREEN)
+				ModdedCrowdControlPlugin.getInstance().adventure().asAdventure(item.getName()).color(NamedTextColor.GREEN)
 		);
 	}
 

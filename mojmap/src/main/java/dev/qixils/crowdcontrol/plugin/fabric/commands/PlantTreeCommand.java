@@ -38,8 +38,7 @@ public class PlantTreeCommand extends ModdedCommand {
 	}
 
 	private static List<ConfiguredFeature<?, ?>> getTreesFor(Level level) {
-		return level.registryAccess().registry(Registries.CONFIGURED_FEATURE)
-				.orElseThrow(() -> new IllegalStateException("No configured feature registry"))
+		return level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE)
 				.stream()
 				.filter(feature -> {
 					FeatureConfiguration c = feature.config();

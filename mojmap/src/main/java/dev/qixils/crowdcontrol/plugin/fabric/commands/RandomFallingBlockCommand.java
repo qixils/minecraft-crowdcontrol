@@ -57,7 +57,7 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 					playerLoc.x(),
 					Math.min(
 						playerLoc.y() + FALLING_BLOCK_FALL_DISTANCE,
-						world.getMaxBuildHeight() - 1
+						world.getMaxY() - 1
 					),
 					playerLoc.z()
 				);

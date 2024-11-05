@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import dev.qixils.crowdcontrol.plugin.fabric.event.Craft;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -35,17 +36,19 @@ public abstract class ResultSlotMixin extends Slot {
 
 	@Inject(method = "onTake", at = @At("HEAD"))
 	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
-		if (player.level().isClientSide)
-			return;
-		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
+		if (player.level().isClientSide) return;
+		MinecraftServer server = player.level().getServer();
+		if (server == null) return; // failsafe?
+		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
 	@Inject(method = "onQuickCraft", at = @At("HEAD"))
 	public void onQuickCraft(ItemStack result, int i, CallbackInfo ci) {
-		if (player.level().isClientSide)
-			return;
-		RecipeHolder<CraftingRecipe> recipe = player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
+		if (player.level().isClientSide) return;
+		MinecraftServer server = player.level().getServer();
+		if (server == null) return; // failsafe?
+		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 

@@ -40,7 +40,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 		Location location = new Location(world, origin.x(), world.getLogicalHeight() - 1, origin.z(), origin.yaw(), origin.pitch());
 		while (true) {
 			BlockState block = location.block();
-			if (location.y() < (world.getMinBuildHeight() + 1)) // idk if the +1 is necessary but why not
+			if (location.y() < (world.getMinY() + 1)) // idk if the +1 is necessary but why not
 				return null;
 			else if (block.getBlock().isPossibleToRespawnInThis(block) && !block.blocksMotion())
 				air += 1;

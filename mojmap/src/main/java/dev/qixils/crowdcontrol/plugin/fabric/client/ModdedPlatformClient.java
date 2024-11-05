@@ -80,7 +80,7 @@ public abstract class ModdedPlatformClient implements ClientModInitializer {
 			ResourceLocation shader = withDefaultNamespace("shaders/post/" + payload.shader() + ".json");
 
 			client.execute(() -> {
-				client.gameRenderer.loadEffect(shader);
+				client.gameRenderer.setPostEffect(shader);
 				SHADER_ACTIVE = true;
 			});
 			executor.schedule(() -> client.execute(() -> {
