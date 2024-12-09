@@ -56,13 +56,20 @@ subprojects {
         compileOnly("io.netty:netty-buffer:$nettyVersion")
     }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    val targetJavaVersion = 21
+    tasks.withType<JavaCompile>().configureEach {
+        options.release.set(targetJavaVersion)
+        options.encoding = Charsets.UTF_8.name()
     }
 
-    tasks.withType<JavaCompile> {
-        options.encoding = Charsets.UTF_8.name()
+    java {
+        val javaVersion = JavaVersion.toVersion(targetJavaVersion)
+        if (JavaVersion.current() < javaVersion) {
+            toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
+        }
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+//    withSourcesJar()
     }
 
     val isPlatform = project.name.endsWith("-platform")
@@ -91,10 +98,6 @@ subprojects {
         tasks {
             // TODO: disable output of non-shaded jars? or make their file names more obvious?
             shadowJar {
-                // exclude Java >8 META-INF files
-                if (java.targetCompatibility.isJava8) {
-                    exclude("META-INF/versions/")
-                }
                 // set name of output file to CrowdControl-XYZ-VERSION.jar
                 val titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
                 archiveBaseName.set("CrowdControl-$titleCaseName")

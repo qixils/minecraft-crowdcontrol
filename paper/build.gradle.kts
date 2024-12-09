@@ -22,23 +22,6 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
-// Java 17 boilerplate
-
-val targetJavaVersion = 21
-tasks.withType<JavaCompile>().configureEach {
-    options.release.set(targetJavaVersion)
-}
-
-java {
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-    }
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-//    withSourcesJar()
-}
-
 // plugin.yml generation
 paper {
     name = "CrowdControl"

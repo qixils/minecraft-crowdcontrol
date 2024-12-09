@@ -81,23 +81,6 @@ tasks.processResources {
     }
 }
 
-// Java 21 boilerplate
-
-val targetJavaVersion = 21
-tasks.withType<JavaCompile>().configureEach {
-    options.release.set(targetJavaVersion)
-}
-
-java {
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-    }
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-//    withSourcesJar()
-}
-
 //loom {
 //    mixin {
 //        defaultRefmapName.set("crowd-control-refmap.json")
