@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
+// TODO: remove sponge cope
+
 public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements TranslationRegistry {
 	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/KyoriTranslator");
 	private final String prefix;
@@ -64,8 +66,8 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		try {
 			int idx = urlPath.indexOf("!");
 			File jarUrl = idx == -1
-				? new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()) // TODO: even this doesn't work on forge omg wtf
-				: new File(urlPath.substring("file:".length(), urlPath.indexOf("!"))); // TODO: url encoder error on sponge 7 AAAAAAAAA
+				? new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
+				: new File(urlPath.substring("file:".length(), urlPath.indexOf("!")));
 			try (JarFile jar = new JarFile(jarUrl)) {
 				return Collections.list(jar.entries()).stream()
 					.filter(entry -> entry.getName().startsWith(path))

@@ -37,24 +37,6 @@ jobs:
           name: crowdcontrol-paper
           path: "paper/build/libs/CrowdControl-*.jar"
 
-      - name: Upload Sponge 7 Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: crowdcontrol-sponge7
-          path: "sponge-7/build/libs/CrowdControl-*.jar"
-
-      - name: Upload Sponge 8 Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: crowdcontrol-sponge8
-          path: "sponge-8/build/libs/CrowdControl-*.jar"
-
-      - name: Upload Sponge 11 Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: crowdcontrol-sponge11
-          path: "sponge-11/build/libs/CrowdControl-*.jar"
-
       - name: Upload Fabric Artifact
         uses: actions/upload-artifact@v3
         with:

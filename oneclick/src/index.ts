@@ -2,7 +2,6 @@ import path from 'path';
 import fs from 'fs-extra';
 import { downloadPaper } from './paper.js';
 import { downloadFabric } from './fabric.js';
-import { downloadSponge } from './sponge.js';
 import { downloadJRE } from './java.js';
 import { mkdir, semverSort } from './utils.js';
 
