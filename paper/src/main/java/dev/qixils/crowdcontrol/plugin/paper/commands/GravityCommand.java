@@ -53,16 +53,16 @@ public class GravityCommand extends TimedVoidCommand {
 				.startCallback(effect -> {
 					players.set(plugin.getPlayers(request));
 					players.get().forEach(player -> player.getScheduler().run(plugin, $ -> {
-						addModifier(player, Attribute.GENERIC_GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_SCALAR, false);
-						addModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_SCALAR, false);
-						addModifier(player, Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_NUMBER, false);
+						addModifier(player, Attribute.GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_SCALAR, false);
+						addModifier(player, Attribute.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_SCALAR, false);
+						addModifier(player, Attribute.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_NUMBER, false);
 					}, null));
 					playerAnnounce(players.get(), request);
 					return request.buildResponse().type(Response.ResultType.SUCCESS).message("SUCCESS");
 				})
 				.completionCallback(effect -> players.get().forEach(player -> player.getScheduler().run(plugin, $ -> {
-					removeModifier(player, Attribute.GENERIC_GRAVITY, GRAVITY_MODIFIER_UUID);
-					removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
+					removeModifier(player, Attribute.GRAVITY, GRAVITY_MODIFIER_UUID);
+					removeModifier(player, Attribute.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
 				}, null)))
 				.build().queue();
 	}

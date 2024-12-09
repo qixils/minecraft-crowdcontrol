@@ -56,9 +56,9 @@ public class EntitySizeCommand extends ImmediateCommand {
 						continue;
 					if (loc.distanceSquared(entityLoc) > radius)
 						continue;
-					if (AttributeUtil.getModifier(living, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID).map(AttributeModifier::getAmount).orElse(0d) == level)
+					if (AttributeUtil.getModifier(living, Attribute.SCALE, SCALE_MODIFIER_UUID).map(AttributeModifier::getAmount).orElse(0d) == level)
 						continue;
-					entity.getScheduler().run(plugin, $ -> addModifier(living, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, true), null);
+					entity.getScheduler().run(plugin, $ -> addModifier(living, Attribute.SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, true), null);
 					success = true;
 					break;
 				}

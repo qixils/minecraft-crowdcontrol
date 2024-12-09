@@ -34,7 +34,7 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 	@Override
 	public double maxHealth() {
-		AttributeInstance attribute = entity().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		AttributeInstance attribute = entity().getAttribute(Attribute.MAX_HEALTH);
 		if (attribute == null)
 			return 20;
 		return attribute.getValue();
@@ -42,7 +42,7 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 
 	@Override
 	public double maxHealthOffset() {
-		AttributeInstance attribute = entity().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		AttributeInstance attribute = entity().getAttribute(Attribute.MAX_HEALTH);
 		if (attribute == null)
 			return 0;
 
@@ -60,7 +60,7 @@ public class PaperLivingEntity extends PaperEntity implements CCLivingEntity {
 	@Override
 	public void maxHealthOffset(double newOffset) {
 		execute(() -> {
-			addModifier(entity(), Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH_MODIFIER_UUID, MAX_HEALTH_MODIFIER_NAME, newOffset, AttributeModifier.Operation.ADD_NUMBER, true);
+			addModifier(entity(), Attribute.MAX_HEALTH, MAX_HEALTH_MODIFIER_UUID, MAX_HEALTH_MODIFIER_NAME, newOffset, AttributeModifier.Operation.ADD_NUMBER, true);
 
 			float computedMaxHealth = (float) (20 + newOffset);
 			health(Math.min(health(), computedMaxHealth));

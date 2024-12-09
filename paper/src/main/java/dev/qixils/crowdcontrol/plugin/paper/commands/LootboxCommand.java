@@ -53,14 +53,14 @@ public class LootboxCommand extends RegionalCommandSync {
 					|| material == Material.GOLD_BLOCK
 	).collect(Collectors.toUnmodifiableSet());
 	private static final List<Attribute> ATTRIBUTES = Arrays.asList(
-			Attribute.GENERIC_MAX_HEALTH,
-			Attribute.GENERIC_KNOCKBACK_RESISTANCE,
-			Attribute.GENERIC_MOVEMENT_SPEED,
-			Attribute.GENERIC_ATTACK_DAMAGE,
-			Attribute.GENERIC_ARMOR,
-			Attribute.GENERIC_ARMOR_TOUGHNESS,
-			Attribute.GENERIC_ATTACK_KNOCKBACK,
-			Attribute.GENERIC_ATTACK_SPEED
+			Attribute.MAX_HEALTH,
+			Attribute.KNOCKBACK_RESISTANCE,
+			Attribute.MOVEMENT_SPEED,
+			Attribute.ATTACK_DAMAGE,
+			Attribute.ARMOR,
+			Attribute.ARMOR_TOUGHNESS,
+			Attribute.ATTACK_KNOCKBACK,
+			Attribute.ATTACK_SPEED
 	);
 	private static final Map<UUID, Inventory> OPEN_LOOTBOXES = new HashMap<>();
 	private final String effectName;
