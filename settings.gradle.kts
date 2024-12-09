@@ -29,9 +29,6 @@ fun incl(asPath: String, fromPath: String) {
 
 incl(":base-common", "common")
 include(":configurate-common")
-incl(":sponge7-platform", "sponge-7")
-//incl(":sponge8-platform", "sponge-8")
-//incl(":sponge11-platform", "sponge-11")
 incl(":paper-platform", "paper")
 incl(":mojmap-common", "mojmap")
 incl(":fabric-platform", "fabric")
