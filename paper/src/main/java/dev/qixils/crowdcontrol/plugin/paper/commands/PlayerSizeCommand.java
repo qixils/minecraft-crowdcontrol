@@ -49,10 +49,10 @@ public class PlayerSizeCommand extends PaperCommand implements CCTimedEffect {
 			List<Player> players = playerSupplier.get();
 			for (Player player : players) {
 				player.getScheduler().run(plugin.getPaperPlugin(), $ -> {
-					addModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
-					addModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID, SCALE_STEP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
-					addModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, SCALE_JUMP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
-					addModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					addModifier(player, Attribute.SCALE, SCALE_MODIFIER_UUID, SCALE_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					addModifier(player, Attribute.STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID, SCALE_STEP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					addModifier(player, Attribute.JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, SCALE_JUMP_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
+					addModifier(player, Attribute.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, level, AttributeModifier.Operation.ADD_SCALAR, false);
 				}, null);
 			}
 			idMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
@@ -64,10 +64,10 @@ public class PlayerSizeCommand extends PaperCommand implements CCTimedEffect {
 	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		for (Player player : toPlayers(idMap.remove(request.getRequestId()))) {
 			player.getScheduler().run(plugin.getPaperPlugin(), $ -> {
-				removeModifier(player, Attribute.GENERIC_SCALE, SCALE_MODIFIER_UUID);
-				removeModifier(player, Attribute.GENERIC_STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID);
-				removeModifier(player, Attribute.GENERIC_JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID);
-				removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
+				removeModifier(player, Attribute.SCALE, SCALE_MODIFIER_UUID);
+				removeModifier(player, Attribute.STEP_HEIGHT, SCALE_STEP_MODIFIER_UUID);
+				removeModifier(player, Attribute.JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID);
+				removeModifier(player, Attribute.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
 			}, null);
 		}
 	}

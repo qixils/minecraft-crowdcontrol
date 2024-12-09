@@ -57,9 +57,9 @@ GravityCommand extends PaperCommand implements CCTimedEffect {
 			playerMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 
 			players.forEach(player -> player.getScheduler().run(plugin.getPaperPlugin(), $ -> {
-				addModifier(player, Attribute.GENERIC_GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_SCALAR, false);
-				addModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_SCALAR, false);
-				addModifier(player, Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_NUMBER, false);
+				addModifier(player, Attribute.GRAVITY, GRAVITY_MODIFIER_UUID, GRAVITY_MODIFIER_NAME, gravityLevel, AttributeModifier.Operation.ADD_SCALAR, false);
+				addModifier(player, Attribute.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, FALL_MODIFIER_NAME, fallLevel, AttributeModifier.Operation.ADD_SCALAR, false);
+				addModifier(player, Attribute.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_NUMBER, false);
 			}, null));
 
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
@@ -70,8 +70,8 @@ GravityCommand extends PaperCommand implements CCTimedEffect {
 	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		List<Player> players = toPlayers(playerMap.remove(request.getRequestId()));
 		players.forEach(player -> player.getScheduler().run(plugin.getPaperPlugin(), $ -> {
-			removeModifier(player, Attribute.GENERIC_GRAVITY, GRAVITY_MODIFIER_UUID);
-			removeModifier(player, Attribute.GENERIC_SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
+			removeModifier(player, Attribute.GRAVITY, GRAVITY_MODIFIER_UUID);
+			removeModifier(player, Attribute.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID);
 		}, null));
 	}
 
