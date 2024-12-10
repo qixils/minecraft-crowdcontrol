@@ -5,7 +5,7 @@ plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "8.6" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
-    id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "1.9-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("io.papermc.paperweight.userdev") version "1.7.1" apply false

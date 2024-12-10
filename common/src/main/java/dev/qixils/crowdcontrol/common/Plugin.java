@@ -19,8 +19,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
 import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
 import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
-import live.crowdcontrol.cc4j.websocket.payload.CCUserRecord;
-import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
+import live.crowdcontrol.cc4j.websocket.payload.*;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -35,6 +34,7 @@ import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.permission.PredicatePermission;
+import org.incendo.cloud.suggestion.Suggestion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -540,7 +541,6 @@ public abstract class Plugin<P, S> {
 		EntityMapper<S> mapper = commandSenderMapper();
 
 		// TODO: support i18n in cloud command descriptions
-		// TODO: suggestions are broken (on neoforge)
 
 		//// Account Command ////
 
@@ -612,7 +612,7 @@ public abstract class Plugin<P, S> {
 				P player = asPlayer(ctx.sender());
 				if (player == null) return;
 				Optional<CCPlayer> ccPlayerOpt = optionalCCPlayer(player);
-				if (!ccPlayerOpt.isPresent()) return;
+				if (ccPlayerOpt.isEmpty()) return;
 				CCPlayer ccPlayer = ccPlayerOpt.get();
 				if (ccPlayer.getUserToken() != null) return;
 				Audience audience = mapper.asAudience(ctx.sender());
@@ -620,34 +620,23 @@ public abstract class Plugin<P, S> {
 				ccPlayer.authenticate(code);
 			}));
 		// execute command
-		/*
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")
 				.commandDescription(description("Executes the effect with the given ID"))
 				.permission(PredicatePermission.of(mapper::isAdmin))
 				.argument(
-					StringParser.<S>stringComponent(StringMode.SINGLE)
+					StringParser
+						.stringComponent(StringParser.StringMode.SINGLE)
 						.name("effect")
-						.description(description("The username of the stream account to unlink"))
+						.description(description("ID of the effect to execute"))
 						.required()
-						.suggestionProvider((ctx, input) -> CompletableFuture.supplyAsync(() -> {
-							List<Command<P>> effects = commandRegister().getCommands();
-							String lowerInput = input.lastRemainingToken().toLowerCase(Locale.ENGLISH);
-							Set<Suggestion> suggestions = new LinkedHashSet<>();
-							for (Command<P> effect : effects) {
-								if (effect.getEffectName() == null) continue;
-								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-								if (effectName.startsWith(lowerInput))
-									suggestions.add(suggestion(effectName));
-							}
-							for (Command<P> effect : effects) {
-								if (effect.getEffectName() == null) continue;
-								String effectName = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-								if (effectName.contains(lowerInput))
-									suggestions.add(suggestion(effectName));
-							}
-							return new ArrayList<>(suggestions);
-						}))
+						.suggestionProvider((context, input) -> CompletableFuture.completedFuture(commandRegister()
+							.getCommands()
+							.stream()
+							.filter(command -> command.getEffectName().toLowerCase().contains(input.lastRemainingToken().toLowerCase()))
+							.map(command -> Suggestion.suggestion(command.getEffectName()))
+							.sorted(Comparator.comparing(Suggestion::suggestion))
+							.collect(Collectors.toList())))
 				)
 				.handler(commandContext -> {
 					// TODO: allow targeting multiple players
@@ -659,14 +648,48 @@ public abstract class Plugin<P, S> {
 						return;
 					}
 					Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
-					@SuppressWarnings("ArraysAsListWithZeroOrOneArgument") // need mutable list
-					List<P> players = new ArrayList<>(Arrays.asList(player));
-					Executor executor = effect.getExecutor();
-					executor.execute(() -> effect.execute(players, new Request.Builder().id(1).effect(effect.getEffectName()).viewer(playerMapper().getUsername(player)).build()));
+					List<P> players = new ArrayList<>(Collections.singletonList(player));
+					// TODO: add simpler constructors
+					effect.execute(
+						() -> players,
+						new PublicEffectPayload(
+							UUID.randomUUID(),
+							0L,
+							new CCEffectDescription(
+								effect.getEffectName(),
+								"game",
+								new CCName(getTextUtil().asPlain(effect.getDisplayName())),
+								null,
+								null,
+								null,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								null,
+								null,
+								null,
+								10
+							),
+							new CCUserRecord(
+								"ccuid-01j7cnrvpbh5aw45pwpe1vqvdw",
+								"lexikiq",
+								ProfileType.TWITCH,
+								"106025167",
+								""
+							),
+							null,
+							null,
+							false,
+							1
+						),
+						optionalCCPlayer(player).orElseThrow()
+					);
 				})
 			);
 		}
-		 */
 
 		MinecraftExceptionHandler.<S>create(mapper::asAudience)
 			.defaultHandlers()
@@ -903,6 +926,10 @@ public abstract class Plugin<P, S> {
 		updateConditionalEffectVisibility(optionalCCPlayer(player).orElse(null));
 	}
 
+	public void updateConditionalEffectVisibility(UUID player) {
+		updateConditionalEffectVisibility(optionalCCPlayer(player).orElse(null));
+	}
+
 	public void updateConditionalEffectVisibility() {
 		if (crowdControl == null) return;
 		crowdControl.getPlayers().forEach(this::updateConditionalEffectVisibility);
@@ -966,16 +993,14 @@ public abstract class Plugin<P, S> {
 						String.format("https://interact.crowdcontrol.live/#/%s/%s", user.getProfile().getValue(), user.getOriginId())))));
 		});
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.EFFECT_REQUEST, request -> {
-			getSLF4JLogger().info("New request {}", request.getRequestId());
+			getSLF4JLogger().debug("New request {}", request.getRequestId());
 		});
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.EFFECT_RESPONSE, response -> {
 			UUID requestId = response.getRequestId();
-			getSLF4JLogger().info("Effect response {}", requestId);
+			getSLF4JLogger().debug("Effect response {}", requestId);
 			ResponseStatus status = response.getStatus();
 			TrackedEffect effect = trackedEffects.get(requestId);
 			if (effect == null) return;
-
-			getSLF4JLogger().info("Effect response still {}", requestId);
 
 			Command<?> command;
 			try {
@@ -985,12 +1010,9 @@ public abstract class Plugin<P, S> {
 				return;
 			}
 
-			getSLF4JLogger().info("Effect response still {} command {}", requestId, command.getEffectName());
-
 			switch (status) {
 				case SUCCESS:
 				case TIMED_BEGIN:
-					getSLF4JLogger().info("Beginning {}", requestId);
 					List<Audience> audiences = new ArrayList<>(3);
 
 					initTo(audiences, this::getConsole);
@@ -1005,7 +1027,6 @@ public abstract class Plugin<P, S> {
 							getViewerComponent(effect.getRequest(), true).color(Plugin.USER_COLOR),
 							command.getProcessedDisplayName(effect.getRequest()).colorIfAbsent(Plugin.CMD_COLOR)
 						));
-						getSLF4JLogger().info("Begun {}", requestId);
 					} catch (Exception e) {
 						LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
 					}
@@ -1014,11 +1035,8 @@ public abstract class Plugin<P, S> {
 				case FAIL_PERMANENT:
 				case TIMED_END:
 				case UNKNOWN:
-					getSLF4JLogger().info("Byebye {}", requestId);
 					trackedEffects.remove(requestId);
 			}
-
-			getSLF4JLogger().info("Cya {}", requestId);
 		});
 	}
 

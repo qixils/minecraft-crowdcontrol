@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
 import jerozgen.languagereload.LanguageReload;
 import jerozgen.languagereload.config.Config;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class FabricPlatformClient extends ModdedPlatformClient {
+public class FabricPlatformClient extends ModdedPlatformClient implements ClientModInitializer {
 	@Override
 	public @NotNull Set<ExtraFeature> getExtraFeatures() {
 		Set<ExtraFeature> features = super.getExtraFeatures();

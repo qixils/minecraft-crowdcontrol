@@ -1,9 +1,9 @@
+val architecturyApiVersion: String by project
 val neoforgeVersion: String by project
 val mojmapVersion: String by project
 val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
 val cloudMojmapVersion: String by project
-val fabricForgifiedVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
 
@@ -50,8 +50,8 @@ dependencies {
 
     neoForge("net.neoforged:neoforge:$neoforgeVersion")
 
-    modImplementation("org.sinytra.forgified-fabric-api:forgified-fabric-api:$fabricForgifiedVersion")
-    modImplementation(include("net.kyori:adventure-platform-neoforge:6.0.0")!!)
+    modImplementation("dev.architectury:architectury-neoforge:$architecturyApiVersion")
+    modImplementation(include("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
     modImplementation(include("org.incendo:cloud-neoforge:$cloudMojmapVersion")!!)
     modImplementation(include("me.shedaniel.cloth:cloth-config-neoforge:$clothConfigVersion")!!)
     modCompileOnly("net.luckperms:api:$luckPermsVersion")
@@ -65,6 +65,9 @@ dependencies {
         exclude(group = "com.google.j2objc")
         exclude(group = "com.google.code.findbugs")
         exclude(group = "org.incendo", module = "cloud-core")
+        exclude(group = "com.fasterxml.jackson.annotation")
+        exclude(group = "com.fasterxml.jackson.core") // TODO: jarjar? not sure where this is pulled in from
+        // TODO: jarjar geantryref, websockets
     }
     common(project(path = ":mojmap-common", configuration = "namedElements")) { isTransitive = false }
     shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
@@ -81,12 +84,13 @@ tasks.processResources {
     }
 }
 
-//loom {
-//    mixin {
-//        defaultRefmapName.set("crowd-control-refmap.json")
-//    }
+loom {
+    mixin {
+        useLegacyMixinAp.set(true)
+        defaultRefmapName.set("crowd-control-refmap.json")
+    }
 //    accessWidenerPath = project(":mojmap-common").projectDir.resolve("src/main/resources/crowdcontrol.accesswidener")
-//}
+}
 
 // loom.neoForge {}
 

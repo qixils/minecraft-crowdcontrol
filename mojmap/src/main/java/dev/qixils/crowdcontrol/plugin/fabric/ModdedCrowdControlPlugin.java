@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
+import dev.architectury.event.events.common.LifecycleEvent;
+import dev.architectury.networking.NetworkManager;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
@@ -24,9 +26,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
@@ -65,7 +64,7 @@ import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
  * {@link Command Commands}.
  */
 @Getter
-public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> implements ModInitializer {
+public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> {
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
@@ -114,33 +113,18 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		getEventManager().register(Leave.class, leave -> onPlayerLeave(leave.player()));
 	}
 
-	@Override
 	public void onInitialize() {
 		getSLF4JLogger().debug("Initializing");
 		registerChatCommands();
-		ServerLifecycleEvents.SERVER_STARTING.register(newServer -> {
+		LifecycleEvent.SERVER_STARTING.register(newServer -> {
 			getSLF4JLogger().debug("Server starting");
 			setServer(newServer);
 		});
-		ServerLifecycleEvents.SERVER_STOPPED.register($ -> {
+		LifecycleEvent.SERVER_STOPPED.register($ -> {
 			getSLF4JLogger().debug("Server stopping");
 			setServer(null);
 		});
 		PacketUtil.registerPackets();
-		ServerPlayNetworking.registerGlobalReceiver(ResponseVersionC2S.PACKET_ID, (payload, context) -> {
-			UUID uuid = context.player().getUUID();
-			SemVer version = payload.version();
-			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
-			clientVersions.put(uuid, version);
-			updateConditionalEffectVisibility(context.player());
-		});
-		ServerPlayNetworking.registerGlobalReceiver(ExtraFeatureC2S.PACKET_ID, (payload, context) -> {
-			UUID uuid = context.player().getUUID();
-			Set<ExtraFeature> features = payload.features();
-			getSLF4JLogger().info("Received features {} from client {}", features, uuid);
-			extraFeatures.put(uuid, features);
-			updateConditionalEffectVisibility(context.player());
-		});
 	}
 
 	public <T> Registry<T> registry(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
@@ -256,7 +240,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
 			getSLF4JLogger().debug("Sending version request to {}", player.getUUID());
-			ServerPlayNetworking.send(player, RequestVersionS2C.INSTANCE);
+			PacketUtil.sendToPlayer(player, RequestVersionS2C.INSTANCE);
 		}
 		// super
 		super.onPlayerJoin(player);
@@ -303,5 +287,21 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 
 	public @NotNull List<ServerPlayer> toPlayerList(@Nullable Collection<UUID> uuids) {
 		return toPlayerStream(uuids).toList();
+	}
+
+	public void handleVersionResponse(ResponseVersionC2S payload, NetworkManager.PacketContext context) {
+		UUID uuid = context.getPlayer().getUUID();
+		SemVer version = payload.version();
+		getSLF4JLogger().info("Received version {} from client {}", version, uuid);
+		clientVersions.put(uuid, version);
+		updateConditionalEffectVisibility(uuid);
+	}
+
+	public void handleExtraFeatures(ExtraFeatureC2S payload, NetworkManager.PacketContext context) {
+		UUID uuid = context.getPlayer().getUUID();
+		Set<ExtraFeature> features = payload.features();
+		getSLF4JLogger().info("Received features {} from client {}", features, uuid);
+		extraFeatures.put(uuid, features);
+		updateConditionalEffectVisibility(uuid);
 	}
 }
