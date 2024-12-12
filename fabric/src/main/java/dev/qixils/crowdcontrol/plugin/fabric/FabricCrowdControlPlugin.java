@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.qixils.crowdcontrol.common.VersionMetadata;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.util.FabricPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
@@ -22,6 +23,13 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 	private final FabricServerCommandManager<CommandSourceStack> commandManager
 		= FabricServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
 	private final PermissionUtil permissionUtil = new FabricPermissionUtil();
+
+	@Override
+	public void onInitialize() {
+		super.onInitialize();
+
+		PacketUtilImpl.registerPackets();
+	}
 
 	@Override
 	public @Nullable Path getPath(@NotNull String asset) {

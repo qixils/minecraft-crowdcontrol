@@ -41,9 +41,9 @@ dependencies {
 }
 
 loom {
-    mixin {
-        useLegacyMixinAp.set(true)
-        defaultRefmapName.set("crowdcontrol-refmap.json")
-    }
+//    mixin {
+//        useLegacyMixinAp.set(true)
+//        defaultRefmapName.set("crowdcontrol-refmap.json")
+//    }
     accessWidenerPath = file("src/main/resources/crowdcontrol.accesswidener")
 }

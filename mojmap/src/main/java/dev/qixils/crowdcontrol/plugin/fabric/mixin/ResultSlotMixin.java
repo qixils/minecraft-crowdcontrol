@@ -21,11 +21,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ResultSlot.class)
 public abstract class ResultSlotMixin extends Slot {
 
-	@Shadow
+	@Shadow(aliases = {"field_7870"})
 	@Final
 	private CraftingContainer craftSlots;
 
-	@Shadow
+	@Shadow(aliases = {"field_7868"})
 	@Final
 	private Player player;
 

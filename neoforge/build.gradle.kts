@@ -85,10 +85,10 @@ tasks.processResources {
 }
 
 loom {
-    mixin {
-        useLegacyMixinAp.set(true)
-        defaultRefmapName.set("crowd-control-refmap.json")
-    }
+//    mixin {
+//        useLegacyMixinAp.set(true)
+//        defaultRefmapName.set("crowd-control-refmap.json")
+//    }
 //    accessWidenerPath = project(":mojmap-common").projectDir.resolve("src/main/resources/crowdcontrol.accesswidener")
 }
 

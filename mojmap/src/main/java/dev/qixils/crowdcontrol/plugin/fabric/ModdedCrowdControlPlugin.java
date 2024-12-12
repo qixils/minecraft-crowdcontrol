@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.architectury.event.events.common.LifecycleEvent;
-import dev.architectury.networking.NetworkManager;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
@@ -17,10 +16,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.ExtraFeatureC2S;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
@@ -124,7 +120,6 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 			getSLF4JLogger().debug("Server stopping");
 			setServer(null);
 		});
-		PacketUtil.registerPackets();
 	}
 
 	public <T> Registry<T> registry(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
@@ -289,16 +284,16 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		return toPlayerStream(uuids).toList();
 	}
 
-	public void handleVersionResponse(ResponseVersionC2S payload, NetworkManager.PacketContext context) {
-		UUID uuid = context.getPlayer().getUUID();
+	public void handleVersionResponse(ResponseVersionC2S payload, ServerPacketContext context) {
+		UUID uuid = context.player().getUUID();
 		SemVer version = payload.version();
 		getSLF4JLogger().info("Received version {} from client {}", version, uuid);
 		clientVersions.put(uuid, version);
 		updateConditionalEffectVisibility(uuid);
 	}
 
-	public void handleExtraFeatures(ExtraFeatureC2S payload, NetworkManager.PacketContext context) {
-		UUID uuid = context.getPlayer().getUUID();
+	public void handleExtraFeatures(ExtraFeatureC2S payload, ServerPacketContext context) {
+		UUID uuid = context.player().getUUID();
 		Set<ExtraFeature> features = payload.features();
 		getSLF4JLogger().info("Received features {} from client {}", features, uuid);
 		extraFeatures.put(uuid, features);

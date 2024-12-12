@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import dev.architectury.event.events.client.ClientLifecycleEvent;
-import dev.architectury.networking.NetworkManager;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
@@ -67,29 +66,7 @@ public abstract class ModdedPlatformClient {
 		ModdedCrowdControlPlugin.CLIENT_INITIALIZED = true;
 		ClientLifecycleEvent.CLIENT_STARTED.register(this::setClient);
 		ClientLifecycleEvent.CLIENT_STOPPING.register(client -> setClient(null));
-		PacketUtil.registerPackets();
-		NetworkManager.registerReceiver(NetworkManager.s2c(), RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC, (payload, context) -> {
-			logger.info("Received version request from server!");
-			ClientPacketUtil.sendToServer(new ResponseVersionC2S(SemVer.MOD));
-			ClientPacketUtil.sendToServer(new ExtraFeatureC2S(getExtraFeatures()));
-		});
-		NetworkManager.registerReceiver(NetworkManager.s2c(), SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC, (payload, context) -> {
-			logger.debug("Received shader request from server!");
-			ResourceLocation shader = withDefaultNamespace("shaders/post/" + payload.shader() + ".json");
-
-			client.execute(() -> {
-				client.gameRenderer.setPostEffect(shader);
-				SHADER_ACTIVE = true;
-			});
-			executor.schedule(() -> client.execute(() -> {
-				SHADER_ACTIVE = false;
-				client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
-			}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
-		});
-		NetworkManager.registerReceiver(NetworkManager.s2c(), MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC, (payload, context) -> {
-			if (payload.statusType() == null || payload.statusValue() == null) return;
-			context.getPlayer().cc$setMovementStatus(payload.statusType(), payload.statusValue());
-		});
+		ClientPacketUtil.registerPackets();
 	}
 
 	private void setClient(@Nullable Minecraft client) {
@@ -130,5 +107,30 @@ public abstract class ModdedPlatformClient {
 		category.addEntry(entryBuilder.startTextDescription(Component.translatable("config.crowdcontrol.advanced_settings")).build());
 		// TODO: add entity & item limits
 		return builder.build();
+	}
+
+	public void handleRequestVersion(@NotNull RequestVersionS2C payload, @NotNull ClientPacketContext context) {
+		logger.info("Received version request from server!");
+		context.send(new ResponseVersionC2S(SemVer.MOD));
+		context.send(new ExtraFeatureC2S(getExtraFeatures()));
+	}
+
+	public void handleSetShader(@NotNull SetShaderS2C payload, @NotNull ClientPacketContext context) {
+		logger.debug("Received shader request from server!");
+		ResourceLocation shader = withDefaultNamespace("shaders/post/" + payload.shader() + ".json");
+
+		client.execute(() -> {
+			client.gameRenderer.setPostEffect(shader);
+			SHADER_ACTIVE = true;
+		});
+		executor.schedule(() -> client.execute(() -> {
+			SHADER_ACTIVE = false;
+			client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
+		}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
+	}
+
+	public void handleMovementStatus(@NotNull MovementStatusS2C payload, @NotNull ClientPacketContext context) {
+		if (payload.statusType() == null || payload.statusValue() == null) return;
+		context.player().cc$setMovementStatus(payload.statusType(), payload.statusValue());
 	}
 }

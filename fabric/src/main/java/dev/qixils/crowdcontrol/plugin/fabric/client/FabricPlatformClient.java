@@ -2,7 +2,12 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
+import dev.qixils.crowdcontrol.plugin.fabric.client.fabric.ClientPacketContextImpl;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import jerozgen.languagereload.LanguageReload;
 import jerozgen.languagereload.config.Config;
 import net.fabricmc.api.ClientModInitializer;
@@ -15,6 +20,23 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class FabricPlatformClient extends ModdedPlatformClient implements ClientModInitializer {
+
+	public static @NotNull FabricPlatformClient get() {
+		return (FabricPlatformClient) ModdedPlatformClient.get();
+	}
+
+	@Override
+	public void onInitializeClient() {
+		super.onInitializeClient();
+
+		PacketUtilImpl.registerPackets();
+
+		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> handleRequestVersion(payload, new ClientPacketContextImpl(context)));
+		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> handleSetShader(payload, new ClientPacketContextImpl(context)));
+		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (payload, context) -> handleMovementStatus(payload, new ClientPacketContextImpl(context)));
+		ClientPlayNetworking.registerGlobalReceiver(SetLanguageS2C.PACKET_ID, (payload, context) -> handleLanguage(payload));
+	}
+
 	@Override
 	public @NotNull Set<ExtraFeature> getExtraFeatures() {
 		Set<ExtraFeature> features = super.getExtraFeatures();
@@ -23,7 +45,7 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 		return features;
 	}
 
-	private void handleLanguage(SetLanguageS2C payload) {
+	public void handleLanguage(SetLanguageS2C payload) {
 		if (client == null) return;
 		if (!getExtraFeatures().contains(ExtraFeature.LANGUAGE_RELOAD)) return;
 		if (LANGUAGE_STATE == payload.state()) return;
@@ -54,11 +76,5 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 				payload.duration().toMillis(),
 				TimeUnit.MILLISECONDS
 			);
-	}
-
-	@Override
-	public void onInitializeClient() {
-		super.onInitializeClient();
-		ClientPlayNetworking.registerGlobalReceiver(SetLanguageS2C.PACKET_ID, (payload, context) -> handleLanguage(payload));
 	}
 }

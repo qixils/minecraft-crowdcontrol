@@ -22,7 +22,7 @@ import java.util.Optional;
 
 @Mixin(KeyboardInput.class)
 public abstract class KeyboardInputMixin extends ClientInput {
-	@Shadow
+	@Shadow(aliases = {"field_3902"})
 	@Final
 	private Options options;
 
