@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Consumer;
 
+@Deprecated
 public final class EventManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger("CrowdControl/EventManager");
 	private final Multimap<Class<Event>, Consumer<Event>> listeners = HashMultimap.create();

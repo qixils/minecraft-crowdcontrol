@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.qixils.crowdcontrol.plugin.fabric.mixin",
+  "refmap": "mojmap-common-mojmap-common-refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EntityMixin",
+    "LivingEntityMixin",
+    "NameTagItemMixin",
+    "PlayerListMixin",
+    "PlayerMixin",
+    "ResultSlotMixin",
+    "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin",
+    "TickMixin"
+  ],
+  "client": [
+    "GameRendererMixin",
+    "KeyboardInputMixin",
+    "MinecraftClientMixin",
+    "UniformMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

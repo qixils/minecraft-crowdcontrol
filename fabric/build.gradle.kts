@@ -1,6 +1,5 @@
 val adventureVersion: String by project
 val adventurePlatformModVersion: String by project
-val architecturyApiVersion: String by project
 val clothConfigVersion: String by project
 val cloudMojmapVersion: String by project
 val crowdControlVersion: String by project
@@ -61,7 +60,6 @@ dependencies {
 
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation("dev.architectury:architectury-fabric:$architecturyApiVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
     modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")

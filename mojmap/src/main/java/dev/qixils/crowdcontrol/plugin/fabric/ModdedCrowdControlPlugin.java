@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
-import dev.architectury.event.events.common.LifecycleEvent;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
@@ -11,12 +10,12 @@ import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.client.ModdedPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
@@ -26,7 +25,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -112,11 +110,11 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	public void onInitialize() {
 		getSLF4JLogger().debug("Initializing");
 		registerChatCommands();
-		LifecycleEvent.SERVER_STARTING.register(newServer -> {
+		MinecraftEvents.SERVER_STARTING.register(newServer -> {
 			getSLF4JLogger().debug("Server starting");
 			setServer(newServer);
 		});
-		LifecycleEvent.SERVER_STOPPED.register($ -> {
+		MinecraftEvents.SERVER_STOPPED.register(newServer -> {
 			getSLF4JLogger().debug("Server stopping");
 			setServer(null);
 		});
@@ -167,12 +165,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	@Override
 	public @NotNull Collection<String> getHosts() {
 		Set<String> hosts = new HashSet<>(super.getHosts());
-		if (CLIENT_AVAILABLE) {
-			ModdedPlatformClient.get()
-					.player()
-					.map(player -> player.getUUID().toString().toLowerCase(Locale.ENGLISH))
-					.ifPresent(hosts::add);
-		}
+		ClientAdapter.getLocalPlayerId().map(UUID::toString).ifPresent(hosts::add);
 		return hosts;
 	}
 
@@ -226,12 +219,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	@Override
 	public void onPlayerJoin(ServerPlayer player) {
 		// put client version
-		if (CLIENT_AVAILABLE) {
-			ModdedPlatformClient.get().player()
-					.map(LocalPlayer::getUUID)
-					.filter(uuid -> uuid.equals(player.getUUID()))
-					.ifPresent(uuid -> clientVersions.put(uuid, SemVer.MOD));
-		}
+		ClientAdapter.getLocalPlayerId().ifPresent(uuid -> clientVersions.put(uuid, SemVer.MOD));
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
 			getSLF4JLogger().debug("Sending version request to {}", player.getUUID());

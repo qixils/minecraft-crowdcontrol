@@ -1,12 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
-import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -64,9 +64,9 @@ public abstract class ModdedPlatformClient {
 	public void onInitializeClient() {
 		INSTANCE = this;
 		ModdedCrowdControlPlugin.CLIENT_INITIALIZED = true;
-		ClientLifecycleEvent.CLIENT_STARTED.register(this::setClient);
-		ClientLifecycleEvent.CLIENT_STOPPING.register(client -> setClient(null));
-		ClientPacketUtil.registerPackets();
+		ClientAdapter.setLocalPlayerIdSupplier(() -> player().map(LocalPlayer::getUUID));
+		ClientMinecraftEvents.CLIENT_STARTED.register(this::setClient);
+		ClientMinecraftEvents.CLIENT_STOPPING.register(client -> setClient(null));
 	}
 
 	private void setClient(@Nullable Minecraft client) {

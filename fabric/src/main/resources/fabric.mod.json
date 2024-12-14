@@ -38,8 +38,7 @@
     "cloud": "*",
     "adventure-platform-fabric": "*",
     "net_kyori_adventure-api": "*",
-    "cloth-config": "*",
-    "architectury": "*"
+    "cloth-config": "*"
   },
   "recommends": {
     "languagereload": "*",

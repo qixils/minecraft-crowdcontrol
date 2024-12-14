@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import com.mojang.blaze3d.platform.WindowEventHandler;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.client.ClientMinecraftEvents;
 import live.crowdcontrol.cc4j.CrowdControl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
@@ -29,5 +30,16 @@ public abstract class MinecraftClientMixin extends ReentrantBlockableEventLoop<R
 		plugin.setPaused(paused);
 		if (paused) cc.pauseAll();
 		else cc.resumeAll();
+	}
+
+	@Inject(at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V", shift = At.Shift.AFTER, remap = false), method = "destroy")
+	private void onStopping(CallbackInfo ci) {
+		ClientMinecraftEvents.CLIENT_STOPPING.fire((Minecraft) (Object) this);
+	}
+
+	// We inject after the thread field is set so `ThreadExecutor#getThread` will work
+	@Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;gameThread:Ljava/lang/Thread;", shift = At.Shift.AFTER, ordinal = 0), method = "run")
+	private void onStart(CallbackInfo ci) {
+		ClientMinecraftEvents.CLIENT_STARTED.fire((Minecraft) (Object) this);
 	}
 }

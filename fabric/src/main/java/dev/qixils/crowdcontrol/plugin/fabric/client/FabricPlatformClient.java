@@ -11,6 +11,8 @@ import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import jerozgen.languagereload.LanguageReload;
 import jerozgen.languagereload.config.Config;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +21,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@Environment(EnvType.CLIENT)
 public class FabricPlatformClient extends ModdedPlatformClient implements ClientModInitializer {
 
 	public static @NotNull FabricPlatformClient get() {
