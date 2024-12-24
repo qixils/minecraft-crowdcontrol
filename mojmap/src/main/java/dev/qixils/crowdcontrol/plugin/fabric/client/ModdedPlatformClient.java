@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -132,5 +133,12 @@ public abstract class ModdedPlatformClient {
 	public void handleMovementStatus(@NotNull MovementStatusS2C payload, @NotNull ClientPacketContext context) {
 		if (payload.statusType() == null || payload.statusValue() == null) return;
 		context.player().cc$setMovementStatus(payload.statusType(), payload.statusValue());
+	}
+
+	public abstract void sendToServer(@NotNull CustomPacketPayload payload);
+
+	public static void sendToServerStatic(@NotNull CustomPacketPayload payload) {
+		if (INSTANCE == null) return;
+		INSTANCE.sendToServer(payload);
 	}
 }

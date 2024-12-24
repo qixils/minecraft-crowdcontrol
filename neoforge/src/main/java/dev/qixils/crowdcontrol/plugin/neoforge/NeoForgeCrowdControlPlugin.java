@@ -8,10 +8,13 @@ import dev.qixils.crowdcontrol.plugin.neoforge.util.LuckPermsPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.neoforge.util.NeoForgePermissionUtil;
 import lombok.Getter;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
@@ -79,6 +82,15 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 			server().getServerModName(),
 			FMLLoader.versionInfo().neoForgeVersion()
 		);
+	}
+
+	public void sendToPlayer(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload) {
+		// TODO: check can send?
+		try {
+			PacketDistributor.sendToPlayer(player, payload);
+		} catch (UnsupportedOperationException e) {
+			getSLF4JLogger().debug("Player {} cannot receive packet {}", player, payload);
+		}
 	}
 }
 

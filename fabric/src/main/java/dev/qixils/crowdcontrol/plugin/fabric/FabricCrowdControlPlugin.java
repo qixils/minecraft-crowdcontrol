@@ -6,8 +6,11 @@ import dev.qixils.crowdcontrol.plugin.fabric.util.FabricPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.fabric.FabricServerCommandManager;
 import org.jetbrains.annotations.NotNull;
@@ -64,5 +67,14 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 				.map(container -> container.getMetadata().getVersion().getFriendlyString())
 				.orElse(null)
 		);
+	}
+
+	public void sendToPlayer(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload) {
+		if (!ServerPlayNetworking.canSend(player, payload.type())) return;
+		try {
+			ServerPlayNetworking.send(player, payload);
+		} catch (UnsupportedOperationException e) {
+			getSLF4JLogger().debug("Player {} cannot receive packet {}", player, payload);
+		}
 	}
 }

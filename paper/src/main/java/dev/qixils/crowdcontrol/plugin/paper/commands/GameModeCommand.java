@@ -46,7 +46,7 @@ public class GameModeCommand extends PaperCommand implements CCTimedEffect {
 		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
 		this.displayName = Component.translatable(gamemode);
-		this.effectName = gamemode.name() + "_mode";
+		this.effectName = gamemode.name().toLowerCase() + "_mode";
 	}
 
 	private static NamespacedKey getGamemodeKey(Plugin plugin) {

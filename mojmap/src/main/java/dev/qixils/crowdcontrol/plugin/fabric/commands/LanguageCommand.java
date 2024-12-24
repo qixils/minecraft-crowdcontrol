@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.PacketUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
@@ -49,7 +48,7 @@ public class LanguageCommand extends ModdedCommand implements CCTimedEffect {
 
 			// send packet
 			for (ServerPlayer player : players)
-				PacketUtil.sendToPlayer(player, packet);
+				plugin.sendToPlayer(player, packet);
 
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, duration.toMillis());
 		}));

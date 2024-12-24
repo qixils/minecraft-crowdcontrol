@@ -14,7 +14,10 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ExtraFeatureC2S;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.ServerPacketContext;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
@@ -30,6 +33,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -223,7 +227,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
 			getSLF4JLogger().debug("Sending version request to {}", player.getUUID());
-			PacketUtil.sendToPlayer(player, RequestVersionS2C.INSTANCE);
+			sendToPlayer(player, RequestVersionS2C.INSTANCE);
 		}
 		// super
 		super.onPlayerJoin(player);
@@ -286,5 +290,12 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		getSLF4JLogger().info("Received features {} from client {}", features, uuid);
 		extraFeatures.put(uuid, features);
 		updateConditionalEffectVisibility(uuid);
+	}
+
+	public abstract void sendToPlayer(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload);
+
+	public static void sendToPlayerStatic(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload) {
+		if (!isInstanceAvailable()) return;
+		getInstance().sendToPlayer(player, payload);
 	}
 }
