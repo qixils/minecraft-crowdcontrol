@@ -26,6 +26,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.EAT_CHORUS
 @Getter
 public class TeleportCommand extends RegionalCommand {
 	private final String effectName = "chorus_fruit";
+	private final List<String> effectGroups = List.of("walk", "look");
 
 	public TeleportCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
@@ -49,8 +50,8 @@ public class TeleportCommand extends RegionalCommand {
 
 	@Override
 	protected @Nullable CCEffectResponse precheck(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		if (isActive(ccPlayer, "walk", "look"))
-			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot fling while frozen");
+		if (isArrayActive(ccPlayer))
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot teleport while frozen");
 		return null;
 	}
 

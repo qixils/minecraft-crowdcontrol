@@ -8,6 +8,7 @@ import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.level.ServerLevel;
@@ -25,7 +26,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Getter
 abstract class NearbyLocationCommand<S> extends ModdedCommand {
+	private final List<String> effectGroups = List.of("walk", "look");
+
 	protected NearbyLocationCommand(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -91,6 +95,9 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isArrayActive(ccPlayer))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot teleport while frozen");
+
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
 				ServerLevel world = player.serverLevel();

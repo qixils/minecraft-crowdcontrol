@@ -51,7 +51,7 @@ public class TeleportCommand extends ModdedCommand {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			if (isArrayActive(ccPlayer))
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot fling while frozen");
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot teleport while frozen");
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
 				if (player.isPassenger())
