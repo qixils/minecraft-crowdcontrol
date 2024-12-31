@@ -25,7 +25,7 @@ useServerSeoMeta({
     --code-bg-color: rgba(100, 100, 100, 0.1);
     --code-fg-color: #F06478;
     --font-size-base: 1.125em;
-    --font-base: Poppins,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+    --font-base: Poppins,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';
     --leading-base: 1.65;
     --leading-tight: 1.1;
 

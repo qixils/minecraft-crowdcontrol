@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed} from 'vue';
+import PortInstructions from '~/components/PortInstructions.vue'
 
 const route = useRoute();
 const version = useState('version', () => route.query.v);
@@ -18,10 +19,15 @@ useSeoMeta({
   <div>
     <h1>SpongeForge {{ version }} Remote Server Setup</h1>
 
+    <p class="alert alert-warning">
+      The Sponge plugins have reached end-of-life and will no longer be updated.
+      Our ability to provide further support for these versions will be limited.
+    </p>
+
     <p>
       The following steps detail how to set up a Minecraft {{ version }} remote Forge server with Crowd Control.
       It is expected that you have already rented a remote server through a service like
-      <a href="https://grryno.com/">Grryno</a> or <a href="https://bloom.host/">bloom.host</a>.
+      <a href="https://bloom.host/">bloom.host</a>.
 
       Note that no free hosts that we are aware of, including Aternos,
       support the firewall features necessary to use Crowd Control.
@@ -47,11 +53,7 @@ useSeoMeta({
         </ul>
       </li>
       <li>
-        In the firewall/ports panel, open the port 58431 so that users may connect to the Crowd Control server.
-        <br />ℹ️ If you aren't paying for a dedicated IP address then you will likely will be unable to choose a specific port to open and instead get assigned a random one.
-        You will have to update the plugin's config file, as described below, to use your assigned port.
-        You should also be sure to use your assigned port in the Crowd Control app at the end of the host field,
-        i.e. for IP <code>1.2.3.4</code> and port <code>5678</code>, you would connect to <code>1.2.3.4:5678</code>.
+        <PortInstructions :localLink="`/guide/sponge/server/local?v=${version}`" />
       </li>
       <li>Run the Minecraft server.</li>
       <li>(Optional) To edit the plugin's config file, you must first shut down the server using <code>/stop</code>. The config file can be found at <code>&lt;root&gt;/config/crowdcontrol.conf</code>.</li>

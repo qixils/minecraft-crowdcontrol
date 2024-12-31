@@ -28,6 +28,11 @@ useSeoMeta({
   <div>
     <h2>SpongeForge {{version}} Local Server Setup</h2>
 
+    <p class="alert alert-warning">
+      The Sponge plugins have reached end-of-life and will no longer be updated.
+      Our ability to provide further support for these versions will be limited.
+    </p>
+
     <p>The following steps detail how to manually set up a Minecraft {{version}} local Forge server with Crowd Control.</p>
 
     <ol>

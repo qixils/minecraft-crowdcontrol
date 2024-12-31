@@ -24,6 +24,11 @@ useSeoMeta({
   <div>
     <h1>Sponge {{ api }} Troubleshooting</h1>
 
+    <p class="alert alert-warning">
+      The Sponge plugins have reached end-of-life and will no longer be updated.
+      Our ability to provide further support for these versions will be limited.
+    </p>
+
     <h2>"Failed to load a valid ResourcePackInfo"</h2>
 
     <p>This warning is thrown by Sponge when running in the client but is totally safe to ignore.</p>

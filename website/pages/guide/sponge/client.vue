@@ -19,6 +19,11 @@ useSeoMeta({
     <h1>SpongeForge {{ version }} Client Setup</h1>
 
     <p class="alert alert-warning">
+      The Sponge plugins have reached end-of-life and will no longer be updated.
+      Our ability to provide further support for these versions will be limited.
+    </p>
+
+    <p class="alert alert-warning">
       Aside from potentially easier setup for singleplayer sessions,
       there is currently no advantage to adding the Sponge mod to your client,
       so feel free to skip this guide if you only plan to play on servers.
@@ -86,7 +91,6 @@ useSeoMeta({
       <li>In the <strong>Game Library</strong> tab, select <strong>Minecraft</strong>.</li>
       <li>Select <strong>Configure Minecraft</strong>.</li>
       <li>Enter your Minecraft username and click next.</li>
-      <li>Select <strong>Sponge {{api}}</strong> and click next.</li>
       <li>Select <strong>Remote</strong>.</li>
       <li>Enter in <code>localhost</code> as the host and click next.</li>
       <li>Accept the default password <code>crowdcontrol</code> by clicking next.</li>

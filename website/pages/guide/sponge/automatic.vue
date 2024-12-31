@@ -18,6 +18,11 @@ useSeoMeta({
   <div>
     <h1>Sponge {{ version }} Automatic Setup</h1>
 
+    <p class="alert alert-warning">
+      The Sponge plugins have reached end-of-life and will no longer be updated.
+      Our ability to provide further support for these versions will be limited.
+    </p>
+
     <p>The following steps provide a quick setup for running a local game server.</p>
 
     <ol>
