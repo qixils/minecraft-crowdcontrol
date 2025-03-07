@@ -57,6 +57,12 @@ useServerSeoMeta({
     text-decoration: none;
   }
 
+  a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2rem;
+    text-decoration-thickness: 2px;
+  }
+
   header, h1 {
     text-align: center;
   }
