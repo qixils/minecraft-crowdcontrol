@@ -29,8 +29,8 @@ useSeoMeta({
       <li>In the <strong>Game Library</strong> tab, select <strong>Minecraft</strong>.</li>
       <li>Select <strong>Configure Minecraft</strong>.</li>
       <li>Enter your Minecraft username and click next.</li>
-      <li>Select <strong>Sponge {{ version.api }}</strong> and click next.</li>
       <li>Select <strong>Local</strong>.</li>
+      <li>Select <strong>Sponge {{ version.api }}</strong> and click next.</li>
       <li>Select <strong>Click to install</strong> and <strong>Okay</strong>.</li>
       <li>
         (Optional) You may now select <strong>Open Folder</strong> next to <strong>Minecraft</strong> on the <strong>Game Paths</strong> tab

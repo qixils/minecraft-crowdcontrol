@@ -26,8 +26,8 @@ useSeoMeta({
       <li>In the <strong>Game Library</strong> tab, select <strong>Minecraft</strong>.</li>
       <li>Select <strong>Configure Minecraft</strong>.</li>
       <li>Enter your Minecraft username and click next.</li>
-      <li>Select <strong>NeoForge</strong> and click next.</li>
       <li>Select <strong>Local</strong>.</li>
+      <li>Select <strong>NeoForge</strong> and click next.</li>
       <li>Select <strong>Click to install</strong> and <strong>Okay</strong>.</li>
       <li>(Optional) You may now select <strong>Open Folder</strong> next to <strong>Minecraft</strong> on the <strong>Game Paths</strong> tab and copy any NeoForge {{ version.id }} mods you want to play with into the <code>NeoForge/mods</code> folder. If you're playing a modpack, you may also have to copy the modpack's <code>config</code> folder into the <code>NeoForge</code> folder.</li>
       <li>In the <strong>Live</strong> tab, select <strong>Launch Server</strong>.</li>

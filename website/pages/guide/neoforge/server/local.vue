@@ -45,7 +45,11 @@ useSeoMeta({
       <PortForward />
     </ol>
 
-    <p>Users may now connect using the <NuxtLink :to="`/guide/neoforge/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide your public IP address and the password used in the config file to your streamers.</p>
+    <p>
+      Users may now connect using the <NuxtLink :to="`/guide/neoforge/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide.
+      On your computer, you can connect using the host <code>localhost</code>,
+      but anyone else will need your public IP address.
+    </p>
 
     <p>For extra security, consider enabling a user whitelist using the vanilla <code>/whitelist</code> command. This prevents unknown players from joining the server and potentially griefing your builds.</p>
   </div>
