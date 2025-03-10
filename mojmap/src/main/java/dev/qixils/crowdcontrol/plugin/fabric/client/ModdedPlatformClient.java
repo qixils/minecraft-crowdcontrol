@@ -17,7 +17,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -28,9 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static net.minecraft.resources.ResourceLocation.withDefaultNamespace;
 
 @Environment(EnvType.CLIENT)
 public abstract class ModdedPlatformClient {
@@ -118,16 +114,16 @@ public abstract class ModdedPlatformClient {
 
 	public void handleSetShader(@NotNull SetShaderS2C payload, @NotNull ClientPacketContext context) {
 		logger.debug("Received shader request from server!");
-		ResourceLocation shader = withDefaultNamespace("shaders/post/" + payload.shader() + ".json");
-
-		client.execute(() -> {
-			client.gameRenderer.setPostEffect(shader);
-			SHADER_ACTIVE = true;
-		});
-		executor.schedule(() -> client.execute(() -> {
-			SHADER_ACTIVE = false;
-			client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
-		}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
+//		ResourceLocation shader = withDefaultNamespace(payload.shader());
+//
+//		client.execute(() -> {
+//			client.gameRenderer.setPostEffect(shader);
+//			SHADER_ACTIVE = true;
+//		});
+//		executor.schedule(() -> client.execute(() -> {
+//			SHADER_ACTIVE = false;
+//			client.gameRenderer.checkEntityPostEffect(client.cameraEntity);
+//		}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
 	}
 
 	public void handleMovementStatus(@NotNull MovementStatusS2C payload, @NotNull ClientPacketContext context) {

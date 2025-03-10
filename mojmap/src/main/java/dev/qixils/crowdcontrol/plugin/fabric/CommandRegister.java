@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.impl.Shader;
 import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
@@ -167,9 +166,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			initTo(commands, () -> new GameModeCommand(plugin, gameType, gameType == GameType.SPECTATOR ? 8L : 15L));
 		}
 
-		for (Shader shader : Shader.values()) {
-			initTo(commands, () -> new ShaderCommand(plugin, shader));
-		}
+//		for (Shader shader : Shader.values()) {
+//			initTo(commands, () -> new ShaderCommand(plugin, shader));
+//		}
 	}
 
 	@Override

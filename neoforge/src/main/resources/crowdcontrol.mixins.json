@@ -17,8 +17,7 @@
   "client": [
     "GameRendererMixin",
     "KeyboardInputMixin",
-    "MinecraftClientMixin",
-    "UniformMixin"
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1
