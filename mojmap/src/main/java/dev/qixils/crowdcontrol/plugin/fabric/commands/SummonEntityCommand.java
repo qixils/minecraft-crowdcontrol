@@ -52,7 +52,8 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 public class SummonEntityCommand<E extends Entity> extends ModdedCommand implements EntityCommand<E> {
 	private static final Set<EquipmentSlot> HANDS = Arrays.stream(EquipmentSlot.values()).filter(slot -> slot.getType() == EquipmentSlot.Type.HAND).collect(Collectors.toSet());
 	private final Map<EquipmentSlot, List<ArmorItem>> humanoidArmor;
-	protected final EntityType<E> entityType;
+	protected final EntityType<? extends E> entityType;
+	protected final EntityType<? extends E>[] entityTypes;
 	private final String effectName;
 	private final Component displayName;
 	private List<ResourceKey<LootTable>> lootTables = null;
@@ -68,10 +69,24 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	);
 
 	public SummonEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
+		this(
+			plugin,
+			"entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)),
+			Component.translatable("cc.effect.summon_entity.name", plugin.toAdventure(entityType.getDescription())),
+			entityType
+		);
+	}
+
+	@SafeVarargs
+	public SummonEntityCommand(ModdedCrowdControlPlugin plugin, String effectName, @Nullable Component displayName, EntityType<? extends E> firstEntity, EntityType<? extends E>... otherEntities) {
 		super(plugin);
-		this.entityType = entityType;
-		this.effectName = "entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
-		this.displayName = Component.translatable("cc.effect.summon_entity.name", plugin.toAdventure(entityType.getDescription()));
+		this.entityType = firstEntity;
+		this.entityTypes = new EntityType[1 + otherEntities.length];
+		this.entityTypes[0] = firstEntity;
+		System.arraycopy(otherEntities, 0, this.entityTypes, 1, otherEntities.length);
+
+		this.effectName = effectName;
+		this.displayName = displayName;
 
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<ArmorItem>> armor = new HashMap<>(4);
@@ -92,6 +107,15 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		this.humanoidArmor = Collections.unmodifiableMap(armor);
 	}
 
+	public @NotNull Component getDisplayName() {
+		if (displayName != null) return displayName;
+		return getDefaultDisplayName();
+	}
+
+	public EntityType<? extends E> getRandomEntityType() {
+		return RandomUtil.randomElementFrom(entityTypes);
+	}
+
 	private List<ResourceKey<LootTable>> getLootTables(MinecraftServer server) {
 		if (lootTables != null)
 			return lootTables;
@@ -107,7 +131,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			List<ServerPlayer> players = playerSupplier.get();
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+			int playerLimit = config.getEntityLimit(getEffectName().replace("entity_", ""));
 			if (playerLimit > 0) {
 				boolean hostsBypass = config.hostsBypass();
 				AtomicInteger victims = new AtomicInteger();
@@ -140,7 +164,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	@Blocking
 	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
-		E entity = entityType.create(player.serverLevel(), EntitySpawnReason.COMMAND);
+		E entity = getRandomEntityType().create(player.serverLevel(), EntitySpawnReason.COMMAND);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 		// set variables
@@ -155,9 +179,6 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			tamable.tame(player);
 		if (entity instanceof LivingEntity livingEntity)
 			livingEntity.cc$setViewerSpawned();
-		// TODO
-//		if (entity instanceof AbstractBoat boat)
-//			boat.setVariant(randomElementFrom(Boat.Type.values()));
 		if (entity instanceof Wolf wolf) {
 			wolf.setCollarColor(randomElementFrom(DyeColor.values())); // TODO: crash
 			wolf.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.WOLF_VARIANT).listElements()));

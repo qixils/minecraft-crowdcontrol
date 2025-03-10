@@ -14,11 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
-	private final String effectName = "entity_charged_creeper";
-	private final Component displayName = getDefaultDisplayName();
-
 	public ChargedCreeperCommand(ModdedCrowdControlPlugin plugin) {
-		super(plugin, EntityType.CREEPER);
+		super(plugin, "entity_charged_creeper", null, EntityType.CREEPER);
 	}
 
 	@Override

@@ -18,7 +18,10 @@ import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,15 +33,35 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 
 @Getter
 public class RemoveEntityCommand<E extends Entity> extends ModdedCommand implements EntityCommand<E> {
-	protected final EntityType<E> entityType;
+	protected final EntityType<? extends E> entityType;
+	protected final List<EntityType<? extends E>> entityTypes;
 	private final String effectName;
 	private final Component displayName;
 
 	public RemoveEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
+		this(
+			plugin,
+			"remove_entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)),
+			Component.translatable("cc.effect.remove_entity.name", plugin.toAdventure(entityType.getDescription())),
+			entityType
+		);
+	}
+
+	@SafeVarargs
+	public RemoveEntityCommand(ModdedCrowdControlPlugin plugin, String effectName, @Nullable Component displayName, EntityType<? extends E> firstEntity, EntityType<? extends E>... otherEntities) {
 		super(plugin);
-		this.entityType = entityType;
-		this.effectName = "remove_entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
-		this.displayName = Component.translatable("cc.effect.remove_entity.name", plugin.toAdventure(entityType.getDescription()));
+		this.entityType = firstEntity;
+		this.entityTypes = new ArrayList<>(1 + otherEntities.length);
+		entityTypes.add(firstEntity);
+		entityTypes.addAll(Arrays.asList(otherEntities));
+
+		this.effectName = effectName;
+		this.displayName = displayName;
+	}
+
+	public @NotNull Component getDisplayName() {
+		if (displayName != null) return displayName;
+		return getDefaultDisplayName();
 	}
 
 	@Override
@@ -51,7 +74,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	private boolean removeEntityFrom(ServerPlayer player) {
 		Vec3 playerPosition = player.position();
 		List<Entity> entities = StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
-				.filter(entity -> entity.getType() == entityType && entity.distanceToSqr(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
+				.filter(entity -> getEntityTypes().contains(entity.getType()) && entity.distanceToSqr(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
 				.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
 		if (entities.isEmpty())
 			return false;

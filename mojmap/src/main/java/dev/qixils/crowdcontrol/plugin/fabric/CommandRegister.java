@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -15,11 +16,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.AbstractChestBoat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,6 +138,60 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			initTo(commands, () -> new SummonEntityCommand<>(plugin, entity));
 			initTo(commands, () -> new RemoveEntityCommand<>(plugin, entity));
 		}
+
+		// misc grouped summons
+		EntityType<AbstractBoat>[] boats = new EntityType[] {
+			EntityType.OAK_BOAT,
+			EntityType.BIRCH_BOAT,
+			EntityType.ACACIA_BOAT,
+			EntityType.CHERRY_BOAT,
+			EntityType.DARK_OAK_BOAT,
+			EntityType.JUNGLE_BOAT,
+			EntityType.MANGROVE_BOAT,
+			EntityType.PALE_OAK_BOAT,
+			EntityType.SPRUCE_BOAT,
+			EntityType.BAMBOO_RAFT
+		};
+		EntityType<AbstractChestBoat>[] chestBoats = new EntityType[] {
+			EntityType.OAK_CHEST_BOAT,
+			EntityType.BIRCH_CHEST_BOAT,
+			EntityType.ACACIA_CHEST_BOAT,
+			EntityType.CHERRY_CHEST_BOAT,
+			EntityType.DARK_OAK_CHEST_BOAT,
+			EntityType.JUNGLE_CHEST_BOAT,
+			EntityType.MANGROVE_CHEST_BOAT,
+			EntityType.PALE_OAK_CHEST_BOAT,
+			EntityType.SPRUCE_CHEST_BOAT,
+			EntityType.BAMBOO_CHEST_RAFT
+		};
+		initTo(commands, () -> new SummonEntityCommand<>(
+			plugin,
+			"entity_boat",
+			Component.translatable("cc.effect.summon_entity.name", Component.translatable("cc.effect.summon_entity.boat")),
+			boats[0],
+			Arrays.copyOfRange(boats, 1, boats.length)
+		));
+		initTo(commands, () -> new SummonEntityCommand<>(
+			plugin,
+			"entity_chest_boat",
+			Component.translatable("cc.effect.summon_entity.name", Component.translatable("cc.effect.summon_entity.chest_boat")),
+			chestBoats[0],
+			Arrays.copyOfRange(chestBoats, 1, chestBoats.length)
+		));
+		initTo(commands, () -> new RemoveEntityCommand<>(
+			plugin,
+			"remove_entity_boat",
+			Component.translatable("cc.effect.remove_entity.name", Component.translatable("cc.effect.summon_entity.boat")),
+			boats[0],
+			Arrays.copyOfRange(boats, 1, boats.length)
+		));
+		initTo(commands, () -> new RemoveEntityCommand<>(
+			plugin,
+			"remove_entity_chest_boat",
+			Component.translatable("cc.effect.remove_entity.name", Component.translatable("cc.effect.summon_entity.chest_boat")),
+			chestBoats[0],
+			Arrays.copyOfRange(chestBoats, 1, chestBoats.length)
+		));
 
 		// register difficulty commands
 		for (Difficulty difficulty : Difficulty.values())

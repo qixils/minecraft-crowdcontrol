@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
-	@NotNull EntityType<E> getEntityType();
+	@NotNull EntityType<? extends E> getEntityType();
 
 	@Override
 	default @NotNull FeatureFlagSet requiredFeatures() {
