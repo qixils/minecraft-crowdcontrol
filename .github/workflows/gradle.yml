@@ -38,7 +38,7 @@ jobs:
           path: "paper/build/libs/CrowdControl-*.jar"
 
       - name: Upload Fabric Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: crowdcontrol-fabric
           path: "fabric/build/libs/CrowdControl-*.jar"
