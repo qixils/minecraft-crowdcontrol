@@ -13,6 +13,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.GameRule;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -97,14 +98,26 @@ public class KeepInventoryCommand extends PaperCommand {
 	}
 
 	@Override
+	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
+		// Cannot use inventory effects while /gamerule keepInventory true
+		return potentialPlayers.stream()
+			.anyMatch(player -> player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY) == Boolean.TRUE)
+			? TriState.FALSE
+			: TriState.TRUE;
+	}
+
+	@Override
 	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		if (plugin.isGlobal())
 			return globalKeepInventory == enable ? TriState.FALSE : TriState.TRUE;
 
-		TriState state = potentialPlayers.stream().map(player -> TriState.fromBoolean(enable != keepingInventory.contains(player.getUniqueId()))).reduce((prev, next) -> {
-			if (prev != next) return TriState.UNKNOWN;
-			return prev;
-		}).orElse(TriState.UNKNOWN);
+		TriState state = potentialPlayers.stream()
+			.map(player -> TriState.fromBoolean(enable != isKeepingInventory(player.getUniqueId())))
+			.reduce((prev, next) -> {
+				if (prev != next) return TriState.UNKNOWN;
+				return prev;
+			})
+			.orElse(TriState.UNKNOWN);
 
 		if (state == TriState.FALSE) return state;
 		return TriState.TRUE; // fixing UNKNOWN essentially

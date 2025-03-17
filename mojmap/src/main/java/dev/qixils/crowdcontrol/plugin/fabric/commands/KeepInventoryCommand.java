@@ -14,6 +14,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.GameRules;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -88,14 +89,26 @@ public class KeepInventoryCommand extends ModdedCommand {
 	}
 
 	@Override
+	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
+		// Cannot use inventory effects while /gamerule keepInventory true
+		return potentialPlayers.stream()
+			.anyMatch(player -> player.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
+			? TriState.FALSE
+			: TriState.TRUE;
+	}
+
+	@Override
 	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
 		if (plugin.isGlobal())
 			return globalKeepInventory == enable ? TriState.FALSE : TriState.TRUE;
 
-		TriState state = potentialPlayers.stream().map(player -> TriState.fromBoolean(enable != keepingInventory.contains(player.getUUID()))).reduce((prev, next) -> {
-			if (prev != next) return TriState.UNKNOWN;
-			return prev;
-		}).orElse(TriState.UNKNOWN);
+		TriState state = potentialPlayers.stream()
+			.map(player -> TriState.fromBoolean(enable != isKeepingInventory(player.getUUID())))
+			.reduce((prev, next) -> {
+				if (prev != next) return TriState.UNKNOWN;
+				return prev;
+			})
+			.orElse(TriState.UNKNOWN);
 
 		if (state == TriState.FALSE) return state;
 		return TriState.TRUE; // fixing UNKNOWN essentially

@@ -14,12 +14,14 @@ import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.plugin.fabric.commands.KeepInventoryCommand.globalKeepInventory;
+import static dev.qixils.crowdcontrol.plugin.fabric.commands.KeepInventoryCommand.isKeepingInventory;
 
 @Getter
 public class ClearInventoryCommand extends ModdedCommand {
@@ -35,7 +37,7 @@ public class ClearInventoryCommand extends ModdedCommand {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
 				// ensure keep inventory is not enabled
-				if (KeepInventoryCommand.isKeepingInventory(player))
+				if (isKeepingInventory(player))
 					continue;
 
 				// ensure inventory is not empty
@@ -61,9 +63,30 @@ public class ClearInventoryCommand extends ModdedCommand {
 	}
 
 	@Override
+	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
+		// Cannot use inventory effects while /gamerule keepInventory true
+		return potentialPlayers.stream()
+			.anyMatch(player -> player.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
+			? TriState.FALSE
+			: TriState.TRUE;
+	}
+
+	@Override
 	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
-		if (!plugin.isGlobal())
-			return TriState.TRUE;
-		return globalKeepInventory ? TriState.FALSE : TriState.TRUE;
+		if (plugin.isGlobal())
+			return globalKeepInventory ? TriState.FALSE : TriState.TRUE;
+
+		TriState keepingInventory = potentialPlayers.stream()
+			.map(player -> TriState.fromBoolean(isKeepingInventory(player.getUUID())))
+			.reduce((prev, next) -> {
+				if (prev != next) return TriState.UNKNOWN;
+				return prev;
+			})
+			.orElse(TriState.UNKNOWN);
+
+		// if everyone is keeping inventory then no inventories can be cleared
+		if (keepingInventory == TriState.TRUE) return TriState.FALSE;
+		// some inventories can be cleared
+		return TriState.TRUE;
 	}
 }
