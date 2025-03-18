@@ -603,22 +603,6 @@ public abstract class Plugin<P, S> {
 					// TODO: extra features
 				}
 			}));
-		// link command
-		manager.command(ccCmd.literal("link")
-			.commandDescription(description("Authorize your Crowd Control account"))
-			.argument(StringParser.stringComponent(StringParser.StringMode.SINGLE).name("code").description(description("Link code")).required())
-			.handler(ctx -> {
-				String code = ctx.get("code");
-				P player = asPlayer(ctx.sender());
-				if (player == null) return;
-				Optional<CCPlayer> ccPlayerOpt = optionalCCPlayer(player);
-				if (ccPlayerOpt.isEmpty()) return;
-				CCPlayer ccPlayer = ccPlayerOpt.get();
-				if (ccPlayer.getUserToken() != null) return;
-				Audience audience = mapper.asAudience(ctx.sender());
-				audience.sendMessage(Component.text("Logging in..."));
-				ccPlayer.authenticate(code);
-			}));
 		// execute command
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")
@@ -812,7 +796,7 @@ public abstract class Plugin<P, S> {
 	 */
 	public void initCrowdControl() {
 		loadConfig();
-		crowdControl = new CrowdControl("Minecraft", "Minecraft", "app-01jbazzkrjbw7y60kw5f9c82nh", getDataFolder());
+		crowdControl = new CrowdControl("Minecraft", "Minecraft", "app-01jbazzkrjbw7y60kw5f9c82nh", "", getDataFolder());
 		commandRegister().register();
 		// re-trigger player join for any missed players
 		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerJoin);
@@ -954,12 +938,12 @@ public abstract class Plugin<P, S> {
 		mapper.asAudience(joiningPlayer).sendMessage(JOIN_MESSAGE);
 
 		CCPlayer ccPlayer = cc.addPlayer(uuid);
-		ccPlayer.getEventManager().registerEventConsumer(CCEventType.IDENTIFIED, payload -> {
+		ccPlayer.getEventManager().registerEventConsumer(CCEventType.GENERATED_AUTH_CODE, payload -> {
 			String url = ccPlayer.getAuthUrl();
 			if (url == null) return; // eh?
 			// ensure player is still online
 			Optional<P> optPlayer = mapper.getPlayer(uuid);
-			if (!optPlayer.isPresent()) return;
+			if (optPlayer.isEmpty()) return;
 			P player = optPlayer.get();
 			// send messages
 			Audience audience = mapper.asAudience(player);
@@ -970,10 +954,6 @@ public abstract class Plugin<P, S> {
 			//  like hey some effects can't be used because you aren't a host / aren't a client
 //			if (!globalEffectsUsable())
 //				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
-		});
-		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTH_PROGRESS, () -> {
-			playerMapper().getPlayer(ccPlayer.getUuid()).ifPresent(p -> playerMapper().asAudience(p)
-				.sendMessage(Component.text("run command `/crowdcontrol link`")));
 		});
 		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTHENTICATED, () -> {
 			if (ccPlayer.getGameSessionId() != null) return;
