@@ -1,9 +1,8 @@
 val crowdControlVersion: String by project
 val adventureVersion: String by project
-val adventurePlatformVersion: String by project
 val cloudVersion: String by project
 val cloudExtrasVersion: String by project
-val nettyVersion: String by project
+val slf4jVersion: String by project
 
 dependencies {
 //    api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
@@ -24,6 +23,7 @@ dependencies {
     api("org.incendo:cloud-minecraft-extras:$cloudExtrasVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
+    api("org.slf4j:slf4j-api:$slf4jVersion")
 }
 
 description = "Minecraft Crowd Control: Common"

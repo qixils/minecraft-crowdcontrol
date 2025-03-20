@@ -46,10 +46,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
@@ -796,19 +793,26 @@ public abstract class Plugin<P, S> {
 	 */
 	public void initCrowdControl() {
 		loadConfig();
-		crowdControl = new CrowdControl("Minecraft", "Minecraft", "app-01jbazzkrjbw7y60kw5f9c82nh", "", getDataFolder());
+		crowdControl = new CrowdControl("Minecraft", "Minecraft", "ccaid-01jpt9gzz1qjwbg9cc3hg9mpn4", "5faffc3b5821707373d833dec7fa72d9beb3f338547f3b6e9c5ebdf15df25909", getDataFolder());
 		commandRegister().register();
 		// re-trigger player join for any missed players
 		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerJoin);
 	}
 
-	public void shutdown() {
+	public CompletableFuture<?> shutdown() {
 		if (crowdControl != null) {
 			getPlayerManager().getAllPlayersFull().forEach(this::onPlayerLeave);
 			crowdControl.close();
 			crowdControl = null;
 		}
 		scheduledExecutor.shutdown();
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return scheduledExecutor.awaitTermination(3, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	/**

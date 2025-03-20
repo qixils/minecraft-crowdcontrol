@@ -47,9 +47,7 @@ import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
@@ -118,6 +116,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 			getSLF4JLogger().debug("Server starting");
 			setServer(newServer);
 		});
+		MinecraftEvents.SERVER_STOPPING.register($ -> shutdown());
 		MinecraftEvents.SERVER_STOPPED.register(newServer -> {
 			getSLF4JLogger().debug("Server stopping");
 			setServer(null);
@@ -197,9 +196,6 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 			this.server = null;
 			this.adventure = null;
 			this.syncExecutor = Runnable::run;
-			if (this.crowdControl != null) {
-				shutdown();
-			}
 		} else {
 			this.server = server;
 			this.adventure = MinecraftServerAudiences.of(server);
@@ -210,9 +206,19 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	}
 
 	@Override
-	public void shutdown() {
-		super.shutdown();
+	public CompletableFuture<?> shutdown() {
+		var superShutdown = super.shutdown();
 		asyncExecutor.shutdown();
+		return CompletableFuture.allOf(
+			superShutdown,
+			CompletableFuture.supplyAsync(() -> {
+				try {
+					return asyncExecutor.awaitTermination(3, TimeUnit.SECONDS);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			})
+		);
 	}
 
 	@Override
