@@ -26,6 +26,7 @@ useSeoMeta({
     <ol>
       <li>Download and install the <a href="https://crowdcontrol.live/">Crowd Control app</a>.</li>
       <li>In the <strong>Game Selection</strong> tab, select <strong>Minecraft</strong>.</li>
+      <li>Under <strong>Select a Pack</strong>, choose the last option <strong>Minecraft (Legacy)</strong>.</li>
       <li>Select <strong>Configure Minecraft</strong>.</li>
       <li>Enter your Minecraft username and click next.</li>
       <li>Select <strong>Remote</strong>.</li>

@@ -38,7 +38,7 @@ useSeoMeta({
       <li>(Optional) Copy any other Fabric {{ version.id }} mods that you want to play with into the <code>mods</code> folder.</li>
       <li>Run the Minecraft server using the <code>start.bat</code> file on Windows or <code>start.sh</code> on Linux to initialize the plugin's configuration files. You will have to run it twice, as the first will prompt you to accept Minecraft's End User License Agreement.</li>
       <li>To change the plugin's configuration file, you must first shut down the server by typing <code>stop</code> in the server window. The config file is located at <code>&lt;root&gt;/config/crowdcontrol.conf</code>.</li>
-      <PortForward />
+      <PortForward :legacy="version.legacy" />
     </ol>
 
     <p>

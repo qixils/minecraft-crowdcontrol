@@ -19,8 +19,7 @@ useSeoMeta({
     <h1>NeoForge {{ version.id }} Local Server Setup</h1>
 
     <p class="alert alert-warning">
-      The NeoForge mod is in early alpha. It may experience more mod incompatibilities than expected.
-      Additionally, some instructions relating to the Crowd Control app may be unavailable as we roll out support.
+      The NeoForge mod is in beta. It may experience more mod incompatibilities than expected.
     </p>
 
     <VersionWarning :version-data="versionData" />
@@ -37,12 +36,11 @@ useSeoMeta({
       <li>In the installer window, click the <code>Install server</code> option and then the triple dots next to the Install Location to open the directory selector. Find or create a new, empty folder and click Open, then click OK. This folder will be important in later steps so don't lose it. From here on, this folder will be referred to as the "root folder".</li>
       <li>Click the <code>Proceed</code> button to create the NeoForge server. After the setup is complete, click OK.</li>
       <li>Navigate to where you installed the server and create a new folder called <code>mods</code>.</li>
-      <li>Download the latest build of the <a :href="`https://modrinth.com/mod/forgified-fabric-api/versions?l=neoforge&g=${version.id}&c=release`">Forgified Fabric API</a> and place it in the <code>mods</code> folder.</li>
       <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=neoforge&g=${version.id}`">Crowd Control for NeoForge</a> and place it in the <code>mods</code> folder.</li>
       <li>(Optional) Copy any other NeoForge {{ version.id }} mods that you want to play with into the <code>mods</code> folder.</li>
       <li>Run the Minecraft server using the <code>start.bat</code> file on Windows or <code>start.sh</code> on Linux to initialize the plugin's configuration files. You will have to run it twice, as the first will prompt you to accept Minecraft's End User License Agreement.</li>
       <li>To change the plugin's configuration file, you must first shut down the server by typing <code>stop</code> in the server window. The config file is located at <code>&lt;root&gt;/config/crowdcontrol.conf</code>.</li>
-      <PortForward />
+      <PortForward :legacy="version.legacy" />
     </ol>
 
     <p>

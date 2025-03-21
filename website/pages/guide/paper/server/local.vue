@@ -37,7 +37,7 @@ useSeoMeta({
         </ul>
       </li>
       <li>(Optional) Once you shut down the server using <code>/stop</code>, you can edit the plugin's configuration file. The config file can be found at <code>&lt;root&gt;/plugins/CrowdControl/config.yml</code>.</li>
-      <PortForward />
+      <PortForward :legacy="version.legacy" />
     </ol>
 
     <p>

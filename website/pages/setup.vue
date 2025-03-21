@@ -82,7 +82,7 @@ const questionVersion = pushQuestion({
   subtext: "Any version not listed is unsupported.",
   answers: computed(() => {
     const vals = (questionModloader.answer.value && versions.modloadersBySlug[questionModloader.answer.value]?.versions) || versions.allVersions
-    return vals.map((version, index) => ({ slug: version.id, title: !index ? `${version.id} (Latest)` : version.id }))
+    return vals.map((version, index) => ({ slug: version.id, title: !index ? `${version.id} (Newest)` : version.id }))
   }),
 })
 const questionExperience = pushQuestion({
@@ -116,12 +116,13 @@ const guide = computed(() => { // TODO: lazy?
   const loaderVersion = modloadersBySlug[loader] && modloadersBySlug[loader].versions.find(v => v.id === versionId)
   const isLatest = !!loaderVersion?.latest
   const isSupported = !!loaderVersion?.supported
+  const isLegacy = !!loaderVersion?.legacy
 
   const page = experienced
     ? 'client'
     : env === 'remote'
       ? 'server/remote'
-      : env === 'local' || !isLatest || !isSupported
+      : env === 'local' || !isLatest || !isSupported || isLegacy
         ? 'server/local'
         : 'automatic'
 
