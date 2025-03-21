@@ -12,6 +12,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
@@ -72,8 +73,11 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
+		ServerLevel level = player.serverLevel();
+		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return false;
+
 		Vec3 playerPosition = player.position();
-		List<Entity> entities = StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
+		List<Entity> entities = StreamSupport.stream(level.getAllEntities().spliterator(), false)
 				.filter(entity -> getEntityTypes().contains(entity.getType()) && entity.distanceToSqr(playerPosition) <= REMOVE_ENTITY_RADIUS * REMOVE_ENTITY_RADIUS)
 				.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
 		if (entities.isEmpty())

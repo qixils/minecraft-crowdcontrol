@@ -30,7 +30,7 @@ public interface EntityCommand extends FeatureElementCommand {
 
 	@Override
 	default boolean isFeatureEnabled(@NotNull World world) {
-		return getEntityType().isEnabledByFeature(world);
+		return world.isEnabled(getEntityType());
 	}
 
 	default boolean isMonster() {
@@ -47,6 +47,7 @@ public interface EntityCommand extends FeatureElementCommand {
 
 	@Override
 	default TriState isSelectable(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
+		// TODO: dragon check?
 		if (!isMonster())
 			return TriState.UNKNOWN;
 		if (!serverIsPeaceful())
@@ -55,14 +56,19 @@ public interface EntityCommand extends FeatureElementCommand {
 	}
 
 	default @Nullable CCEffectResponse tryExecute(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		// Block execution if impossible for all players
+		CCEffectResponse error = null;
 		for (Player player : players) {
-			if (isMonster() && levelIsPeaceful(player.getWorld())) {
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
-			}
-			if (!isFeatureEnabled(player.getWorld())) {
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
-			}
+			World world = player.getWorld();
+			if (isMonster() && levelIsPeaceful(world))
+				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
+			else if (getEntityType() == EntityType.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END)
+				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
+			else if (!world.isEnabled(getEntityType()))
+				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
+			else
+				return null;
 		}
-		return null;
+		return error;
 	}
 }

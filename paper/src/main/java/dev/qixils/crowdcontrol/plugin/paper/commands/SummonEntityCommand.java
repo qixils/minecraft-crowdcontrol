@@ -129,6 +129,8 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 
 	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
 		World world = player.getWorld();
+		if (entityType == EntityType.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END) return null;
+
 		Entity entity = world.spawnEntity(player.getLocation(), entityType);
 		if (viewer != null) {
 			entity.customName(viewer);

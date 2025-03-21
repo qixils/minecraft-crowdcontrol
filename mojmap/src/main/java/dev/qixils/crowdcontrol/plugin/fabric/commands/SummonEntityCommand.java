@@ -164,9 +164,12 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	@Blocking
 	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
+		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return null;
+
 		E entity = getRandomEntityType().create(player.serverLevel(), EntitySpawnReason.COMMAND);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
+
 		// set variables
 		entity.setPos(player.position());
 		if (viewer != null) {

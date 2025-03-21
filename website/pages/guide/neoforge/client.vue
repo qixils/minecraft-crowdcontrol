@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { neoForgeVersions as versions, supportedNeoForgeVersions as supportedVersions, neoForgeLatest as latestVersion } from '../../../utils/versions'
+import { useVersion } from '~/composables/useVersion'
+import VersionWarning from '~/components/VersionWarning.vue'
+import * as versions from '~/utils/versions'
 
-const route = useRoute();
-const version = useState('version', () => route.query.v);
-if (!version.value || !versions.includes(version.value)) { version.value = latestVersion; }
-const supported = computed(() => supportedVersions.includes(version.value));
-const latest = computed(() => version.value === latestVersion);
+const versionData = useVersion(versions.neoForgeML)
+const { version } = versionData
 
 useSeoMeta({
-  title: `NeoForge ${version.value} Client Setup · Minecraft Crowd Control`,
-  description: `NeoForge ${version.value} Client Setup Guide`,
-  ogDescription: `NeoForge ${version.value} Client Setup Guide`,
+  title: `NeoForge ${version.id} Client Setup · Minecraft Crowd Control`,
+  description: `NeoForge ${version.id} Client Setup Guide`,
+  ogDescription: `NeoForge ${version.id} Client Setup Guide`,
 })
 </script>
 
 <template>
   <div>
-    <h1>NeoForge {{ version }} Client Setup</h1>
+    <h1>NeoForge {{ version.id }} Client Setup</h1>
 
-    <p class="alert alert-warning" v-if="!supported">
-      The selected Minecraft version is no longer receiving mod updates.
-      Please consider updating to {{ latestVersion }}.
+    <p class="alert alert-warning">
+      The NeoForge mod is in early alpha. It may experience more mod incompatibilities than expected.
+      Additionally, some instructions relating to the Crowd Control app may be unavailable as we roll out support.
     </p>
+
+    <VersionWarning :version-data="versionData" />
 
     <h2>Installing the Mod</h2>
 
@@ -40,21 +40,21 @@ useSeoMeta({
           <li>You may first need to download and install <a href="https://adoptium.net/temurin/releases/">Java</a>.</li>
         </ul>
       </li>
-      <li>Ensure the Minecraft version is set to {{ version }} and click the <code>Install</code> button.</li>
+      <li>Ensure the Minecraft version is set to {{ version.id }} and click the <code>Install</code> button.</li>
       <li>Navigate to your Minecraft installation folder.
         <ul>
           <li>On Windows, this can be accessed by Pressing <code>Windows Key + R</code> and typing <code>%AppData%\.minecraft</code>.</li>
         </ul>
       </li>
       <li>Create a new folder called <code>mods</code>.</li>
-      <li>Download the latest build of the <a :href="`https://modrinth.com/mod/forgified-fabric-api/versions?l=neoforge&g=${version}&c=release`">Forgified Fabric API</a> and place it in the <code>mods</code> folder.</li>
-      <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=neoforge&g=${version}`">Crowd Control for NeoForge</a> and place it in the <code>mods</code> folder.</li>
-      <li>(Optional) Copy all the other NeoForge {{ version }} mods that you want to play with into the <code>mods</code> folder.</li>
+      <li>Download the latest build of the <a :href="`https://modrinth.com/mod/forgified-fabric-api/versions?l=neoforge&g=${version.id}&c=release`">Forgified Fabric API</a> and place it in the <code>mods</code> folder.</li>
+      <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=neoforge&g=${version.id}`">Crowd Control for NeoForge</a> and place it in the <code>mods</code> folder.</li>
+      <li>(Optional) Copy all the other NeoForge {{ version.id }} mods that you want to play with into the <code>mods</code> folder.</li>
     </ol>
 
     <p>
       The mod is now installed! Open your Minecraft Launcher and select the <code>NeoForge</code> profile to play.
-      You may now <NuxtLink :to="`/guide/neoforge/join?v=${version}`">join a Crowd Control server</NuxtLink>
+      You may now <NuxtLink :to="`/guide/neoforge/join?v=${version.id}`">join a Crowd Control server</NuxtLink>
       or <a href="#starting">start a single player session</a>.
     </p>
 
@@ -71,7 +71,7 @@ useSeoMeta({
       <li>Select <strong>Remote</strong>.</li>
       <li>Enter in <code>localhost</code> as the host and click next.</li>
       <li>Accept the default password <code>crowdcontrol</code> by clicking next.</li>
-      <li>Launch your modded instance of Minecraft {{ version }} and open the world you want to play on.</li>
+      <li>Launch your modded instance of Minecraft {{ version.id }} and open the world you want to play on.</li>
       <li>In the app, if you see a <strong>Connector Error</strong> button, click on it to refresh the connection to the game.</li>
       <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
       <li>Open the <strong>Effect Manager</strong> in the Crowd Control app to test effects.</li>

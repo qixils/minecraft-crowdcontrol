@@ -10,11 +10,13 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,6 +39,10 @@ public class BucketClutchCommand extends ModdedCommand {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
 				Item material = player.serverLevel().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
+				ItemStack giveItem = new ItemStack(material);
+				player.registryAccess().lookup(Registries.ENCHANTMENT)
+					.flatMap(registry -> registry.get(Enchantments.VANISHING_CURSE))
+					.ifPresent(enchantment -> giveItem.enchant(enchantment, 1));
 
 				Location curr = new Location(player);
 				int offset = BUCKET_CLUTCH_MAX - 1;
@@ -74,7 +80,7 @@ public class BucketClutchCommand extends ModdedCommand {
 								player.drop(true);
 						}
 					}
-					player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(material));
+					player.setItemInHand(InteractionHand.MAIN_HAND, giveItem.copy());
 				});
 			}
 			return success

@@ -11,6 +11,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -37,6 +38,8 @@ public class BucketClutchCommand extends RegionalCommand {
 	@Override
 	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		Material material = player.getWorld().isUltraWarm() ? Material.COBWEB : Material.WATER_BUCKET;
+		ItemStack giveItem = new ItemStack(material);
+		giveItem.addEnchantment(Enchantment.VANISHING_CURSE, 1);
 
 		Location curr = player.getLocation();
 		int offset = BUCKET_CLUTCH_MAX - 1;
@@ -76,7 +79,7 @@ public class BucketClutchCommand extends RegionalCommand {
 						player.dropItem(true);
 				}
 			}
-			inv.setItemInMainHand(new ItemStack(material));
+			inv.setItemInMainHand(giveItem);
 			return true;
 		});
 	}

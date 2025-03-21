@@ -9,6 +9,7 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -57,6 +58,7 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 
 	@Override
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		if (entityType == EntityType.ENDER_DRAGON && player.getWorld().getEnvironment() == World.Environment.THE_END) return false;
 		for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
 			entity.remove();
 			return true;

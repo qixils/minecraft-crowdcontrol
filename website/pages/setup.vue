@@ -5,98 +5,130 @@ useServerSeoMeta({
   ogDescription: 'Dynamic setup guide for Minecraft Crowd Control',
 })
 
-import {computed} from 'vue'
-import {fabricML} from "~/utils/versions";
+import { computed } from 'vue'
+import { useUrlSearchParams } from '@vueuse/core'
+import * as versions from "~/utils/versions"
 
 // TODO: improve suggested articles for sponge
 
-const question = useState('question', () => "gamemode")
-const gamemode_index = useState<number | undefined>('gamemode_index', () => undefined)
-const modloader_index = useState<number | undefined>('modloader_index', () => undefined)
-const version_index = useState<number | undefined>('version_index', () => undefined)
-const experience = useState<boolean | undefined>('experience', () => undefined)
-
-const gamemodes = ["Singleplayer", "Multiplayer on a local server", "Multiplayer on a remote server"]
-const gamemode = computed(() => {
-  if (gamemode_index.value === undefined) return undefined
-  return gamemodes[gamemode_index.value]
-})
-
-const modloader = computed(() => {
-  if (modloader_index.value === undefined) return undefined
-  return modloaders[modloader_index.value]
-})
-
-const version = computed(() => {
-  if (version_index.value === undefined) return undefined
-  return modloader.value!.versions[version_index.value]
-})
-
-function set(value: any) {
-  switch (question.value) {
-    case "gamemode":
-      gamemode_index.value = value;
-      question.value = "modloader";
-      break;
-    case "modloader":
-      modloader_index.value = value;
-      question.value = "version";
-      break;
-    case "version":
-      version_index.value = value;
-      console.log(allVersions[value])
-      question.value = (((modloader.value?.id === "unsure" && fabricVersions.includes(allVersions[value])) || modloader.value?.id === "fabric" || (modloader.value?.id === "sponge" && spongeVersionsArray[value] !== "1.12.2")) && gamemode.value === "Singleplayer") ? "experience" : "done";
-      break;
-    case "experience":
-      experience.value = value;
-      question.value = "done";
-      break;
-  }
+interface Answer {
+  slug: string
+  title: string
 }
 
-const guide = computed(() => {
-  let gmval = gamemode.value
-  let verval = version.value
-  let mlval = modloader.value
-  let expval = experience.value
+interface QuestionMetadata {
+  slug: string
+  crumb: string
+  title: string
+  answers: Ref<Answer[]>
+  subtext?: string
+  hidden?: boolean
+}
 
-  if (gmval === undefined) return "ERR! Missing field"
-  if (verval === undefined) return "ERR! Missing field"
-  if (mlval === undefined) return "ERR! Missing field"
+interface Question extends QuestionMetadata {
+  answer: Ref<string | undefined>
+}
 
-  // pick modloader
-  if (mlval.id === "unsure") {
-    if (fabricVersions.includes(verval) && gmval === "Singleplayer" && expval === true) {
-      mlval = fabricML;
-    } else {
-      // just pick the first supported one
-      for (const ml of modloaders) {
-        if (ml.id === "unsure") continue;
-        if (ml.versions.includes(verval)) {
-          mlval = ml;
-          break;
-        }
-      }
-    }
+const questions: Question[] = []
+const searchParams = useUrlSearchParams('history', {
+  writeMode: 'push',
+})
 
-    if (mlval.id === "unsure") {
-      return "ERR! Unable to pick a modloader for your version of Minecraft. Please pick one manually.";
-    }
-  }
+// TODO: can i do this as like, deep reactive or something?
+const pushQuestion = (question: QuestionMetadata) => {
+  const answer = computed({
+    get() {
+      const param = searchParams[question.slug]
+      return Array.isArray(param) ? param[0] : param
+    },
+    set(newValue) {
+      searchParams[question.slug] = newValue
+    },
+  })
+  const fullQuestion = {...question, answer}
+  questions.push(fullQuestion)
+  return fullQuestion
+}
 
-  // pick page
-  let page: string;
-  if (gmval === "Multiplayer on a remote server") {
-    page = "server/remote";
-  } else if (expval) {
-    page = "client";
-  } else if (verval === mlval.versions[0]) {
-    page = "automatic";
-  } else {
-    page = "server/local";
-  }
+const questionEnvironment = pushQuestion({
+  slug: "environment",
+  crumb: "Environment",
+  title: "Are you intending to play alone, with friends on a server hosted on your PC (free but complex), or with friends on a remotely hosted server?",
+  answers: ref([
+    {
+      slug: 'solo',
+      title: 'Singleplayer',
+    },
+    {
+      slug: 'local',
+      title: 'Local Multiplayer',
+    },
+    {
+      slug: 'remote',
+      title: 'Remote Multiplayer',
+    },
+  ]),
+})
+const questionModloader = pushQuestion({
+  slug: "modloader",
+  crumb: "Modloader",
+  title: "What modloader are you using?",
+  answers: ref(versions.modloaders.map(({id, name}) => ({slug: id, title: name}))),
+})
+const questionVersion = pushQuestion({
+  slug: "version",
+  crumb: "Version",
+  title: "What version of Minecraft are you playing?",
+  subtext: "Any version not listed is unsupported.",
+  answers: computed(() => {
+    const vals = (questionModloader.answer.value && versions.modloadersBySlug[questionModloader.answer.value]?.versions) || versions.allVersions
+    return vals.map((version, index) => ({ slug: version.id, title: !index ? `${version.id} (Latest)` : version.id }))
+  }),
+})
+const questionExperience = pushQuestion({
+  slug: "experience",
+  crumb: "Experience",
+  title: "Would you consider yourself experienced at managing and installing Minecraft mods?",
+  hidden: true,
+  answers: computed(() =>
+    questionEnvironment.answer.value === 'solo' && questionModloader.answer.value && ['fabric', 'neoforge'].includes(questionModloader.answer.value)
+      ? [{slug: 'yes', title: 'Yes'},{slug: 'no', title: 'No'}]
+      : []
+  )
+})
 
-  return `/guide/${mlval.id}/${page}?v=${verval}`;
+const question = computed(() => questions.find(item => !item.answer.value && item.answers.value.length))
+const guide = computed(() => { // TODO: lazy?
+  const env = questionEnvironment.answer.value
+  const versionId = questionVersion.answer.value
+  const experienced = questionExperience.answer.value === 'yes'
+  
+  const loader: string = questionModloader.answer.value && questionModloader.answer.value !== 'unsure'
+    ? questionModloader.answer.value
+    : versions.fabricVersions.some(v => v.id === versionId)
+      ? 'fabric'
+      : versions.neoForgeVersions.some(v => v.id === versionId)
+        ? 'neoforge'
+        : versions.paperVersions.some(v => v.id === versionId)
+          ? 'paper'
+          : versions.modloaders.find(modloader => modloader.id !== 'unsure' && modloader.versions.some(v => v.id === versionId))!.id // (sponge fallback lol)
+  
+  const loaderVersion = modloadersBySlug[loader] && modloadersBySlug[loader].versions.find(v => v.id === versionId)
+  const isLatest = !!loaderVersion?.latest
+  const isSupported = !!loaderVersion?.supported
+
+  const page = experienced
+    ? 'client'
+    : env === 'remote'
+      ? 'server/remote'
+      : env === 'local' || !isLatest || !isSupported
+        ? 'server/local'
+        : 'automatic'
+
+  const url = new URL(`/guide/${loader}/${page}`, window.location.href)
+  if (versionId) url.searchParams.set('v', versionId);
+
+  return url.toString()
 })
 </script>
 
@@ -108,44 +140,16 @@ const guide = computed(() => {
       <NuxtLink to="/">read this first</NuxtLink>.
     </p>
     <hr>
-    <div v-if="question === 'gamemode'">
+    <div v-if="question">
       <p>
-        Are you intending to play alone, with friends on a server hosted on your PC, or with friends on a remotely hosted server?
+        {{ question.title }}
+        <span v-if="question.subtext" class="subtext">{{ question.subtext }}</span>
       </p>
       <div class="buttons">
-        <button v-for="(value, index) in gamemodes" :key="index" @click="set(index)">
-          {{ value }}
+        <button v-for="answer in question.answers.value" @click="question.answer.value = answer.slug">
+          {{ answer.title }}
         </button>
       </div>
-    </div>
-    <div v-else-if="question === 'modloader'">
-      <p>What modloader are you using?</p>
-      <div class="buttons">
-        <button v-for="(value, index) in modloaders" :key="index" @click="set(index)">
-          {{ value.name }}
-        </button>
-      </div>
-    </div>
-    <div v-else-if="question === 'version'">
-      <p>What version of Minecraft are you playing? <span class="subtext">Any version not listed is unsupported.</span></p>
-      <div class="buttons">
-        <button v-for="(value, index) in modloader!.versions" :key="index" @click="set(index)">
-          <span v-if="value === allVersions[0]">Latest ({{ value }})</span>
-          <span v-else>{{ value }}</span>
-        </button>
-      </div>
-    </div>
-    <div v-else-if="question === 'experience'">
-      <p>Would you consider yourself experienced at managing and installing Minecraft mods?</p>
-      <div class="buttons">
-        <button @click="set(true)">Yes</button>
-        <button @click="set(false)">No</button>
-      </div>
-    </div>
-    <div v-else-if="guide.startsWith('ERR! ')">
-      <p>
-        Error: {{ guide.substring(5) }}
-      </p>
     </div>
     <div v-else>
       Please follow <NuxtLink :to="guide" class="underline">this guide</NuxtLink> to set up Crowd Control.

@@ -10,6 +10,11 @@ useSeoMeta({
   <div>
     <h1>NeoForge: Joining an External Server</h1>
 
+    <p class="alert alert-warning">
+      The NeoForge mod is in early alpha. It may experience more mod incompatibilities than expected.
+      Additionally, some instructions relating to the Crowd Control app may be unavailable as we roll out support.
+    </p>
+
     <p>The following steps are for streamers who are connecting to another individual's server.</p>
 
     <ol>

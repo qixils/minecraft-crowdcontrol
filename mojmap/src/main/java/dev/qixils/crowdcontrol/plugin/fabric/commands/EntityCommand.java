@@ -43,6 +43,7 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 
 	@Override
 	default TriState isSelectable(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
+		// TODO: dragon check?
 		if (!isMonster())
 			return TriState.UNKNOWN;
 		if (!serverIsPeaceful())
@@ -51,14 +52,19 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 	}
 
 	default @Nullable CCEffectResponse tryExecute(@NotNull List<@NotNull ServerPlayer> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		// error only if everyone has an error
+		CCInstantEffectResponse error = null;
 		for (ServerPlayer player : players) {
-			if (isMonster() && levelIsPeaceful(player.serverLevel())) {
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
-			}
-			if (!isEnabled(player.serverLevel().enabledFeatures())) {
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
-			}
+			ServerLevel level = player.serverLevel();
+			if (isMonster() && levelIsPeaceful(level))
+				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
+			else if (getEntityType() == EntityType.ENDER_DRAGON && level.getDragonFight() != null)
+				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
+			else if (!isEnabled(player.serverLevel().enabledFeatures()))
+				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
+			else
+				return null;
 		}
-		return null;
+		return error;
 	}
 }

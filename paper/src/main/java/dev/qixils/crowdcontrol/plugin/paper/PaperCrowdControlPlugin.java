@@ -13,6 +13,7 @@ import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.world.flag.FeatureDependant;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -25,7 +26,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -276,7 +276,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		return Bukkit.getWorlds().stream().allMatch(material::isEnabledByFeature);
 	}
 
-	public static boolean isFeatureEnabled(EntityType entityType) {
-		return Bukkit.getWorlds().stream().allMatch(entityType::isEnabledByFeature);
+	public static boolean isFeatureEnabled(FeatureDependant entityType) {
+		return Bukkit.getWorlds().stream().allMatch(world -> world.isEnabled(entityType));
 	}
 }

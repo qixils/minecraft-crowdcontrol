@@ -956,7 +956,7 @@ public abstract class Plugin<P, S> {
 			}
 			// TODO: restore? maybe go for less of a warning angle and more of an informational angle,
 			//  like hey some effects can't be used because you aren't a host / aren't a client
-//			if (!globalEffectsUsable())
+//			if (!globalEffectsUsable() && mapper.isAdmin(player))
 //				audience.sendMessage(NO_GLOBAL_EFFECTS_MESSAGE);
 		});
 		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTHENTICATED, () -> {

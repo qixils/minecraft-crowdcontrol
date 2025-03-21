@@ -39,6 +39,10 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/setup': { ssr: false },
+  },
+
   modules: ['@nuxt/ui'],
-  compatibilityDate: '2024-08-27'
+  compatibilityDate: '2024-08-27',
 })

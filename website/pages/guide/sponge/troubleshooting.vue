@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import {computed} from 'vue';
+import { computed } from 'vue'
+import { useVersion } from '~/composables/useVersion'
+import * as versions from '~/utils/versions'
 
-const route = useRoute();
-const version = useState('version', () => route.query.v);
-if (!version.value || !spongeVersions.has(version.value)) { version.value = spongeLatest; }
-const latest = computed(() => version.value === spongeLatest);
-const api = computed(() => spongeVersions.get(version.value));
+const versionData = useVersion(versions.spongeML)
+const { version } = versionData
+
 const docs = computed(() => {
-  if (api.value === 7) return '7.4.0';
+  if (version.api === 7) return '7.4.0';
   return 'stable';
 })
 
 useSeoMeta({
-  title: `Sponge ${version.value} Troubleshooting Guide · Minecraft Crowd Control`,
-  description: `Sponge ${version.value} Troubleshooting Guide`,
-  ogDescription: `Sponge ${version.value} Troubleshooting Guide`,
+  title: `Sponge ${version.id} Troubleshooting Guide · Minecraft Crowd Control`,
+  description: `Sponge ${version.id} Troubleshooting Guide`,
+  ogDescription: `Sponge ${version.id} Troubleshooting Guide`,
 })
 
 // TODO: move all the mod data here
@@ -22,7 +22,12 @@ useSeoMeta({
 
 <template>
   <div>
-    <h1>Sponge {{ api }} Troubleshooting</h1>
+    <h1>Sponge {{ version.api }} Troubleshooting</h1>
+
+    <p class="alert alert-warning">
+      The Sponge plugins have reached end-of-life and will no longer be updated.
+      Our ability to provide further support for these versions will be limited.
+    </p>
 
     <h2>"Failed to load a valid ResourcePackInfo"</h2>
 
@@ -30,7 +35,7 @@ useSeoMeta({
 
     <h2>"CrowdControl is not a valid mod file"</h2>
 
-    <p>If you see this warning on startup but <em>not</em> the ResourcePackInfo warning described above, it means that you do not have <a :href="`https://spongepowered.org/downloads/spongeforge?minecraft=${version}&offset=0`">SpongeForge</a> installed. You must download it and add it to your <code>mods</code> folder.</p>
+    <p>If you see this warning on startup but <em>not</em> the ResourcePackInfo warning described above, it means that you do not have <a :href="`https://spongepowered.org/downloads/spongeforge?minecraft=${version.id}&offset=0`">SpongeForge</a> installed. You must download it and add it to your <code>mods</code> folder.</p>
 
     <h2 id="incompatible-mods">Incompatible Mods</h2>
 
@@ -50,13 +55,18 @@ useSeoMeta({
     <p>The following incompatible mods have known fixes that haven't been widely published. <strong>If you have one of these mods in your modpack, you should delete it and replace it with the fixed build.</strong></p>
 
     <ul>
-      <li v-if="version === '1.16.5'">
-        Abnormals Core:
-        <a href="https://cdn.discordapp.com/attachments/406987481825804290/949798054117122058/abnormals_core-1.16.5-3.3.1.jar">Fixed</a>
-        by Sponge developers
-        (<a href="https://github.com/team-abnormals/blueprint/commit/df4932960266f2e30a541097811193c17d1bb339">source</a>)
-      </li>
-      <li v-else><i>(No known mods for the selected version.)</i></li>
+      <template v-if="version.id === '1.16.5'">
+        <li>
+          Abnormals Core:
+          <a href="https://cdn.discordapp.com/attachments/406987481825804290/949798054117122058/abnormals_core-1.16.5-3.3.1.jar">Fixed</a>
+          by Sponge developers
+          (<a href="https://github.com/team-abnormals/blueprint/commit/df4932960266f2e30a541097811193c17d1bb339">source</a>)
+        </li>
+      </template>
+
+      <template v-else>
+        <li><i>(No known mods for the selected version.)</i></li>
+      </template>
     </ul>
 
     <h3>Mods with No Known Fix</h3>
