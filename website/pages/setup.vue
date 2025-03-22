@@ -67,6 +67,10 @@ const questionEnvironment = pushQuestion({
       slug: 'remote',
       title: 'Remote Multiplayer',
     },
+    {
+      slug: 'realms',
+      title: 'Realms',
+    },
   ]),
 })
 const questionModloader = pushQuestion({
@@ -141,7 +145,16 @@ const guide = computed(() => { // TODO: lazy?
       <NuxtLink to="/">read this first</NuxtLink>.
     </p>
     <hr>
-    <div v-if="question">
+    <div v-if="questionEnvironment.answer.value === 'realms'">
+      Unfortunately, Minecraft Realms does not support mods, so it is incompatible for use with Minecraft Crowd Control.
+      To play with others, you must setup a local or remote server.
+      <div class="buttons">
+        <button @click="questionEnvironment.answer.value = ''">
+          Go Back
+        </button>
+      </div>
+    </div>
+    <div v-else-if="question">
       <p>
         {{ question.title }}
         <span v-if="question.subtext" class="subtext">{{ question.subtext }}</span>
