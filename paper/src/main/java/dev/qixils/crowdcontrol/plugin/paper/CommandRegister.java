@@ -6,6 +6,8 @@ import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.paper.utils.MaterialTag;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -123,7 +125,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// enchantments
-		for (Enchantment enchantment : Registry.ENCHANTMENT) {
+		for (Enchantment enchantment : RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)) {
 			initTo(commands, () -> new EnchantmentCommand(plugin, enchantment), e -> plugin.getSLF4JLogger().warn("Enchantment {} does not implement the Adventure/Paper API. Ignoring.", enchantment.getKey()));
 		}
 
