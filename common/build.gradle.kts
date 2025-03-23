@@ -5,9 +5,7 @@ val cloudExtrasVersion: String by project
 val slf4jVersion: String by project
 
 dependencies {
-//    api("dev.qixils.crowdcontrol:crowd-control-receiver:$crowdControlVersion")
-    api("live.crowdcontrol.cc4j:pubsub:1.0.0-SNAPSHOT")
-//    api("com.google.code.findbugs:findbugs-annotations:3.0.1")
+    api("live.crowdcontrol.cc4j:pubsub:$crowdControlVersion")
 
     compileOnly("net.kyori:adventure-api:$adventureVersion")
     api("net.kyori:adventure-text-minimessage:$adventureVersion") {

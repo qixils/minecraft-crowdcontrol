@@ -2,13 +2,13 @@ val adventureVersion: String by project
 val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
 val cloudMojmapVersion: String by project
-val crowdControlVersion: String by project
 val fabricVersion: String by project
 val loaderVersion: String by project
 val modMenuVersion: String by project
 val mojmapVersion: String by project
-val parchmentVersion: String by project
 val configurateVersion: String by project
+val luckoPermissionsApiVersion: String by project
+val languageReloadVersion: String by project
 
 plugins {
     id("architectury-plugin")
@@ -66,7 +66,8 @@ dependencies {
     modImplementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
     })
-    modImplementation("maven.modrinth:language-reload:1.6.1+1.21")
+    modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
+    modImplementation("maven.modrinth:language-reload:$languageReloadVersion")
 
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
