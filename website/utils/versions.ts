@@ -28,6 +28,7 @@ export const paperVersions: Version[] = autoVersion([
 export const paperLatest = findLatest(paperVersions)
 
 export const fabricVersions: Version[] = autoVersion([
+    { id: "1.21.4", supported: true, legacy: false },
     { id: "1.21.3", supported: true, legacy: false },
     { id: "1.21.1", supported: false, legacy: true },
     { id: "1.20.6", supported: false, legacy: true },
@@ -40,6 +41,7 @@ export const fabricVersions: Version[] = autoVersion([
 export const fabricLatest = findLatest(fabricVersions)
 
 export const neoForgeVersions: Version[] = autoVersion([
+    { id: "1.21.4", supported: true, legacy: false },
     { id: "1.21.3", supported: true, legacy: false },
     { id: "1.21.1", supported: false, legacy: true },
 ])

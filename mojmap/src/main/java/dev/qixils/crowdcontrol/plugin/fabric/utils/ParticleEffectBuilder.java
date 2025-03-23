@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,18 +83,18 @@ public class ParticleEffectBuilder<T extends ParticleOptions> {
 		level.sendParticles(particleOptions, position.x, position.y, position.z, count, distance.x(), distance.y(), distance.z(), maxSpeed);
 	}
 
-	/**
-	 * Sends the particle effect to the specified player.
-	 *
-	 * @param player the player to send the particle effect to
-	 * @param force  whether to force the particle effect to render
-	 *               (i.e. ignore long distances and the "Minimal" particle effect setting)
-	 */
-	public void sendTo(ServerPlayer player, boolean force) {
-		if (level == null)
-			throw new IllegalStateException("No level set");
-		if (position == null)
-			throw new IllegalStateException("No position set");
-		level.sendParticles(player, particleOptions, force, position.x, position.y, position.z, count, distance.x(), distance.y(), distance.z(), maxSpeed);
-	}
+//	/**
+//	 * Sends the particle effect to the specified player.
+//	 *
+//	 * @param player the player to send the particle effect to
+//	 * @param force  whether to force the particle effect to render
+//	 *               (i.e. ignore long distances and the "Minimal" particle effect setting)
+//	 */
+//	public void sendTo(ServerPlayer player, boolean force) {
+//		if (level == null)
+//			throw new IllegalStateException("No level set");
+//		if (position == null)
+//			throw new IllegalStateException("No position set");
+//		level.sendParticles(player, particleOptions, force, alwaysShow, position.x, position.y, position.z, count, distance.x(), distance.y(), distance.z(), maxSpeed);
+//	}
 }
