@@ -855,23 +855,37 @@ public abstract class Plugin<P, S> {
 
 		for (Command<P> effect : commandRegister().getCommands()) {
 			String id = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-			TriState visibility = effect.isVisible(user, potentialPlayers);
-			if (visibility != TriState.FALSE) {
-				Set<ExtraFeature> extraFeatures;
-				SemVer minVersion;
-				// this assumes that if a player has a feature available then they also have a client available
-				if (!(extraFeatures = effect.requiredExtraFeatures()).isEmpty()) {
-					boolean available = potentialPlayers.stream().anyMatch(player -> extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player)));
-					visibility = TriState.fromBoolean(available);
-				} else if ((minVersion = effect.getMinimumModVersion()).isAtLeast(SemVer.ZERO)) {
-					visibility = TriState.fromBoolean(clientVersion.isAtLeast(minVersion));
-				} else if (effect.isGlobal())
-					visibility = TriState.fromBoolean(globalVisible);
+			TriState visibility;
+			try {
+				visibility = effect.isVisible(user, potentialPlayers);
+				if (visibility != TriState.FALSE) {
+					Set<ExtraFeature> extraFeatures;
+					SemVer minVersion;
+					// this assumes that if a player has a feature available then they also have a client available
+					if (!(extraFeatures = effect.requiredExtraFeatures()).isEmpty()) {
+						boolean available = potentialPlayers.stream().anyMatch(player -> extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player)));
+						visibility = TriState.fromBoolean(available);
+					} else if ((minVersion = effect.getMinimumModVersion()).isAtLeast(SemVer.ZERO)) {
+						visibility = TriState.fromBoolean(clientVersion.isAtLeast(minVersion));
+					} else if (effect.isGlobal())
+						visibility = TriState.fromBoolean(globalVisible);
+				}
+			} catch (Exception e) {
+				getSLF4JLogger().error("Hiding faulty effect {}", id, e);
+				visibility = TriState.FALSE;
 			}
+
 			if (visibility != TriState.UNKNOWN)
 				effects.computeIfAbsent(visibility == TriState.TRUE ? ReportStatus.MENU_VISIBLE : ReportStatus.MENU_HIDDEN, k -> new ArrayList<>()).add(id);
 
-			TriState selectable = effect.isSelectable(user, potentialPlayers);
+			TriState selectable;
+			try {
+				selectable = effect.isSelectable(user, potentialPlayers);
+			} catch (Exception e) {
+				getSLF4JLogger().error("Disabling faulty effect {}", id, e);
+				selectable = TriState.FALSE;
+			}
+
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
 				effects.computeIfAbsent(selectable == TriState.TRUE ? ReportStatus.MENU_AVAILABLE : ReportStatus.MENU_UNAVAILABLE, k -> new ArrayList<>()).add(id);
 		}
@@ -995,8 +1009,8 @@ public abstract class Plugin<P, S> {
 			}
 
 			switch (status) {
+				// NOTE: TIMED_BEGIN also emits SUCCESS !
 				case SUCCESS:
-				case TIMED_BEGIN:
 					List<Audience> audiences = new ArrayList<>(3);
 
 					initTo(audiences, this::getConsole);
@@ -1014,7 +1028,6 @@ public abstract class Plugin<P, S> {
 					} catch (Exception e) {
 						LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
 					}
-					if (status == ResponseStatus.TIMED_BEGIN) break;
 				case FAIL_TEMPORARY:
 				case FAIL_PERMANENT:
 				case TIMED_END:
