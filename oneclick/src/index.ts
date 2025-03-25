@@ -17,8 +17,8 @@ const modVersions = await Promise.allSettled([
 ])
 
 const modVersion = modVersions
-.filter(result => result.status === "fulfilled")
-.map(result => result.value.version_number.split("+")[0])
+.flatMap(result => (result.status === 'fulfilled' && !!result.value) ? [result.value] : [])
+.map(result => result.version_number.split("+")[0])
 .sort(semverSort)
 .at(-1)!
 

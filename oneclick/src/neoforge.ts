@@ -41,5 +41,6 @@ export async function downloadNeoForge(to: string) {
 start ..\\java\\${jre}\\bin\\java.exe -Xmx2048M -Xms2048M @user_jvm_args.txt @libraries/net/neoforged/neoforge/${neoLatest}/win_args.txt %* > log.txt 2> errorlog.txt`)
 
     const mods = path.resolve(root, "mods")
-    return await downloadMod(mods, "sponge", minecraft, { filename: `CrowdControl-NeoForge.jar` })
+    await mkdir(mods, { empty: true })
+    return await downloadMod(mods, "neoforge", minecraft, { filename: `CrowdControl-NeoForge.jar` })
 }
