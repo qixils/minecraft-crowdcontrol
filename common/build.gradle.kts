@@ -44,7 +44,7 @@ tasks.register("generateApplicationFile") {
     outputs.file(applicationFile)
     doLast {
         generatedResourcesFolder.mkdirs()
-        applicationFile.writeText((findProperty("applicationId")?.toString() ?: "") + '\n' + (findProperty("applicationSecret")?.toString() ?: "") + '\n')
+        applicationFile.writeText((findProperty("applicationId")?.toString() ?: "") + ':' + (findProperty("applicationSecret")?.toString() ?: ""))
     }
 }
 

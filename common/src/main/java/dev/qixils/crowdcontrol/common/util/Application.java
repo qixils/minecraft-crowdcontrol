@@ -1,8 +1,10 @@
 package dev.qixils.crowdcontrol.common.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public final class Application {
@@ -17,8 +19,9 @@ public final class Application {
 		InputStream inputStream = Application.class.getClassLoader().getResourceAsStream("mccc-application.txt");
 		if (inputStream == null)
 			throw new IllegalStateException("Could not load application from resources");
-		Scanner scanner = new Scanner(inputStream);
-		APPLICATION_ID = scanner.next("\n");
-		APPLICATION_SECRET = scanner.next("\n");
+		String[] tokens = new Scanner(inputStream).next().split(":");
+		LoggerFactory.getLogger("ABC").info(Arrays.toString(tokens));
+		APPLICATION_ID = tokens[0];
+		APPLICATION_SECRET = tokens[1];
 	}
 }
