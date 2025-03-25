@@ -967,7 +967,7 @@ public abstract class Plugin<P, S> {
 			// send messages
 			Audience audience = mapper.asAudience(player);
 			if (ccPlayer.getUserToken() == null) {
-				audience.sendMessage(LINK_MESSAGE.clickEvent(ClickEvent.openUrl(ccPlayer.getAuthUrl())));
+				audience.sendMessage(LINK_MESSAGE.clickEvent(ClickEvent.copyToClipboard(ccPlayer.getAuthUrl())));
 			}
 			// TODO: restore? maybe go for less of a warning angle and more of an informational angle,
 			//  like hey some effects can't be used because you aren't a host / aren't a client
