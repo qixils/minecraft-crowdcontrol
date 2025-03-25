@@ -54,6 +54,7 @@ export async function downloadPaper(to: string) {
     let build: Build | undefined
     let version: string | undefined
     for (const vers of data.versions.toReversed()) {
+        if (vers != "1.21.4") continue; // TODO
         build = await fetchLatest(vers)
         if (build) {
             version = vers
