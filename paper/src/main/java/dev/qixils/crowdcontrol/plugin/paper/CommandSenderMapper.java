@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
+import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.hasPermission;
+
 @Getter
 @RequiredArgsConstructor
 class CommandSenderMapper<E extends CommandSender> implements EntityMapper<E> {
@@ -31,7 +33,7 @@ class CommandSenderMapper<E extends CommandSender> implements EntityMapper<E> {
 
 	@Override
 	public boolean isAdmin(@NotNull E commandSource) {
-		if (commandSource.hasPermission(PaperUtil.ADMIN_PERMISSION)) return true;
+		if (hasPermission(commandSource, PaperUtil.ADMIN_PERMISSION)) return true;
 		return EntityMapper.super.isAdmin(commandSource);
 	}
 }

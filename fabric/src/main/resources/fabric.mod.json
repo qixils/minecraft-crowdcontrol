@@ -34,11 +34,12 @@
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
-    "minecraft": ">=1.21- <=1.21.1",
+    "minecraft": ">=1.21.2- <=1.21.4",
     "cloud": "*",
     "adventure-platform-fabric": "*",
     "net_kyori_adventure-api": "*",
-    "cloth-config": "*"
+    "cloth-config": "*",
+    "fabric-permissions-api-v0": "*"
   },
   "recommends": {
     "languagereload": "*",
@@ -49,14 +50,6 @@
     "extrasounds": "*"
   },
   "custom": {
-    "loom:injected_interfaces": {
-      "net/minecraft/class_3222": ["dev/qixils/crowdcontrol/plugin/fabric/interfaces/GameTypeEffectComponent"],
-      "net/minecraft/class_1657": ["dev/qixils/crowdcontrol/plugin/fabric/interfaces/MovementStatus"],
-      "net/minecraft/class_1309": [
-        "dev/qixils/crowdcontrol/plugin/fabric/interfaces/ViewerMob",
-        "dev/qixils/crowdcontrol/plugin/fabric/interfaces/OriginalDisplayName"
-      ]
-    },
     "modmenu": {
       "links": {
         "modmenu.discord": "https://discord.gg/warpworld"

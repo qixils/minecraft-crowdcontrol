@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.qixils.crowdcontrol.plugin.fabric.mixin",
+  "refmap": "mojmap-common-mojmap-common-refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityMixin",
@@ -15,7 +16,6 @@
     "TickMixin"
   ],
   "client": [
-    "EffectInstanceMixin",
     "GameRendererMixin",
     "KeyboardInputMixin",
     "MinecraftClientMixin"

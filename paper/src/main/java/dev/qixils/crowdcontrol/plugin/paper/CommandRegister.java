@@ -3,10 +3,11 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
-import dev.qixils.crowdcontrol.common.command.impl.Shader;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.paper.utils.MaterialTag;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -17,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
+import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 
 public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdControlPlugin> {
 	private static final MaterialTag SET_BLOCKS = new MaterialTag(CommandConstants.SET_BLOCKS);
@@ -123,7 +125,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// enchantments
-		for (Enchantment enchantment : Registry.ENCHANTMENT) {
+		for (Enchantment enchantment : RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)) {
 			initTo(commands, () -> new EnchantmentCommand(plugin, enchantment), e -> plugin.getSLF4JLogger().warn("Enchantment {} does not implement the Adventure/Paper API. Ignoring.", enchantment.getKey()));
 		}
 
@@ -139,23 +141,27 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			initTo(commands, () -> new GameModeCommand(plugin, gamemode, gamemode == GameMode.SPECTATOR ? 8L : 15L));
 		}
 
-		for (Shader shader : Shader.values()) {
-			initTo(commands, () -> new ShaderCommand(plugin, shader));
-		}
+//		for (Shader shader : Shader.values()) {
+//			initTo(commands, () -> new ShaderCommand(plugin, shader));
+//		}
 	}
 
 	@Override
 	protected void registerListener(Command<Player> command) {
-		Bukkit.getPluginManager().registerEvents((Listener) command, plugin);
+		if (command instanceof Listener listener)
+			Bukkit.getPluginManager().registerEvents(listener, plugin.getPaperPlugin());
+		else
+			plugin.getSLF4JLogger().warn("Could not register listener for command {}", command.getEffectName());
 	}
 
 	@Override
 	protected void onFirstRegistry() {
-		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), plugin);
-		Bukkit.getPluginManager().registerEvents(new MovementStatusCommand.Manager(), plugin);
-		Bukkit.getPluginManager().registerEvents(new LootboxCommand.Manager(plugin), plugin);
-		Bukkit.getPluginManager().registerEvents(new FreezeCommand.Manager(plugin), plugin);
-		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(plugin), plugin);
-		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), plugin);
+		PaperLoader paperPlugin = plugin.getPaperPlugin();
+		Bukkit.getPluginManager().registerEvents(new KeepInventoryCommand.Manager(), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new MovementStatusCommand.Manager(), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new LootboxCommand.Manager(plugin), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new FreezeCommand.Manager(plugin), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(paperPlugin), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), paperPlugin);
 	}
 }

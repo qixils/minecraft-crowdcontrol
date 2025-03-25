@@ -11,10 +11,10 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
+
+// TODO: remove sponge cope
 
 public final class KyoriTranslator extends TranslatableComponentRenderer<Locale> implements TranslationRegistry {
 	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/KyoriTranslator");
@@ -47,27 +49,44 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	}
 
 	// Find all the items in the JVM resource path
-	private List<String> listResourcesIn(String path) throws Exception {
+	private List<String> listResourcesIn(Plugin<?, ?> plugin, String path) throws Exception {
 		URL url = loadFirst(path, pluginClassLoader, ClassLoader.getSystemClassLoader());
 		if (url == null) return Collections.emptyList();
 		String urlPath = url.getPath();
 
 		if (url.getProtocol().equals("file")) { // OS dir
-			try (Stream<Path> paths = Files.list(Paths.get(new URI(urlPath)))) {
-				return paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
-			}
-		} else { // packed in jar?
+			try {
+				try (Stream<Path> paths = Files.list(Paths.get(new URI(urlPath)))) {
+					return paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
+				}
+			} catch (Exception ignored) {}
+		}
+
+		// packed in jar?
+		try {
 			int idx = urlPath.indexOf("!");
 			File jarUrl = idx == -1
-				? new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()) // TODO: even this doesn't work on forge omg wtf
-				: new File(urlPath.substring("file:".length(), urlPath.indexOf("!"))); // TODO: url encoder error on sponge 7 AAAAAAAAA
+				? new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
+				: new File(urlPath.substring("file:".length(), urlPath.indexOf("!")));
 			try (JarFile jar = new JarFile(jarUrl)) {
 				return Collections.list(jar.entries()).stream()
 					.filter(entry -> entry.getName().startsWith(path))
 					.map(entry -> entry.getName().substring(path.length()))
 					.collect(Collectors.toList());
 			}
-		}
+		} catch (Exception ignored) {}
+
+		// let's try native operations
+		try {
+			Path folder = plugin.getPath(path);
+			if (folder == null) throw new RuntimeException();
+
+			try (Stream<Path> paths = Files.list(folder)) {
+				return paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
+			}
+		} catch (Exception ignored) {}
+
+		return Collections.emptyList();
 	}
 
 	/**
@@ -75,14 +94,14 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	 * For a prefix like "MyModName", the translator will load all files matching "/i18n/MyModName_*.properties",
 	 * where the asterisk is a language code like "en_US".
 	 *
-	 * @param modId       the ID of your mod/plugin
-	 * @param prefix      the prefix for language resource files
-	 * @param pluginClass the main class of your plugin
-	 * @param locales     the locales to load (used only if reflection fails)
+	 * @param modId   the ID of your mod/plugin
+	 * @param prefix  the prefix for language resource files
+	 * @param plugin  the plugin
+	 * @param locales the locales to load (used only if reflection fails)
 	 */
-	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Class<?> pluginClass, @NotNull Locale @NotNull ... locales) {
+	public KyoriTranslator(@NotNull String modId, @NotNull String prefix, @NotNull Plugin<?, ?> plugin, @NotNull Locale @NotNull ... locales) {
 		this.prefix = prefix;
-		this.pluginClassLoader = pluginClass.getClassLoader();
+		this.pluginClassLoader = plugin.getClass().getClassLoader();
 
 		Pattern filePattern = Pattern.compile(Pattern.quote(prefix) + "_(?<languageTag>\\w{2}(?:_\\w+)*)\\.properties");
 		logger.debug("Registering translator");
@@ -95,7 +114,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		// load locales
 		boolean loaded = false;
 		try {
-			List<String> filenames = listResourcesIn("i18n/");
+			List<String> filenames = listResourcesIn(plugin, "i18n/");
 			if (!filenames.isEmpty()) {
 				for (String filename : filenames) {
 					Matcher matcher = filePattern.matcher(filename);

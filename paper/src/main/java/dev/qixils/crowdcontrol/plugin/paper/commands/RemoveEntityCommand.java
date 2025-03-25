@@ -2,8 +2,11 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.World;
@@ -39,15 +42,13 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 	}
 
 	@Override
-	protected Response.@Nullable Builder precheck(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		return tryExecute(players, request);
+	protected @Nullable CCEffectResponse precheck(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return tryExecute(players, request, ccPlayer);
 	}
 
 	@Override
-	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(Response.ResultType.RETRY)
-			.message("No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
 	}
 
 	@Override
@@ -56,7 +57,7 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		if (entityType == EntityType.ENDER_DRAGON && player.getWorld().getEnvironment() == World.Environment.THE_END) return false;
 		for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
 			entity.remove();

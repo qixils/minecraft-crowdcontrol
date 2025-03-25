@@ -1,36 +1,41 @@
 package dev.qixils.crowdcontrol.common.command;
 
+import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.EventListener;
-import dev.qixils.crowdcontrol.common.ExecuteUsing;
 import dev.qixils.crowdcontrol.common.Global;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
+import dev.qixils.crowdcontrol.common.util.CCResponseException;
+import dev.qixils.crowdcontrol.common.util.DynamicForwardingAudience;
 import dev.qixils.crowdcontrol.common.util.SemVer;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Request.Target;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.Builder;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
-import net.kyori.adventure.audience.Audience;
+import live.crowdcontrol.cc4j.CCEffect;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CrowdControl;
+import live.crowdcontrol.cc4j.IUserRecord;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.LoggerFactory;
 
-import javax.annotation.CheckReturnValue;
+import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A command which handles incoming effects requested by Crowd Control server.
  *
  * @param <P> class used to represent online players
  */
-public interface Command<P> {
+public interface Command<P> extends CCEffect {
 
 	/**
 	 * Gets the plugin that registered this command.
@@ -45,14 +50,11 @@ public interface Command<P> {
 	 * Executes this command. This will apply a certain effect to all the targeted {@code players}.
 	 * The resulting status of executing the command (or null) is returned.
 	 *
-	 * @param players players to apply the effect to
+	 * @param playerSupplier supplies players to apply the effect to
 	 * @param request request that prompted the execution of this command
-	 * @return {@link CompletableFuture} containing either the resulting status of executing the
-	 * command or null
+	 * @param ccPlayer connection that invoked the request
 	 */
-	@NotNull
-	@CheckReturnValue
-	CompletableFuture<@Nullable Builder> execute(@NotNull List<@NotNull P> players, @NotNull Request request);
+	void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer);
 
 	/**
 	 * Determines if this command object listens for events dispatched by the Minecraft server API.
@@ -69,7 +71,7 @@ public interface Command<P> {
 	 *
 	 * @return internal code name
 	 */
-	@Nullable
+	@NotNull
 	@CheckReturnValue
 	String getEffectName();
 
@@ -109,7 +111,7 @@ public interface Command<P> {
 	 * Gets the effect's raw display name. This is used when sending a chat message to streamers
 	 * informing them of the activation of an effect.
 	 *
-	 * <p>Further processing may take place in the {@link #getProcessedDisplayName(Request)} method.</p>
+	 * <p>Further processing may take place in the {@link #getProcessedDisplayName(PublicEffectPayload)} method.</p>
 	 *
 	 * @return display name
 	 */
@@ -128,16 +130,33 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
-	default Component getProcessedDisplayName(@NotNull Request request) {
+	default Component getProcessedDisplayName(@NotNull PublicEffectPayload request) {
 		Component displayName = getDisplayName();
 
+		if (request.getQuantity() > 0) {
+			return getQuantityName(displayName, request);
+		}
+
+		if (request.getEffect().getDuration() > 0) {
+			return getDurationName(displayName, request);
+		}
+
+		return displayName;
+	}
+
+	@ApiStatus.Internal
+	@ApiStatus.OverrideOnly
+	default Component getQuantityName(@NotNull Component displayName, @NotNull PublicEffectPayload request) {
+		if (!(displayName instanceof TranslatableComponent))
+			return displayName;
+
 		QuantityStyle style = getQuantityStyle();
-		if (style == QuantityStyle.NONE || !(displayName instanceof TranslatableComponent))
+		if (style == QuantityStyle.NONE)
 			return displayName;
 
 		TranslatableComponent translatable = (TranslatableComponent) displayName;
 		List<Component> args = new ArrayList<>(translatable.args());
-		Component quantity = Component.text(request.getQuantityOrDefault());
+		Component quantity = Component.text(request.getQuantity());
 		if (style == QuantityStyle.APPEND || style == QuantityStyle.APPEND_X) {
 			args.add(quantity);
 		} else if (style == QuantityStyle.PREPEND || style == QuantityStyle.PREPEND_X) {
@@ -145,7 +164,7 @@ public interface Command<P> {
 		}
 		translatable = translatable.args(args);
 
-		if ((style == QuantityStyle.APPEND_X || style == QuantityStyle.PREPEND_X) && request.getQuantityOrDefault() > 1) {
+		if ((style == QuantityStyle.APPEND_X || style == QuantityStyle.PREPEND_X) && request.getQuantity() > 1) {
 			String[] keyParts = translatable.key().split("\\.");
 			if (keyParts.length == 4 && keyParts[0].equals("cc") && keyParts[1].equals("effect") && keyParts[3].equals("name")) {
 				keyParts[2] += "_x";
@@ -155,6 +174,13 @@ public interface Command<P> {
 		}
 
 		return translatable;
+	}
+
+	@ApiStatus.Internal
+	@ApiStatus.OverrideOnly
+	default Component getDurationName(@NotNull Component displayName, @NotNull PublicEffectPayload request) {
+		Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+		return displayName.append(Component.text(" (" + duration.getSeconds() + "s)", Plugin.DIM_CMD_COLOR));
 	}
 
 	/**
@@ -175,212 +201,104 @@ public interface Command<P> {
 	 */
 	@NotNull
 	@CheckReturnValue
+	@Deprecated
 	default Executor getExecutor() {
+		/*
 		ExecuteUsing.Type executeUsing = Optional.ofNullable(getClass().getAnnotation(ExecuteUsing.class))
 			.map(ExecuteUsing::value)
 			.orElse(ExecuteUsing.Type.ASYNC);
 		Executor executor;
 		switch (executeUsing) {
+			case SYNC_GLOBAL:
+				executor = getPlugin().getSyncExecutor(); // TODO: getGlobalExecutor
+				break;
 			case ASYNC:
 			default:
 				executor = Runnable::run;
 				break;
-			case SYNC_GLOBAL:
-				executor = getPlugin().getSyncExecutor(); // TODO: getGlobalExecutor
-				break;
 		}
 		return executor;
+		 */
+		return Runnable::run;
 	}
 
-	/**
-	 * {@link #execute Executes} this command and notifies its targets (if
-	 * {@link Plugin#announceEffects() enabled}).
-	 *
-	 * @param request request that prompted the execution of this command
-	 */
-	default void executeAndNotify(@NotNull Request request) {
-		getExecutor().execute(() -> wrappedExecuteAndNotify(request));
-	}
-
-	@ApiStatus.Internal
-	default void wrappedExecuteAndNotify(@NotNull Request request) {
-		if (request.getType() == null || !request.getType().isEffectType()) return;
-
+	@Override
+	default void onTrigger(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		Plugin<P, ?> plugin = getPlugin();
+
 		plugin.getSLF4JLogger().debug("Executing {} from {}", getDisplayName(), request);
-		List<P> players = plugin.getPlayers(request);
+		Function<Boolean, List<P>> playerSupplier = (_force) -> {
+			boolean force = _force;
 
-		// remove players on older version of the mod
-		SemVer minVersion = getMinimumModVersion();
-		if (minVersion.isGreaterThan(SemVer.ZERO))
-			players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minVersion));
-
-		// remove players missing extra features
-		Set<ExtraFeature> extraFeatures = requiredExtraFeatures();
-		if (!extraFeatures.isEmpty())
-			players.removeIf(player -> extraFeatures.stream().anyMatch(feature -> !plugin.getExtraFeatures(player).contains(feature)));
-
-		// ensure targets are online / available
-		if (players.isEmpty()) {
-			request.buildResponse()
-				.type(ResultType.FAILURE)
-				.message("No available players online")
-				.send();
-			return;
-		}
-
-		// disallow execution of global commands | TODO: is this even a valid codepath?
-		if (isGlobal()) {
-			if (!plugin.globalEffectsUsable()) {
-				request.buildResponse()
-					.type(ResultType.FAILURE)
-					.message("Global effects are disabled")
-					.send();
-				return;
-			} else if (!isGlobalCommandUsable(players, request)) {
-				request.buildResponse()
-					.type(ResultType.FAILURE)
-					.message("Global effects cannot be used on the targeted streamer")
-					.send();
-				return;
+			if (isExclusive() && isArrayActive(ccPlayer) && !force) {
+				throw new CCResponseException(new CCInstantEffectResponse(
+					request.getRequestId(),
+					ResponseStatus.FAIL_TEMPORARY,
+					"Conflicting effects were already active"
+				));
 			}
-		}
 
-		// create shuffled copy of players so that the recipients of limited effects are random
-		List<P> shuffledPlayers = new ArrayList<>(players);
-		Collections.shuffle(shuffledPlayers);
+			if (getPlugin().isPaused() && !force) {
+				throw new CCResponseException(new CCInstantEffectResponse(
+					request.getRequestId(),
+					ResponseStatus.FAIL_TEMPORARY,
+					"Cannot run effects whilst game is paused"
+				));
+			}
 
-		execute(shuffledPlayers, request).thenAcceptAsync(builder -> {
-			if (builder == null) return;
+			Stream<P> playerStream = plugin.getPlayerManager().getPlayers(request);
 
-			Response response = builder.build();
-			response.send();
+			// remove players on older version of the mod
+			SemVer minVersion = getMinimumModVersion();
+			if (minVersion.isGreaterThan(SemVer.ZERO))
+				playerStream = playerStream.filter(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isAtLeast(minVersion));
 
-			if (response.getResultType() == Response.ResultType.SUCCESS)
-				announce(plugin.playerMapper().asAudience(players), request);
-		}, plugin.getAsyncExecutor());
-	}
+			// remove players missing extra features
+			Set<ExtraFeature> extraFeatures = requiredExtraFeatures();
+			if (!extraFeatures.isEmpty())
+				playerStream = playerStream.filter(player -> extraFeatures.stream().allMatch(feature -> plugin.isFeatureAvailable(feature, player)));
 
-	/**
-	 * Determines if this global command is usable.
-	 *
-	 * @param players players being targeted by this command
-	 * @param request request that prompted the execution of this command
-	 * @return whether this global command is usable
-	 */
-	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
-	default boolean isGlobalCommandUsable(@Nullable List<P> players, @NotNull Request request) {
-		Plugin<P, ?> plugin = getPlugin();
-		if (plugin.isGlobal(request))
-			return true;
+			List<P> playerList = playerStream.collect(Collectors.toList());
 
-		Collection<String> hosts = plugin.getHosts();
-		if (hosts.isEmpty())
-			return false;
+			if (isGlobal() && playerList.stream().noneMatch(plugin::globalEffectsUsableFor) && !force) {
+				throw new CCResponseException(new CCInstantEffectResponse(
+					request.getRequestId(),
+					ResponseStatus.FAIL_PERMANENT,
+					"Global effects cannot be used on the targeted streamer"
+				));
+			}
 
-		for (Target target : request.getTargets()) {
-			if (target.getId() != null && hosts.contains(target.getId()))
-				return true;
-			if (target.getName() != null && hosts.contains(target.getName().toLowerCase(Locale.ENGLISH)))
-				return true;
-		}
+			// ensure targets are online / available
+			if (playerList.isEmpty() && !force) {
+				throw new CCResponseException(new CCInstantEffectResponse(
+					request.getRequestId(),
+					ResponseStatus.FAIL_TEMPORARY,
+					"No available players online"
+				));
+			}
 
-		if (players == null)
-			players = plugin.getPlayers(request);
+			// shuffle players so that the recipients of limited effects are random
+			Collections.shuffle(playerList);
 
-		for (P player : players) {
-			if (isHost(player))
-				return true;
-		}
+			return playerList;
+		};
 
-		return false;
-	}
+		plugin.trackEffect(
+			request.getRequestId(),
+			new TrackedEffect(
+				new DynamicForwardingAudience(() -> plugin.playerMapper().asAudience(playerSupplier.apply(true))),
+				request,
+				ccPlayer
+			)
+		);
 
-	/**
-	 * Whether the specified player is known to be a server host.
-	 *
-	 * @param player player to check
-	 * @return whether the player is a server host
-	 */
-	default boolean isHost(@NotNull P player) {
-		return getPlugin().isHost(player);
-	}
-
-	/**
-	 * Whether the specified player is not known to be a server host.
-	 *
-	 * @param player player to check
-	 * @return whether the player is not a server host
-	 */
-	default boolean isNotHost(@NotNull P player) {
-		return !isHost(player);
-	}
-
-	/**
-	 * Announces the {@link #execute(List, Request) execution} of this command.
-	 *
-	 * @param request request that prompted the execution of this command
-	 * @see #playerAnnounce(Collection, Request)
-	 * @see #announce(Collection, Request)
-	 * @see #announce(Audience, Request)
-	 * @deprecated usage of {@link #playerAnnounce(Collection, Request)} is preferred
-	 */
-	@Deprecated
-	default void announce(final @NotNull Request request) {
-		Plugin<P, ?> plugin = getPlugin();
-		if (!plugin.announceEffects()) return;
-		announce(plugin.playerMapper().asAudience(plugin.getPlayers(request)), request);
-	}
-
-	/**
-	 * Announces the {@link #execute(List, Request) execution} of this command.
-	 *
-	 * @param audiences collection of audiences to render the effect announcement to
-	 * @param request   request that prompted the execution of this command
-	 */
-	default void announce(final Collection<? extends Audience> audiences, final Request request) {
-		Plugin<?, ?> plugin = getPlugin();
-		if (!plugin.announceEffects()) return;
-		announce(Audience.audience(audiences), request);
-	}
-
-	/**
-	 * Announces the {@link #execute(List, Request) execution} of this command.
-	 *
-	 * @param players collection of players to render the effect announcement to
-	 * @param request request that prompted the execution of this command
-	 */
-	default void playerAnnounce(final Collection<P> players, final Request request) {
-		Plugin<P, ?> plugin = getPlugin();
-		if (!plugin.announceEffects()) return;
-		announce(plugin.playerMapper().asAudience(players), request);
-	}
-
-	/**
-	 * Announces the {@link #execute(List, Request) execution} of this command.
-	 *
-	 * @param audience audience to render the effect announcement to
-	 * @param request  request that prompted the execution of this command
-	 */
-	default void announce(final Audience audience, final Request request) {
-		Plugin<P, ?> plugin = getPlugin();
-
-		List<Audience> audiences = new ArrayList<>(3);
-		audiences.add(plugin.getConsole());
-		if (plugin.announceEffects()) {
-			audiences.add(plugin.playerMapper().asAudience(plugin.getPlayerManager().getSpectators()));
-			audiences.add(audience);
-		}
-
-		try {
-			Audience.audience(audiences).sendMessage(Component.translatable(
-					"cc.effect.used",
-					plugin.getViewerComponent(request, true).color(Plugin.USER_COLOR),
-					getProcessedDisplayName(request).colorIfAbsent(Plugin.CMD_COLOR)
-			));
-		} catch (Exception e) {
-			LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
-		}
+		getExecutor().execute(() -> {
+			try {
+				execute(() -> playerSupplier.apply(false), request, ccPlayer);
+			} catch (CCResponseException e) {
+				ccPlayer.sendResponse(e.getResponse());
+			}
+		});
 	}
 
 	/**
@@ -403,15 +321,6 @@ public interface Command<P> {
 	}
 
 	/**
-	 * Whether this command can only be applied to players with the mod installed locally.
-	 *
-	 * @return whether this effect is client-side
-	 */
-	default boolean isClientOnly() {
-		return getMinimumModVersion().isGreaterThan(SemVer.ZERO) || !requiredExtraFeatures().isEmpty();
-	}
-
-	/**
 	 * Whether this command can only be run when global effects are enabled
 	 * or the targeted players includes a server host.
 	 *
@@ -426,7 +335,7 @@ public interface Command<P> {
 	 *
 	 * @return whether this effect is selectable
 	 */
-	default TriState isSelectable() {
+	default TriState isSelectable(@NotNull IUserRecord user, @NotNull List<P> potentialPlayers) {
 		return TriState.UNKNOWN;
 	}
 
@@ -435,7 +344,42 @@ public interface Command<P> {
 	 *
 	 * @return whether this effect is visible
 	 */
-	default TriState isVisible() {
+	default TriState isVisible(@NotNull IUserRecord user, @NotNull List<P> potentialPlayers) {
 		return TriState.UNKNOWN;
+	}
+
+	default boolean isExclusive() {
+		return true;
+	}
+
+	/**
+	 * Determines if any effects with the provided IDs are active.
+	 *
+	 * @param player player to check
+	 * @param effectIDs effect IDs
+	 * @return if effect is active
+	 */
+	@ApiStatus.NonExtendable
+	default boolean isActive(@NotNull CCPlayer player, @NotNull String... effectIDs) {
+		CrowdControl cc = getPlugin().getCrowdControl();
+		if (cc == null) return false;
+		UUID uuid = player.getUuid();
+		return Arrays.stream(effectIDs)
+			.flatMap(effectID -> Stream.concat(Stream.of(effectID), getPlugin().commandRegister().getEffectsByGroup(effectID).stream()))
+			.anyMatch(effectID -> cc.isPlayerEffectActive(effectID, uuid));
+	}
+
+	default boolean isArrayActive(@NotNull CCPlayer player) {
+		return isActive(player, getEffectArray());
+	}
+
+	default List<String> getEffectGroups() {
+		return Collections.emptyList();
+	}
+
+	default String[] getEffectArray() {
+		List<String> list = new ArrayList<>(getEffectGroups());
+		list.add(getEffectName().toLowerCase(Locale.US));
+		return list.toArray(new String[0]);
 	}
 }

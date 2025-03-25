@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.common.command;
 
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.command.impl.AllCommand;
 import dev.qixils.crowdcontrol.common.command.impl.HalfHealthCommand;
 import dev.qixils.crowdcontrol.common.command.impl.HealthModifierCommand;
 import dev.qixils.crowdcontrol.common.command.impl.exp.ExpAddCommand;
@@ -23,8 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 
 /**
  * Manages the registry of commands (aka effects).
@@ -37,44 +37,11 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	protected final @NotNull Set<Class<? extends Command<PLAYER>>> registeredCommandClasses = new HashSet<>();
 	protected final @NotNull Map<Class<? extends Command<PLAYER>>, Command<PLAYER>> singleCommandInstances = new HashMap<>();
 	protected final @NotNull Map<@Nullable String, Command<PLAYER>> registeredCommandMap = new HashMap<>();
+	protected final @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> effectGroupMap = new HashMap<>();
 	protected @MonotonicNonNull List<Command<PLAYER>> registeredCommands;
 
 	protected AbstractCommandRegister(@NotNull PLUGIN plugin) {
 		this.plugin = plugin;
-	}
-
-	@Nullable
-	protected final <T> T init(@NotNull Supplier<T> supplier, @Nullable Consumer<Exception> onError) {
-		try {
-			return supplier.get();
-		} catch (Exception e) {
-			if (onError != null) {
-				try {
-					onError.accept(e);
-				} catch (Exception e2) {
-					plugin.getSLF4JLogger().error("Failed to initialize {}...", supplier.getClass().getName(), e);
-					plugin.getSLF4JLogger().error("...and failed to call onError", e2);
-				}
-			} else {
-				plugin.getSLF4JLogger().error("Failed to initialize {}", supplier.getClass().getName(), e);
-			}
-			return null;
-		}
-	}
-
-	@Nullable
-	protected final <T> T init(@NotNull Supplier<T> supplier) {
-		return init(supplier, null);
-	}
-
-	protected final <T> void initTo(@NotNull Collection<T> collection, @NotNull Supplier<? extends T> supplier, @Nullable Consumer<Exception> onError) {
-		T t = init(supplier, onError);
-		if (t != null)
-			collection.add(t);
-	}
-
-	protected final <T> void initTo(@NotNull Collection<T> collection, @NotNull Supplier<? extends T> supplier) {
-		initTo(collection, supplier, null);
 	}
 
 	@SafeVarargs
@@ -89,7 +56,6 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 
 	protected void createCommands(List<Command<PLAYER>> commands) {
 		commands.addAll(this.<Command<PLAYER>>initAll(
-			() -> new AllCommand<>(plugin),
 			() -> new HalfHealthCommand<>(plugin),
 			() -> new MaxHealthSubCommand<>(plugin),
 			() -> new MaxHealthAddCommand<>(plugin),
@@ -119,9 +85,11 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		List<Command<PLAYER>> commands = new ArrayList<>();
 		createCommands(commands);
 		for (Command<PLAYER> command : commands) {
-			String effectName = command.getEffectName();
-			if (effectName != null) effectName = effectName.toLowerCase(Locale.ENGLISH);
+			String effectName = command.getEffectName().toLowerCase(Locale.ENGLISH);
 			registeredCommandMap.put(effectName, command);
+
+			for (String effectGroup : command.getEffectGroups())
+				effectGroupMap.computeIfAbsent(effectGroup, $ -> new ArrayList<>()).add(effectName);
 
 			//noinspection unchecked
 			Class<Command<PLAYER>> clazz = (Class<Command<PLAYER>>) command.getClass();
@@ -152,8 +120,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 	public final void register() {
 		boolean firstRegistry = registeredCommands == null;
 		for (Command<PLAYER> command : getCommands()) {
-			String name = command.getEffectName();
-			if (name != null) name = name.toLowerCase(Locale.ENGLISH);
+			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
 			plugin.registerCommand(name, command);
 
 			if (firstRegistry && command.isEventListener()) {
@@ -218,5 +185,9 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 				+ ", not " + command.getClass().getSimpleName());
 		//noinspection unchecked
 		return (T) command;
+	}
+
+	public final List<String> getEffectsByGroup(@NotNull String effectGroup) {
+		return Collections.unmodifiableList(effectGroupMap.getOrDefault(effectGroup, Collections.emptyList()));
 	}
 }

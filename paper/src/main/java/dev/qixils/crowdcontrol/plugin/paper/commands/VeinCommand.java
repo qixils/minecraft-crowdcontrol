@@ -5,8 +5,11 @@ import dev.qixils.crowdcontrol.common.util.Weighted;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.plugin.paper.utils.BlockUtil.BlockFinder;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -60,14 +63,12 @@ public class VeinCommand extends RegionalCommandSync {
 	}
 
 	@Override
-	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(Response.ResultType.RETRY)
-			.message("Could not find any blocks to replace");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find any blocks to replace");
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		BlockFinder finder = BlockFinder.builder()
 			.origin(player.getLocation())
 			.maxRadius(VEIN_RADIUS)

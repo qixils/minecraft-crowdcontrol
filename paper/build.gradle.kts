@@ -1,6 +1,6 @@
 import xyz.jpenilla.runpaper.task.RunServer
 
-val cloudVersion: String by project
+val cloudPaperVersion: String by project
 val minecraftVersion: String by project
 val paperlibVersion: String by project
 
@@ -13,41 +13,20 @@ plugins {
     //id("io.papermc.paperweight.userdev")
 }
 
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
-}
-
 dependencies {
     implementation(project(":base-common"))
-    implementation("com.github.qixils.cloud:cloud-paper:$cloudVersion")
+    implementation("org.incendo:cloud-paper:$cloudPaperVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
 
     //paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
     compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
-// Java 17 boilerplate
-
-val targetJavaVersion = 21
-tasks.withType<JavaCompile>().configureEach {
-    options.release.set(targetJavaVersion)
-}
-
-java {
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-    }
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-//    withSourcesJar()
-}
-
 // plugin.yml generation
 paper {
     name = "CrowdControl"
     version = project.version.toString() + "+paper"
-    main = "dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin"
+    main = "dev.qixils.crowdcontrol.plugin.paper.PaperLoader"
     apiVersion = minecraftVersion
     prefix = "CrowdControl"
     authors = listOf("qixils")
@@ -64,10 +43,10 @@ tasks {
         configure(minecraftVersion)
     }
     runPaper.folia.registerTask {
-        configure("1.20.6")
+        configure(minecraftVersion)
     }
     // create extra runServer tasks for later versions of Minecraft
-    for (mcVersion in listOf<String>("1.21.1")) {
+    for (mcVersion in listOf<String>("1.21.4")) {
         register("runServer$mcVersion", RunServer::class.java) {
             configure(mcVersion)
             dependsOn("shadowJar")

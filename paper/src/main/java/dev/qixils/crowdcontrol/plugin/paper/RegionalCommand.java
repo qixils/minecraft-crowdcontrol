@@ -1,8 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.util.CompletableFutureUtils;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,24 +16,25 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import static net.kyori.adventure.text.Component.text;
 
-public abstract class RegionalCommand extends Command {
+public abstract class RegionalCommand extends PaperCommand {
 	protected RegionalCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
 
-	protected Response.@Nullable Builder precheck(@NotNull List<@NotNull Player> players, @NotNull Request request) {
+	protected @Nullable CCEffectResponse precheck(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		return null;
 	}
 
-	protected abstract CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull Request request);
+	protected abstract CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer);
 
-	protected abstract Response.@NotNull Builder buildFailure(@NotNull Request request);
+	protected abstract @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer);
 
-	private CompletableFuture<Boolean> executeSafely(@NotNull Player player, @NotNull Request request) {
-		return executeRegionallyAsync(player, request).handle((success, error) -> {
+	private CompletableFuture<Boolean> executeSafely(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return executeRegionallyAsync(player, request, ccPlayer).handle((success, error) -> {
 			if (success) return true;
 			if (error != null) getPlugin().getSLF4JLogger().error(text("Failed to execute ").append(getDisplayName()), error);
 			return false;
@@ -41,35 +46,38 @@ public abstract class RegionalCommand extends Command {
 	}
 
 	@Override
-	public @NotNull CompletableFuture<Response.@Nullable Builder> execute(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		Response.Builder precheck = precheck(players, request);
-		if (precheck != null) return CompletableFuture.completedFuture(precheck);
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<Player> players = playerSupplier.get();
+			CCEffectResponse precheck = precheck(players, request, ccPlayer);
+			if (precheck != null) return precheck;
 
-		int playerLimit = getPlayerLimit();
-		if (playerLimit > 0) {
-			boolean hostsBypass = plugin.getLimitConfig().hostsBypass();
-			AtomicInteger victims = new AtomicInteger();
-			players = players.stream()
-				.sorted(Comparator.comparing(this::isHost))
-				.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && isHost(player)))
-				.toList();
-		}
-
-		List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-		for (Player player : players) {
-			CompletableFuture<Boolean> future = new CompletableFuture<>();
-			futures.add(future);
-			player.getScheduler().run(plugin, $ -> executeSafely(player, request).thenApply(future::complete), () -> future.complete(false));
-		}
-
-		return CompletableFutureUtils.allOf(futures).handleAsync(($1, $2) -> {
-			for (CompletableFuture<Boolean> future : futures) {
-				try {
-					if (future.get())
-						return request.buildResponse().type(Response.ResultType.SUCCESS);
-				} catch (Exception ignored) {}
+			int playerLimit = getPlayerLimit();
+			if (playerLimit > 0) {
+				boolean hostsBypass = plugin.getLimitConfig().hostsBypass();
+				AtomicInteger victims = new AtomicInteger();
+				players = players.stream()
+					.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
+					.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
+					.toList();
 			}
-			return buildFailure(request);
-		});
+
+			List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+			for (Player player : players) {
+				CompletableFuture<Boolean> future = new CompletableFuture<>();
+				futures.add(future);
+				player.getScheduler().run(plugin.getPaperPlugin(), $ -> executeSafely(player, request, ccPlayer).thenApply(future::complete), () -> future.complete(false));
+			}
+
+			return CompletableFutureUtils.allOf(futures).handleAsync(($1, $2) -> {
+				for (CompletableFuture<Boolean> future : futures) {
+					try {
+						if (future.get())
+							return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+					} catch (Exception ignored) {}
+				}
+				return buildFailure(request, ccPlayer);
+			}).join();
+		}));
 	}
 }

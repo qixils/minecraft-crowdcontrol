@@ -38,17 +38,27 @@ useSeoMeta({
           <li>(Optional) Pre-generating chunks using a plugin like <a :href="`https://modrinth.com/plugin/chunky/versions?g=${version.id}&l=paper`">Chunky</a> is recommended for optimal performance.</li>
         </ul>
       </li>
-      <li>
-        <PortInstructions :localLink="`/guide/paper/server/local?v=${version.id}`" />
-      </li>
+      <PortInstructions v-if="version.legacy" :localLink="`/guide/paper/server/local?v=${version.id}`" />
       <li>Run the Minecraft server.</li>
       <li>(Optional) To edit the plugin's config file, you must first shut down the server using <code>/stop</code>. The config file can be found at <code>&lt;root&gt;/plugins/CrowdControl/config.yml</code>.</li>
     </ol>
 
-    <p>Users may now connect using the <NuxtLink :to="`/guide/paper/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide the server's IP address and the password used in the config file (default: <code>crowdcontrol</code>) to your streamers.</p>
+    <p>
+      Users may now connect using the <NuxtLink :to="`/guide/paper/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide.
+      Make sure to provide the server's IP address
+      <template v-if="version.legacy">and the password used in the config file (default: <code>crowdcontrol</code>)</template>
+      to your streamers.
+    </p>
 
-    <p>For extra security, consider enabling a user whitelist using the vanilla <code>/whitelist</code> command. This prevents unknown players from joining the server and potentially griefing your builds.</p>
+    <p>
+      For extra security, consider enabling a user whitelist using the vanilla <code>/whitelist</code> command.
+      This prevents unknown players from joining the server and potentially griefing your builds.
+      Additionally, you can use permissions mods such as LuckPerms to restrict the <code>crowdcontrol.use</code> permission to trusted users.
+    </p>
 
-    <p>You may also be interested in setting up <a href="https://geysermc.org/">GeyserMC</a> to allow Bedrock edition users (i.e. console players) to play.</p>
+    <p>
+      You may also be interested in setting up <a href="https://geysermc.org/">GeyserMC</a>
+      to allow Bedrock edition users (i.e. console players) to play.
+    </p>
   </div>
 </template>

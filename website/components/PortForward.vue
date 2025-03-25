@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   defineProps<{
-    optional?: boolean
+    optional?: boolean,
+    legacy?: boolean,
   }>()
 </script>
 
@@ -12,7 +13,7 @@
     Please consult Google if you need assistance on this step as we are not able to help with the specific process.
     <ul>
       <li>Open the port <strong>25565</strong> to allow players to join the Minecraft server.</li>
-      <li>Open the port <strong>58431</strong> to allow players to connect their Crowd Control app to the server.</li>
+      <li v-if="legacy">Open the port <strong>58431</strong> to allow players to connect their Crowd Control app to the server.</li>
     </ul>
   </li>
 </template>

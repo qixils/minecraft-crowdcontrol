@@ -1,11 +1,17 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.CrowdControl;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -19,18 +25,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
-public class FreezeCommand extends TimedVoidCommand {
+public class FreezeCommand extends PaperCommand implements CCTimedEffect {
 	public static final Map<UUID, List<FreezeData>> DATA = new HashMap<>();
-	private static final Map<UUID, TimedEffect> TIMED_EFFECTS = new HashMap<>();
+	private static final Map<UUID, Map<UUID, FreezeData>> TIMED_EFFECTS = new HashMap<>();
 
 	private final String effectName;
 	private final String effectGroup;
+	private final List<String> effectGroups;
 	private final LocationModifier modifier;
 	private final MovementStatusType freezeType;
 	private final MovementStatusValue freezeValue;
@@ -39,6 +47,7 @@ public class FreezeCommand extends TimedVoidCommand {
 		super(plugin);
 		this.effectName = effectName;
 		this.effectGroup = effectGroup;
+		this.effectGroups = Collections.singletonList(effectGroup);
 		this.modifier = modifier;
 		this.freezeType = freezeType;
 		this.freezeValue = freezeValue;
@@ -61,36 +70,35 @@ public class FreezeCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		AtomicReference<Map<UUID, FreezeData>> atomic = new AtomicReference<>();
-		new TimedEffect.Builder()
-			.request(request)
-			.effectGroup(effectGroup)
-			.duration(getDuration(request))
-			.startCallback(timedEffect -> {
-				List<Player> players = getPlugin().getPlayers(request);
-				Map<UUID, FreezeData> locations = new HashMap<>();
-				players.forEach(player -> {
-					UUID uuid = player.getUniqueId();
-					TIMED_EFFECTS.put(uuid, timedEffect);
-					FreezeData data = new FreezeData(modifier, player.getLocation());
-					locations.put(uuid, data);
-					DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data);
-					MovementStatusCommand.setValue(plugin, player, freezeType, freezeValue);
-				});
-				atomic.set(locations);
-				playerAnnounce(players, request);
-				return null;
-			})
-			.completionCallback($ -> atomic.get().forEach((uuid, data) -> {
-				TIMED_EFFECTS.remove(uuid);
-				DATA.get(uuid).remove(data);
-				Player player = Bukkit.getPlayer(uuid);
-				if (player == null)
-					return;
-				MovementStatusCommand.setValue(plugin, player, freezeType, MovementStatusValue.ALLOWED);
-			}))
-			.build().queue();
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray()))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
+			List<Player> players = playerSupplier.get();
+			Map<UUID, FreezeData> locations = new HashMap<>();
+			players.forEach(player -> {
+				UUID uuid = player.getUniqueId();
+				FreezeData data = new FreezeData(modifier, player.getLocation());
+				locations.put(uuid, data);
+				DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data);
+				MovementStatusCommand.setValue(plugin, player, freezeType, freezeValue);
+			});
+			TIMED_EFFECTS.put(request.getRequestId(), locations);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
+	}
+
+	@Override
+	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		Map<UUID, FreezeData> locations = TIMED_EFFECTS.remove(request.getRequestId());
+		if (locations == null) return;
+		locations.forEach((uuid, data) -> {
+			DATA.get(uuid).remove(data);
+			Player player = Bukkit.getPlayer(uuid);
+			if (player == null)
+				return;
+			MovementStatusCommand.setValue(plugin, player, freezeType, MovementStatusValue.ALLOWED);
+		});
 	}
 
 	@FunctionalInterface
@@ -143,12 +151,12 @@ public class FreezeCommand extends TimedVoidCommand {
 		public Manager(PaperCrowdControlPlugin plugin) {
 			this.plugin = plugin;
 
-			Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, $ -> {
+			Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin.getPaperPlugin(), $ -> {
 				for (Map.Entry<UUID, List<FreezeData>> entry : DATA.entrySet()) {
 					UUID uuid = entry.getKey();
 					Player player = Bukkit.getPlayer(uuid);
 					if (player == null) continue;
-					player.getScheduler().run(plugin, $$ -> {
+					player.getScheduler().run(plugin.getPaperPlugin(), $$ -> {
 						Location cur = player.getLocation();
 						Location dest = cur.clone();
 						for (FreezeData data : entry.getValue())
@@ -166,15 +174,15 @@ public class FreezeCommand extends TimedVoidCommand {
 
 		@EventHandler
 		public void onDeath(PlayerDeathEvent death) {
-			UUID uuid = death.getEntity().getUniqueId();
-			TimedEffect effect = TIMED_EFFECTS.get(uuid);
-			if (effect == null) return;
+			CrowdControl cc = plugin.getCrowdControl();
+			if (cc == null) return;
 
-			try {
-				effect.complete();
-			} catch (Exception e) {
-				plugin.getSLF4JLogger().warn("Failed to stop freeze effect", e);
-			}
+			UUID uuid = death.getPlayer().getUniqueId();
+			Set<UUID> requestIds = TIMED_EFFECTS.entrySet().stream()
+				.filter(entry -> entry.getValue().containsKey(uuid))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toSet());
+			requestIds.forEach(cc::cancelByRequestId);
 		}
 
 		@EventHandler

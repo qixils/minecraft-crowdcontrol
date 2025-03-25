@@ -67,6 +67,10 @@ const questionEnvironment = pushQuestion({
       slug: 'remote',
       title: 'Remote Multiplayer',
     },
+    {
+      slug: 'realms',
+      title: 'Realms',
+    },
   ]),
 })
 const questionModloader = pushQuestion({
@@ -82,7 +86,7 @@ const questionVersion = pushQuestion({
   subtext: "Any version not listed is unsupported.",
   answers: computed(() => {
     const vals = (questionModloader.answer.value && versions.modloadersBySlug[questionModloader.answer.value]?.versions) || versions.allVersions
-    return vals.map((version, index) => ({ slug: version.id, title: !index ? `${version.id} (Latest)` : version.id }))
+    return vals.map((version, index) => ({ slug: version.id, title: !index ? `${version.id} (Newest)` : version.id }))
   }),
 })
 const questionExperience = pushQuestion({
@@ -116,12 +120,13 @@ const guide = computed(() => { // TODO: lazy?
   const loaderVersion = modloadersBySlug[loader] && modloadersBySlug[loader].versions.find(v => v.id === versionId)
   const isLatest = !!loaderVersion?.latest
   const isSupported = !!loaderVersion?.supported
+  const isLegacy = !!loaderVersion?.legacy
 
   const page = experienced
     ? 'client'
     : env === 'remote'
       ? 'server/remote'
-      : env === 'local' || !isLatest || !isSupported
+      : env === 'local' || !isLatest || !isSupported || isLegacy
         ? 'server/local'
         : 'automatic'
 
@@ -140,7 +145,16 @@ const guide = computed(() => { // TODO: lazy?
       <NuxtLink to="/">read this first</NuxtLink>.
     </p>
     <hr>
-    <div v-if="question">
+    <div v-if="questionEnvironment.answer.value === 'realms'">
+      Unfortunately, Minecraft Realms does not support mods, so it is incompatible for use with Minecraft Crowd Control.
+      To play with others, you must setup a local or remote server.
+      <div class="buttons">
+        <button @click="questionEnvironment.answer.value = ''">
+          Go Back
+        </button>
+      </div>
+    </div>
+    <div v-else-if="question">
       <p>
         {{ question.title }}
         <span v-if="question.subtext" class="subtext">{{ question.subtext }}</span>

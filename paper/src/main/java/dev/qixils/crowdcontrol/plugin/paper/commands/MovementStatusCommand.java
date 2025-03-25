@@ -1,16 +1,20 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
-import dev.qixils.crowdcontrol.TimedEffect;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.packets.MovementStatusPacketS2C;
 import dev.qixils.crowdcontrol.common.util.ComparableUtil;
 import dev.qixils.crowdcontrol.common.util.SemVer;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedVoidCommand;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -19,21 +23,25 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DISABLE_JUMPING_DURATION;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.INVERT_CONTROLS_DURATION;
+import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.toPlayers;
 
 @Getter
-public class MovementStatusCommand extends TimedVoidCommand {
+public class MovementStatusCommand extends PaperCommand implements CCTimedEffect {
+	private final Map<UUID, List<UUID>> idMap = new HashMap<>();
 	private final String effectName;
 	private final String effectGroup;
 	private final Duration defaultDuration;
 	private final MovementStatusType type;
 	private final MovementStatusValue value;
-	private final boolean clientOnly;
-	private final SemVer minimumModVersion;
+    private final SemVer minimumModVersion;
 
 	public MovementStatusCommand(PaperCrowdControlPlugin plugin, String effectName, String effectGroup, Duration defaultDuration, MovementStatusType type, MovementStatusValue value, boolean clientOnly) {
 		super(plugin);
@@ -42,7 +50,6 @@ public class MovementStatusCommand extends TimedVoidCommand {
 		this.defaultDuration = defaultDuration;
 		this.type = type;
 		this.value = value;
-		this.clientOnly = clientOnly;
 		if (clientOnly)
 			this.minimumModVersion = ComparableUtil.max(type.addedIn(), value.addedIn());
 		else
@@ -86,34 +93,29 @@ public class MovementStatusCommand extends TimedVoidCommand {
 	}
 
 	@Override
-	public void voidExecute(@NotNull List<@NotNull Player> ignored, @NotNull Request request) {
-		AtomicReference<List<Player>> atomicPlayers = new AtomicReference<>();
-		new TimedEffect.Builder()
-			.request(request)
-			.effectGroup(effectGroup)
-			.duration(getDuration(request))
-			.startCallback($ -> {
-				List<Player> players = plugin.getPlayers(request);
-				if (clientOnly)
-					players.removeIf(player -> plugin.getModVersion(player).orElse(SemVer.ZERO).isLessThan(minimumModVersion));
-				atomicPlayers.set(players);
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray()))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Unable to stack movement statuses");
 
-				if (players.isEmpty())
-					return request.buildResponse()
-						.type(Response.ResultType.FAILURE)
-						.message("No targetable players online");
+			List<Player> players = playerSupplier.get();
 
-				for (Player player : players)
-					setValue(plugin, player, type, value);
-				playerAnnounce(players, request);
+			if (players.isEmpty())
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No targetable players online");
 
-				return null; // success
-			})
-			.completionCallback($ -> {
-				for (Player player : atomicPlayers.get())
-					setValue(plugin, player, type, MovementStatusValue.ALLOWED);
-			})
-			.build().queue();
+			idMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
+
+			for (Player player : players)
+				setValue(plugin, player, type, value);
+
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
+	}
+
+	@Override
+	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		for (Player player : toPlayers(idMap.remove(request.getRequestId())))
+			setValue(plugin, player, type, MovementStatusValue.ALLOWED);
 	}
 
 	public static MovementStatusCommand disableJumping(PaperCrowdControlPlugin plugin) {

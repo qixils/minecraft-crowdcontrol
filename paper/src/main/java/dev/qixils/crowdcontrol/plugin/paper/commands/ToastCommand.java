@@ -3,8 +3,11 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -58,14 +61,12 @@ public class ToastCommand extends RegionalCommandSync implements Listener {
 	}
 
 	@Override
-	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(Response.ResultType.RETRY)
-			.message("Unable to open window");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Unable to open window");
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		player.playSound(Sounds.ANNOYING.get(), player);
 		Collection<NamespacedKey> recipes = player.getDiscoveredRecipes();
 		player.undiscoverRecipes(recipes);
@@ -80,7 +81,7 @@ public class ToastCommand extends RegionalCommandSync implements Listener {
 		// future ensures the task doesn't get cancelled before the inventory is opened
 		CompletableFuture<Void> hasStarted = new CompletableFuture<>();
 
-		Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> {
+		Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin.getPaperPlugin(), task -> {
 			if (!hasStarted.complete(null) && inv.getViewers().isEmpty()) {
 				task.cancel();
 				openInventories.remove(player.getUniqueId(), inv);

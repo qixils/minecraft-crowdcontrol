@@ -2,9 +2,12 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommand;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response.Builder;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -25,7 +28,10 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.completedStage;
 
+@Getter
 abstract class NearbyLocationCommand<S> extends RegionalCommand {
+	private final List<String> effectGroups = List.of("walk", "look");
+
 	protected NearbyLocationCommand(PaperCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -90,12 +96,19 @@ abstract class NearbyLocationCommand<S> extends RegionalCommand {
 	}
 
 	@Override
-	protected @NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse().type(ResultType.FAILURE).message("Could not find a location to teleport to");
+	protected @Nullable CCEffectResponse precheck(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		if (isArrayActive(ccPlayer))
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot teleport while frozen");
+		return null;
 	}
 
 	@Override
-	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull Request request) {
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find a location to teleport to");
+	}
+
+	@Override
+	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		World world = player.getWorld();
 		Location location = player.getLocation();
 		S currentType = currentType(location);
@@ -115,7 +128,7 @@ abstract class NearbyLocationCommand<S> extends RegionalCommand {
 					return completedStage(false);
 
 				return CompletableFuture
-					.supplyAsync(() -> safeLocation(search), runnable -> Bukkit.getRegionScheduler().run(plugin, search, $ -> runnable.run()))
+					.supplyAsync(() -> safeLocation(search), runnable -> Bukkit.getRegionScheduler().run(plugin.getPaperPlugin(), search, $ -> runnable.run()))
 					.thenCompose(destination -> {
 						if (destination == null)
 							return completedStage(false);

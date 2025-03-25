@@ -4,10 +4,15 @@ import dev.qixils.crowdcontrol.common.packets.SetLanguagePacketS2C;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.paper.PaperCommand;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.paper.TimedImmediateCommand;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.CCTimedEffect;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.bukkit.entity.Player;
@@ -16,9 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Getter
-public class LanguageCommand extends TimedImmediateCommand {
+public class LanguageCommand extends PaperCommand implements CCTimedEffect {
 	private static final @NotNull Set<UUID> ACTIVE = new HashSet<>();
 	private final @NotNull String effectName = "language_random";
 	private final @NotNull Duration defaultDuration = Duration.ofSeconds(30);
@@ -30,30 +36,35 @@ public class LanguageCommand extends TimedImmediateCommand {
 		super(plugin);
 	}
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		players.removeIf(player -> ACTIVE.contains(player.getUniqueId()));
-		if (players.isEmpty())
-			return request.buildResponse().type(Response.ResultType.RETRY).message("All players already have an active language effect");
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			if (isActive(ccPlayer, getEffectArray()))
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
 
-		// create byte buf
-		Duration duration = getDuration(request);
-		SetLanguagePacketS2C packet = new SetLanguagePacketS2C(LanguageState.RANDOM, duration);
+			List<Player> players = playerSupplier.get();
+			players.removeIf(player -> ACTIVE.contains(player.getUniqueId()));
+			if (players.isEmpty())
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "All players already have an active language effect");
 
-		// send packet
-		for (Player player : players) {
-			ACTIVE.add(player.getUniqueId());
-			plugin.getPluginChannel().sendMessage(player, packet);
-		}
+			// create byte buf
+			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			SetLanguagePacketS2C packet = new SetLanguagePacketS2C(LanguageState.RANDOM, duration);
 
-		// schedule removal
-		plugin.getScheduledExecutor().schedule(
-			() -> players.forEach(player -> ACTIVE.remove(player.getUniqueId())),
-			duration.toMillis(),
-			TimeUnit.MILLISECONDS
-		);
+			// send packet
+			for (Player player : players) {
+				ACTIVE.add(player.getUniqueId());
+				plugin.getPluginChannel().sendMessage(player, packet);
+			}
 
-		return request.buildResponse().type(Response.ResultType.SUCCESS).timeRemaining(duration);
+			// schedule removal
+			plugin.getScheduledExecutor().schedule(
+				() -> players.forEach(player -> ACTIVE.remove(player.getUniqueId())),
+				duration.toMillis(),
+				TimeUnit.MILLISECONDS
+			);
+
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, duration.toMillis());
+		}));
 	}
 }

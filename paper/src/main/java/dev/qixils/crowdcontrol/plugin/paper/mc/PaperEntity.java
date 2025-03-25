@@ -27,7 +27,7 @@ public class PaperEntity implements CCEntity {
 
 	@Override
 	public void execute(@NotNull Runnable runnable, @Nullable Runnable onCancel) {
-		entity().getScheduler().run(plugin, $ -> runnable.run(), onCancel);
+		entity().getScheduler().run(plugin.getPaperPlugin(), $ -> runnable.run(), onCancel);
 	}
 
 	@Override

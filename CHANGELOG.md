@@ -2,12 +2,15 @@
 
 A list of all changes made to the software in reverse chronological order.
 
-## 3.6.3
+## 4.0.0
 
+- Redesigned the mod to directly authenticate to Crowd Control and manage your session without needing the app or opened ports
+- Added support for [NeoForge](https://neoforged.net/)
 - Added _Curse of Vanishing_ enchantment to the item given by the _Water Bucket Clutch_ effect
 - Disabled ability to spawn or kill dragons in The End (to mitigate fight corruption issues)
-- Fixed the global effects warning message displaying to non-administrators
 - Fixed various mod incompatibility issues
+- Paper: Implemented workaround for issues with LuckPerms
+- Paper: Fixed *Eat Chorus Fruit* teleporting you into blocks
 
 ## 3.6.2
 

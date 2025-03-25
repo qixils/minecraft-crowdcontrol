@@ -5,10 +5,13 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.sound.Sound;
@@ -53,14 +56,14 @@ public class LootboxCommand extends RegionalCommandSync {
 					|| material == Material.GOLD_BLOCK
 	).collect(Collectors.toUnmodifiableSet());
 	private static final List<Attribute> ATTRIBUTES = Arrays.asList(
-			Attribute.GENERIC_MAX_HEALTH,
-			Attribute.GENERIC_KNOCKBACK_RESISTANCE,
-			Attribute.GENERIC_MOVEMENT_SPEED,
-			Attribute.GENERIC_ATTACK_DAMAGE,
-			Attribute.GENERIC_ARMOR,
-			Attribute.GENERIC_ARMOR_TOUGHNESS,
-			Attribute.GENERIC_ATTACK_KNOCKBACK,
-			Attribute.GENERIC_ATTACK_SPEED
+			Attribute.MAX_HEALTH,
+			Attribute.KNOCKBACK_RESISTANCE,
+			Attribute.MOVEMENT_SPEED,
+			Attribute.ATTACK_DAMAGE,
+			Attribute.ARMOR,
+			Attribute.ARMOR_TOUGHNESS,
+			Attribute.ATTACK_KNOCKBACK,
+			Attribute.ATTACK_SPEED
 	);
 	private static final Map<UUID, Inventory> OPEN_LOOTBOXES = new HashMap<>();
 	private final String effectName;
@@ -233,14 +236,12 @@ public class LootboxCommand extends RegionalCommandSync {
 	}
 
 	@Override
-	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(Response.ResultType.RETRY)
-			.message("Player already has a lootbox open");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Player already has a lootbox open");
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		if (isLootboxOpen(player.getUniqueId()))
 			return false;
 
@@ -287,7 +288,7 @@ public class LootboxCommand extends RegionalCommandSync {
 				return;
 
 			Inventory lootbox = OPEN_LOOTBOXES.get(uuid);
-			player.getScheduler().run(plugin, $ -> player.openInventory(lootbox), null);
+			player.getScheduler().run(plugin.getPaperPlugin(), $ -> player.openInventory(lootbox), null);
 		}
 	}
 }

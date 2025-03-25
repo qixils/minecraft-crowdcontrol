@@ -7,24 +7,25 @@ pluginManagement {
             url = uri("https://maven.fabricmc.net/")
         }
         maven {
-            name = "Sponge Snapshots"
-            url = uri("https://repo.spongepowered.org/repository/maven-public/")
+            name = "Architectury"
+            url = uri("https://maven.architectury.dev/")
+        }
+        maven {
+            name = "Forge"
+            url =  uri("https://files.minecraftforge.net/maven/")
         }
         gradlePluginPortal()
     }
 }
 
-// TODO reduce code repetition using a function
-include(":base-common")
+fun incl(asPath: String, fromPath: String) {
+    include(asPath)
+    project(asPath).projectDir = file(fromPath)
+}
+
+incl(":base-common", "common")
 include(":configurate-common")
-include(":sponge7-platform")
-include(":sponge8-platform")
-include(":sponge11-platform")
-include(":paper-platform")
-include(":fabric-platform")
-project(":base-common").projectDir = file("common")
-project(":sponge7-platform").projectDir = file("sponge-7")
-project(":sponge8-platform").projectDir = file("sponge-8")
-project(":sponge11-platform").projectDir = file("sponge-11")
-project(":paper-platform").projectDir = file("paper")
-project(":fabric-platform").projectDir = file("fabric")
+incl(":paper-platform", "paper")
+incl(":mojmap-common", "mojmap")
+incl(":fabric-platform", "fabric")
+incl(":neoforge-platform", "neoforge")

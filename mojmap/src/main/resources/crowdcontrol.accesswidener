@@ -1,0 +1,9 @@
+accessWidener v2 named
+accessible method net/minecraft/world/entity/animal/Wolf setCollarColor (Lnet/minecraft/world/item/DyeColor;)V
+accessible method net/minecraft/client/renderer/GameRenderer setPostEffect (Lnet/minecraft/resources/ResourceLocation;)V
+accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageMax I
+accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePerDistance F
+accessible field net/minecraft/world/entity/monster/Creeper DATA_IS_POWERED Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible field net/minecraft/world/entity/player/Inventory compartments Ljava/util/List;
+accessible field net/minecraft/world/entity/LivingEntity dead Z
+accessible field net/minecraft/stats/ServerRecipeBook known Ljava/util/Set;

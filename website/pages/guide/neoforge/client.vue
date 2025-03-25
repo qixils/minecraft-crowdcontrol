@@ -18,8 +18,7 @@ useSeoMeta({
     <h1>NeoForge {{ version.id }} Client Setup</h1>
 
     <p class="alert alert-warning">
-      The NeoForge mod is in early alpha. It may experience more mod incompatibilities than expected.
-      Additionally, some instructions relating to the Crowd Control app may be unavailable as we roll out support.
+      The NeoForge mod is in beta. It may experience more mod incompatibilities than expected.
     </p>
 
     <VersionWarning :version-data="versionData" />
@@ -47,7 +46,6 @@ useSeoMeta({
         </ul>
       </li>
       <li>Create a new folder called <code>mods</code>.</li>
-      <li>Download the latest build of the <a :href="`https://modrinth.com/mod/forgified-fabric-api/versions?l=neoforge&g=${version.id}&c=release`">Forgified Fabric API</a> and place it in the <code>mods</code> folder.</li>
       <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=neoforge&g=${version.id}`">Crowd Control for NeoForge</a> and place it in the <code>mods</code> folder.</li>
       <li>(Optional) Copy all the other NeoForge {{ version.id }} mods that you want to play with into the <code>mods</code> folder.</li>
     </ol>
@@ -60,21 +58,16 @@ useSeoMeta({
 
     <h2 id="starting">Starting a Single Player Session</h2>
 
-    <p>The following steps detail how to start a Crowd Control session on a single player world. It assumes
-      you have already downloaded and installed the mod.</p>
+    <p>
+      The following steps detail how to start a Crowd Control session on a single player world.
+      It assumes you have already downloaded and installed the mod.
+    </p>
 
     <ol>
-      <li>Download and install the <a href="https://crowdcontrol.live/">Crowd Control app</a>.</li>
-      <li>In the <strong>Game Library</strong> tab, select <strong>Minecraft</strong>.</li>
-      <li>Select <strong>Configure Minecraft</strong>.</li>
-      <li>Enter your Minecraft username and click next.</li>
-      <li>Select <strong>Remote</strong>.</li>
-      <li>Enter in <code>localhost</code> as the host and click next.</li>
-      <li>Accept the default password <code>crowdcontrol</code> by clicking next.</li>
+      <li>(Recommended) Download and install the <a href="https://crowdcontrol.live/">Crowd Control app</a> to be able to manage the cost of effects among other settings.</li>
       <li>Launch your modded instance of Minecraft {{ version.id }} and open the world you want to play on.</li>
-      <li>In the app, if you see a <strong>Connector Error</strong> button, click on it to refresh the connection to the game.</li>
-      <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
-      <li>Open the <strong>Effect Manager</strong> in the Crowd Control app to test effects.</li>
+      <li>Follow the instructions in the chat to link your Crowd Control account and start your session.</li>
+      <li>Test some effects from the Interact Link shared in the chat to ensure everything is working.</li>
     </ol>
   </div>
 </template>

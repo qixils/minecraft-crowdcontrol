@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import dev.qixils.crowdcontrol.socket.Request;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,9 +14,9 @@ public abstract class RegionalCommandSync extends RegionalCommand {
 	}
 
 	@Override
-	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull Request request) {
-		return CompletableFuture.completedFuture(executeRegionallySync(player, request));
+	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return CompletableFuture.completedFuture(executeRegionallySync(player, request, ccPlayer));
 	}
 
-	protected abstract boolean executeRegionallySync(@NotNull Player player, @NotNull Request request);
+	protected abstract boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer);
 }

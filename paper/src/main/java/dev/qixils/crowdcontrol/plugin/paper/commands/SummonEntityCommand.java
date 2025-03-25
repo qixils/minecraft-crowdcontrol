@@ -5,11 +5,14 @@ import com.destroystokyo.paper.loottable.LootableInventory;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.plugin.paper.utils.RegistryUtil;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
 import io.papermc.paper.entity.CollarColorable;
 import io.papermc.paper.event.player.PlayerNameEntityEvent;
 import io.papermc.paper.registry.RegistryKey;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -92,7 +95,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		this.entityType = entityType;
 		this.effectName = "entity_" + csIdOf(entityType);
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType));
-		this.mobKey = getMobKey(plugin);
+		this.mobKey = getMobKey(plugin.getPaperPlugin());
 	}
 
 	@NotNull
@@ -110,19 +113,17 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 	}
 
 	@Override
-	protected Response.@NotNull Builder buildFailure(@NotNull Request request) {
-		return request.buildResponse()
-			.type(Response.ResultType.UNAVAILABLE)
-			.message("Failed to spawn entity; likely not supported by this version of Minecraft");
+	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Failed to spawn entity; likely not supported by this version of Minecraft");
 	}
 
 	@Override
-	protected Response.@Nullable Builder precheck(@NotNull List<@NotNull Player> players, @NotNull Request request) {
-		return tryExecute(players, request); // todo: a bit redundant?
+	protected @Nullable CCEffectResponse precheck(@NotNull List<@NotNull Player> players, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		return tryExecute(players, request, ccPlayer);
 	}
 
 	@Override
-	protected boolean executeRegionallySync(@NotNull Player player, @NotNull Request request) {
+	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		return spawnEntity(plugin.getViewerComponentOrNull(request, false), player) != null;
 	}
 
@@ -206,7 +207,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onNameTag(PlayerNameEntityEvent event) {
 		LivingEntity entity = event.getEntity();
-		if (!isMobViewerSpawned(plugin, entity)) return;
+		if (!isMobViewerSpawned(plugin.getPaperPlugin(), entity)) return;
 		entity.getPersistentDataContainer().remove(getMobKey());
 	}
 }

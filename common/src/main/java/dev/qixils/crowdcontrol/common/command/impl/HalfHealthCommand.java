@@ -1,41 +1,44 @@
 package dev.qixils.crowdcontrol.common.command.impl;
 
 import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.command.ImmediateCommand;
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
-import dev.qixils.crowdcontrol.socket.Request;
-import dev.qixils.crowdcontrol.socket.Response;
-import dev.qixils.crowdcontrol.socket.Response.ResultType;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.HALVE_HEALTH_MIN_HEALTH;
 
 @Getter
 @RequiredArgsConstructor
-public class HalfHealthCommand<P> implements ImmediateCommand<P> {
+public class HalfHealthCommand<P> implements Command<P> {
 	private final String effectName = "half_health";
 	private final Plugin<P, ?> plugin;
 
-	@NotNull
 	@Override
-	public Response.Builder executeImmediately(@NotNull List<@NotNull P> players, @NotNull Request request) {
-		Response.Builder response = request.buildResponse()
-				.type(ResultType.RETRY)
-				.message("Health is already minimum");
-
-		for (P rawPlayer : players) {
-			CCPlayer player = plugin.getPlayer(rawPlayer);
-			double health = player.health();
-			if (health > HALVE_HEALTH_MIN_HEALTH) {
-				response.type(ResultType.SUCCESS).message("SUCCESS");
-				sync(() -> player.damage(health / 2f));
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<P> players = playerSupplier.get();
+			boolean success = false;
+			for (P rawPlayer : players) {
+				MCCCPlayer player = plugin.getPlayer(rawPlayer);
+				double health = player.health();
+				if (health > HALVE_HEALTH_MIN_HEALTH) {
+					sync(() -> player.damage(health / 2f));
+					success = true;
+				}
 			}
-		}
-
-		return response;
+			return success
+				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Health is already minimum");
+		}));
 	}
 }

@@ -1,24 +1,19 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.paper.PaperCommandManager;
-import dev.qixils.crowdcontrol.CrowdControl;
 import dev.qixils.crowdcontrol.common.*;
-import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
-import dev.qixils.crowdcontrol.common.mc.CCPlayer;
+import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.*;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
-import dev.qixils.crowdcontrol.socket.SocketManager;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
@@ -28,7 +23,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -38,20 +32,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.paper.PaperCommandManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Function;
 
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 
-public final class PaperCrowdControlPlugin extends JavaPlugin implements Listener, Plugin<Player, CommandSender> {
+@SuppressWarnings("UnstableApiUsage")
+public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceStack> implements Listener {
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_MIN_VERSION = new SemVer(1, 20, 6);
 	public static final @NotNull SemVer MINECRAFT_VERSION = new SemVer(Bukkit.getMinecraftVersion());
@@ -61,15 +55,17 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	public static final PersistentDataType<String, MovementStatusValue> MOVEMENT_STATUS_VALUE_TYPE = new EnumDataType<>(MovementStatusValue.class, o -> o.orElse(MovementStatusValue.ALLOWED));
 
 	@Getter
-	private final Executor syncExecutor = runnable -> Bukkit.getGlobalRegionScheduler().execute(this, runnable);
+	private final Executor syncExecutor;
 	@Getter
-	private final Executor asyncExecutor = runnable -> Bukkit.getAsyncScheduler().runNow(this, $ -> runnable.run());
+	private final Executor asyncExecutor;
+	@Getter
+	private final Path dataFolder;
 	@Getter
 	@Accessors(fluent = true)
 	private final PlayerEntityMapper<Player> playerMapper = new PlayerMapper(this);
 	@Getter
 	@Accessors(fluent = true)
-	private final EntityMapper<CommandSender> commandSenderMapper = new CommandSenderMapper<>(this);
+	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(new CommandSenderMapper<>(this));
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
@@ -77,60 +73,27 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	@Getter
 	private final TextUtilImpl textUtil = new TextUtilImpl(Bukkit.getUnsafe().componentFlattener());
 	@Getter
-	private final Class<Player> playerClass = Player.class;
-	@Getter
-	private final Class<CommandSender> commandSenderClass = CommandSender.class;
-	FileConfiguration config = getConfig();
+	private final PaperLoader paperPlugin;
 	// actual stuff
 	@Getter
-	@Setter
-	private @Nullable String password = DEFAULT_PASSWORD;
-	@Getter
-	@Setter
-	private String IP = null;
-	@Getter
-	@Setter
-	private int port = DEFAULT_PORT;
-	@Getter
-	CrowdControl crowdControl = null;
-	@Getter
-	private PaperCommandManager<CommandSender> commandManager;
-	@Getter
-	private boolean global = false;
-	@Getter
-	@Setter
-	@NotNull
-	private HideNames hideNames = HideNames.NONE;
-	@Getter
-	private Collection<String> hosts = Collections.emptyList();
-	private boolean announce = true;
-	@Getter
-	private boolean adminRequired = false;
-	@Getter
-	private boolean autoDetectIP = true;
-	@Getter
-	private LimitConfig limitConfig = new LimitConfig();
-	@Getter
-	@NotNull
-	private SoftLockConfig softLockConfig = new SoftLockConfig();
+	private PaperCommandManager<CommandSourceStack> commandManager;
 	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Getter
 	@NotNull
-	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-	@Getter
-	@NotNull
-	private final Map<String, List<SocketManager>> sentEvents = new HashMap<>();
-	@Getter
-	@NotNull
 	private final PluginChannel pluginChannel = new PluginChannel(this);
-	private final Map<UUID, SemVer> clientVersions = new HashMap<>();
-	private final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
 
-	@Override
+	public PaperCrowdControlPlugin(@NotNull PaperLoader paperPlugin) {
+		super(Player.class, CommandSourceStack.class);
+		this.dataFolder = paperPlugin.getDataFolder().toPath().resolve("Data");
+		this.paperPlugin = paperPlugin;
+		syncExecutor = runnable -> Bukkit.getGlobalRegionScheduler().execute(paperPlugin, runnable);
+		asyncExecutor = runnable -> Bukkit.getAsyncScheduler().runNow(paperPlugin, $ -> runnable.run());
+	}
+
 	public void onLoad() {
-		saveDefaultConfig();
+		paperPlugin.saveDefaultConfig();
 
 		// init sound validator
 		CommandConstants.SOUND_VALIDATOR = _key -> {
@@ -155,21 +118,21 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 			SemVer version = message.version();
 			getSLF4JLogger().info("Received version {} from client {}", version, uuid);
 			clientVersions.put(uuid, version);
-			updateConditionalEffectVisibility(crowdControl);
+			updateConditionalEffectVisibility(player);
 		});
 		pluginChannel.registerIncomingPluginChannel(ExtraFeaturePacketC2S.METADATA, (player, message) -> {
 			UUID uuid = player.getUniqueId();
 			Set<ExtraFeature> features = message.features();
 			getSLF4JLogger().info("Received features {} from client {}", features, uuid);
 			extraFeatures.put(uuid, features);
-			updateConditionalEffectVisibility(crowdControl);
+			updateConditionalEffectVisibility(player);
 		});
 	}
 
 	@Override
 	public void loadConfig() {
-		reloadConfig();
-		config = getConfig();
+		paperPlugin.reloadConfig();
+		FileConfiguration config = paperPlugin.getConfig();
 
 		// soft-lock observer
 		ConfigurationSection softLockSection = config.getConfigurationSection("soft-lock-observer");
@@ -211,31 +174,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		// misc
 		global = config.getBoolean("global", global);
 		announce = config.getBoolean("announce", announce);
-		adminRequired = config.getBoolean("admin-required", adminRequired);
 		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
-		port = config.getInt("port", port);
-		IP = config.getString("ip", IP);
-		if ("".equals(IP) || "null".equalsIgnoreCase(IP) || "127.0.0.1".equals(IP)) IP = null;
-		password = config.getString("password", password);
-		autoDetectIP = config.getBoolean("ip-detect", autoDetectIP);
-	}
-
-	public void initCrowdControl() {
-		loadConfig();
-
-		if (password == null || password.isEmpty()) { // TODO: allow empty password if CC allows it
-			LOGGER.error("No password has been set in the plugin's config file. Please set one by editing plugins/CrowdControl/config.yml or set a temporary password using the /password command.");
-			return;
-		}
-		crowdControl = CrowdControl.server().ip(IP).port(port).password(password).build();
-
-		commandRegister().register();
-		postInitCrowdControl(crowdControl);
-	}
-
-	@Override
-	public void updateCrowdControl(@Nullable CrowdControl crowdControl) {
-		this.crowdControl = crowdControl;
 	}
 
 	@Contract("null -> null; !null -> !null")
@@ -251,7 +190,6 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@SneakyThrows
-	@Override
 	public void onEnable() {
 		if (!PaperLib.isPaper()) {
 			throw new IllegalStateException("The Paper server software is required. Please upgrade from Spigot to Paper, it should be a simple and painless upgrade in 99.99% of cases.");
@@ -262,22 +200,13 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 
 		initCrowdControl();
 
-		Bukkit.getPluginManager().registerEvents(this, this);
-		Bukkit.getPluginManager().registerEvents(softLockResolver, this);
+		Bukkit.getPluginManager().registerEvents(this, paperPlugin);
+		Bukkit.getPluginManager().registerEvents(softLockResolver, paperPlugin);
 
 		try {
-			commandManager = new PaperCommandManager<>(this,
-				AsynchronousCommandExecutionCoordinator.<CommandSender>builder()
-					.withAsynchronousParsing().build(),
-				Function.identity(),
-				Function.identity()
-			);
-			try {
-				commandManager.registerBrigadier();
-				commandManager.registerAsynchronousCompletions();
-			} catch (Exception exception) {
-				LOGGER.warn("Chat command manager partially failed to initialize, ignoring.");
-			}
+			commandManager = PaperCommandManager.builder()
+				.executionCoordinator(ExecutionCoordinator.asyncCoordinator())
+				.buildOnEnable(paperPlugin);
 			registerChatCommands();
 		} catch (Exception exception) {
 			throw new IllegalStateException("The command manager was unable to load. Please ensure you are using the latest version of Paper.", exception);
@@ -289,33 +218,8 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		return LOGGER;
 	}
 
-	@Override
 	public void onDisable() {
-		if (crowdControl != null) {
-			crowdControl.shutdown("Plugin is unloading (server may be shutting down)");
-			crowdControl = null;
-		}
-	}
-
-	public boolean announceEffects() {
-		return announce;
-	}
-
-	@Override
-	public void setAnnounceEffects(boolean announceEffects) {
-		announce = announceEffects;
-	}
-
-	@Override
-	public void registerCommand(@Nullable String name, @NotNull Command<Player> command) {
-		if (name != null)
-			name = name.toLowerCase(Locale.ENGLISH);
-		try {
-			crowdControl.registerHandler(name, command::executeAndNotify);
-			LOGGER.debug("Registered CC command '{}'", name);
-		} catch (IllegalArgumentException e) {
-			LOGGER.warn("Failed to register command: {}", name, e);
-		}
+		shutdown();
 	}
 
 	@Override
@@ -330,7 +234,7 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 		// Spigot docs allege you have to add a delay before sending plugin channel messages
 		// This seems true, so we add a 5 tick delay, but ideally this is short enough to come before the effect visibility update
 		if (!clientVersions.containsKey(player.getUniqueId())) {
-			player.getScheduler().execute(this, () -> pluginChannel.sendMessage(player, VersionRequestPacketS2C.INSTANCE), null, 10);
+			player.getScheduler().execute(paperPlugin, () -> pluginChannel.sendMessage(player, VersionRequestPacketS2C.INSTANCE), null, 10);
 		}
 	}
 
@@ -344,28 +248,13 @@ public final class PaperCrowdControlPlugin extends JavaPlugin implements Listene
 	}
 
 	@Override
-	public @NotNull CCPlayer getPlayer(@NotNull Player player) {
+	public @NotNull MCCCPlayer getPlayer(@NotNull Player player) {
 		return new PaperPlayer(this, player);
 	}
 
 	@Override
-	public @NotNull Optional<SemVer> getModVersion(@NotNull Player player) {
-		return Optional.ofNullable(clientVersions.get(player.getUniqueId()));
-	}
-
-	@Override
-	public @NotNull Set<ExtraFeature> getExtraFeatures(@NotNull Player player) {
-		return extraFeatures.get(player.getUniqueId());
-	}
-
-	@Override
-	public int getModdedPlayerCount() {
-		return clientVersions.size();
-	}
-
-	@Override
-	public boolean isFeatureAvailable(@NotNull ExtraFeature feature) {
-		return extraFeatures.values().stream().anyMatch(set -> set.contains(feature));
+	public @Nullable Player asPlayer(@NotNull CommandSourceStack sender) {
+		return objAsPlayer(sender.getSender());
 	}
 
 	@Override

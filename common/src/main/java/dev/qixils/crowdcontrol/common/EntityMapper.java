@@ -2,9 +2,9 @@ package dev.qixils.crowdcontrol.common;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
@@ -68,17 +68,14 @@ public interface EntityMapper<E> {
 	 * @return true if the entity is an administrator
 	 */
 	default boolean isAdmin(@NotNull E entity) {
-		String uuid = tryGetUniqueId(entity)
-				.map(id -> id.toString()
-						.toLowerCase(Locale.US)
-						.replace("-", ""))
-				.orElse(null);
-		if (uuid == null) return false;
-
-		return getPlugin().getHosts().stream()
-				.anyMatch(host -> host.toLowerCase(Locale.ENGLISH)
-						.replace("-", "")
-						.equals(uuid));
+		Plugin plugin = getPlugin();
+		Object player = null;
+		try {
+			player = plugin.asPlayer(entity);
+		} catch (Exception ignored) {
+		}
+		if (player == null) return false;
+		return plugin.globalEffectsUsableFor(player);
 	}
 
 	/**
