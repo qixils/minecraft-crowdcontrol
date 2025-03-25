@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
+import dev.qixils.crowdcontrol.common.util.Application;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
@@ -793,7 +794,7 @@ public abstract class Plugin<P, S> {
 	 */
 	public void initCrowdControl() {
 		loadConfig();
-		crowdControl = new CrowdControl("Minecraft", "Minecraft", "ccaid-01jpt9gzz1qjwbg9cc3hg9mpn4", "5faffc3b5821707373d833dec7fa72d9beb3f338547f3b6e9c5ebdf15df25909", getDataFolder());
+		crowdControl = new CrowdControl("Minecraft", "Minecraft", Application.APPLICATION_ID, Application.APPLICATION_SECRET, getDataFolder());
 		commandRegister().register();
 		// re-trigger player join for any missed players
 		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerJoin);

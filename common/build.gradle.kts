@@ -27,14 +27,24 @@ dependencies {
 description = "Minecraft Crowd Control: Common"
 
 // generate mccc-version.txt resource file
-val generatedResourcesFile = File(project.buildDir, "generated/resources/")
-val versionFile = File(generatedResourcesFile, "mccc-version.txt")
+val generatedResourcesFolder = File(project.buildDir, "generated/resources/")
+val versionFile = File(generatedResourcesFolder, "mccc-version.txt")
 tasks.register("generateVersionFile") {
     inputs.property("version", project.version)
     outputs.file(versionFile)
     doLast {
-        generatedResourcesFile.mkdirs()
+        generatedResourcesFolder.mkdirs()
         versionFile.writeText(project.version.toString())
+    }
+}
+val applicationFile = File(generatedResourcesFolder, "mccc-application.txt")
+tasks.register("generateApplicationFile") {
+    inputs.property("applicationId", findProperty("applicationId") ?: "")
+    inputs.property("applicationSecret", findProperty("applicationSecret") ?: "")
+    outputs.file(applicationFile)
+    doLast {
+        generatedResourcesFolder.mkdirs()
+        applicationFile.writeText((findProperty("applicationId")?.toString() ?: "") + '\n' + (findProperty("applicationSecret")?.toString() ?: "") + '\n')
     }
 }
 
@@ -42,4 +52,5 @@ sourceSets.main { resources.srcDir(File(project.buildDir, "generated/resources/"
 
 tasks.processResources {
     dependsOn("generateVersionFile")
+    dependsOn("generateApplicationFile")
 }
