@@ -42,7 +42,7 @@ export async function downloadFabric(to: string) {
 
     console.info(`Fetching Fabric versions`)
     const versions = await fetch(`https://meta.fabricmc.net/v2/versions`, uaheaderfull).then(r => r.json() as Promise<AllVersions>)
-    const latestGame = versions.game.find(ver => ver.version === '1.21.4') // TODO findLatest(versions.game)
+    const latestGame = versions.game.find(ver => ver.version === '1.21.4')! // TODO findLatest(versions.game)
     const latestLoader = findLatest(versions.loader)
     const latestInstaller = findLatest(versions.installer)
     
