@@ -231,6 +231,13 @@ public abstract class Plugin<P, S> {
 	);
 
 	/**
+	 * A message shown to players when hovering over the aforementioned {@link #LINK_MESSAGE}.
+	 */
+	public static final Component LINK_HOVER_MESSAGE = translatable(
+		"cc.join.link.hover"
+	);
+
+	/**
 	 * A warning message sent to players when they join the server if global effects are
 	 * completely unavailable.
 	 */
@@ -967,7 +974,10 @@ public abstract class Plugin<P, S> {
 			// send messages
 			Audience audience = mapper.asAudience(player);
 			if (ccPlayer.getUserToken() == null) {
-				audience.sendMessage(LINK_MESSAGE.clickEvent(ClickEvent.copyToClipboard(ccPlayer.getAuthUrl())));
+				audience.sendMessage(LINK_MESSAGE
+					.clickEvent(ClickEvent.copyToClipboard(ccPlayer.getAuthUrl()))
+					.hoverEvent(LINK_HOVER_MESSAGE)
+				);
 			}
 			// TODO: restore? maybe go for less of a warning angle and more of an informational angle,
 			//  like hey some effects can't be used because you aren't a host / aren't a client

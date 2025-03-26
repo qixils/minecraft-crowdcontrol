@@ -15,10 +15,10 @@ using static CrowdControl.Games.Packs.ISimplePipelinePack;
 using ConnectorType = CrowdControl.Common.ConnectorType;
 using EffectStatus = CrowdControl.Common.EffectStatus;
 
-namespace CrowdControl.Games.Packs.Minecraft;
+namespace CrowdControl.Games.Packs.MinecraftLegacy;
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
-public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
+public class MinecraftLegacy : SimpleTCPPack<SimpleTCPClientConnector>
 {
     public override PromptType PromptType => PromptType.Host | PromptType.Username | PromptType.Password;
 
@@ -30,12 +30,12 @@ public class Minecraft : SimpleTCPPack<SimpleTCPClientConnector>
     private readonly HashSet<RequestType> _allowed_request_types = [RequestType.Test, RequestType.Start, RequestType.Stop, RequestType.GenericEvent, RequestType.RpcResponse, RequestType.Login, RequestType.PlayerInfo, RequestType.KeepAlive];
     public override HashSet<RequestType>? AllowedRequestTypes => _allowed_request_types;
 
-    public Minecraft(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
+    public MinecraftLegacy(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler)
     {
         ConnectionDialogNames[PromptType.Username] = "Minecraft ID";
     }
 
-    public override Game Game => new("Minecraft", "Minecraft", "PC", ConnectorType.SimpleTCPClientConnector);
+    public override Game Game => new("Minecraft (Legacy)", "MinecraftLegacy", "PC", ConnectorType.SimpleTCPClientConnector);
     public override EffectList Effects => new Effect[]
     {
         // miscellaneous
