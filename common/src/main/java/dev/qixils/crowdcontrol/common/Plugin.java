@@ -961,7 +961,7 @@ public abstract class Plugin<P, S> {
 			if (ccPlayer.getUserToken() == null) {
 				audience.sendMessage(translatable("cc.join.link.text.1", TextColor.color(0xF1D4FC)));
 				audience.sendMessage(translatable("cc.join.link.text.2", TextColor.color(0xE8CEF2)).arguments(Component.keybind("key.chat")));
-				audience.sendMessage(translatable("cc.join.link.text.3", TextColor.color(0xE1C7EB)).clickEvent(ClickEvent.copyToClipboard(ccPlayer.getAuthUrl())));
+				audience.sendMessage(translatable("cc.join.link.text.3", TextColor.color(0xE1C7EB)).clickEvent(ClickEvent.copyToClipboard(ccPlayer.getAuthUrl())).hoverEvent(translatable("cc.join.link.text.3.hover")));
 				audience.sendMessage(translatable("cc.join.link.text.4", TextColor.color(0xD9C1E3), TextDecoration.ITALIC));
 				audience.sendMessage(translatable("cc.join.link.text.5", TextColor.color(0xD2BADB), TextDecoration.ITALIC));
 				audience.sendMessage(translatable("cc.join.link.text.6", TextColor.color(0xCBB4D4)));
