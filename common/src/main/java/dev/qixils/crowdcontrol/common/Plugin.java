@@ -946,7 +946,10 @@ public abstract class Plugin<P, S> {
 			getSLF4JLogger().warn("Joining player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
 		}
+
 		mapper.asAudience(joiningPlayer).sendMessage(JOIN_MESSAGE);
+
+		if (!playerMapper().hasPermission(joiningPlayer, Plugin.USE_PERMISSION)) return;
 
 		CCPlayer ccPlayer = cc.addPlayer(uuid);
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.GENERATED_AUTH_CODE, payload -> {

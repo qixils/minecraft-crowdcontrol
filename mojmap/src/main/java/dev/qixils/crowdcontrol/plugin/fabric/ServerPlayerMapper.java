@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.qixils.crowdcontrol.common.LoginData;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
@@ -14,8 +15,6 @@ import java.net.SocketAddress;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.common.Plugin.ADMIN_PERMISSION;
 
 @Getter
 @RequiredArgsConstructor
@@ -38,10 +37,8 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	}
 
 	@Override
-	public boolean isAdmin(@NotNull ServerPlayer entity) {
-		if (entity.hasPermissions(3)) return true;
-		if (plugin.getPermissionUtil().check(entity, ADMIN_PERMISSION)) return true;
-		return PlayerEntityMapper.super.isAdmin(entity);
+	public boolean hasPermission(@NotNull ServerPlayer entity, @NotNull PermissionWrapper perm) {
+		return plugin.getPermissionUtil().check(entity, perm);
 	}
 
 	@Override

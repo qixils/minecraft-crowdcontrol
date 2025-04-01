@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
@@ -30,9 +31,7 @@ public class CommandSourceStackMapper implements EntityMapper<CommandSourceStack
 	}
 
 	@Override
-	public final boolean isAdmin(@NotNull CommandSourceStack entity) {
-		// TODO: LuckPerms hook
-		if (entity.hasPermission(3)) return true;
-		return EntityMapper.super.isAdmin(entity);
+	public boolean hasPermission(@NotNull CommandSourceStack entity, @NotNull PermissionWrapper perm) {
+		return plugin.getPermissionUtil().check(entity, perm);
 	}
 }
