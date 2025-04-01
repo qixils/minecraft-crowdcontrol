@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import org.jetbrains.annotations.CheckReturnValue;
@@ -61,6 +62,15 @@ public interface EntityMapper<E> {
 	}
 
 	/**
+	 * Determines if the provided entity can access the requested permission node.
+	 *
+	 * @param entity the entity to check
+	 * @param perm the requested perm
+	 * @return true if the entity has access
+	 */
+	boolean hasPermission(@NotNull E entity, @NotNull PermissionWrapper perm);
+
+	/**
 	 * Determines if the provided entity is an administrator. This is defined as the object having
 	 * the {@link Plugin#ADMIN_PERMISSION} permission node or being a Minecraft operator.
 	 *
@@ -68,6 +78,8 @@ public interface EntityMapper<E> {
 	 * @return true if the entity is an administrator
 	 */
 	default boolean isAdmin(@NotNull E entity) {
+		if (hasPermission(entity, Plugin.ADMIN_PERMISSION)) return true;
+
 		Plugin plugin = getPlugin();
 		Object player = null;
 		try {

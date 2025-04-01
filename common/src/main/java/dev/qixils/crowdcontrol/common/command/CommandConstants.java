@@ -312,6 +312,7 @@ public class CommandConstants {
 		"chicken",
 		"cod",
 		"cow",
+		"creaking",
 		"creeper",
 		"dolphin",
 		"donkey",

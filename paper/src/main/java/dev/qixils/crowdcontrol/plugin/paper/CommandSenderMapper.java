@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.hasPermission;
 
 @Getter
 @RequiredArgsConstructor
@@ -32,8 +31,7 @@ class CommandSenderMapper<E extends CommandSender> implements EntityMapper<E> {
 	}
 
 	@Override
-	public boolean isAdmin(@NotNull E commandSource) {
-		if (hasPermission(commandSource, PaperUtil.ADMIN_PERMISSION)) return true;
-		return EntityMapper.super.isAdmin(commandSource);
+	public boolean hasPermission(@NotNull E entity, @NotNull PermissionWrapper perm) {
+		return PaperUtil.hasPermission(entity, PaperUtil.toPaper(perm));
 	}
 }

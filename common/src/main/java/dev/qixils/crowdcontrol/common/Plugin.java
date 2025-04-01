@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
+import dev.qixils.crowdcontrol.common.util.Application;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
@@ -219,14 +220,6 @@ public abstract class Plugin<P, S> {
 			.append(text("ls", TextColor.color(0xFFCEEA)))
 			.append(text(".dev", TextColor.color(0xFFB7E5))),
 		text("crowdcontrol.live", TextColor.color(0xFAE100))
-	);
-
-	/**
-	 * A message sent to players when they join the server if they have no stream account linked.
-	 */
-	public static final Component LINK_MESSAGE = translatable(
-		"cc.join.link.text",
-		TextColor.color(0xF1D4FC)
 	);
 
 	/**
@@ -793,7 +786,7 @@ public abstract class Plugin<P, S> {
 	 */
 	public void initCrowdControl() {
 		loadConfig();
-		crowdControl = new CrowdControl("Minecraft", "Minecraft", "ccaid-01jpt9gzz1qjwbg9cc3hg9mpn4", "5faffc3b5821707373d833dec7fa72d9beb3f338547f3b6e9c5ebdf15df25909", getDataFolder());
+		crowdControl = new CrowdControl("Minecraft", "Minecraft", Application.APPLICATION_ID, Application.APPLICATION_SECRET, getDataFolder());
 		commandRegister().register();
 		// re-trigger player join for any missed players
 		getPlayerManager().getAllPlayersFull().forEach(this::onPlayerJoin);
@@ -855,23 +848,37 @@ public abstract class Plugin<P, S> {
 
 		for (Command<P> effect : commandRegister().getCommands()) {
 			String id = effect.getEffectName().toLowerCase(Locale.ENGLISH);
-			TriState visibility = effect.isVisible(user, potentialPlayers);
-			if (visibility != TriState.FALSE) {
-				Set<ExtraFeature> extraFeatures;
-				SemVer minVersion;
-				// this assumes that if a player has a feature available then they also have a client available
-				if (!(extraFeatures = effect.requiredExtraFeatures()).isEmpty()) {
-					boolean available = potentialPlayers.stream().anyMatch(player -> extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player)));
-					visibility = TriState.fromBoolean(available);
-				} else if ((minVersion = effect.getMinimumModVersion()).isAtLeast(SemVer.ZERO)) {
-					visibility = TriState.fromBoolean(clientVersion.isAtLeast(minVersion));
-				} else if (effect.isGlobal())
-					visibility = TriState.fromBoolean(globalVisible);
+			TriState visibility;
+			try {
+				visibility = effect.isVisible(user, potentialPlayers);
+				if (visibility != TriState.FALSE) {
+					Set<ExtraFeature> extraFeatures;
+					SemVer minVersion;
+					// this assumes that if a player has a feature available then they also have a client available
+					if (!(extraFeatures = effect.requiredExtraFeatures()).isEmpty()) {
+						boolean available = potentialPlayers.stream().anyMatch(player -> extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player)));
+						visibility = TriState.fromBoolean(available);
+					} else if ((minVersion = effect.getMinimumModVersion()).isAtLeast(SemVer.ZERO)) {
+						visibility = TriState.fromBoolean(clientVersion.isAtLeast(minVersion));
+					} else if (effect.isGlobal())
+						visibility = TriState.fromBoolean(globalVisible);
+				}
+			} catch (Exception e) {
+				getSLF4JLogger().error("Hiding faulty effect {}", id, e);
+				visibility = TriState.FALSE;
 			}
+
 			if (visibility != TriState.UNKNOWN)
 				effects.computeIfAbsent(visibility == TriState.TRUE ? ReportStatus.MENU_VISIBLE : ReportStatus.MENU_HIDDEN, k -> new ArrayList<>()).add(id);
 
-			TriState selectable = effect.isSelectable(user, potentialPlayers);
+			TriState selectable;
+			try {
+				selectable = effect.isSelectable(user, potentialPlayers);
+			} catch (Exception e) {
+				getSLF4JLogger().error("Disabling faulty effect {}", id, e);
+				selectable = TriState.FALSE;
+			}
+
 			if (selectable != TriState.UNKNOWN && visibility != TriState.FALSE)
 				effects.computeIfAbsent(selectable == TriState.TRUE ? ReportStatus.MENU_AVAILABLE : ReportStatus.MENU_UNAVAILABLE, k -> new ArrayList<>()).add(id);
 		}
@@ -939,7 +946,10 @@ public abstract class Plugin<P, S> {
 			getSLF4JLogger().warn("Joining player {} has no UUID", mapper.getUsername(joiningPlayer));
 			return;
 		}
+
 		mapper.asAudience(joiningPlayer).sendMessage(JOIN_MESSAGE);
+
+		if (!playerMapper().hasPermission(joiningPlayer, Plugin.USE_PERMISSION)) return;
 
 		CCPlayer ccPlayer = cc.addPlayer(uuid);
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.GENERATED_AUTH_CODE, payload -> {
@@ -952,7 +962,13 @@ public abstract class Plugin<P, S> {
 			// send messages
 			Audience audience = mapper.asAudience(player);
 			if (ccPlayer.getUserToken() == null) {
-				audience.sendMessage(LINK_MESSAGE.clickEvent(ClickEvent.openUrl(ccPlayer.getAuthUrl())));
+				audience.sendMessage(translatable("cc.join.link.text.1", TextColor.color(0xF1D4FC)));
+				audience.sendMessage(translatable("cc.join.link.text.2", TextColor.color(0xE8CEF2)).arguments(Component.keybind("key.chat")));
+				audience.sendMessage(translatable("cc.join.link.text.3", TextColor.color(0xE1C7EB)).clickEvent(ClickEvent.copyToClipboard(ccPlayer.getAuthUrl())).hoverEvent(translatable("cc.join.link.text.3.hover")));
+				audience.sendMessage(translatable("cc.join.link.text.4", TextColor.color(0xD9C1E3), TextDecoration.ITALIC));
+				audience.sendMessage(translatable("cc.join.link.text.5", TextColor.color(0xD2BADB), TextDecoration.ITALIC));
+				audience.sendMessage(translatable("cc.join.link.text.6", TextColor.color(0xCBB4D4)));
+				audience.sendMessage(translatable("cc.join.link.text.7", TextColor.color(0xC3ADCC), TextDecoration.ITALIC));
 			}
 			// TODO: restore? maybe go for less of a warning angle and more of an informational angle,
 			//  like hey some effects can't be used because you aren't a host / aren't a client
@@ -995,8 +1011,8 @@ public abstract class Plugin<P, S> {
 			}
 
 			switch (status) {
+				// NOTE: TIMED_BEGIN also emits SUCCESS !
 				case SUCCESS:
-				case TIMED_BEGIN:
 					List<Audience> audiences = new ArrayList<>(3);
 
 					initTo(audiences, this::getConsole);
@@ -1014,7 +1030,6 @@ public abstract class Plugin<P, S> {
 					} catch (Exception e) {
 						LoggerFactory.getLogger("CrowdControl/Command").warn("Failed to announce effect", e);
 					}
-					if (status == ResponseStatus.TIMED_BEGIN) break;
 				case FAIL_TEMPORARY:
 				case FAIL_PERMANENT:
 				case TIMED_END:

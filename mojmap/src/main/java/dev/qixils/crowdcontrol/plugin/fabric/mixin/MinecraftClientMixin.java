@@ -27,6 +27,8 @@ public abstract class MinecraftClientMixin extends ReentrantBlockableEventLoop<R
 
 		// no shadow due to volatility
 		boolean paused = ((Minecraft) (Object) this).isPaused();
+		if (plugin.isPaused() == paused) return; // we already know it is(n't) paused
+
 		plugin.setPaused(paused);
 		if (paused) cc.pauseAll();
 		else cc.resumeAll();
