@@ -52,10 +52,11 @@ public abstract class LivingEntityMixin extends Entity implements ViewerMob, Ori
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
 	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
-		if (tag.contains(Components.VIEWER_MOB))
-			cc$isViewerSpawned = tag.getBoolean(Components.VIEWER_MOB);
-		if (tag.contains(Components.ORIGINAL_DISPLAY_NAME))
-			cc$originalDisplayName = Component.Serializer.fromJson(tag.getString(Components.ORIGINAL_DISPLAY_NAME), registryAccess());
+		cc$isViewerSpawned = tag.getBoolean(Components.VIEWER_MOB).orElse(false);
+		cc$originalDisplayName = tag
+			.getString(Components.ORIGINAL_DISPLAY_NAME)
+			.map(json -> Component.Serializer.fromJson(json, registryAccess()))
+			.orElse(null);
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))

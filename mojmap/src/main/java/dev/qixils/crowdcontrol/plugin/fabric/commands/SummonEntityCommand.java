@@ -184,11 +184,11 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		if (entity instanceof LivingEntity livingEntity)
 			livingEntity.cc$setViewerSpawned();
 		if (entity instanceof Wolf wolf) {
-			wolf.setCollarColor(randomElementFrom(DyeColor.values())); // TODO: crash
+			wolf.setCollarColor(randomElementFrom(DyeColor.values()));
 			wolf.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.WOLF_VARIANT).listElements()));
 		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
-			mooshroom.setVariant(MushroomCow.Variant.BROWN);
+			mooshroom.setVariant(MushroomCow.Variant.BROWN); // TODO: validate neoforge accesstransformer
 		if (entity instanceof AbstractHorse horse) {
 			if (horse.canUseSlot(EquipmentSlot.BODY) && RandomUtil.RNG.nextBoolean()) {
 				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
@@ -200,25 +200,25 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 					.toList());
 				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
 			}
-			horse.setOwnerUUID(player.getUUID());
+			horse.setOwner(player);
 			horse.setTamed(true);
 		}
 		if (entity instanceof Sheep sheep) // TODO: jeb
 			sheep.setColor(randomElementFrom(DyeColor.values()));
-		if (entity instanceof Saddleable saddleable && RandomUtil.RNG.nextBoolean())
-			saddleable.equipSaddle(new ItemStack(Items.SADDLE), null);
+		if (entity instanceof LivingEntity livingEntity && livingEntity.canUseSlot(EquipmentSlot.SADDLE) && RandomUtil.RNG.nextBoolean())
+			livingEntity.setItemSlot(EquipmentSlot.SADDLE, new ItemStack(Items.SADDLE));
 		if (entity instanceof EnderMan enderman)
 			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
 		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT.listElements()));
+			frog.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.FROG_VARIANT).listElements()));
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.values()));
 		if (entity instanceof Rabbit rabbit)
 			rabbit.setVariant(weightedRandom(RABBIT_VARIANTS));
 		if (entity instanceof VillagerDataHolder villager)
-			villager.setVariant(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE));
+			villager.setVillagerData(villager.getVillagerData().withType(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE.listElements())));
 		if (entity instanceof ContainerEntity container)
 			container.setContainerLootTable(randomElementFrom(getLootTables(level.getServer())));
 

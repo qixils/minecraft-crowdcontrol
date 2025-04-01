@@ -54,8 +54,10 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
 	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
-		if (tag.contains(Components.GAME_TYPE_EFFECT))
-			cc$gameTypeEffect = GameType.byName(tag.getString(Components.GAME_TYPE_EFFECT), null);
+		cc$gameTypeEffect = tag
+			.getString(Components.GAME_TYPE_EFFECT)
+			.map(name -> GameType.byName(name, null))
+			.orElse(null);
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))

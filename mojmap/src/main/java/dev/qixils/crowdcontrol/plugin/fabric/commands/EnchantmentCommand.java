@@ -97,10 +97,8 @@ public class EnchantmentCommand extends ModdedCommand {
 
 	public static ItemStack getItem(Inventory inv, EquipmentSlot slot) {
 		if (slot == EquipmentSlot.MAINHAND)
-			return inv.getItem(inv.selected);
-		if (slot == EquipmentSlot.OFFHAND)
-			return inv.offhand.getFirst();
-		return inv.armor.get(slot.getIndex());
+			return inv.getSelectedItem();
+		return inv.getItem(slot.getIndex(Inventory.INVENTORY_SIZE));
 	}
 
 	public static int getEnchantmentLevel(ItemStack item, Holder<Enchantment> enchantment) {
