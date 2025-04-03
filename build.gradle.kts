@@ -49,7 +49,7 @@ subprojects {
             name = "Jitpack"
         }
         mavenCentral()
-//        mavenLocal()
+        mavenLocal()
     }
 
     dependencies {
@@ -80,7 +80,7 @@ subprojects {
         relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
         relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")
         relocate("net.kyori.adventure.serializer", "dev.qixils.relocated.adventure.serializer")
-        relocate("net.kyori.option", "dev.qixils.relocated.adventure.option") // TODO
+//        relocate("net.kyori.option", "dev.qixils.relocated.adventure.option") // TODO
         relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations")
         relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
         relocate("javassist", "dev.qixils.relocated.javassist")
