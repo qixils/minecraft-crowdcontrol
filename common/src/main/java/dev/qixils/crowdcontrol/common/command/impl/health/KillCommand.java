@@ -32,7 +32,8 @@ public class KillCommand<P> implements Command<P> {
 					"Cannot kill players under the effects of health or location modifiers"
 				);
 			}
-			sync(() -> players.stream().map(plugin::getPlayer).forEach(MCCCPlayer::kill));
+			var streamers = players.stream().map(plugin::getPlayer);
+			sync(() -> streamers.forEach(MCCCPlayer::kill));
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 		}));
 	}

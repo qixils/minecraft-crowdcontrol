@@ -47,35 +47,33 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
 			int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
-			sync(() -> {
-				for (ServerPlayer player : playerSupplier.get()) {
-					MobEffectInstance effect = new MobEffectInstance(potionEffectType, durationTicks);
-					MobEffectInstance existingEffect = player.getEffect(potionEffectType);
-					if (existingEffect == null) {
-						plugin.getSLF4JLogger().debug("Adding new effect");
-						player.addEffect(effect);
-					} else {
-						plugin.getSLF4JLogger().debug("Updating existing effect");
-						int oldDuration = existingEffect.getDuration();
-						int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
-						int newAmplifier = existingEffect.getAmplifier() + 1;
-						if (potionEffectType == MobEffects.LEVITATION && newAmplifier > 127)
-							newAmplifier -= 1;
-						player.forceAddEffect(new MobEffectInstance(
-							potionEffectType,
-							newDuration,
-							newAmplifier,
-							existingEffect.isAmbient(),
-							existingEffect.isVisible(),
-							existingEffect.showIcon()
-						), null);
-					}
+			for (ServerPlayer player : playerSupplier.get()) {
+				MobEffectInstance effect = new MobEffectInstance(potionEffectType, durationTicks);
+				MobEffectInstance existingEffect = player.getEffect(potionEffectType);
+				if (existingEffect == null) {
+					plugin.getSLF4JLogger().debug("Adding new effect");
+					player.addEffect(effect);
+				} else {
+					plugin.getSLF4JLogger().debug("Updating existing effect");
+					int oldDuration = existingEffect.getDuration();
+					int newDuration = oldDuration == -1 ? -1 : Math.max(durationTicks, oldDuration);
+					int newAmplifier = existingEffect.getAmplifier() + 1;
+					if (potionEffectType == MobEffects.LEVITATION && newAmplifier > 127)
+						newAmplifier -= 1;
+					player.forceAddEffect(new MobEffectInstance(
+						potionEffectType,
+						newDuration,
+						newAmplifier,
+						existingEffect.isAmbient(),
+						existingEffect.isVisible(),
+						existingEffect.showIcon()
+					), null);
 				}
-			});
+			}
 
 			return isMinimal
 				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 				: new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
-		}));
+		}, plugin.getSyncExecutor()));
 	}
 }

@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
@@ -37,7 +38,7 @@ final class CommandSourceStackMapper implements EntityMapper<CommandSourceStack>
 	}
 
 	@Override
-	public boolean isAdmin(@NotNull CommandSourceStack entity) {
-		return source.isAdmin(entity.getSender()); // allow admins to /execute on other players
+	public boolean hasPermission(@NotNull CommandSourceStack entity, @NotNull PermissionWrapper perm) {
+		return source.hasPermission(entity.getSender(), perm);
 	}
 }

@@ -133,12 +133,16 @@ public interface Command<P> extends CCEffect {
 	default Component getProcessedDisplayName(@NotNull PublicEffectPayload request) {
 		Component displayName = getDisplayName();
 
-		if (request.getQuantity() > 0) {
-			return getQuantityName(displayName, request);
-		}
+		try {
+			if (request.getQuantity() > 1) {
+				displayName = getQuantityName(displayName, request);
+			}
 
-		if (request.getEffect().getDuration() > 0) {
-			return getDurationName(displayName, request);
+			if (request.getEffect().getDuration() > 0) {
+				displayName = getDurationName(displayName, request);
+			}
+		} catch (Exception e) {
+			getPlugin().getSLF4JLogger().warn("Failed to get display name", e);
 		}
 
 		return displayName;
@@ -306,6 +310,7 @@ public interface Command<P> extends CCEffect {
 	 *
 	 * @param runnable command to execute synchronously
 	 */
+	// TODO: figure out how to label this to warn about not using playerSupplier.get inside this
 	default void sync(@NotNull Runnable runnable) {
 		getPlugin().getSyncExecutor().execute(runnable);
 	}
