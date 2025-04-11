@@ -33,6 +33,7 @@ public abstract class AbstractWeatherCommand extends PaperCommand {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			playerSupplier.get(); // validate now is ok to start
 			boolean success = false;
 			for (World world : Bukkit.getWorlds()) {
 				if (world.getEnvironment() != World.Environment.NORMAL)

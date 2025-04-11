@@ -23,13 +23,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.FREEZE_DURATION;
 
 @Getter
 public final class FreezeCommand extends ModdedCommand implements CCTimedEffect {
@@ -63,10 +60,6 @@ public final class FreezeCommand extends ModdedCommand implements CCTimedEffect 
 
 	public FreezeCommand(ModdedCrowdControlPlugin plugin, String effectName, LocationModifier modifier, MovementStatusType freezeType) {
 		this(plugin, effectName, effectName, modifier, freezeType);
-	}
-
-	public @NotNull Duration getDefaultDuration() {
-		return FREEZE_DURATION;
 	}
 
 	@Override

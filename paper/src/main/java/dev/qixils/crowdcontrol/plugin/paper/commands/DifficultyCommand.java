@@ -46,6 +46,7 @@ public class DifficultyCommand extends PaperCommand {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			playerSupplier.get(); // validate now is ok to start
 			if (difficulty.equals(getCurrentDifficulty()))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Server difficulty is already on " + plugin.getTextUtil().asPlain(displayName));
 			sync(() -> Bukkit.getServer().getWorlds().forEach(world -> world.setDifficulty(difficulty)));

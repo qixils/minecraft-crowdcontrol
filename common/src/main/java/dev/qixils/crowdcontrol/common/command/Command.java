@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -198,34 +197,6 @@ public interface Command<P> extends CCEffect {
 		return QuantityStyle.NONE;
 	}
 
-	/**
-	 * Gets the executor to use for this command.
-	 *
-	 * @return command executor
-	 */
-	@NotNull
-	@CheckReturnValue
-	@Deprecated
-	default Executor getExecutor() {
-		/*
-		ExecuteUsing.Type executeUsing = Optional.ofNullable(getClass().getAnnotation(ExecuteUsing.class))
-			.map(ExecuteUsing::value)
-			.orElse(ExecuteUsing.Type.ASYNC);
-		Executor executor;
-		switch (executeUsing) {
-			case SYNC_GLOBAL:
-				executor = getPlugin().getSyncExecutor(); // TODO: getGlobalExecutor
-				break;
-			case ASYNC:
-			default:
-				executor = Runnable::run;
-				break;
-		}
-		return executor;
-		 */
-		return Runnable::run;
-	}
-
 	@Override
 	default void onTrigger(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		Plugin<P, ?> plugin = getPlugin();
@@ -241,6 +212,8 @@ public interface Command<P> extends CCEffect {
 					"Conflicting effects were already active"
 				));
 			}
+
+			getPlugin().getSLF4JLogger().info("Plugin is paused: {}; force: {}", getPlugin().isPaused(), force);
 
 			if (getPlugin().isPaused() && !force) {
 				throw new CCResponseException(new CCInstantEffectResponse(
@@ -296,13 +269,11 @@ public interface Command<P> extends CCEffect {
 			)
 		);
 
-		getExecutor().execute(() -> {
-			try {
-				execute(() -> playerSupplier.apply(false), request, ccPlayer);
-			} catch (CCResponseException e) {
-				ccPlayer.sendResponse(e.getResponse());
-			}
-		});
+		try {
+			execute(() -> playerSupplier.apply(false), request, ccPlayer);
+		} catch (CCResponseException e) {
+			ccPlayer.sendResponse(e.getResponse());
+		}
 	}
 
 	/**

@@ -129,10 +129,6 @@ public class CommandConstants {
 	 */
 	public static final int VEIN_COUNT = 2;
 	/**
-	 * How long the freeze commands should last.
-	 */
-	public static final @NotNull Duration FREEZE_DURATION = Duration.ofSeconds(10);
-	/**
 	 * Collection of blocks to be used in the Place Block command.
 	 */
 	public static final @NotNull KeyedTag SET_BLOCKS = new KeyedTag(

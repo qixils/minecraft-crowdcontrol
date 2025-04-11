@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
-import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
@@ -24,6 +23,7 @@ public class TickFreezeCommand extends ModdedCommand implements CCTimedEffect {
 	private final String effectName = "tick_freeze";
 	private final String effectGroup = "tick_rate";
 	private final List<String> effectGroups = Collections.singletonList(effectGroup);
+	private final boolean exclusive = true;
 
 	public TickFreezeCommand(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
@@ -32,8 +32,7 @@ public class TickFreezeCommand extends ModdedCommand implements CCTimedEffect {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			if (isActive(ccPlayer, getEffectArray()))
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
+			playerSupplier.get(); // validate now is ok to start
 			onResume(request, ccPlayer);
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
 		}));

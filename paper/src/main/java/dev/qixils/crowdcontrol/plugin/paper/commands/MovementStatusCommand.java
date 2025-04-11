@@ -95,9 +95,6 @@ public class MovementStatusCommand extends PaperCommand implements CCTimedEffect
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			if (isActive(ccPlayer, getEffectArray()))
-				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Unable to stack movement statuses");
-
 			List<Player> players = playerSupplier.get();
 
 			if (players.isEmpty())

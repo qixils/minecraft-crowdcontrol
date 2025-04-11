@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
@@ -50,7 +51,7 @@ public class PlayerSizeCommand extends ModdedCommand implements CCTimedEffect {
 				addModifier(player, Attributes.JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
 				addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
 			}
-			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
 		}));
 	}
 

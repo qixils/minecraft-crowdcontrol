@@ -6,6 +6,7 @@ public class CCResponseException extends RuntimeException {
 	private final CCEffectResponse response;
 
 	public CCResponseException(CCEffectResponse response) {
+		super(response.getMessage());
 		this.response = response;
 	}
 
