@@ -13,6 +13,7 @@ import lombok.Getter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -67,12 +68,12 @@ public class BucketClutchCommand extends ModdedCommand {
 							player.setItemInHand(InteractionHand.OFF_HAND, hand);
 						} else {
 							boolean slotFound = false;
+							Inventory inv = player.getInventory();
 							for (int i = 0; i < 36; i++) {
-								List<ItemStack> items = player.getInventory().items;
-								ItemStack item = items.get(i);
+								ItemStack item = inv.getItem(i);
 								if (item.isEmpty()) {
 									slotFound = true;
-									items.set(i, hand);
+									inv.setItem(i, hand);
 									break;
 								}
 							}

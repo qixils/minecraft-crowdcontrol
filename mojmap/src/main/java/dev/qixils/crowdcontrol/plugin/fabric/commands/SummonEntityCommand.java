@@ -23,17 +23,20 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.MushroomCow;
 import net.minecraft.world.entity.animal.Rabbit;
-import net.minecraft.world.entity.animal.Sheep;
-import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.npc.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Blocking;
@@ -51,7 +54,7 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ModdedCommand implements EntityCommand<E> {
 	private static final Set<EquipmentSlot> HANDS = Arrays.stream(EquipmentSlot.values()).filter(slot -> slot.getType() == EquipmentSlot.Type.HAND).collect(Collectors.toSet());
-	private final Map<EquipmentSlot, List<ArmorItem>> humanoidArmor;
+	private final Map<EquipmentSlot, List<Item>> humanoidArmor;
 	protected final EntityType<? extends E> entityType;
 	protected final EntityType<? extends E>[] entityTypes;
 	private final String effectName;
@@ -89,20 +92,18 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		this.displayName = displayName;
 
 		// pre-compute the map of valid armor pieces
-		Map<EquipmentSlot, List<ArmorItem>> armor = new HashMap<>(4);
+		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
 		for (Item item : BuiltInRegistries.ITEM) {
-			if (item instanceof ArmorItem armorItem) {
-				Equippable equippable = armorItem.components().get(DataComponents.EQUIPPABLE);
-				if (equippable == null) continue;
-				EquipmentSlot slot = equippable.slot();
-				if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
-					continue;
-				armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(armorItem);
-			}
+			Equippable equippable = item.components().get(DataComponents.EQUIPPABLE);
+			if (equippable == null) continue;
+			EquipmentSlot slot = equippable.slot();
+			if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
+				continue;
+			armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(item);
 		}
 
 		// make collections unmodifiable
-		for (Map.Entry<EquipmentSlot, List<ArmorItem>> entry : new HashSet<>(armor.entrySet()))
+		for (Map.Entry<EquipmentSlot, List<Item>> entry : new HashSet<>(armor.entrySet()))
 			armor.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
 		this.humanoidArmor = Collections.unmodifiableMap(armor);
 	}
@@ -183,11 +184,11 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		if (entity instanceof LivingEntity livingEntity)
 			livingEntity.cc$setViewerSpawned();
 		if (entity instanceof Wolf wolf) {
-			wolf.setCollarColor(randomElementFrom(DyeColor.values())); // TODO: crash
+			wolf.setCollarColor(randomElementFrom(DyeColor.values()));
 			wolf.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.WOLF_VARIANT).listElements()));
 		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
-			mooshroom.setVariant(MushroomCow.Variant.BROWN);
+			mooshroom.setVariant(MushroomCow.Variant.BROWN); // TODO: validate neoforge accesstransformer
 		if (entity instanceof AbstractHorse horse) {
 			if (horse.canUseSlot(EquipmentSlot.BODY) && RandomUtil.RNG.nextBoolean()) {
 				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
@@ -199,25 +200,25 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 					.toList());
 				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
 			}
-			horse.setOwnerUUID(player.getUUID());
+			horse.setOwner(player);
 			horse.setTamed(true);
 		}
 		if (entity instanceof Sheep sheep) // TODO: jeb
 			sheep.setColor(randomElementFrom(DyeColor.values()));
-		if (entity instanceof Saddleable saddleable && RandomUtil.RNG.nextBoolean())
-			saddleable.equipSaddle(new ItemStack(Items.SADDLE), null);
+		if (entity instanceof LivingEntity livingEntity && livingEntity.canUseSlot(EquipmentSlot.SADDLE) && RandomUtil.RNG.nextBoolean())
+			livingEntity.setItemSlot(EquipmentSlot.SADDLE, new ItemStack(Items.SADDLE));
 		if (entity instanceof EnderMan enderman)
 			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
 		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT.listElements()));
+			frog.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.FROG_VARIANT).listElements()));
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.values()));
 		if (entity instanceof Rabbit rabbit)
 			rabbit.setVariant(weightedRandom(RABBIT_VARIANTS));
 		if (entity instanceof VillagerDataHolder villager)
-			villager.setVariant(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE));
+			villager.setVillagerData(villager.getVillagerData().withType(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE.listElements())));
 		if (entity instanceof ContainerEntity container)
 			container.setContainerLootTable(randomElementFrom(getLootTables(level.getServer())));
 

@@ -21,6 +21,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Unit;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -36,7 +37,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import org.jetbrains.annotations.Contract;
@@ -194,7 +194,7 @@ public class LootboxCommand extends ModdedCommand {
 
 		// make item unbreakable with a default chance of 5% (up to 100% at 10 luck)
 		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
-			itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
+			itemStack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
 
 		if (random.nextInt(ARMOR_TRIM_ODDS) == 0) {
 			itemStack.set(DataComponents.TRIM, new ArmorTrim(
