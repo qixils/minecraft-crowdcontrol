@@ -39,7 +39,7 @@ public class BucketClutchCommand extends RegionalCommand {
 	protected CompletableFuture<Boolean> executeRegionallyAsync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		Material material = player.getWorld().isUltraWarm() ? Material.COBWEB : Material.WATER_BUCKET;
 		ItemStack giveItem = new ItemStack(material);
-		giveItem.addEnchantment(Enchantment.VANISHING_CURSE, 1);
+		giveItem.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
 
 		Location curr = player.getLocation();
 		int offset = BUCKET_CLUTCH_MAX - 1;
