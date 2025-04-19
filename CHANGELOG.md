@@ -2,6 +2,24 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.0.3
+
+- Added support for 1.21.5
+- Hide join messages when player lacks `crowdcontrol.use`
+- Fixed several effects executing regardless of the game being paused
+- Fixed timed effects missing their duration in chat
+- Fixed possible issues with socket reconnections
+- Paper: Fixed _Water Bucket Clutch_ effect
+
+## 4.0.2
+
+- Fixes to timed effects, especially in singleplayer
+- Clarify login instructions
+
+## 4.0.1
+
+Hotfix for Fabric
+
 ## 4.0.0
 
 - Redesigned the mod to directly authenticate to Crowd Control and manage your session without needing the app or opened ports
