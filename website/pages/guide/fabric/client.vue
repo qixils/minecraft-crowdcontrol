@@ -65,11 +65,25 @@ useSeoMeta({
       It assumes you have already downloaded and installed the mod.
     </p>
 
-    <ol>
+    <ol v-if="!version.legacy">
       <li>(Recommended) Download and install the <a href="https://crowdcontrol.live/">Crowd Control app</a> to be able to manage the cost of effects among other settings.</li>
       <li>Launch your modded instance of Minecraft {{ version.id }} and open the world you want to play on.</li>
       <li>Follow the instructions in the chat to link your Crowd Control account and start your session.</li>
       <li>Test some effects from the Interact Link shared in the chat to ensure everything is working.</li>
+    </ol>
+    <ol v-else>
+      <li>Download and install the <a href="https://crowdcontrol.live/">Crowd Control app</a>.</li>
+      <li>In the <strong>Game Library</strong> tab, select <strong>Minecraft</strong>.</li>
+      <li>Under <strong>Select a Pack</strong>, choose the last option <strong>Minecraft (Legacy)</strong>.</li>
+      <li>Select <strong>Configure Minecraft</strong>.</li>
+      <li>Enter your Minecraft username and click next.</li>
+      <li>Select <strong>Remote</strong>.</li>
+      <li>Enter in <code>localhost</code> as the host and click next.</li>
+      <li>Accept the default password <code>crowdcontrol</code> by clicking next.</li>
+      <li>Launch your modded instance of Minecraft {{version.id}} and open the world you want to play on.</li>
+      <li>In the app, if you see a <strong>Connector Error</strong> button, click on it to refresh the connection to the game.</li>
+      <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
+      <li>Open the <strong>Effect Manager</strong> in the Crowd Control app to test effects.</li>
     </ol>
   </div>
 </template>
