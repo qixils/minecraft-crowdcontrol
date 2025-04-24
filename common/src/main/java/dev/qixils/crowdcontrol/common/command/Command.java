@@ -213,7 +213,7 @@ public interface Command<P> extends CCEffect {
 				));
 			}
 
-			getPlugin().getSLF4JLogger().info("Plugin is paused: {}; force: {}", getPlugin().isPaused(), force);
+			getPlugin().getSLF4JLogger().debug("Plugin is paused: {}; force: {}", getPlugin().isPaused(), force);
 
 			if (getPlugin().isPaused() && !force) {
 				throw new CCResponseException(new CCInstantEffectResponse(
