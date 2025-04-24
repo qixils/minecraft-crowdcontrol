@@ -35,12 +35,14 @@ interface Build {
     }
 }
 
-export async function fetchLatest(version: string) {
+export async function fetchLatest(version: string, force?: boolean) {
     const data = await fetch(`https://api.papermc.io/v2/projects/paper/versions/${version}/builds`, uaheaderfull).then(r => r.json() as Promise<BuildsBody>)
-    return data.builds.findLast(build => build.channel === "default")
+    return force
+        ? data.builds[data.builds.length - 1]
+        : data.builds.findLast(build => build.channel === "default")
 }
 
-export async function downloadPaper(to: string) {
+export async function downloadPaper(to: string, forceVersion?: string) {
     try {
         const root = await mkdir(path.resolve(to, "Paper"), { empty: true })
         await writeEula(root)
@@ -55,8 +57,8 @@ export async function downloadPaper(to: string) {
         let build: Build | undefined
         let version: string | undefined
         for (const vers of data.versions.toReversed()) {
-            if (vers !== "1.21.4") continue; // TODO
-            build = await fetchLatest(vers)
+            if (forceVersion && vers !== forceVersion) continue;
+            build = await fetchLatest(vers, !!forceVersion)
             if (build) {
                 version = vers
                 break

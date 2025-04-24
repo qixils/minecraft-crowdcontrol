@@ -9,14 +9,15 @@ export interface SpongeVersion extends Version {
 }
 
 const autoVersion = <T extends Version>(versions: Omit<T, 'latest'>[]): T[] => {
-    return [...versions].sort((a, b) => a.id.localeCompare(b.id)).reverse().map((version, index) => ({ ...version, latest: !index } as T))
+    return [...versions].sort((a, b) => a.id.localeCompare(b.id)).reverse().map((version, index) => ({ latest: !index, ...version } as T))
 }
 const findLatest = (versions: Version[]): Version => {
     return versions.find(version => version.latest) || versions[0]
 }
 
 export const paperVersions: Version[] = autoVersion([
-    { id: "1.21.4", supported: true, legacy: false },
+    { id: "1.21.5", latest: false, supported: true, legacy: false },
+    { id: "1.21.4", latest: true, supported: true, legacy: false },
     { id: "1.21.3", supported: true, legacy: false },
     { id: "1.21.1", supported: false, legacy: true },
     { id: "1.20.6", supported: false, legacy: true },
@@ -28,6 +29,7 @@ export const paperVersions: Version[] = autoVersion([
 export const paperLatest = findLatest(paperVersions)
 
 export const fabricVersions: Version[] = autoVersion([
+    { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: true, legacy: false },
     { id: "1.21.3", supported: true, legacy: false },
     { id: "1.21.1", supported: false, legacy: true },
@@ -41,6 +43,7 @@ export const fabricVersions: Version[] = autoVersion([
 export const fabricLatest = findLatest(fabricVersions)
 
 export const neoForgeVersions: Version[] = autoVersion([
+    { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: true, legacy: false },
     { id: "1.21.3", supported: true, legacy: false },
     { id: "1.21.1", supported: false, legacy: true },

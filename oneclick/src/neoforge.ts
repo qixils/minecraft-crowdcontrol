@@ -9,7 +9,9 @@ interface NeoVersions {
     versions: string[]
 }
 
-export async function downloadNeoForge(to: string) {
+export async function downloadNeoForge(to: string, forceVersion?: string) {
+    if (forceVersion) forceVersion = forceVersion.split(".", 2)[1] + "." // 1.21.5 -> 21.5.
+
     const root = await mkdir(path.resolve(to, `NeoForge`), { empty: true })
     await writeEula(root)
 
@@ -18,8 +20,8 @@ export async function downloadNeoForge(to: string) {
     await writeConfig(config)
 
     const neoVersions = await fetch("https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge", uaheaderfull).then(r => r.json()) as NeoVersions
-    const neoLatest = neoVersions.versions.reverse().find(ver => ver.startsWith("21.4.") && !ver.includes("beta"))! // TODO
-    const minecraft = `1.${neoLatest.substring(0, 4)}` // TODO
+    const neoLatest = neoVersions.versions.reverse().find(ver => forceVersion ? ver.startsWith(forceVersion) : !ver.includes("beta"))!
+    const minecraft = `1.${neoLatest.split(".", 3).slice(0, 2).join(".")}`
 
     console.info(`Downloading NeoForge ${neoLatest} installer`)
     const installerJar = path.resolve(to, `neoforge-${neoLatest}.jar`)

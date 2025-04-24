@@ -11,9 +11,9 @@ const root = await mkdir(path.resolve("output", "Minecraft"))
 await downloadJRE(root, 21)
 
 const modVersions = await Promise.allSettled([
-    await downloadPaper(root),
-    await downloadFabric(root),
-    await downloadNeoForge(root),
+    await downloadPaper(root, "1.21.4"),
+    await downloadFabric(root, "1.21.5"),
+    await downloadNeoForge(root, "1.21.5"),
 ])
 
 const modVersion = modVersions
