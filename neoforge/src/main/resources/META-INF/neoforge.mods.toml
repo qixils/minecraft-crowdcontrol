@@ -35,5 +35,11 @@ ordering = "AFTER"
 side = "SERVER"
 referralUrl = "https://luckperms.net/download"
 
+[[dependencies.crowdcontrol]]
+modId = "adventure_platform_neoforge"
+type = "required"
+ordering = "AFTER"
+side = "BOTH"
+
 [[mixins]]
 config = "crowdcontrol.mixins.json"
