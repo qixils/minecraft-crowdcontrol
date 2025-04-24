@@ -69,7 +69,12 @@ dependencies {
     }
     common(project(path = ":mojmap-common", configuration = "namedElements")) { isTransitive = false }
     shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
-    shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion")
+
+    // jarInJar/include is not transitive so we have to do this cope instead
+    shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion") {
+        exclude(group = "net.kyori")
+    }
+    modImplementation(include("net.kyori:option:1.1.0")!!)
 }
 
 tasks.processResources {
@@ -96,8 +101,6 @@ tasks.shadowJar {
     configurations = listOf(shadowBundle)
     archiveBaseName.set("shadow-CrowdControl")
     archiveVersion.set("")
-
-    relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
 
     exclude("org/slf4j/")
     exclude("io/leangen/geantyref/")
