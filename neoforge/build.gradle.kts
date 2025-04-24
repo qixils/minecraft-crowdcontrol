@@ -101,10 +101,12 @@ tasks.shadowJar {
 
     exclude("org/slf4j/")
     exclude("io/leangen/geantyref/")
+    exclude("net/kyori/option/")
 
     dependencies {
         exclude("org.slf4j::")
         exclude("io.leangen.geantyref::")
+        exclude("net.kyori:option:")
     }
 }
 
