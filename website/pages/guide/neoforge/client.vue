@@ -46,6 +46,7 @@ useSeoMeta({
         </ul>
       </li>
       <li>Create a new folder called <code>mods</code>.</li>
+      <li v-if="version.id === '1.21.1'">Download the latest build of <a :href="`https://modrinth.com/mod/forgified-fabric-api/versions?l=neoforge&g=${version.id}&c=release`">Forgified Fabric API</a> and place it in the <code>mods</code> folder.</li>
       <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=neoforge&g=${version.id}`">Crowd Control for NeoForge</a> and place it in the <code>mods</code> folder.</li>
       <li>(Optional) Copy all the other NeoForge {{ version.id }} mods that you want to play with into the <code>mods</code> folder.</li>
     </ol>

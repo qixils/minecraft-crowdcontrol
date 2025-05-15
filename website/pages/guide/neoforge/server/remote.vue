@@ -36,6 +36,7 @@ useSeoMeta({
     <ol>
       <li>In your admin panel, setup a NeoForge {{ version.id }} server.</li>
       <li>In the file upload panel, create a new folder named <code>mods</code>.</li>
+      <li v-if="version.id === '1.21.1'">Download the latest build of <a :href="`https://modrinth.com/mod/forgified-fabric-api/versions?l=neoforge&g=${version.id}&c=release`">Forgified Fabric API</a> and upload it to the <code>mods</code> folder.</li>
       <li>Download the latest build of <a :href="`https://modrinth.com/mod/crowdcontrol/versions?l=neoforge&g=${version.id}`">Crowd Control</a> and upload it to the <code>mods</code> folder.</li>
       <li>(Optional) Upload any other NeoForge mods you want to play with into the <code>mods</code> folder.
         <ul>
