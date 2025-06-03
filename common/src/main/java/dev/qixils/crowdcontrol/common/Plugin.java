@@ -685,6 +685,17 @@ public abstract class Plugin<P, S> {
 	public boolean globalEffectsUsableFor(@NotNull P player) {
 		if (isGlobal()) return true;
 
+		return isHost(player);
+	}
+
+	/**
+	 * Whether the specified player is known to be a server host.
+	 * Used for managing item and entity limits, even with global effects enabled.
+	 *
+	 * @param player player to check
+	 * @return whether the player is a server host
+	 */
+	public boolean isHost(@NotNull P player) {
 		Collection<String> hosts = getHosts();
 		if (hosts.isEmpty()) return false;
 
@@ -708,18 +719,6 @@ public abstract class Plugin<P, S> {
 
 		String platformId = userToken.getOriginId();
 		return hosts.stream().anyMatch(host -> host.equalsIgnoreCase(platformId));
-	}
-
-	/**
-	 * Whether the specified player is known to be a server host.
-	 *
-	 * @param player player to check
-	 * @return whether the player is a server host
-	 */
-	@Deprecated
-	@ApiStatus.ScheduledForRemoval
-	public boolean isHost(@NotNull P player) {
-		return globalEffectsUsableFor(player);
 	}
 
 	/**

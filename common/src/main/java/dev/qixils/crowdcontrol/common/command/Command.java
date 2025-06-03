@@ -13,6 +13,7 @@ import live.crowdcontrol.cc4j.CCEffect;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CrowdControl;
 import live.crowdcontrol.cc4j.IUserRecord;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -357,5 +359,27 @@ public interface Command<P> extends CCEffect {
 		List<String> list = new ArrayList<>(getEffectGroups());
 		list.add(getEffectName().toLowerCase(Locale.US));
 		return list.toArray(new String[0]);
+	}
+
+	default CCEffectResponse executeLimit(@NotNull List<P> players, int playerLimit, @NotNull Function<P, CCEffectResponse> supplier) {
+		boolean hostsBypass = getPlugin().getLimitConfig().hostsBypass();
+		int victims = 0;
+		CCEffectResponse successResp = null;
+		CCEffectResponse anyResp = null;
+		for (P player : players) {
+			if (playerLimit > 0 && victims >= playerLimit && (!hostsBypass || !getPlugin().isHost(player))) break;
+			CCEffectResponse resp;
+			try {
+				resp = CompletableFuture.supplyAsync(() -> supplier.apply(player), getPlugin().getSyncExecutor()).join();
+			} catch (Exception e) {
+				continue;
+			}
+			anyResp = resp;
+			if (resp.getStatus() == ResponseStatus.SUCCESS || resp.getStatus() == ResponseStatus.TIMED_BEGIN) {
+				victims++;
+				successResp = resp;
+			}
+		}
+		return successResp != null ? successResp : anyResp; // if resp is null then cc4j will handle the fail response for us (eventually...)
 	}
 }

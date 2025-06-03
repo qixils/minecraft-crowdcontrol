@@ -44,7 +44,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -131,34 +130,25 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			List<ServerPlayer> players = playerSupplier.get();
+
 			LimitConfig config = getPlugin().getLimitConfig();
 			int playerLimit = config.getEntityLimit(getEffectName().replace("entity_", ""));
-			if (playerLimit > 0) {
-				boolean hostsBypass = config.hostsBypass();
-				AtomicInteger victims = new AtomicInteger();
-				players = players.stream()
-					.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
-					.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
-					.toList();
-			}
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;
 
-			boolean success = false;
 			Component name = plugin.getViewerComponentOrNull(request, false);
 
-			for (ServerPlayer player : players) {
+			return executeLimit(players, playerLimit, player -> {
+				boolean success = false;
 				try {
-					success |= spawnEntity(name, player) != null;
-				} catch (Exception e) {
-					plugin.getSLF4JLogger().error("Failed to spawn entity", e);
+					success = spawnEntity(name, player) != null;
+				} catch (Exception ignored) {
 				}
-			}
-
-			return success
-				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to spawn entity"); // TODO: hide?
+				return success
+					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to spawn entity");
+			});
 		}, plugin.getSyncExecutor()));
 	}
 

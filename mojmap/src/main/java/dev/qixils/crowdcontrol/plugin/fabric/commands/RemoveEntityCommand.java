@@ -23,9 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
@@ -90,33 +88,23 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
 			List<ServerPlayer> players = playerSupplier.get();
+
 			LimitConfig config = getPlugin().getLimitConfig();
 			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
-			if (playerLimit > 0) {
-				boolean hostsBypass = config.hostsBypass();
-				AtomicInteger victims = new AtomicInteger();
-				players = players.stream()
-					.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
-					.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
-					.toList();
-			}
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;
 
-			boolean success = false;
-
-			for (ServerPlayer player : players) {
+			return executeLimit(players, playerLimit, player -> {
+				boolean success = false;
 				try {
-					success |= removeEntityFrom(player);
-				} catch (Exception e) {
-					plugin.getSLF4JLogger().error("Failed to spawn entity", e);
+					success = removeEntityFrom(player);
+				} catch (Exception ignored) {
 				}
-			}
-
-			return success
-				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
+				return success
+					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
+			});
 		}));
 	}
 }

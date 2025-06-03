@@ -20,9 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 @Getter
@@ -52,23 +50,18 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
-			LimitConfig config = getPlugin().getLimitConfig();
-			boolean hostsBypass = config.hostsBypass();
-			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+			List<ServerPlayer> players = playerSupplier.get();
 
-			AtomicInteger victims = new AtomicInteger();
-			List<ServerPlayer> players = playerSupplier.get().stream()
-				.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
-				.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
-				.toList();
+			LimitConfig config = getPlugin().getLimitConfig();
+			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
 
 			int amount = request.getQuantity();
 			ItemStack itemStack = new ItemStack(item, amount);
 
-			for (ServerPlayer player : players)
-				sync(() -> giveItemTo(player, itemStack));
-
-			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+			return executeLimit(players, playerLimit, player -> {
+				giveItemTo(player, itemStack);
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+			});
 		}));
 	}
 }

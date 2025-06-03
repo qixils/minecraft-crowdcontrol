@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import dev.qixils.crowdcontrol.common.util.CompletableFutureUtils;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
@@ -11,11 +10,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import static net.kyori.adventure.text.Component.text;
@@ -53,31 +49,19 @@ public abstract class RegionalCommand extends PaperCommand {
 			if (precheck != null) return precheck;
 
 			int playerLimit = getPlayerLimit();
-			if (playerLimit > 0) {
-				boolean hostsBypass = plugin.getLimitConfig().hostsBypass();
-				AtomicInteger victims = new AtomicInteger();
-				players = players.stream()
-					.sorted(Comparator.comparing(plugin::globalEffectsUsableFor))
-					.takeWhile(player -> victims.getAndAdd(1) < playerLimit || (hostsBypass && plugin.globalEffectsUsableFor(player)))
-					.toList();
-			}
 
-			List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-			for (Player player : players) {
-				CompletableFuture<Boolean> future = new CompletableFuture<>();
-				futures.add(future);
-				player.getScheduler().run(plugin.getPaperPlugin(), $ -> executeSafely(player, request, ccPlayer).thenApply(future::complete), () -> future.complete(false));
-			}
-
-			return CompletableFutureUtils.allOf(futures).handleAsync(($1, $2) -> {
-				for (CompletableFuture<Boolean> future : futures) {
-					try {
-						if (future.get())
-							return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
-					} catch (Exception ignored) {}
+			return executeLimit(players, playerLimit, player -> {
+				boolean success = false;
+				try {
+					CompletableFuture<Boolean> future = new CompletableFuture<>();
+					player.getScheduler().run(plugin.getPaperPlugin(), $ -> executeSafely(player, request, ccPlayer).thenApply(future::complete), () -> future.complete(false));
+					success = future.join();
+				} catch (Exception ignored) {
 				}
-				return buildFailure(request, ccPlayer);
-			}).join();
+				return success
+					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+					: buildFailure(request, ccPlayer);
+			});
 		}));
 	}
 }
