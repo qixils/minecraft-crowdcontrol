@@ -1,6 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.common.EventListener;
+import dev.qixils.crowdcontrol.common.util.CCResponseException;
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
@@ -9,6 +11,9 @@ import dev.qixils.crowdcontrol.plugin.fabric.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Tick;
 import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Data;
 import lombok.Getter;
@@ -56,24 +61,28 @@ public class DoOrDieCommand extends ModdedCommand {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		// TODO: cooldown
-		List<ServerPlayer> players = playerSupplier.get();
-		List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
-		Collections.shuffle(conditions, random);
-		SuccessCondition condition = conditions.stream()
-			.filter(cond -> cond.canApply(players))
-			.findAny()
-			.orElseThrow(() -> new IllegalStateException("Could not find a condition that can be applied to all targets"));
-		players.forEach(condition::track);
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+			List<ServerPlayer> players = playerSupplier.get();
+			List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
+			Collections.shuffle(conditions, random);
+			SuccessCondition condition = conditions.stream()
+				.filter(cond -> cond.canApply(players))
+				.findAny()
+				.orElseThrow(() -> new CCResponseException(new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find a challenge to apply")));
+			players.forEach(condition::track);
 
-		Task task = new Task(
-			plugin,
-			plugin.server().getTickCount(),
-			players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
-			condition,
-			condition.getComponent()
-		);
-		if (!task.run(null))
-			task.register();
+			Task task = new Task(
+				plugin,
+				plugin.server().getTickCount(),
+				players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
+				condition,
+				condition.getComponent()
+			);
+			if (!task.run(null))
+				task.register();
+
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+		}));
 	}
 
 	@Data
