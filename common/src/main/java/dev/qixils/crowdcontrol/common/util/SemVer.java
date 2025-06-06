@@ -114,6 +114,9 @@ public final class SemVer implements Comparable<SemVer> {
 			major = Integer.parseInt(parts[0]);
 			minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
 			if (parts.length > 2) {
+				int plusIndex = parts[2].indexOf('+');
+				if (plusIndex != -1) parts[2] = parts[2].substring(0, plusIndex);
+
 				int dashIndex = parts[2].indexOf('-');
 				if (dashIndex == -1) {
 					patch = Integer.parseInt(parts[2]);

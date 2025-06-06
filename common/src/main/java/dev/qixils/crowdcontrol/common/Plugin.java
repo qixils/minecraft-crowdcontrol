@@ -1,9 +1,11 @@
 package dev.qixils.crowdcontrol.common;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.http.ModrinthVersion;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.Application;
@@ -44,14 +46,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
+import static live.crowdcontrol.cc4j.websocket.ConnectedPlayer.JACKSON;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static org.incendo.cloud.description.Description.description;
@@ -254,6 +263,8 @@ public abstract class Plugin<P, S> {
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
 	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
+	protected SemVer latestModVersionCached = null;
+	protected Instant latestModVersionCachedAt = Instant.EPOCH;
 
 	protected Plugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;
@@ -533,6 +544,148 @@ public abstract class Plugin<P, S> {
 		// TODO: support i18n in cloud command descriptions
 
 		//// Account Command ////
+
+		Builder<S> accountCmd = manager.commandBuilder("account")
+			.commandDescription(description("Manage your Crowd Control account"));
+
+		// link command
+		manager.command(accountCmd.literal("link")
+			.commandDescription(description("Connect your Crowd Control account"))
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.handler(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.sender());
+				if (crowdControl == null) {
+					// TODO: custom message
+					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
+					return;
+				}
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				if (uuidOpt.isEmpty()) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
+				if (player == null) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				if (player.getToken() != null) {
+					audience.sendMessage(output(translatable("cc.join.account-linked", NamedTextColor.RED)));
+					return;
+				}
+				audience.sendMessage(output(translatable("cc.join.authenticating")));
+				player.regenerateAuthCode();
+			})
+		);
+
+		// unlink command
+		manager.command(accountCmd.literal("unlink")
+			.commandDescription(description("Connect your Crowd Control account"))
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.handler(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.sender());
+				if (crowdControl == null) {
+					// TODO: custom message
+					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
+					return;
+				}
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				if (uuidOpt.isEmpty()) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
+				if (player == null) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				if (player.getToken() == null) {
+					audience.sendMessage(output(translatable("cc.join.account-unlinked", NamedTextColor.RED)));
+					return;
+				}
+				audience.sendMessage(output(translatable("cc.join.unauthenticating")));
+				player.stopSession().handle(($1, $2) -> {
+					player.clearToken();
+					audience.sendMessage(output(translatable("cc.join.unauthenticated")));
+					return $1;
+				});
+			})
+		);
+
+		//// Session Command ////
+
+		Builder<S> sessionCmd = manager.commandBuilder("session")
+			.commandDescription(description("Manage your Crowd Control session"));
+
+		// start command
+		manager.command(sessionCmd.literal("start")
+			.commandDescription(description("Starts your Crowd Control session"))
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.handler(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.sender());
+				if (crowdControl == null) {
+					// TODO: custom message
+					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
+					return;
+				}
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				if (uuidOpt.isEmpty()) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
+				if (player == null) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				UserToken token = player.getUserToken();
+				if (token == null) {
+					audience.sendMessage(output(translatable("cc.join.needs-authentication", NamedTextColor.RED)));
+					return;
+				}
+				if (player.getGameSessionId() != null) {
+					audience.sendMessage(output(translatable("cc.join.session-active", NamedTextColor.RED)));
+					return;
+				}
+				audience.sendMessage(output(translatable("cc.join.starting")));
+				player.startSession(getConditionalEffectVisibility(player.getUserToken()));
+			})
+		);
+
+		// stop command
+		manager.command(sessionCmd.literal("stop")
+			.commandDescription(description("Stop your Crowd Control session"))
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.handler(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.sender());
+				if (crowdControl == null) {
+					// TODO: custom message
+					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
+					return;
+				}
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				if (uuidOpt.isEmpty()) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
+				if (player == null) {
+					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+					return;
+				}
+				UserToken token = player.getUserToken();
+				if (token == null) {
+					audience.sendMessage(output(translatable("cc.join.needs-authentication", NamedTextColor.RED)));
+					return;
+				}
+				if (player.getGameSessionId() == null) {
+					audience.sendMessage(output(translatable("cc.join.session-inactive", NamedTextColor.RED)));
+					return;
+				}
+				player.stopSession();
+				audience.sendMessage(output(translatable("cc.join.stopped")));
+			})
+		);
 
 		//// CrowdControl Command ////
 
@@ -946,20 +1099,28 @@ public abstract class Plugin<P, S> {
 			return;
 		}
 
-		mapper.asAudience(joiningPlayer).sendMessage(JOIN_MESSAGE);
+		Audience audience = mapper.asAudience(joiningPlayer);
+		audience.sendMessage(JOIN_MESSAGE);
 
 		if (!playerMapper().hasPermission(joiningPlayer, Plugin.USE_PERMISSION)) return;
+
+		if (playerMapper().hasPermission(joiningPlayer, Plugin.ADMIN_PERMISSION)) {
+			checkModVersion().thenAccept(latestModVersion -> {
+				if (latestModVersion == null) return;
+				if (!SemVer.MOD.isLessThan(latestModVersion)) return;
+				audience.sendMessage(Component.translatable("cc.join.outdated").decorate(TextDecoration.ITALIC).color(JOIN_MESSAGE_COLOR));
+			});
+		}
 
 		CCPlayer ccPlayer = cc.addPlayer(uuid);
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.GENERATED_AUTH_CODE, payload -> {
 			String url = ccPlayer.getAuthUrl();
 			if (url == null) return; // eh?
 			// ensure player is still online
-			Optional<P> optPlayer = mapper.getPlayer(uuid);
-			if (optPlayer.isEmpty()) return;
-			P player = optPlayer.get();
+//			Optional<P> optPlayer = mapper.getPlayer(uuid);
+//			if (optPlayer.isEmpty()) return;
+//			P player = optPlayer.get();
 			// send messages
-			Audience audience = mapper.asAudience(player);
 			if (ccPlayer.getUserToken() == null) {
 				audience.sendMessage(translatable("cc.join.link.text.1", TextColor.color(0xF1D4FC)));
 				audience.sendMessage(translatable("cc.join.link.text.2", TextColor.color(0xE8CEF2)).arguments(Component.keybind("key.chat")));
@@ -1154,5 +1315,48 @@ public abstract class Plugin<P, S> {
 	 */
 	public boolean isPaused() {
 		return false;
+	}
+
+	@NotNull
+	public CompletableFuture<@Nullable SemVer> checkModVersion() {
+		// TODO: cleanup
+
+		if (Duration.between(latestModVersionCachedAt, Instant.now()).getSeconds() < Duration.ofHours(1).getSeconds())
+			return CompletableFuture.completedFuture(latestModVersionCached);
+
+		return CompletableFuture.supplyAsync(() -> {
+			HttpURLConnection con = null;
+			try {
+				var mcVersionMetadata = getVersionMetadata();
+				String loader = URLEncoder.encode("[\"" + mcVersionMetadata.getModLoaderExpected().toLowerCase(Locale.US) + "\"]", StandardCharsets.UTF_8);
+				String version = URLEncoder.encode("[\"" + mcVersionMetadata.getMinecraftVersion() + "\"]", StandardCharsets.UTF_8);
+				URL url = new URL("https://api.modrinth.com/v2/project/crowdcontrol/version?loaders=" + loader + "&game_versions=" + version);
+				con = (HttpURLConnection) url.openConnection();
+				con.setRequestMethod("GET");
+				con.setRequestProperty("User-Agent", "crowdcontrol4j");
+				con.setRequestProperty("Content-Type", "application/json");
+				con.setConnectTimeout(10000);
+				con.setReadTimeout(10000);
+
+				List<ModrinthVersion> versions = JACKSON.readValue(con.getInputStream(), new TypeReference<>() {
+				});
+				if (con.getResponseCode() != 200)
+					throw new IllegalStateException("Server returned code " + con.getResponseCode());
+				if (versions.isEmpty()) return null;
+				String latestVersion = versions.getFirst().getVersionNumber();
+				if (latestVersion == null) return null;
+				latestModVersionCachedAt = Instant.now();
+				latestModVersionCached = new SemVer(latestVersion);
+				getSLF4JLogger().info("Latest mod version is {}", latestModVersionCached.toString());
+				return latestModVersionCached;
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} finally {
+				if (con != null) con.disconnect();
+			}
+		}).handle((latestModVersion, e) -> {
+			if (e != null) getSLF4JLogger().warn("Failed to fetch latest version", e);
+			return latestModVersion;
+		});
 	}
 }
