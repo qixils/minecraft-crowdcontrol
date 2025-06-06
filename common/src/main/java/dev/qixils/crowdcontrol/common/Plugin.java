@@ -1010,10 +1010,14 @@ public abstract class Plugin<P, S> {
 					if (!(extraFeatures = effect.requiredExtraFeatures()).isEmpty()) {
 						boolean available = potentialPlayers.stream().anyMatch(player -> extraFeatures.stream().allMatch(feature -> isFeatureAvailable(feature, player)));
 						visibility = TriState.fromBoolean(available);
-					} else if ((minVersion = effect.getMinimumModVersion()).isAtLeast(SemVer.ZERO)) {
+					}
+					if (visibility != TriState.FALSE && (minVersion = effect.getMinimumModVersion()).isGreaterThan(SemVer.ZERO)) {
 						visibility = TriState.fromBoolean(clientVersion.isAtLeast(minVersion));
-					} else if (effect.isGlobal())
+						getSLF4JLogger().debug("Client {} version is at least effect {} version {}? {}", clientVersion, effect.getEffectName(), minVersion, visibility);
+					}
+					if (visibility != TriState.FALSE && effect.isGlobal()) {
 						visibility = TriState.fromBoolean(globalVisible);
+					}
 				}
 			} catch (Exception e) {
 				getSLF4JLogger().error("Hiding faulty effect {}", id, e);
@@ -1038,6 +1042,9 @@ public abstract class Plugin<P, S> {
 		CCEffectReport[] reports = new CCEffectReport[effects.size()];
 		int i = 0;
 		for (Map.Entry<ReportStatus, List<String>> entry : effects.entrySet()) {
+			if (entry.getKey() == ReportStatus.MENU_HIDDEN || entry.getKey() == ReportStatus.MENU_UNAVAILABLE) {
+				getSLF4JLogger().debug("{} effects: {}", entry.getKey(), entry.getValue());
+			}
 			reports[i++] = new CCEffectReport(
 				IdentifierType.EFFECT,
 				entry.getKey(),
@@ -1054,11 +1061,14 @@ public abstract class Plugin<P, S> {
 	 * @param ccPlayer the player to send the packets to
 	 */
 	public void updateConditionalEffectVisibility(CCPlayer ccPlayer) {
+		getSLF4JLogger().debug("Updating effect visibility for player {}...", ccPlayer);
 		if (ccPlayer == null) return;
+		getSLF4JLogger().debug("...with session {} & token {}...", ccPlayer.getGameSessionId(), ccPlayer.getUserToken());
 		if (ccPlayer.getGameSessionId() == null) return;
 		if (ccPlayer.getUserToken() == null) return;
 
 		CCEffectReport[] reports = getConditionalEffectVisibility(ccPlayer.getUserToken());
+		getSLF4JLogger().debug("...with {} reports", reports.length);
 		if (reports.length == 0) return;
 
 		ccPlayer.sendReport(reports);
@@ -1137,13 +1147,19 @@ public abstract class Plugin<P, S> {
 		});
 		ccPlayer.getEventManager().registerEventRunnable(CCEventType.AUTHENTICATED, () -> {
 			if (ccPlayer.getGameSessionId() != null) return;
-			if (ccPlayer.getUserToken() == null) return; // !?
+			UserToken user = ccPlayer.getUserToken();
+			if (user == null) return; // !?
 			playerMapper().getPlayer(ccPlayer.getUuid()).ifPresent(p -> playerMapper().asAudience(p)
-				.sendMessage(PREFIX_COMPONENT.append(translatable("cc.join.authenticated").args(text(ccPlayer.getUserToken().getName())))));
+				.sendMessage(PREFIX_COMPONENT.append(translatable("cc.join.authenticated").args(text(user.getName())))));
 			// start session
-			ccPlayer.startSession(getConditionalEffectVisibility(ccPlayer.getUserToken()));
+			getScheduledExecutor().schedule(
+				() -> ccPlayer.startSession(getConditionalEffectVisibility(user)),
+				3,
+				TimeUnit.SECONDS
+			);
 		});
 		ccPlayer.getEventManager().registerEventRunnable(CCEventType.SESSION_STARTED, () -> {
+			updateConditionalEffectVisibility(ccPlayer); // just in case anything changed between then and now
 			UserToken user = ccPlayer.getUserToken();
 			if (user == null) return;
 			playerMapper().getPlayer(ccPlayer.getUuid()).ifPresent(p -> playerMapper().asAudience(p)
