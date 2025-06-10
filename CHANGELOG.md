@@ -2,6 +2,15 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.0.4
+
+- Added `/account` and `/session` commands to manage your login and game session
+- Added a warning in chat when using an outdated version
+- Fixed client-only effects sometimes not showing when intended
+- Fixed global-only effects sometimes showing when not intended
+- Fixed config-limited effects rarely targeting less streamers than intended
+- Fabric: Fixed _Do-or-Die_ effect statuses
+
 ## 4.0.3
 
 - Added support for 1.21.5
