@@ -48,7 +48,7 @@ public class TorchCommand extends ModdedCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			Predicate<Location> predicate = placeTorches
 				? loc -> BlockFinder.isReplaceable(loc.block())
 				: loc -> torches.contains(loc.block().getBlock());

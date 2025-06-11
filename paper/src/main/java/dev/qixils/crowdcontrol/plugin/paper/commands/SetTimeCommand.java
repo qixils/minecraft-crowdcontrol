@@ -31,7 +31,7 @@ public class SetTimeCommand extends PaperCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			playerSupplier.get(); // validate now is ok to start
 			for (World world : Bukkit.getWorlds())
 				world.setTime(time);

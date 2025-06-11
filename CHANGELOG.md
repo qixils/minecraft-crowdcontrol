@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.0.5
+
+- Fabric/NeoForge: Fixed Summon effects crashing the server
+
 ## 4.0.4
 
 - Added `/account` and `/session` commands to manage your login and game session
@@ -9,7 +13,7 @@ A list of all changes made to the software in reverse chronological order.
 - Fixed client-only effects sometimes not showing when intended
 - Fixed global-only effects sometimes showing when not intended
 - Fixed config-limited effects rarely targeting less streamers than intended
-- Fabric: Fixed _Do-or-Die_ effect statuses
+- Fabric/NeoForge: Fixed _Do-or-Die_ effect statuses
 
 ## 4.0.3
 

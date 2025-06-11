@@ -27,7 +27,7 @@ public class SwapCommand extends PaperCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<Player> players = playerSupplier.get();
 			if (players.size() < 2)
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Not enough participating players online");

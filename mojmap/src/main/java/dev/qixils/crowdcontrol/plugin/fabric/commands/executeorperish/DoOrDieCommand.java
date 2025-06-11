@@ -61,7 +61,7 @@ public class DoOrDieCommand extends ModdedCommand {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		// TODO: cooldown
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<ServerPlayer> players = playerSupplier.get();
 			List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
 			Collections.shuffle(conditions, random);

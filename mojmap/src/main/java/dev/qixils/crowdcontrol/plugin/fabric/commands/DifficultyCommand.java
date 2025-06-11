@@ -39,7 +39,7 @@ public class DifficultyCommand extends ModdedCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			playerSupplier.get(); // validate now is ok to start
 			if (plugin.server().getWorldData().isDifficultyLocked())
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Server difficulty is locked");

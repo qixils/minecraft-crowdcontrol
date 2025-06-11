@@ -23,7 +23,7 @@ public class KillCommand<P> implements Command<P> {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<P> players = playerSupplier.get();
 			if (isActive(ccPlayer, "health_modifiers", "freeze")) {
 				return new CCInstantEffectResponse(

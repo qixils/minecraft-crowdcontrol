@@ -25,7 +25,7 @@ public class HalfHealthCommand<P> implements Command<P> {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<P> players = playerSupplier.get();
 			boolean success = false;
 			for (P rawPlayer : players) {

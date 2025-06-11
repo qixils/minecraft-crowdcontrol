@@ -48,7 +48,7 @@ public class EnchantmentCommand extends ModdedCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
 				int level = enchantment.getMaxLevel();

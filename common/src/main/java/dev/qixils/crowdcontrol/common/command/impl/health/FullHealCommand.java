@@ -23,7 +23,7 @@ public class FullHealCommand<P> implements Command<P> {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			if (isActive(ccPlayer, "health_modifier")) {
 				return new CCInstantEffectResponse(
 					request.getRequestId(),

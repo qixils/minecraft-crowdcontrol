@@ -38,7 +38,7 @@ public class LanguageCommand extends ModdedCommand implements CCTimedEffect {
 
 	@Override
 	public void execute(@NotNull Supplier<List<ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			if (isActive(ccPlayer, getEffectArray()))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "All players already have an active language effect");
 			List<ServerPlayer> players = playerSupplier.get();

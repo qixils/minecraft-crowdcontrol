@@ -54,7 +54,7 @@ public class KeepInventoryCommand extends ModdedCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<List<ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<ServerPlayer> players = playerSupplier.get();
 			if (plugin.isGlobal()) {
 				if (globalKeepInventory == enable) {

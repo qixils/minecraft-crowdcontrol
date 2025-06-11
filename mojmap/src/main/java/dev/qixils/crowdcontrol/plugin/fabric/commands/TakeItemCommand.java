@@ -64,7 +64,7 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
@@ -72,7 +72,7 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 
 			int amount = request.getQuantity();
 
-			return executeLimit(players, playerLimit, player -> {
+			return executeLimit(request, players, playerLimit, player -> {
 				boolean success = false;
 				try {
 					success = takeItemFrom(player, amount);

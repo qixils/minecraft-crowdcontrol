@@ -43,14 +43,14 @@ public abstract class RegionalCommand extends PaperCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<Player> players = playerSupplier.get();
 			CCEffectResponse precheck = precheck(players, request, ccPlayer);
 			if (precheck != null) return precheck;
 
 			int playerLimit = getPlayerLimit();
 
-			return executeLimit(players, playerLimit, player -> {
+			return executeLimit(request, players, playerLimit, player -> {
 				boolean success = false;
 				try {
 					CompletableFuture<Boolean> future = new CompletableFuture<>();

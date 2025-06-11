@@ -2,7 +2,9 @@ package dev.qixils.crowdcontrol.common.util;
 
 import live.crowdcontrol.cc4j.CrowdControl;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -26,7 +28,7 @@ public class ThreadUtil {
 	}
 
 	@CheckReturnValue
-	public static @NotNull CCEffectResponse waitForSuccess(Supplier<CCEffectResponse> supplier) {
+	public static @NotNull CCEffectResponse waitForSuccess(@NotNull PublicEffectPayload request, Supplier<CCEffectResponse> supplier) {
 		CCEffectResponse resp = null;
 		long time = System.currentTimeMillis();
 		int i = 0;
@@ -41,11 +43,12 @@ public class ThreadUtil {
 			if (resp != null && (resp.getStatus() == ResponseStatus.SUCCESS || resp.getStatus() == ResponseStatus.FAIL_PERMANENT || resp.getStatus() == ResponseStatus.TIMED_BEGIN)) break;
 			if (i++ > 0 && !sleep()) break;
 		}
-		return resp; // if resp is null then cc4j will handle the fail response for us (eventually...)
+		if (resp != null) return resp;
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Effect failed to execute");
 	}
 
 	@CheckReturnValue
-	public static @NotNull CCEffectResponse waitForSuccess(Supplier<CCEffectResponse> supplier, @NotNull Executor executor) {
-		return waitForSuccess(() -> CompletableFuture.supplyAsync(supplier, executor).join());
+	public static @NotNull CCEffectResponse waitForSuccess(@NotNull PublicEffectPayload request, Supplier<CCEffectResponse> supplier, @NotNull Executor executor) {
+		return waitForSuccess(request, () -> CompletableFuture.supplyAsync(supplier, executor).join());
 	}
 }

@@ -35,7 +35,7 @@ public class EntityChaosCommand extends PaperCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> CompletableFuture.<List<CompletableFuture<Boolean>>>supplyAsync(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> CompletableFuture.<List<CompletableFuture<Boolean>>>supplyAsync(() -> {
 			List<Player> players = playerSupplier.get();
 			Set<Entity> entities = new HashSet<>();
 			if (players.stream().anyMatch(plugin::globalEffectsUsableFor)) {

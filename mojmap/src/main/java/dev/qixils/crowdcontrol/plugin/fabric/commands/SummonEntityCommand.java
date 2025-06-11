@@ -128,7 +128,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
@@ -139,7 +139,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 			Component name = plugin.getViewerComponentOrNull(request, false);
 
-			return executeLimit(players, playerLimit, player -> {
+			return executeLimit(request, players, playerLimit, player -> {
 				boolean success = false;
 				try {
 					success = spawnEntity(name, player) != null;
@@ -149,7 +149,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to spawn entity");
 			});
-		}, plugin.getSyncExecutor()));
+		}));
 	}
 
 	@Blocking

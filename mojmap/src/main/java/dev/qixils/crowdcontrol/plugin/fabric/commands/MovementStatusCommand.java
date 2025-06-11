@@ -54,7 +54,7 @@ public class MovementStatusCommand extends ModdedCommand implements CCTimedEffec
 
 	@Override
 	public void execute(@NotNull Supplier<List<ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<ServerPlayer> players = playerSupplier.get();
 			idMap.put(request.getRequestId(), players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()));
 

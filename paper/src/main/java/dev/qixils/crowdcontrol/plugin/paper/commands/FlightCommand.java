@@ -42,7 +42,7 @@ public class FlightCommand extends PaperCommand implements Listener, CCTimedEffe
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<Player> players = playerSupplier.get();
 			boolean success = false;
 			for (Player player : players) {

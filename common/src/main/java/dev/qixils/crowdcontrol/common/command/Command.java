@@ -361,7 +361,12 @@ public interface Command<P> extends CCEffect {
 		return list.toArray(new String[0]);
 	}
 
-	default CCEffectResponse executeLimit(@NotNull List<P> players, int playerLimit, @NotNull Function<P, CCEffectResponse> supplier) {
+	default CCEffectResponse executeLimit(@NotNull PublicEffectPayload request, @NotNull List<P> players, int playerLimit, @NotNull Function<P, CCEffectResponse> supplier) {
+		boolean isMainThread = Thread.currentThread().getName().equals("Server thread");
+		if (isMainThread) {
+			getPlugin().getSLF4JLogger().error("Effect {} is implemented incorrectly, invoking executeLimit from main thread, please report this!", getEffectName());
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Effect is implemented incorrectly");
+		}
 		boolean hostsBypass = getPlugin().getLimitConfig().hostsBypass();
 		int victims = 0;
 		CCEffectResponse successResp = null;
@@ -380,6 +385,8 @@ public interface Command<P> extends CCEffect {
 				successResp = resp;
 			}
 		}
-		return successResp != null ? successResp : anyResp; // if resp is null then cc4j will handle the fail response for us (eventually...)
+		if (successResp != null) return successResp;
+		if (anyResp != null) return anyResp;
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Effect failed to execute");
 	}
 }

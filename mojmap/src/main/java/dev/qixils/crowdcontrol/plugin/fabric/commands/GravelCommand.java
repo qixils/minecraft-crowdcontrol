@@ -29,7 +29,7 @@ public class GravelCommand extends ModdedCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			Set<Location> locations = new HashSet<>();
 			for (ServerPlayer player : playerSupplier.get())
 				locations.addAll(BlockFinder.builder()

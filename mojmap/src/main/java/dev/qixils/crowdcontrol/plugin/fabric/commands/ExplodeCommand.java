@@ -29,7 +29,7 @@ public class ExplodeCommand extends ModdedCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			// generate a random explosion ~~power~~ radius
 			float power = (float) explosionPower();
 			// whether the explosion should place fire blocks (5% chance)

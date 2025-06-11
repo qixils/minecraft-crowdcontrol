@@ -28,7 +28,7 @@ public class DamageCommand<P> implements Command<P> {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull P>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		int amount = request.getQuantity() * 2;
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			if (isActive(ccPlayer, "health_modifier")) {
 				return new CCInstantEffectResponse(
 					request.getRequestId(),

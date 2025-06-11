@@ -43,7 +43,7 @@ public class PlayerSizeCommand extends PaperCommand implements CCTimedEffect {
 
 	@Override
 	public void execute(@NotNull Supplier<List<Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			if (isActive(ccPlayer, "freeze", effectGroup))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Conflicting effects active");
 			List<Player> players = playerSupplier.get();

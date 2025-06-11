@@ -49,7 +49,7 @@ public class PlantTreeCommand extends ModdedCommand {
 
 	@Override
 	public void execute(@NotNull Supplier<List<ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			AtomicBoolean success = new AtomicBoolean();
 			List<ServerPlayer> players = playerSupplier.get();
 			Collection<CompletableFuture<?>> futures = new ArrayList<>(players.size());

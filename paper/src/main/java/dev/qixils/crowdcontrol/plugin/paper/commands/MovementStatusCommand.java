@@ -94,7 +94,7 @@ public class MovementStatusCommand extends PaperCommand implements CCTimedEffect
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(() -> {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<Player> players = playerSupplier.get();
 
 			if (players.isEmpty())
