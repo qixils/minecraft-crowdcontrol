@@ -44,6 +44,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -139,7 +140,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 			Component name = plugin.getViewerComponentOrNull(request, false);
 
-			return executeLimit(request, players, playerLimit, player -> {
+			return executeLimit(request, players, playerLimit, player -> CompletableFuture.supplyAsync(() -> {
 				boolean success = false;
 				try {
 					success = spawnEntity(name, player) != null;
@@ -148,7 +149,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 				return success
 					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to spawn entity");
-			});
+			}, getPlugin().getSyncExecutor()).join());
 		}));
 	}
 

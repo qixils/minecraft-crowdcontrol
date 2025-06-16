@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 @Getter
@@ -72,7 +73,7 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 
 			int amount = request.getQuantity();
 
-			return executeLimit(request, players, playerLimit, player -> {
+			return executeLimit(request, players, playerLimit, player -> CompletableFuture.supplyAsync(() -> {
 				boolean success = false;
 				try {
 					success = takeItemFrom(player, amount);
@@ -81,7 +82,7 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 				return success
 					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Item could not be found in target inventories");
-			});
+			}, getPlugin().getSyncExecutor()).join());
 		}));
 	}
 }

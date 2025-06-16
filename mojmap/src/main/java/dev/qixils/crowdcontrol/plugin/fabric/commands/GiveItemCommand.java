@@ -59,7 +59,7 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 			ItemStack itemStack = new ItemStack(item, amount);
 
 			return executeLimit(request, players, playerLimit, player -> {
-				giveItemTo(player, itemStack);
+				sync(() -> giveItemTo(player, itemStack));
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 			});
 		}));

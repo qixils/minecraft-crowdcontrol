@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
@@ -95,7 +96,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;
 
-			return executeLimit(request, players, playerLimit, player -> {
+			return executeLimit(request, players, playerLimit, player -> CompletableFuture.supplyAsync(() -> {
 				boolean success = false;
 				try {
 					success = removeEntityFrom(player);
@@ -104,7 +105,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 				return success
 					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
-			});
+			}, getPlugin().getSyncExecutor()).join());
 		}));
 	}
 }

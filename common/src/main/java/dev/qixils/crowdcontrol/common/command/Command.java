@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -361,9 +360,12 @@ public interface Command<P> extends CCEffect {
 		return list.toArray(new String[0]);
 	}
 
+	default boolean isMainThread() {
+		return Thread.currentThread().getName().equals("Server thread");
+	}
+
 	default CCEffectResponse executeLimit(@NotNull PublicEffectPayload request, @NotNull List<P> players, int playerLimit, @NotNull Function<P, CCEffectResponse> supplier) {
-		boolean isMainThread = Thread.currentThread().getName().equals("Server thread");
-		if (isMainThread) {
+		if (isMainThread()) {
 			getPlugin().getSLF4JLogger().error("Effect {} is implemented incorrectly, invoking executeLimit from main thread, please report this!", getEffectName());
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Effect is implemented incorrectly");
 		}
@@ -375,7 +377,8 @@ public interface Command<P> extends CCEffect {
 			if (playerLimit > 0 && victims >= playerLimit && (!hostsBypass || !getPlugin().isHost(player))) break;
 			CCEffectResponse resp;
 			try {
-				resp = CompletableFuture.supplyAsync(() -> supplier.apply(player), getPlugin().getSyncExecutor()).join();
+//				resp = CompletableFuture.supplyAsync(() -> supplier.apply(player), getPlugin().getSyncExecutor()).join();
+				resp = supplier.apply(player);
 			} catch (Exception e) {
 				continue;
 			}

@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -22,5 +23,10 @@ public abstract class PaperCommand implements Command<Player> {
 	@Override
 	public boolean isEventListener() {
 		return this instanceof Listener;
+	}
+
+	@Override
+	public boolean isMainThread() {
+		return Command.super.isMainThread() || Bukkit.isPrimaryThread() || Bukkit.isGlobalTickThread();
 	}
 }
