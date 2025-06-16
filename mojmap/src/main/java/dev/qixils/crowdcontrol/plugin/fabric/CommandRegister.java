@@ -59,6 +59,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new VeinCommand(plugin),
 			() -> new SoundCommand(plugin),
 			() -> new ChargedCreeperCommand(plugin),
+			() -> new ChickenJockeyCommand(plugin),
+			() -> new SmallAntCommand(plugin),
 			() -> new SwapCommand(plugin),
 			() -> new DinnerboneCommand(plugin),
 			() -> new ClutterCommand(plugin),

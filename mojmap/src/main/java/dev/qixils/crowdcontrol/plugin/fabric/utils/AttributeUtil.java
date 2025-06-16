@@ -58,6 +58,8 @@ public class AttributeUtil {
 	public static void addModifier(LivingEntity player, Holder<Attribute> attributeHolder, UUID uuid, double level, AttributeModifier.Operation op, boolean permanent) {
 		AttributeInstance attr = player.getAttribute(attributeHolder);
 		if (attr == null) {
+			// TODO: register
+
 			logger.warn("Player missing {} attribute", attributeHolder.unwrapKey().orElse(null));
 			return;
 		}

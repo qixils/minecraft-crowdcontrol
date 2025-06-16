@@ -36,6 +36,16 @@ public class CommandConstants {
 	public static final UUID SCALE_STEP_MODIFIER_UUID = new UUID(8279684539680771938L, -4906911542497939969L);
 	public static final UUID SCALE_JUMP_MODIFIER_UUID = new UUID(7320315186307875087L, -5912984502438606275L);
 
+	// yes there is already a scale modifier but this allows us to apply small/big scale on top of the ant
+	public static final UUID ANT_SCALE_MODIFIER_UUID = new UUID(-1821843958642947773L, -5045337188442667310L);
+	public static final String ANT_SCALE_MODIFIER_NAME = "ant-scale-cc";
+	public static final UUID ANT_SPEED_MODIFIER_UUID = new UUID(5811146150910903844L, -5416149565125762405L);
+	public static final String ANT_SPEED_MODIFIER_NAME = "ant-speed-cc";
+	public static final UUID ANT_STEP_MODIFIER_UUID = new UUID(1326713636513333747L, -6767548671610976425L);
+	public static final String ANT_STEP_MODIFIER_NAME = "ant-step-cc";
+	public static final UUID ANT_RANGE_MODIFIER_UUID = new UUID(2422796905512585387L, -8469336011429629212L);
+	public static final String ANT_RANGE_MODIFIER_NAME = "ant-range-cc";
+
 	public static final String GRAVITY_MODIFIER_NAME = "gravity-cc";
 	public static final String FALL_MODIFIER_NAME = "fall-cc";
 	public static final String FALL_DMG_MODIFIER_NAME = "fall-dmg-cc";

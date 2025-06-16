@@ -54,13 +54,12 @@ import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
 @Getter
 public class SummonEntityCommand<E extends Entity> extends ModdedCommand implements EntityCommand<E> {
 	private static final Set<EquipmentSlot> HANDS = Arrays.stream(EquipmentSlot.values()).filter(slot -> slot.getType() == EquipmentSlot.Type.HAND).collect(Collectors.toSet());
-	private final Map<EquipmentSlot, List<Item>> humanoidArmor;
 	protected final EntityType<? extends E> entityType;
 	protected final EntityType<? extends E>[] entityTypes;
 	private final String effectName;
 	private final Component displayName;
-	private List<ResourceKey<LootTable>> lootTables = null;
-	private final Map<EntityType<?>, List<Item>> horseArmor = new HashMap<>();
+	private static List<ResourceKey<LootTable>> LOOT_TABLES = null;
+	private static final Map<EntityType<?>, List<Item>> HORSE_ARMOR = new HashMap<>();
 	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
 			Rabbit.Variant.BLACK, 16,
 			Rabbit.Variant.BROWN, 16,
@@ -70,6 +69,25 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			Rabbit.Variant.WHITE_SPLOTCHED, 16,
 			Rabbit.Variant.EVIL, 1
 	);
+	private static final Map<EquipmentSlot, List<Item>> HUMANOID_ARMOR;
+
+	static {
+		// pre-compute the map of valid armor pieces
+		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
+		for (Item item : BuiltInRegistries.ITEM) {
+			Equippable equippable = item.components().get(DataComponents.EQUIPPABLE);
+			if (equippable == null) continue;
+			EquipmentSlot slot = equippable.slot();
+			if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
+				continue;
+			armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(item);
+		}
+
+		// make collections unmodifiable
+		for (Map.Entry<EquipmentSlot, List<Item>> entry : new HashSet<>(armor.entrySet()))
+			armor.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
+		HUMANOID_ARMOR = Collections.unmodifiableMap(armor);
+	}
 
 	public SummonEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(
@@ -90,22 +108,6 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 		this.effectName = effectName;
 		this.displayName = displayName;
-
-		// pre-compute the map of valid armor pieces
-		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
-		for (Item item : BuiltInRegistries.ITEM) {
-			Equippable equippable = item.components().get(DataComponents.EQUIPPABLE);
-			if (equippable == null) continue;
-			EquipmentSlot slot = equippable.slot();
-			if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
-				continue;
-			armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(item);
-		}
-
-		// make collections unmodifiable
-		for (Map.Entry<EquipmentSlot, List<Item>> entry : new HashSet<>(armor.entrySet()))
-			armor.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
-		this.humanoidArmor = Collections.unmodifiableMap(armor);
 	}
 
 	public @NotNull Component getDisplayName() {
@@ -117,10 +119,10 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		return RandomUtil.randomElementFrom(entityTypes);
 	}
 
-	private List<ResourceKey<LootTable>> getLootTables(MinecraftServer server) {
-		if (lootTables != null)
-			return lootTables;
-		return lootTables = ((HolderLookup.Provider) server.reloadableRegistries().lookup())
+	private static List<ResourceKey<LootTable>> getLOOT_TABLES(MinecraftServer server) {
+		if (LOOT_TABLES != null)
+			return LOOT_TABLES;
+		return LOOT_TABLES = ((HolderLookup.Provider) server.reloadableRegistries().lookup())
 			.lookupOrThrow(Registries.LOOT_TABLE)
 			.listElementIds()
 			.filter(key -> key.location().getPath().startsWith("chests/"))
@@ -154,11 +156,11 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	}
 
 	@Blocking
-	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
+	protected static <E extends Entity> E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player, @NotNull EntityType<E> entityType, @NotNull ModdedCrowdControlPlugin plugin) {
 		ServerLevel level = player.serverLevel();
 		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return null;
 
-		E entity = getRandomEntityType().create(player.serverLevel(), EntitySpawnReason.COMMAND);
+		E entity = entityType.create(player.serverLevel(), EntitySpawnReason.COMMAND);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 
@@ -182,7 +184,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			mooshroom.setVariant(MushroomCow.Variant.BROWN); // TODO: validate neoforge accesstransformer
 		if (entity instanceof AbstractHorse horse) {
 			if (horse.canUseSlot(EquipmentSlot.BODY) && RandomUtil.RNG.nextBoolean()) {
-				List<Item> items = horseArmor.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
+				List<Item> items = HORSE_ARMOR.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
 					.filter(item -> {
 						Equippable equippable = item.components().get(DataComponents.EQUIPPABLE);
 						if (equippable == null) return false;
@@ -211,13 +213,13 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		if (entity instanceof VillagerDataHolder villager)
 			villager.setVillagerData(villager.getVillagerData().withType(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE.listElements())));
 		if (entity instanceof ContainerEntity container)
-			container.setContainerLootTable(randomElementFrom(getLootTables(level.getServer())));
+			container.setContainerLootTable(randomElementFrom(getLOOT_TABLES(level.getServer())));
 
 		// add random armor to armor stands
 		if (entity instanceof ArmorStand armorStand) {
 			// could add some chaos (GH#64) here eventually
 			// chaos idea: set drop chance for each slot to a random float
-			List<EquipmentSlot> slots = new ArrayList<>(humanoidArmor.keySet());
+			List<EquipmentSlot> slots = new ArrayList<>(HUMANOID_ARMOR.keySet());
 			Collections.shuffle(slots, random);
 			// begins as a 1 in 4 chance to add a random item but becomes less likely each time
 			// an item is added
@@ -226,7 +228,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 				if (random.nextInt(odds) > 0)
 					continue;
 				odds += ENTITY_ARMOR_INC;
-				ItemStack item = new ItemStack(randomElementFrom(humanoidArmor.get(type)));
+				ItemStack item = new ItemStack(randomElementFrom(HUMANOID_ARMOR.get(type)));
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
 						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START, level.registryAccess());
@@ -245,5 +247,10 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		// spawn entity
 		level.addFreshEntity(entity);
 		return entity;
+	}
+
+	@Blocking
+	protected E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player) {
+		return spawnEntity(viewer, player, getRandomEntityType(), plugin);
 	}
 }

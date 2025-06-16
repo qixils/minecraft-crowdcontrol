@@ -127,7 +127,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		return spawnEntity(plugin.getViewerComponentOrNull(request, false), player) != null;
 	}
 
-	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
+	protected static Entity spawnEntity(@Nullable Component viewer, @NotNull Player player, @NotNull EntityType entityType, @NotNull NamespacedKey mobKey) {
 		World world = player.getWorld();
 		if (entityType == EntityType.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END) return null;
 
@@ -202,6 +202,10 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 
 		entity.getPersistentDataContainer().set(mobKey, PaperCrowdControlPlugin.BOOLEAN_TYPE, true);
 		return entity;
+	}
+
+	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
+		return spawnEntity(viewer, player, entityType, mobKey);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

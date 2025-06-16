@@ -39,8 +39,8 @@ public class AttributeUtil {
 		if (level == 0) return;
 
 		Consumer<AttributeModifier> func = permanent
-			? attr::addTransientModifier
-			: attr::addModifier;
+			? attr::addModifier
+			: attr::addTransientModifier;
 
 		func.accept(new AttributeModifier(
 			uuid,
@@ -53,8 +53,14 @@ public class AttributeUtil {
 	public static void addModifier(Attributable player, Attribute attribute, UUID uuid, String name, double level, AttributeModifier.Operation op, boolean permanent) {
 		AttributeInstance attr = player.getAttribute(attribute);
 		if (attr == null) {
-			logger.warn("Player missing {} attribute", attribute.getKey());
-			return;
+			// TODO: it's probably not necessary to check first? shrug
+			player.registerAttribute(attribute);
+			attr = player.getAttribute(attribute);
+
+			if (attr == null) {
+				logger.warn("Player missing {} attribute", attribute.getKey());
+				return;
+			}
 		}
 
 		addModifier(attr, uuid, name, level, op, permanent);
