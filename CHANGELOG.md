@@ -2,6 +2,11 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.1.0
+
+- Added _Summon Chicken Jockey_ effect
+- Added _Summon Small Ant_ effect
+
 ## 4.0.5
 
 - Fabric/NeoForge: Fixed Summon effects crashing the server
