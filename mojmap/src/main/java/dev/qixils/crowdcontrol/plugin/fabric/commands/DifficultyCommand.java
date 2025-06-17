@@ -41,13 +41,13 @@ public class DifficultyCommand extends ModdedCommand {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			playerSupplier.get(); // validate now is ok to start
-			if (plugin.server().getWorldData().isDifficultyLocked())
+			if (plugin.theGame().getWorldData().isDifficultyLocked())
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Server difficulty is locked");
-			if (plugin.server().getWorldData().getDifficulty() == difficulty)
+			if (plugin.theGame().getWorldData().getDifficulty() == difficulty)
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Server difficulty is already set to " + displayName);
 
 			async(plugin::updateConditionalEffectVisibility);
-			sync(() -> plugin.server().setDifficulty(difficulty, true));
+			sync(() -> plugin.theGame().setDifficulty(difficulty, true));
 
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 		}));
@@ -55,14 +55,18 @@ public class DifficultyCommand extends ModdedCommand {
 
 	@Override
 	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
-		if (plugin.server().getWorldData().isDifficultyLocked())
+		if (plugin.getTheGame() == null)
+			return TriState.UNKNOWN;
+		if (plugin.getTheGame().getWorldData().isDifficultyLocked())
 			return TriState.FALSE;
 		return TriState.TRUE;
 	}
 
 	@Override
 	public TriState isSelectable(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
-		if (plugin.server().getWorldData().getDifficulty() == difficulty)
+		if (plugin.getTheGame() == null)
+			return TriState.UNKNOWN;
+		if (plugin.getTheGame().getWorldData().getDifficulty() == difficulty)
 			return TriState.FALSE;
 		return TriState.TRUE;
 	}

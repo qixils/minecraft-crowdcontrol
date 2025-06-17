@@ -48,15 +48,15 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull UUID uuid) {
-		return Optional.ofNullable(plugin.getServer()).map(server -> server.getPlayerList().getPlayer(uuid));
+		return Optional.ofNullable(plugin.getTheGame()).map(server -> server.playerList().getPlayer(uuid));
 	}
 
 	@SuppressWarnings("ConstantValue")
 	@Override
 	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull InetAddress ip) {
-		return Optional.ofNullable(plugin.getServer()).map(server -> {
+		return Optional.ofNullable(plugin.getTheGame()).map(server -> {
 			ServerPlayer result = null;
-			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			for (ServerPlayer player : server.playerList().getPlayers()) {
 				if (player.connection == null)
 					continue;
 				SocketAddress address = player.connection.getRemoteAddress();
@@ -78,8 +78,8 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public @NotNull Optional<ServerPlayer> getPlayerByLogin(@NotNull LoginData login) {
-		return Optional.ofNullable(plugin.getServer()).flatMap(server -> {
-			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+		return Optional.ofNullable(plugin.getTheGame()).flatMap(server -> {
+			for (ServerPlayer player : server.playerList().getPlayers()) {
 				if (player.getGameProfile().getName().equalsIgnoreCase(login.getName()) || player.getUUID().equals(login.getId()))
 					return Optional.of(player);
 			}

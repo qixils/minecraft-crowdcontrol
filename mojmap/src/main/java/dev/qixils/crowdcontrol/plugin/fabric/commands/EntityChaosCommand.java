@@ -39,7 +39,7 @@ public class EntityChaosCommand extends ModdedCommand {
 			List<ServerPlayer> players = playerSupplier.get();
 			Set<Entity> entities = new HashSet<>(200);
 			if (players.stream().anyMatch(plugin::globalEffectsUsableFor)) {
-				for (ServerLevel level : plugin.server().getAllLevels()) {
+				for (ServerLevel level : plugin.theGame().getAllLevels()) {
 					for (Entity entity : level.getAllEntities()) {
 						if (entity.getType() == EntityType.PLAYER) continue;
 						entities.add(entity);

@@ -106,7 +106,7 @@ public class DoOrDieCommand extends ModdedCommand {
 			pastValue = secondsLeft;
 			boolean isTimeUp = secondsLeft <= 0;
 			for (UUID uuid : notCompleted) {
-				ServerPlayer player = plugin.server().getPlayerList().getPlayer(uuid);
+				ServerPlayer player = plugin.theGame().playerList().getPlayer(uuid);
 				if (player == null) continue;
 
 				if (condition.hasSucceeded(player)) {

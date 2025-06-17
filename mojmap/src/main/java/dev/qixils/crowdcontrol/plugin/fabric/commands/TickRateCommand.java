@@ -42,7 +42,7 @@ public class TickRateCommand extends ModdedCommand implements CCTimedEffect {
 	}
 
 	private void set(float value) {
-		plugin.server().tickRateManager().setTickRate(value);
+		plugin.theGame().tickRateManager().setTickRate(value);
 	}
 
 	@Override

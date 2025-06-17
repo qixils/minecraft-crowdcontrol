@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -20,7 +21,8 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 
 	@Override
 	public @NotNull List<@NotNull ServerPlayer> getAllPlayersFull() {
-		return new ArrayList<>(getPlugin().server().getPlayerList().getPlayers());
+		if (getPlugin().getTheGame() == null) return Collections.emptyList();
+		return new ArrayList<>(getPlugin().getTheGame().playerList().getPlayers());
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public class TickFreezeCommand extends ModdedCommand implements CCTimedEffect {
 	}
 
 	private void set(boolean value) {
-		plugin.server().tickRateManager().setFrozen(value);
+		plugin.theGame().tickRateManager().setFrozen(value);
 	}
 
 	@Override

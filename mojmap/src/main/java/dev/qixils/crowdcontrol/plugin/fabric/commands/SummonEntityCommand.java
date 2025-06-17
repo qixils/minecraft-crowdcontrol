@@ -17,7 +17,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TheGame;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
@@ -119,10 +119,10 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		return RandomUtil.randomElementFrom(entityTypes);
 	}
 
-	private static List<ResourceKey<LootTable>> getLOOT_TABLES(MinecraftServer server) {
+	private static List<ResourceKey<LootTable>> getLootTables(TheGame theGame) {
 		if (LOOT_TABLES != null)
 			return LOOT_TABLES;
-		return LOOT_TABLES = ((HolderLookup.Provider) server.reloadableRegistries().lookup())
+		return LOOT_TABLES = ((HolderLookup.Provider) theGame.reloadableRegistries().lookup())
 			.lookupOrThrow(Registries.LOOT_TABLE)
 			.listElementIds()
 			.filter(key -> key.location().getPath().startsWith("chests/"))
@@ -213,7 +213,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		if (entity instanceof VillagerDataHolder villager)
 			villager.setVillagerData(villager.getVillagerData().withType(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE.listElements())));
 		if (entity instanceof ContainerEntity container)
-			container.setContainerLootTable(randomElementFrom(getLOOT_TABLES(level.getServer())));
+			container.setContainerLootTable(randomElementFrom(getLootTables(level.theGame())));
 
 		// add random armor to armor stands
 		if (entity instanceof ArmorStand armorStand) {

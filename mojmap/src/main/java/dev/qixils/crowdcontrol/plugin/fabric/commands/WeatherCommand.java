@@ -40,7 +40,7 @@ public class WeatherCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			playerSupplier.get(); // validate now is ok to start
 			boolean success = false;
-			for (ServerLevel world : plugin.server().getAllLevels()) {
+			for (ServerLevel world : plugin.theGame().getAllLevels()) {
 				if (!world.dimension().location().getPath().equals("overworld"))
 					continue;
 				if (storm && world.isThundering())

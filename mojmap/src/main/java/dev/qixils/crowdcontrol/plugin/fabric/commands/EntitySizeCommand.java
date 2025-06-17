@@ -54,7 +54,7 @@ public class EntitySizeCommand extends ModdedCommand {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Server not active");
 			Set<Location> locations = playerSupplier.get().stream().map(Location::new).collect(Collectors.toSet());
 			boolean success = false;
-			for (ServerLevel world : plugin.getServer().getAllLevels()) {
+			for (ServerLevel world : plugin.theGame().getAllLevels()) {
 				for (Entity entity : world.getAllEntities()) {
 					if (!(entity instanceof LivingEntity living)) continue;
 					if (entity instanceof Player) continue; // skip players

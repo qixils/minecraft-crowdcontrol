@@ -19,7 +19,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TheGame;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,12 +85,12 @@ public final class FreezeCommand extends ModdedCommand implements CCTimedEffect 
 	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		Map<UUID, FreezeData> locations = TIMED_EFFECTS.remove(request.getRequestId());
 		if (locations == null) return;
-		MinecraftServer server = getPlugin().getServer();
-		if (server == null)
+		TheGame theGame = getPlugin().getTheGame();
+		if (theGame == null)
 			return;
 		locations.forEach((uuid, data) -> {
 			DATA.get(uuid).remove(data);
-			ServerPlayer player = server.getPlayerList().getPlayer(uuid);
+			ServerPlayer player = theGame.playerList().getPlayer(uuid);
 			if (player == null)
 				return;
 			player.cc$setMovementStatus(freezeType, MovementStatusValue.ALLOWED);

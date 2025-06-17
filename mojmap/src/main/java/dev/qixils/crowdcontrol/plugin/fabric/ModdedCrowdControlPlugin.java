@@ -36,6 +36,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TheGame;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.flag.FeatureElement;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -69,6 +70,8 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	private final EventManager eventManager = new EventManager();
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
+	@Nullable
+	protected TheGame theGame;
 	@Nullable
 	protected MinecraftServer server;
 	@Nullable @Accessors(fluent = true)
@@ -124,7 +127,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	}
 
 	public <T> Registry<T> registry(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
-		if (accessor == null) accessor = server().registryAccess();
+		if (accessor == null) accessor = theGame().registryAccess();
 		return accessor.lookupOrThrow(key);
 	}
 
@@ -173,6 +176,13 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	}
 
 	@NotNull
+	public TheGame theGame() throws IllegalStateException {
+		if (this.theGame == null)
+			throw new IllegalStateException("Tried to access game without one running");
+		return this.theGame;
+	}
+
+	@NotNull
 	public MinecraftServer server() throws IllegalStateException {
 		if (this.server == null)
 			throw new IllegalStateException("Tried to access server without one running");
@@ -191,13 +201,15 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 		return Optional.ofNullable(this.adventure);
 	}
 
-	protected void setServer(@Nullable MinecraftServer server) {
-		if (server == null) {
+	protected void setServer(@Nullable TheGame theGame) {
+		if (theGame == null) {
+			this.theGame = null;
 			this.server = null;
 			this.adventure = null;
 			this.syncExecutor = Runnable::run;
 		} else {
-			this.server = server;
+			this.theGame = theGame;
+			this.server = theGame.server();
 			this.adventure = MinecraftServerAudiences.of(server);
 			this.syncExecutor = server;
 			this.textUtil = new MojmapTextUtil(this);
@@ -246,8 +258,8 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 
 	@NotNull
 	public TriState isEnabled(FeatureElement feature) {
-		if (server == null) return TriState.UNKNOWN;
-		return TriState.fromBoolean(feature.isEnabled(server.getWorldData().enabledFeatures()));
+		if (theGame == null) return TriState.UNKNOWN;
+		return TriState.fromBoolean(feature.isEnabled(theGame.getWorldData().enabledFeatures()));
 	}
 
 	public boolean isDisabled(FeatureElement feature) {
@@ -273,9 +285,9 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	public abstract PermissionUtil getPermissionUtil();
 
 	public @NotNull Stream<ServerPlayer> toPlayerStream(@Nullable Collection<UUID> uuids) {
-		MinecraftServer _server = server;
-		if (uuids == null || _server == null) return Stream.empty();
-		return uuids.stream().map(id -> _server.getPlayerList().getPlayer(id)).filter(Objects::nonNull);
+		TheGame _theGame = theGame;
+		if (uuids == null || _theGame == null) return Stream.empty();
+		return uuids.stream().map(id -> _theGame.playerList().getPlayer(id)).filter(Objects::nonNull);
 	}
 
 	public @NotNull List<ServerPlayer> toPlayerList(@Nullable Collection<UUID> uuids) {

@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 	@NotNull EntityType<? extends E> getEntityType();
@@ -38,7 +37,7 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 	}
 
 	default boolean serverIsPeaceful() {
-		return StreamSupport.stream(getPlugin().server().getAllLevels().spliterator(), false).allMatch(this::levelIsPeaceful);
+		return getPlugin().theGame().getAllLevels().stream().allMatch(this::levelIsPeaceful);
 	}
 
 	@Override

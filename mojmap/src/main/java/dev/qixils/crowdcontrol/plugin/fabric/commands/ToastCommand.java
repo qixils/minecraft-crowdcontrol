@@ -78,7 +78,7 @@ public final class ToastCommand extends ModdedCommand {
 
 				// spam recipe toasts
 				ServerRecipeBook book = player.getRecipeBook();
-				RecipeManager recipeManager = plugin.server().getRecipeManager();
+				RecipeManager recipeManager = plugin.theGame().getRecipeManager();
 				Collection<RecipeHolder<?>> recipes = book.known
 					.stream()
 					.flatMap(location -> recipeManager.byKey(location).stream())

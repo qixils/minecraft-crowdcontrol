@@ -190,7 +190,7 @@ public class LootboxCommand extends ModdedCommand {
 	@Contract(mutates = "param1")
 	public void randomlyModifyItem(ItemStack itemStack, int luck, @Nullable RegistryAccess registryAccess) {
 		if (registryAccess == null)
-			registryAccess = plugin.server().registryAccess();
+			registryAccess = plugin.theGame().registryAccess();
 
 		// make item unbreakable with a default chance of 5% (up to 100% at 10 luck)
 		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))

@@ -35,7 +35,7 @@ public class SetTimeCommand extends ModdedCommand {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			playerSupplier.get(); // validate now is ok to start
-			for (ServerLevel level : plugin.server().getAllLevels()) {
+			for (ServerLevel level : plugin.theGame().getAllLevels()) {
 				final long ogTime = level.getDayTime();
 				final long setTime = (ogTime - (ogTime % 24000)) + time;
 				sync(() -> level.setDayTime(setTime));
