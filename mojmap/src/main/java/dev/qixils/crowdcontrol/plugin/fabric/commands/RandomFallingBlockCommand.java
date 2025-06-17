@@ -52,7 +52,7 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 			ploop:
 			for (ServerPlayer player : playerSupplier.get()) {
 				Location playerLoc = new Location(player);
-				ServerLevel world = player.serverLevel();
+				ServerLevel world = player.level();
 				BlockPos position = BlockPos.containing(
 					playerLoc.x(),
 					Math.min(
@@ -71,8 +71,8 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 				}
 
 				// get block to place
-				Block block = getRandomBlock(player.serverLevel());
-				FallingBlockEntity entity = FallingBlockEntity.fall(player.serverLevel(), position, block.defaultBlockState());
+				Block block = getRandomBlock(player.level());
+				FallingBlockEntity entity = FallingBlockEntity.fall(player.level(), position, block.defaultBlockState());
 				entity.fallDamagePerDistance = 0.75f;
 				entity.fallDamageMax = 4;
 				entity.dropItem = true;

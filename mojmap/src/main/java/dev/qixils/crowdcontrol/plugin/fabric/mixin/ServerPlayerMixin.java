@@ -7,8 +7,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.GameTypeEffectComponent;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -17,6 +15,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameRules.BooleanValue;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,8 +34,8 @@ import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInvento
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements GameTypeEffectComponent {
 
-	public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-		super(level, blockPos, f, gameProfile);
+	public ServerPlayerMixin(Level level, GameProfile gameProfile) {
+		super(level, gameProfile);
 	}
 
 	@Unique
@@ -53,7 +53,7 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 	}
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
+	void onReadAdditionalSaveData(ValueInput tag, CallbackInfo ci) {
 		cc$gameTypeEffect = tag
 			.getString(Components.GAME_TYPE_EFFECT)
 			.map(name -> GameType.byName(name, null))
@@ -61,7 +61,7 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-	void onAddAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
+	void onAddAdditionalSaveData(ValueOutput tag, CallbackInfo ci) {
 		if (cc$gameTypeEffect != null)
 			tag.putString(Components.GAME_TYPE_EFFECT, cc$gameTypeEffect.getName());
 	}

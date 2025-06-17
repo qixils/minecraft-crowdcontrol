@@ -66,7 +66,7 @@ public class ClearInventoryCommand extends ModdedCommand {
 	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
 		// Cannot use inventory effects while /gamerule keepInventory true
 		return potentialPlayers.stream()
-			.anyMatch(player -> player.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
+			.anyMatch(player -> player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
 			? TriState.FALSE
 			: TriState.TRUE;
 	}

@@ -56,7 +56,7 @@ public class TeleportCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get()) {
 				if (player.isPassenger())
 					player.stopRiding();
-				ServerLevel level = player.serverLevel();
+				ServerLevel level = player.level();
 				double x = player.getX();
 				double y = player.getY();
 				double z = player.getZ();

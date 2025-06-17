@@ -39,7 +39,7 @@ public class DinnerboneCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			Set<LivingEntity> entities = new HashSet<>();
 			for (ServerPlayer player : playerSupplier.get()) {
-				entities.addAll(StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
+				entities.addAll(StreamSupport.stream(player.level().getAllEntities().spliterator(), false)
 					.filter(entity -> entity instanceof LivingEntity
 						&& entity.getType() != EntityType.PLAYER
 						&& entity.position().distanceToSqr(player.position()) <= (ENTITY_SEARCH_RADIUS * ENTITY_SEARCH_RADIUS))

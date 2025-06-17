@@ -157,10 +157,10 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 	@Blocking
 	protected static <E extends Entity> E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player, @NotNull EntityType<E> entityType, @NotNull ModdedCrowdControlPlugin plugin) {
-		ServerLevel level = player.serverLevel();
+		ServerLevel level = player.level();
 		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return null;
 
-		E entity = entityType.create(player.serverLevel(), EntitySpawnReason.COMMAND);
+		E entity = entityType.create(player.level(), EntitySpawnReason.COMMAND);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 
