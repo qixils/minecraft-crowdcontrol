@@ -45,8 +45,8 @@ public class AttributeUtil {
 		if (level == 0) return;
 
 		Consumer<AttributeModifier> func = permanent
-			? attr::addTransientModifier
-			: attr::addPermanentModifier;
+			? attr::addPermanentModifier
+			: attr::addTransientModifier;
 
 		func.accept(new AttributeModifier(
 			migrateId(uuid),
