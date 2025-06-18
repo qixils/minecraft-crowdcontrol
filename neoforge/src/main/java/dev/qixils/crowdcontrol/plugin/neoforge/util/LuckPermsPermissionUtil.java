@@ -6,8 +6,9 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.util.Tristate;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.PermissionSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.entity.UniquelyIdentifyable;
 
 public class LuckPermsPermissionUtil extends NeoForgePermissionUtil {
 	private LuckPerms api;
@@ -35,15 +36,19 @@ public class LuckPermsPermissionUtil extends NeoForgePermissionUtil {
 	}
 
 	@Override
-	public boolean check(SharedSuggestionProvider source, PermissionWrapper permission) {
+	public boolean check(PermissionSource source, PermissionWrapper permission) {
 		boolean fallback = super.check(source, permission);
 
 		initializeApi();
 		if (api == null) return fallback;
 
-		if (!(source instanceof CommandSourceStack stack)) return fallback;
+		UniquelyIdentifyable entity = null;
+		if (source instanceof UniquelyIdentifyable asEntity) {
+			entity = asEntity;
+		} else if (source instanceof CommandSourceStack stack) {
+			entity = stack.getEntity();
+		}
 
-		Entity entity = stack.getEntity();
 		if (entity == null) return fallback;
 
 		User user = api.getUserManager().getUser(entity.getUUID());
