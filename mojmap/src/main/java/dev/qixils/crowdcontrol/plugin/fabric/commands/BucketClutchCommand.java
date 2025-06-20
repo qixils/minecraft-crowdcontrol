@@ -39,7 +39,7 @@ public class BucketClutchCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				Item material = player.serverLevel().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
+				Item material = player.level().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
 				ItemStack giveItem = new ItemStack(material);
 				player.registryAccess().lookup(Registries.ENCHANTMENT)
 					.flatMap(registry -> registry.get(Enchantments.VANISHING_CURSE))

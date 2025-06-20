@@ -39,7 +39,7 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 
 	@Blocking
 	public static void giveItemTo(ServerPlayer player, ItemStack itemStack) {
-		ItemEntity entity = player.spawnAtLocation(player.serverLevel(), itemStack);
+		ItemEntity entity = player.spawnAtLocation(player.level(), itemStack);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn item entity");
 		entity.setTarget(player.getUUID());

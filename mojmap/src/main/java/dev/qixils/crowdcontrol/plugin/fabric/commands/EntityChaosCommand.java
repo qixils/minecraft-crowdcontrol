@@ -71,7 +71,7 @@ public class EntityChaosCommand extends ModdedCommand {
 					entity.ejectPassengers();
 					ServerPlayer target = players.get((i++) % players.size());
 					Vec3 dest = target.position();
-					success |= entity.teleportTo(target.serverLevel(), dest.x, dest.y, dest.z, emptySet(), entity.getYRot(), entity.getXRot(), false); // boolean is unused?
+					success |= entity.teleportTo(target.level(), dest.x, dest.y, dest.z, emptySet(), entity.getYRot(), entity.getXRot(), false); // boolean is unused?
 				} catch (Exception ignored) {}
 			}
 

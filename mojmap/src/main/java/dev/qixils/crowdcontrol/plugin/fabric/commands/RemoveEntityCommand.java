@@ -72,7 +72,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
-		ServerLevel level = player.serverLevel();
+		ServerLevel level = player.level();
 		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return false;
 
 		Vec3 playerPosition = player.position();

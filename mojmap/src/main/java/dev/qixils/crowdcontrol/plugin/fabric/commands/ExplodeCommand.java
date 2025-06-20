@@ -39,7 +39,7 @@ public class ExplodeCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get()) {
 				sync(() -> {
 					Vec3 pos = player.position().subtract(0, .5, 0);
-					player.serverLevel().explode(
+					player.level().explode(
 						null,
 						pos.x,
 						pos.y,

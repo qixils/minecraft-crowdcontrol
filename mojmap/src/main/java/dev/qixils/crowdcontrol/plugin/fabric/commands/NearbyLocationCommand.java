@@ -100,7 +100,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				ServerLevel world = player.serverLevel();
+				ServerLevel world = player.level();
 				Location location = new Location(player);
 				S currentType = currentType(location);
 				List<S> searchTypes = new ArrayList<>(getSearchTypes(world));

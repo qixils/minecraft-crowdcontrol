@@ -43,13 +43,16 @@ public class RespawnCommand extends ModdedCommand {
 				BlockPos pos;
 				float angle;
 				if (respawnConfig == null) {
-					level = player.server.getLevel(Level.OVERWORLD);
+					if (player.getServer() == null)
+						continue;
+					level = player.getServer().getLevel(Level.OVERWORLD);
 					if (level == null)
 						continue;
 					pos = level.getSharedSpawnPos();
 					angle = 0;
 				} else {
-					level = player.server.getLevel(respawnConfig.dimension());
+					if (player.getServer() == null) continue;
+					level = player.getServer().getLevel(respawnConfig.dimension());
 					if (level == null) continue;
 					pos = respawnConfig.pos();
 					angle = respawnConfig.angle();

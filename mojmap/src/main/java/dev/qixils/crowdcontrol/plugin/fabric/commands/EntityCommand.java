@@ -55,12 +55,12 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 		// error only if everyone has an error
 		CCInstantEffectResponse error = null;
 		for (ServerPlayer player : players) {
-			ServerLevel level = player.serverLevel();
+			ServerLevel level = player.level();
 			if (isMonster() && levelIsPeaceful(level))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
 			else if (getEntityType() == EntityType.ENDER_DRAGON && level.getDragonFight() != null)
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
-			else if (!isEnabled(player.serverLevel().enabledFeatures()))
+			else if (!isEnabled(player.level().enabledFeatures()))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
 			else
 				return null;
