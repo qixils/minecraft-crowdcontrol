@@ -1,15 +1,18 @@
+import type { SetOptional } from "type-fest"
+
 export interface Version {
     id: string
     latest: boolean
     supported: boolean
     legacy: boolean
+    sort?: string
 }
 export interface SpongeVersion extends Version {
     api: number
 }
 
-const autoVersion = <T extends Version>(versions: Omit<T, 'latest'>[]): T[] => {
-    return [...versions].sort((a, b) => a.id.localeCompare(b.id)).reverse().map((version, index) => ({ latest: !index, ...version } as T))
+const autoVersion = <T extends Version>(versions: SetOptional<T, 'latest'>[]): T[] => {
+    return [...versions].sort((a, b) => (a.sort || a.id).localeCompare(b.sort || b.id)).reverse().map((version, index) => ({ latest: !index, ...version } as T))
 }
 const findLatest = (versions: Version[]): Version => {
     return versions.find(version => version.latest) || versions[0]
@@ -31,7 +34,7 @@ export const paperLatest = findLatest(paperVersions)
 
 export const fabricVersions: Version[] = autoVersion([
     { id: "1.21.6", supported: true, legacy: false },
-    { id: "25w14craftmine", supported: true, legacy: false },
+    { id: "25w14craftmine", supported: true, legacy: false, sort: "1.21.5-AF" },
     { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: false, legacy: false },
     { id: "1.21.3", supported: false, legacy: false },
@@ -47,7 +50,7 @@ export const fabricLatest = findLatest(fabricVersions)
 
 export const neoForgeVersions: Version[] = autoVersion([
     { id: "1.21.6", supported: true, legacy: false },
-    { id: "25w14craftmine", supported: true, legacy: false },
+    { id: "25w14craftmine", supported: true, legacy: false, sort: "1.21.5-AF" },
     { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: false, legacy: false },
     { id: "1.21.3", supported: false, legacy: false },

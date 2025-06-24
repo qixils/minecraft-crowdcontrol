@@ -1118,7 +1118,7 @@ public abstract class Plugin<P, S> {
 			checkModVersion().thenAccept(latestModVersion -> {
 				if (latestModVersion == null) return;
 				if (!SemVer.MOD.isLessThan(latestModVersion)) return;
-				audience.sendMessage(Component.translatable("cc.join.outdated").decorate(TextDecoration.ITALIC).color(JOIN_MESSAGE_COLOR));
+				audience.sendMessage(Component.translatable("cc.join.outdated").decorate(TextDecoration.ITALIC).color(JOIN_MESSAGE_COLOR).clickEvent(ClickEvent.openUrl("https://modrinth.com/mod/crowdcontrol")));
 			});
 		}
 
