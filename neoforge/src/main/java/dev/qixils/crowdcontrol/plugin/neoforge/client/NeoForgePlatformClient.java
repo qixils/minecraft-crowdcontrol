@@ -16,7 +16,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +57,7 @@ public class NeoForgePlatformClient extends ModdedPlatformClient {
 	public void sendToServer(@NotNull CustomPacketPayload payload) {
 		// TODO: check can send?
 		try {
-			PacketDistributor.sendToServer(payload);
+			ClientPacketDistributor.sendToServer(payload);
 		} catch (UnsupportedOperationException e) {
 			logger.debug("Server cannot receive packet {}", payload);
 		}
