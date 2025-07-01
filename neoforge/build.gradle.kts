@@ -7,7 +7,7 @@ val configurateVersion: String by project
 val luckPermsVersion: String by project
 
 plugins {
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
     id("architectury-plugin")
     id("dev.architectury.loom")
 }
