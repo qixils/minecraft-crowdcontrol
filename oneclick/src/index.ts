@@ -11,9 +11,9 @@ const root = await mkdir(path.resolve("output", "Minecraft"))
 await downloadJRE(root, 21)
 
 const modVersions = await Promise.allSettled([
-    await downloadPaper(root, "1.21.4"),
-    await downloadFabric(root, "1.21.6"),
-    await downloadNeoForge(root, "1.21.6"),
+    downloadPaper(root, "1.21.7"),
+    downloadFabric(root, "1.21.7"),
+    downloadNeoForge(root, "1.21.7"),
 ])
 
 const modVersion = modVersions
@@ -21,5 +21,10 @@ const modVersion = modVersions
 .map(result => result.version_number.split("+")[0])
 .sort(semverSort)
 .at(-1)!
+
+console.log(modVersion)
+if (modVersions.some(v => v.status === 'rejected')) {
+    console.error('!!! something failed !!!')
+}
 
 // await fs.writeFile(path.resolve(root, "ccver"), modVersion)
