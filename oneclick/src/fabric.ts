@@ -55,6 +55,10 @@ export async function downloadFabric(to: string, forceVersion?: string) {
 
     const mods = await mkdir(path.resolve(root, "mods"))
     await downloadMod(mods, "fabric", latestGame.version, { project: "fabric-api", filename: "fabric-api.jar" })
-    await downloadMod(mods, "fabric", latestGame.version, { project: "lithium", filename: "Lithium.jar" })
+    try {
+        await downloadMod(mods, "fabric", latestGame.version, { project: "lithium", filename: "Lithium.jar" })
+    } catch {
+        console.warn("could not download lithium")
+    }
     return await downloadMod(mods, "fabric", latestGame.version, { filename: "CrowdControl-Fabric.jar" })
 }
