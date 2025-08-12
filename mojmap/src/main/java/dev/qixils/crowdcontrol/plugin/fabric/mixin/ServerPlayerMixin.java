@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand.FreezeData;
@@ -22,7 +24,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -94,12 +95,12 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 			datum.previousLocation = dest;
 	}
 
-	@Redirect(
+	@WrapOperation(
 			method = "restoreFrom",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
-	private boolean restoreFromRedirectKeepInventory(GameRules gameRules, GameRules.Key<BooleanValue> key) {
-		return keepInventoryRedirect(this, gameRules, key);
+	private boolean restoreFromRedirectKeepInventory(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {
+		return keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 
 	@Inject(method = "die", at = @At("HEAD"), cancellable = true)

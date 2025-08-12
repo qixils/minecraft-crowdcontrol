@@ -16,10 +16,15 @@ public class EntityUtil {
 	private EntityUtil() {
 	}
 
-	public static boolean keepInventoryRedirect(Entity entity, GameRules gameRules, GameRules.Key<BooleanValue> key) {
-		// get server's default value
-		boolean keepInventory = gameRules.getBoolean(key);
-
+	/**
+	 * Redirect the keepInventory value
+	 *
+	 * @param entity Entity trying to respawn
+	 * @param keepInventory Global server value for the gamerule
+	 * @param key ID of the gamerule being checked
+	 * @return resulting, potentially redirected value
+	 */
+	public static boolean keepInventoryRedirect(Entity entity, boolean keepInventory, GameRules.Key<BooleanValue> key) {
 		// double check that this is the keep inventory game rule
 		if (key != GameRules.RULE_KEEPINVENTORY)
 			return keepInventory;

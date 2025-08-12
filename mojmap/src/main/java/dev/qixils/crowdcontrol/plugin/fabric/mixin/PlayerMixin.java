@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
@@ -18,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.EnumMap;
@@ -69,24 +70,19 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 			ci.cancel();
 	}
 
-	@Unique
-	private boolean cc$keepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {
-		return EntityUtil.keepInventoryRedirect(this, gameRules, key);
-	}
-
-	@Redirect(
+	@WrapOperation(
 			method = "dropEquipment",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
-	private boolean equipmentKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {
-		return cc$keepInventoryRedirect(gameRules, key);
+	private boolean equipmentKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {
+		return EntityUtil.keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 
-	@Redirect(
+	@WrapOperation(
 			method = "getBaseExperienceReward",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
-	private boolean experienceKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key) {
-		return cc$keepInventoryRedirect(gameRules, key);
+	private boolean experienceKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {
+		return EntityUtil.keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 }
