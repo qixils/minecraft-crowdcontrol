@@ -3,7 +3,7 @@ val mojmapVersion: String by project
 
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "8.14" apply false
+    id("io.freefair.lombok") version "8.14.2" apply false
     id("com.gradleup.shadow") version "8.3.7" apply true
     id("dev.architectury.loom") version "1.10-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
