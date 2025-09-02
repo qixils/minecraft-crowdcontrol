@@ -26,8 +26,10 @@ useSeoMeta({
       It is expected that you have already rented a remote server through a service like
       <a href="https://bloom.host/">bloom.host</a>.
 
-      Note that no free hosts that we are aware of, including Aternos,
-      support the firewall features necessary to use Crowd Control.
+      <template v-if="version.legacy">
+        Note that no free hosts that we are aware of, including Aternos, support the firewall features
+        necessary to use Crowd Control on the selected Minecraft version.
+      </template>
     </p>
 
     <ol>
