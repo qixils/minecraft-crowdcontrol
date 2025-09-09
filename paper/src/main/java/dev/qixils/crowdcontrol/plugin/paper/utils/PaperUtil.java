@@ -52,6 +52,5 @@ public class PaperUtil {
 		return uuids.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).toList();
 	}
 
-	public static final Permission USE_PERMISSION = toPaper(Plugin.USE_PERMISSION);
 	public static final Permission ADMIN_PERMISSION = toPaper(Plugin.ADMIN_PERMISSION);
 }

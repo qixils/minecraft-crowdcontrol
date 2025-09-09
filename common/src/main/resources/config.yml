@@ -1,16 +1,3 @@
-# Password that Crowd Control clients must enter to connect to this Crowd Control server.
-# This may be temporarily overridden using the "/password" command.
-password: "crowdcontrol"
-
-# The IP to bind the Crowd Control server on.
-# This option is intended for advanced server configurations only.
-# Do not change it unless you know what you are doing.
-ip: null
-
-# The port to listen for incoming connections on.
-# This port must be opened in your server's (or router's) firewall.
-port: 58431
-
 # Makes it so that all purchased effects apply to everyone on the server.
 global: false
 

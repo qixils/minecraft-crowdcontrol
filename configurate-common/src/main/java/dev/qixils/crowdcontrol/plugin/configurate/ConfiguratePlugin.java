@@ -76,6 +76,7 @@ public abstract class ConfiguratePlugin<P, S> extends Plugin<P, S> {
 		// misc
 		global = config.node("global").getBoolean(global);
 		announce = config.node("announce").getBoolean(announce);
+		adminRequired = config.node("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
 	}
 
