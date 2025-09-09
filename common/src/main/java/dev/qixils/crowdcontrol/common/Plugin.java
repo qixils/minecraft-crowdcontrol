@@ -157,11 +157,13 @@ public abstract class Plugin<P, S> {
 	/**
 	 * The permission node required to receive effects.
 	 */
-	public static final PermissionWrapper USE_PERMISSION = PermissionWrapper.builder()
-		.node("crowdcontrol.use")
-		.description("Whether a player is allowed to receive effects")
-		.defaultPermission(PermissionWrapper.DefaultPermission.ALL)
-		.build();
+	public PermissionWrapper getUsePermission() {
+		return PermissionWrapper.builder()
+			.node("crowdcontrol.use")
+			.description("Whether a player is allowed to receive effects")
+			.defaultPermission(isAdminRequired() ? PermissionWrapper.DefaultPermission.OP : PermissionWrapper.DefaultPermission.ALL)
+			.build();
+	}
 
 	/**
 	 * The permission node required to use administrative commands.
@@ -250,6 +252,7 @@ public abstract class Plugin<P, S> {
 	protected CrowdControl crowdControl = null;
 	protected boolean global = false;
 	protected boolean announce = true;
+	protected boolean adminRequired = false;
 	@NotNull
 	protected HideNames hideNames = HideNames.NONE;
 	@NotNull
@@ -346,6 +349,15 @@ public abstract class Plugin<P, S> {
 	 */
 	public void setAnnounceEffects(boolean announceEffects) {
 		this.announce = announceEffects;
+	}
+
+	/**
+	 * Whether admin permissions are required to use the mod.
+	 *
+	 * @return if admin is required
+	 */
+	public boolean isAdminRequired() {
+		return adminRequired;
 	}
 
 	/**
@@ -551,7 +563,7 @@ public abstract class Plugin<P, S> {
 		// link command
 		manager.command(accountCmd.literal("link")
 			.commandDescription(description("Connect your Crowd Control account"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
 				Audience audience = mapper.asAudience(commandContext.sender());
 				if (crowdControl == null) {
@@ -581,7 +593,7 @@ public abstract class Plugin<P, S> {
 		// unlink command
 		manager.command(accountCmd.literal("unlink")
 			.commandDescription(description("Connect your Crowd Control account"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
 				Audience audience = mapper.asAudience(commandContext.sender());
 				if (crowdControl == null) {
@@ -620,7 +632,7 @@ public abstract class Plugin<P, S> {
 		// start command
 		manager.command(sessionCmd.literal("start")
 			.commandDescription(description("Starts your Crowd Control session"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
 				Audience audience = mapper.asAudience(commandContext.sender());
 				if (crowdControl == null) {
@@ -655,7 +667,7 @@ public abstract class Plugin<P, S> {
 		// stop command
 		manager.command(sessionCmd.literal("stop")
 			.commandDescription(description("Stop your Crowd Control session"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, USE_PERMISSION))) // TODO: maybe a more effective means to do this
+			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
 				Audience audience = mapper.asAudience(commandContext.sender());
 				if (crowdControl == null) {
@@ -1112,7 +1124,7 @@ public abstract class Plugin<P, S> {
 		Audience audience = mapper.asAudience(joiningPlayer);
 		audience.sendMessage(JOIN_MESSAGE);
 
-		if (!playerMapper().hasPermission(joiningPlayer, Plugin.USE_PERMISSION)) return;
+		if (!playerMapper().hasPermission(joiningPlayer, getUsePermission())) return;
 
 		if (playerMapper().hasPermission(joiningPlayer, Plugin.ADMIN_PERMISSION)) {
 			checkModVersion().thenAccept(latestModVersion -> {

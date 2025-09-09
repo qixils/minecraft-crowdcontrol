@@ -7,15 +7,12 @@ import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.ModdedPlatformClient;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Options;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -24,9 +21,6 @@ import java.util.function.Function;
 
 @Mixin(KeyboardInput.class)
 public abstract class KeyboardInputMixin extends ClientInput {
-	@Shadow(aliases = {"field_3902"})
-	@Final
-	private Options options;
 
 	@Unique
 	private boolean cc$handleIsDown(@NotNull Function<KeyMapping, Boolean> getResult, @NotNull KeyMapping original, @Nullable KeyMapping inverse, @NotNull MovementStatusType type) {
@@ -45,22 +39,22 @@ public abstract class KeyboardInputMixin extends ClientInput {
 
 	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 0))
 	public boolean isForwardDown(KeyMapping keyMapping, Operation<Boolean> original) {
-		return cc$handleIsDown(original::call, keyMapping, options.keyDown, MovementStatusType.WALK);
+		return cc$handleIsDown(original::call, keyMapping, ((KeyboardInput) (Object) this).options.keyDown, MovementStatusType.WALK);
 	}
 
 	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 1))
 	public boolean isBackDown(KeyMapping keyMapping, Operation<Boolean> original) {
-		return cc$handleIsDown(original::call, keyMapping, options.keyUp, MovementStatusType.WALK);
+		return cc$handleIsDown(original::call, keyMapping, ((KeyboardInput) (Object) this).options.keyUp, MovementStatusType.WALK);
 	}
 
 	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 2))
 	public boolean isLeftDown(KeyMapping keyMapping, Operation<Boolean> original) {
-		return cc$handleIsDown(original::call, keyMapping, options.keyRight, MovementStatusType.WALK);
+		return cc$handleIsDown(original::call, keyMapping, ((KeyboardInput) (Object) this).options.keyRight, MovementStatusType.WALK);
 	}
 
 	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 3))
 	public boolean isRightDown(KeyMapping keyMapping, Operation<Boolean> original) {
-		return cc$handleIsDown(original::call, keyMapping, options.keyLeft, MovementStatusType.WALK);
+		return cc$handleIsDown(original::call, keyMapping, ((KeyboardInput) (Object) this).options.keyLeft, MovementStatusType.WALK);
 	}
 
 	// commented out because it interferes with non-jump actions like swimming

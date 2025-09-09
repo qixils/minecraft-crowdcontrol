@@ -33,7 +33,7 @@ public final class PaperPlayerManager extends AbstractPlayerManager<Player> {
 		if (!player.isValid()) return false;
 		if (player.isDead()) return false;
 		if (isSpectator(player)) return false;
-		if (!hasPermission(player, PaperUtil.USE_PERMISSION)) return false;
+		if (!hasPermission(player, PaperUtil.toPaper(plugin.getUsePermission()))) return false;
 		Permission perm = getEffectPermission(request).map(PaperUtil::toPaper).orElse(null);
 		if (perm != null && !hasPermission(player, perm)) return false;
 		return true;
