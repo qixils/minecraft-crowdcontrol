@@ -13,3 +13,6 @@ accessible field net/minecraft/world/entity/player/Inventory equipment Lnet/mine
 accessible field net/minecraft/world/entity/EntityEquipment items Ljava/util/EnumMap;
 accessible field net/minecraft/world/entity/LivingEntity dead Z
 accessible field net/minecraft/stats/ServerRecipeBook known Ljava/util/Set;
+accessible field net/minecraft/client/player/KeyboardInput options Lnet/minecraft/client/Options;
+accessible field net/minecraft/world/inventory/ResultSlot craftSlots Lnet/minecraft/world/inventory/CraftingContainer;
+accessible field net/minecraft/world/inventory/ResultSlot player Lnet/minecraft/world/entity/player/Player;
