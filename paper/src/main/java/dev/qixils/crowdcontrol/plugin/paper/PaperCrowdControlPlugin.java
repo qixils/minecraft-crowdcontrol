@@ -174,6 +174,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		// misc
 		global = config.getBoolean("global", global);
 		announce = config.getBoolean("announce", announce);
+		adminRequired = config.getBoolean("admin-required", adminRequired);
 		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
 	}
 
