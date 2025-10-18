@@ -122,8 +122,15 @@ subprojects {
             maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots") {
                 name = "Sonatype Snapshots 2"
             }
-            maven(url = "https://maven.shedaniel.me") {
-                name = "Shedaniel"
+            exclusiveContent {
+                forRepository {
+                    maven(url = "https://maven.shedaniel.me") {
+                        name = "Shedaniel"
+                    }
+                }
+                filter {
+                    includeGroup("me.shedaniel.cloth")
+                }
             }
 
             exclusiveContent {

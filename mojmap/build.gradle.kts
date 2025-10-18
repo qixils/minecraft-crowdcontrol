@@ -14,7 +14,7 @@ plugins {
 }
 
 architectury {
-    common("fabric", "neoforge")
+    common("fabric")//, "neoforge")
 }
 
 dependencies {
@@ -29,9 +29,9 @@ dependencies {
     // Do NOT use other classes from Fabric Loader.
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
 
-    modCompileOnly("net.kyori:adventure-platform-mod-shared-fabric-repack:$adventurePlatformModVersion")
+    modCompileOnly("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")
     modCompileOnly("org.incendo:cloud-minecraft-modded-common-fabric-repack:$cloudMojmapVersion")
-    modCompileOnly("me.shedaniel.cloth:cloth-config:$clothConfigVersion")
+    modCompileOnly("maven.modrinth:cloth-config:$clothConfigVersion")
 
     // TODO: adventure is being weird
     compileOnly("net.kyori:adventure-api:$adventureVersion")

@@ -63,7 +63,7 @@ dependencies {
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
     modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
-    modImplementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
+    modImplementation(include("maven.modrinth:cloth-config:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
     })
     modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
