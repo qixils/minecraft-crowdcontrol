@@ -38,7 +38,7 @@ public class EntityUtil {
 	}
 
 	public static void handleDie(LivingEntity entity, final DamageSource cause, final CallbackInfo ci) {
-		if (entity.level().isClientSide) return;
+		if (entity.level().isClientSide()) return;
 		if (!ModdedCrowdControlPlugin.isInstanceAvailable()) return;
 		if (entity.dead) return;
 		Death event = new Death(entity, cause);
@@ -47,7 +47,7 @@ public class EntityUtil {
 	}
 
 	public static void handleDamage(final Entity entity, final DamageSource cause, final float amount, final CallbackInfoReturnable<Boolean> cir) {
-		if (entity.level().isClientSide) return;
+		if (entity.level().isClientSide()) return;
 		if (!ModdedCrowdControlPlugin.isInstanceAvailable()) return;
 		Damage event = new Damage(entity, cause, amount);
 		event.fire(ModdedCrowdControlPlugin.getInstance());

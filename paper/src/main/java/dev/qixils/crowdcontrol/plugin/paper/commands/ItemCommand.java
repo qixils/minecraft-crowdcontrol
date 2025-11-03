@@ -10,6 +10,6 @@ public interface ItemCommand extends FeatureElementCommand {
 
 	@Override
 	default boolean isFeatureEnabled(@NotNull World world) {
-		return getItem().isEnabledByFeature(world);
+		return getItem().asItemType() != null && world.isEnabled(getItem().asItemType());
 	}
 }

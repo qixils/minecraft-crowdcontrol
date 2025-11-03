@@ -43,7 +43,7 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public @NotNull String getUsername(@NotNull ServerPlayer player) {
-		return player.getGameProfile().getName();
+		return player.getGameProfile().name();
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 	public @NotNull Optional<ServerPlayer> getPlayerByLogin(@NotNull LoginData login) {
 		return Optional.ofNullable(plugin.getServer()).flatMap(server -> {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				if (player.getGameProfile().getName().equalsIgnoreCase(login.getName()) || player.getUUID().equals(login.getId()))
+				if (player.getGameProfile().name().equalsIgnoreCase(login.getName()) || player.getUUID().equals(login.getId()))
 					return Optional.of(player);
 			}
 			return Optional.empty();

@@ -42,7 +42,7 @@ public class BlockCommand extends RegionalCommandSync implements FeatureElementC
 
 	@Override
 	public boolean isFeatureEnabled(@NotNull World world) {
-		return material.isEnabledByFeature(world);
+		return material.asBlockType() != null && world.isEnabled(material.asBlockType());
 	}
 
 	@Nullable

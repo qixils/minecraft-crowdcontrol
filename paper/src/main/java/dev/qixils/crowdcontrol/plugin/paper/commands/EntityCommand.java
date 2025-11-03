@@ -30,7 +30,7 @@ public interface EntityCommand extends FeatureElementCommand {
 
 	@Override
 	default boolean isFeatureEnabled(@NotNull World world) {
-		return getEntityType().isEnabledByFeature(world);
+		return world.isEnabled(getEntityType());
 	}
 
 	default boolean isMonster() {
@@ -64,7 +64,7 @@ public interface EntityCommand extends FeatureElementCommand {
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
 			else if (getEntityType() == EntityType.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END)
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
-			else if (!getEntityType().isEnabledByFeature(world))
+			else if (!world.isEnabled(getEntityType()))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
 			else
 				return null;

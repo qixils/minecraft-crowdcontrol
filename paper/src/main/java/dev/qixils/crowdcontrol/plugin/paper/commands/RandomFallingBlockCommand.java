@@ -40,8 +40,9 @@ public class RandomFallingBlockCommand extends RegionalCommandSync {
 				&& !mat.isEmpty()
 				&& mat.isSolid() // for now, try to ensure blocks are... visible
 				&& mat.isOccluding() // ^^
-				&& mat.isEnabledByFeature(world))
-			.toList()));
+				&& mat.asBlockType() != null
+				&& world.isEnabled(mat.asBlockType())
+			).toList()));
 	}
 
 

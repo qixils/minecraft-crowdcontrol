@@ -28,7 +28,7 @@ public class ChickenJockeyCommand extends SummonEntityCommand<Chicken> {
 		if (zombie == null) return chicken;
 		zombie.setBaby(true);
 
-		zombie.startRiding(chicken, true);
+		zombie.startRiding(chicken, true, true);
 
 		return chicken;
 	}
