@@ -43,7 +43,7 @@ public class HealthModifierCommand<P> implements Command<P>, CCTimedEffect {
 			return new CCTimedEffectResponse(
 				request.getRequestId(),
 				ResponseStatus.TIMED_BEGIN,
-				request.getEffect().getDuration() * 1000L
+				request.getEffect().getDurationMillis()
 			);
 		}));
 	}

@@ -24,6 +24,14 @@ ip-detect: true
 # Can be 'none' to disable, 'chat' to hide only in chat, or 'all' to hide everywhere.
 hide-names: none
 
+# Controls the behavior of Custom Effects.
+custom-effects:
+
+  # Whether to enable the module.
+  # Currently, this auto-generates custom effects for modded Mobs, Enchantments, and Potions.
+  # After enabling, make sure to customize the generated prices in your Crowd Control app's Effect Manager.
+  enabled: false
+
 # The Soft Lock Observer detects when a player is in a death loop
 # and attempts to spare them from it by killing nearby enemies.
 soft-lock-observer:

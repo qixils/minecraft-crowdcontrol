@@ -11,6 +11,7 @@ import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
@@ -102,8 +103,12 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 
 		// entity commands
 		for (EntityType entity : Registry.ENTITY_TYPE) {
-			if (!isWhitelistedEntity(entity)) continue;
+			if (entity.getEntityClass() == null) continue;
+			if (!isWhitelistedEntity(entity) && !Mob.class.isAssignableFrom(entity.getEntityClass())) continue;
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
+
+			if (entity.equals(EntityType.LIGHTNING_BOLT)) continue;
+			if (entity.equals(EntityType.TNT)) continue;
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}
 
@@ -113,8 +118,20 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		}
 
 		// potions
-		for (PotionEffectType potionEffectType : Registry.POTION_EFFECT_TYPE) {
-			initTo(commands, () -> new PotionCommand(plugin, potionEffectType));
+		for (PotionEffectType potion : Registry.POTION_EFFECT_TYPE) {
+			if (potion.equals(PotionEffectType.LUCK)) continue; // unused
+			if (potion.equals(PotionEffectType.UNLUCK)) continue; // unused
+			if (potion.equals(PotionEffectType.JUMP_BOOST)) continue; // disabled in favor of gravity
+			if (potion.equals(PotionEffectType.HUNGER)) continue; // disabled in favor of take food
+			if (potion.equals(PotionEffectType.SATURATION)) continue; // disabled in favor of give food
+			if (potion.equals(PotionEffectType.INSTANT_DAMAGE)) continue; // disabled in favor of take health
+			if (potion.equals(PotionEffectType.INSTANT_HEALTH)) continue; // disabled in favor of give health
+			if (potion.equals(PotionEffectType.WITHER)) continue; // we tend to avoid effects that can kill
+			if (potion.equals(PotionEffectType.WIND_CHARGED)) continue; // doesn't do much for players
+			if (potion.equals(PotionEffectType.OOZING)) continue; // doesn't do much for players
+			if (potion.equals(PotionEffectType.RAID_OMEN)) continue; // this isn't like. a "real" effect. it's granted by Bad Omen. just use bad omen
+			if (potion.equals(PotionEffectType.TRIAL_OMEN)) continue; // this isn't like. a "real" effect. it's granted by Bad Omen. just use bad omen
+			initTo(commands, () -> new PotionCommand(plugin, potion));
 		}
 
 		// block sets

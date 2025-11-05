@@ -2,9 +2,18 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.2.0
+
+- Added support for 1.21.9/1.21.10
+- Added auto-generated custom effects
+  - Initial trial run to gather ideas and feedback
+  - Must be turned on in the mod's config file
+  - Auto-generates custom effects for spawning modded mobs, enchants, and potions
+  - Prices can be edited in the Crowd Control app after linking your account
+
 ## 4.1.0
 
-- Added support for 1.21.6
+- Added support for 1.21.6/1.21.7/1.21.8
 - Added support for 25w14craftmine
 - Added _Summon Chicken Jockey_ effect
 - Added _Summon Small Ant_ effect

@@ -43,7 +43,7 @@ public class LanguageCommand extends ModdedCommand implements CCTimedEffect {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "All players already have an active language effect");
 			List<ServerPlayer> players = playerSupplier.get();
 
-			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			Duration duration = Duration.ofSeconds(request.getEffect().getDurationMillis());
 			SetLanguageS2C packet = new SetLanguageS2C(LanguageState.RANDOM, duration);
 
 			// send packet

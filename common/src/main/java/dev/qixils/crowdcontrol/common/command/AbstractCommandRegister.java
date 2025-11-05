@@ -82,6 +82,9 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		if (registeredCommands != null)
 			return registeredCommands;
 
+		if (!isReady())
+			return Collections.emptyList();
+
 		List<Command<PLAYER>> commands = new ArrayList<>();
 		createCommands(commands);
 		for (Command<PLAYER> command : commands) {
@@ -100,7 +103,19 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 			registeredCommandClasses.add(clazz);
 		}
 
-		return registeredCommands = commands;
+		registeredCommands = commands;
+
+		for (Command<PLAYER> command : commands) {
+			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
+			plugin.registerCommand(name, command);
+
+			if (command.isEventListener()) {
+				registerListener(command);
+			}
+		}
+		onFirstRegistry();
+
+		return commands;
 	}
 
 	public final <C extends Command<PLAYER>> List<? extends C> getCommands(Class<C> clazz) {
@@ -117,18 +132,16 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 
 	protected abstract void registerListener(Command<PLAYER> command);
 
-	public final void register() {
-		boolean firstRegistry = registeredCommands == null;
-		for (Command<PLAYER> command : getCommands()) {
-			String name = command.getEffectName().toLowerCase(Locale.ENGLISH);
-			plugin.registerCommand(name, command);
+	public boolean isReady() {
+		return true;
+	}
 
-			if (firstRegistry && command.isEventListener()) {
-				registerListener(command);
-			}
-		}
-		if (firstRegistry)
-			onFirstRegistry();
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
+	public final void register() {
+		getCommands();
 	}
 
 	/**

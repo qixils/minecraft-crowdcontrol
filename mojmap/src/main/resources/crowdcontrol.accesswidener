@@ -16,3 +16,4 @@ accessible field net/minecraft/stats/ServerRecipeBook known Ljava/util/Set;
 accessible field net/minecraft/client/player/KeyboardInput options Lnet/minecraft/client/Options;
 accessible field net/minecraft/world/inventory/ResultSlot craftSlots Lnet/minecraft/world/inventory/CraftingContainer;
 accessible field net/minecraft/world/inventory/ResultSlot player Lnet/minecraft/world/entity/player/Player;
+accessible field net/minecraft/world/entity/EntityType factory Lnet/minecraft/world/entity/EntityType$EntityFactory;
