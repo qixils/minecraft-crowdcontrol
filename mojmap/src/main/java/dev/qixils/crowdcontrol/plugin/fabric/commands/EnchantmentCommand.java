@@ -6,9 +6,11 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,10 +21,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
@@ -34,16 +33,23 @@ public class EnchantmentCommand extends ModdedCommand {
 	protected final Enchantment enchantment;
 	private final String effectName;
 	private final Component displayName;
+	private final CCName extensionName;
+	private final String image = "enchant_sharpness";
+	private final int price = 50;
+	private final byte priority = 0;
+	private final List<String> categories = Collections.singletonList("Enchantments");
 
 	public EnchantmentCommand(ModdedCrowdControlPlugin plugin, Holder<Enchantment> enchantment) {
 		super(plugin);
 		this.enchantmentHolder = enchantment;
 		this.enchantment = enchantmentHolder.value();
 		this.effectName = "enchant_" + csIdOf(enchantment.unwrapKey().orElseThrow());
-		this.displayName = Component.translatable(
+		TranslatableComponent _displayName = Component.translatable(
 				"cc.effect.enchant.name",
 				plugin.toAdventure(Enchantment.getFullname(enchantment, enchantment.value().getMaxLevel()).copy().setStyle(Style.EMPTY))
 		);
+		this.displayName = _displayName;
+		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.enchant.extension")));
 	}
 
 	@Override

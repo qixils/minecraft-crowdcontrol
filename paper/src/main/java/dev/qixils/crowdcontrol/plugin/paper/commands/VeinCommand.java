@@ -37,9 +37,9 @@ public class VeinCommand extends RegionalCommandSync {
 	// Gets a 2x2 chunk of blocks
 	@Contract(mutates = "param1, param2")
 	private static void addOreVein(List<Location> deepslateBlocks, List<Location> stoneBlocks, Location base) {
-		for (int x = 0; x <= 1; ++x) {
+		for (int x = 0; x <= 2; ++x) {
 			for (int y = 0; y <= 1; ++y) {
-				for (int z = 0; z <= 1; ++z) {
+				for (int z = 0; z <= 2; ++z) {
 					Location loc = base.clone().add(x, y, z);
 					Block block = loc.getBlock();
 					Material matType = block.getType();
@@ -107,18 +107,18 @@ public class VeinCommand extends RegionalCommandSync {
 
 	@Getter
 	public enum Ores implements Weighted {
-		DIAMOND(Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE, 3),
-		IRON(Material.IRON_ORE, Material.DEEPSLATE_IRON_ORE, 3),
-		COAL(Material.COAL_ORE, Material.DEEPSLATE_COAL_ORE, 3),
-		EMERALD(Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE, 3),
-		GOLD(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE, 3),
-		REDSTONE(Material.REDSTONE_ORE, Material.DEEPSLATE_REDSTONE_ORE, 3),
-		LAPIS(Material.LAPIS_ORE, Material.DEEPSLATE_LAPIS_ORE, 3),
-		ANCIENT_DEBRIS(Material.ANCIENT_DEBRIS, 1),
-		QUARTZ(Material.NETHER_QUARTZ_ORE, 3),
-		NETHER_GOLD(Material.NETHER_GOLD_ORE, 3),
-		SILVERFISH(Material.INFESTED_STONE, Material.INFESTED_DEEPSLATE, 2),
-		LAVA(Material.LAVA, 8);
+		DIAMOND(Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE, 6),
+		IRON(Material.IRON_ORE, Material.DEEPSLATE_IRON_ORE, 6),
+		COAL(Material.COAL_ORE, Material.DEEPSLATE_COAL_ORE, 6),
+		EMERALD(Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE, 6),
+		GOLD(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE, 6),
+		REDSTONE(Material.REDSTONE_ORE, Material.DEEPSLATE_REDSTONE_ORE, 6),
+		LAPIS(Material.LAPIS_ORE, Material.DEEPSLATE_LAPIS_ORE, 6),
+		ANCIENT_DEBRIS(Material.ANCIENT_DEBRIS, 3),
+		QUARTZ(Material.NETHER_QUARTZ_ORE, 6),
+		NETHER_GOLD(Material.NETHER_GOLD_ORE, 6),
+		SILVERFISH(Material.INFESTED_STONE, Material.INFESTED_DEEPSLATE, 1),
+		LAVA(Material.LAVA, 1);
 
 		public static final int TOTAL_WEIGHTS = Arrays.stream(values()).mapToInt(Ores::getWeight).sum();
 		private final Material block;

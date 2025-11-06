@@ -12,10 +12,12 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.vehicle.AbstractBoat;
 import net.minecraft.world.entity.vehicle.AbstractChestBoat;
 import net.minecraft.world.item.Item;
@@ -24,11 +26,9 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.isWhitelistedEntity;
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 
@@ -49,6 +49,11 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, BuiltInRegistries.BLOCK);
 			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, BuiltInRegistries.ITEM);
 		}
+	}
+
+	@Override
+	public boolean isReady() {
+		return plugin.getServer() != null && plugin.getServer().overworld() != null;
 	}
 
 	@Override
@@ -124,21 +129,22 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 		));
 
 		// entity commands
-		Map<String, EntityType<?>> minecraftEntities = new HashMap<>();
-		Map<String, EntityType<?>> moddedEntities = new HashMap<>();
+		// TODO: could bring back the fill-in-vanilla-holes thing to have some better defaults for some modded mobs?
+		//  but there will probably be overlap and make it weird idk
 		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
-			if (!isWhitelistedEntity(entry.getKey())) continue;
-			String id = csIdOf(entry.getKey());
-			Map<String, EntityType<?>> entities = entry.getKey().location().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE) ? minecraftEntities : moddedEntities;
-			entities.put(id, entry.getValue());
-		}
-		for (Map.Entry<String, EntityType<?>> entry : moddedEntities.entrySet()) {
-			if (minecraftEntities.containsKey(entry.getKey())) continue;
-			minecraftEntities.put(entry.getKey(), entry.getValue());
-		}
-		for (EntityType<?> entity : minecraftEntities.values()) {
-			initTo(commands, () -> new SummonEntityCommand<>(plugin, entity));
-			initTo(commands, () -> new RemoveEntityCommand<>(plugin, entity));
+			try {
+				if (!entry.getValue().isEnabled(plugin.server().overworld().enabledFeatures())) continue;
+
+				boolean allowed = isWhitelistedEntity(entry.getKey()) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
+				if (!allowed) continue;
+				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
+
+				if (entry.getValue().equals(EntityType.LIGHTNING_BOLT)) continue;
+				if (entry.getValue().equals(EntityType.TNT)) continue;
+				initTo(commands, () -> new RemoveEntityCommand<>(plugin, entry.getValue()));
+			} catch (Exception e) {
+				plugin.getSLF4JLogger().warn("Failed to check if entity is allowed; ignoring", e);
+			}
 		}
 
 		// misc grouped summons
@@ -200,8 +206,22 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			initTo(commands, () -> new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		BuiltInRegistries.MOB_EFFECT.listElements()
-			.forEach(potion -> initTo(commands, () -> new PotionCommand(plugin, potion)));
+		BuiltInRegistries.MOB_EFFECT.listElements().forEach(potion -> {
+			if (!potion.value().isEnabled(plugin.server().overworld().enabledFeatures())) return;
+			if (potion.is(MobEffects.LUCK)) return; // unused
+			if (potion.is(MobEffects.UNLUCK)) return; // unused
+			if (potion.is(MobEffects.JUMP_BOOST)) return; // disabled in favor of gravity
+			if (potion.is(MobEffects.HUNGER)) return; // disabled in favor of take food
+			if (potion.is(MobEffects.SATURATION)) return; // disabled in favor of give food
+			if (potion.is(MobEffects.INSTANT_DAMAGE)) return; // disabled in favor of take health
+			if (potion.is(MobEffects.INSTANT_HEALTH)) return; // disabled in favor of give health
+			if (potion.is(MobEffects.WITHER)) return; // we tend to avoid effects that can kill
+			if (potion.is(MobEffects.WIND_CHARGED)) return; // doesn't do much for players
+			if (potion.is(MobEffects.OOZING)) return; // doesn't do much for players
+			if (potion.is(MobEffects.RAID_OMEN)) return; // this isn't like. a "real" effect. it's granted by Bad Omen. just use bad omen
+			if (potion.is(MobEffects.TRIAL_OMEN)) return; // this isn't like. a "real" effect. it's granted by Bad Omen. just use bad omen
+			initTo(commands, () -> new PotionCommand(plugin, potion));
+		});
 
 		// block sets
 		for (Block block : setBlocks)
