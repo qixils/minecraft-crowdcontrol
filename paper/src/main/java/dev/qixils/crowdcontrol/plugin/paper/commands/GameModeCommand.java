@@ -67,7 +67,7 @@ public class GameModeCommand extends PaperCommand implements CCTimedEffect {
 			List<Player> players = playerSupplier.get();
 			activeRequests.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 			setGameMode(players, gamemode, true);
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

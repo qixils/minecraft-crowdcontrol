@@ -50,7 +50,7 @@ public class ShaderCommand extends PaperCommand implements CCTimedEffect {
 			idMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
 
 			// create byte buf
-			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
 			ShaderPacketS2C packet = new ShaderPacketS2C(shader, duration);
 
 			// send packet

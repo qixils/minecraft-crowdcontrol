@@ -105,7 +105,7 @@ public class MovementStatusCommand extends PaperCommand implements CCTimedEffect
 			for (Player player : players)
 				setValue(plugin, player, type, value);
 
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

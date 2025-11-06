@@ -77,7 +77,7 @@ public final class FreezeCommand extends ModdedCommand implements CCTimedEffect 
 				player.cc$setMovementStatus(freezeType, freezeValue);
 			});
 			TIMED_EFFECTS.put(request.getRequestId(), locations);
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

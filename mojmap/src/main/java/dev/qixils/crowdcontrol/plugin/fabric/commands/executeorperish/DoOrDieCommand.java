@@ -81,7 +81,7 @@ public class DoOrDieCommand extends ModdedCommand {
 			if (!task.run(null))
 				task.register();
 
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

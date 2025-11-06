@@ -89,6 +89,10 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 	private final String effectName;
 	private final Component displayName;
 	private final NamespacedKey mobKey;
+	private final String image = "entity_creeper";
+	private final int price;
+	private final byte priority = 5;
+	private final List<String> categories = Collections.singletonList("Summon Entity");
 
 	public SummonEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);
@@ -96,6 +100,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		this.effectName = "entity_" + csIdOf(entityType);
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType));
 		this.mobKey = getMobKey(plugin.getPaperPlugin());
+		this.price = entityType.getEntityClass() != null && Enemy.class.isAssignableFrom(entityType.getEntityClass()) ? 1000 : 5000;
 	}
 
 	@NotNull
