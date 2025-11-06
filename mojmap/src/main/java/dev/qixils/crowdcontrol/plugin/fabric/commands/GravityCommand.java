@@ -15,7 +15,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -25,7 +24,6 @@ import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.removeMo
 
 @Getter
 public class GravityCommand extends ModdedCommand implements CCTimedEffect {
-	private final Duration defaultDuration = POTION_DURATION;
 	private final String effectName;
 
 	private final double gravityLevel;
@@ -57,7 +55,7 @@ public class GravityCommand extends ModdedCommand implements CCTimedEffect {
 				addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, fallLevel, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
 				addModifier(player, Attributes.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, fallDmgLevel, AttributeModifier.Operation.ADD_VALUE, false);
 			}
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

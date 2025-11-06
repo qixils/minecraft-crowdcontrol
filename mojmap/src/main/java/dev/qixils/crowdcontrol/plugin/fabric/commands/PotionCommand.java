@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
@@ -8,10 +9,14 @@ import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -19,8 +24,11 @@ import net.minecraft.world.effect.MobEffects;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
 
 @Getter
 public class PotionCommand extends ModdedCommand implements CCTimedEffect {
@@ -28,14 +36,23 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 	private final boolean isMinimal;
 	private final @NotNull String effectName;
 	private final @NotNull Component displayName;
+	private final CCName extensionName;
+	private final String image = "potion_speed";
+	private final int price = 50;
+	private final byte priority = 0;
+	private final List<String> categories = Collections.singletonList("Potion Effects");
+	private final CustomEffectDuration extensionDuration = new CustomEffectDuration(POTION_SECONDS);
 
 	@SuppressWarnings("ConstantConditions")
 	public PotionCommand(@NotNull ModdedCrowdControlPlugin plugin, @NotNull Holder<MobEffect> potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		this.effectName = "potion_" + potionEffectType.unwrapKey().orElseThrow().location().getPath();
+		ResourceLocation loc = potionEffectType.unwrapKey().orElseThrow().location();
+		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(loc);
 		this.isMinimal = potionEffectType.value().isInstantenous();
-		this.displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
+		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
+		this.displayName = _displayName;
+		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.potion.extension")));
 	}
 
 	@Override
@@ -44,7 +61,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 			if (potionEffectType == MobEffects.JUMP_BOOST && isActive(ccPlayer, "disable_jumping"))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot apply jump boost while Disable Jump is active");
 
-			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			Duration duration = Duration.ofSeconds(request.getEffect().getDurationMillis());
 			int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
 			for (ServerPlayer player : playerSupplier.get()) {
@@ -73,7 +90,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 
 			return isMinimal
 				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-				: new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+				: new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}, plugin.getSyncExecutor()));
 	}
 }
