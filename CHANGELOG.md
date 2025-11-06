@@ -4,12 +4,18 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 4.2.0
 
-- Added support for 1.21.9/1.21.10
+- Paper/Fabric: Added support for 1.21.9/1.21.10
+  - NeoForge is unsupported on new versions for now due to several breaking changes in their networking stack
 - Added auto-generated custom effects
   - Initial trial run to gather ideas and feedback
   - Must be turned on in the mod's config file
   - Auto-generates custom effects for spawning modded mobs, enchants, and potions
   - Prices can be edited in the Crowd Control app after linking your account
+- Buffed _Ore Vein_ effect
+  - Now generates 3 veins nearby instead of 2
+  - Each vein can now be slightly larger
+  - Frequency of troll veins (lava, silverfish) are heavily reduced
+  - Fabric/NeoForge: Now pulls from the "#c:ores" tag, allowing modded ores to spawn
 
 ## 4.1.0
 

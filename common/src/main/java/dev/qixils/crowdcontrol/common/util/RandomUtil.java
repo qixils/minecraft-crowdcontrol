@@ -284,7 +284,7 @@ public class RandomUtil {
 	 * @throws NullPointerException     if an item in the array is null
 	 */
 	@NotNull
-	public static <T extends Weighted> T weightedRandom(T @NotNull [] weightedArray, int totalWeights) throws IllegalArgumentException, NullPointerException {
+	public static <T extends Weighted> T weightedRandom(@NotNull T @NotNull [] weightedArray, int totalWeights) throws IllegalArgumentException, NullPointerException {
 		if (weightedArray.length == 0)
 			throw new IllegalArgumentException("Array may not be empty");
 		// Weighted random code based off of https://stackoverflow.com/a/6737362
@@ -306,13 +306,55 @@ public class RandomUtil {
 	 * @throws NullPointerException     if an item in the array is null
 	 */
 	@NotNull
-	public static <T extends Weighted> T weightedRandom(T @NotNull [] weightedArray) throws IllegalArgumentException, NullPointerException {
+	public static <T extends Weighted> T weightedRandom(@NotNull T @NotNull [] weightedArray) throws IllegalArgumentException, NullPointerException {
 		if (weightedArray.length == 0)
 			throw new IllegalArgumentException("Array may not be empty");
 		int total = 0;
 		for (T t : weightedArray)
 			total += t.getWeight();
 		return weightedRandom(weightedArray, total);
+	}
+
+	/**
+	 * Picks a random item from a list of weighted items.
+	 *
+	 * @param weightedList  list of weighted items
+	 * @param totalWeights  total number of weights
+	 * @param <T>           type of item
+	 * @return randomly selected item
+	 * @throws IllegalArgumentException if the list is empty
+	 * @throws NullPointerException     if an item in the list is null
+	 */
+	@NotNull
+	public static <T extends Weighted> T weightedRandom(@NotNull List<@NotNull T> weightedList, int totalWeights) throws IllegalArgumentException, NullPointerException {
+		if (weightedList.isEmpty())
+			throw new IllegalArgumentException("List may not be empty");
+		// Weighted random code based off of https://stackoverflow.com/a/6737362
+		int idx = 0;
+		for (double r = Math.random() * totalWeights; idx < weightedList.size() - 1; ++idx) {
+			r -= weightedList.get(idx).getWeight();
+			if (r <= 0.0) break;
+		}
+		return weightedList.get(idx);
+	}
+
+	/**
+	 * Picks a random item from a list of weighted items.
+	 *
+	 * @param weightedList list of weighted items
+	 * @param <T>          type of item
+	 * @return randomly selected item
+	 * @throws IllegalArgumentException if the list is empty
+	 * @throws NullPointerException     if an item in the list is null
+	 */
+	@NotNull
+	public static <T extends Weighted> T weightedRandom(@NotNull List<@NotNull T> weightedList) throws IllegalArgumentException, NullPointerException {
+		if (weightedList.isEmpty())
+			throw new IllegalArgumentException("List may not be empty");
+		int total = 0;
+		for (T t : weightedList)
+			total += t.getWeight();
+		return weightedRandom(weightedList, total);
 	}
 
 	/**

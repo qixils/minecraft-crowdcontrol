@@ -78,7 +78,7 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 		}
 	}
 
-	public final List<Command<PLAYER>> getCommands() {
+	public synchronized final List<Command<PLAYER>> getCommands() {
 		if (registeredCommands != null)
 			return registeredCommands;
 

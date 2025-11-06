@@ -137,7 +137,7 @@ public class CommandConstants {
 	/**
 	 * The amount of veins to spawn per usage of the ore vein command.
 	 */
-	public static final int VEIN_COUNT = 2;
+	public static final int VEIN_COUNT = 3;
 	/**
 	 * Collection of blocks to be used in the Place Block command.
 	 */
