@@ -116,7 +116,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 		int _price = 500;
 		try {
-			if (firstEntity.create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Enemy) {
+			if (firstEntity.create(plugin.theGame().overworld(), EntitySpawnReason.COMMAND) instanceof Enemy) {
 				_price = 1000;
 			}
 		} catch (Exception e) {

@@ -53,7 +53,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 
 	@Override
 	public boolean isReady() {
-		return plugin.getServer() != null && plugin.getServer().overworld() != null;
+		return plugin.getTheGame() != null && plugin.getTheGame().overworld() != null;
 	}
 
 	@Override
@@ -133,9 +133,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 		//  but there will probably be overlap and make it weird idk
 		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
 			try {
-				if (!entry.getValue().isEnabled(plugin.server().overworld().enabledFeatures())) continue;
+				if (!entry.getValue().isEnabled(plugin.theGame().overworld().enabledFeatures())) continue;
 
-				boolean allowed = isWhitelistedEntity(entry.getKey()) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
+				boolean allowed = isWhitelistedEntity(entry.getKey()) || entry.getValue().create(plugin.theGame().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
 				if (!allowed) continue;
 				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
 
@@ -207,7 +207,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 
 		// potions
 		BuiltInRegistries.MOB_EFFECT.listElements().forEach(potion -> {
-			if (!potion.value().isEnabled(plugin.server().overworld().enabledFeatures())) return;
+			if (!potion.value().isEnabled(plugin.theGame().overworld().enabledFeatures())) return;
 			if (potion.is(MobEffects.LUCK)) return; // unused
 			if (potion.is(MobEffects.UNLUCK)) return; // unused
 			if (potion.is(MobEffects.JUMP_BOOST)) return; // disabled in favor of gravity
