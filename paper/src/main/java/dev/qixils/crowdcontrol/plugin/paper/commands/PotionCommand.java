@@ -8,9 +8,12 @@ import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -18,10 +21,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_DURATION;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
+import static dev.qixils.crowdcontrol.common.command.CommandConstants.asMinimalSafeString;
 
 @Getter
 public class PotionCommand extends PaperCommand implements CCTimedEffect {
@@ -29,13 +34,21 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 	private final boolean isMinimal;
 	private final @NotNull String effectName;
 	private final @NotNull Component displayName;
+	private final CCName extensionName;
+	private final String image = "potion_speed";
+	private final int price = 50;
+	private final byte priority = 0;
+	private final List<String> categories = Collections.singletonList("Potion Effects");
+	private final CustomEffectDuration extensionDuration = new CustomEffectDuration(POTION_SECONDS);
 
 	public PotionCommand(PaperCrowdControlPlugin plugin, PotionEffectType potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
 		this.effectName = "potion_" + nameOf(potionEffectType);
 		this.isMinimal = potionEffectType.isInstant();
-		this.displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
+		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
+		this.displayName = _displayName;
+		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.potion.extension")));
 	}
 
 	private static String nameOf(PotionEffectType type) {
@@ -52,16 +65,8 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 			case "CONFUSION" -> "NAUSEA";
 			case "DAMAGE_RESISTANCE" -> "RESISTANCE";
 			case "UNLUCK" -> "BAD_LUCK";
-			default -> {
-				if (name.startsWith("minecraft:"))
-					yield type.getKey().getKey();
-				yield name;
-			}
+			default -> asMinimalSafeString(type.key());
 		};
-	}
-
-	public @NotNull Duration getDefaultDuration() {
-		return POTION_DURATION;
 	}
 
 	@Override
@@ -73,7 +78,7 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 
 			List<Player> players = playerSupplier.get();
 
-			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			Duration duration = Duration.ofSeconds(request.getEffect().getDurationMillis());
 			int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
 			// TODO: improve folia...
@@ -97,7 +102,7 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 					player.getScheduler().run(plugin.getPaperPlugin(), $ -> player.addPotionEffect(potionEffectType.createEffect(durationTicks, 0)), null);
 			}
 
-			return request.getEffect().getDuration() > 0
+			return request.getEffect().getDurationMillis() > 0
 				? new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, duration.toMillis())
 				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 		}));

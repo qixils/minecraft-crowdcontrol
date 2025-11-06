@@ -137,7 +137,7 @@ public class CommandConstants {
 	/**
 	 * The amount of veins to spawn per usage of the ore vein command.
 	 */
-	public static final int VEIN_COUNT = 2;
+	public static final int VEIN_COUNT = 3;
 	/**
 	 * Collection of blocks to be used in the Place Block command.
 	 */
@@ -179,10 +179,6 @@ public class CommandConstants {
 	 * How long potion effects given by the potion command should last in seconds.
 	 */
 	public static final int POTION_SECONDS = 20;
-	/**
-	 * How long potion effects given by the potion command should last as a {@link Duration}.
-	 */
-	public static final @NotNull Duration POTION_DURATION = Duration.ofSeconds(POTION_SECONDS);
 	/**
 	 * The time in ticks that represents the start of the day.
 	 */
@@ -296,6 +292,14 @@ public class CommandConstants {
 	);
 
 	/**
+	 * Collection of explicitly blacklisted spawnable entities.
+	 */
+	public static final @NotNull Set<String> BLACKLISTED_ENTITIES = Set.of(
+		"marker",
+		""
+	);
+
+	/**
 	 * Collection of whitelisted spawnable entities.
 	 * These names generally match those of the {@code EntityType} enum from Bukkit.
 	 */
@@ -394,7 +398,13 @@ public class CommandConstants {
 	));
 
 	public static String asMinimalString(Key key) {
-		return key.namespace().equals(MINECRAFT_NAMESPACE) ? key.value() : key.asString();
+		return key.asMinimalString();
+	}
+
+	public static String asMinimalSafeString(Key key) {
+		return key.namespace().equals("minecraft")
+			? key.value()
+			: key.namespace() + '_' + key.value();
 	}
 
 	public static boolean isWhitelistedEntity(Keyed keyed) {
@@ -677,7 +687,7 @@ public class CommandConstants {
 	public static String csIdOf(Keyed _id) {
 		Key id = _id.key();
 		if (!id.namespace().equals(MINECRAFT_NAMESPACE))
-			return id.value();
+			return asMinimalSafeString(id);
 		String path = id.value();
 		switch (path) {
 			case "lightning_bolt":

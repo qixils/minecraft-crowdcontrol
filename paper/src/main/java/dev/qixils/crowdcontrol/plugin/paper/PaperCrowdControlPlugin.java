@@ -144,8 +144,20 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 			softLockConfig = new SoftLockConfig(
 				softLockSection.getInt("period", DEF_PERIOD),
 				softLockSection.getInt("deaths", DEF_DEATHS),
-				config.getInt("search-horizontal", DEF_SEARCH_HORIZ),
-				config.getInt("search-vertical", DEF_SEARCH_VERT)
+				softLockSection.getInt("search-horizontal", DEF_SEARCH_HORIZ),
+				softLockSection.getInt("search-vertical", DEF_SEARCH_VERT)
+			);
+		}
+
+		// custom effects
+		ConfigurationSection customEffectsSection = config.getConfigurationSection("custom-effects");
+		if (customEffectsSection == null) {
+			LOGGER.debug("No custom effects config found, using defaults");
+			customEffectsConfig = new CustomEffectsConfig();
+		} else {
+			LOGGER.debug("Loading custom effects config");
+			customEffectsConfig = new CustomEffectsConfig(
+				customEffectsSection.getBoolean("enabled", false)
 			);
 		}
 

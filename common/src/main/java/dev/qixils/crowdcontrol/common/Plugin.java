@@ -22,6 +22,9 @@ import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
 import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
 import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffect;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectsOperation;
 import live.crowdcontrol.cc4j.websocket.payload.*;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
@@ -56,6 +59,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
@@ -138,6 +142,11 @@ public abstract class Plugin<P, S> {
 	 * Key for the Set Language packet.
 	 */
 	public static final Key SET_LANGUAGE_KEY = Key.key(NAMESPACE, "set-language");
+
+	/**
+	 * Valid ID for custom effects.
+	 */
+	public static final Pattern CUSTOM_EFFECTS_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+$");
 
 	/**
 	 * The prefix to use in command output as a {@link Component}.
@@ -257,6 +266,8 @@ public abstract class Plugin<P, S> {
 	protected HideNames hideNames = HideNames.NONE;
 	@NotNull
 	protected Collection<String> hosts = Collections.emptySet();
+	@NotNull
+	protected CustomEffectsConfig customEffectsConfig = new CustomEffectsConfig();
 	@NotNull
 	protected LimitConfig limitConfig = new LimitConfig();
 	@NotNull
@@ -387,6 +398,16 @@ public abstract class Plugin<P, S> {
 	 */
 	public void setHideNames(@NotNull HideNames hideNames) {
 		this.hideNames = hideNames;
+	}
+
+	/**
+	 * Gets the plugin's {@link CustomEffectsConfig}.
+	 *
+	 * @return custom effects config parsed from the plugin's config file
+	 */
+	@NotNull
+	public CustomEffectsConfig getCustomEffectsConfig() {
+		return customEffectsConfig;
 	}
 
 	/**
@@ -539,6 +560,48 @@ public abstract class Plugin<P, S> {
 	}
 
 	/**
+	 *
+	 * @param ccPlayer the player's session to start
+	 */
+	public void startSession(@NotNull CCPlayer ccPlayer) {
+		UserToken user = ccPlayer.getUserToken();
+		if (user == null) return; // !?
+
+		// custom effects
+		Map<String, CustomEffect> newEffects;
+		var effects = Optional.ofNullable(crowdControl)
+			.map(CrowdControl::getGamePack)
+			.map(pack -> pack.getEffects().getGame())
+			.filter(game -> !game.isEmpty());
+		if (getCustomEffectsConfig().enabled() && effects.isPresent()) {
+			List<Command<P>> registeredEffects = commandRegister().getCommands();
+			Set<String> knownEffects = effects.get().keySet().stream()
+				.map(str -> str.toLowerCase(Locale.ENGLISH))
+				.collect(Collectors.toSet());
+			getSLF4JLogger().info("game {} {} {} {}", crowdControl != null, crowdControl != null && crowdControl.getGamePack() != null, knownEffects.size(), knownEffects);
+			newEffects = registeredEffects.stream()
+				.filter(command -> command.getPriority() > Byte.MIN_VALUE)
+				.filter(command -> CUSTOM_EFFECTS_ID_PATTERN.matcher(command.getEffectName().toLowerCase(Locale.ENGLISH)).matches())
+				.filter(command -> !knownEffects.contains(command.getEffectName().toLowerCase(Locale.ENGLISH)))
+				.sorted((a, b) -> {
+					if (a.getPriority() != b.getPriority()) return b.getPriority() - a.getPriority();
+					return a.getExtensionName().computeSortValue().compareToIgnoreCase(b.getExtensionName().computeSortValue());
+				})
+				.limit(75)
+				.map(command -> Map.entry(command.getEffectName().toLowerCase(Locale.ENGLISH), new CustomEffect(command.getExtensionName(), command.getPrice(), command.getDescription(), command.getCategories(), command.getImage())))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
+		} else {
+			newEffects = Collections.emptyMap();
+		}
+		// note: we always invoke this so we can replace an older list if one existed
+		getSLF4JLogger().info("thanks to {}, sending {} custom effects: {}", getCustomEffectsConfig().enabled(), newEffects.size(), newEffects.keySet());
+		ccPlayer.setCustomEffects(Collections.singletonList(new CustomEffectsOperation("replace-all", newEffects)));
+
+		// actually start it
+		ccPlayer.startSession(getConditionalEffectVisibility(user));
+	}
+
+	/**
 	 * Registers the plugin's basic chat commands.
 	 */
 	public void registerChatCommands() {
@@ -660,7 +723,7 @@ public abstract class Plugin<P, S> {
 					return;
 				}
 				audience.sendMessage(output(translatable("cc.join.starting")));
-				player.startSession(getConditionalEffectVisibility(player.getUserToken()));
+				startSession(player);
 			})
 		);
 
@@ -810,7 +873,7 @@ public abstract class Plugin<P, S> {
 								null,
 								null,
 								null,
-								10
+								new CustomEffectDuration(10)
 							),
 							new CCUserRecord(
 								"ccuid-01j7cnrvpbh5aw45pwpe1vqvdw",
@@ -1165,7 +1228,7 @@ public abstract class Plugin<P, S> {
 				.sendMessage(PREFIX_COMPONENT.append(translatable("cc.join.authenticated").args(text(user.getName())))));
 			// start session
 			getScheduledExecutor().schedule(
-				() -> ccPlayer.startSession(getConditionalEffectVisibility(user)),
+				() -> startSession(ccPlayer),
 				3,
 				TimeUnit.SECONDS
 			);

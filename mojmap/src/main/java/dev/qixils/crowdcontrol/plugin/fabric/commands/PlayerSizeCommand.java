@@ -51,7 +51,7 @@ public class PlayerSizeCommand extends ModdedCommand implements CCTimedEffect {
 				addModifier(player, Attributes.JUMP_STRENGTH, SCALE_JUMP_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
 				addModifier(player, Attributes.SAFE_FALL_DISTANCE, FALL_MODIFIER_UUID, level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
 			}
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 
