@@ -22,6 +22,7 @@ const findLatest = (versions: Version[]): Version => {
 }
 
 export const paperVersions: Version[] = autoVersion([
+    { id: "1.21.10", supported: true, legacy: false },
     { id: "1.21.8", supported: true, legacy: false },
     { id: "1.21.6", supported: true, legacy: false },
     { id: "1.21.5", supported: true, legacy: false },
@@ -37,6 +38,7 @@ export const paperVersions: Version[] = autoVersion([
 export const paperLatest = findLatest(paperVersions)
 
 export const fabricVersions: Version[] = autoVersion([
+    { id: "1.21.10", supported: true, legacy: false },
     { id: "1.21.8", supported: true, legacy: false },
     { id: "1.21.6", supported: true, legacy: false },
     { id: "25w14craftmine", supported: true, legacy: false },

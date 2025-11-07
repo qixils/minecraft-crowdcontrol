@@ -23,6 +23,7 @@ import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
 import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffect;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectBuilder;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectsOperation;
 import live.crowdcontrol.cc4j.websocket.payload.*;
@@ -578,7 +579,6 @@ public abstract class Plugin<P, S> {
 			Set<String> knownEffects = effects.get().keySet().stream()
 				.map(str -> str.toLowerCase(Locale.ENGLISH))
 				.collect(Collectors.toSet());
-			getSLF4JLogger().info("game {} {} {} {}", crowdControl != null, crowdControl != null && crowdControl.getGamePack() != null, knownEffects.size(), knownEffects);
 			newEffects = registeredEffects.stream()
 				.filter(command -> command.getPriority() > Byte.MIN_VALUE)
 				.filter(command -> CUSTOM_EFFECTS_ID_PATTERN.matcher(command.getEffectName().toLowerCase(Locale.ENGLISH)).matches())
@@ -588,13 +588,22 @@ public abstract class Plugin<P, S> {
 					return a.getExtensionName().computeSortValue().compareToIgnoreCase(b.getExtensionName().computeSortValue());
 				})
 				.limit(75)
-				.map(command -> Map.entry(command.getEffectName().toLowerCase(Locale.ENGLISH), new CustomEffect(command.getExtensionName(), command.getPrice(), command.getDescription(), command.getCategories(), command.getImage())))
+				.map(command -> Map.entry(
+					command.getEffectName().toLowerCase(Locale.ENGLISH),
+					CustomEffectBuilder.builder()
+						.name(command.getExtensionName())
+						.price(command.getPrice())
+						.description(command.getDescription())
+						.category(command.getCategories())
+						.image(command.getImage())
+						.inactive(command.isInactive())
+						.build()
+				))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
 		} else {
 			newEffects = Collections.emptyMap();
 		}
 		// note: we always invoke this so we can replace an older list if one existed
-		getSLF4JLogger().info("thanks to {}, sending {} custom effects: {}", getCustomEffectsConfig().enabled(), newEffects.size(), newEffects.keySet());
 		ccPlayer.setCustomEffects(Collections.singletonList(new CustomEffectsOperation("replace-all", newEffects)));
 
 		// actually start it
