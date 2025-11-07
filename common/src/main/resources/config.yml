@@ -29,8 +29,8 @@ custom-effects:
 
   # Whether to enable the module.
   # Currently, this auto-generates custom effects for modded Mobs, Enchantments, and Potions.
-  # After enabling, make sure to customize the generated prices in your Crowd Control app's Effect Manager.
-  enabled: false
+  # Auto-generated custom effects are hidden by default and must be enabled from the Crowd Control app's Effect Manager.
+  enabled: true
 
 # The Soft Lock Observer detects when a player is in a death loop
 # and attempts to spare them from it by killing nearby enemies.
