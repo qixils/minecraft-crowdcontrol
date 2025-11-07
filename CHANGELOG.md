@@ -16,6 +16,9 @@ A list of all changes made to the software in reverse chronological order.
   - Each vein can now be slightly larger
   - Frequency of troll veins (lava, silverfish) are heavily reduced
   - Fabric/NeoForge: Now pulls from the "#c:ores" tag, allowing modded ores to spawn
+- Improved Fabric/NeoForge mod compatibility with MixinExtras
+- Fixed `admin-required` config setting
+- Removed unused config settings from examples
 
 ## 4.1.0
 

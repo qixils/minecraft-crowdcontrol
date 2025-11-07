@@ -157,7 +157,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		} else {
 			LOGGER.debug("Loading custom effects config");
 			customEffectsConfig = new CustomEffectsConfig(
-				customEffectsSection.getBoolean("enabled", false)
+				customEffectsSection.getBoolean("enabled", true)
 			);
 		}
 

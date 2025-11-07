@@ -47,7 +47,7 @@ public abstract class ConfiguratePlugin<P, S> extends Plugin<P, S> {
 
 		// custom effects
 		customEffectsConfig = new CustomEffectsConfig(
-			config.node("custom-effects", "enabled").getBoolean(false)
+			config.node("custom-effects", "enabled").getBoolean(true)
 		);
 
 		// hosts
