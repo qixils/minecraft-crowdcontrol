@@ -54,7 +54,7 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 
 	@Override
 	public void jumpFromGround(CallbackInfo ci) {
-		Jump event = new Jump((Player) (Object) this, this.level().isClientSide);
+		Jump event = new Jump((Player) (Object) this, this.level().isClientSide());
 
 		boolean cantJump = cc$getMovementStatus(MovementStatusType.JUMP) == MovementStatusValue.DENIED;
 		boolean cantWalk = cc$getMovementStatus(MovementStatusType.WALK) == MovementStatusValue.DENIED;

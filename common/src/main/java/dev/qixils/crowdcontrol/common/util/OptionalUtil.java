@@ -9,7 +9,8 @@ import java.util.stream.Stream;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class OptionalUtil {
 
-	public static <T> Stream<T> stream(Optional<T> optional) {
+	@Deprecated
+	public static <T> Stream<@NotNull T> stream(Optional<T> optional) {
 		return optional.map(Stream::of).orElseGet(Stream::empty);
 	}
 

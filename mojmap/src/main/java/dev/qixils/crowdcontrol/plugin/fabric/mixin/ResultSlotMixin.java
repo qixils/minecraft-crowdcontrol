@@ -28,7 +28,7 @@ public abstract class ResultSlotMixin extends Slot {
 	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
 		CraftingContainer craftSlots = ((ResultSlot) (Object) this).craftSlots;
 
-		if (player.level().isClientSide) return;
+		if (player.level().isClientSide()) return;
 		MinecraftServer server = player.level().getServer();
 		if (server == null) return; // failsafe?
 		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
@@ -40,7 +40,7 @@ public abstract class ResultSlotMixin extends Slot {
 		CraftingContainer craftSlots = ((ResultSlot) (Object) this).craftSlots;
 		Player player = ((ResultSlot) (Object) this).player;
 
-		if (player.level().isClientSide) return;
+		if (player.level().isClientSide()) return;
 		MinecraftServer server = player.level().getServer();
 		if (server == null) return; // failsafe?
 		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);

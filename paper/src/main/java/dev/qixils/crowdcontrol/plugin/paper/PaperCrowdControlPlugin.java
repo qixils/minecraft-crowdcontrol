@@ -13,6 +13,7 @@ import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.world.flag.FeatureDependant;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -25,7 +26,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -144,8 +144,20 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 			softLockConfig = new SoftLockConfig(
 				softLockSection.getInt("period", DEF_PERIOD),
 				softLockSection.getInt("deaths", DEF_DEATHS),
-				config.getInt("search-horizontal", DEF_SEARCH_HORIZ),
-				config.getInt("search-vertical", DEF_SEARCH_VERT)
+				softLockSection.getInt("search-horizontal", DEF_SEARCH_HORIZ),
+				softLockSection.getInt("search-vertical", DEF_SEARCH_VERT)
+			);
+		}
+
+		// custom effects
+		ConfigurationSection customEffectsSection = config.getConfigurationSection("custom-effects");
+		if (customEffectsSection == null) {
+			LOGGER.debug("No custom effects config found, using defaults");
+			customEffectsConfig = new CustomEffectsConfig();
+		} else {
+			LOGGER.debug("Loading custom effects config");
+			customEffectsConfig = new CustomEffectsConfig(
+				customEffectsSection.getBoolean("enabled", true)
 			);
 		}
 
@@ -273,11 +285,15 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		return Bukkit.getWorlds().stream().allMatch(feature::isFeatureEnabled);
 	}
 
-	public static boolean isFeatureEnabled(Material material) {
-		return Bukkit.getWorlds().stream().allMatch(material::isEnabledByFeature);
+	public static boolean isFeatureEnabled(FeatureDependant feature) {
+		return Bukkit.getWorlds().stream().allMatch(world -> world.isEnabled(feature));
 	}
 
-	public static boolean isFeatureEnabled(EntityType entityType) {
-		return Bukkit.getWorlds().stream().allMatch(entityType::isEnabledByFeature);
+	public static boolean isFeatureEnabled(Material material) {
+		FeatureDependant dependant = material.asBlockType() != null
+				? material.asBlockType()
+				: material.asItemType();
+		if (dependant == null) return false;
+		return isFeatureEnabled(dependant);
 	}
 }

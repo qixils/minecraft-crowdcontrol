@@ -9,9 +9,10 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -38,25 +39,18 @@ public class RespawnCommand extends ModdedCommand {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot fling while frozen");
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				ServerPlayer.RespawnConfig respawnConfig = player.getRespawnConfig();
-				ServerLevel level;
-				BlockPos pos;
-				float angle;
-				if (respawnConfig == null) {
-					if (player.getServer() == null)
-						continue;
-					level = player.getServer().getLevel(Level.OVERWORLD);
-					if (level == null)
-						continue;
-					pos = level.getSharedSpawnPos();
-					angle = 0;
-				} else {
-					if (player.getServer() == null) continue;
-					level = player.getServer().getLevel(respawnConfig.dimension());
-					if (level == null) continue;
-					pos = respawnConfig.pos();
-					angle = respawnConfig.angle();
-				}
+				//noinspection ConstantValue
+				if (player.level() == null || player.level().getServer() == null)
+					continue;
+				MinecraftServer server = player.level().getServer();
+
+				LevelData.RespawnData respawnData = player.getRespawnConfig() != null
+					? player.getRespawnConfig().respawnData()
+					: server.getRespawnData();
+				ServerLevel level = server.getLevel(respawnData.dimension());
+				BlockPos pos = respawnData.pos();
+				float angle = respawnData.yaw();
+
 				teleport(player, level, pos, angle);
 				success = true;
 			}

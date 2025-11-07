@@ -48,7 +48,7 @@ public class GameModeCommand extends ModdedCommand implements CCTimedEffect {
 			List<ServerPlayer> players = playerSupplier.get();
 			activeRequests.put(request.getRequestId(), players.stream().map(ServerPlayer::getUUID).toList());
 			setGameMode(players, gamemode, true);
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}, plugin.getSyncExecutor()));
 	}
 

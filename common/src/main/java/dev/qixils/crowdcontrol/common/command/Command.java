@@ -16,12 +16,15 @@ import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.*;
@@ -97,6 +100,93 @@ public interface Command<P> extends CCEffect {
 	}
 
 	/**
+	 * Gets the viewer-facing display name for this command.
+	 *
+	 * @return cc effect name
+	 */
+	@NotNull
+	@CheckReturnValue
+	default CCName getExtensionName() {
+		return new CCName(getPlugin().getTextUtil().asPlain(getDisplayName()));
+	}
+
+	/**
+	 * Gets the custom image to use in the extension.
+	 * Can be an effect ID or URL.
+	 *
+	 * @return custom image or null
+	 */
+	@Nullable
+	@CheckReturnValue
+	default String getImage() {
+		return null;
+	}
+
+	/**
+	 * The default price if added as a custom effect.
+	 *
+	 * @return positive integer
+	 */
+	@CheckReturnValue
+	default int getPrice() {
+		return 100;
+	}
+
+	/**
+	 * Gets the description to display to viewers in the extension.
+	 *
+	 * @return description or null
+	 */
+	@Nullable
+	@CheckReturnValue
+	default String getDescription() {
+		return null;
+	}
+
+	/**
+	 * The categories this effect should be classed under on the extension.
+	 *
+	 * @return categories or null
+	 */
+	@Nullable
+	@CheckReturnValue
+	default List<@NotNull String> getCategories() {
+		return null;
+	}
+
+	/**
+	 * Gets the default duration for this effect.
+	 * It can be configured by the streamer unless defined as immutable.
+	 *
+	 * @return default duration or null
+	 */
+	@Nullable
+	@CheckReturnValue
+	default CustomEffectDuration getExtensionDuration() {
+		return null;
+	}
+
+	/**
+	 * This returns the priority of the effect to be considered when custom effect slots are limited.
+	 * A value of {@value Byte#MIN_VALUE} indicates the effect should not be included at all.
+	 *
+	 * @return priority byte
+	 */
+	@CheckReturnValue
+	default byte getPriority() {
+		return Byte.MIN_VALUE;
+	}
+
+	/**
+	 * This returns whether the effect should default to disabled in the extension.
+	 *
+	 * @return inactive
+	 */
+	default boolean isInactive() {
+		return true;
+	}
+
+	/**
 	 * Gets the default display name for this command.
 	 *
 	 * @return default display name
@@ -138,7 +228,7 @@ public interface Command<P> extends CCEffect {
 				displayName = getQuantityName(displayName, request);
 			}
 
-			if (request.getEffect().getDuration() > 0) {
+			if (request.getEffect().getDurationMillis() > 0) {
 				displayName = getDurationName(displayName, request);
 			}
 		} catch (Exception e) {
@@ -183,7 +273,7 @@ public interface Command<P> extends CCEffect {
 	@ApiStatus.Internal
 	@ApiStatus.OverrideOnly
 	default Component getDurationName(@NotNull Component displayName, @NotNull PublicEffectPayload request) {
-		Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+		Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
 		return displayName.append(Component.text(" (" + duration.getSeconds() + "s)", Plugin.DIM_CMD_COLOR));
 	}
 

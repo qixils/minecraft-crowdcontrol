@@ -1,9 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.configurate;
 
-import dev.qixils.crowdcontrol.common.HideNames;
-import dev.qixils.crowdcontrol.common.LimitConfig;
-import dev.qixils.crowdcontrol.common.Plugin;
-import dev.qixils.crowdcontrol.common.SoftLockConfig;
+import dev.qixils.crowdcontrol.common.*;
 import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
@@ -42,10 +39,15 @@ public abstract class ConfiguratePlugin<P, S> extends Plugin<P, S> {
 
 		// soft-lock observer
 		softLockConfig = new SoftLockConfig(
-			config.node("soft-lock-observer.period").getInt(DEF_PERIOD),
-			config.node("soft-lock-observer.deaths").getInt(DEF_DEATHS),
-			config.node("soft-lock-observer.search-horizontal").getInt(DEF_SEARCH_HORIZ),
-			config.node("soft-lock-observer.search-vertical").getInt(DEF_SEARCH_VERT)
+			config.node("soft-lock-observer", "period").getInt(DEF_PERIOD),
+			config.node("soft-lock-observer", "deaths").getInt(DEF_DEATHS),
+			config.node("soft-lock-observer", "search-horizontal").getInt(DEF_SEARCH_HORIZ),
+			config.node("soft-lock-observer", "search-vertical").getInt(DEF_SEARCH_VERT)
+		);
+
+		// custom effects
+		customEffectsConfig = new CustomEffectsConfig(
+			config.node("custom-effects", "enabled").getBoolean(true)
 		);
 
 		// hosts
@@ -93,6 +95,11 @@ public abstract class ConfiguratePlugin<P, S> extends Plugin<P, S> {
 			config.node("global").set(global);
 			config.node("announce").set(announce);
 			config.node("hide-names").set(hideNames.getConfigCode());
+			config.node("soft-lock-observer", "period").set(softLockConfig.getPeriod());
+			config.node("soft-lock-observer", "deaths").set(softLockConfig.getDeaths());
+			config.node("soft-lock-observer", "search-horizontal").set(softLockConfig.getSearchH());
+			config.node("soft-lock-observer", "search-vertical").set(softLockConfig.getSearchV());
+			config.node("custom-effects", "enabled").set(customEffectsConfig.enabled());
 			getConfigLoader().save(config);
 		} catch (ConfigurateException e) {
 			throw new RuntimeException("Could not save plugin config", e);
