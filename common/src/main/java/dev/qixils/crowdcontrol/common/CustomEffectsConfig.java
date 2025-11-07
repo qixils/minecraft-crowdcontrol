@@ -19,7 +19,7 @@ public final class CustomEffectsConfig {
 	 * Constructs an empty limit configuration.
 	 */
 	public CustomEffectsConfig() {
-		this(false);
+		this(true);
 	}
 
 	/**
