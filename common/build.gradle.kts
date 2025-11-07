@@ -6,7 +6,7 @@ val slf4jVersion: String by project
 val jacksonVersion: String by project
 
 dependencies {
-    api("dev.qixils.cc4j:pubsub:$crowdControlVersion")
+    api("dev.qixils:cc4j-pubsub:$crowdControlVersion")
     api("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     api("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
