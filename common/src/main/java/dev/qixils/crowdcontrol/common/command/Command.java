@@ -178,6 +178,15 @@ public interface Command<P> extends CCEffect {
 	}
 
 	/**
+	 * This returns whether the effect should default to disabled in the extension.
+	 *
+	 * @return inactive
+	 */
+	default boolean isInactive() {
+		return true;
+	}
+
+	/**
 	 * Gets the default display name for this command.
 	 *
 	 * @return default display name
