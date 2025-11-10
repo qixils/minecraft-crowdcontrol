@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.2.1
+
+Fixed an issue with timed effects.
+
 ## 4.2.0
 
 - Paper/Fabric: Added support for 1.21.9/1.21.10
