@@ -1,7 +1,19 @@
 import type { SetOptional } from "type-fest"
 
+// todo: improve this some day
 export const sortIds: Record<string, string> = {
-    "25w14craftmine": "1.21.5-AF",
+    "25w14craftmine": "1.21.05-AF",
+    "1.21.9": "1.21.09",
+    "1.21.8": "1.21.08",
+    "1.21.7": "1.21.07",
+    "1.21.6": "1.21.06",
+    "1.21.5": "1.21.05",
+    "1.21.4": "1.21.04",
+    "1.21.3": "1.21.03",
+    "1.21.2": "1.21.02",
+    "1.21.1": "1.21.01",
+    "1.21.0": "1.21.00",
+    "1.21": "1.21.00",
 }
 
 export interface Version {
