@@ -38,6 +38,7 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 	private final String image = "potion_speed";
 	private final int price = 50;
 	private final byte priority = 0;
+	private final boolean exclusive;
 	private final List<String> categories = Collections.singletonList("Potion Effects");
 	private final CustomEffectDuration extensionDuration = new CustomEffectDuration(POTION_SECONDS);
 
@@ -49,6 +50,16 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", Component.translatable(potionEffectType));
 		this.displayName = _displayName;
 		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.potion.extension")));
+		this.exclusive = potionEffectType.equals(PotionEffectType.BLINDNESS)
+			|| potionEffectType.equals(PotionEffectType.DARKNESS)
+			|| potionEffectType.equals(PotionEffectType.FIRE_RESISTANCE)
+			|| potionEffectType.equals(PotionEffectType.GLOWING)
+			|| potionEffectType.equals(PotionEffectType.INFESTED)
+			|| potionEffectType.equals(PotionEffectType.INVISIBILITY)
+			|| potionEffectType.equals(PotionEffectType.NAUSEA)
+			|| potionEffectType.equals(PotionEffectType.NIGHT_VISION)
+			|| potionEffectType.equals(PotionEffectType.SLOW_FALLING)
+			|| potionEffectType.equals(PotionEffectType.WATER_BREATHING);
 	}
 
 	private static String nameOf(PotionEffectType type) {
@@ -78,7 +89,7 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 
 			List<Player> players = playerSupplier.get();
 
-			Duration duration = Duration.ofSeconds(request.getEffect().getDurationMillis());
+			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
 			int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
 			// TODO: improve folia...
