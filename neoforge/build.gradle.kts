@@ -127,8 +127,8 @@ tasks.remapJar {
 }
 
 publishMods {
-    val versionFrom = "1.21.5"
-    val versionTo = "1.21.5"
+    val versionFrom = "1.21.6"
+    val versionTo = "1.21.6"
 
     file.set(tasks.remapJar.get().archiveFile)
     modLoaders.add("neoforge")
