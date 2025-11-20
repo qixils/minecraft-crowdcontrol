@@ -14,6 +14,7 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
@@ -165,7 +166,7 @@ public class LootboxCommand extends RegionalCommandSync {
 		for (int i = 0; i <= luck; i++) {
 			enchantments = Math.max(enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
-		List<Enchantment> enchantmentList = Registry.ENCHANTMENT.stream()
+		List<Enchantment> enchantmentList = registryAccess.getRegistry(RegistryKey.ENCHANTMENT).stream()
 				.filter(enchantment -> enchantment.canEnchantItem(itemStack))
 				.collect(Collectors.toList());
 		if (random.nextDouble() >= (.8d - (luck * .2d)))
@@ -177,10 +178,22 @@ public class LootboxCommand extends RegionalCommandSync {
 			List<Enchantment> addedEnchantments = new ArrayList<>(enchantments);
 			for (int i = 0; i < enchantmentList.size() && addedEnchantments.size() < enchantments; ++i) {
 				Enchantment enchantment = enchantmentList.get(i);
+
 				// block conflicting enchantments (unless the die roll decides otherwise)
-				if (addedEnchantments.stream().anyMatch(x -> x.conflictsWith(enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
+				boolean isVanilla = enchantment.key().namespace().equals(Key.MINECRAFT_NAMESPACE);
+				if (addedEnchantments.stream().anyMatch(
+					x -> x.conflictsWith(enchantment)
+					&& (
+						// allow skipping if one of the enchants isn't vanilla
+						// or if a 90% chance procs
+						!isVanilla
+							|| !x.key().namespace().equals(Key.MINECRAFT_NAMESPACE)
+							|| random.nextDouble() >= (.1d + (luck * .1d))
+					)
+				))
 					continue;
 				addedEnchantments.add(enchantment);
+
 				// determine enchantment level
 				int level = enchantment.getStartLevel();
 				if (enchantment.getMaxLevel() > level) {

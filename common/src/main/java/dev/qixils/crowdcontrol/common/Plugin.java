@@ -830,6 +830,14 @@ public abstract class Plugin<P, S> {
 					// TODO: extra features
 				}
 			}));
+		// reloadconfig command
+		manager.command(ccCmd.literal("reloadconfig")
+			.commandDescription(description("Reloads the mod's config file"))
+			.handler(ctx -> {
+				Audience audience = mapper.asAudience(ctx.sender());
+				loadConfig();
+				audience.sendMessage(output(translatable("cc.command.crowdcontrol.reloadconfig.output")));
+			}));
 		// execute command
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")

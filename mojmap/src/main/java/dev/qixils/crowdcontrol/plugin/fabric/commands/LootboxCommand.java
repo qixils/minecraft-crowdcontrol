@@ -20,6 +20,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
 import net.minecraft.world.SimpleContainer;
@@ -221,11 +223,22 @@ public class LootboxCommand extends ModdedCommand {
 
 		// add enchantments
 		List<Holder<Enchantment>> addedEnchantments = new ArrayList<>(enchantments);
+		ResourceLocation nullKey = ResourceLocation.fromNamespaceAndPath("null", "null");
 		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
 			Holder<Enchantment> enchantment = enchantmentList.removeFirst();
 
-			// block conflicting enchantments (unless the die roll decides otherwise)
-			if (addedEnchantments.stream().anyMatch(x -> Enchantment.areCompatible(x, enchantment)) && random.nextDouble() >= (.1d + (luck * .1d)))
+			// block conflicting vanilla enchantments (unless the die roll decides otherwise)
+			boolean isVanilla = enchantment.unwrapKey().map(ResourceKey::location).orElse(nullKey).namespace().equals(ResourceLocation.DEFAULT_NAMESPACE);
+			if (addedEnchantments.stream().anyMatch(
+				x -> !Enchantment.areCompatible(x, enchantment)
+				&& (
+					// allow skipping if one of the enchants isn't vanilla
+					// or if a 90% chance procs
+					!isVanilla
+						|| !x.unwrapKey().map(ResourceKey::location).orElse(nullKey).namespace().equals(ResourceLocation.DEFAULT_NAMESPACE)
+						|| random.nextDouble() >= (.1d + (luck * .1d))
+				)
+			))
 				continue;
 			addedEnchantments.add(enchantment);
 
