@@ -127,8 +127,8 @@ tasks.remapJar {
 }
 
 publishMods {
-    val versionFrom = "1.21.5"
-    val versionTo = "1.21.5"
+    val versionFrom = "25w14craftmine"
+    val versionTo = "25w14craftmine"
 
     file.set(tasks.remapJar.get().archiveFile)
     modLoaders.add("neoforge")
@@ -137,10 +137,7 @@ publishMods {
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
         projectId.set("830331")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
-        }
+        minecraftVersions.add("1.21.5-Snapshot")
         version.set(versionId)
         displayName.set(buildString {
             append("[NeoForge ")
@@ -156,14 +153,12 @@ publishMods {
         serverRequired.set(true)
         clientRequired.set(false)
         embeds("cloth-config")
+        type.set(ReleaseType.BETA)
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
-        }
+        minecraftVersions.add(versionFrom)
         version.set(versionId)
         displayName.set(buildString {
             append("v")
@@ -177,5 +172,6 @@ publishMods {
             append(")")
         })
         embeds("cloth-config", "adventure-platform-mod")
+        type.set(ReleaseType.STABLE)
     }
 }
