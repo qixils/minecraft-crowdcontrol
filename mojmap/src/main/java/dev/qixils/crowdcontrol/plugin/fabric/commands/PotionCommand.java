@@ -40,6 +40,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 	private final String image = "potion_speed";
 	private final int price = 50;
 	private final byte priority = 0;
+	private final boolean exclusive;
 	private final List<String> categories = Collections.singletonList("Potion Effects");
 	private final CustomEffectDuration extensionDuration = new CustomEffectDuration(POTION_SECONDS);
 
@@ -53,6 +54,16 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
 		this.displayName = _displayName;
 		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.potion.extension")));
+		this.exclusive = potionEffectType.is(MobEffects.BLINDNESS)
+			|| potionEffectType.is(MobEffects.DARKNESS)
+			|| potionEffectType.is(MobEffects.FIRE_RESISTANCE)
+			|| potionEffectType.is(MobEffects.GLOWING)
+			|| potionEffectType.is(MobEffects.INFESTED)
+			|| potionEffectType.is(MobEffects.INVISIBILITY)
+			|| potionEffectType.is(MobEffects.NAUSEA)
+			|| potionEffectType.is(MobEffects.NIGHT_VISION)
+			|| potionEffectType.is(MobEffects.SLOW_FALLING)
+			|| potionEffectType.is(MobEffects.WATER_BREATHING);
 	}
 
 	@Override
@@ -61,7 +72,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 			if (potionEffectType == MobEffects.JUMP_BOOST && isActive(ccPlayer, "disable_jumping"))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot apply jump boost while Disable Jump is active");
 
-			Duration duration = Duration.ofSeconds(request.getEffect().getDurationMillis());
+			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
 			int durationTicks = isMinimal ? 1 : (int) duration.getSeconds() * 20;
 
 			for (ServerPlayer player : playerSupplier.get()) {
