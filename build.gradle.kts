@@ -10,6 +10,7 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     id("io.papermc.paperweight.userdev") version "1.7.7" apply false
     id("architectury-plugin") version "3.4-SNAPSHOT" apply true
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0" apply false
 }
 
 repositories {
@@ -49,7 +50,6 @@ subprojects {
             name = "Jitpack"
         }
         mavenCentral()
-        mavenLocal()
     }
 
     dependencies {
