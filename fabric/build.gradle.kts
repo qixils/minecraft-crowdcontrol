@@ -129,8 +129,8 @@ tasks.remapJar {
 }
 
 publishMods {
-    val versionFrom = "1.21.6"
-    val versionTo = "1.21.8"
+    val versionFrom = "1.21.9"
+    val versionTo = "1.21.10"
 
     file.set(tasks.remapJar.get().archiveFile)
     modLoaders.add("fabric")

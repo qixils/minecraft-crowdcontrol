@@ -69,8 +69,8 @@ fun RunServer.configure(mcVersion: String) {
 }
 
 publishMods {
-    val versionFrom = "1.21.2"
-    val versionTo = "1.21.8"
+    val versionFrom = "1.21.9"
+    val versionTo = "1.21.10"
 
     file.set(tasks.shadowJar.get().archiveFile)
     modLoaders.add("paper")
