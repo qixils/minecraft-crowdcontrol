@@ -1,3 +1,5 @@
+import me.modmuss50.mpp.ReleaseType
+
 val neoforgeVersion: String by project
 val mojmapVersion: String by project
 val adventurePlatformModVersion: String by project
@@ -6,10 +8,13 @@ val cloudMojmapVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
 
+val versionId = project.version.toString() + "+neoforge-$mojmapVersion"
+
 plugins {
     id("com.gradleup.shadow")
     id("architectury-plugin")
     id("dev.architectury.loom")
+    id("me.modmuss50.mod-publish-plugin")
 }
 
 architectury {
@@ -83,7 +88,7 @@ tasks.processResources {
     filteringCharset = "UTF-8"
 
     filesMatching("META-INF/neoforge.mods.toml") {
-        expand("version" to project.version.toString() + "+neoforge-$mojmapVersion")
+        expand("version" to versionId)
     }
 }
 
@@ -119,4 +124,58 @@ tasks.remapJar {
     inputFile.set(tasks.shadowJar.get().archiveFile)
     archiveBaseName.set("CrowdControl-NeoForge+$mojmapVersion")
     archiveClassifier.set("")
+}
+
+publishMods {
+    val versionFrom = "1.21.6"
+    val versionTo = "1.21.6"
+
+    file.set(tasks.remapJar.get().archiveFile)
+    modLoaders.add("neoforge")
+    type.set(ReleaseType.STABLE)
+    changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
+    curseforge {
+        accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
+        projectId.set("830331")
+        minecraftVersionRange {
+            start.set(versionFrom)
+            end.set(versionTo)
+        }
+        version.set(versionId)
+        displayName.set(buildString {
+            append("[NeoForge ")
+            append(versionFrom)
+            if (versionFrom != versionTo) {
+                append("-")
+                append(versionTo)
+            }
+            append("] v")
+            append(project.version.toString())
+        })
+        javaVersions.add(JavaVersion.VERSION_21)
+        serverRequired.set(true)
+        clientRequired.set(false)
+        embeds("cloth-config")
+    }
+    modrinth {
+        accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
+        projectId.set("6XhH9LqD")
+        minecraftVersionRange {
+            start.set(versionFrom)
+            end.set(versionTo)
+        }
+        version.set(versionId)
+        displayName.set(buildString {
+            append("v")
+            append(project.version.toString())
+            append(" (NeoForge ")
+            append(versionFrom)
+            if (versionFrom != versionTo) {
+                append("-")
+                append(versionTo)
+            }
+            append(")")
+        })
+        embeds("cloth-config", "adventure-platform-mod")
+    }
 }

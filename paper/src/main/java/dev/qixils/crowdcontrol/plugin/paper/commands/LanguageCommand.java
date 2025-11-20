@@ -45,7 +45,7 @@ public class LanguageCommand extends PaperCommand implements CCTimedEffect {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "All players already have an active language effect");
 
 			// create byte buf
-			Duration duration = Duration.ofSeconds(request.getEffect().getDurationMillis());
+			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
 			SetLanguagePacketS2C packet = new SetLanguagePacketS2C(LanguageState.RANDOM, duration);
 
 			// send packet

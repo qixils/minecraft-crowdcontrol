@@ -2,6 +2,13 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.2.2
+
+- Added `/crowdcontrol reloadconfig` command
+- Fixed durations on some timed effects
+- Fixed exclusivity of potion effects
+- Fabric/NeoForge: Fixed Lootbox odds to add enchants
+
 ## 4.2.1
 
 Fixed an issue with timed effects.
