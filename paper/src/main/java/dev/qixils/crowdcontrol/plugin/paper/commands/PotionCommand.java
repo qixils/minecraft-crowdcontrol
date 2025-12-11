@@ -59,7 +59,8 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 			|| potionEffectType.equals(PotionEffectType.NAUSEA)
 			|| potionEffectType.equals(PotionEffectType.NIGHT_VISION)
 			|| potionEffectType.equals(PotionEffectType.SLOW_FALLING)
-			|| potionEffectType.equals(PotionEffectType.WATER_BREATHING);
+			|| potionEffectType.equals(PotionEffectType.WATER_BREATHING)
+			|| potionEffectType.equals(PotionEffectType.ABSORPTION);
 	}
 
 	private static String nameOf(PotionEffectType type) {

@@ -224,9 +224,10 @@ public class LootboxCommand extends RegionalCommandSync {
 				Attribute attribute = attributeList.get(i);
 				String name = "lootbox_" + attribute.getKey().getKey();
 				// determine percent amount for the modifier
-				double amount = 0d;
+				double max = attribute.equals(Attribute.MOVEMENT_SPEED) ? 0.2d : 1d;
+				double amount = -max; // just a fallback
 				for (int j = 0; j <= luck; j++) {
-					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
+					amount = Math.max(amount, random.nextDouble(-max, max + 0.001d));
 				}
 				// create & add attribute
 				itemMeta.addAttributeModifier(attribute, createModifier(name, amount, target));

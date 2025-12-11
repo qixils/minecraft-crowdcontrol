@@ -13,10 +13,7 @@ import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
-import live.crowdcontrol.cc4j.CCEventType;
-import live.crowdcontrol.cc4j.CCPlayer;
-import live.crowdcontrol.cc4j.CrowdControl;
-import live.crowdcontrol.cc4j.IUserRecord;
+import live.crowdcontrol.cc4j.*;
 import live.crowdcontrol.cc4j.websocket.UserToken;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
 import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
@@ -1215,6 +1212,15 @@ public abstract class Plugin<P, S> {
 		}
 
 		CCPlayer ccPlayer = cc.addPlayer(uuid);
+		ccPlayer.getEventManager().registerEventConsumer(CCEventType.MESSAGE, message -> {
+			Optional<P> newPlayer = playerMapper().getPlayer(ccPlayer.getUuid());
+			if (newPlayer.isEmpty()) return;
+			Audience newAudience = playerMapper().asAudience(newPlayer.get());
+			Component text = PREFIX_COMPONENT.append(Component.text(message.message()));
+			if (message.level() == CCMessage.Level.ERROR) text = text.color(NamedTextColor.RED);
+			else if (message.level() == CCMessage.Level.WARN) text = text.color(NamedTextColor.GOLD);
+			newAudience.sendMessage(text);
+		});
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.GENERATED_AUTH_CODE, payload -> {
 			String url = ccPlayer.getAuthUrl();
 			if (url == null) return; // eh?
