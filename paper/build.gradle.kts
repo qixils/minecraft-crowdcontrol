@@ -49,7 +49,7 @@ tasks {
         configure(minecraftVersion)
     }
     // create extra runServer tasks for later versions of Minecraft
-    for (mcVersion in listOf<String>("1.21.4", "1.21.5", "1.21.6")) {
+    for (mcVersion in listOf<String>("1.21.11")) {
         register("runServer$mcVersion", RunServer::class.java) {
             configure(mcVersion)
             dependsOn("shadowJar")
@@ -70,7 +70,7 @@ fun RunServer.configure(mcVersion: String) {
 
 publishMods {
     val versionFrom = "1.21.9"
-    val versionTo = "1.21.10"
+    val versionTo = "1.21.11"
 
     file.set(tasks.shadowJar.get().archiveFile)
     modLoaders.add("paper")

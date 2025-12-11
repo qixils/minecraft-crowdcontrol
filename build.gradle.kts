@@ -50,7 +50,7 @@ subprojects {
             name = "Jitpack"
         }
         mavenCentral()
-        mavenLocal()
+//        mavenLocal()
     }
 
     dependencies {

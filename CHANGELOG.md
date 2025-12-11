@@ -2,6 +2,14 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.2.3
+
+- Added support for 1.21.11
+- Added new warnings to chat for connection issues
+- Fixed lootbox only applying positive attributes
+- Fixed lootbox giving overly high speed attributes
+- Fixed more potion effects
+
 ## 4.2.2
 
 - Added `/crowdcontrol reloadconfig` command
