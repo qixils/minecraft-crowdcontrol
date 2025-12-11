@@ -114,7 +114,7 @@ public abstract class ModdedPlatformClient {
 
 	public void handleSetShader(@NotNull SetShaderS2C payload, @NotNull ClientPacketContext context) {
 		logger.debug("Received shader request from server!");
-//		ResourceLocation shader = withDefaultNamespace(payload.shader());
+//		Identifier shader = withDefaultNamespace(payload.shader());
 //
 //		client.execute(() -> {
 //			client.gameRenderer.setPostEffect(shader);

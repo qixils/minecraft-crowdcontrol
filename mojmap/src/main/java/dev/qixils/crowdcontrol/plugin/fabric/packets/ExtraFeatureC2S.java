@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -14,7 +14,7 @@ import java.util.Set;
 public class ExtraFeatureC2S extends ExtraFeaturePacketC2S implements CustomPacketPayload {
 	// boilerplate
 	public static final StreamCodec<RegistryFriendlyByteBuf, ExtraFeatureC2S> PACKET_CODEC = CustomPacketPayload.codec(ExtraFeatureC2S::write, ExtraFeatureC2S::new);
-	public static final Type<ExtraFeatureC2S> PACKET_ID = new Type<>(ResourceLocation.parse(METADATA.channel()));
+	public static final Type<ExtraFeatureC2S> PACKET_ID = new Type<>(Identifier.parse(METADATA.channel()));
 	public @Override @NotNull Type<ExtraFeatureC2S> type() { return PACKET_ID; }
 	public ExtraFeatureC2S(@NotNull FriendlyByteBuf buf) { super(buf); }
 	public ExtraFeatureC2S(@NotNull Set<ExtraFeature> version) { super(version); }

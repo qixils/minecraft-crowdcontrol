@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
-import static net.minecraft.resources.ResourceLocation.parse;
+import static net.minecraft.resources.Identifier.parse;
 
 public class SetLanguageS2C extends SetLanguagePacketS2C implements CustomPacketPayload {
 	// boilerplate

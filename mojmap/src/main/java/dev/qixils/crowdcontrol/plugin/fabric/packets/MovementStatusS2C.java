@@ -9,7 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
-import static net.minecraft.resources.ResourceLocation.parse;
+import static net.minecraft.resources.Identifier.parse;
 
 public class MovementStatusS2C extends MovementStatusPacketS2C implements CustomPacketPayload {
 	public static final StreamCodec<RegistryFriendlyByteBuf, MovementStatusS2C> PACKET_CODEC = CustomPacketPayload.codec(MovementStatusS2C::write, MovementStatusS2C::new);

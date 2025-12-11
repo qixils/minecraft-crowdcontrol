@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.interfaces;
 
 import org.jetbrains.annotations.NotNull;
 
-import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
+import static net.minecraft.resources.Identifier.fromNamespaceAndPath;
 
 public final class Components {
 	public static final @NotNull String VIEWER_MOB = fromNamespaceAndPath("crowdcontrol", "viewer-mob").asString();

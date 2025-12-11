@@ -21,18 +21,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.MushroomCow;
-import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
+import net.minecraft.world.entity.animal.cow.MushroomCow;
+import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.animal.frog.Frog;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.rabbit.Rabbit;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.npc.VillagerDataHolder;
+import net.minecraft.world.entity.npc.villager.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -140,7 +140,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		return LOOT_TABLES = ((HolderLookup.Provider) server.reloadableRegistries().lookup())
 			.lookupOrThrow(Registries.LOOT_TABLE)
 			.listElementIds()
-			.filter(key -> key.location().getPath().startsWith("chests/"))
+			.filter(key -> key.identifier().getPath().startsWith("chests/"))
 			.toList();
 	}
 

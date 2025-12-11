@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -18,8 +18,8 @@ import java.util.function.Consumer;
 public class AttributeUtil {
 	private static final Logger logger = LoggerFactory.getLogger("CrowdControl/AttributeUtil");
 
-	public static ResourceLocation migrateId(UUID uuid) {
-		return ResourceLocation.withDefaultNamespace(uuid.toString().toLowerCase(Locale.US));
+	public static Identifier migrateId(UUID uuid) {
+		return Identifier.withDefaultNamespace(uuid.toString().toLowerCase(Locale.US));
 	}
 
 	public static Optional<AttributeModifier> getModifier(@Nullable AttributeInstance attr, UUID uuid) {

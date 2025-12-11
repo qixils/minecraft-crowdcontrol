@@ -50,7 +50,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
 
-import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
+import static net.minecraft.resources.Identifier.fromNamespaceAndPath;
 
 // TODO: can no longer connect to paper servers
 

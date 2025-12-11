@@ -13,10 +13,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameRules.BooleanValue;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
@@ -97,9 +97,9 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 
 	@WrapOperation(
 			method = "restoreFrom",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;")
 	)
-	private boolean restoreFromRedirectKeepInventory(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {
+	private Object restoreFromRedirectKeepInventory(GameRules gameRules, GameRule<Boolean> key, Operation<Boolean> original) {
 		return keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 

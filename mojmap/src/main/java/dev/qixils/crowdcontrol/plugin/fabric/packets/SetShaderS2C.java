@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
-import static net.minecraft.resources.ResourceLocation.parse;
+import static net.minecraft.resources.Identifier.parse;
 
 public class SetShaderS2C extends ShaderPacketS2C implements CustomPacketPayload {
 	// boilerplate

@@ -20,8 +20,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
 import net.minecraft.world.SimpleContainer;
@@ -223,19 +223,19 @@ public class LootboxCommand extends ModdedCommand {
 
 		// add enchantments
 		List<Holder<Enchantment>> addedEnchantments = new ArrayList<>(enchantments);
-		ResourceLocation nullKey = ResourceLocation.fromNamespaceAndPath("null", "null");
+		Identifier nullKey = Identifier.fromNamespaceAndPath("null", "null");
 		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
 			Holder<Enchantment> enchantment = enchantmentList.removeFirst();
 
 			// block conflicting vanilla enchantments (unless the die roll decides otherwise)
-			boolean isVanilla = enchantment.unwrapKey().map(ResourceKey::location).orElse(nullKey).namespace().equals(ResourceLocation.DEFAULT_NAMESPACE);
+			boolean isVanilla = enchantment.unwrapKey().map(ResourceKey::identifier).orElse(nullKey).namespace().equals(Identifier.DEFAULT_NAMESPACE);
 			if (addedEnchantments.stream().anyMatch(
 				x -> !Enchantment.areCompatible(x, enchantment)
 				&& (
 					// allow skipping if one of the enchants isn't vanilla
 					// or if a 90% chance procs
 					!isVanilla
-						|| !x.unwrapKey().map(ResourceKey::location).orElse(nullKey).namespace().equals(ResourceLocation.DEFAULT_NAMESPACE)
+						|| !x.unwrapKey().map(ResourceKey::identifier).orElse(nullKey).namespace().equals(Identifier.DEFAULT_NAMESPACE)
 						|| random.nextDouble() >= (.1d + (luck * .1d))
 				)
 			))
@@ -269,10 +269,12 @@ public class LootboxCommand extends ModdedCommand {
 			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
 				Holder<Attribute> attribute = attributeList.get(i);
 				// determine percent amount for the modifier
-				double amount = 0d;
+				double max = attribute.is(Attributes.MOVEMENT_SPEED) ? 0.2d : 1d;
+				double amount = -max; // just a fallback
 				for (int j = 0; j <= luck; j++) {
-					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
+					amount = Math.max(amount, random.nextDouble(-max, max + 0.001d));
 				}
+				if (Math.abs(amount) < 0.01d) continue;
 				// create & add attribute
 				AttributeModifier attributeModifier = new AttributeModifier(migrateId(UUID.randomUUID()), amount, Operation.ADD_VALUE);
 				ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);

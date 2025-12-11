@@ -5,7 +5,7 @@ plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "8.14" apply false
     id("com.gradleup.shadow") version "8.3.7" apply true
-    id("dev.architectury.loom") version "1.11-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
     //id("io.papermc.paperweight.userdev") version "1.7.7" apply false
@@ -50,6 +50,7 @@ subprojects {
             name = "Jitpack"
         }
         mavenCentral()
+//        mavenLocal()
     }
 
     dependencies {
