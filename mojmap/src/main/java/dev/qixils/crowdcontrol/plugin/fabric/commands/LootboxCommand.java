@@ -269,10 +269,12 @@ public class LootboxCommand extends ModdedCommand {
 			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
 				Holder<Attribute> attribute = attributeList.get(i);
 				// determine percent amount for the modifier
-				double amount = 0d;
+				double max = attribute.is(Attributes.MOVEMENT_SPEED) ? 0.2d : 1d;
+				double amount = -max; // just a fallback
 				for (int j = 0; j <= luck; j++) {
-					amount = Math.max(amount, (random.nextDouble() * 2) - 1);
+					amount = Math.max(amount, random.nextDouble(-max, max + 0.001d));
 				}
+				if (Math.abs(amount) < 0.01d) continue;
 				// create & add attribute
 				AttributeModifier attributeModifier = new AttributeModifier(migrateId(UUID.randomUUID()), amount, Operation.ADD_VALUE);
 				ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);

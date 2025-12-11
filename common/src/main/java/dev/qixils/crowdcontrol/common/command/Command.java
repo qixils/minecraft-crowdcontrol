@@ -224,9 +224,8 @@ public interface Command<P> extends CCEffect {
 		Component displayName = getDisplayName();
 
 		try {
-			if (request.getQuantity() > 1) {
-				displayName = getQuantityName(displayName, request);
-			}
+			// getquantityname has its own checks, we don't need another one here
+			displayName = getQuantityName(displayName, request);
 
 			if (request.getEffect().getDurationMillis() > 0) {
 				displayName = getDurationName(displayName, request);
