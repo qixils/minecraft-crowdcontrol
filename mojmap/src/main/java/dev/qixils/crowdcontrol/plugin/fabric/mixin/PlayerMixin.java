@@ -13,9 +13,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameRules.BooleanValue;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -72,17 +72,17 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 
 	@WrapOperation(
 			method = "dropEquipment",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;")
 	)
-	private boolean equipmentKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {
+	private Object equipmentKeepInventoryRedirect(GameRules gameRules, GameRule<@NotNull Boolean> key, Operation<Boolean> original) {
 		return EntityUtil.keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 
 	@WrapOperation(
 			method = "getBaseExperienceReward",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;")
 	)
-	private boolean experienceKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {
+	private Object experienceKeepInventoryRedirect(GameRules gameRules, GameRule<@NotNull Boolean> key, Operation<Boolean> original) {
 		return EntityUtil.keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 }

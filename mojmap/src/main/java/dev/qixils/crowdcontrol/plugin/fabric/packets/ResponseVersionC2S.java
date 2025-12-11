@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
-import static net.minecraft.resources.ResourceLocation.parse;
+import static net.minecraft.resources.Identifier.parse;
 
 public class ResponseVersionC2S extends VersionResponsePacketC2S implements CustomPacketPayload {
 	// boilerplate

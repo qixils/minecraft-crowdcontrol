@@ -7,8 +7,9 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameRules.BooleanValue;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRules;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -24,9 +25,9 @@ public class EntityUtil {
 	 * @param key ID of the gamerule being checked
 	 * @return resulting, potentially redirected value
 	 */
-	public static boolean keepInventoryRedirect(Entity entity, boolean keepInventory, GameRules.Key<BooleanValue> key) {
+	public static boolean keepInventoryRedirect(Entity entity, boolean keepInventory, GameRule<@NotNull Boolean> key) {
 		// double check that this is the keep inventory game rule
-		if (key != GameRules.RULE_KEEPINVENTORY)
+		if (key != GameRules.KEEP_INVENTORY)
 			return keepInventory;
 
 		// don't redirect if the game rule is enabled

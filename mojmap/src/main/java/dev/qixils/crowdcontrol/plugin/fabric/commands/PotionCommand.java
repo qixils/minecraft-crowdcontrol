@@ -16,7 +16,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -48,7 +48,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 	public PotionCommand(@NotNull ModdedCrowdControlPlugin plugin, @NotNull Holder<MobEffect> potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		ResourceLocation loc = potionEffectType.unwrapKey().orElseThrow().location();
+		Identifier loc = potionEffectType.unwrapKey().orElseThrow().identifier();
 		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(loc);
 		this.isMinimal = potionEffectType.value().isInstantenous();
 		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));

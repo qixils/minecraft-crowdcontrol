@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
-import net.minecraft.FieldsAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -19,8 +17,6 @@ import java.util.Collections;
 
 import static java.lang.Math.pow;
 
-@FieldsAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public record Location(ServerLevel level, double x, double y, double z, float yaw, float pitch) {
 	public Location(Entity player) {
 		this((ServerLevel) player.level(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());

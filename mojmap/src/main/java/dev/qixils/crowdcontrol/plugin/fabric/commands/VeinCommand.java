@@ -15,7 +15,7 @@ import lombok.Getter;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -36,8 +36,8 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 @Getter
 public class VeinCommand extends ModdedCommand {
 	// we don't have fabric api imported anymore so we have to define the common tags manually
-	public static final TagKey<Block> ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores"));
-	public static final TagKey<Block> ORE_BEARING_GROUND_DEEPSLATE = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ore_bearing_ground/deepslate"));
+	public static final TagKey<Block> ORES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "ores"));
+	public static final TagKey<Block> ORE_BEARING_GROUND_DEEPSLATE = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "ore_bearing_ground/deepslate"));
 
 	private final String effectName = "vein";
 
@@ -93,18 +93,18 @@ public class VeinCommand extends ModdedCommand {
 				registry.getOrThrow(ORES).stream()
 					.filter(Holder::isBound) // failsafe
 					.sorted((a, b) -> {
-						ResourceLocation keyA = a.unwrapKey().get().location();
-						ResourceLocation keyB = b.unwrapKey().get().location();
+						Identifier keyA = a.unwrapKey().get().identifier();
+						Identifier keyB = b.unwrapKey().get().identifier();
 						boolean deepslateA = keyA.value().startsWith("deepslate_");
 						boolean deepslateB = keyB.value().startsWith("deepslate_");
 						if (deepslateA != deepslateB) return deepslateA ? 1 : -1;
 						return keyA.asString().compareTo(keyB.asString());
 					})
 					.forEachOrdered(item -> {
-						ResourceLocation location = item.unwrapKey().get().location();
+						Identifier location = item.unwrapKey().get().identifier();
 						if (location.value().startsWith("deepslate_")) {
 							Optional<Ore> matching = ores.stream().filter(ore -> {
-								ResourceLocation oreLoc = ore.getBlock().unwrapKey().get().location();
+								Identifier oreLoc = ore.getBlock().unwrapKey().get().identifier();
 								if (!location.namespace().equals(oreLoc.namespace())) return false;
 								if (!location.value().equals("deepslate_" + oreLoc.value())) return false;
 								return true;

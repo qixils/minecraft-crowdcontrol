@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
 
 import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModifier;
-import static net.minecraft.resources.ResourceLocation.withDefaultNamespace;
+import static net.minecraft.resources.Identifier.withDefaultNamespace;
 
 public class FabricLivingEntity extends FabricEntity implements CCLivingEntity {
 

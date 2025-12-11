@@ -14,7 +14,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -92,7 +92,7 @@ public class KeepInventoryCommand extends ModdedCommand {
 	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
 		// Cannot use inventory effects while /gamerule keepInventory true
 		return potentialPlayers.stream()
-			.anyMatch(player -> player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
+			.anyMatch(player -> player.level().getGameRules().get(GameRules.KEEP_INVENTORY))
 			? TriState.FALSE
 			: TriState.TRUE;
 	}

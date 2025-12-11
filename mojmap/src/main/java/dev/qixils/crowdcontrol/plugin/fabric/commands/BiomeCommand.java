@@ -4,8 +4,8 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -111,7 +111,7 @@ public class BiomeCommand extends NearbyLocationCommand<ResourceKey<Biome>> {
 
 	@Override
 	protected @NotNull Component nameOf(@NotNull ResourceKey<Biome> searchType) {
-		ResourceLocation id = searchType.location();
+		Identifier id = searchType.identifier();
 		return Component.translatable("biome." + id.getNamespace() + "." + id.getPath());
 	}
 

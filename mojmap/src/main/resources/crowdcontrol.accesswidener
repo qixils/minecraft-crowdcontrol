@@ -3,9 +3,9 @@ accessible method net/minecraft/world/entity/animal/wolf/Wolf setCollarColor (Ln
 accessible method net/minecraft/world/entity/animal/wolf/Wolf setVariant (Lnet/minecraft/core/Holder;)V
 accessible method net/minecraft/world/entity/animal/frog/Frog setVariant (Lnet/minecraft/core/Holder;)V
 accessible method net/minecraft/world/entity/animal/axolotl/Axolotl setVariant (Lnet/minecraft/world/entity/animal/axolotl/Axolotl$Variant;)V
-accessible method net/minecraft/world/entity/animal/Rabbit setVariant (Lnet/minecraft/world/entity/animal/Rabbit$Variant;)V
-accessible method net/minecraft/world/entity/animal/MushroomCow setVariant (Lnet/minecraft/world/entity/animal/MushroomCow$Variant;)V
-accessible method net/minecraft/client/renderer/GameRenderer setPostEffect (Lnet/minecraft/resources/ResourceLocation;)V
+accessible method net/minecraft/world/entity/animal/rabbit/Rabbit setVariant (Lnet/minecraft/world/entity/animal/rabbit/Rabbit$Variant;)V
+accessible method net/minecraft/world/entity/animal/cow/MushroomCow setVariant (Lnet/minecraft/world/entity/animal/cow/MushroomCow$Variant;)V
+accessible method net/minecraft/client/renderer/GameRenderer setPostEffect (Lnet/minecraft/resources/Identifier;)V
 accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageMax I
 accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePerDistance F
 accessible field net/minecraft/world/entity/monster/Creeper DATA_IS_POWERED Lnet/minecraft/network/syncher/EntityDataAccessor;
