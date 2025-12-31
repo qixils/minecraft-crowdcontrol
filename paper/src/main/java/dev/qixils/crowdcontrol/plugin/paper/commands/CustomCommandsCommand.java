@@ -17,12 +17,12 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
@@ -45,6 +45,9 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 	}
 
 	public static boolean onSummonEntity(PaperCrowdControlPlugin plugin, Player player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
+		CraftPlayer craftPlayer = (CraftPlayer) player;
+		ServerLevel level = (ServerLevel) craftPlayer.getHandle().level(); // forwards compat with 1.21.6+ (removes serverLevel())
+
 		String entityStr = action.getOption("type", String.class, "minecraft:pig");
 		NamespacedKey entityId = Objects.requireNonNullElseGet(NamespacedKey.fromString(entityStr), () -> new NamespacedKey("minecraft", "pig"));
 		EntityType entityType = Registry.ENTITY_TYPE.getOrThrow(entityId);
@@ -62,7 +65,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 		Location location;
 		String posStr = action.getOption("pos", String.class, "~ ~ ~");
 		try {
-			Vec3 pos = Vec3Argument.vec3().parse(new StringReader(posStr.strip())).getPosition(((CraftPlayer) player).getHandle().createCommandSourceStack());
+			Vec3 pos = Vec3Argument.vec3().parse(new StringReader(posStr.strip())).getPosition(craftPlayer.getHandle().createCommandSourceStack());
 			location = player.getLocation().set(pos.x, pos.y, pos.z);
 		} catch (Exception e) {
 			location = player.getLocation();
@@ -70,23 +73,24 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 		}
 
 		Location finalPos = location;
-		net.minecraft.world.entity.Entity entity = net.minecraft.world.entity.EntityType.loadEntityRecursive(tag, ((CraftWorld) player.getWorld()).getHandle(), EntitySpawnReason.COMMAND, entityx -> {
+		net.minecraft.world.entity.Entity entity = net.minecraft.world.entity.EntityType.loadEntityRecursive(tag, level, EntitySpawnReason.COMMAND, entityx -> {
 			entityx.spawnReason = CreatureSpawnEvent.SpawnReason.COMMAND; // Paper - Entity#getEntitySpawnReason
 			entityx.getBukkitEntity().teleport(finalPos, PlayerTeleportEvent.TeleportCause.PLUGIN);
 			return entityx;
 		});
 		if (entity == null) return false;
 
-		if (nbt == null && entity instanceof net.minecraft.world.entity.Mob mob) mob.finalizeSpawn(((CraftWorld) player.getWorld()).getHandle(), ((CraftWorld) player.getWorld()).getHandle().getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
+		if (nbt == null && entity instanceof net.minecraft.world.entity.Mob mob) mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
 
-		return ((CraftWorld) player.getWorld()).getHandle().tryAddFreshEntityWithPassengers(entity);
+		return level.tryAddFreshEntityWithPassengers(entity);
 	}
 
 	public static boolean onGiveItem(PaperCrowdControlPlugin plugin, Player player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
+		CraftPlayer craftPlayer = (CraftPlayer) player;
 		String itemStr = action.getOption("item", String.class, "minecraft:dirt");
 		net.minecraft.world.item.ItemStack stack;
 		try {
-			ItemParser.ItemResult result = new ItemParser(((CraftPlayer) player).getHandle().registryAccess()).parse(new StringReader(itemStr));
+			ItemParser.ItemResult result = new ItemParser(craftPlayer.getHandle().registryAccess()).parse(new StringReader(itemStr));
 			ItemInput input = new ItemInput(result.item(), result.components());
 			stack = input.createItemStack(1, false);
 		} catch (Exception e) {
