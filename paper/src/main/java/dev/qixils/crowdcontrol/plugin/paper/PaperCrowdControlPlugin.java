@@ -1,6 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
-import dev.qixils.crowdcontrol.common.*;
+import dev.qixils.crowdcontrol.common.EntityMapper;
+import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
+import dev.qixils.crowdcontrol.common.Plugin;
+import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
@@ -23,8 +26,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,15 +35,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.PaperCommandManager;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
-
-import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceStack> implements Listener {
@@ -83,18 +82,20 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	@Getter
 	@NotNull
 	private final PluginChannel pluginChannel = new PluginChannel(this);
+	@Getter
+	@NotNull
+	private final YamlConfigurationLoader configLoader;
 
 	public PaperCrowdControlPlugin(@NotNull PaperLoader paperPlugin) {
 		super(Player.class, CommandSourceStack.class);
-		this.dataFolder = paperPlugin.getDataFolder().toPath().resolve("Data");
 		this.paperPlugin = paperPlugin;
 		syncExecutor = runnable -> Bukkit.getGlobalRegionScheduler().execute(paperPlugin, runnable);
 		asyncExecutor = runnable -> Bukkit.getAsyncScheduler().runNow(paperPlugin, $ -> runnable.run());
+		this.dataFolder = paperPlugin.getDataPath().resolve("Data");
+		this.configLoader = createConfigLoader(paperPlugin.getDataPath(), "config.yml", YamlConfigurationLoader.builder());
 	}
 
 	public void onLoad() {
-		paperPlugin.saveDefaultConfig();
-
 		// init sound validator
 		CommandConstants.SOUND_VALIDATOR = _key -> {
 			NamespacedKey key = PaperUtil.toPaper(_key);
@@ -127,79 +128,6 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 			extraFeatures.put(uuid, features);
 			updateConditionalEffectVisibility(player);
 		});
-	}
-
-	@Override
-	public void loadConfig() {
-		paperPlugin.reloadConfig();
-		FileConfiguration config = paperPlugin.getConfig();
-
-		// soft-lock observer
-		ConfigurationSection softLockSection = config.getConfigurationSection("soft-lock-observer");
-		if (softLockSection == null) {
-			LOGGER.debug("No soft-lock config found, using defaults");
-			softLockConfig = new SoftLockConfig();
-		} else {
-			LOGGER.debug("Loading soft-lock config");
-			softLockConfig = new SoftLockConfig(
-				softLockSection.getInt("period", DEF_PERIOD),
-				softLockSection.getInt("deaths", DEF_DEATHS),
-				softLockSection.getInt("search-horizontal", DEF_SEARCH_HORIZ),
-				softLockSection.getInt("search-vertical", DEF_SEARCH_VERT)
-			);
-		}
-
-		// custom effects
-		ConfigurationSection customEffectsSection = config.getConfigurationSection("custom-effects");
-		if (customEffectsSection == null) {
-			LOGGER.debug("No custom effects config found, using defaults");
-			customEffectsConfig = new CustomEffectsConfig();
-		} else {
-			LOGGER.debug("Loading custom effects config");
-			customEffectsConfig = new CustomEffectsConfig(
-				customEffectsSection.getBoolean("enabled", true)
-			);
-		}
-
-		// hosts
-		hosts = Collections.unmodifiableCollection(config.getStringList("hosts"));
-		if (!hosts.isEmpty()) {
-			Set<String> loweredHosts = new HashSet<>(hosts.size());
-			for (String host : hosts)
-				loweredHosts.add(host.toLowerCase(Locale.ENGLISH));
-			hosts = Collections.unmodifiableSet(loweredHosts);
-		}
-
-		// limit config
-		ConfigurationSection limitSection = config.getConfigurationSection("limits");
-		if (limitSection == null) {
-			LOGGER.debug("No limit config found, using defaults");
-			limitConfig = new LimitConfig();
-		} else {
-			LOGGER.debug("Loading limit config");
-			boolean hostsBypass = limitSection.getBoolean("hosts-bypass", true);
-			Map<String, Integer> itemLimits = parseLimitConfigSection(limitSection.getConfigurationSection("items"));
-			Map<String, Integer> entityLimits = parseLimitConfigSection(limitSection.getConfigurationSection("entities"));
-			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
-		}
-
-		// misc
-		global = config.getBoolean("global", global);
-		announce = config.getBoolean("announce", announce);
-		adminRequired = config.getBoolean("admin-required", adminRequired);
-		hideNames = HideNames.fromConfigCode(config.getString("hide-names", hideNames.getConfigCode()));
-	}
-
-	@Contract("null -> null; !null -> !null")
-	private static Map<String, Integer> parseLimitConfigSection(@Nullable ConfigurationSection section) {
-		if (section == null)
-			return null;
-		Set<String> keys = section.getKeys(false);
-		Map<String, Integer> map = new HashMap<>(keys.size());
-		for (String key : keys) {
-			map.put(key, section.getInt(key));
-		}
-		return map;
 	}
 
 	@SneakyThrows

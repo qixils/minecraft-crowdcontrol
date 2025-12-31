@@ -59,7 +59,7 @@ dependencies {
     modImplementation(include("me.shedaniel.cloth:cloth-config-neoforge:$clothConfigVersion")!!)
     modCompileOnly("net.luckperms:api:$luckPermsVersion")
 
-    shadowBundle(project(":configurate-common")) {
+    shadowBundle(project(":base-common")) {
         exclude(group = "com.google.code.gson")
         exclude(group = "com.google.auto.service")
         exclude(group = "com.google.inject")
