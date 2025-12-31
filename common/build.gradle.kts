@@ -4,6 +4,7 @@ val cloudVersion: String by project
 val cloudExtrasVersion: String by project
 val slf4jVersion: String by project
 val jacksonVersion: String by project
+val configurateVersion: String by project
 
 dependencies {
     api("dev.qixils:cc4j-pubsub:$crowdControlVersion")
@@ -26,6 +27,11 @@ dependencies {
         exclude(group = "net.kyori", module = "adventure-api")
     }
     api("org.slf4j:slf4j-api:$slf4jVersion")
+
+    api("org.spongepowered:configurate-core:$configurateVersion")
+    api("net.kyori:adventure-serializer-configurate4:$adventureVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
 }
 
 description = "Minecraft Crowd Control: Common"
