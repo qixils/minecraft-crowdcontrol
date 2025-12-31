@@ -21,6 +21,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -46,6 +47,8 @@ public class CustomCommandsCommand extends ModdedCommand {
 	}
 
 	public static boolean onSummonEntity(ModdedCrowdControlPlugin plugin, ServerPlayer player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
+		ServerLevel level = player.serverLevel();
+
 		String entityStr = action.getOption("type", String.class, "minecraft:pig");
 		ResourceLocation entityId = Objects.requireNonNullElseGet(ResourceLocation.tryParse(entityStr), () -> ResourceLocation.fromNamespaceAndPath("minecraft", "pig"));
 
@@ -77,15 +80,15 @@ public class CustomCommandsCommand extends ModdedCommand {
 		}
 
 		Vec3 finalPos = pos;
-		Entity entity = EntityType.loadEntityRecursive(tag, player.serverLevel(), EntitySpawnReason.COMMAND, entityx -> {
+		Entity entity = EntityType.loadEntityRecursive(tag, level, EntitySpawnReason.COMMAND, entityx -> {
 			entityx.snapTo(finalPos.x, finalPos.y, finalPos.z, entityx.getYRot(), entityx.getXRot());
 			return entityx;
 		});
 		if (entity == null) return false;
 
-		if (nbt == null && entity instanceof Mob mob) mob.finalizeSpawn(player.serverLevel(), player.serverLevel().getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
+		if (nbt == null && entity instanceof Mob mob) mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
 
-		return player.serverLevel().tryAddFreshEntityWithPassengers(entity);
+		return level.tryAddFreshEntityWithPassengers(entity);
 	}
 
 	public static boolean onGiveItem(ModdedCrowdControlPlugin plugin, ServerPlayer player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
