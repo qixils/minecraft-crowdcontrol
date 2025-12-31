@@ -47,7 +47,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 	}
 
 	public static boolean onSummonEntity(ModdedCrowdControlPlugin plugin, ServerPlayer player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
-		ServerLevel level = player.serverLevel();
+		ServerLevel level = player.level();
 
 		String entityStr = action.getOption("type", String.class, "minecraft:pig");
 		ResourceLocation entityId = Objects.requireNonNullElseGet(ResourceLocation.tryParse(entityStr), () -> ResourceLocation.fromNamespaceAndPath("minecraft", "pig"));
