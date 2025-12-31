@@ -24,7 +24,6 @@ fun incl(asPath: String, fromPath: String) {
 }
 
 incl(":base-common", "common")
-include(":configurate-common")
 //incl(":paper-platform", "paper")
 incl(":mojmap-common", "mojmap")
 incl(":fabric-platform", "fabric")

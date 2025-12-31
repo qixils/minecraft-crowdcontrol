@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.custom.CustomCommandData;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.paper.utils.MaterialTag;
@@ -163,6 +164,12 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 //		for (Shader shader : Shader.values()) {
 //			initTo(commands, () -> new ShaderCommand(plugin, shader));
 //		}
+
+		if (plugin.getCustomEffectsConfig().effects() != null) {
+			for (CustomCommandData data : plugin.getCustomEffectsConfig().effects()) {
+				initTo(commands, () -> new CustomCommandsCommand(plugin, data));
+			}
+		}
 	}
 
 	@Override
