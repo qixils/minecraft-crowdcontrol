@@ -77,6 +77,16 @@ custom-effects:
 #              stick[rarity="epic",max_stack_size=1,enchantments={"minecraft:knockback":5},custom_name="Baton"]
 #            quantity: 1
 
+#    - name:
+#        text: Duplicate Cows
+#      description: Spawns a cow on every cow
+#      price: 10000
+#      actions:
+#        - type: run-command
+#          options:
+#            command: >-
+#              execute as @e[type=cow] at @s run summon cow
+
 # The Soft Lock Observer detects when a player is in a death loop
 # and attempts to spare them from it by killing nearby enemies.
 soft-lock-observer:
