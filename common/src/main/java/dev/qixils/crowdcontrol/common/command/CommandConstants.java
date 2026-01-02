@@ -252,7 +252,8 @@ public class CommandConstants {
 		Key.key(MINECRAFT_NAMESPACE, "cooked_porkchop"),
 		Key.key(MINECRAFT_NAMESPACE, "recovery_compass"),
 		Key.key(MINECRAFT_NAMESPACE, "stick"),
-		Key.key(MINECRAFT_NAMESPACE, "mace")
+		Key.key(MINECRAFT_NAMESPACE, "mace"),
+		Key.key(MINECRAFT_NAMESPACE, "totem_of_undying")
 	);
 	/**
 	 * Collection of flower blocks.
