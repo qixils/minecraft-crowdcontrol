@@ -18,7 +18,7 @@ architectury {
 }
 
 dependencies {
-    implementation(project(":configurate-common"))
+    implementation(project(":base-common"))
     implementation("org.spongepowered:configurate-hocon:$configurateVersion")
 
     minecraft("net.minecraft:minecraft:$mojmapVersion")
