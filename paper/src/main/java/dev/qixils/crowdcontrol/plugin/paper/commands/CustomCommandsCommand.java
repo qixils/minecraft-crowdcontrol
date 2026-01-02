@@ -124,7 +124,14 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 			com.mojang.brigadier.context.ContextChain.tryFlatten(results.getContext().build(commandLine)).orElseThrow(() -> com.mojang.brigadier.exceptions.CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().createWithContext(results.getReader()));
 
 			// ok we can run the command now; if it errors then `return true;` is skipped
-			commands.performCommand(results, commandLine, commandLine, true);
+			try {
+				commands.performCommand(results, commandLine, commandLine, true);
+			} catch (NoSuchMethodError e) {
+				// changed some time between now and 1.21.10, idk if this will even work lmao? im not sure if paper obfuscates functions that it made itself??
+				// but hey the changelog warns this shit isn't stable on paper so not too serious if it doesn't work
+				net.minecraft.commands.Commands.class.getMethod("performCommand", com.mojang.brigadier.ParseResults.class, String.class, boolean.class).invoke(commands, results, commandLine, true);
+			}
+
 			return true;
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to run command", e);
