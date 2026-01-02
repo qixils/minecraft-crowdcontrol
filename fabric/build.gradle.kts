@@ -77,7 +77,7 @@ dependencies {
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
 
-    shadowBundle(project(":configurate-common")) {
+    shadowBundle(project(":base-common")) {
         exclude(group = "com.google.code.gson")
         exclude(group = "com.google.auto.service")
         exclude(group = "com.google.inject")
