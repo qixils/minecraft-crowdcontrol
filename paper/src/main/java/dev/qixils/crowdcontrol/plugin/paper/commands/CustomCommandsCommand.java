@@ -124,7 +124,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 			com.mojang.brigadier.context.ContextChain.tryFlatten(results.getContext().build(commandLine)).orElseThrow(() -> com.mojang.brigadier.exceptions.CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().createWithContext(results.getReader()));
 
 			// ok we can run the command now; if it errors then `return true;` is skipped
-			commands.performCommand(results, commandLine, commandLine, true);
+			commands.performCommand(results, commandLine, true);
 			return true;
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to run command", e);
