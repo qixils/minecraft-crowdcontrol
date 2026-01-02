@@ -20,8 +20,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,28 +54,22 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 			plugin.getSLF4JLogger().warn("Failed to parse pos tag", e);
 		}
 
-		Location finalPos = location;
-		if (nbt == null) {
-			player.getWorld().spawnEntity(location, entityType, true);
-		} else {
-			// TODO: replace with EntityFactory once it is able to spawn passengers
-			try {
-				net.minecraft.server.level.ServerLevel level = ((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle().level();
-				net.minecraft.nbt.CompoundTag tag = net.minecraft.commands.arguments.CompoundTagArgument.compoundTag().parse(new com.mojang.brigadier.StringReader(nbt));
-				tag = tag.copy();
-				tag.putString("id", entityType.key().toString());
-				net.minecraft.world.entity.Entity entity = net.minecraft.world.entity.EntityType.loadEntityRecursive(tag, level, net.minecraft.world.entity.EntitySpawnReason.COMMAND, entityx -> {
-					entityx.spawnReason = CreatureSpawnEvent.SpawnReason.COMMAND; // Paper - Entity#getEntitySpawnReason
-					entityx.getBukkitEntity().teleport(finalPos, PlayerTeleportEvent.TeleportCause.PLUGIN);
-					return entityx;
-				});
-				if (entity == null) return false;
-				if (entity instanceof net.minecraft.world.entity.Mob mob) mob.finalizeSpawn(level, level.getCurrentDifficultyAt(net.minecraft.core.BlockPos.containing(location.x(), location.y(), location.z())), net.minecraft.world.entity.EntitySpawnReason.COMMAND, null);
-				return level.tryAddFreshEntityWithPassengers(entity, CreatureSpawnEvent.SpawnReason.COMMAND);
-			} catch (Exception e) {
-				plugin.getSLF4JLogger().warn("Failed to spawn entity", e);
-				return false;
+		try {
+			Location finalPos = location;
+			if (nbt == null) {
+				player.getWorld().spawnEntity(finalPos, entityType, true);
+			} else {
+				// TODO: we're using EntityFactory now in spite of the fact that passengers don't exist
+				//  because nms isn't working (in spite of it returning true)
+				//  pain and suffering
+				//  just use fabric :)
+				String editedNbt = nbt.replaceFirst("\\{", "{id:\"" + entityType.key() + "\",").replaceFirst(",}$", "}");
+				Bukkit.getEntityFactory().createEntitySnapshot(editedNbt).createEntity(finalPos);
+				return true;
 			}
+		} catch (Exception e) {
+			plugin.getSLF4JLogger().warn("Failed to spawn entity", e);
+			return false;
 		}
 
 		return true;
