@@ -20,7 +20,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -50,7 +50,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 		ServerLevel level = player.level();
 
 		String entityStr = action.getOption("type", String.class, "minecraft:pig");
-		ResourceLocation entityId = Objects.requireNonNullElseGet(ResourceLocation.tryParse(entityStr), () -> ResourceLocation.fromNamespaceAndPath("minecraft", "pig"));
+		Identifier entityId = Objects.requireNonNullElseGet(Identifier.tryParse(entityStr), () -> Identifier.fromNamespaceAndPath("minecraft", "pig"));
 
 		Registry<EntityType<?>> entities = player.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE);
 		Holder.Reference<EntityType<?>> entityType = entities.get(entityId).or(() -> {
@@ -68,7 +68,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 			plugin.getSLF4JLogger().warn("Failed to parse NBT tag", e);
 		}
 		tag = tag.copy();
-		tag.putString("id", entityType.key().location().toString());
+		tag.putString("id", entityType.key().identifier().toString());
 
 		Vec3 pos;
 		try {
