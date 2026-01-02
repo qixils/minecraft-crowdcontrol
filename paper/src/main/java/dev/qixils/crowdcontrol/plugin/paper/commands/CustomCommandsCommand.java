@@ -62,7 +62,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 		} else {
 			// TODO: replace with EntityFactory once it is able to spawn passengers
 			try {
-				net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) ((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle().level();
+				net.minecraft.server.level.ServerLevel level = ((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle().level();
 				net.minecraft.nbt.CompoundTag tag = net.minecraft.commands.arguments.CompoundTagArgument.compoundTag().parse(new com.mojang.brigadier.StringReader(nbt));
 				tag = tag.copy();
 				tag.putString("id", entityType.key().toString());
