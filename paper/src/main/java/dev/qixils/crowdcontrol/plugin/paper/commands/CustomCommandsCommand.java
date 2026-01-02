@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
-import com.mojang.brigadier.ParseResults;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandAction;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandData;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
@@ -130,7 +129,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 			} catch (NoSuchMethodError e) {
 				// changed some time between now and 1.21.10, idk if this will even work lmao? im not sure if paper obfuscates functions that it made itself??
 				// but hey the changelog warns this shit isn't stable on paper so not too serious if it doesn't work
-				net.minecraft.commands.Commands.class.getMethod("performCommand", ParseResults.class, String.class, boolean.class).invoke(commands, results, commandLine, true);
+				net.minecraft.commands.Commands.class.getMethod("performCommand", com.mojang.brigadier.ParseResults.class, String.class, boolean.class).invoke(commands, results, commandLine, true);
 			}
 
 			return true;
