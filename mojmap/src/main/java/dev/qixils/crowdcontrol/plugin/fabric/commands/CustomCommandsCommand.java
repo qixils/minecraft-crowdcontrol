@@ -130,7 +130,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 			: _cmd;
 
 		try {
-			Commands commands = plugin.server().getCommands();
+			Commands commands = plugin.theGame().getCommands();
 			CommandDispatcher<CommandSourceStack> dispatcher = commands.getDispatcher();
 			ParseResults<CommandSourceStack> results = dispatcher.parse(commandLine, player.createCommandSourceStack().withSuppressedOutput());
 
