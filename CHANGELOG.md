@@ -6,7 +6,7 @@ A list of all changes made to the software in reverse chronological order.
 
 - Added user-generated Custom Effects
   - Setup using examples in the config file
-  - Releasing initially with custom NBT item and entity spawns
+  - Releasing initially with NBT item/entity spawns and custom commands
   - Recommended to use Fabric; Paper may be unstable
   - NBT is Minecraft version-dependent and may break between versions
 
