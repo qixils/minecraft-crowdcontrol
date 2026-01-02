@@ -1,6 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.context.ContextChain;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandAction;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandData;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
@@ -12,10 +15,14 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.minecraft.commands.CommandResultCallback;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.arguments.item.ItemParser;
+import net.minecraft.commands.execution.ExecutionContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -49,7 +56,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 	public static boolean onSummonEntity(ModdedCrowdControlPlugin plugin, ServerPlayer player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
 		ServerLevel level = player.level();
 
-		String entityStr = action.getOption("type", String.class, "minecraft:pig");
+		String entityStr = action.getString("type", "minecraft:pig");
 		ResourceLocation entityId = Objects.requireNonNullElseGet(ResourceLocation.tryParse(entityStr), () -> ResourceLocation.fromNamespaceAndPath("minecraft", "pig"));
 
 		Registry<EntityType<?>> entities = player.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE);
@@ -60,7 +67,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 		}).orElse(null);
 		if (entityType == null) return false;
 
-		String nbt = action.getOption("nbt", String.class, null);
+		String nbt = action.getString("nbt", null);
 		CompoundTag tag = new CompoundTag();
 		try {
 			if (nbt != null) tag = CompoundTagArgument.compoundTag().parse(new StringReader(nbt));
@@ -72,7 +79,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 
 		Vec3 pos;
 		try {
-			String posStr = action.getOption("pos", String.class, "~ ~ ~");
+			String posStr = action.getString("pos", "~ ~ ~");
 			pos = Vec3Argument.vec3().parse(new StringReader(posStr)).getPosition(player.createCommandSourceStack());
 		} catch (Exception e) {
 			pos = player.position();
@@ -92,7 +99,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 	}
 
 	public static boolean onGiveItem(ModdedCrowdControlPlugin plugin, ServerPlayer player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
-		String itemStr = action.getOption("item", String.class, "minecraft:dirt");
+		String itemStr = action.getString("item", "minecraft:dirt");
 		ItemStack stack;
 		try {
 			ItemParser.ItemResult result = new ItemParser(player.registryAccess()).parse(new StringReader(itemStr));
@@ -114,9 +121,39 @@ public class CustomCommandsCommand extends ModdedCommand {
 		return true;
 	}
 
+	public static boolean onRunCommand(ModdedCrowdControlPlugin plugin, ServerPlayer player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
+		String _cmd = action.getString("command", null);
+		if (_cmd == null || _cmd.isEmpty()) return false;
+
+		String commandLine = _cmd.startsWith("/")
+			? _cmd.substring(1)
+			: _cmd;
+
+		try {
+			Commands commands = plugin.server().getCommands();
+			CommandDispatcher<CommandSourceStack> dispatcher = commands.getDispatcher();
+			ParseResults<CommandSourceStack> results = dispatcher.parse(commandLine, player.createCommandSourceStack().withSuppressedOutput());
+
+			CommandSourceStack commandSourceStack = results.getContext().getSource();
+			ContextChain<CommandSourceStack> contextChain = Commands.finishParsing(results, commandLine, commandSourceStack);
+
+			if (contextChain == null) throw new RuntimeException("Unknown command `" + _cmd + '`');
+
+			Commands.executeCommandInContext(
+				commandSourceStack,
+				executionContext -> ExecutionContext.queueInitialCommandExecution(executionContext, commandLine, contextChain, commandSourceStack, CommandResultCallback.EMPTY)
+			);
+			return true;
+		} catch (Exception e) {
+			plugin.getSLF4JLogger().warn("Failed to run command", e);
+		}
+		return false;
+	}
+
 	public static final @NotNull Map<String, Executor> EXECUTORS = Map.ofEntries(
 		Map.entry("summon-entity", CustomCommandsCommand::onSummonEntity),
-		Map.entry("give-item", CustomCommandsCommand::onGiveItem)
+		Map.entry("give-item", CustomCommandsCommand::onGiveItem),
+		Map.entry("run-command", CustomCommandsCommand::onRunCommand)
 	);
 
 

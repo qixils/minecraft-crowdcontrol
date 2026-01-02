@@ -20,6 +20,26 @@ public record CustomCommandAction(String type, @Nullable ConfigurationNode optio
 		}
 	}
 
+	@Contract("_, !null -> !null")
+	private String _getString(String name, @Nullable String def) {
+		if (options == null) return def;
+
+		try {
+			String value = options.node(name).getString();
+			if (value == null) return def;
+			return value;
+		} catch (Exception ignored) {
+			return def;
+		}
+	}
+
+	@Contract("_, !null -> !null")
+	public String getString(String name, @Nullable String def) {
+		String value = _getString(name, def);
+		if (value == null) return null;
+		return value.trim();
+	}
+
 	public int getInt(String name, int def) {
 		if (options == null) return def;
 
