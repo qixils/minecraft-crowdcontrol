@@ -58,7 +58,7 @@ tasks.register("generateApplicationFile") {
     }
 }
 
-sourceSets.main { resources.srcDir(File(project.buildDir, "generated/resources/")) }
+sourceSets.main { resources.srcDir(generatedResourcesFolder) }
 
 tasks.processResources {
     dependsOn("generateVersionFile")
