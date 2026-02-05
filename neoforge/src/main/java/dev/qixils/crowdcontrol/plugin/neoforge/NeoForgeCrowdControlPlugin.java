@@ -2,7 +2,7 @@ package dev.qixils.crowdcontrol.plugin.neoforge;
 
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.neoforge.PacketUtilImpl;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import dev.qixils.crowdcontrol.plugin.neoforge.util.LuckPermsPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.neoforge.util.NeoForgePermissionUtil;
@@ -16,6 +16,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
 import org.jetbrains.annotations.NotNull;
@@ -45,13 +46,28 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 			permissionUtil = new NeoForgePermissionUtil();
 		}
 
-		onInitialize();
-
 		modBus.addListener(this::register);
+
+		onInitialize();
 	}
 
 	public void register(final RegisterPayloadHandlersEvent event) {
-		PacketUtilImpl.registerPackets(event);
+		final PayloadRegistrar registrar = event.registrar("1").optional();
+		registrar.playToServer(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC, (payload, context) -> {
+			if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
+			if (!NeoForgeCrowdControlPlugin.isInstanceAvailable()) return;
+			NeoForgeCrowdControlPlugin.getInstance().handleVersionResponse(payload, new ServerPacketContext(serverPlayer));
+		});
+		registrar.playToServer(ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC, (payload, context) -> {
+			if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
+			if (!NeoForgeCrowdControlPlugin.isInstanceAvailable()) return;
+			NeoForgeCrowdControlPlugin.getInstance().handleExtraFeatures(payload, new ServerPacketContext(serverPlayer));
+		});
+
+		registrar.playToClient(SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC);
+		registrar.playToClient(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
+		registrar.playToClient(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
+		registrar.playToClient(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);
 	}
 
 	@Override
