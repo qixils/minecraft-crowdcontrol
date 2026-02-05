@@ -53,21 +53,21 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 
 	public void register(final RegisterPayloadHandlersEvent event) {
 		final PayloadRegistrar registrar = event.registrar("1").optional();
-		registrar.playToServer(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC, (payload, context) -> {
+		registrar.playBidirectional(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC, (payload, context) -> {
 			if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
 			if (!NeoForgeCrowdControlPlugin.isInstanceAvailable()) return;
 			NeoForgeCrowdControlPlugin.getInstance().handleVersionResponse(payload, new ServerPacketContext(serverPlayer));
-		});
-		registrar.playToServer(ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC, (payload, context) -> {
+		}, (payload, ctx) -> {});
+		registrar.playBidirectional(ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC, (payload, context) -> {
 			if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
 			if (!NeoForgeCrowdControlPlugin.isInstanceAvailable()) return;
 			NeoForgeCrowdControlPlugin.getInstance().handleExtraFeatures(payload, new ServerPacketContext(serverPlayer));
-		});
+		}, (payload, ctx) -> {});
 
-		registrar.playToClient(SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC);
-		registrar.playToClient(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
-		registrar.playToClient(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
-		registrar.playToClient(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);
+		registrar.playBidirectional(SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC, (payload, ctx) -> {});
+		registrar.playBidirectional(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC, (payload, ctx) -> {});
+		registrar.playBidirectional(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC, (payload, ctx) -> {});
+		registrar.playBidirectional(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC, (payload, ctx) -> {});
 	}
 
 	@Override
