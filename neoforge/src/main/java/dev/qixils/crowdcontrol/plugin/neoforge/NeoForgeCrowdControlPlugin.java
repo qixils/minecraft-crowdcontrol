@@ -23,10 +23,10 @@ import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 // TODO: improve pause checks
 
@@ -75,19 +75,37 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 
 	@Override
 	public @Nullable Path getPath(@NotNull String asset) {
-		return NeoForgeInitializer.container.getModInfo().getOwningFile().getFile().findResource(asset);
+		try {
+			return NeoForgeInitializer.container.getModInfo().getOwningFile().getFile().getContents().findFile(asset).map(Path::of).orElse(null);
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
+	@Override
+	public @NotNull Stream<String> getPathNames(@NotNull String directory) {
+		try {
+			if (!directory.endsWith("/")) directory = directory + '/';
+			int directories = directory.replaceAll("[^/]", "").length();
+
+			Stream.Builder<String> paths = Stream.builder();
+			var contents = NeoForgeInitializer.container.getModInfo().getOwningFile().getFile().getContents();
+			contents.visitContent(directory, (path, resource) -> {
+				if (path.replaceAll("[^/]", "").length() != directories) return;
+				paths.accept(path);
+			});
+			return paths.build();
+		} catch (Exception ignored) {
+			getSLF4JLogger().error("kyoritranslator2 failed loadsss", ignored);
+			return Stream.empty();
+		}
 	}
 
 	@Override
 	public InputStream getInputStream(@NotNull String asset) {
-		Path path = getPath(asset);
-
-		if (path == null)
-			return null;
-
 		try {
-			return Files.newInputStream(path);
-		} catch (IOException e) {
+			return NeoForgeInitializer.container.getModInfo().getOwningFile().getFile().getContents().openFile(asset);
+		} catch (Exception e) {
 			getSLF4JLogger().warn("Encountered exception while retrieving asset {}", asset, e);
 			return null;
 		}
@@ -99,7 +117,7 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 			server().getServerVersion(),
 			"NeoForge",
 			server().getServerModName(),
-			FMLLoader.versionInfo().neoForgeVersion()
+			Optional.ofNullable(FMLLoader.getCurrentOrNull()).map(fml -> fml.getVersionInfo().neoForgeVersion()).orElse(null)
 		);
 	}
 

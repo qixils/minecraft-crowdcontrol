@@ -49,42 +49,55 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	}
 
 	// Find all the items in the JVM resource path
-	private List<String> listResourcesIn(Plugin<?, ?> plugin, String path) throws Exception {
-		URL url = loadFirst(path, pluginClassLoader, ClassLoader.getSystemClassLoader());
-		if (url == null) return Collections.emptyList();
-		String urlPath = url.getPath();
+	private List<String> listResourcesIn(Plugin<?, ?> plugin, String path) {
+		@Nullable URL url = loadFirst(path, pluginClassLoader, ClassLoader.getSystemClassLoader());
+		@Nullable String urlPath = url == null ? null : url.getPath();
 
-		if (url.getProtocol().equals("file")) { // OS dir
+		if (url != null && urlPath != null && url.getProtocol().equals("file")) { // OS dir
 			try {
 				try (Stream<Path> paths = Files.list(Paths.get(new URI(urlPath)))) {
-					return paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
+					List<String> outPaths = paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
+					if (!outPaths.isEmpty()) return outPaths;
 				}
 			} catch (Exception ignored) {}
 		}
 
 		// packed in jar?
-		try {
-			int idx = urlPath.indexOf("!");
-			File jarUrl = idx == -1
-				? new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
-				: new File(urlPath.substring("file:".length(), urlPath.indexOf("!")));
-			try (JarFile jar = new JarFile(jarUrl)) {
-				return Collections.list(jar.entries()).stream()
-					.filter(entry -> entry.getName().startsWith(path))
-					.map(entry -> entry.getName().substring(path.length()))
-					.collect(Collectors.toList());
-			}
-		} catch (Exception ignored) {}
+		if (urlPath != null) {
+			try {
+				int idx = urlPath.indexOf("!");
+				File jarUrl = idx == -1
+					? new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI())
+					: new File(urlPath.substring("file:".length(), urlPath.indexOf("!")));
+				try (JarFile jar = new JarFile(jarUrl)) {
+					List<String> outPaths = Collections.list(jar.entries()).stream()
+						.filter(entry -> entry.getName().startsWith(path))
+						.map(entry -> entry.getName().substring(path.length()))
+						.collect(Collectors.toList());
+					if (!outPaths.isEmpty()) return outPaths;
+				}
+			} catch (Exception ignored) {}
+		}
 
 		// let's try native operations
 		try {
 			Path folder = plugin.getPath(path);
-			if (folder == null) throw new RuntimeException();
+			if (folder == null) throw new RuntimeException("folder was null");
 
 			try (Stream<Path> paths = Files.list(folder)) {
-				return paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
+				List<String> outPaths = paths.map(file -> file.getFileName().toString()).collect(Collectors.toList());
+				if (!outPaths.isEmpty()) return outPaths;
 			}
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
+
+		try {
+			try (Stream<String> paths = plugin.getPathNames(path)) {
+				List<String> outPaths = paths.collect(Collectors.toList());
+				if (!outPaths.isEmpty()) return outPaths;
+			}
+		} catch (Exception ignored) {
+		}
 
 		return Collections.emptyList();
 	}
@@ -169,7 +182,7 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	private void register(Locale locale) {
 		ResourceBundle bundle = ResourceBundle.getBundle("i18n." + prefix, locale, pluginClassLoader);
 		translator.registerAll(locale, bundle, false);
-		logger.info("Registered locale " + locale);
+		logger.info("Registered locale {}", locale);
 	}
 
 	@Override
@@ -180,13 +193,13 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 
 	@Override
 	public @Nullable MessageFormat translate(@NotNull String key, @NotNull Locale locale) {
-		logger.debug("Plainly translating " + key + " for " + locale);
+		logger.debug("Plainly translating {} for {}", key, locale);
 		return translator.translate(key, locale);
 	}
 
 	@Override
 	protected @NotNull Component renderTranslatable(@NotNull TranslatableComponent component, @NotNull Locale context) {
-		logger.debug("Richly translating " + component.key() + " for " + context);
+		logger.debug("Richly translating {} for {}", component.key(), context);
 		final @Nullable MessageFormat format = translate(component.key(), context);
 
 		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method
