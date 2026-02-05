@@ -6,7 +6,7 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.util.Tristate;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.PermissionSource;
+import net.minecraft.server.permissions.PermissionSetSupplier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.UniquelyIdentifyable;
 
@@ -36,7 +36,7 @@ public class LuckPermsPermissionUtil extends NeoForgePermissionUtil {
 	}
 
 	@Override
-	public boolean check(PermissionSource source, PermissionWrapper permission) {
+	public boolean check(PermissionSetSupplier source, PermissionWrapper permission) {
 		boolean fallback = super.check(source, permission);
 
 		initializeApi();
