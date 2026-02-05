@@ -16,6 +16,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
@@ -53,21 +54,23 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 
 	public void register(final RegisterPayloadHandlersEvent event) {
 		final PayloadRegistrar registrar = event.registrar("1").optional();
-		registrar.playBidirectional(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC, (payload, context) -> {
-			if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
-			if (!NeoForgeCrowdControlPlugin.isInstanceAvailable()) return;
-			NeoForgeCrowdControlPlugin.getInstance().handleVersionResponse(payload, new ServerPacketContext(serverPlayer));
-		}, (payload, ctx) -> {});
-		registrar.playBidirectional(ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC, (payload, context) -> {
-			if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
-			if (!NeoForgeCrowdControlPlugin.isInstanceAvailable()) return;
-			NeoForgeCrowdControlPlugin.getInstance().handleExtraFeatures(payload, new ServerPacketContext(serverPlayer));
-		}, (payload, ctx) -> {});
+		registrar.playToServer(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC, this::onResponsePacket);
+		registrar.playToServer(ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC, this::onFeaturePacket);
 
-		registrar.playBidirectional(SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC, (payload, ctx) -> {});
-		registrar.playBidirectional(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC, (payload, ctx) -> {});
-		registrar.playBidirectional(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC, (payload, ctx) -> {});
-		registrar.playBidirectional(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC, (payload, ctx) -> {});
+		registrar.playToClient(SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC);
+		registrar.playToClient(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
+		registrar.playToClient(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
+		registrar.playToClient(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);
+	}
+
+	private void onResponsePacket(ResponseVersionC2S payload, IPayloadContext context) {
+		if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
+		handleVersionResponse(payload, new ServerPacketContext(serverPlayer));
+	}
+
+	private void onFeaturePacket(ExtraFeatureC2S payload, IPayloadContext context) {
+		if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
+		handleExtraFeatures(payload, new ServerPacketContext(serverPlayer));
 	}
 
 	@Override

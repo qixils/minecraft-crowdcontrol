@@ -32,8 +32,6 @@ public class NeoForgePlatformClient extends ModdedPlatformClient {
 	}
 
 	public void registerClient(final RegisterClientPayloadHandlersEvent event) {
-		logger.debug("Registering listeners (client)");
-
 		event.register(SetShaderS2C.PACKET_ID, (payload, context) -> {
 			if (!(context.player() instanceof LocalPlayer localPlayer)) return;
 			handleSetShader(payload, new ClientPacketContextImpl(context, localPlayer));
@@ -47,8 +45,6 @@ public class NeoForgePlatformClient extends ModdedPlatformClient {
 			handleMovementStatus(payload, new ClientPacketContextImpl(context, localPlayer));
 		});
 		event.register(SetLanguageS2C.PACKET_ID, (payload, context) -> {});
-
-		logger.debug("Actually registered listeners (client)");
 	}
 
 	@Override
