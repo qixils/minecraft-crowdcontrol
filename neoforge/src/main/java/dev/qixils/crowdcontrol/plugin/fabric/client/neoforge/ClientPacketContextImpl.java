@@ -18,6 +18,6 @@ public record ClientPacketContextImpl(@NotNull IPayloadContext context, @NotNull
 
 	@Override
 	public void send(@NotNull CustomPacketPayload payload) {
-		context.handle(payload);
+		context.reply(payload);
 	}
 }

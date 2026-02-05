@@ -614,6 +614,7 @@ public abstract class Plugin<P, S> {
 							.category(category)
 							.image(command.getImage())
 							.inactive(command.isInactive())
+							.duration(command.getExtensionDuration())
 							.build()
 					);
 				})
@@ -621,7 +622,7 @@ public abstract class Plugin<P, S> {
 		} else {
 			newEffects = Collections.emptyMap();
 		}
-		getSLF4JLogger().info("Registering custom effects {}", newEffects.entrySet().stream().map(entry -> entry.getKey() + ':' + entry.getValue().name().getDisplayName()).toList());
+		getSLF4JLogger().debug("Registering custom effects {}", newEffects.entrySet().stream().map(entry -> entry.getKey() + ':' + entry.getValue().name().getDisplayName()).toList());
 		// note: we always invoke this so we can replace an older list if one existed
 		ccPlayer.setCustomEffects(Collections.singletonList(new CustomEffectsOperation("replace-all", newEffects)));
 

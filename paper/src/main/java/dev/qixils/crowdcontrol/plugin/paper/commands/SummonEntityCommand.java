@@ -100,7 +100,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		this.effectName = "entity_" + csIdOf(entityType);
 		this.displayName = Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType));
 		this.mobKey = getMobKey(plugin.getPaperPlugin());
-		this.price = entityType.getEntityClass() != null && Enemy.class.isAssignableFrom(entityType.getEntityClass()) ? 1000 : 5000;
+		this.price = entityType.getEntityClass() != null && Enemy.class.isAssignableFrom(entityType.getEntityClass()) ? 1000 : 500;
 	}
 
 	@NotNull
