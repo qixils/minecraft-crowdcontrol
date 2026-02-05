@@ -7,7 +7,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
     id("dev.architectury.loom") version "1.10-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
-    id("net.minecrell.plugin-yml.bukkit") version "0.6.0" apply false // Generates plugin.yml
+    id("de.eldoria.plugin-yml.bukkit") version "0.8.0" apply false // Generates plugin.yml
     id("io.papermc.paperweight.userdev") version "1.7.7" apply false
     id("architectury-plugin") version "3.4-SNAPSHOT" apply true
     id("me.modmuss50.mod-publish-plugin") version "1.1.0" apply false
