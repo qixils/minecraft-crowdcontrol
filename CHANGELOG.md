@@ -53,6 +53,7 @@ Fixed an issue with timed effects.
   - Fabric/NeoForge: Now pulls from the "#c:ores" tag, allowing modded ores to spawn
 - Improved Fabric/NeoForge mod compatibility with MixinExtras
 - Fixed `admin-required` config setting
+- Fixed `soft-lock-observer` config setting on Fabric/NeoForge 
 - Removed unused config settings from examples
 
 ## 4.1.0
