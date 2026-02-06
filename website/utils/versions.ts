@@ -92,8 +92,9 @@ export const spongeVersions: SpongeVersion[] = [
 ]
 export const spongeLatest = findLatest(spongeVersions)
 
-const allVersionsSet = new Set([...fabricVersions, ...paperVersions, ...neoForgeVersions, ...spongeVersions].map(version => version.id));
-export const allVersions: Version[] = autoVersion([...allVersionsSet].map(version => ({ id: version, supported: false, legacy: false })));
+const allVersionsArr = [...fabricVersions, ...paperVersions, ...neoForgeVersions, ...spongeVersions]
+const allVersionsSet = new Set(allVersionsArr.map(version => version.id));
+export const allVersions: Version[] = autoVersion([...allVersionsSet].map(version => ({ id: version, supported: false, legacy: allVersionsArr.find(item => item.id === version)?.legacy ?? false })));
 
 export interface Modloader<T extends Version = Version> {
     name: string

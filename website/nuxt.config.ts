@@ -40,7 +40,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/setup': { ssr: false },
+    // '/setup': { ssr: false },
   },
 
   modules: ['@nuxt/ui'],
