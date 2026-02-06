@@ -21,42 +21,46 @@ public class LuckPermsPermissionUtil extends NeoForgePermissionUtil {
 
 	@Override
 	public boolean check(Entity entity, PermissionWrapper permission) {
-		boolean fallback = super.check(entity, permission);
+		try {
+			initializeApi();
+			if (api == null) return super.check(entity, permission);
 
-		initializeApi();
-		if (api == null) return fallback;
+			User user = api.getUserManager().getUser(entity.getUUID());
+			if (user == null) return super.check(entity, permission);
 
-		User user = api.getUserManager().getUser(entity.getUUID());
-		if (user == null) return fallback;
+			Tristate state = user.getCachedData().getPermissionData().checkPermission(permission.getNode());
+			if (state == Tristate.UNDEFINED) return super.check(entity, permission);
 
-		Tristate state = user.getCachedData().getPermissionData().checkPermission(permission.getNode());
-		if (state == Tristate.UNDEFINED) return fallback;
-
-		return state.asBoolean();
+			return state.asBoolean();
+		} catch (Exception ignored) {
+			return super.check(entity, permission);
+		}
 	}
 
 	@Override
 	public boolean check(PermissionSource source, PermissionWrapper permission) {
-		boolean fallback = super.check(source, permission);
+		try {
+			initializeApi();
+			if (api == null) return super.check(source, permission);
 
-		initializeApi();
-		if (api == null) return fallback;
+			UniquelyIdentifyable entity = null;
+			if (source instanceof UniquelyIdentifyable asEntity) {
+				entity = asEntity;
+			} else if (source instanceof CommandSourceStack stack) {
+				entity = stack.getEntity();
+			}
 
-		UniquelyIdentifyable entity = null;
-		if (source instanceof UniquelyIdentifyable asEntity) {
-			entity = asEntity;
-		} else if (source instanceof CommandSourceStack stack) {
-			entity = stack.getEntity();
+			if (entity == null) return super.check(source, permission);
+
+			User user = api.getUserManager().getUser(entity.getUUID());
+			if (user == null) return super.check(source, permission);
+
+			Tristate state = user.getCachedData().getPermissionData().checkPermission(permission.getNode());
+			if (state == Tristate.UNDEFINED) return super.check(source, permission);
+
+			return state.asBoolean();
+		} catch (Exception ignored) {
+			return super.check(source, permission);
 		}
-
-		if (entity == null) return fallback;
-
-		User user = api.getUserManager().getUser(entity.getUUID());
-		if (user == null) return fallback;
-
-		Tristate state = user.getCachedData().getPermissionData().checkPermission(permission.getNode());
-		if (state == Tristate.UNDEFINED) return fallback;
-
-		return state.asBoolean();
 	}
 }

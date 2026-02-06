@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useServerSeoMeta({
+useSeoMeta({
   title: 'Setup · Minecraft Crowd Control',
   description: 'Dynamic setup guide for Minecraft Crowd Control',
   ogDescription: 'Dynamic setup guide for Minecraft Crowd Control',
@@ -103,6 +103,8 @@ const questionExperience = pushQuestion({
 
 const question = computed(() => questions.find(item => !item.answer.value && item.answers.value.length))
 const guide = computed(() => { // TODO: lazy?
+  if (!window) return
+
   const env = questionEnvironment.answer.value
   const versionId = questionVersion.answer.value
   const experienced = questionExperience.answer.value === 'yes'
