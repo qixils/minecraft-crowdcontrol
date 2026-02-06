@@ -2,13 +2,18 @@ package dev.qixils.crowdcontrol.plugin.paper.utils;
 
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
+import dev.qixils.crowdcontrol.plugin.paper.permissions.LuckPermsPermissionUtil;
+import dev.qixils.crowdcontrol.plugin.paper.permissions.PaperPermissionUtil;
+import dev.qixils.crowdcontrol.plugin.paper.permissions.PermissionUtil;
 import net.kyori.adventure.key.Key;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +24,8 @@ import java.util.UUID;
 
 public class PaperUtil {
 	private PaperUtil() {}
+
+	private static PermissionUtil permissionUtil;
 
 	public static PermissionDefault toPaper(PermissionWrapper.DefaultPermission defaultPermission) {
 		return switch (defaultPermission) {
@@ -39,12 +46,24 @@ public class PaperUtil {
 		return new NamespacedKey(key.namespace(), key.value());
 	}
 
+	@NotNull
+	public static PermissionUtil getPermissionUtil() {
+		if (permissionUtil == null) {
+			try {
+				if (!Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) throw new IllegalStateException("LuckPerms not enabled");
+				RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+				if (provider == null) throw new IllegalStateException("LuckPerms not available");
+				permissionUtil = new LuckPermsPermissionUtil(provider.getProvider());
+			} catch (Exception ignored) {
+				permissionUtil = new PaperPermissionUtil();
+			}
+		}
+		return permissionUtil;
+	}
+
+	@Deprecated
 	public static boolean hasPermission(Permissible permissible, Permission permission) {
-		return switch (permissible.permissionValue(permission)) {
-			case TRUE -> true;
-			case FALSE -> false;
-			default -> permission.getDefault().getValue(permissible.isOp());
-		};
+		return getPermissionUtil().hasPermission(permissible, permission);
 	}
 
 	public static List<Player> toPlayers(@Nullable List<UUID> uuids) {
