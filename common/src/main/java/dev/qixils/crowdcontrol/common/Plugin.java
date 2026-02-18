@@ -69,6 +69,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
@@ -614,6 +615,7 @@ public abstract class Plugin<P, S> {
 							.category(category)
 							.image(command.getImage())
 							.inactive(command.isInactive())
+							.duration(command.getExtensionDuration())
 							.build()
 					);
 				})
@@ -621,7 +623,7 @@ public abstract class Plugin<P, S> {
 		} else {
 			newEffects = Collections.emptyMap();
 		}
-		getSLF4JLogger().info("Registering custom effects {}", newEffects.entrySet().stream().map(entry -> entry.getKey() + ':' + entry.getValue().name().getDisplayName()).toList());
+		getSLF4JLogger().debug("Registering custom effects {}", newEffects.entrySet().stream().map(entry -> entry.getKey() + ':' + entry.getValue().name().getDisplayName()).toList());
 		// note: we always invoke this so we can replace an older list if one existed
 		ccPlayer.setCustomEffects(Collections.singletonList(new CustomEffectsOperation("replace-all", newEffects)));
 
@@ -1560,6 +1562,7 @@ public abstract class Plugin<P, S> {
 
 	/**
 	 * Gets a Path for one of the mod's resource files.
+	 * May not support directories on some platforms; in those cases consider {@link #getPathNames}.
 	 *
 	 * @param asset filename
 	 * @return path if found
@@ -1571,6 +1574,26 @@ public abstract class Plugin<P, S> {
 			return Paths.get(getClass().getClassLoader().getResource(asset).toURI());
 		} catch (Exception ignored) {
 			return null;
+		}
+	}
+
+	/**
+	 * Lists the names of files in the specified folder.
+	 * I.e. for directory "i18n" it might return ["CrowdControl_en_US.properties"]
+	 * Supported on some platforms where {@link #getPath(String)} doesn't work.
+	 *
+	 * @param directory directory to list files
+	 * @return stream of file names
+	 */
+	@ApiStatus.Internal
+	public @NotNull Stream<String> getPathNames(@NotNull String directory) {
+		try {
+			Path path = getPath(directory);
+			if (path == null) return Stream.empty();
+
+			return Files.list(path).map(item -> item.getFileName().toString());
+		} catch (Exception ignored) {
+			return Stream.empty();
 		}
 	}
 

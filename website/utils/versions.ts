@@ -70,7 +70,9 @@ export const fabricVersions: Version[] = autoVersion([
 export const fabricLatest = findLatest(fabricVersions)
 
 export const neoForgeVersions: Version[] = autoVersion([
-//     { id: "1.21.8", supported: true, legacy: false },
+    { id: "1.21.11", supported: true, legacy: false },
+    { id: "1.21.10", supported: true, legacy: false },
+    { id: "1.21.8", supported: true, legacy: false },
     { id: "1.21.6", supported: true, legacy: false },
     { id: "25w14craftmine", supported: true, legacy: false },
     { id: "1.21.5", supported: true, legacy: false },
@@ -90,8 +92,9 @@ export const spongeVersions: SpongeVersion[] = [
 ]
 export const spongeLatest = findLatest(spongeVersions)
 
-const allVersionsSet = new Set([...fabricVersions, ...paperVersions, ...neoForgeVersions, ...spongeVersions].map(version => version.id));
-export const allVersions: Version[] = autoVersion([...allVersionsSet].map(version => ({ id: version, supported: false, legacy: false })));
+const allVersionsArr = [...fabricVersions, ...paperVersions, ...neoForgeVersions, ...spongeVersions]
+const allVersionsSet = new Set(allVersionsArr.map(version => version.id));
+export const allVersions: Version[] = autoVersion([...allVersionsSet].map(version => ({ id: version, supported: false, legacy: allVersionsArr.find(item => item.id === version)?.legacy ?? false })));
 
 export interface Modloader<T extends Version = Version> {
     name: string

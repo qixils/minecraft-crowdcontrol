@@ -127,12 +127,12 @@ tasks.remapJar {
 }
 
 publishMods {
-    val versionFrom = "1.21.7"
-    val versionTo = "1.21.7"
+    val versionFrom = "1.21.11"
+    val versionTo = "1.21.11"
 
     file.set(tasks.remapJar.get().archiveFile)
     modLoaders.add("neoforge")
-    type.set(ReleaseType.ALPHA)
+    type.set(ReleaseType.STABLE)
     changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))

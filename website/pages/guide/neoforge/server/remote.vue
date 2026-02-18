@@ -51,7 +51,7 @@ useSeoMeta({
     </ol>
 
     <p>
-      Users may now connect using the <NuxtLink :to="`/guide/neoforge/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide.
+      Users, including yourself, may now connect using the <NuxtLink :to="`/guide/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide.
       Make sure to provide the server's IP address
       <template v-if="version.legacy">and the password used in the config file (default: <code>crowdcontrol</code>)</template>
       to your streamers.
