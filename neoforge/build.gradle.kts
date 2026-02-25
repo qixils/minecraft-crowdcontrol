@@ -7,6 +7,7 @@ val clothConfigVersion: String by project
 val cloudMojmapVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
+val jacksonVersion: String by project
 
 val versionId = project.version.toString() + "+neoforge-$mojmapVersion"
 
@@ -69,7 +70,7 @@ dependencies {
         exclude(group = "com.google.code.findbugs")
         exclude(group = "org.incendo", module = "cloud-core")
         exclude(group = "com.fasterxml.jackson.annotation")
-        exclude(group = "com.fasterxml.jackson.core") // TODO: jarjar? not sure where this is pulled in from
+        exclude(group = "com.fasterxml.jackson.core")
         // TODO: jarjar geantryref, websockets
     }
     common(project(path = ":mojmap-common", configuration = "namedElements")) { isTransitive = false }
@@ -79,6 +80,9 @@ dependencies {
     shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion") {
         exclude(group = "net.kyori")
     }
+    shadowBundle("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+    shadowBundle("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    shadowBundle("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     modImplementation(include("net.kyori:option:1.1.0")!!)
 }
 
