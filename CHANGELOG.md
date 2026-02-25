@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.4.1
+
+Fixed loading issue with NeoForge 1.21.11.
+
 ## 4.4.0
 
 - NeoForge is once again supported
