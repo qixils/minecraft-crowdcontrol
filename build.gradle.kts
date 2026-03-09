@@ -5,11 +5,11 @@ plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "8.14" apply false
     id("com.gradleup.shadow") version "8.3.7" apply true
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
+    id("fabric-loom") version "1.13-SNAPSHOT" apply false
+    id("net.neoforged.moddev") version "2.0.140" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("de.eldoria.plugin-yml.bukkit") version "0.8.0" apply false // Generates plugin.yml
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" apply false
-    id("architectury-plugin") version "3.4-SNAPSHOT" apply true
     id("me.modmuss50.mod-publish-plugin") version "1.1.0" apply false
 }
 
@@ -18,12 +18,8 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-architectury {
-    minecraft = mojmapVersion
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 subprojects {
@@ -57,7 +53,7 @@ subprojects {
         compileOnly("io.netty:netty-buffer:$nettyVersion")
     }
 
-    val targetJavaVersion = 21
+    val targetJavaVersion = 25
     tasks.withType<JavaCompile>().configureEach {
         options.release.set(targetJavaVersion)
         options.encoding = Charsets.UTF_8.name()
@@ -100,7 +96,8 @@ subprojects {
             // TODO: disable output of non-shaded jars? or make their file names more obvious?
             shadowJar {
                 // set name of output file to CrowdControl-XYZ-VERSION.jar
-                val titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
+                var titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
+                if (titleCaseName == "Neoforge") titleCaseName = "NeoForge"
                 archiveBaseName.set("CrowdControl-$titleCaseName")
                 archiveClassifier.set("")
             }

@@ -2,20 +2,36 @@ rootProject.name = "minecraft-crowd-control"
 
 pluginManagement {
     repositories {
-        maven {
-            name = "Fabric"
-            url = uri("https://maven.fabricmc.net/")
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "Fabric"
+                    url = uri("https://maven.fabricmc.net")
+                }
+            }
+            filter {
+                includeGroupAndSubgroups("net.fabricmc")
+                includeGroup("fabric-loom")
+            }
         }
-        maven {
-            name = "Architectury"
-            url = uri("https://maven.architectury.dev/")
-        }
-        maven {
-            name = "Forge"
-            url =  uri("https://files.minecraftforge.net/maven/")
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "Forge"
+                    url = uri("https://maven.minecraftforge.net")
+                }
+            }
+            filter {
+                includeGroupAndSubgroups("net.minecraftforge")
+            }
         }
         gradlePluginPortal()
+        mavenCentral()
     }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 fun incl(asPath: String, fromPath: String) {
