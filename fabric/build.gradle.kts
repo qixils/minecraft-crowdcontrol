@@ -55,12 +55,15 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:$mojmapVersion")
+    minecraft("net.minecraft:minecraft:$mojmapVersion")
     mappings(loom.officialMojangMappings())
 
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion") {
+        exclude(group = "net.fabricmc.fabric-api")
+        exclude(group = "net.fabricmc.fabric-loader")
+    })
     modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation(include("maven.modrinth:cloth-config:$clothConfigVersion") {
@@ -83,7 +86,7 @@ dependencies {
         exclude(group = "org.incendo", module = "cloud-core")
     }
     common(project(path = ":mojmap-common", configuration = "namedElements")) // { isTransitive = false }
-    shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
+    shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionFabric"))
     shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion")
 }
 

@@ -22,6 +22,7 @@ out/
 
 # Package Files #
 *.jar
+!/mavenlibs/**/*.jar
 *.war
 *.nar
 *.ear
