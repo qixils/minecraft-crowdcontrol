@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.4.2
+
+- Fabric: Fixed client effects being unavailable.
+
 ## 4.4.1
 
 Fixed loading issue with NeoForge 1.21.11.
