@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
@@ -26,6 +27,10 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 	private final EntityType entityType;
 	private final String effectName;
 	private final Component displayName;
+	private final String image = "remove_entity_creeper";
+	private final int price = 250;
+	private final byte priority = -5;
+	private final List<String> categories = Collections.singletonList("Remove Entity");
 
 	public RemoveEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
 		super(plugin);

@@ -42,7 +42,7 @@ useSeoMeta({
     </ol>
 
     <p>
-      Users may now connect using the <NuxtLink :to="`/guide/fabric/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide.
+      Users, including yourself, may now connect using the <NuxtLink :to="`/guide/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide.
       On your computer, you can connect using the host <code>localhost</code>,
       but anyone else will need your public IP address.
     </p>

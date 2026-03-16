@@ -56,7 +56,7 @@ public class PlayerSizeCommand extends PaperCommand implements CCTimedEffect {
 				}, null);
 			}
 			idMap.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

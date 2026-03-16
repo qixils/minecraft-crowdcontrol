@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -37,6 +38,10 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	protected final List<EntityType<? extends E>> entityTypes;
 	private final String effectName;
 	private final Component displayName;
+	private final String image = "remove_entity_creeper";
+	private final int price = 250;
+	private final byte priority = -5;
+	private final List<String> categories = Collections.singletonList("Remove Entity");
 
 	public RemoveEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(

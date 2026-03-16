@@ -3,12 +3,12 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerManager;
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
-import dev.qixils.crowdcontrol.plugin.configurate.ConfiguratePlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
@@ -56,7 +56,7 @@ import java.util.stream.Stream;
  * {@link Command Commands}.
  */
 @Getter
-public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerPlayer, CommandSourceStack> {
+public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, CommandSourceStack> {
 	// client stuff
 	public static boolean CLIENT_INITIALIZED = false;
 	public static boolean CLIENT_AVAILABLE = false;
@@ -91,7 +91,7 @@ public abstract class ModdedCrowdControlPlugin extends ConfiguratePlugin<ServerP
 	@Accessors(fluent = true)
 	private final EntityMapper<CommandSourceStack> commandSenderMapper = new CommandSourceStackMapper(this);
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
-	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(Path.of("config"));
+	private final @NotNull HoconConfigurationLoader configLoader = createConfigLoader(Path.of("config"), "crowdcontrol.conf", HoconConfigurationLoader.builder());
 	private static @MonotonicNonNull ModdedCrowdControlPlugin instance;
 	@Getter @Setter
 	private boolean paused = false;

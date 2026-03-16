@@ -31,6 +31,7 @@ import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.npc.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.DyeColor;
@@ -58,6 +59,10 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	protected final EntityType<? extends E>[] entityTypes;
 	private final String effectName;
 	private final Component displayName;
+	private final String image = "entity_creeper";
+	private final int price;
+	private final byte priority = 5;
+	private final List<String> categories = Collections.singletonList("Summon Entity");
 	private static List<ResourceKey<LootTable>> LOOT_TABLES = null;
 	private static final Map<EntityType<?>, List<Item>> HORSE_ARMOR = new HashMap<>();
 	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
@@ -108,6 +113,16 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 		this.effectName = effectName;
 		this.displayName = displayName;
+
+		int _price = 500;
+		try {
+			if (firstEntity.create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Enemy) {
+				_price = 1000;
+			}
+		} catch (Exception e) {
+			plugin.getSLF4JLogger().debug("Could not generate default price for {}", BuiltInRegistries.ENTITY_TYPE.getKey(firstEntity), e);
+		}
+		this.price = _price;
 	}
 
 	public @NotNull Component getDisplayName() {

@@ -1,31 +1,38 @@
+import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
 val cloudPaperVersion: String by project
 val minecraftVersion: String by project
 val paperlibVersion: String by project
+val configurateVersion: String by project
+val luckPermsVersion: String by project
 
 val mcVersionSplit = minecraftVersion.split(".")
+val versionId = project.version.toString() + "+paper-" + minecraftVersion
 description = "Minecraft Crowd Control: Paper"
 
 plugins {
     id("xyz.jpenilla.run-paper") // Adds runServer and runMojangMappedServer tasks for testing
-    id("net.minecrell.plugin-yml.paper") // Generates plugin.yml
-    //id("io.papermc.paperweight.userdev")
+    id("de.eldoria.plugin-yml.bukkit") // Generates plugin.yml
+    id("io.papermc.paperweight.userdev")
+    id("me.modmuss50.mod-publish-plugin")
 }
 
 dependencies {
     implementation(project(":base-common"))
     implementation("org.incendo:cloud-paper:$cloudPaperVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
+    implementation("org.spongepowered:configurate-yaml:$configurateVersion")
+    compileOnly("net.luckperms:api:$luckPermsVersion")
 
-    //paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
-    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
+//    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
 }
 
 // plugin.yml generation
-paper {
+bukkit {
     name = "CrowdControl"
-    version = project.version.toString() + "+paper"
+    version = versionId
     main = "dev.qixils.crowdcontrol.plugin.paper.PaperLoader"
     apiVersion = minecraftVersion
     prefix = "CrowdControl"
@@ -35,6 +42,8 @@ paper {
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
     foliaSupported = true
+
+    softDepend = listOf("LuckPerms")
 }
 
 // configure runServer task
@@ -56,6 +65,7 @@ tasks {
 
     shadowJar {
         relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
+        relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
     }
 }
 
@@ -63,4 +73,36 @@ fun RunServer.configure(mcVersion: String) {
     minecraftVersion(mcVersion)
     runDirectory.set(layout.projectDirectory.dir("run/$mcVersion"))
     group = "run paper"
+}
+
+publishMods {
+    val versionFrom = "1.21.2"
+    val versionTo = "1.21.8"
+
+    file.set(tasks.shadowJar.get().archiveFile)
+    modLoaders.add("paper")
+    modLoaders.add("folia")
+    modLoaders.add("purpur")
+    type.set(ReleaseType.STABLE)
+    changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
+    modrinth {
+        accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
+        projectId.set("6XhH9LqD")
+        minecraftVersionRange {
+            start.set(versionFrom)
+            end.set(versionTo)
+        }
+        version.set(versionId)
+        displayName.set(buildString {
+            append("v")
+            append(project.version.toString())
+            append(" (Paper ")
+            append(versionFrom)
+            if (versionFrom != versionTo) {
+                append("-")
+                append(versionTo)
+            }
+            append(")")
+        })
+    }
 }

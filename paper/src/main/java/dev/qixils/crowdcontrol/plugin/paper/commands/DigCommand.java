@@ -33,8 +33,9 @@ public class DigCommand extends RegionalCommandSync {
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		Location playerLocation = player.getLocation();
 		boolean success = false;
+		int depth = getDigDepth();
 		for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
-			for (int y = getDigDepth(); y <= 0; ++y) {
+			for (int y = depth; y <= 0; ++y) {
 				for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
 					Location block = playerLocation.clone().add(x, y, z);
 					if (!block.getBlock().isEmpty()) {

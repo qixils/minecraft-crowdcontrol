@@ -61,7 +61,7 @@ public class FlightCommand extends PaperCommand implements Listener, CCTimedEffe
 			if (!success)
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Target is already flying or able to fly");
 			uuids.put(request.getRequestId(), players.stream().map(Player::getUniqueId).toList());
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

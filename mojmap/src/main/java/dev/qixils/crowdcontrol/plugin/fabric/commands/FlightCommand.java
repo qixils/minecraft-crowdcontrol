@@ -67,7 +67,7 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 			if (!success)
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Target is already flying or able to fly");
 			uuidMap.put(request.getRequestId(), players.stream().map(ServerPlayer::getUUID).toList());
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

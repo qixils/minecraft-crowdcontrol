@@ -78,7 +78,7 @@ useSeoMeta({
 
     <p>
       The mod is now installed! Open your Minecraft Launcher and select the <code>forge</code> profile to play.
-      You may now <NuxtLink :to="`/guide/sponge/join?v=${version.id}`">join a Crowd Control server</NuxtLink>
+      You may now <NuxtLink :to="`/guide/join?v=${version.id}`">join a Crowd Control server</NuxtLink>
       or <a href="#starting">start a single player session</a>.
     </p>
 

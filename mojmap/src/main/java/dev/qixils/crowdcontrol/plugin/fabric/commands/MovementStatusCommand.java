@@ -61,7 +61,7 @@ public class MovementStatusCommand extends ModdedCommand implements CCTimedEffec
 			for (Player player : players)
 				player.cc$setMovementStatus(type, value);
 
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

@@ -107,7 +107,7 @@ public class DoOrDieCommand extends PaperCommand implements CCTimedEffect {
 					task.cancel();
 			}, 1, tickRate);
 
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 }

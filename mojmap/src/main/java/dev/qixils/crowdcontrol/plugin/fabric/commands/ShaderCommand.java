@@ -43,7 +43,7 @@ public class ShaderCommand extends ModdedCommand implements CCTimedEffect {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "All players already have an active screen effect");
 
 			// create byte buf
-			Duration duration = Duration.ofSeconds(request.getEffect().getDuration());
+			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
 			SetShaderS2C packet = new SetShaderS2C(shader, duration);
 
 			// send packet

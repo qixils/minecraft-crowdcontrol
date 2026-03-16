@@ -15,7 +15,6 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -27,7 +26,6 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.toPlayers;
 @Getter
 public class
 GravityCommand extends PaperCommand implements CCTimedEffect {
-	private final Duration defaultDuration = POTION_DURATION;
 	private final String effectName;
 	private final String effectGroup = "gravity";
 	private final List<String> effectGroups = Collections.singletonList(effectGroup);
@@ -62,7 +60,7 @@ GravityCommand extends PaperCommand implements CCTimedEffect {
 				addModifier(player, Attribute.FALL_DAMAGE_MULTIPLIER, FALL_DMG_MODIFIER_UUID, FALL_DMG_MODIFIER_NAME, fallDmgLevel, AttributeModifier.Operation.ADD_NUMBER, false);
 			}, null));
 
-			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDuration() * 1000L);
+			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
 	}
 

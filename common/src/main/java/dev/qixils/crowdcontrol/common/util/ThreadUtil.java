@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
@@ -37,6 +38,9 @@ public class ThreadUtil {
 				resp = supplier.get();
 			} catch (CCResponseException e) {
 				resp = e.getResponse();
+			} catch (CompletionException e) {
+				if (e.getCause() instanceof CCResponseException cc) resp = cc.getResponse();
+				else log.warn("Failed to supply completed", e);
 			} catch (Exception e) {
 				log.warn("Failed to supply", e);
 			}

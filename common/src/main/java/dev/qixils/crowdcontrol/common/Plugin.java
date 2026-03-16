@@ -13,18 +13,21 @@ import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
-import live.crowdcontrol.cc4j.CCEventType;
-import live.crowdcontrol.cc4j.CCPlayer;
-import live.crowdcontrol.cc4j.CrowdControl;
-import live.crowdcontrol.cc4j.IUserRecord;
+import io.leangen.geantyref.TypeToken;
+import live.crowdcontrol.cc4j.*;
 import live.crowdcontrol.cc4j.websocket.UserToken;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
 import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
 import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffect;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectBuilder;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
+import live.crowdcontrol.cc4j.websocket.http.CustomEffectsOperation;
 import live.crowdcontrol.cc4j.websocket.payload.*;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.serializer.configurate4.ConfigurateComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -44,20 +47,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurateException;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.loader.AbstractConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
 import static live.crowdcontrol.cc4j.websocket.ConnectedPlayer.JACKSON;
@@ -138,6 +151,11 @@ public abstract class Plugin<P, S> {
 	 * Key for the Set Language packet.
 	 */
 	public static final Key SET_LANGUAGE_KEY = Key.key(NAMESPACE, "set-language");
+
+	/**
+	 * Valid ID for custom effects.
+	 */
+	public static final Pattern CUSTOM_EFFECTS_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+$");
 
 	/**
 	 * The prefix to use in command output as a {@link Component}.
@@ -258,6 +276,8 @@ public abstract class Plugin<P, S> {
 	@NotNull
 	protected Collection<String> hosts = Collections.emptySet();
 	@NotNull
+	protected CustomEffectsConfig customEffectsConfig = new CustomEffectsConfig();
+	@NotNull
 	protected LimitConfig limitConfig = new LimitConfig();
 	@NotNull
 	protected SoftLockConfig softLockConfig = new SoftLockConfig();
@@ -268,6 +288,7 @@ public abstract class Plugin<P, S> {
 	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
 	protected SemVer latestModVersionCached = null;
 	protected Instant latestModVersionCachedAt = Instant.EPOCH;
+	protected @NotNull Path defaultDataFolder = Paths.get("config", "CrowdControlData");
 
 	protected Plugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;
@@ -390,6 +411,16 @@ public abstract class Plugin<P, S> {
 	}
 
 	/**
+	 * Gets the plugin's {@link CustomEffectsConfig}.
+	 *
+	 * @return custom effects config parsed from the plugin's config file
+	 */
+	@NotNull
+	public CustomEffectsConfig getCustomEffectsConfig() {
+		return customEffectsConfig;
+	}
+
+	/**
 	 * Gets the plugin's {@link LimitConfig}.
 	 *
 	 * @return limit config parsed from the plugin's config file
@@ -448,7 +479,9 @@ public abstract class Plugin<P, S> {
 	@NotNull
 	public abstract AbstractCommandRegister<P, ?> commandRegister();
 
-	public abstract @NotNull Path getDataFolder();
+	public @NotNull Path getDataFolder() {
+		return defaultDataFolder;
+	}
 
 	/**
 	 * Gets the plugin's {@link CommandManager}.
@@ -536,6 +569,65 @@ public abstract class Plugin<P, S> {
 	 */
 	public @Nullable P asPlayer(@NotNull S sender) {
 		return objAsPlayer(sender);
+	}
+
+	/**
+	 *
+	 * @param ccPlayer the player's session to start
+	 */
+	public void startSession(@NotNull CCPlayer ccPlayer) {
+		UserToken user = ccPlayer.getUserToken();
+		if (user == null) return; // !?
+
+		// custom effects
+		Map<String, CustomEffect> newEffects;
+		var effects = Optional.ofNullable(crowdControl)
+			.map(CrowdControl::getGamePack)
+			.map(pack -> pack.getEffects().getGame())
+			.filter(game -> !game.isEmpty());
+		if (effects.isPresent()) {
+			List<Command<P>> registeredEffects = commandRegister().getCommands();
+			Set<String> knownEffects = effects.get().keySet().stream()
+				.map(str -> str.toLowerCase(Locale.ENGLISH))
+				.collect(Collectors.toSet());
+			newEffects = registeredEffects.stream()
+				.filter(command -> command.getPriority() > Byte.MIN_VALUE)
+				.filter(command -> CUSTOM_EFFECTS_ID_PATTERN.matcher(command.getEffectName().toLowerCase(Locale.ENGLISH)).matches())
+				.filter(command -> !knownEffects.contains(command.getEffectName().toLowerCase(Locale.ENGLISH)))
+				.filter(command -> !command.isInactive() || getCustomEffectsConfig().autogenerated())
+				.sorted((a, b) -> {
+					if (a.getPriority() != b.getPriority()) return b.getPriority() - a.getPriority();
+					return a.getExtensionName().computeSortValue().compareToIgnoreCase(b.getExtensionName().computeSortValue());
+				})
+				.limit(75)
+				.map(command -> {
+					List<String> category = new ArrayList<>();
+					category.add("Custom Effects");
+					if (command.getCategories() != null) category.addAll(command.getCategories());
+
+					return Map.entry(
+						command.getEffectName().toLowerCase(Locale.ENGLISH),
+						CustomEffectBuilder.builder()
+							.name(command.getExtensionName())
+							.price(command.getPrice())
+							.description(command.getDescription())
+							.category(category)
+							.image(command.getImage())
+							.inactive(command.isInactive())
+							.duration(command.getExtensionDuration())
+							.build()
+					);
+				})
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
+		} else {
+			newEffects = Collections.emptyMap();
+		}
+		getSLF4JLogger().debug("Registering custom effects {}", newEffects.entrySet().stream().map(entry -> entry.getKey() + ':' + entry.getValue().name().getDisplayName()).toList());
+		// note: we always invoke this so we can replace an older list if one existed
+		ccPlayer.setCustomEffects(Collections.singletonList(new CustomEffectsOperation("replace-all", newEffects)));
+
+		// actually start it
+		ccPlayer.startSession(getConditionalEffectVisibility(user));
 	}
 
 	/**
@@ -660,7 +752,7 @@ public abstract class Plugin<P, S> {
 					return;
 				}
 				audience.sendMessage(output(translatable("cc.join.starting")));
-				player.startSession(getConditionalEffectVisibility(player.getUserToken()));
+				startSession(player);
 			})
 		);
 
@@ -758,6 +850,14 @@ public abstract class Plugin<P, S> {
 					// TODO: extra features
 				}
 			}));
+		// reloadconfig command
+		manager.command(ccCmd.literal("reloadconfig")
+			.commandDescription(description("Reloads the mod's config file"))
+			.handler(ctx -> {
+				Audience audience = mapper.asAudience(ctx.sender());
+				loadConfig();
+				audience.sendMessage(output(translatable("cc.command.crowdcontrol.reloadconfig.output")));
+			}));
 		// execute command
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")
@@ -810,7 +910,7 @@ public abstract class Plugin<P, S> {
 								null,
 								null,
 								null,
-								10
+								new CustomEffectDuration(10)
 							),
 							new CCUserRecord(
 								"ccuid-01j7cnrvpbh5aw45pwpe1vqvdw",
@@ -836,10 +936,151 @@ public abstract class Plugin<P, S> {
 			.registerTo(manager);
 	}
 
+	protected abstract ConfigurationLoader<?> getConfigLoader() throws IllegalStateException;
+
 	/**
 	 * Loads the configuration file.
 	 */
-	public abstract void loadConfig();
+	public void loadConfig() {
+		ConfigurationNode config;
+		try {
+			config = getConfigLoader().load();
+		} catch (IOException e) {
+			throw new RuntimeException("Could not load plugin config", e);
+		}
+
+		// soft-lock observer
+		softLockConfig = new SoftLockConfig(
+			config.node("soft-lock-observer", "period").getInt(DEF_PERIOD),
+			config.node("soft-lock-observer", "deaths").getInt(DEF_DEATHS),
+			config.node("soft-lock-observer", "search-horizontal").getInt(DEF_SEARCH_HORIZ),
+			config.node("soft-lock-observer", "search-vertical").getInt(DEF_SEARCH_VERT)
+		);
+
+		// custom effects
+		try {
+			customEffectsConfig = config.node("custom-effects").get(CustomEffectsConfig.class, new CustomEffectsConfig());
+		} catch (Exception e) {
+			getSLF4JLogger().warn("!!!!!!!!!!!!!! Failed to load custom effects config", e);
+		}
+
+		// hosts
+		TypeToken<Set<String>> hostToken = new TypeToken<>() {};
+		try {
+			hosts = Collections.unmodifiableSet(config.node("hosts").get(hostToken, new HashSet<>(hosts)));
+		} catch (SerializationException e) {
+			throw new RuntimeException("Could not parse 'hosts' config variable", e);
+		}
+		if (!hosts.isEmpty()) {
+			Set<String> loweredHosts = new HashSet<>(hosts.size());
+			for (String host : hosts)
+				loweredHosts.add(host.toLowerCase(Locale.ROOT));
+			hosts = Collections.unmodifiableSet(loweredHosts);
+		}
+
+		// limit config
+		boolean hostsBypass = config.node("limits", "hosts-bypass").getBoolean(limitConfig.hostsBypass());
+		TypeToken<Map<String, Integer>> limitToken = new TypeToken<>() {};
+		try {
+			Map<String, Integer> itemLimits = config.node("limits", "items").get(limitToken, limitConfig.itemLimits());
+			Map<String, Integer> entityLimits = config.node("limits", "entities").get(limitToken, limitConfig.entityLimits());
+			limitConfig = new LimitConfig(hostsBypass, itemLimits, entityLimits);
+		} catch (SerializationException e) {
+			getSLF4JLogger().warn("Could not parse limits config", e);
+		}
+
+		// misc
+		global = config.node("global").getBoolean(global);
+		announce = config.node("announce").getBoolean(announce);
+		adminRequired = config.node("admin-required").getBoolean(adminRequired);
+		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
+	}
+
+	public void saveConfig() {
+		try {
+			// TODO: add comments
+			// TODO: custom
+			ConfigurationNode config = getConfigLoader().createNode();
+			TypeToken<Set<String>> hostToken = new TypeToken<>() {};
+			TypeToken<Map<String, Integer>> limitToken = new TypeToken<>() {};
+			config.node("hosts").set(hostToken, new HashSet<>(hosts));
+			config.node("limits", "hosts-bypass").set(limitConfig.hostsBypass());
+			config.node("limits", "items").set(limitToken, limitConfig.itemLimits());
+			config.node("limits", "entities").set(limitToken, limitConfig.entityLimits());
+			config.node("global").set(global);
+			config.node("announce").set(announce);
+			config.node("hide-names").set(hideNames.getConfigCode());
+			config.node("soft-lock-observer", "period").set(softLockConfig.getPeriod());
+			config.node("soft-lock-observer", "deaths").set(softLockConfig.getDeaths());
+			config.node("soft-lock-observer", "search-horizontal").set(softLockConfig.getSearchH());
+			config.node("soft-lock-observer", "search-vertical").set(softLockConfig.getSearchV());
+			config.node("custom-effects", "autogenerated").set(customEffectsConfig.autogenerated());
+			getConfigLoader().save(config);
+		} catch (ConfigurateException e) {
+			throw new RuntimeException("Could not save plugin config", e);
+		}
+	}
+
+	protected @NotNull Path fixConfigDirectory(@NotNull Path configDirectory) {
+		if (configDirectory.getFileName().toString().equals("crowdcontrol.conf"))
+			configDirectory = configDirectory.getParent();
+		return configDirectory;
+	}
+
+	/**
+	 * Creates a config loader given the directory in which plugin config files are stored.
+	 *
+	 * @param configDirectory path in which plugin config files are stored
+	 * @return the loader for a config file
+	 * @throws IllegalStateException copying the default config file failed
+	 */
+	@CheckReturnValue
+	protected <T extends AbstractConfigurationLoader<@NotNull CommentedConfigurationNode>> T createConfigLoader(@NotNull Path configDirectory,
+																												@NotNull String filename,
+																												@NotNull AbstractConfigurationLoader.Builder<?, @NotNull T> builder) throws IllegalStateException {
+		configDirectory = fixConfigDirectory(configDirectory);
+		defaultDataFolder = configDirectory.resolve("CrowdControlData");
+
+		if (!Files.exists(configDirectory)) {
+			try {
+				Files.createDirectories(configDirectory);
+			} catch (Exception e) {
+				throw new IllegalStateException("Could not create config directory", e);
+			}
+		}
+
+		// move old config
+		Path configPath = configDirectory.resolve(filename);
+		if (filename.equals("crowdcontrol.conf")) {
+			Path oldConfigPath = configDirectory.resolve("crowd-control.conf");
+			if (Files.exists(oldConfigPath)) {
+				try {
+					Files.move(oldConfigPath, configPath);
+				} catch (Exception e) {
+					getSLF4JLogger().warn("Could not move old config file to new location", e);
+				}
+			}
+		}
+
+		if (!Files.exists(configPath)) {
+			// read the default config
+			String defaultFile = filename.endsWith(".conf") ? "assets/crowdcontrol/default.conf" : "config.yml";
+			InputStream inputStream = getInputStream(defaultFile);
+			if (inputStream == null)
+				throw new IllegalStateException("Could not find default config file");
+			// copy the default config to the config path
+			try {
+				Files.copy(inputStream, configPath);
+			} catch (IOException e) {
+				throw new IllegalStateException("Could not copy default config file to " + configPath, e);
+			}
+		}
+
+		return builder
+			.defaultOptions(opts -> opts.serializers(build -> build.registerAll(ConfigurateComponentSerializer.configurate().serializers())))
+			.path(configPath)
+			.build();
+	}
 
 	/**
 	 * Determines whether it's possible for global effects to execute for the specified player.
@@ -1135,6 +1376,15 @@ public abstract class Plugin<P, S> {
 		}
 
 		CCPlayer ccPlayer = cc.addPlayer(uuid);
+		ccPlayer.getEventManager().registerEventConsumer(CCEventType.MESSAGE, message -> {
+			Optional<P> newPlayer = playerMapper().getPlayer(ccPlayer.getUuid());
+			if (newPlayer.isEmpty()) return;
+			Audience newAudience = playerMapper().asAudience(newPlayer.get());
+			Component text = PREFIX_COMPONENT.append(Component.text(message.message()));
+			if (message.level() == CCMessage.Level.ERROR) text = text.color(NamedTextColor.RED);
+			else if (message.level() == CCMessage.Level.WARN) text = text.color(NamedTextColor.GOLD);
+			newAudience.sendMessage(text);
+		});
 		ccPlayer.getEventManager().registerEventConsumer(CCEventType.GENERATED_AUTH_CODE, payload -> {
 			String url = ccPlayer.getAuthUrl();
 			if (url == null) return; // eh?
@@ -1165,7 +1415,7 @@ public abstract class Plugin<P, S> {
 				.sendMessage(PREFIX_COMPONENT.append(translatable("cc.join.authenticated").args(text(user.getName())))));
 			// start session
 			getScheduledExecutor().schedule(
-				() -> ccPlayer.startSession(getConditionalEffectVisibility(user)),
+				() -> startSession(ccPlayer),
 				3,
 				TimeUnit.SECONDS
 			);

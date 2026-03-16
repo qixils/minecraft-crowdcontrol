@@ -1,26 +1,32 @@
 package dev.qixils.crowdcontrol.plugin.fabric.event;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 @Deprecated
 public final class EventManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger("CrowdControl/EventManager");
-	private final Multimap<Class<Event>, Consumer<Event>> listeners = HashMultimap.create();
+	private final Map<Class<Event>, Collection<Consumer<Event>>> listeners = new ConcurrentHashMap<>();
 
 	public <E extends Event> void register(Class<E> eventClass, Consumer<E> listener) {
 		//noinspection unchecked
-		listeners.put((Class<Event>) eventClass, (Consumer<Event>) listener);
+		listeners.computeIfAbsent((Class<Event>) eventClass, $ -> new ConcurrentLinkedQueue<>()).add((Consumer<Event>) listener);
 	}
 
 	public <E extends Event> void unregister(Class<E> eventClass, Consumer<E> listener) {
-		listeners.remove(eventClass, listener);
+		Collection<Consumer<Event>> events = listeners.get(eventClass);
+		if (events == null) return;
+		events.remove(listener);
+		if (events.isEmpty()) listeners.remove(eventClass);
 	}
 
 	public void registerListeners(Object object) {
@@ -40,13 +46,20 @@ public final class EventManager {
 	}
 
 	public void fire(Event event) {
+		if (listeners.isEmpty()) return;
+
 		Class<? extends Event> eventClass = event.getClass();
-		for (Map.Entry<Class<Event>, Consumer<Event>> entry : listeners.entries()) {
+
+		for (Map.Entry<Class<Event>, Collection<Consumer<Event>>> entry : new HashSet<>(listeners.entrySet())) {
 			if (!entry.getKey().isAssignableFrom(eventClass)) continue;
-			try {
-				entry.getValue().accept(event);
-			} catch (Throwable t) {
-				LOGGER.warn("An error occurred while firing event " + eventClass.getSimpleName(), t);
+			if (entry.getValue().isEmpty()) continue;
+
+			for (Consumer<Event> listener : new ArrayList<>(entry.getValue())) {
+				try {
+					listener.accept(event);
+				} catch (Throwable t) {
+					LOGGER.warn("An error occurred while firing event {}", eventClass.getSimpleName(), t);
+				}
 			}
 		}
 	}

@@ -1,14 +1,17 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -16,9 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 @Getter
@@ -26,12 +27,21 @@ public class EnchantmentCommand extends RegionalCommandSync {
 	protected final Enchantment enchantment;
 	private final String effectName;
 	private final Component displayName;
+	private final CCName extensionName;
+	private final String image = "enchant_sharpness";
+	private final int price = 50;
+	private final byte priority = 0;
+	private final List<String> categories = Collections.singletonList("Enchantments");
 
 	public EnchantmentCommand(PaperCrowdControlPlugin plugin, Enchantment enchantment) {
 		super(plugin);
 		this.enchantment = enchantment;
-		this.effectName = "enchant_" + plugin.getTextUtil().translate(enchantment).replace(' ', '_');
-		this.displayName = Component.translatable("cc.effect.enchant.name", enchantment.displayName(enchantment.getMaxLevel()).color(null));
+		this.effectName = "enchant_" + (enchantment.key().namespace().equals("minecraft")
+			? plugin.getTextUtil().translate(enchantment).replace(' ', '_') // todo: what?
+			: CommandConstants.asMinimalSafeString(enchantment.key()));
+		TranslatableComponent _displayName = Component.translatable("cc.effect.enchant.name", enchantment.displayName(enchantment.getMaxLevel()).color(null));
+		this.displayName = _displayName;
+		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.enchant.extension")));
 	}
 
 	@Override
