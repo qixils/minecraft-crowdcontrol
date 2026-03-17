@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.command.impl.Shader;
+import dev.qixils.crowdcontrol.common.packets.ShaderPacketS2C;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
@@ -44,7 +44,7 @@ public class ShaderCommand extends ModdedCommand implements CCTimedEffect {
 
 			// create byte buf
 			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
-			SetShaderS2C packet = new SetShaderS2C(shader, duration);
+			ShaderPacketS2C packet = new ShaderPacketS2C(shader, duration);
 
 			// send packet
 			for (ServerPlayer player : playerSupplier.get())

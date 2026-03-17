@@ -1,12 +1,12 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
+import dev.qixils.crowdcontrol.common.packets.SetLanguagePacketS2C;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
@@ -44,7 +44,7 @@ public class LanguageCommand extends ModdedCommand implements CCTimedEffect {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
-			SetLanguageS2C packet = new SetLanguageS2C(LanguageState.RANDOM, duration);
+			SetLanguagePacketS2C packet = new SetLanguagePacketS2C(LanguageState.RANDOM, duration);
 
 			// send packet
 			for (ServerPlayer player : players)

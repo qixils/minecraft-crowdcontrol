@@ -1,13 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
+import dev.qixils.crowdcontrol.common.packets.*;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.plugin.fabric.client.fabric.ClientPacketContextImpl;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
+import io.netty.buffer.Unpooled;
 import jerozgen.languagereload.LanguageReload;
 import jerozgen.languagereload.config.Config;
 import net.fabricmc.api.ClientModInitializer;
@@ -15,12 +13,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.client.resources.language.LanguageInfo;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public class FabricPlatformClient extends ModdedPlatformClient implements ClientModInitializer {
@@ -35,10 +36,10 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 
 		PacketUtilImpl.registerPackets();
 
-		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> handleRequestVersion(payload, new ClientPacketContextImpl(context)));
-		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> handleSetShader(payload, new ClientPacketContextImpl(context)));
-		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (payload, context) -> handleMovementStatus(payload, new ClientPacketContextImpl(context)));
-		ClientPlayNetworking.registerGlobalReceiver(SetLanguageS2C.PACKET_ID, (payload, context) -> handleLanguage(payload));
+		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(VersionRequestPacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleRequestVersion(VersionRequestPacketS2C.INSTANCE, new ClientPacketContextImpl(minecraft, sender)));
+		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(ShaderPacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleSetShader(new ShaderPacketS2C(buf), new ClientPacketContextImpl(minecraft, sender)));
+		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(MovementStatusPacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleMovementStatus(new MovementStatusPacketS2C(buf), new ClientPacketContextImpl(minecraft, sender)));
+		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(SetLanguagePacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleLanguage(new SetLanguagePacketS2C(buf)));
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 		return features;
 	}
 
-	public void handleLanguage(SetLanguageS2C payload) {
+	public void handleLanguage(SetLanguagePacketS2C payload) {
 		if (client == null) return;
 		if (!getExtraFeatures().contains(ExtraFeature.LANGUAGE_RELOAD)) return;
 		if (LANGUAGE_STATE == payload.state()) return;
@@ -62,7 +63,7 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 			}
 			case RANDOM -> {
 				Config config = Config.getInstance();
-				List<String> languages = new ArrayList<>(client.getLanguageManager().getLanguages().keySet());
+				List<String> languages = client.getLanguageManager().getLanguages().stream().map(LanguageInfo::getCode).collect(Collectors.toList());
 				languages.remove(config.language);
 				languages.removeAll(config.fallbacks);
 				languages.remove("en_us");
@@ -76,16 +77,19 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 
 		if (LANGUAGE_STATE != LanguageState.RESET)
 			executor.schedule(
-				() -> handleLanguage(new SetLanguageS2C(LanguageState.RESET, Duration.ZERO)),
+				() -> handleLanguage(new SetLanguagePacketS2C(LanguageState.RESET, Duration.ZERO)),
 				payload.duration().toMillis(),
 				TimeUnit.MILLISECONDS
 			);
 	}
 
-	public void sendToServer(@NotNull CustomPacketPayload payload) {
-		if (!ClientPlayNetworking.canSend(payload.type())) return;
+	public void sendToServer(@NotNull PluginPacket payload) {
+		ResourceLocation loc = new ResourceLocation(payload.metadata().channel());
+		if (!ClientPlayNetworking.canSend(loc)) return;
 		try {
-			ClientPlayNetworking.send(payload);
+			FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+			payload.write(buf);
+			ClientPlayNetworking.send(loc, new FriendlyByteBuf(buf.copy()));
 		} catch (UnsupportedOperationException e) {
 			logger.debug("Server cannot receive packet {}", payload);
 		}

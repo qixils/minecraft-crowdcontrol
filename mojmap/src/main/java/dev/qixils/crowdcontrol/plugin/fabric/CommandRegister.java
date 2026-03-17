@@ -10,6 +10,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCom
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -46,9 +47,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 	private void registerTags() {
 		if (!tagsRegistered) {
 			tagsRegistered = true;
-			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, BuiltInRegistries.BLOCK);
-			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, BuiltInRegistries.BLOCK);
-			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, BuiltInRegistries.ITEM);
+			setBlocks = new TypedTag<>(CommandConstants.SET_BLOCKS, Registry.BLOCK);
+			setFallingBlocks = new TypedTag<>(CommandConstants.SET_FALLING_BLOCKS, Registry.BLOCK);
+			giveTakeItems = new TypedTag<>(CommandConstants.GIVE_TAKE_ITEMS, Registry.ITEM);
 		}
 	}
 
@@ -132,11 +133,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 		// entity commands
 		// TODO: could bring back the fill-in-vanilla-holes thing to have some better defaults for some modded mobs?
 		//  but there will probably be overlap and make it weird idk
-		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
+		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : Registry.ENTITY_TYPE.entrySet()) {
 			try {
-				if (!entry.getValue().isEnabled(plugin.server().overworld().enabledFeatures())) continue;
-
-				boolean allowed = isWhitelistedEntity(entry.getKey()) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
+				boolean allowed = isWhitelistedEntity(entry.getKey()) || entry.getValue().create(plugin.server().overworld()) instanceof Mob;
 				if (!allowed) continue;
 				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
 

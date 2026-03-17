@@ -7,15 +7,16 @@ import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
+import dev.qixils.crowdcontrol.common.packets.ExtraFeaturePacketC2S;
+import dev.qixils.crowdcontrol.common.packets.PluginPacket;
+import dev.qixils.crowdcontrol.common.packets.VersionRequestPacketS2C;
+import dev.qixils.crowdcontrol.common.packets.VersionResponsePacketC2S;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.ExtraFeatureC2S;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.ServerPacketContext;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.MojmapTextUtil;
@@ -28,11 +29,7 @@ import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -117,24 +114,6 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 			getSLF4JLogger().debug("Server stopping");
 			setServer(null);
 		});
-	}
-
-	@Deprecated(forRemoval = true)
-	public <T> Registry<T> registry(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
-		if (accessor == null) accessor = server().registryAccess();
-		return accessor.lookupOrThrow(key);
-	}
-
-	@Deprecated(forRemoval = true)
-	public <T> Iterable<Holder.Reference<T>> registryHolders(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
-		Registry<T> registry = registry(key, accessor);
-		return new Iterable<>() {
-            @NotNull
-            @Override
-            public Iterator<Holder.Reference<T>> iterator() {
-                return registry.listElements().iterator();
-            }
-        };
 	}
 
 	@Override
@@ -231,7 +210,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 		// request client version if not available
 		if (!clientVersions.containsKey(player.getUUID())) {
 			getSLF4JLogger().debug("Sending version request to {}", player.getUUID());
-			sendToPlayer(player, RequestVersionS2C.INSTANCE);
+			sendToPlayer(player, VersionRequestPacketS2C.INSTANCE);
 		}
 		// super
 		super.onPlayerJoin(player);
@@ -274,7 +253,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 		return toPlayerStream(uuids).toList();
 	}
 
-	public void handleVersionResponse(ResponseVersionC2S payload, ServerPacketContext context) {
+	public void handleVersionResponse(VersionResponsePacketC2S payload, ServerPacketContext context) {
 		UUID uuid = context.player().getUUID();
 		SemVer version = payload.version();
 		getSLF4JLogger().info("Received version {} from client {}", version, uuid);
@@ -282,7 +261,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 		updateConditionalEffectVisibility(uuid);
 	}
 
-	public void handleExtraFeatures(ExtraFeatureC2S payload, ServerPacketContext context) {
+	public void handleExtraFeatures(ExtraFeaturePacketC2S payload, ServerPacketContext context) {
 		UUID uuid = context.player().getUUID();
 		Set<ExtraFeature> features = payload.features();
 		getSLF4JLogger().info("Received features {} from client {}", features, uuid);
@@ -290,9 +269,9 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 		updateConditionalEffectVisibility(uuid);
 	}
 
-	public abstract void sendToPlayer(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload);
+	public abstract void sendToPlayer(@NotNull ServerPlayer player, @NotNull PluginPacket payload);
 
-	public static void sendToPlayerStatic(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload) {
+	public static void sendToPlayerStatic(@NotNull ServerPlayer player, @NotNull PluginPacket payload) {
 		if (!isInstanceAvailable()) return;
 		getInstance().sendToPlayer(player, payload);
 	}

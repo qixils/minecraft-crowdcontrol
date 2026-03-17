@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import dev.qixils.crowdcontrol.common.HideNames;
+import dev.qixils.crowdcontrol.common.packets.*;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -15,8 +16,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -86,38 +86,38 @@ public abstract class ModdedPlatformClient {
 		ConfigBuilder builder = ConfigBuilder.create()
 			// I wish I could hide the search bar
 			.setParentScreen(parent)
-			.setTitle(Component.translatable("config.crowdcontrol.title"))
+			.setTitle(new TranslatableComponent("config.crowdcontrol.title"))
 			.setSavingRunnable(plugin::saveConfig);
-		ConfigCategory category = builder.getOrCreateCategory(Component.translatable("config.crowdcontrol.category.general"));
+		ConfigCategory category = builder.getOrCreateCategory(new TranslatableComponent("config.crowdcontrol.category.general"));
 		ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-		category.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.crowdcontrol.announce.name"), plugin.announceEffects())
+		category.addEntry(entryBuilder.startBooleanToggle(new TranslatableComponent("config.crowdcontrol.announce.name"), plugin.announceEffects())
 			.setDefaultValue(true)
-			.setTooltip(Component.translatable("config.crowdcontrol.announce.description"))
+			.setTooltip(new TranslatableComponent("config.crowdcontrol.announce.description"))
 			.setSaveConsumer(plugin::setAnnounceEffects)
 			.build());
-		category.addEntry(entryBuilder.startEnumSelector(Component.translatable("config.crowdcontrol.hide_names.name"), HideNames.class, plugin.getHideNames())
+		category.addEntry(entryBuilder.startEnumSelector(new TranslatableComponent("config.crowdcontrol.hide_names.name"), HideNames.class, plugin.getHideNames())
 			.setDefaultValue(HideNames.NONE)
-			.setTooltip(Component.translatable("config.crowdcontrol.hide_names.description"))
+			.setTooltip(new TranslatableComponent("config.crowdcontrol.hide_names.description"))
 			.setSaveConsumer(plugin::setHideNames)
-			.setEnumNameProvider(enumValue -> Component.translatable("config.crowdcontrol.hide_names.option." + ((HideNames) enumValue).getConfigCode()))
+			.setEnumNameProvider(enumValue -> new TranslatableComponent("config.crowdcontrol.hide_names.option." + ((HideNames) enumValue).getConfigCode()))
 			.build());
-		category.addEntry(entryBuilder.startTextDescription(Component.translatable("config.crowdcontrol.advanced_settings")).build());
+		category.addEntry(entryBuilder.startTextDescription(new TranslatableComponent("config.crowdcontrol.advanced_settings")).build());
 		// TODO: add entity & item limits
 		return builder.build();
 	}
 
-	public void handleRequestVersion(@NotNull RequestVersionS2C payload, @NotNull ClientPacketContext context) {
+	public void handleRequestVersion(@NotNull VersionRequestPacketS2C payload, @NotNull ClientPacketContext context) {
 		logger.info("Received version request from server!");
-		context.send(new ResponseVersionC2S(SemVer.MOD));
-		context.send(new ExtraFeatureC2S(getExtraFeatures()));
+		context.send(new VersionResponsePacketC2S(SemVer.MOD));
+		context.send(new ExtraFeaturePacketC2S(getExtraFeatures()));
 	}
 
-	public void handleSetShader(@NotNull SetShaderS2C payload, @NotNull ClientPacketContext context) {
+	public void handleSetShader(@NotNull ShaderPacketS2C payload, @NotNull ClientPacketContext context) {
 		logger.debug("Received shader request from server!");
 //		ResourceLocation shader = withDefaultNamespace(payload.shader());
 //
 //		client.execute(() -> {
-//			client.gameRenderer.setPostEffect(shader);
+//			client.gameRenderer.loadEffect(shader);
 //			SHADER_ACTIVE = true;
 //		});
 //		executor.schedule(() -> client.execute(() -> {
@@ -126,14 +126,14 @@ public abstract class ModdedPlatformClient {
 //		}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
 	}
 
-	public void handleMovementStatus(@NotNull MovementStatusS2C payload, @NotNull ClientPacketContext context) {
+	public void handleMovementStatus(@NotNull MovementStatusPacketS2C payload, @NotNull ClientPacketContext context) {
 		if (payload.statusType() == null || payload.statusValue() == null) return;
 		context.player().cc$setMovementStatus(payload.statusType(), payload.statusValue());
 	}
 
-	public abstract void sendToServer(@NotNull CustomPacketPayload payload);
+	public abstract void sendToServer(@NotNull PluginPacket payload);
 
-	public static void sendToServerStatic(@NotNull CustomPacketPayload payload) {
+	public static void sendToServerStatic(@NotNull PluginPacket payload) {
 		if (INSTANCE == null) return;
 		INSTANCE.sendToServer(payload);
 	}

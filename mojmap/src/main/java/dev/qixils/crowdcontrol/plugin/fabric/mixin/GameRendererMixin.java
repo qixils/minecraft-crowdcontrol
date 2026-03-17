@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
-	@Inject(method = "setPostEffect", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "loadEffect", at = @At("HEAD"), cancellable = true)
 	private void onPostEffect(ResourceLocation effect, CallbackInfo ci) {
 		if (ModdedPlatformClient.SHADER_ACTIVE)
 			ci.cancel();
@@ -30,7 +30,7 @@ public class GameRendererMixin {
 			ci.cancel();
 	}
 
-	@Inject(method = "clearPostEffect", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "shutdownEffect", at = @At("HEAD"), cancellable = true)
 	private void onClearPostEffect(CallbackInfo ci) {
 		if (ModdedPlatformClient.SHADER_ACTIVE)
 			ci.cancel();

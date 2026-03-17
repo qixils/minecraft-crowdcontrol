@@ -7,7 +7,7 @@ import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.ModdedPlatformClient;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.client.player.LocalPlayer;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Mixin(KeyboardInput.class)
-public abstract class KeyboardInputMixin extends ClientInput {
+public abstract class KeyboardInputMixin extends Input {
 
 	@Unique
 	private boolean cc$handleIsDown(@NotNull Function<KeyMapping, Boolean> getResult, @NotNull KeyMapping original, @Nullable KeyMapping inverse, @NotNull MovementStatusType type) {

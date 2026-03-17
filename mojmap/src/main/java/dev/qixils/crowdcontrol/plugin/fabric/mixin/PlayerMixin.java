@@ -4,10 +4,10 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
+import dev.qixils.crowdcontrol.common.packets.MovementStatusPacketS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -48,20 +48,20 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 		else
 			cc$prohibited.put(type, value);
 		if (((Object) this) instanceof ServerPlayer serverPlayer) {
-			ModdedCrowdControlPlugin.sendToPlayerStatic(serverPlayer, new MovementStatusS2C(type, value));
+			ModdedCrowdControlPlugin.sendToPlayerStatic(serverPlayer, new MovementStatusPacketS2C(type, value));
 		}
 	}
 
 	@Override
 	public void jumpFromGround(CallbackInfo ci) {
-		Jump event = new Jump((Player) (Object) this, this.level().isClientSide);
+		Jump event = new Jump((Player) (Object) this, this.level.isClientSide);
 
 		boolean cantJump = cc$getMovementStatus(MovementStatusType.JUMP) == MovementStatusValue.DENIED;
 		boolean cantWalk = cc$getMovementStatus(MovementStatusType.WALK) == MovementStatusValue.DENIED;
 		if (cantJump || cantWalk) {
 			event.cancel();
 			if (!event.isClientSide() && ((Object)this) instanceof ServerPlayer sPlayer /* not necessary for clients */ && !cantWalk /* avoids teleporting twice */) {
-				sPlayer.connection.teleport(getX(), getY(), getZ(), getYRot(), getXRot());
+				sPlayer.connection.teleport(getX(), getY(), getZ(), getRotationVector().x, getRotationVector().y);
 			}
 		}
 
@@ -79,7 +79,7 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 	}
 
 	@WrapOperation(
-			method = "getBaseExperienceReward",
+			method = "getExperienceReward",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
 	private boolean experienceKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {
