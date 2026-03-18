@@ -15,7 +15,6 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.commands.CommandResultCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.CompoundTagArgument;
@@ -43,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 @Getter
@@ -130,6 +130,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 			: _cmd;
 
 		try {
+			// todo: there is a ContextChain.runExecutable which seems to be simpler, but maybe less versatile
 			Commands commands = plugin.server().getCommands();
 			CommandDispatcher<CommandSourceStack> dispatcher = commands.getDispatcher();
 			ParseResults<CommandSourceStack> results = dispatcher.parse(commandLine, player.createCommandSourceStack().withSuppressedOutput());
@@ -139,11 +140,15 @@ public class CustomCommandsCommand extends ModdedCommand {
 
 			if (contextChain == null) throw new RuntimeException("Unknown command `" + _cmd + '`');
 
+			AtomicBoolean successful = new AtomicBoolean(true);
 			Commands.executeCommandInContext(
 				commandSourceStack,
-				executionContext -> ExecutionContext.queueInitialCommandExecution(executionContext, commandLine, contextChain, commandSourceStack, CommandResultCallback.EMPTY)
+				executionContext -> ExecutionContext.queueInitialCommandExecution(executionContext, commandLine, contextChain, commandSourceStack, (success, result) -> {
+					if (success && result != 0) return;
+					successful.set(false);
+				})
 			);
-			return true;
+			return successful.get();
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to run command", e);
 		}
