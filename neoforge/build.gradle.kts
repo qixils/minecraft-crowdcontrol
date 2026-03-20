@@ -8,6 +8,7 @@ val jacksonVersion: String by project
 val crowdControlVersion: String by project
 val adventureVersion: String by project
 val geantyrefVersion: String by project
+val yaclVersion: String by project
 val minecraft_version: String by project
 val neoforge_version: String by project
 val mod_id: String by project
@@ -81,6 +82,7 @@ repositories {
 
 dependencies {
     implementation(jarJar("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
+    implementation(jarJar("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")!!)
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     // add transitive deps

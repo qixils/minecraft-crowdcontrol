@@ -1,5 +1,9 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
+import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
+import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
+import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -10,6 +14,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,7 +80,48 @@ public abstract class ModdedPlatformClient {
 	}
 
 	public static Screen createConfigScreen(Screen parent) {
-		return parent; // TODO yacl
+		ModdedCrowdControlPlugin plugin = ModdedCrowdControlPlugin.getInstance();
+		plugin.loadConfig();
+		try {
+			return YetAnotherConfigLib.createBuilder()
+				.title(Component.translatable("config.crowdcontrol.title"))
+				.save(plugin::saveConfig)
+				.category(ConfigCategory.createBuilder()
+					.name(Component.translatable("config.crowdcontrol.category.general"))
+					.option(Option.<Boolean>createBuilder()
+						.name(Component.translatable("config.crowdcontrol.announce.name"))
+						.description(OptionDescription.of(Component.translatable("config.crowdcontrol.announce.description")))
+						.binding(
+							true,
+							plugin::announceEffects,
+							plugin::setAnnounceEffects
+						)
+						.controller(TickBoxControllerBuilder::create)
+						.build()
+					)
+					.option(Option.<HideNames>createBuilder()
+						.name(Component.translatable("config.crowdcontrol.hide_names.name"))
+						.description(OptionDescription.of(Component.translatable("config.crowdcontrol.hide_names.description")))
+						.binding(
+							HideNames.NONE,
+							plugin::getHideNames,
+							plugin::setHideNames
+						)
+						.controller(opt -> EnumControllerBuilder.create(opt)
+							.enumClass(HideNames.class)
+							.formatValue(enumValue -> Component.translatable("config.crowdcontrol.hide_names.option." + enumValue.getConfigCode()))
+						)
+						.build()
+					)
+					.option(LabelOption.create(Component.translatable("config.crowdcontrol.advanced_settings")))
+					.build()
+				)
+				.build()
+				.generateScreen(parent);
+		} catch (Exception e) {
+			plugin.getSLF4JLogger().atWarn().setCause(e).log("Failed to create yacl screen");
+			return new ConfigMissingScreen(parent);
+		}
 	}
 
 	public void handleRequestVersion(@NotNull RequestVersionS2C payload, @NotNull ClientPacketContext context) {

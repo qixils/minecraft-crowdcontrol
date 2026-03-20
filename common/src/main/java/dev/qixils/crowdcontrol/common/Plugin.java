@@ -989,7 +989,7 @@ public abstract class Plugin<P, S> {
 	public void saveConfig() {
 		try {
 			// TODO: add comments
-			// TODO: custom
+			// TODO: custom effects
 			ConfigurationNode config = getConfigLoader().createNode();
 			TypeToken<Set<String>> hostToken = new TypeToken<>() {};
 			TypeToken<Map<String, Integer>> limitToken = new TypeToken<>() {};

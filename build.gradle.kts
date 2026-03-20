@@ -32,6 +32,7 @@ subprojects {
     }
 
     repositories {
+        mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/") {
             name = "PaperMC"
         }
@@ -47,10 +48,12 @@ subprojects {
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
             name = "sonatype-oss-snapshots"
         }
+        maven("https://maven.isxander.dev/releases") {
+            name = "Xander Maven"
+        }
         maven("https://jitpack.io") {
             name = "Jitpack"
         }
-        mavenCentral()
         mavenLocal()
     }
 

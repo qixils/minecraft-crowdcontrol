@@ -41,6 +41,7 @@
   },
   "recommends": {
     "languagereload": "*",
+    "yet_another_config_lib_v3": "*",
     "modmenu": "*"
   },
   "breaks": {

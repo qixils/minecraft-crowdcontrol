@@ -47,5 +47,11 @@ type = "required"
 ordering = "AFTER"
 side = "BOTH"
 
+[[dependencies.crowdcontrol]]
+modId = "yet_another_config_lib_v3"
+mandatory = true
+ordering = "NONE"
+side = "CLIENT"
+
 [[mixins]]
 config = "crowdcontrol.mixins.json"
