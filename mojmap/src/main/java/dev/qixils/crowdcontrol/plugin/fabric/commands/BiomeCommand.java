@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -21,16 +20,15 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEAR
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.BIOME_SEARCH_STEP;
 
 @Getter
-public class BiomeCommand extends NearbyLocationCommand<ResourceKey<Biome>> {
-	private static final Map<ResourceKey<Level>, List<ResourceKey<Biome>>> BIOMES = Map.of(
+public class BiomeCommand extends NearbyLocationCommand<Biome> {
+	private static final Map<ResourceKey<Level>, List<Biome>> BIOMES = Map.of(
 			Level.OVERWORLD, List.of(
 					Biomes.PLAINS,
 					Biomes.SUNFLOWER_PLAINS,
-					Biomes.SNOWY_PLAINS,
+					Biomes.SNOWY_TUNDRA,
 					Biomes.ICE_SPIKES,
 					Biomes.DESERT,
 					Biomes.SWAMP,
-					Biomes.MANGROVE_SWAMP,
 					Biomes.FOREST,
 					Biomes.FLOWER_FOREST,
 					Biomes.BIRCH_FOREST,
@@ -39,27 +37,15 @@ public class BiomeCommand extends NearbyLocationCommand<ResourceKey<Biome>> {
 					Biomes.SNOWY_TAIGA,
 					Biomes.SAVANNA,
 					Biomes.SAVANNA_PLATEAU,
-					Biomes.WINDSWEPT_HILLS,
-					Biomes.WINDSWEPT_GRAVELLY_HILLS,
-					Biomes.WINDSWEPT_FOREST,
-					Biomes.WINDSWEPT_SAVANNA,
+					Biomes.MOUNTAINS,
 					Biomes.JUNGLE,
-					Biomes.SPARSE_JUNGLE,
 					Biomes.BAMBOO_JUNGLE,
 					Biomes.BADLANDS,
 					Biomes.ERODED_BADLANDS,
-					Biomes.WOODED_BADLANDS,
-					Biomes.MEADOW,
-					Biomes.GROVE,
-					Biomes.SNOWY_SLOPES,
-					Biomes.FROZEN_PEAKS,
-					Biomes.JAGGED_PEAKS,
-					Biomes.STONY_PEAKS,
 					Biomes.RIVER,
 					Biomes.FROZEN_RIVER,
 					Biomes.BEACH,
 					Biomes.SNOWY_BEACH,
-					Biomes.STONY_SHORE,
 					Biomes.WARM_OCEAN,
 					Biomes.LUKEWARM_OCEAN,
 					Biomes.COLD_OCEAN,
@@ -95,28 +81,27 @@ public class BiomeCommand extends NearbyLocationCommand<ResourceKey<Biome>> {
 	}
 
 	@Override
-	protected @Nullable Location search(@NotNull Location origin, @NotNull ResourceKey<Biome> searchType) {
+	protected @Nullable Location search(@NotNull Location origin, @NotNull Biome searchType) {
 //		BlockPos pos = origin.pos();
 //		var pair = origin.level().getChunkSource().getGenerator().getBiomeSource().findBiomeHorizontal(pos.getX(), pos.getY(), pos.getZ(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP, biome -> biome.is(searchType), origin.level().getRandom(), true, origin.level().getChunkSource().randomState().sampler());
-		var pair = origin.level().findClosestBiome3d(biome -> biome.is(searchType), origin.pos(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP, BIOME_SEARCH_STEP);
+		var pair = origin.level().findNearestBiome(searchType, origin.pos(), BIOME_SEARCH_RADIUS, BIOME_SEARCH_STEP);
 		if (pair == null)
 			return null;
-		return new Location(origin.level(), pair.getFirst());
+		return new Location(origin.level(), pair);
 	}
 
 	@Override
-	protected @NotNull Collection<ResourceKey<Biome>> getSearchTypes(@NotNull ServerLevel level) {
+	protected @NotNull Collection<Biome> getSearchTypes(@NotNull ServerLevel level) {
 		return BIOMES.get(level.dimension());
 	}
 
 	@Override
-	protected @NotNull Component nameOf(@NotNull ResourceKey<Biome> searchType) {
-		ResourceLocation id = searchType.location();
-		return Component.translatable("biome." + id.getNamespace() + "." + id.getPath());
+	protected @NotNull Component nameOf(@NotNull Biome searchType) {
+		return plugin.toAdventure(searchType.getName());
 	}
 
 	@Override
-	protected @Nullable ResourceKey<Biome> currentType(@NotNull Location origin) {
-		return origin.level().getBiome(origin.pos()).unwrapKey().orElse(null);
+	protected @Nullable Biome currentType(@NotNull Location origin) {
+		return origin.level().getBiome(origin.pos());
 	}
 }

@@ -49,6 +49,16 @@ subprojects {
         maven("https://jitpack.io") {
             name = "Jitpack"
         }
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.fabricmc.net/") {
+                    name = "Fabric"
+                }
+            }
+            filter {
+                includeGroup("com.google.jimfs")
+            }
+        }
         mavenCentral()
         // idk why this exists for adventure and not for me
         exclusiveContent {

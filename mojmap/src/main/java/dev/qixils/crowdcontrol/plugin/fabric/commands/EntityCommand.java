@@ -1,7 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.TriState;
-import dev.qixils.crowdcontrol.plugin.fabric.FeatureElementCommand;
+import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
@@ -14,20 +15,17 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
+public interface EntityCommand<E extends Entity> extends Command<ServerPlayer> {
 	@NotNull EntityType<? extends E> getEntityType();
 
-	@Override
-	default @NotNull FeatureFlagSet requiredFeatures() {
-		return getEntityType().requiredFeatures();
-	}
+	@NonNull ModdedCrowdControlPlugin getPlugin();
 
 	default boolean isMonster() {
 		return getEntityType().getCategory() == MobCategory.MONSTER;
@@ -55,13 +53,11 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 		// error only if everyone has an error
 		CCInstantEffectResponse error = null;
 		for (ServerPlayer player : players) {
-			ServerLevel level = player.serverLevel();
+			ServerLevel level = player.getLevel();
 			if (isMonster() && levelIsPeaceful(level))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
-			else if (getEntityType() == EntityType.ENDER_DRAGON && level.getDragonFight() != null)
+			else if (getEntityType() == EntityType.ENDER_DRAGON && level.dragonFight() != null)
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
-			else if (!isEnabled(player.serverLevel().enabledFeatures()))
-				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
 			else
 				return null;
 		}

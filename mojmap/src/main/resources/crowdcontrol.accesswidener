@@ -1,20 +1,13 @@
 accessWidener v2 named
-accessible method net/minecraft/world/entity/animal/wolf/Wolf setCollarColor (Lnet/minecraft/world/item/DyeColor;)V
-accessible method net/minecraft/world/entity/animal/wolf/Wolf setVariant (Lnet/minecraft/core/Holder;)V
-accessible method net/minecraft/world/entity/animal/frog/Frog setVariant (Lnet/minecraft/core/Holder;)V
-accessible method net/minecraft/world/entity/animal/axolotl/Axolotl setVariant (Lnet/minecraft/world/entity/animal/axolotl/Axolotl$Variant;)V
-accessible method net/minecraft/world/entity/animal/Rabbit setVariant (Lnet/minecraft/world/entity/animal/Rabbit$Variant;)V
-accessible method net/minecraft/world/entity/animal/MushroomCow setVariant (Lnet/minecraft/world/entity/animal/MushroomCow$Variant;)V
-accessible method net/minecraft/client/renderer/GameRenderer setPostEffect (Lnet/minecraft/resources/ResourceLocation;)V
+accessible method net/minecraft/world/entity/animal/MushroomCow setMushroomType (Lnet/minecraft/world/entity/animal/MushroomCow$MushroomType;)V
 accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageMax I
-accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePerDistance F
+accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageAmount F
 accessible field net/minecraft/world/entity/monster/Creeper DATA_IS_POWERED Lnet/minecraft/network/syncher/EntityDataAccessor;
-accessible field net/minecraft/world/entity/player/Inventory equipment Lnet/minecraft/world/entity/EntityEquipment;
-accessible field net/minecraft/world/entity/EntityEquipment items Ljava/util/EnumMap;
 accessible field net/minecraft/world/entity/LivingEntity dead Z
-accessible field net/minecraft/stats/ServerRecipeBook known Ljava/util/Set;
+accessible field net/minecraft/stats/RecipeBook known Ljava/util/Set;
 accessible field net/minecraft/client/player/KeyboardInput options Lnet/minecraft/client/Options;
 accessible field net/minecraft/world/inventory/ResultSlot craftSlots Lnet/minecraft/world/inventory/CraftingContainer;
 accessible field net/minecraft/world/inventory/ResultSlot player Lnet/minecraft/world/entity/player/Player;
 accessible field net/minecraft/world/entity/EntityType factory Lnet/minecraft/world/entity/EntityType$EntityFactory;
-accessible method net/minecraft/commands/Commands finishParsing (Lcom/mojang/brigadier/ParseResults;Ljava/lang/String;Lnet/minecraft/commands/CommandSourceStack;)Lcom/mojang/brigadier/context/ContextChain;
+accessible method net/minecraft/tags/BlockTags bind (Ljava/lang/String;)Lnet/minecraft/tags/Tag$Named;
+accessible method net/minecraft/world/entity/decoration/ArmorStand setShowArms (Z)V

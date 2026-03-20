@@ -32,13 +32,13 @@ public final class ConditionFlags implements Predicate<ServerPlayer> {
 
 	@Override
 	public boolean test(@NotNull ServerPlayer player) {
-		if (!allowedDimensions.isEmpty() && !allowedDimensions.contains(player.serverLevel().dimension()))
+		if (!allowedDimensions.isEmpty() && !allowedDimensions.contains(player.level.dimension()))
 			return false;
 		for (Map.Entry<Item, Integer> entry : requiredItems.entrySet()) {
 			Item item = entry.getKey();
 			int required = entry.getValue();
 			int count = 0;
-			for (ItemStack stack : InventoryUtil.viewAllItems(player.getInventory())) {
+			for (ItemStack stack : InventoryUtil.viewAllItems(player.inventory)) {
 				if (stack != null && stack.getItem() == item) {
 					count += stack.getCount();
 					if (count >= required)

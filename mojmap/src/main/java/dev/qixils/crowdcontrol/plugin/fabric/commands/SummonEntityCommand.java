@@ -12,34 +12,29 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.MushroomCow;
 import net.minecraft.world.entity.animal.Rabbit;
-import net.minecraft.world.entity.animal.axolotl.Axolotl;
-import net.minecraft.world.entity.animal.frog.Frog;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.animal.sheep.Sheep;
-import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.npc.VillagerDataHolder;
-import net.minecraft.world.entity.vehicle.ContainerEntity;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.equipment.Equippable;
-import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,29 +58,29 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	private final int price;
 	private final byte priority = 5;
 	private final List<String> categories = Collections.singletonList("Summon Entity");
-	private static List<ResourceKey<LootTable>> LOOT_TABLES = null;
+	private static List<ResourceLocation> LOOT_TABLES = null;
 	private static final Map<EntityType<?>, List<Item>> HORSE_ARMOR = new HashMap<>();
-	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
-			Rabbit.Variant.BLACK, 16,
-			Rabbit.Variant.BROWN, 16,
-			Rabbit.Variant.GOLD, 16,
-			Rabbit.Variant.SALT, 16,
-			Rabbit.Variant.WHITE, 16,
-			Rabbit.Variant.WHITE_SPLOTCHED, 16,
-			Rabbit.Variant.EVIL, 1
+	private static final Map<Integer, Integer> RABBIT_VARIANTS = Map.of(
+			0, 16,
+			1, 16,
+			2, 16,
+			3, 16,
+			4, 16,
+			5, 16,
+			99, 1
 	);
 	private static final Map<EquipmentSlot, List<Item>> HUMANOID_ARMOR;
 
 	static {
 		// pre-compute the map of valid armor pieces
 		Map<EquipmentSlot, List<Item>> armor = new HashMap<>(4);
-		for (Item item : BuiltInRegistries.ITEM) {
-			Equippable equippable = item.components().get(DataComponents.EQUIPPABLE);
-			if (equippable == null) continue;
-			EquipmentSlot slot = equippable.slot();
-			if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
-				continue;
-			armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(item);
+		for (Item item : Registry.ITEM) {
+			if (item instanceof ArmorItem armorItem) {
+				EquipmentSlot slot = armorItem.getSlot();
+				if (slot.getType() != EquipmentSlot.Type.ARMOR)
+					continue;
+				armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(item);
+			}
 		}
 
 		// make collections unmodifiable
@@ -97,7 +92,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public SummonEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(
 			plugin,
-			"entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)),
+			"entity_" + csIdOf(ModdedCrowdControlPlugin.toKeyed(Registry.ENTITY_TYPE.getKey(entityType))),
 			Component.translatable("cc.effect.summon_entity.name", plugin.toAdventure(entityType.getDescription())),
 			entityType
 		);
@@ -116,11 +111,11 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 		int _price = 500;
 		try {
-			if (firstEntity.create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Enemy) {
+			if (firstEntity.create(plugin.server().overworld()) instanceof Enemy) {
 				_price = 1000;
 			}
 		} catch (Exception e) {
-			plugin.getSLF4JLogger().debug("Could not generate default price for {}", BuiltInRegistries.ENTITY_TYPE.getKey(firstEntity), e);
+			plugin.getSLF4JLogger().debug("Could not generate default price for {}", Registry.ENTITY_TYPE.getKey(firstEntity), e);
 		}
 		this.price = _price;
 	}
@@ -134,13 +129,13 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		return RandomUtil.randomElementFrom(entityTypes);
 	}
 
-	private static List<ResourceKey<LootTable>> getLOOT_TABLES(MinecraftServer server) {
+	private static List<ResourceLocation> getLOOT_TABLES(MinecraftServer server) {
 		if (LOOT_TABLES != null)
 			return LOOT_TABLES;
-		return LOOT_TABLES = ((HolderLookup.Provider) server.reloadableRegistries().lookup())
-			.lookupOrThrow(Registries.LOOT_TABLE)
-			.listElementIds()
-			.filter(key -> key.location().getPath().startsWith("chests/"))
+		return LOOT_TABLES = server.getLootTables()
+			.getIds()
+			.stream()
+			.filter(key -> key.getPath().startsWith("chests/"))
 			.toList();
 	}
 
@@ -172,63 +167,56 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 	@Blocking
 	protected static <E extends Entity> E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player, @NotNull EntityType<E> entityType, @NotNull ModdedCrowdControlPlugin plugin) {
-		ServerLevel level = player.serverLevel();
-		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return null;
+		ServerLevel level = player.getLevel();
+		if (entityType == EntityType.ENDER_DRAGON && level.dragonFight() != null) return null;
 
-		E entity = entityType.create(player.serverLevel(), EntitySpawnReason.COMMAND);
+		E entity = entityType.create(player.getLevel());
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 
 		// set variables
-		entity.setPos(player.position());
+		entity.setPos(player.getX(), player.getY(), player.getZ());
 		if (viewer != null) {
 			entity.setCustomName(plugin.toNative(viewer, player));
 			entity.setCustomNameVisible(true);
 		}
 		if (entity instanceof Mob mob)
-			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
+			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, null, null);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
 		if (entity instanceof LivingEntity livingEntity)
 			livingEntity.cc$setViewerSpawned();
 		if (entity instanceof Wolf wolf) {
 			wolf.setCollarColor(randomElementFrom(DyeColor.values()));
-			wolf.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.WOLF_VARIANT).listElements()));
 		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
-			mooshroom.setVariant(MushroomCow.Variant.BROWN); // TODO: validate neoforge accesstransformer
+			mooshroom.setMushroomType(MushroomCow.MushroomType.BROWN); // TODO: validate neoforge accesstransformer
 		if (entity instanceof AbstractHorse horse) {
-			if (horse.canUseSlot(EquipmentSlot.BODY) && RandomUtil.RNG.nextBoolean()) {
-				List<Item> items = HORSE_ARMOR.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
-					.filter(item -> {
-						Equippable equippable = item.components().get(DataComponents.EQUIPPABLE);
-						if (equippable == null) return false;
-						return equippable.slot().getType() == EquipmentSlot.Type.ANIMAL_ARMOR;
-					})
+			if (horse.canWearArmor() && RandomUtil.RNG.nextBoolean()) {
+				List<Item> items = HORSE_ARMOR.computeIfAbsent(entityType, $ -> Registry.ITEM.stream()
+					.filter(item -> horse.isArmor(new ItemStack(item)))
 					.toList());
-				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
+				horse.setSlot(401, new ItemStack(randomElementFrom(items)));
 			}
-			horse.setOwner(player);
+			horse.setOwnerUUID(player.getUUID());
 			horse.setTamed(true);
 		}
 		if (entity instanceof Sheep sheep) // TODO: jeb
 			sheep.setColor(randomElementFrom(DyeColor.values()));
-		if (entity instanceof LivingEntity livingEntity && livingEntity.canUseSlot(EquipmentSlot.SADDLE) && RandomUtil.RNG.nextBoolean())
-			livingEntity.setItemSlot(EquipmentSlot.SADDLE, new ItemStack(Items.SADDLE));
+		if (entity instanceof Saddleable saddleable && saddleable.isSaddleable() && RandomUtil.RNG.nextBoolean())
+			saddleable.equipSaddle(SoundSource.NEUTRAL);
 		if (entity instanceof EnderMan enderman)
-			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
+			enderman.setCarriedBlock(randomElementFrom(Registry.BLOCK).defaultBlockState());
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
-		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.FROG_VARIANT).listElements()));
-		if (entity instanceof Axolotl axolotl)
-			axolotl.setVariant(randomElementFrom(Axolotl.Variant.values()));
 		if (entity instanceof Rabbit rabbit)
-			rabbit.setVariant(weightedRandom(RABBIT_VARIANTS));
-		if (entity instanceof VillagerDataHolder villager)
-			villager.setVillagerData(villager.getVillagerData().withType(randomElementFrom(BuiltInRegistries.VILLAGER_TYPE.listElements())));
-		if (entity instanceof ContainerEntity container)
-			container.setContainerLootTable(randomElementFrom(getLOOT_TABLES(level.getServer())));
+			rabbit.setRabbitType(weightedRandom(RABBIT_VARIANTS));
+		if (entity instanceof Villager villager)
+			villager.setVillagerData(villager.getVillagerData().setType(randomElementFrom(Registry.VILLAGER_TYPE)));
+		if (entity instanceof AbstractMinecartContainer container)
+			container.setLootTable(randomElementFrom(getLOOT_TABLES(level.getServer())), random.nextLong());
+		if (entity instanceof Boat boat)
+			boat.setType(randomElementFrom(Boat.Type.values()));
 
 		// add random armor to armor stands
 		if (entity instanceof ArmorStand armorStand) {
@@ -246,7 +234,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 				ItemStack item = new ItemStack(randomElementFrom(HUMANOID_ARMOR.get(type)));
 				plugin.commandRegister()
 						.getCommandByName("lootbox", LootboxCommand.class)
-						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START, level.registryAccess());
+						.randomlyModifyItem(item, odds / ENTITY_ARMOR_START);
 				armorStand.setItemSlot(type, item);
 			}
 
@@ -254,7 +242,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 				armorStand.setShowArms(true);
 				for (EquipmentSlot slot : HANDS) {
 					if (!RNG.nextBoolean()) continue;
-					armorStand.setItemSlot(slot, plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(RNG.nextInt(6), level.registryAccess()));
+					armorStand.setItemSlot(slot, plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(RNG.nextInt(6)));
 				}
 			}
 		}

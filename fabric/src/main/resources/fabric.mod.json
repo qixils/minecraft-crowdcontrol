@@ -34,11 +34,11 @@
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
-    "minecraft": ">=1.21.5- <1.22",
+    "minecraft": "1.16.1",
     "cloud": "*",
     "adventure-platform-fabric": "*",
     "net_kyori_adventure-api": "*",
-    "cloth-config": "*",
+    "cloth-config2": "*",
     "fabric-permissions-api-v0": "*"
   },
   "recommends": {

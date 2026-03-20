@@ -9,12 +9,12 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ResultSlot.class)
 public abstract class ResultSlotMixin extends Slot {
@@ -25,13 +25,13 @@ public abstract class ResultSlotMixin extends Slot {
 	}
 
 	@Inject(method = "onTake", at = @At("HEAD"))
-	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
+	public void onTake(Player player, ItemStack result, CallbackInfoReturnable<ItemStack> cir) {
 		CraftingContainer craftSlots = ((ResultSlot) (Object) this).craftSlots;
 
-		if (player.level().isClientSide) return;
-		MinecraftServer server = player.level().getServer();
+		if (player.level.isClientSide) return;
+		MinecraftServer server = player.level.getServer();
 		if (server == null) return; // failsafe?
-		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
+		CraftingRecipe recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
@@ -40,10 +40,10 @@ public abstract class ResultSlotMixin extends Slot {
 		CraftingContainer craftSlots = ((ResultSlot) (Object) this).craftSlots;
 		Player player = ((ResultSlot) (Object) this).player;
 
-		if (player.level().isClientSide) return;
-		MinecraftServer server = player.level().getServer();
+		if (player.level.isClientSide) return;
+		MinecraftServer server = player.level.getServer();
 		if (server == null) return; // failsafe?
-		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
+		CraftingRecipe recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.level).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 

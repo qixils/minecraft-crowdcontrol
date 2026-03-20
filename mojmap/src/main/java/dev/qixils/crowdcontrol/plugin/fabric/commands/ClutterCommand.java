@@ -33,7 +33,7 @@ public class ClutterCommand extends ModdedCommand {
 			// swaps random items in player's inventory
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				Inventory inventory = player.getInventory();
+				Inventory inventory = player.inventory;
 				List<ItemStack> shuffled = InventoryUtil.viewAllItems(inventory);
 				List<ItemStack> original = new ArrayList<>(shuffled);
 				Collections.shuffle(shuffled);

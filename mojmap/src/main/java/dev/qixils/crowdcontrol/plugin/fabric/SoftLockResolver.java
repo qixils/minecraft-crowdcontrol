@@ -6,9 +6,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -26,7 +24,6 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 			Blocks.FIRE,
 			Blocks.WITHER_ROSE
 	);
-	private final @NotNull TargetingConditions conditions;
 
 	/**
 	 * Initializes the observer.
@@ -35,31 +32,25 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 	 */
 	public SoftLockResolver(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
-		this.conditions = TargetingConditions.forNonCombat()
-			.ignoreLineOfSight()
-			.ignoreInvisibilityTesting()
-			.range(getSearchH());
 	}
 
 	@Override
 	public void onSoftLock(ServerPlayer player) {
 		// kill nearby monsters
-		for (Mob entity : player.serverLevel().getNearbyEntities(
+		for (Mob entity : player.level.getEntitiesOfClass(
 				Mob.class,
-				conditions,
-				player,
-				AABB.ofSize(player.position(), getSearchH() *2, getSearchV() *2, getSearchH() *2)
+				AABB.ofSize(getSearchH() *2, getSearchV() *2, getSearchH() *2).move(player.position()),
+				e -> e instanceof Enemy
 		)) {
-			if (entity instanceof Enemy)
-				entity.remove(RemovalReason.KILLED);
+			entity.remove();
 		}
 
 		// remove nearby dangerous blocks
 		for (int x = -getSearchH(); x <= getSearchH(); x++) {
 			for (int y = -getSearchV(); y <= getSearchV(); y++) {
 				for (int z = -getSearchH(); z <= getSearchH(); z++) {
-					ServerLevel level = player.serverLevel();
-					BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
+					ServerLevel level = player.getLevel();
+					BlockPos pos = new BlockPos(player.position().add(x, y, z));
 					BlockState block = level.getBlockState(pos);
 					if (dangerousBlocks.contains(block.getBlock()))
 						level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

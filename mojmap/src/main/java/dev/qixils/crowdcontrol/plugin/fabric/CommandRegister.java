@@ -8,26 +8,18 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
-import net.kyori.adventure.text.Component;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
-import net.minecraft.world.entity.vehicle.AbstractChestBoat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +59,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new SoundCommand(plugin),
 			() -> new ChargedCreeperCommand(plugin),
 			() -> new ChickenJockeyCommand(plugin),
-			() -> new SmallAntCommand(plugin),
+//			() -> new SmallAntCommand(plugin),
 			() -> new SwapCommand(plugin),
 			() -> new DinnerboneCommand(plugin),
 			() -> new ClutterCommand(plugin),
@@ -110,21 +102,21 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> WeatherCommand.clear(plugin),
 			() -> WeatherCommand.downfall(plugin),
 			() -> WeatherCommand.storm(plugin),
-			() -> GravityCommand.zero(plugin),
-			() -> GravityCommand.low(plugin),
-			() -> GravityCommand.high(plugin),
-			() -> GravityCommand.maximum(plugin),
+//			() -> GravityCommand.zero(plugin),
+//			() -> GravityCommand.low(plugin),
+//			() -> GravityCommand.high(plugin),
+//			() -> GravityCommand.maximum(plugin),
 			() -> new BiomeCommand(plugin),
 			() -> new StructureCommand(plugin),
 			() -> new DeleteRandomItemCommand(plugin),
 			() -> new UniteCommand(plugin),
-			() -> TickRateCommand.doubleRate(plugin),
-			() -> TickRateCommand.halfRate(plugin),
-			() -> new TickFreezeCommand(plugin),
-			() -> PlayerSizeCommand.increase(plugin),
-			() -> PlayerSizeCommand.decrease(plugin),
-			() -> EntitySizeCommand.increase(plugin),
-			() -> EntitySizeCommand.decrease(plugin),
+//			() -> TickRateCommand.doubleRate(plugin),
+//			() -> TickRateCommand.halfRate(plugin),
+//			() -> new TickFreezeCommand(plugin),
+//			() -> PlayerSizeCommand.increase(plugin),
+//			() -> PlayerSizeCommand.decrease(plugin),
+//			() -> EntitySizeCommand.increase(plugin),
+//			() -> EntitySizeCommand.decrease(plugin),
 			() -> new RandomFallingBlockCommand(plugin),
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin)
@@ -147,79 +139,20 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			}
 		}
 
-		// misc grouped summons
-		EntityType<AbstractBoat>[] boats = new EntityType[] {
-			EntityType.OAK_BOAT,
-			EntityType.BIRCH_BOAT,
-			EntityType.ACACIA_BOAT,
-			EntityType.CHERRY_BOAT,
-			EntityType.DARK_OAK_BOAT,
-			EntityType.JUNGLE_BOAT,
-			EntityType.MANGROVE_BOAT,
-			EntityType.PALE_OAK_BOAT,
-			EntityType.SPRUCE_BOAT,
-			EntityType.BAMBOO_RAFT
-		};
-		EntityType<AbstractChestBoat>[] chestBoats = new EntityType[] {
-			EntityType.OAK_CHEST_BOAT,
-			EntityType.BIRCH_CHEST_BOAT,
-			EntityType.ACACIA_CHEST_BOAT,
-			EntityType.CHERRY_CHEST_BOAT,
-			EntityType.DARK_OAK_CHEST_BOAT,
-			EntityType.JUNGLE_CHEST_BOAT,
-			EntityType.MANGROVE_CHEST_BOAT,
-			EntityType.PALE_OAK_CHEST_BOAT,
-			EntityType.SPRUCE_CHEST_BOAT,
-			EntityType.BAMBOO_CHEST_RAFT
-		};
-		initTo(commands, () -> new SummonEntityCommand<>(
-			plugin,
-			"entity_boat",
-			Component.translatable("cc.effect.summon_entity.name", Component.translatable("cc.effect.summon_entity.boat")),
-			boats[0],
-			Arrays.copyOfRange(boats, 1, boats.length)
-		));
-		initTo(commands, () -> new SummonEntityCommand<>(
-			plugin,
-			"entity_chest_boat",
-			Component.translatable("cc.effect.summon_entity.name", Component.translatable("cc.effect.summon_entity.chest_boat")),
-			chestBoats[0],
-			Arrays.copyOfRange(chestBoats, 1, chestBoats.length)
-		));
-		initTo(commands, () -> new RemoveEntityCommand<>(
-			plugin,
-			"remove_entity_boat",
-			Component.translatable("cc.effect.remove_entity.name", Component.translatable("cc.effect.summon_entity.boat")),
-			boats[0],
-			Arrays.copyOfRange(boats, 1, boats.length)
-		));
-		initTo(commands, () -> new RemoveEntityCommand<>(
-			plugin,
-			"remove_entity_chest_boat",
-			Component.translatable("cc.effect.remove_entity.name", Component.translatable("cc.effect.summon_entity.chest_boat")),
-			chestBoats[0],
-			Arrays.copyOfRange(chestBoats, 1, chestBoats.length)
-		));
-
 		// register difficulty commands
 		for (Difficulty difficulty : Difficulty.values())
 			initTo(commands, () -> new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		BuiltInRegistries.MOB_EFFECT.listElements().forEach(potion -> {
-			if (!potion.value().isEnabled(plugin.server().overworld().enabledFeatures())) return;
-			if (potion.is(MobEffects.LUCK)) return; // unused
-			if (potion.is(MobEffects.UNLUCK)) return; // unused
-			if (potion.is(MobEffects.JUMP_BOOST)) return; // disabled in favor of gravity
-			if (potion.is(MobEffects.HUNGER)) return; // disabled in favor of take food
-			if (potion.is(MobEffects.SATURATION)) return; // disabled in favor of give food
-			if (potion.is(MobEffects.INSTANT_DAMAGE)) return; // disabled in favor of take health
-			if (potion.is(MobEffects.INSTANT_HEALTH)) return; // disabled in favor of give health
-			if (potion.is(MobEffects.WITHER)) return; // we tend to avoid effects that can kill
-			if (potion.is(MobEffects.WIND_CHARGED)) return; // doesn't do much for players
-			if (potion.is(MobEffects.OOZING)) return; // doesn't do much for players
-			if (potion.is(MobEffects.RAID_OMEN)) return; // this isn't like. a "real" effect. it's granted by Bad Omen. just use bad omen
-			if (potion.is(MobEffects.TRIAL_OMEN)) return; // this isn't like. a "real" effect. it's granted by Bad Omen. just use bad omen
+		Registry.MOB_EFFECT.forEach(potion -> {
+			if (potion == MobEffects.LUCK) return; // unused
+			if (potion == MobEffects.UNLUCK) return; // unused
+			if (potion == MobEffects.JUMP) return; // disabled in favor of gravity
+			if (potion == MobEffects.HUNGER) return; // disabled in favor of take food
+			if (potion == MobEffects.SATURATION) return; // disabled in favor of give food
+			if (potion == MobEffects.HARM) return; // disabled in favor of take health
+			if (potion == MobEffects.HEAL) return; // disabled in favor of give health
+			if (potion == MobEffects.WITHER) return; // we tend to avoid effects that can kill
 			initTo(commands, () -> new PotionCommand(plugin, potion));
 		});
 
@@ -231,7 +164,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			initTo(commands, () -> new FallingBlockCommand(plugin, block));
 
 		// enchantments
-		for (Holder<Enchantment> enchantment : plugin.registryHolders(Registries.ENCHANTMENT, null))
+		for (Enchantment enchantment : Registry.ENCHANTMENT)
 			initTo(commands, () -> new EnchantmentCommand(plugin, enchantment));
 
 		// give/take items

@@ -11,11 +11,10 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +45,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public RemoveEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(
 			plugin,
-			"remove_entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)),
+			"remove_entity_" + csIdOf(ModdedCrowdControlPlugin.toKeyed(Registry.ENTITY_TYPE.getKey(entityType))),
 			Component.translatable("cc.effect.remove_entity.name", plugin.toAdventure(entityType.getDescription())),
 			entityType
 		);
@@ -77,8 +76,8 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
-		ServerLevel level = player.serverLevel();
-		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return false;
+		ServerLevel level = player.getLevel();
+		if (entityType == EntityType.ENDER_DRAGON && level.dragonFight() != null) return false;
 
 		Vec3 playerPosition = player.position();
 		List<Entity> entities = StreamSupport.stream(level.getAllEntities().spliterator(), false)
@@ -86,7 +85,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 				.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
 		if (entities.isEmpty())
 			return false;
-		entities.getFirst().remove(RemovalReason.KILLED);
+		entities.getFirst().remove();
 		return true;
 	}
 
@@ -96,7 +95,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+			int playerLimit = config.getEntityLimit(Registry.ENTITY_TYPE.getKey(entityType).getPath());
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;

@@ -12,12 +12,13 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,10 +38,9 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 	private final Map<ServerLevel, List<Block>> blocks = new WeakHashMap<>();
 
 	public Block getRandomBlock(ServerLevel level) {
-		return RandomUtil.randomElementFrom(blocks.computeIfAbsent(level, $ -> BuiltInRegistries.BLOCK.stream()
-			.filter(block -> block.defaultBlockState().isSolid()
-				&& block.defaultBlockState().canOcclude()
-				&& block.isEnabled(level.enabledFeatures()))
+		return RandomUtil.randomElementFrom(blocks.computeIfAbsent(level, $ -> Registry.BLOCK.stream()
+			.filter(block -> block.defaultBlockState().getMaterial().isSolid()
+				&& block.defaultBlockState().canOcclude())
 			.toList()));
 	}
 
@@ -52,12 +52,12 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 			ploop:
 			for (ServerPlayer player : playerSupplier.get()) {
 				Location playerLoc = new Location(player);
-				ServerLevel world = player.serverLevel();
-				BlockPos position = BlockPos.containing(
+				ServerLevel world = player.getLevel();
+				BlockPos position = new BlockPos(
 					playerLoc.x(),
 					Math.min(
 						playerLoc.y() + FALLING_BLOCK_FALL_DISTANCE,
-						world.getMaxY() - 1
+						world.getMaxBuildHeight() - 1
 					),
 					playerLoc.z()
 				);
@@ -71,11 +71,22 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 				}
 
 				// get block to place
-				Block block = getRandomBlock(player.serverLevel());
-				FallingBlockEntity entity = FallingBlockEntity.fall(player.serverLevel(), position, block.defaultBlockState());
-				entity.fallDamagePerDistance = 0.75f;
+				Block block = getRandomBlock(player.getLevel());
+				BlockState blockState = block.defaultBlockState();
+				FallingBlockEntity entity = new FallingBlockEntity(
+					player.getLevel(),
+					position.getX() + 0.5,
+					position.getY(),
+					position.getZ() + 0.5,
+					// this isn't ever true i don't think but it's just copypasted from modern mc
+					blockState.hasProperty(BlockStateProperties.WATERLOGGED) ? blockState.setValue(BlockStateProperties.WATERLOGGED, false) : blockState
+				);
+				player.getLevel().setBlock(position, blockState.getFluidState().createLegacyBlock(), 3);
+				entity.setHurtsEntities(true);
+				entity.fallDamageAmount = 0.75f;
 				entity.fallDamageMax = 4;
 				entity.dropItem = true;
+				player.getLevel().addFreshEntity(entity);
 
 				success = true;
 			}

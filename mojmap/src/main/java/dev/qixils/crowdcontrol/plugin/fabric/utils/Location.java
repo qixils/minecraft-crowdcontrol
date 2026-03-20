@@ -1,7 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.utils;
 
-import net.minecraft.FieldsAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.mojang.math.Vector3d;
+import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -12,18 +12,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
-
-import java.util.Collections;
 
 import static java.lang.Math.pow;
 
-@FieldsAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public record Location(ServerLevel level, double x, double y, double z, float yaw, float pitch) {
 	public Location(Entity player) {
-		this((ServerLevel) player.level(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+		this((ServerLevel) player.level, player.getX(), player.getY(), player.getZ(), player.getRotationVector().y, player.getRotationVector().x);
 	}
 
 	public Location(ServerLevel level, double x, double y, double z) {
@@ -39,7 +33,7 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	}
 
 	public BlockPos pos() {
-		return BlockPos.containing(x, y, z);
+		return new BlockPos(x, y, z);
 	}
 
 	public Vec3 vec3() {
@@ -55,7 +49,7 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	}
 
 	public void teleportHere(ServerPlayer player) {
-		player.teleportTo(level, x, y, z, Collections.emptySet(), yaw, pitch, false); // boolean is unused?
+		player.teleportTo(level, x, y, z, yaw, pitch); // boolean is unused?
 	}
 
 	@CheckReturnValue

@@ -49,7 +49,7 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 					continue;
 				if (gamemode == GameType.SPECTATOR)
 					continue;
-				Abilities abilities = player.getAbilities();
+				Abilities abilities = player.abilities;
 				if (abilities.mayfly)
 					continue;
 				if (abilities.flying)
@@ -58,7 +58,7 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 				sync(() -> {
 					abilities.mayfly = true;
 					abilities.flying = true;
-					player.addDeltaMovement(new Vec3(0, 0.2, 0));
+					player.setDeltaMovement(player.getDeltaMovement().add(new Vec3(0, 0.2, 0)));
 					player.hurtMarked = true;
 					player.onUpdateAbilities();
 					// TODO: set abilities.flying=true; again after 1 tick
@@ -75,7 +75,7 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		List<ServerPlayer> players = plugin.toPlayerList(uuidMap.remove(request.getRequestId()));
 		sync(() -> players.forEach(player -> {
-			Abilities abilities = player.getAbilities();
+			Abilities abilities = player.abilities;
 			abilities.mayfly = false;
 			abilities.flying = false;
 			player.onUpdateAbilities();
@@ -91,7 +91,7 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 			return;
 		if (gamemode == GameType.SPECTATOR)
 			return;
-		Abilities abilities = player.getAbilities();
+		Abilities abilities = player.abilities;
 		if (!abilities.flying && !abilities.mayfly)
 			return;
 		abilities.mayfly = false;

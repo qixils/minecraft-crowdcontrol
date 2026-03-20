@@ -13,7 +13,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 @Getter
-public class TakeItemCommand extends ModdedCommand implements ItemCommand {
+public class TakeItemCommand extends ModdedCommand {
 	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Item item;
 	private final String effectName;
@@ -35,12 +35,12 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 	public TakeItemCommand(ModdedCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "take_" + BuiltInRegistries.ITEM.getKey(item).getPath();
+		this.effectName = "take_" + Registry.ITEM.getKey(item).getPath();
 		this.defaultDisplayName = Component.translatable("cc.effect.take_item.name", plugin.toAdventure(item.getName(new ItemStack(item))));
 	}
 
 	private boolean takeItemFrom(Player player, int amount) {
-		Inventory inventory = player.getInventory();
+		Inventory inventory = player.inventory;
 		// simulate
 		int toTake = 0;
 		for (ItemStack itemStack : InventoryUtil.viewAllItems(inventory)) {
@@ -69,7 +69,7 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+			int playerLimit = config.getItemLimit(Registry.ITEM.getKey(item).getPath());
 
 			int amount = request.getQuantity();
 

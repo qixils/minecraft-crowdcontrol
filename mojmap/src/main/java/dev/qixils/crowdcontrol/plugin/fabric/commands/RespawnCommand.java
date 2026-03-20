@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -28,7 +27,7 @@ public class RespawnCommand extends ModdedCommand {
 	}
 
 	private void teleport(ServerPlayer player, ServerLevel level, BlockPos pos, float angle) {
-		sync(() -> player.teleportTo(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, Collections.emptySet(), angle, 0, false)); // boolean is unused?
+		sync(() -> player.teleportTo(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, angle, 0));
 	}
 
 	@Override
@@ -38,23 +37,15 @@ public class RespawnCommand extends ModdedCommand {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot fling while frozen");
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				ServerPlayer.RespawnConfig respawnConfig = player.getRespawnConfig();
-				ServerLevel level;
-				BlockPos pos;
-				float angle;
-				if (respawnConfig == null) {
+				ServerLevel level = player.getRespawnDimension() != null ? plugin.server().getLevel(player.getRespawnDimension()) : null;
+				BlockPos pos = player.getRespawnPosition();
+				if (level == null || pos == null) {
 					level = player.server.getLevel(Level.OVERWORLD);
 					if (level == null)
-						continue;
+						continue; // !?
 					pos = level.getSharedSpawnPos();
-					angle = 0;
-				} else {
-					level = player.server.getLevel(respawnConfig.dimension());
-					if (level == null) continue;
-					pos = respawnConfig.pos();
-					angle = respawnConfig.angle();
 				}
-				teleport(player, level, pos, angle);
+				teleport(player, level, pos, 0);
 				success = true;
 			}
 			return success

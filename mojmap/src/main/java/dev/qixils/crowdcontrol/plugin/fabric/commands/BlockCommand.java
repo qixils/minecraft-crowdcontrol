@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
-import dev.qixils.crowdcontrol.plugin.fabric.FeatureElementCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
@@ -12,9 +11,8 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +22,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Getter
-public class BlockCommand extends ModdedCommand implements FeatureElementCommand {
+public class BlockCommand extends ModdedCommand {
 	private final Block blockType;
 	private final String effectName;
 	private final Component displayName;
@@ -33,7 +31,7 @@ public class BlockCommand extends ModdedCommand implements FeatureElementCommand
 		this(
 				plugin,
 				blockType,
-				"block_" + BuiltInRegistries.BLOCK.getKey(blockType).getPath(),
+				"block_" + Registry.BLOCK.getKey(blockType).getPath(),
 				Component.translatable("cc.effect.block.name", plugin.toAdventure(blockType.getName()))
 		);
 	}
@@ -43,11 +41,6 @@ public class BlockCommand extends ModdedCommand implements FeatureElementCommand
 		this.blockType = blockType;
 		this.effectName = effectName;
 		this.displayName = displayName;
-	}
-
-	@Override
-	public @NotNull FeatureFlagSet requiredFeatures() {
-		return blockType.requiredFeatures();
 	}
 
 	@Nullable

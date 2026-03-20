@@ -5,7 +5,7 @@ val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformVersion: String by project
-val cloudMojmapVersion: String by project
+val cloudVersion: String by project
 val fabricVersion: String by project
 
 plugins {
@@ -29,13 +29,17 @@ dependencies {
     // Do NOT use other classes from Fabric Loader.
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
 
-    modCompileOnly("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")
-    modCompileOnly("org.incendo:cloud-minecraft-modded-common-fabric-repack:$cloudMojmapVersion")
+    modCompileOnly("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
+    modCompileOnly("dev.qixils.cloud:cloud-fabric:$cloudVersion")
     modCompileOnly("maven.modrinth:cloth-config:$clothConfigVersion")
 
     // TODO: adventure is being weird
     compileOnly("net.kyori:adventure-api:$adventureVersion")
-    compileOnly("net.kyori:adventure-platform-api:$adventurePlatformVersion")
+    compileOnly("net.kyori:adventure-platform-api:$adventurePlatformVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
+    }
 }
 
 loom {

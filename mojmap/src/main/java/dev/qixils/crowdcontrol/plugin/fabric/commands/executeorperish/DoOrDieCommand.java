@@ -110,7 +110,7 @@ public class DoOrDieCommand extends ModdedCommand {
 				if (player == null) continue;
 
 				if (condition.hasSucceeded(player)) {
-					ItemStack reward = plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(condition.getRewardLuck(), player.registryAccess());
+					ItemStack reward = plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(condition.getRewardLuck());
 					player.showTitle(doOrDieSuccess(plugin.toAdventure(reward.getItem().getName(reward))));
 					notCompleted.remove(uuid);
 					player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());
@@ -118,7 +118,7 @@ public class DoOrDieCommand extends ModdedCommand {
 				} else if (isTimeUp) {
 					condition.reset(player);
 					player.showTitle(DO_OR_DIE_FAILURE);
-					player.kill(player.serverLevel());
+					player.kill();
 				} else {
 					Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
 					player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));

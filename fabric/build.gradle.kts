@@ -3,7 +3,7 @@ import me.modmuss50.mpp.ReleaseType
 val adventureVersion: String by project
 val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
-val cloudMojmapVersion: String by project
+val cloudVersion: String by project
 val fabricVersion: String by project
 val loaderVersion: String by project
 val modMenuVersion: String by project
@@ -66,10 +66,11 @@ dependencies {
     modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion") {
+        exclude(group = "net.kyori", module = "adventure-api")
         exclude(group = "net.fabricmc.fabric-api")
         exclude(group = "net.fabricmc.fabric-loader")
     })
-    modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
+    modImplementation(include("dev.qixils.cloud:cloud-fabric:$cloudVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation(include("maven.modrinth:cloth-config:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
@@ -79,6 +80,7 @@ dependencies {
 
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
+    include("net.kyori:adventure-key:$adventureVersion") // wtf adventure LMFAO
 
     shadowBundle(project(":base-common")) {
         exclude(group = "com.google.code.gson")

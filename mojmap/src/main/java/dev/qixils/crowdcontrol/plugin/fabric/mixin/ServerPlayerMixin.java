@@ -11,7 +11,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
@@ -35,8 +34,8 @@ import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInvento
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements GameTypeEffectComponent {
 
-	public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-		super(level, blockPos, f, gameProfile);
+	public ServerPlayerMixin(Level level, BlockPos blockPos, GameProfile gameProfile) {
+		super(level, blockPos, gameProfile);
 	}
 
 	@Unique
@@ -55,10 +54,9 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
 	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
-		cc$gameTypeEffect = tag
-			.getString(Components.GAME_TYPE_EFFECT)
-			.map(name -> GameType.byName(name, null))
-			.orElse(null);
+		cc$gameTypeEffect = tag.contains(Components.GAME_TYPE_EFFECT)
+			? GameType.byName(tag.getString(Components.GAME_TYPE_EFFECT), null)
+			: null;
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
@@ -108,8 +106,8 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 		EntityUtil.handleDie(this, source, ci);
 	}
 
-	@Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
-	private void callDamageEvent(ServerLevel serverLevel, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+	@Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+	private void callDamageEvent(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		EntityUtil.handleDamage(this, source, amount, cir);
 	}
 }

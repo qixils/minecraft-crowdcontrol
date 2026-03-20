@@ -36,7 +36,7 @@ public class GameModeCommand extends ModdedCommand implements CCTimedEffect {
 		super(plugin);
 		this.defaultDuration = Duration.ofSeconds(seconds);
 		this.gamemode = gamemode;
-		this.displayName = plugin.toAdventure(gamemode.getLongDisplayName());
+		this.displayName = plugin.toAdventure(gamemode.getDisplayName());
 		this.effectName = gamemode.getName() + "_mode";
 	}
 

@@ -19,7 +19,7 @@ public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, S
 	// helper methods
 
 	public static boolean isPassable(BlockState block) {
-		return !block.blocksMotion();
+		return !block.getMaterial().blocksMotion();
 	}
 
 	public static boolean isPassable(Location location) {
@@ -27,7 +27,7 @@ public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, S
 	}
 
 	public static boolean isSolid(BlockState block) {
-		return block.isSolid();
+		return block.getMaterial().isSolid();
 	}
 
 	public static boolean isSolid(Location location) {
@@ -35,7 +35,7 @@ public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, S
 	}
 
 	public static boolean isReplaceable(BlockState block) {
-		return block.canBeReplaced();
+		return block.getMaterial().isReplaceable();
 	}
 
 	public static boolean isReplaceable(Location location) {

@@ -12,7 +12,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Getter
-public class GiveItemCommand extends ModdedCommand implements ItemCommand {
+public class GiveItemCommand extends ModdedCommand {
 	private final @NotNull QuantityStyle quantityStyle = QuantityStyle.APPEND_X;
 	private final Item item;
 	private final String effectName;
@@ -33,17 +33,16 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 	public GiveItemCommand(ModdedCrowdControlPlugin plugin, Item item) {
 		super(plugin);
 		this.item = item;
-		this.effectName = "give_" + BuiltInRegistries.ITEM.getKey(item).getPath();
+		this.effectName = "give_" + Registry.ITEM.getKey(item).getPath();
 		this.defaultDisplayName = Component.translatable("cc.effect.give_item.name", plugin.toAdventure(item.getName(new ItemStack(item))));
 	}
 
 	@Blocking
 	public static void giveItemTo(ServerPlayer player, ItemStack itemStack) {
-		ItemEntity entity = player.spawnAtLocation(player.serverLevel(), itemStack);
+		ItemEntity entity = player.spawnAtLocation(itemStack);
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn item entity");
-		entity.setTarget(player.getUUID());
-		entity.setThrower(player);
+		entity.setThrower(player.getUUID());
 		entity.setPickUpDelay(0);
 	}
 
@@ -53,7 +52,7 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+			int playerLimit = config.getItemLimit(Registry.ITEM.getKey(item).getPath());
 
 			int amount = request.getQuantity();
 			ItemStack itemStack = new ItemStack(item, amount);

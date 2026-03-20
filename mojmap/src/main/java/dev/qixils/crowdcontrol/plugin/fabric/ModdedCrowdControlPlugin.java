@@ -25,6 +25,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.Keyed;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
@@ -239,6 +241,11 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 
 	public @NotNull net.minecraft.network.chat.Component toNative(Component text, @NotNull Pointered viewer) {
 		return adventure().toNative(toAdventure(text, viewer));
+	}
+
+	// idk how they missed this in old adventure lol
+	public static @NotNull Keyed toKeyed(Key loc) {
+		return () -> loc;
 	}
 
 	public abstract PermissionUtil getPermissionUtil();

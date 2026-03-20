@@ -11,9 +11,9 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,6 +30,8 @@ import java.util.function.Supplier;
 abstract class NearbyLocationCommand<S> extends ModdedCommand {
 	private final List<String> effectGroups = List.of("walk", "look");
 
+	private static double lengthSquared(double value1, double value2) { return value1 * value1 + value2 * value2; }
+
 	protected NearbyLocationCommand(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
 	}
@@ -41,12 +43,12 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 
 		int air = 0;
 		final ServerLevel world = origin.level();
-		Location location = new Location(world, origin.x(), world.getLogicalHeight() - 1, origin.z(), origin.yaw(), origin.pitch());
+		Location location = new Location(world, origin.x(), world.getMaxBuildHeight() - 1, origin.z(), origin.yaw(), origin.pitch());
 		while (true) {
 			BlockState block = location.block();
-			if (location.y() < (world.getMinY() + 1)) // idk if the +1 is necessary but why not
+			if (location.y() < 1) // idk if the +1 is necessary but why not
 				return null;
-			else if (block.getBlock().isPossibleToRespawnInThis(block) && !block.blocksMotion())
+			else if (block.getBlock().isPossibleToRespawnInThis() && !block.getMaterial().blocksMotion())
 				air += 1;
 			else if (air >= 1)
 				break;
@@ -69,7 +71,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 		Block type = block.getBlock();
 		if (Blocks.FIRE.equals(type))
 			location.block(Blocks.AIR.defaultBlockState());
-		else if (!block.blocksMotion())
+		else if (!block.getMaterial().blocksMotion())
 			location.block(Blocks.GLASS.defaultBlockState());
 
 		// place player on top of the block
@@ -100,7 +102,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				ServerLevel world = player.serverLevel();
+				ServerLevel world = player.getLevel();
 				Location location = new Location(player);
 				S currentType = currentType(location);
 				List<S> searchTypes = new ArrayList<>(getSearchTypes(world));
@@ -117,9 +119,9 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 						continue;
 					}
 					// TODO: feature parity issue -- this length check uses only X/Z while other platforms use X/Y/Z. former is probably preferable.
-					if (Mth.lengthSquared(destination.x() - location.x(), destination.z() - location.z()) <= 2500) // 50 blocks
+					if (lengthSquared(destination.x() - location.x(), destination.z() - location.z()) <= 2500) // 50 blocks
 						continue;
-					if (!world.getWorldBorder().isWithinBounds(destination.x(), destination.z()))
+					if (!world.getWorldBorder().isWithinBounds(new BlockPos(destination.x(), 100, destination.z())))
 						continue;
 					player.teleportTo(destination.x(), destination.y(), destination.z());
 					player.sendActionBar(Component.translatable(

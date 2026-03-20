@@ -13,7 +13,7 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -43,7 +43,7 @@ public class TorchCommand extends ModdedCommand {
 		super(plugin);
 		this.placeTorches = placeTorches;
 		this.effectName = placeTorches ? "lit" : "dim";
-		this.torches = new TypedTag<>(CommandConstants.TORCHES, BuiltInRegistries.BLOCK);
+		this.torches = new TypedTag<>(CommandConstants.TORCHES, Registry.BLOCK);
 	}
 
 	@Override

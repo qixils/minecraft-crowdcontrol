@@ -29,7 +29,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +66,7 @@ public final class ToastCommand extends ModdedCommand {
 
 	public ToastCommand(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
-		TITLE = plugin.adventure().asNative(POPUP_TITLE);
+		TITLE = plugin.adventure().toNative(POPUP_TITLE);
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public final class ToastCommand extends ModdedCommand {
 				// spam recipe toasts
 				ServerRecipeBook book = player.getRecipeBook();
 				RecipeManager recipeManager = plugin.server().getRecipeManager();
-				Collection<RecipeHolder<?>> recipes = book.known
+				Collection<Recipe<?>> recipes = (Collection<Recipe<?>>) book.known
 					.stream()
 					.flatMap(location -> recipeManager.byKey(location).stream())
 					.toList();
@@ -143,13 +143,14 @@ public final class ToastCommand extends ModdedCommand {
 		}
 
 		@Override
-		public void clicked(int slotIndex, int buttonIndex, @NotNull ClickType clickType, @NotNull Player player) {
+		public ItemStack clicked(int slotIndex, int buttonIndex, @NotNull ClickType clickType, @NotNull Player player) {
 			if (!(player instanceof ServerPlayer sPlayer))
-				return;
-			sPlayer.containerMenu.sendAllDataToRemote();
-			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, sPlayer.inventoryMenu.incrementStateId(), sPlayer.containerMenu.getCarried()));
+				return null;
+			sPlayer.containerMenu.broadcastChanges();
+			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, sPlayer.inventory.getCarried()));
 			if (slotIndex >= 0 && slotIndex < sPlayer.containerMenu.slots.size())
-				sPlayer.connection.send(new ClientboundContainerSetSlotPacket(sPlayer.containerMenu.containerId, sPlayer.inventoryMenu.incrementStateId(), slotIndex, sPlayer.containerMenu.getSlot(slotIndex).getItem()));
+				sPlayer.connection.send(new ClientboundContainerSetSlotPacket(sPlayer.containerMenu.containerId, slotIndex, sPlayer.containerMenu.getSlot(slotIndex).getItem()));
+			return ItemStack.EMPTY;
 		}
 	}
 }

@@ -18,7 +18,7 @@ public class TickMixin {
 		MinecraftEvents.SERVER_STARTING.fire((MinecraftServer) (Object) this);
 	}
 
-	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;buildServerStatus()Lnet/minecraft/network/protocol/status/ServerStatus;", ordinal = 0), method = "runServer")
+	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;updateStatusIcon(Lnet/minecraft/network/protocol/status/ServerStatus;)V", ordinal = 0), method = "runServer")
 	private void afterSetupServer(CallbackInfo info) {
 		MinecraftEvents.SERVER_STARTED.fire((MinecraftServer) (Object) this);
 	}

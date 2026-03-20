@@ -32,7 +32,7 @@ public class DeleteRandomItemCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				Inventory inv = player.getInventory();
+				Inventory inv = player.inventory;
 				if (inv.isEmpty())
 					continue;
 				success = true;

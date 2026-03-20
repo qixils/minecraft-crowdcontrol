@@ -15,7 +15,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -26,13 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SECONDS;
 
 @Getter
 public class PotionCommand extends ModdedCommand implements CCTimedEffect {
-	private final @NotNull Holder<MobEffect> potionEffectType;
+	private final @NotNull MobEffect potionEffectType;
 	private final boolean isMinimal;
 	private final @NotNull String effectName;
 	private final @NotNull Component displayName;
@@ -45,32 +46,30 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 	private final CustomEffectDuration extensionDuration = new CustomEffectDuration(POTION_SECONDS);
 
 	@SuppressWarnings("ConstantConditions")
-	public PotionCommand(@NotNull ModdedCrowdControlPlugin plugin, @NotNull Holder<MobEffect> potionEffectType) {
+	public PotionCommand(@NotNull ModdedCrowdControlPlugin plugin, @NotNull MobEffect potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		ResourceLocation loc = potionEffectType.unwrapKey().orElseThrow().location();
+		ResourceLocation loc = Objects.requireNonNull(Registry.MOB_EFFECT.getKey(potionEffectType));
 		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(loc);
-		this.isMinimal = potionEffectType.value().isInstantenous();
-		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
+		this.isMinimal = potionEffectType.isInstantenous();
+		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.getDisplayName()));
 		this.displayName = _displayName;
 		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.potion.extension")));
-		this.exclusive = potionEffectType.is(MobEffects.BLINDNESS)
-			|| potionEffectType.is(MobEffects.DARKNESS)
-			|| potionEffectType.is(MobEffects.FIRE_RESISTANCE)
-			|| potionEffectType.is(MobEffects.GLOWING)
-			|| potionEffectType.is(MobEffects.INFESTED)
-			|| potionEffectType.is(MobEffects.INVISIBILITY)
-			|| potionEffectType.is(MobEffects.NAUSEA)
-			|| potionEffectType.is(MobEffects.NIGHT_VISION)
-			|| potionEffectType.is(MobEffects.SLOW_FALLING)
-			|| potionEffectType.is(MobEffects.WATER_BREATHING)
-			|| potionEffectType.is(MobEffects.ABSORPTION);
+		this.exclusive = potionEffectType == MobEffects.BLINDNESS
+			|| potionEffectType == MobEffects.FIRE_RESISTANCE
+			|| potionEffectType == MobEffects.GLOWING
+			|| potionEffectType == MobEffects.INVISIBILITY
+			|| potionEffectType == MobEffects.CONFUSION
+			|| potionEffectType == MobEffects.NIGHT_VISION
+			|| potionEffectType == MobEffects.SLOW_FALLING
+			|| potionEffectType == MobEffects.WATER_BREATHING
+			|| potionEffectType == MobEffects.ABSORPTION;
 	}
 
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
-			if (potionEffectType == MobEffects.JUMP_BOOST && isActive(ccPlayer, "disable_jumping"))
+			if (potionEffectType == MobEffects.JUMP && isActive(ccPlayer, "disable_jumping"))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot apply jump boost while Disable Jump is active");
 
 			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());
@@ -96,7 +95,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 						existingEffect.isAmbient(),
 						existingEffect.isVisible(),
 						existingEffect.showIcon()
-					), null);
+					));
 				}
 			}
 

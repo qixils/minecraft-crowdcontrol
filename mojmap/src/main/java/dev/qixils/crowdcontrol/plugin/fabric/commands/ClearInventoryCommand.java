@@ -41,7 +41,7 @@ public class ClearInventoryCommand extends ModdedCommand {
 					continue;
 
 				// ensure inventory is not empty
-				Inventory inv = player.getInventory();
+				Inventory inv = player.inventory;
 				boolean hasItems = false;
 				for (ItemStack item : InventoryUtil.viewAllItems(inv)) {
 					if (!item.isEmpty()) {
@@ -66,7 +66,7 @@ public class ClearInventoryCommand extends ModdedCommand {
 	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<ServerPlayer> potentialPlayers) {
 		// Cannot use inventory effects while /gamerule keepInventory true
 		return potentialPlayers.stream()
-			.anyMatch(player -> player.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
+			.anyMatch(player -> player.getLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
 			? TriState.FALSE
 			: TriState.TRUE;
 	}

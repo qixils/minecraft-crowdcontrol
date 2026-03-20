@@ -9,7 +9,7 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,14 +39,14 @@ public class ExplodeCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get()) {
 				sync(() -> {
 					Vec3 pos = player.position().subtract(0, .5, 0);
-					player.serverLevel().explode(
+					player.level.explode(
 						null,
 						pos.x,
 						pos.y,
 						pos.z,
 						power,
 						fire,
-						Level.ExplosionInteraction.TNT
+						Explosion.BlockInteraction.BREAK
 					);
 					player.setDeltaMovement(0, .5, 0);
 					player.hurtMarked = true;

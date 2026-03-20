@@ -399,7 +399,8 @@ public class CommandConstants {
 	));
 
 	public static String asMinimalString(Key key) {
-		return key.asMinimalString();
+		if (key.namespace().equals(MINECRAFT_NAMESPACE)) return key.value();
+		return key.asString();
 	}
 
 	public static String asMinimalSafeString(Key key) {
@@ -410,7 +411,7 @@ public class CommandConstants {
 
 	public static boolean isWhitelistedEntity(Keyed keyed) {
 		Key key = keyed.key();
-		return ENTITIES.contains(asMinimalString(key)) || ENTITIES.contains(csIdOf(key));
+		return ENTITIES.contains(asMinimalString(key)) || ENTITIES.contains(csIdOf(keyed));
 	}
 
 	// do-or-die

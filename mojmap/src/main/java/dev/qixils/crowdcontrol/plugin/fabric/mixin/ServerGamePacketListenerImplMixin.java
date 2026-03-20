@@ -13,6 +13,6 @@ public class ServerGamePacketListenerImplMixin {
 
 	@Inject(method = "handleContainerClose", at = @At("HEAD"))
 	public void onHandleContainerClose(ServerboundContainerClosePacket serverboundContainerClosePacket, CallbackInfo ci) {
-		LootboxCommand.onInventoryClose(((ServerGamePacketListenerImpl) (Object) this).getPlayer());
+		LootboxCommand.onInventoryClose(((ServerGamePacketListenerImpl) (Object) this).player);
 	}
 }

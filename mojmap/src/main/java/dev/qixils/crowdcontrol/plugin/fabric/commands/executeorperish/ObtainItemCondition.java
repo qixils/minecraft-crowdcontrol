@@ -30,6 +30,6 @@ public final class ObtainItemCondition extends AbstractCondition {
 
 	@Override
 	public boolean hasSucceeded(@NotNull ServerPlayer player) {
-		return player.getInventory().contains(stack);
+		return player.inventory.contains(stack);
 	}
 }

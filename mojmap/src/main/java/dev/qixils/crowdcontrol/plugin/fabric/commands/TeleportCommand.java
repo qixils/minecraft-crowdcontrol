@@ -56,13 +56,13 @@ public class TeleportCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get()) {
 				if (player.isPassenger())
 					player.stopRiding();
-				ServerLevel level = player.serverLevel();
+				ServerLevel level = player.getLevel();
 				double x = player.getX();
 				double y = player.getY();
 				double z = player.getZ();
 				for (int i = 0; i < 16; ++i) {
 					double destX = x + nextDoubleOffset();
-					double destY = Mth.clamp(y + nextIntOffset(), level.getMinY(), level.getMinY() + level.getLogicalHeight() - 1);
+					double destY = Mth.clamp(y + nextIntOffset(), 1, level.getMaxBuildHeight() - 1);
 					double destZ = z + nextDoubleOffset();
 					if (!player.randomTeleport(destX, destY, destZ, true)) continue;
 					level.playSound(null, x, y, z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);

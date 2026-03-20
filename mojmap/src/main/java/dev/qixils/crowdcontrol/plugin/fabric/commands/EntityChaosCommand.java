@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.CHAOS_LOCAL_RADIUS;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_CHAOS_MIN;
-import static java.util.Collections.emptySet;
 
 @Getter
 public class EntityChaosCommand extends ModdedCommand {
@@ -48,7 +47,7 @@ public class EntityChaosCommand extends ModdedCommand {
 			} else {
 				for (ServerPlayer player : playerSupplier.get()) {
 					Vec3 pp = player.position();
-					for (Entity entity : ((ServerLevel) player.level()).getAllEntities()) {
+					for (Entity entity : player.getLevel().getAllEntities()) {
 						// TODO: I can probably reduce some loops here right?
 						if (entity.getType() == EntityType.PLAYER) continue;
 						Vec3 ep = entity.position();
@@ -71,7 +70,12 @@ public class EntityChaosCommand extends ModdedCommand {
 					entity.ejectPassengers();
 					ServerPlayer target = players.get((i++) % players.size());
 					Vec3 dest = target.position();
-					success |= entity.teleportTo(target.serverLevel(), dest.x, dest.y, dest.z, emptySet(), entity.getYRot(), entity.getXRot(), false); // boolean is unused?
+					if (entity.level != target.getLevel()) {
+						entity = entity.changeDimension(target.getLevel());
+						if (entity == null) continue;
+					}
+					entity.moveTo(dest.x, dest.y, dest.z, entity.getRotationVector().y, entity.getRotationVector().x);
+					success = true;
 				} catch (Exception ignored) {}
 			}
 

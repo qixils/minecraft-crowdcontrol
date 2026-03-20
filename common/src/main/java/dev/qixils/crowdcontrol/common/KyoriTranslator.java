@@ -7,7 +7,6 @@ import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.renderer.TranslatableComponentRenderer;
-import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.NotNull;
@@ -173,12 +172,6 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	}
 
 	@Override
-	public @Nullable Component translate(final @NotNull TranslatableComponent component, final @NotNull Locale context) {
-		if (translate(component.key(), context) == null) return null;
-		return renderTranslatable(component, context);
-	}
-
-	@Override
 	public @Nullable MessageFormat translate(@NotNull String key, @NotNull Locale locale) {
 		logger.debug("Plainly translating " + key + " for " + locale);
 		return translator.translate(key, locale);
@@ -193,8 +186,19 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 		//  (and in fact, it hasn't from a lot of testing)
 		// also this needs to be here because #optionallyRenderChildrenAppendAndBuild calls this method to, well, render children
 		// although that's not to say that this couldn't be improved. it probably could be.
-		if (format == null)
-			return GlobalTranslator.renderer().render(component, context);
+		// update: yoinked this code from the parent class i hope it works ??? kinda can't figure out how this works on this old version
+		if (format == null) {
+			final TranslatableComponent.Builder builder = Component.translatable()
+				.key(component.key());
+			if (!component.args().isEmpty()) {
+				final List<Component> args = new ArrayList<>(component.args());
+				for (int i = 0, size = args.size(); i < size; i++) {
+					args.set(i, this.render(args.get(i), context));
+				}
+				builder.args(args);
+			}
+			return this.mergeStyleAndOptionallyDeepRender(component, builder, context);
+		}
 
 		final TextComponent.Builder builder = Component.text(); // mostly just a dummy for appending children
 		this.mergeStyle(component, builder, context);

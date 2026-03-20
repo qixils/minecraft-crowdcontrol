@@ -34,7 +34,7 @@ public class LavaCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get())
 				locations.addAll(BlockFinder.builder()
 					.origin(player)
-					.locationValidator(loc -> loc.block().is(Blocks.WATER) || loc.block().is(Blocks.WATER_CAULDRON))
+					.locationValidator(loc -> loc.block().is(Blocks.WATER))
 					.shuffleLocations(false)
 					.maxRadius(10)
 					.build().getAll());
@@ -42,7 +42,7 @@ public class LavaCommand extends ModdedCommand {
 			if (locations.isEmpty())
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No replaceable blocks nearby");
 
-			sync(() -> locations.forEach(loc -> loc.block((loc.block().is(Blocks.WATER_CAULDRON) ? Blocks.LAVA_CAULDRON : Blocks.LAVA).defaultBlockState())));
+			sync(() -> locations.forEach(loc -> loc.block(Blocks.LAVA.defaultBlockState())));
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 		}));
 	}

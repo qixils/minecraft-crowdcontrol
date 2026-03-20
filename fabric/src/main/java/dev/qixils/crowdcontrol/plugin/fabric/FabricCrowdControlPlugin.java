@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
+import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
+import cloud.commandframework.fabric.FabricServerCommandManager;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.packets.PluginPacket;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
@@ -14,8 +16,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.fabric.FabricServerCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,12 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 @Getter
 public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implements ModInitializer {
 	private final FabricServerCommandManager<CommandSourceStack> commandManager
-		= FabricServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
+		= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>newBuilder().withAsynchronousParsing().build());
 	private final PermissionUtil permissionUtil = new FabricPermissionUtil();
 
 	@Override

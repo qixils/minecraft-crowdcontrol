@@ -9,9 +9,10 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,14 +21,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.StreamSupport;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.DINNERBONE_NAME;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.ENTITY_SEARCH_RADIUS;
 
 @Getter
 public class DinnerboneCommand extends ModdedCommand {
-	private static final Component DINNERBONE_COMPONENT = Component.literal(DINNERBONE_NAME);
+	private static final Component DINNERBONE_COMPONENT = new TextComponent(DINNERBONE_NAME);
 	private final String effectName = "dinnerbone";
 
 	public DinnerboneCommand(ModdedCrowdControlPlugin plugin) {
@@ -39,12 +39,9 @@ public class DinnerboneCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			Set<LivingEntity> entities = new HashSet<>();
 			for (ServerPlayer player : playerSupplier.get()) {
-				entities.addAll(StreamSupport.stream(player.serverLevel().getAllEntities().spliterator(), false)
-					.filter(entity -> entity instanceof LivingEntity
-						&& entity.getType() != EntityType.PLAYER
-						&& entity.position().distanceToSqr(player.position()) <= (ENTITY_SEARCH_RADIUS * ENTITY_SEARCH_RADIUS))
-					.map(entity -> (LivingEntity) entity)
-					.toList());
+				player.level.getEntities(player, new AABB(player.blockPosition()).inflate(ENTITY_SEARCH_RADIUS), entity -> entity instanceof LivingEntity)
+					.stream().map(entity -> (LivingEntity) entity)
+					.forEach(entities::add);
 			}
 			if (entities.isEmpty())
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No nearby entities");

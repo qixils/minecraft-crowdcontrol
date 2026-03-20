@@ -1,5 +1,12 @@
 package dev.qixils.crowdcontrol.common;
 
+import cloud.commandframework.Command.Builder;
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.keys.SimpleCloudKey;
+import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.permission.PredicatePermission;
 import com.fasterxml.jackson.core.type.TypeReference;
 import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
@@ -35,12 +42,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
-import org.incendo.cloud.Command.Builder;
-import org.incendo.cloud.CommandManager;
-import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
-import org.incendo.cloud.parser.standard.StringParser;
-import org.incendo.cloud.permission.PredicatePermission;
-import org.incendo.cloud.suggestion.Suggestion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +77,6 @@ import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
 import static live.crowdcontrol.cc4j.websocket.ConnectedPlayer.JACKSON;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
-import static org.incendo.cloud.description.Description.description;
 
 /**
  * The main class used by a Crowd Control implementation which defines numerous methods for
@@ -164,7 +164,7 @@ public abstract class Plugin<P, S> {
 		.append(text('[', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
 		.append(text(PREFIX, NamedTextColor.YELLOW))
 		.append(text(']', NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
-		.appendSpace()
+		.append(Component.space())
 		.build();
 
 	/**
@@ -650,20 +650,20 @@ public abstract class Plugin<P, S> {
 		//// Account Command ////
 
 		Builder<S> accountCmd = manager.commandBuilder("account")
-			.commandDescription(description("Manage your Crowd Control account"));
+			.meta(CommandMeta.DESCRIPTION, "Manage your Crowd Control account");
 
 		// link command
 		manager.command(accountCmd.literal("link")
-			.commandDescription(description("Connect your Crowd Control account"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
+			.meta(CommandMeta.DESCRIPTION, "Connect your Crowd Control account")
+			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.sender());
+				Audience audience = mapper.asAudience(commandContext.getSender());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
 					return;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
 					return;
@@ -684,16 +684,16 @@ public abstract class Plugin<P, S> {
 
 		// unlink command
 		manager.command(accountCmd.literal("unlink")
-			.commandDescription(description("Connect your Crowd Control account"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
+			.meta(CommandMeta.DESCRIPTION, "Connect your Crowd Control account")
+			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.sender());
+				Audience audience = mapper.asAudience(commandContext.getSender());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
 					return;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
 					return;
@@ -719,20 +719,20 @@ public abstract class Plugin<P, S> {
 		//// Session Command ////
 
 		Builder<S> sessionCmd = manager.commandBuilder("session")
-			.commandDescription(description("Manage your Crowd Control session"));
+			.meta(CommandMeta.DESCRIPTION, "Manage your Crowd Control session");
 
 		// start command
 		manager.command(sessionCmd.literal("start")
-			.commandDescription(description("Starts your Crowd Control session"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
+			.meta(CommandMeta.DESCRIPTION, "Starts your Crowd Control session")
+			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.sender());
+				Audience audience = mapper.asAudience(commandContext.getSender());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
 					return;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
 					return;
@@ -758,16 +758,16 @@ public abstract class Plugin<P, S> {
 
 		// stop command
 		manager.command(sessionCmd.literal("stop")
-			.commandDescription(description("Stop your Crowd Control session"))
-			.permission(PredicatePermission.of(user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
+			.meta(CommandMeta.DESCRIPTION, "Stop your Crowd Control session")
+			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
 			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.sender());
+				Audience audience = mapper.asAudience(commandContext.getSender());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
 					return;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.sender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
 					return;
@@ -795,14 +795,14 @@ public abstract class Plugin<P, S> {
 
 		// base command
 		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
-			.commandDescription(description("View information about and manage the Crowd Control service"));
+			.meta(CommandMeta.DESCRIPTION, "View information about and manage the Crowd Control service");
 
 		// status command
 		manager.command(ccCmd.literal("status")
-			.commandDescription(description("Get the status of the Crowd Control service"))
-			.permission(PredicatePermission.of(mapper::isAdmin))
+			.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
+			.permission(PredicatePermission.of(SimpleCloudKey.of(ADMIN_PERMISSION.getNode()), mapper::isAdmin))
 			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.sender());
+				Audience audience = mapper.asAudience(commandContext.getSender());
 				if (crowdControl == null) {
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
 					return;
@@ -810,7 +810,7 @@ public abstract class Plugin<P, S> {
 				TextComponent.Builder msg = text()
 					.append(PREFIX_COMPONENT)
 					.append(translatable("cc.command.crowdcontrol.status.online"))
-					.appendSpace();
+					.append(Component.space());
 				boolean added = false;
 				for (P player : getPlayerManager().getAllPlayersFull()) {
 					CCPlayer ccPlayer = optionalCCPlayer(player).orElse(null);
@@ -822,7 +822,7 @@ public abstract class Plugin<P, S> {
 						msg.append(translatable("cc.command.crowdcontrol.status.sources.header"));
 					added = true;
 
-					msg.appendNewline().append(translatable(
+					msg.append(Component.newline()).append(translatable(
 						String.format(
 							"cc.command.crowdcontrol.status.sources.%s",
 							ccPlayer.getGameSessionId() == null ? "offline" : "live"
@@ -835,11 +835,11 @@ public abstract class Plugin<P, S> {
 			}));
 		// version command
 		manager.command(ccCmd.literal("version")
-			.commandDescription(description("Get the version of the server's and players' Crowd Control mod"))
+			.meta(CommandMeta.DESCRIPTION, "Get the version of the server's and players' Crowd Control mod")
 			.handler(ctx -> {
-				Audience audience = mapper.asAudience(ctx.sender());
+				Audience audience = mapper.asAudience(ctx.getSender());
 				Component message = output(translatable("cc.command.crowdcontrol.version.server", text(SemVer.MOD.toString())));
-				audience.sendMessage(message.appendSpace().append(translatable("cc.command.crowdcontrol.version.clients.header")));
+				audience.sendMessage(message.append(Component.space()).append(translatable("cc.command.crowdcontrol.version.clients.header")));
 				for (P player : getPlayerManager().getAllPlayersFull()) {
 					Optional<SemVer> version = getModVersion(player);
 					if (version.isPresent()) {
@@ -852,34 +852,33 @@ public abstract class Plugin<P, S> {
 			}));
 		// reloadconfig command
 		manager.command(ccCmd.literal("reloadconfig")
-			.commandDescription(description("Reloads the mod's config file"))
+			.meta(CommandMeta.DESCRIPTION, "Reloads the mod's config file")
 			.handler(ctx -> {
-				Audience audience = mapper.asAudience(ctx.sender());
+				Audience audience = mapper.asAudience(ctx.getSender());
 				loadConfig();
 				audience.sendMessage(output(translatable("cc.command.crowdcontrol.reloadconfig.output")));
 			}));
 		// execute command
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
 			manager.command(ccCmd.literal("execute")
-				.commandDescription(description("Executes the effect with the given ID"))
-				.permission(PredicatePermission.of(mapper::isAdmin))
+				.meta(CommandMeta.DESCRIPTION, "Executes the effect with the given ID")
+				.permission(PredicatePermission.of(SimpleCloudKey.of(ADMIN_PERMISSION.getNode()),mapper::isAdmin))
 				.argument(
-					StringParser
-						.stringComponent(StringParser.StringMode.SINGLE)
-						.name("effect")
-						.description(description("ID of the effect to execute"))
-						.required()
-						.suggestionProvider((context, input) -> CompletableFuture.completedFuture(commandRegister()
+					StringArgument.<S>newBuilder("effect")
+						.single()
+						.asRequired()
+						.withSuggestionsProvider((context, input) -> commandRegister()
 							.getCommands()
 							.stream()
-							.filter(command -> command.getEffectName().toLowerCase().contains(input.lastRemainingToken().toLowerCase()))
-							.map(command -> Suggestion.suggestion(command.getEffectName()))
-							.sorted(Comparator.comparing(Suggestion::suggestion))
-							.collect(Collectors.toList())))
+							.map(Command::getEffectName)
+							.filter(effectName -> effectName.toLowerCase().contains(input.toLowerCase()))
+							.sorted()
+							.collect(Collectors.toList()))
+						.build()
 				)
 				.handler(commandContext -> {
 					// TODO: allow targeting multiple players
-					S sender = commandContext.sender();
+					S sender = commandContext.getSender();
 					Audience audience = mapper.asAudience(sender);
 					P player = asPlayer(sender);
 					if (player == null) {
@@ -930,10 +929,10 @@ public abstract class Plugin<P, S> {
 			);
 		}
 
-		MinecraftExceptionHandler.<S>create(mapper::asAudience)
-			.defaultHandlers()
-			.decorator(component -> output(component).color(NamedTextColor.RED))
-			.registerTo(manager);
+		new MinecraftExceptionHandler<S>()
+			.withDefaultHandlers()
+			.withDecorator(component -> output(component).color(NamedTextColor.RED))
+			.apply(manager, mapper::asAudience);
 	}
 
 	protected abstract ConfigurationLoader<?> getConfigLoader() throws IllegalStateException;
@@ -1395,7 +1394,7 @@ public abstract class Plugin<P, S> {
 			// send messages
 			if (ccPlayer.getUserToken() == null) {
 				audience.sendMessage(translatable("cc.join.link.text.1", TextColor.color(0xF1D4FC)));
-				audience.sendMessage(translatable("cc.join.link.text.2", TextColor.color(0xE8CEF2)).arguments(Component.keybind("key.chat")));
+				audience.sendMessage(translatable("cc.join.link.text.2", TextColor.color(0xE8CEF2)).args(Component.keybind("key.chat")));
 				audience.sendMessage(translatable("cc.join.link.text.3", TextColor.color(0xE1C7EB)).clickEvent(ClickEvent.copyToClipboard(ccPlayer.getAuthUrl())).hoverEvent(translatable("cc.join.link.text.3.hover")));
 				audience.sendMessage(translatable("cc.join.link.text.4", TextColor.color(0xD9C1E3), TextDecoration.ITALIC));
 				audience.sendMessage(translatable("cc.join.link.text.5", TextColor.color(0xD2BADB), TextDecoration.ITALIC));

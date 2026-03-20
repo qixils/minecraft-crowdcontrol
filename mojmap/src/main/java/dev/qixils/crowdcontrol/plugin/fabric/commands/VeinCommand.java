@@ -12,12 +12,11 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_COUNT;
@@ -36,8 +34,8 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 @Getter
 public class VeinCommand extends ModdedCommand {
 	// we don't have fabric api imported anymore so we have to define the common tags manually
-	public static final TagKey<Block> ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores"));
-	public static final TagKey<Block> ORE_BEARING_GROUND_DEEPSLATE = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ore_bearing_ground/deepslate"));
+	// TODO: fabric-api is maybe not available
+	public static final Tag<Block> ORES = BlockTags.bind("c:ores");
 
 	private final String effectName = "vein";
 
@@ -46,16 +44,14 @@ public class VeinCommand extends ModdedCommand {
 	}
 
 	// Gets a 2x2 chunk of blocks
-	@Contract(mutates = "param1, param2")
-	private void addOreVein(List<Location> deepslateBlocks, List<Location> stoneBlocks, Location base) {
+	@Contract(mutates = "param1")
+	private void addOreVein(List<Location> stoneBlocks, Location base) {
 		for (int x = 0; x <= 2; ++x) {
 			for (int y = 0; y <= 1; ++y) {
 				for (int z = 0; z <= 2; ++z) {
 					Location loc = base.add(x, y, z);
 					BlockState block = loc.block();
-					if (block.is(ORE_BEARING_GROUND_DEEPSLATE)) {
-						deepslateBlocks.add(loc);
-					} else if (!block.isAir()) {
+					if (!block.isAir()) {
 						stoneBlocks.add(loc);
 					}
 				}
@@ -83,68 +79,39 @@ public class VeinCommand extends ModdedCommand {
 					.locationValidator(loc -> !loc.block().isAir())
 					.build();
 
-				Registry<Block> registry = player.level().registryAccess().lookupOrThrow(Registries.BLOCK);
 				List<Ore> ores = new ArrayList<>();
 
 				// troll blocks
-				ores.add(new Ore(registry.wrapAsHolder(Blocks.LAVA), 1));
-				ores.add(new Ore(registry.wrapAsHolder(Blocks.INFESTED_STONE), registry.wrapAsHolder(Blocks.INFESTED_DEEPSLATE), 1));
+				ores.add(new Ore(Blocks.LAVA, 1));
+				ores.add(new Ore(Blocks.INFESTED_STONE, 1));
 
-				registry.getOrThrow(ORES).stream()
-					.filter(Holder::isBound) // failsafe
+				ORES.getValues().stream()
 					.sorted((a, b) -> {
-						ResourceLocation keyA = a.unwrapKey().get().location();
-						ResourceLocation keyB = b.unwrapKey().get().location();
-						boolean deepslateA = keyA.value().startsWith("deepslate_");
-						boolean deepslateB = keyB.value().startsWith("deepslate_");
-						if (deepslateA != deepslateB) return deepslateA ? 1 : -1;
+						ResourceLocation keyA = Registry.BLOCK.getKey(a);
+						ResourceLocation keyB = Registry.BLOCK.getKey(b);
 						return keyA.asString().compareTo(keyB.asString());
 					})
-					.forEachOrdered(item -> {
-						ResourceLocation location = item.unwrapKey().get().location();
-						if (location.value().startsWith("deepslate_")) {
-							Optional<Ore> matching = ores.stream().filter(ore -> {
-								ResourceLocation oreLoc = ore.getBlock().unwrapKey().get().location();
-								if (!location.namespace().equals(oreLoc.namespace())) return false;
-								if (!location.value().equals("deepslate_" + oreLoc.value())) return false;
-								return true;
-							}).findFirst();
-							if (matching.isPresent()) {
-								int idx = ores.indexOf(matching.get());
-								if (idx != -1) { // failsafe
-									ores.set(idx, matching.get().withDeepslate(item));
-									return;
-								}
-							}
-						}
-
-						ores.add(new Ore(item, item.is(registry.wrapAsHolder(Blocks.ANCIENT_DEBRIS)) ? 3 : 6));
-					});
+					.forEach(item -> ores.add(new Ore(item, item == Blocks.ANCIENT_DEBRIS ? 3 : 6)));
 
 				for (int iter = 0; iter < VEIN_COUNT; iter++) {
 					Ore ore = RandomUtil.weightedRandom(ores);
 
 					List<Location> setBlocks = new ArrayList<>(8);
-					List<Location> setDeepslateBlocks = new ArrayList<>(8);
 					Location oreLocation = finder.next();
 					if (oreLocation == null)
 						continue;
 
 					// get 2x2 chunk of blocks
-					addOreVein(setDeepslateBlocks, setBlocks, oreLocation);
+					addOreVein(setBlocks, oreLocation);
 
 					// if we didn't find viable blocks, exit
-					if (setBlocks.isEmpty() && setDeepslateBlocks.isEmpty())
+					if (setBlocks.isEmpty())
 						continue;
 
 					success = true;
 					randomlyShrinkOreVein(setBlocks);
-					randomlyShrinkOreVein(setDeepslateBlocks);
 
-					sync(() -> {
-						setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().value().defaultBlockState()));
-						setDeepslateBlocks.forEach(blockPos -> blockPos.block(ore.getDeepslateBlock().value().defaultBlockState()));
-					});
+					sync(() -> setBlocks.forEach(blockPos -> blockPos.block(ore.getBlock().defaultBlockState())));
 				}
 			}
 			return success
@@ -155,22 +122,12 @@ public class VeinCommand extends ModdedCommand {
 
 	@Getter
 	public static class Ore implements Weighted {
-		private final Holder<Block> block;
-		private final Holder<Block> deepslateBlock;
+		private final Block block;
 		private final int weight;
 
-		Ore(Holder<Block> block, Holder<Block> deepslateBlock, int weight) {
+		Ore(Block block, int weight) {
 			this.block = block;
-			this.deepslateBlock = deepslateBlock;
 			this.weight = weight;
-		}
-
-		Ore(Holder<Block> block, int weight) {
-			this(block, block, weight);
-		}
-
-		public Ore withDeepslate(Holder<Block> deepslateBlock) {
-			return new Ore(this.block, deepslateBlock, weight);
 		}
 	}
 }
