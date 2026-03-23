@@ -4,7 +4,7 @@ val mojmapVersion: String by project
 plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "9.2.0" apply false
-    id("com.gradleup.shadow") version "8.3.7" apply true
+    id("com.gradleup.shadow") version "9.4.0" apply true
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
     id("net.neoforged.moddev") version "2.0.140" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
@@ -20,6 +20,9 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 subprojects {
@@ -76,6 +79,8 @@ subprojects {
     val isModded = listOf("mojmap-common", "fabric-platform", "neoforge-platform").contains(project.name)
 
     tasks.shadowJar {
+        isZip64 = true // wtf
+
         relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
         relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
         relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")
