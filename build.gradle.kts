@@ -3,8 +3,8 @@ val mojmapVersion: String by project
 
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "8.14" apply false
-    id("com.gradleup.shadow") version "8.3.7" apply true
+    id("io.freefair.lombok") version "9.2.0" apply false
+    id("com.gradleup.shadow") version "9.4.0" apply true
     id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("de.eldoria.plugin-yml.bukkit") version "0.8.0" apply false // Generates plugin.yml
@@ -77,6 +77,8 @@ subprojects {
     val isModded = listOf("mojmap-common", "fabric-platform", "neoforge-platform").contains(project.name)
 
     tasks.shadowJar {
+        isZip64 = true // wtf
+
         relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
         relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
         relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")
