@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.common.util.MappedKeyedTag;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.*;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish.DoOrDieCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.TypedTag;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -136,7 +137,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			try {
 				if (!entry.getValue().isEnabled(plugin.server().overworld().enabledFeatures())) continue;
 
-				boolean allowed = isWhitelistedEntity(entry.getKey()) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
+				boolean allowed = isWhitelistedEntity(MinecraftAudiences.key(entry.getKey())) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
 				if (!allowed) continue;
 				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
 

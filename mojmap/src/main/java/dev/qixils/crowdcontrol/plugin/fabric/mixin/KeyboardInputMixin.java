@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.ModdedPlatformClient;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.KeyboardInput;
@@ -29,7 +30,7 @@ public abstract class KeyboardInputMixin extends ClientInput {
 		Optional<LocalPlayer> player = ModdedPlatformClient.get().player();
 		if (player.isEmpty())
 			return getResult.apply(original);
-		MovementStatusValue status = player.get().cc$getMovementStatus(type);
+		MovementStatusValue status = ((MovementStatus) player.get()).cc$getMovementStatus(type);
 		if (status == MovementStatusValue.DENIED)
 			return false;
 		if (status == MovementStatusValue.INVERTED && inverse != null)

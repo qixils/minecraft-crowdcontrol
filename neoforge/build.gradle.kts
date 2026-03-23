@@ -23,10 +23,11 @@ plugins {
 neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
-    val at = project(":base-common").file("src/main/resources/META-INF/accesstransformer.cfg")
-    if (at.exists()) {
-        accessTransformers.from(at.absolutePath)
+    val at = project(":mojmap-common").file("src/main/resources/META-INF/accesstransformer.cfg")
+    if (!at.exists()) {
+        throw RuntimeException("Could not load access transformer")
     }
+    accessTransformers.from(at.absolutePath)
 //    parchment {
 //        minecraftVersion.set(parchment_minecraft)
 //        mappingsVersion.set(parchment_version)

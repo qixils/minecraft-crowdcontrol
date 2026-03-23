@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.qixils.crowdcontrol.common.AbstractPlayerManager;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.GameTypeEffectComponent;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,6 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 
 	@Override
 	public boolean isSpectator(@NotNull ServerPlayer player) {
-		return player.isSpectator() && player.cc$getGameTypeEffect() == null;
+		return player.isSpectator() && ((GameTypeEffectComponent) player).cc$getGameTypeEffect() == null;
 	}
 }

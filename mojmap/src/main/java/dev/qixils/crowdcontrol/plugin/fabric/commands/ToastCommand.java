@@ -74,7 +74,7 @@ public final class ToastCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			for (ServerPlayer player : playerSupplier.get()) {
 				// annoying sound
-				player.playSound(Sounds.ANNOYING.get(), Sound.Emitter.self());
+				plugin.adventure().audience(player).playSound(Sounds.ANNOYING.get(), Sound.Emitter.self());
 
 				// spam recipe toasts
 				ServerRecipeBook book = player.getRecipeBook();

@@ -95,18 +95,18 @@ public class VeinCommand extends ModdedCommand {
 					.sorted((a, b) -> {
 						Identifier keyA = a.unwrapKey().get().identifier();
 						Identifier keyB = b.unwrapKey().get().identifier();
-						boolean deepslateA = keyA.value().startsWith("deepslate_");
-						boolean deepslateB = keyB.value().startsWith("deepslate_");
+						boolean deepslateA = keyA.getPath().startsWith("deepslate_");
+						boolean deepslateB = keyB.getPath().startsWith("deepslate_");
 						if (deepslateA != deepslateB) return deepslateA ? 1 : -1;
-						return keyA.asString().compareTo(keyB.asString());
+						return keyA.compareTo(keyB);
 					})
 					.forEachOrdered(item -> {
 						Identifier location = item.unwrapKey().get().identifier();
-						if (location.value().startsWith("deepslate_")) {
+						if (location.getPath().startsWith("deepslate_")) {
 							Optional<Ore> matching = ores.stream().filter(ore -> {
 								Identifier oreLoc = ore.getBlock().unwrapKey().get().identifier();
-								if (!location.namespace().equals(oreLoc.namespace())) return false;
-								if (!location.value().equals("deepslate_" + oreLoc.value())) return false;
+								if (!location.getNamespace().equals(oreLoc.getNamespace())) return false;
+								if (!location.getPath().equals("deepslate_" + oreLoc.getPath())) return false;
 								return true;
 							}).findFirst();
 							if (matching.isPresent()) {

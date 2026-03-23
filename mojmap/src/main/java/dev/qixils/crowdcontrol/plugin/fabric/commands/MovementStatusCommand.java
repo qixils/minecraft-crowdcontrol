@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCTimedEffectResponse;
@@ -59,7 +60,7 @@ public class MovementStatusCommand extends ModdedCommand implements CCTimedEffec
 			idMap.put(request.getRequestId(), players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()));
 
 			for (Player player : players)
-				player.cc$setMovementStatus(type, value);
+				((MovementStatus) player).cc$setMovementStatus(type, value);
 
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));
@@ -67,7 +68,7 @@ public class MovementStatusCommand extends ModdedCommand implements CCTimedEffec
 
 	@Override
 	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
-		plugin.toPlayerStream(idMap.remove(request.getRequestId())).forEach(player -> player.cc$setMovementStatus(type, MovementStatusValue.ALLOWED));
+		plugin.toPlayerStream(idMap.remove(request.getRequestId())).forEach(player -> ((MovementStatus) player).cc$setMovementStatus(type, MovementStatusValue.ALLOWED));
 	}
 
 	public static MovementStatusCommand disableJumping(ModdedCrowdControlPlugin plugin) {

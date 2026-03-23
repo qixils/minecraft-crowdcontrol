@@ -50,17 +50,17 @@ dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
     // TODO: to remove in 26.1
     mappings(loom.officialMojangMappings())
-    implementation("net.fabricmc:fabric-loader:$fabric_loader_version")
-    implementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
+    modImplementation("net.fabricmc:fabric-loader:$fabric_loader_version")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    implementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
-    implementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
-    implementation("com.terraformersmc:modmenu:$modMenuVersion")
-    implementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
+    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
+    modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
+    modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
+    modImplementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
     })
-    implementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
-    implementation("maven.modrinth:language-reload:$languageReloadVersion")
+    modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
+    modImplementation("maven.modrinth:language-reload:$languageReloadVersion")
 
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
@@ -80,10 +80,11 @@ dependencies {
 }
 
 loom {
-    val aw = project(":mojmap-common").file("src/main/resources/$mod_id.accesswidener")
-    if (aw.exists()) {
-        accessWidenerPath.set(aw)
+    val aw = file("src/main/resources/$mod_id.accesswidener")
+    if (!aw.exists()) {
+        throw RuntimeException("Could not find access widener")
     }
+    accessWidenerPath.set(aw)
 
     mixin {
         defaultRefmapName.set("${mod_id}.refmap.json")

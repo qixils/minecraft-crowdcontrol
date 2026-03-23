@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
@@ -74,7 +75,7 @@ public final class FreezeCommand extends ModdedCommand implements CCTimedEffect 
 				FreezeData data = new FreezeData(modifier, new Location(player));
 				locations.put(uuid, data);
 				DATA.computeIfAbsent(uuid, $2 -> new ArrayList<>()).add(data);
-				player.cc$setMovementStatus(freezeType, freezeValue);
+				((MovementStatus) player).cc$setMovementStatus(freezeType, freezeValue);
 			});
 			TIMED_EFFECTS.put(request.getRequestId(), locations);
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
@@ -93,7 +94,7 @@ public final class FreezeCommand extends ModdedCommand implements CCTimedEffect 
 			ServerPlayer player = server.getPlayerList().getPlayer(uuid);
 			if (player == null)
 				return;
-			player.cc$setMovementStatus(freezeType, MovementStatusValue.ALLOWED);
+			((MovementStatus) player).cc$setMovementStatus(freezeType, MovementStatusValue.ALLOWED);
 		});
 	}
 
