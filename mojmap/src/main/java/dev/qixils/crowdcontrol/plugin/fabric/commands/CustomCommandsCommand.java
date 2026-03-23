@@ -1,9 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.context.ContextChain;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandAction;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandData;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
@@ -15,13 +12,11 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.arguments.item.ItemParser;
-import net.minecraft.commands.execution.ExecutionContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -42,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 @Getter
@@ -130,29 +124,13 @@ public class CustomCommandsCommand extends ModdedCommand {
 			: _cmd;
 
 		try {
-			// todo: there is a ContextChain.runExecutable which seems to be simpler, but maybe less versatile
 			Commands commands = plugin.server().getCommands();
-			CommandDispatcher<CommandSourceStack> dispatcher = commands.getDispatcher();
-			ParseResults<CommandSourceStack> results = dispatcher.parse(commandLine, player.createCommandSourceStack().withSuppressedOutput());
-
-			CommandSourceStack commandSourceStack = results.getContext().getSource();
-			ContextChain<CommandSourceStack> contextChain = Commands.finishParsing(results, commandLine, commandSourceStack);
-
-			if (contextChain == null) throw new RuntimeException("Unknown command `" + _cmd + '`');
-
-			AtomicBoolean successful = new AtomicBoolean(true);
-			Commands.executeCommandInContext(
-				commandSourceStack,
-				executionContext -> ExecutionContext.queueInitialCommandExecution(executionContext, commandLine, contextChain, commandSourceStack, (success, result) -> {
-					if (success && result != 0) return;
-					successful.set(false);
-				})
-			);
-			return successful.get();
+			int result = commands.getDispatcher().execute(commandLine, player.createCommandSourceStack().withSuppressedOutput());
+			return result != 0;
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to run command", e);
+			return false;
 		}
-		return false;
 	}
 
 	public static final @NotNull Map<String, Executor> EXECUTORS = Map.ofEntries(
@@ -222,6 +200,6 @@ public class CustomCommandsCommand extends ModdedCommand {
 			return success
 				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to execute custom actions");
-		}));
+		}, plugin.getSyncExecutor()));
 	}
 }

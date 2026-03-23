@@ -2,6 +2,14 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.5.0
+
+- Fabric: Added support for 1.16.1
+- Fabric/NeoForge: Added support for 26.1
+- Fabric/NeoForge: Fixed run-command in custom effects
+- Fabric/NeoForge: Migrate config UI to YACL and made optional to reduce filesize
+- Fabric/NeoForge: Added more options to the config UI
+
 ## 4.4.2
 
 - Fabric: Fixed client effects being unavailable.
