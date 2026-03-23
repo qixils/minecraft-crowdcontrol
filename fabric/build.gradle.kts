@@ -3,7 +3,6 @@ import me.modmuss50.mpp.ReleaseType
 val adventureVersion: String by project
 val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
-val cloudMojmapVersion: String by project
 val fabricVersion: String by project
 val loaderVersion: String by project
 val modMenuVersion: String by project
@@ -54,7 +53,6 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
-    modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")

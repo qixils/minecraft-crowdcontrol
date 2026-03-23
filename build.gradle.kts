@@ -3,7 +3,7 @@ val mojmapVersion: String by project
 
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "8.14" apply false
+    id("io.freefair.lombok") version "9.2.0" apply false
     id("com.gradleup.shadow") version "8.3.7" apply true
     id("fabric-loom") version "1.13-SNAPSHOT" apply false
     id("net.neoforged.moddev") version "2.0.140" apply false
@@ -38,6 +38,9 @@ subprojects {
         }
         maven("https://maven.neoforged.net/releases") {
             name = "NeoForged"
+        }
+        maven("https://libraries.minecraft.net") {
+            name = "Minecraft Libraries"
         }
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
             name = "sonatype-oss-snapshots"
@@ -82,10 +85,6 @@ subprojects {
         relocate("javassist", "dev.qixils.relocated.javassist")
         relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
         relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
-
-        if (!isModded) {
-            relocate("org.incendo.cloud", "dev.qixils.relocated.cloud")
-        }
     }
 
     if (isPlatform) {

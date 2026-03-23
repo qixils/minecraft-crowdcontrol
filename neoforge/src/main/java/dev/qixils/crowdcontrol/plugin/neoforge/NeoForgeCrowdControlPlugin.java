@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.neoforge;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
@@ -14,12 +15,11 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +32,6 @@ import java.util.stream.Stream;
 
 @Getter
 public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
-	private final NeoForgeServerCommandManager<CommandSourceStack> commandManager
-		= NeoForgeServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
 	private final PermissionUtil permissionUtil;
 	private final ModContainer container;
 
@@ -47,12 +45,13 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 			permissionUtil = new NeoForgePermissionUtil();
 		}
 
-		modBus.addListener(this::register);
+		modBus.addListener(this::registerPayloadHandlers);
+		modBus.addListener(this::registerChatCommandsEvent);
 
 		onInitialize();
 	}
 
-	public void register(final RegisterPayloadHandlersEvent event) {
+	public void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
 		final PayloadRegistrar registrar = event.registrar("1").optional();
 		registrar.playToServer(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC, this::onResponsePacket);
 		registrar.playToServer(ExtraFeatureC2S.PACKET_ID, ExtraFeatureC2S.PACKET_CODEC, this::onFeaturePacket);
@@ -61,6 +60,13 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 		registrar.playToClient(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
 		registrar.playToClient(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
 		registrar.playToClient(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);
+	}
+
+	public void registerChatCommandsEvent(final RegisterCommandsEvent event) {
+		var dispatcher = event.getDispatcher();
+		for (LiteralArgumentBuilder<CommandSourceStack> command : registerChatCommands()) {
+			dispatcher.register(command);
+		}
 	}
 
 	private void onResponsePacket(ResponseVersionC2S payload, IPayloadContext context) {

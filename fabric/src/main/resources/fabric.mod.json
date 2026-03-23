@@ -35,7 +35,6 @@
     "fabricloader": "*",
     "fabric": "*",
     "minecraft": ">=1.21.11- <1.22",
-    "cloud": "*",
     "adventure-platform-fabric": "*",
     "net_kyori_adventure-api": "*",
     "cloth-config": "*",

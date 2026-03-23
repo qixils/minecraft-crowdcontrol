@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
@@ -16,6 +17,7 @@ import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.world.flag.FeatureDependant;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -33,8 +35,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.paper.PaperCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -43,7 +43,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
 
-@SuppressWarnings("UnstableApiUsage")
 public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceStack> implements Listener {
 	public static final @NotNull ComponentLogger LOGGER = ComponentLogger.logger("CrowdControl/Plugin");
 	public static final @NotNull SemVer MINECRAFT_MIN_VERSION = new SemVer(1, 20, 6);
@@ -74,8 +73,6 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	@Getter
 	private final PaperLoader paperPlugin;
 	// actual stuff
-	@Getter
-	private PaperCommandManager<CommandSourceStack> commandManager;
 	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
@@ -143,15 +140,12 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 
 		Bukkit.getPluginManager().registerEvents(this, paperPlugin);
 		Bukkit.getPluginManager().registerEvents(softLockResolver, paperPlugin);
-
-		try {
-			commandManager = PaperCommandManager.builder()
-				.executionCoordinator(ExecutionCoordinator.asyncCoordinator())
-				.buildOnEnable(paperPlugin);
-			registerChatCommands();
-		} catch (Exception exception) {
-			throw new IllegalStateException("The command manager was unable to load. Please ensure you are using the latest version of Paper.", exception);
-		}
+		paperPlugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+			var registrar = commands.registrar();
+			for (LiteralArgumentBuilder<CommandSourceStack> command : registerChatCommands()) {
+				registrar.register(command.build());
+			}
+		});
 	}
 
 	@Override

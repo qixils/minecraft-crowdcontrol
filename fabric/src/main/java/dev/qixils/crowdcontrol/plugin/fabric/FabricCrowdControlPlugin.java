@@ -1,18 +1,18 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.util.FabricPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.fabric.FabricServerCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,8 +23,6 @@ import java.nio.file.Path;
 
 @Getter
 public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implements ModInitializer {
-	private final FabricServerCommandManager<CommandSourceStack> commandManager
-		= FabricServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
 	private final PermissionUtil permissionUtil = new FabricPermissionUtil();
 
 	@Override
@@ -32,6 +30,11 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 		super.onInitialize();
 
 		PacketUtilImpl.registerPackets();
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			for (LiteralArgumentBuilder<CommandSourceStack> command : registerChatCommands()) {
+				dispatcher.register(command);
+			}
+		});
 	}
 
 	@Override

@@ -1,16 +1,17 @@
 val crowdControlVersion: String by project
 val adventureVersion: String by project
-val cloudVersion: String by project
-val cloudExtrasVersion: String by project
 val slf4jVersion: String by project
 val jacksonVersion: String by project
 val configurateVersion: String by project
+val brigadier_version: String by project
 
 dependencies {
     api("dev.qixils:cc4j-pubsub:$crowdControlVersion")
     api("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     api("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+
+    compileOnly("com.mojang:brigadier:$brigadier_version")
 
     compileOnly("net.kyori:adventure-api:$adventureVersion")
     api("net.kyori:adventure-text-minimessage:$adventureVersion") {
@@ -20,10 +21,6 @@ dependencies {
         exclude(group = "net.kyori", module = "adventure-api")
     }
     api("net.kyori:adventure-text-serializer-legacy:$adventureVersion") {
-        exclude(group = "net.kyori", module = "adventure-api")
-    }
-    api("org.incendo:cloud-core:$cloudVersion")
-    api("org.incendo:cloud-minecraft-extras:$cloudExtrasVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
     api("org.slf4j:slf4j-api:$slf4jVersion")

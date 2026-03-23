@@ -3,7 +3,6 @@ import me.modmuss50.mpp.ReleaseType
 val neoforgeVersion: String by project
 val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
-val cloudMojmapVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
 val jacksonVersion: String by project
@@ -92,7 +91,6 @@ repositories {
 
 dependencies {
     implementation(jarJar("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
-    implementation(jarJar("org.incendo:cloud-neoforge:$cloudMojmapVersion")!!)
     implementation(jarJar("me.shedaniel.cloth:cloth-config-neoforge:$clothConfigVersion")!!)
     compileOnly("net.luckperms:api:$luckPermsVersion")
 

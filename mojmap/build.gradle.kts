@@ -3,7 +3,6 @@ val adventurePlatformModVersion: String by project
 val clothConfigVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformVersion: String by project
-val cloudMojmapVersion: String by project
 val neo_form_version: String by project
 
 plugins {
@@ -36,7 +35,6 @@ dependencies {
     implementation("org.spongepowered:configurate-hocon:$configurateVersion")
 
     compileOnly("net.kyori:adventure-platform-mod-shared:$adventurePlatformModVersion")
-    compileOnly("org.incendo:cloud-minecraft-modded-common:$cloudMojmapVersion")
     compileOnly("me.shedaniel.cloth:cloth-config:$clothConfigVersion")
 
     // TODO: adventure is being weird

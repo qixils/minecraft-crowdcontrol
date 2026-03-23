@@ -1,7 +1,6 @@
 import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
-val cloudPaperVersion: String by project
 val minecraftVersion: String by project
 val paperlibVersion: String by project
 val configurateVersion: String by project
@@ -20,7 +19,6 @@ plugins {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("org.incendo:cloud-paper:$cloudPaperVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
     implementation("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
