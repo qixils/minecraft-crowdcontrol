@@ -35,10 +35,15 @@ public class SetTimeCommand extends ModdedCommand {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			playerSupplier.get(); // validate now is ok to start
+			var manager = plugin.server().clockManager();
 			for (ServerLevel level : plugin.server().getAllLevels()) {
-				final long ogTime = level.getDayTime();
+				var dimensionType = level.dimensionType();
+				var clock = dimensionType.defaultClock();
+				if (clock.isEmpty()) continue;
+
+				final long ogTime = manager.getTotalTicks(clock.get());
 				final long setTime = (ogTime - (ogTime % 24000)) + time;
-				sync(() -> level.setDayTime(setTime));
+				sync(() -> manager.setTotalTicks(clock.get(), setTime));
 			}
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
 		}));

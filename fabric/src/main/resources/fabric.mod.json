@@ -33,7 +33,7 @@
   "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
     "fabricloader": "*",
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": ">=1.21.11- <1.22",
     "adventure-platform-fabric": "*",
     "net_kyori_adventure-api": "*",

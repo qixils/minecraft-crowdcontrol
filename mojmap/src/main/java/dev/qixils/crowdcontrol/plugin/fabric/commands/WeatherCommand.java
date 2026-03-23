@@ -50,9 +50,23 @@ public class WeatherCommand extends ModdedCommand {
 				if (!rain && !world.isRaining() && !world.isThundering())
 					continue;
 				if (!rain)
-					sync(() -> world.setWeatherParameters(ticks, 0, false, false));
+					sync(() -> {
+						var weather = world.getWeatherData();
+						weather.setClearWeatherTime(ticks);
+						weather.setRainTime(0);
+						weather.setThunderTime(0);
+						weather.setRaining(false);
+						weather.setThundering(false);
+					});
 				else
-					sync(() -> world.setWeatherParameters(0, ticks, true, storm));
+					sync(() -> {
+						var weather = world.getWeatherData();
+						weather.setClearWeatherTime(0);
+						weather.setRainTime(ticks);
+						weather.setThunderTime(ticks); // this is what the old method did, as odd as it looks
+						weather.setRaining(false);
+						weather.setThundering(true);
+					});
 				success = true;
 			}
 			return success

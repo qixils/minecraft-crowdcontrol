@@ -96,9 +96,9 @@ public class CustomCommandsCommand extends ModdedCommand {
 		String itemStr = action.getString("item", "minecraft:dirt");
 		ItemStack stack;
 		try {
-			ItemParser.ItemResult result = new ItemParser(player.registryAccess()).parse(new StringReader(itemStr));
+			var result = new ItemParser(player.registryAccess()).parse(new StringReader(itemStr));
 			ItemInput input = new ItemInput(result.item(), result.components());
-			stack = input.createItemStack(1, false);
+			stack = input.createItemStack(1);
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to generate item stack", e);
 			return false;
