@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -106,13 +105,13 @@ public abstract class ModdedPlatformClient {
 		return builder.build();
 	}
 
-	public void handleRequestVersion(@NotNull VersionRequestPacketS2C payload, @NotNull ClientPacketContext context) {
+	public void handleRequestVersion(@NotNull VersionRequestPacketS2C payload) {
 		logger.info("Received version request from server!");
-		context.send(new VersionResponsePacketC2S(SemVer.MOD));
-		context.send(new ExtraFeaturePacketC2S(getExtraFeatures()));
+		sendToServer(new VersionResponsePacketC2S(SemVer.MOD));
+		sendToServer(new ExtraFeaturePacketC2S(getExtraFeatures()));
 	}
 
-	public void handleSetShader(@NotNull ShaderPacketS2C payload, @NotNull ClientPacketContext context) {
+	public void handleSetShader(@NotNull ShaderPacketS2C payload) {
 		logger.debug("Received shader request from server!");
 //		ResourceLocation shader = withDefaultNamespace(payload.shader());
 //
@@ -126,9 +125,11 @@ public abstract class ModdedPlatformClient {
 //		}), payload.duration().toMillis(), TimeUnit.MILLISECONDS);
 	}
 
-	public void handleMovementStatus(@NotNull MovementStatusPacketS2C payload, @NotNull ClientPacketContext context) {
+	public void handleMovementStatus(@NotNull MovementStatusPacketS2C payload) {
 		if (payload.statusType() == null || payload.statusValue() == null) return;
-		context.player().cc$setMovementStatus(payload.statusType(), payload.statusValue());
+		var player = Minecraft.getInstance().player;
+		if (player == null) return;
+		player.cc$setMovementStatus(payload.statusType(), payload.statusValue());
 	}
 
 	public abstract void sendToServer(@NotNull PluginPacket payload);

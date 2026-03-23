@@ -3,7 +3,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 import dev.qixils.crowdcontrol.common.packets.*;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
-import dev.qixils.crowdcontrol.plugin.fabric.client.fabric.ClientPacketContextImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import io.netty.buffer.Unpooled;
 import jerozgen.languagereload.LanguageReload;
@@ -11,7 +10,7 @@ import jerozgen.languagereload.config.Config;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.network.FriendlyByteBuf;
@@ -19,7 +18,10 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -36,10 +38,10 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 
 		PacketUtilImpl.registerPackets();
 
-		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(VersionRequestPacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleRequestVersion(VersionRequestPacketS2C.INSTANCE, new ClientPacketContextImpl(minecraft, sender)));
-		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(ShaderPacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleSetShader(new ShaderPacketS2C(buf), new ClientPacketContextImpl(minecraft, sender)));
-		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(MovementStatusPacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleMovementStatus(new MovementStatusPacketS2C(buf), new ClientPacketContextImpl(minecraft, sender)));
-		ClientPlayNetworking.registerGlobalReceiver(new ResourceLocation(SetLanguagePacketS2C.METADATA.channel()), (minecraft, $2, buf, sender) -> handleLanguage(new SetLanguagePacketS2C(buf)));
+		ClientSidePacketRegistry.INSTANCE.register(new ResourceLocation(VersionRequestPacketS2C.METADATA.channel()), (ctx, buf) -> handleRequestVersion(VersionRequestPacketS2C.INSTANCE));
+		ClientSidePacketRegistry.INSTANCE.register(new ResourceLocation(ShaderPacketS2C.METADATA.channel()), (ctx, buf) -> handleSetShader(new ShaderPacketS2C(buf)));
+		ClientSidePacketRegistry.INSTANCE.register(new ResourceLocation(MovementStatusPacketS2C.METADATA.channel()), (ctx, buf) -> handleMovementStatus(new MovementStatusPacketS2C(buf)));
+		ClientSidePacketRegistry.INSTANCE.register(new ResourceLocation(SetLanguagePacketS2C.METADATA.channel()), (ctx, buf) -> handleLanguage(new SetLanguagePacketS2C(buf)));
 	}
 
 	@Override
@@ -85,11 +87,11 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 
 	public void sendToServer(@NotNull PluginPacket payload) {
 		ResourceLocation loc = new ResourceLocation(payload.metadata().channel());
-		if (!ClientPlayNetworking.canSend(loc)) return;
+		if (!ClientSidePacketRegistry.INSTANCE.canServerReceive(loc)) return;
 		try {
 			FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
 			payload.write(buf);
-			ClientPlayNetworking.send(loc, new FriendlyByteBuf(buf.copy()));
+			ClientSidePacketRegistry.INSTANCE.sendToServer(loc, new FriendlyByteBuf(buf.copy()));
 		} catch (UnsupportedOperationException e) {
 			logger.debug("Server cannot receive packet {}", payload);
 		}

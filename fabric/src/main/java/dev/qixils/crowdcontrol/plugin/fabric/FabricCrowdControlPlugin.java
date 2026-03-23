@@ -10,7 +10,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.FriendlyByteBuf;
@@ -74,11 +74,11 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 
 	public void sendToPlayer(@NotNull ServerPlayer player, @NotNull PluginPacket payload) {
 		ResourceLocation loc = new ResourceLocation(payload.metadata().channel());
-		if (!ServerPlayNetworking.canSend(player, loc)) return;
+		if (!ServerSidePacketRegistry.INSTANCE.canPlayerReceive(player, loc)) return;
 		try {
 			FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
 			payload.write(buf);
-			ServerPlayNetworking.send(player, loc, new FriendlyByteBuf(buf.copy()));
+			ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, loc, new FriendlyByteBuf(buf.copy()));
 		} catch (UnsupportedOperationException e) {
 			getSLF4JLogger().debug("Player {} cannot receive packet {}", player, payload);
 		}
