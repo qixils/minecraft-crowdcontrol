@@ -8,8 +8,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
-import jerozgen.languagereload.LanguageReload;
-import jerozgen.languagereload.config.Config;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -19,7 +17,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Environment(EnvType.CLIENT)
@@ -57,19 +55,21 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 
 		switch (LANGUAGE_STATE) {
 			case RESET -> {
-				Config config = Config.getInstance();
-				LanguageReload.setLanguage(config.previousLanguage, config.previousFallbacks);
+				// TODO 26.1
+//				Config config = Config.getInstance();
+//				LanguageReload.setLanguage(config.previousLanguage, config.previousFallbacks);
 			}
 			case RANDOM -> {
-				Config config = Config.getInstance();
-				List<String> languages = new ArrayList<>(client.getLanguageManager().getLanguages().keySet());
-				languages.remove(config.language);
-				languages.removeAll(config.fallbacks);
-				languages.remove("en_us");
-				Collections.shuffle(languages);
-				LinkedList<String> fallback = new LinkedList<>(languages.subList(1, 6));
-				fallback.add("en_us"); // I assume this should always be loaded
-				LanguageReload.setLanguage(languages.getFirst(), fallback);
+				// TODO 26.1
+//				Config config = Config.getInstance();
+//				List<String> languages = new ArrayList<>(client.getLanguageManager().getLanguages().keySet());
+//				languages.remove(config.language);
+//				languages.removeAll(config.fallbacks);
+//				languages.remove("en_us");
+//				Collections.shuffle(languages);
+//				LinkedList<String> fallback = new LinkedList<>(languages.subList(1, 6));
+//				fallback.add("en_us"); // I assume this should always be loaded
+//				LanguageReload.setLanguage(languages.getFirst(), fallback);
 			}
 			case null, default -> logger.warn("Unknown language state {}", LANGUAGE_STATE);
 		}

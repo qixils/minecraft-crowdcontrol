@@ -1,6 +1,5 @@
 val configurateVersion: String by project
 val adventurePlatformModVersion: String by project
-val clothConfigVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformVersion: String by project
 val neo_form_version: String by project
@@ -35,7 +34,6 @@ dependencies {
     implementation("org.spongepowered:configurate-hocon:$configurateVersion")
 
     compileOnly("net.kyori:adventure-platform-mod-shared:$adventurePlatformModVersion")
-    compileOnly("me.shedaniel.cloth:cloth-config:$clothConfigVersion")
 
     // TODO: adventure is being weird
     compileOnly("net.kyori:adventure-api:$adventureVersion")

@@ -2,7 +2,6 @@ import me.modmuss50.mpp.ReleaseType
 
 val neoforgeVersion: String by project
 val adventurePlatformModVersion: String by project
-val clothConfigVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
 val jacksonVersion: String by project
@@ -91,7 +90,6 @@ repositories {
 
 dependencies {
     implementation(jarJar("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
-    implementation(jarJar("me.shedaniel.cloth:cloth-config-neoforge:$clothConfigVersion")!!)
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     // TODO: is this still needed? should we shadow everythimg manually? (probably)
@@ -162,7 +160,7 @@ publishMods {
         javaVersions.add(JavaVersion.VERSION_21)
         serverRequired.set(true)
         clientRequired.set(false)
-        embeds("cloth-config")
+//        embeds("yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -183,6 +181,6 @@ publishMods {
             }
             append(")")
         })
-        embeds("cloth-config", "adventure-platform-mod")
+        embeds("adventure-platform-mod")
     }
 }

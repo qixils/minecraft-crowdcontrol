@@ -2,7 +2,6 @@ import me.modmuss50.mpp.ReleaseType
 
 val adventureVersion: String by project
 val adventurePlatformModVersion: String by project
-val clothConfigVersion: String by project
 val fabricVersion: String by project
 val loaderVersion: String by project
 val modMenuVersion: String by project
@@ -18,7 +17,7 @@ val versionId = project.version.toString() + "+fabric-$minecraft_version"
 
 plugins {
     id("multiloader-loader")
-    id("fabric-loom")
+    id("net.fabricmc.fabric-loom")
     id("me.modmuss50.mod-publish-plugin")
 }
 
@@ -47,18 +46,13 @@ configurations {
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
-    // TODO: to remove in 26.1
-    mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:$fabric_loader_version")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
+    implementation("net.fabricmc:fabric-loader:$fabric_loader_version")
+    implementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
-    modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
-    modImplementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
-        exclude(group = "net.fabricmc.fabric-api")
-    })
-    modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
-    modImplementation("maven.modrinth:language-reload:$languageReloadVersion")
+    implementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
+    implementation("com.terraformersmc:modmenu:$modMenuVersion")
+    implementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
+//    implementation("maven.modrinth:language-reload:$languageReloadVersion")
 
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
@@ -113,12 +107,6 @@ sourceSets.configureEach {
         }
     }
 }
-// TODO: to remove in 26.1
-loom.remapConfigurations.configureEach {
-    configurations.named(name) {
-        attributes.attribute(loaderAttribute, "fabric")
-    }
-}
 // end todo
 
 // TODO: is this still necessary?
@@ -170,7 +158,7 @@ publishMods {
         clientRequired.set(false)
         requires("fabric-api")
         optional("modmenu", "language-reload")
-        embeds("cloth-config")
+//        embeds("yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -193,6 +181,6 @@ publishMods {
         })
         requires("fabric-api")
         optional("modmenu", "language-reload")
-        embeds("cloth-config", "adventure-platform-mod")
+        embeds("adventure-platform-mod")
     }
 }

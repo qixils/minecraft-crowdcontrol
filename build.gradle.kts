@@ -5,7 +5,7 @@ plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "9.2.0" apply false
     id("com.gradleup.shadow") version "8.3.7" apply true
-    id("fabric-loom") version "1.13-SNAPSHOT" apply false
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
     id("net.neoforged.moddev") version "2.0.140" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("de.eldoria.plugin-yml.bukkit") version "0.8.0" apply false // Generates plugin.yml
