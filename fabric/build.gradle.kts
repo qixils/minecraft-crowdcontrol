@@ -88,7 +88,7 @@ dependencies {
         exclude(group = "org.incendo", module = "cloud-core")
     }
     common(project(path = ":mojmap-common", configuration = "namedElements")) // { isTransitive = false }
-    shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
+    shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionFabric"))
     shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion")
 }
 
