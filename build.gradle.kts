@@ -77,6 +77,8 @@ subprojects {
     val isModded = listOf("mojmap-common", "fabric-platform", "neoforge-platform").contains(project.name)
 
     tasks.shadowJar {
+        isZip64 = true // wtf
+
         relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
         relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
         relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")
