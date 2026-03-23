@@ -34,7 +34,7 @@
   "depends": {
     "fabricloader": "*",
     "fabric-api": "*",
-    "minecraft": ">=1.21.11- <1.22",
+    "minecraft": ">=26.1- <26.2",
     "adventure-platform-fabric": "*",
     "net_kyori_adventure-api": "*",
     "fabric-permissions-api-v0": "*"
