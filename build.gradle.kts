@@ -4,7 +4,7 @@ val mojmapVersion: String by project
 plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "9.2.0" apply false
-    id("com.gradleup.shadow") version "9.4.0" apply true
+    id("com.gradleup.shadow") version "8.3.10" apply true
     id("dev.architectury.loom") version "1.10-SNAPSHOT" apply false
     id("xyz.jpenilla.run-paper") version "2.3.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("de.eldoria.plugin-yml.bukkit") version "0.8.0" apply false // Generates plugin.yml
