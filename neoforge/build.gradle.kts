@@ -12,8 +12,7 @@ val minecraft_version: String by project
 val neoforge_version: String by project
 val mod_id: String by project
 
-val versionId = rootProject.version.toString() + "+neoforge-$minecraft_version"
-version = "$minecraft_version-${rootProject.version}"
+val versionId = project.version.toString() + "+neoforge-$minecraft_version"
 
 plugins {
     id("multiloader-loader")
@@ -121,7 +120,7 @@ publishMods {
                 append(versionTo)
             }
             append("] v")
-            append(rootProject.version.toString())
+            append(project.version.toString())
         })
         javaVersions.add(JavaVersion.VERSION_21)
         serverRequired.set(true)
@@ -138,7 +137,7 @@ publishMods {
         version.set(versionId)
         displayName.set(buildString {
             append("v")
-            append(rootProject.version.toString())
+            append(project.version.toString())
             append(" (NeoForge ")
             append(versionFrom)
             if (versionFrom != versionTo) {

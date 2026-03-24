@@ -8,7 +8,6 @@ val luckPermsVersion: String by project
 
 val mcVersionSplit = minecraftVersion.split(".")
 val versionId = project.version.toString() + "+paper-" + minecraftVersion
-version = "$minecraftVersion-${rootProject.version}"
 description = "Minecraft Crowd Control: Paper"
 
 plugins {
@@ -65,7 +64,7 @@ tasks {
 
     shadowJar {
         // set name of output file to CrowdControl-PLATFORM+VERSION.jar
-        archiveBaseName.set("CrowdControl-Paper+$version")
+        archiveBaseName.set("CrowdControl-Paper+$minecraftVersion-$version")
         archiveClassifier.set("")
         archiveVersion.set("")
 
@@ -114,7 +113,7 @@ publishMods {
         version.set(versionId)
         displayName.set(buildString {
             append("v")
-            append(rootProject.version.toString())
+            append(project.version.toString())
             append(" (Paper ")
             append(versionFrom)
             if (versionFrom != versionTo) {

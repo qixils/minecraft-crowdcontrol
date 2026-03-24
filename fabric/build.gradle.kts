@@ -16,8 +16,7 @@ val fabric_loader_version: String by project
 val fabric_version: String by project
 val mod_id: String by project
 
-val versionId = rootProject.version.toString() + "+fabric-$minecraft_version"
-version = "$minecraft_version-${rootProject.version}"
+val versionId = project.version.toString() + "+fabric-$minecraft_version"
 
 plugins {
     id("multiloader-loader")
@@ -95,7 +94,7 @@ sourceSets.configureEach {
 
 // TODO: is this still necessary?
 //tasks.processResources {
-//    inputs.property("version", rootProject.version)
+//    inputs.property("version", project.version)
 //    inputs.property("minecraftVersion", mojmapVersion)
 //    filteringCharset = "UTF-8"
 //
@@ -129,7 +128,7 @@ publishMods {
                 append(versionTo)
             }
             append("] v")
-            append(rootProject.version.toString())
+            append(project.version.toString())
         })
         javaVersions.add(JavaVersion.VERSION_21)
         serverRequired.set(true)
@@ -148,7 +147,7 @@ publishMods {
         version.set(versionId)
         displayName.set(buildString {
             append("v")
-            append(rootProject.version.toString())
+            append(project.version.toString())
             append(" (Fabric ")
             append(versionFrom)
             if (versionFrom != versionTo) {

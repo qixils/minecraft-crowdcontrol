@@ -1,5 +1,5 @@
 val nettyVersion: String by project
-val mojmapVersion: String by project
+val minecraft_version: String by project
 
 plugins {
     id("java-library") apply true
@@ -88,7 +88,7 @@ subprojects {
                     // set name of output file to CrowdControl-PLATFORM+VERSION.jar
                     var titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
                     if (titleCaseName == "Neoforge") titleCaseName = "NeoForge"
-                    archiveBaseName.set("CrowdControl-$titleCaseName+$version")
+                    archiveBaseName.set("CrowdControl-$titleCaseName+$minecraft_version-$version")
                     archiveClassifier.set("")
                     archiveVersion.set("")
                 }
