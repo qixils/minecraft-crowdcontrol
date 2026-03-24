@@ -136,13 +136,13 @@ tasks.remapJar {
 }
 
 publishMods {
-    val versionFrom = "1.21.5"
-    val versionTo = "1.21.5"
+    val versionFrom = "1.16.1"
+    val versionTo = "1.16.1"
 
     file.set(tasks.remapJar.get().archiveFile)
     modLoaders.add("fabric")
     modLoaders.add("quilt")
-    type.set(ReleaseType.STABLE)
+    type.set(ReleaseType.BETA)
     changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
