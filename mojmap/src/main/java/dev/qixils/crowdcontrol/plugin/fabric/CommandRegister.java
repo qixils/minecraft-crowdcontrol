@@ -177,6 +177,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 		// gamemode commands
 		for (GameType gameType : GameType.values()) {
 			if (gameType == GameType.SURVIVAL) continue;
+			if (gameType == GameType.NOT_SET) continue; // !?
 			initTo(commands, () -> new GameModeCommand(plugin, gameType, gameType == GameType.SPECTATOR ? 8L : 15L));
 		}
 

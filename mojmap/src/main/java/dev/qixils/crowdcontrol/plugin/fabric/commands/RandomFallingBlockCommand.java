@@ -86,6 +86,7 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 				entity.fallDamageAmount = 0.75f;
 				entity.fallDamageMax = 4;
 				entity.dropItem = true;
+				entity.time = 1;
 				player.getLevel().addFreshEntity(entity);
 
 				success = true;

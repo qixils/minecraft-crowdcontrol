@@ -12,11 +12,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,10 +29,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 
 @Getter
 public class VeinCommand extends ModdedCommand {
-	// we don't have fabric api imported anymore so we have to define the common tags manually
-	// TODO: fabric-api is maybe not available
-	public static final Tag<Block> ORES = BlockTags.bind("c:ores");
-
 	private final String effectName = "vein";
 
 	public VeinCommand(ModdedCrowdControlPlugin plugin) {
@@ -81,17 +73,19 @@ public class VeinCommand extends ModdedCommand {
 
 				List<Ore> ores = new ArrayList<>();
 
+				ores.add(new Ore(Blocks.COAL_ORE, 6));
+				ores.add(new Ore(Blocks.DIAMOND_ORE, 6));
+				ores.add(new Ore(Blocks.EMERALD_ORE, 6));
+				ores.add(new Ore(Blocks.GOLD_ORE, 6));
+				ores.add(new Ore(Blocks.IRON_ORE, 6));
+				ores.add(new Ore(Blocks.LAPIS_ORE, 6));
+				ores.add(new Ore(Blocks.REDSTONE_ORE, 6));
+				ores.add(new Ore(Blocks.NETHER_GOLD_ORE, 6));
+				ores.add(new Ore(Blocks.NETHER_QUARTZ_ORE, 6));
+				ores.add(new Ore(Blocks.ANCIENT_DEBRIS, 3));
 				// troll blocks
 				ores.add(new Ore(Blocks.LAVA, 1));
 				ores.add(new Ore(Blocks.INFESTED_STONE, 1));
-
-				ORES.getValues().stream()
-					.sorted((a, b) -> {
-						ResourceLocation keyA = Registry.BLOCK.getKey(a);
-						ResourceLocation keyB = Registry.BLOCK.getKey(b);
-						return keyA.asString().compareTo(keyB.asString());
-					})
-					.forEach(item -> ores.add(new Ore(item, item == Blocks.ANCIENT_DEBRIS ? 3 : 6)));
 
 				for (int iter = 0; iter < VEIN_COUNT; iter++) {
 					Ore ore = RandomUtil.weightedRandom(ores);

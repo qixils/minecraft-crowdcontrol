@@ -269,6 +269,7 @@ public class LootboxCommand extends ModdedCommand {
 
 	// lore getter
 	private List<net.kyori.adventure.text.Component> getLore(ItemStack itemStack) {
+		List<Component> lines = new ArrayList<>();
 		// yanked from vanilla
 		CompoundTag tag = itemStack.getTag();
 		if (tag != null) {
@@ -277,7 +278,6 @@ public class LootboxCommand extends ModdedCommand {
 
 				if (displayTag.getTagType("Lore") == 9) {
 					ListTag listTag = displayTag.getList("Lore", 8);
-					List<Component> lines = new ArrayList<>();
 
 					for (int j = 0; j < listTag.size(); ++j) {
 						String string = listTag.getString(j);
@@ -290,12 +290,10 @@ public class LootboxCommand extends ModdedCommand {
 						} catch (JsonParseException ignored) {
 						}
 					}
-
-					return lines;
 				}
 			}
 		}
-		return Collections.emptyList();
+		return lines;
 	}
 
 	// lore setter
