@@ -11,7 +11,7 @@ val luckPermsVersion: String by project
 val versionId = project.version.toString() + "+neoforge-$mojmapVersion"
 
 plugins {
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
     id("architectury-plugin")
     id("dev.architectury.loom")
     id("me.modmuss50.mod-publish-plugin")

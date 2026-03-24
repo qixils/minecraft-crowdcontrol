@@ -1,5 +1,5 @@
 import path from "path";
-import { downloadFile, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
+import { downloadFile, jrePaths, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
 import { downloadMod } from "./modrinth.js";
 
 interface BaseBody {
@@ -42,7 +42,7 @@ export async function fetchLatest(version: string, force?: boolean) {
         : data.builds.findLast(build => build.channel === "default")
 }
 
-export async function downloadPaper(to: string, forceVersion?: string) {
+export async function downloadPaper(to: string, forceVersion: string, java: keyof (typeof jrePaths)) {
     try {
         const root = await mkdir(path.resolve(to, "Paper"), { empty: true })
         await writeEula(root)
@@ -74,7 +74,7 @@ export async function downloadPaper(to: string, forceVersion?: string) {
         const paperDlUrl = `https://api.papermc.io/v2/projects/paper/versions/${version}/builds/${build.build}/downloads/${dlName}`
         await downloadFile(serverJar, paperDlUrl)
 
-        await writeRun(serverJar, 21)
+        await writeRun(serverJar, java)
         
         return await downloadMod(plugins, "paper", version, { filename: "CrowdControl-Paper.jar" })
     } catch (e) {

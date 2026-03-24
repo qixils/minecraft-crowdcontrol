@@ -2,6 +2,27 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.5.0
+
+- Added new effect _Replace Air with Water_
+- Fixed _Spectator Mode_ effect showing in chat twice
+- Fabric: Added support for 1.16.1
+- Fabric/NeoForge: Added support for 26.1
+- Fabric/NeoForge 26.1+: Added new effects _Age Nearby Mobs to Babies_ and _Adults_
+- Fabric/NeoForge: Fixed run-command in custom effects
+- Fabric/NeoForge: Fixed armor trims being given to non-armor items in lootboxes
+- Fabric/NeoForge 26.1+: Migrate config UI to YACL and made optional to reduce filesize
+  - Temporarily disabled while waiting for YACL to publish a NeoForge build
+- Fabric/NeoForge 26.1+: Added more options to the config UI
+
+## 4.4.2
+
+- Fabric: Fixed client effects being unavailable.
+
+## 4.4.1
+
+Fixed loading issue with NeoForge 1.21.11.
+
 ## 4.4.0
 
 - NeoForge is once again supported
