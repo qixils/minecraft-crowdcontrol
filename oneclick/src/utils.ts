@@ -12,6 +12,7 @@ export const jreMode: "static" | "dynamic" = "static"
 export const jrePaths = {
   8: "jdk8u422-b05",
   21: "jdk-21.0.4-7",
+  25: "jdk-25",
 }
 
 export async function mkdir(dir: string, {

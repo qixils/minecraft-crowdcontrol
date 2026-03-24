@@ -1,5 +1,5 @@
 import path from "path";
-import { downloadFile, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
+import { downloadFile, jrePaths, mkdir, uaheaderfull, writeConfig, writeEula, writeRun } from "./utils.js";
 import { downloadMod } from "./modrinth.js";
 
 interface BaseVersion {
@@ -32,7 +32,7 @@ export function findLatest<Version extends { stable: boolean }>(versions: Versio
     return versions.find(version => version.stable) ?? versions[0]
 }
 
-export async function downloadFabric(to: string, forceVersion?: string) {
+export async function downloadFabric(to: string, forceVersion: string, java: keyof (typeof jrePaths)) {
     const root = await mkdir(path.resolve(to, "Fabric"), { empty: true })
     await writeEula(root)
 
@@ -51,7 +51,7 @@ export async function downloadFabric(to: string, forceVersion?: string) {
     const serverUrl = `https://meta.fabricmc.net/v2/versions/loader/${latestGame.version}/${latestLoader.version}/${latestInstaller.version}/server/jar`
     await downloadFile(serverJar, serverUrl)
 
-    await writeRun(serverJar, 21)
+    await writeRun(serverJar, java)
 
     const mods = await mkdir(path.resolve(root, "mods"))
     await downloadMod(mods, "fabric", latestGame.version, { project: "fabric-api", filename: "fabric-api.jar" })
