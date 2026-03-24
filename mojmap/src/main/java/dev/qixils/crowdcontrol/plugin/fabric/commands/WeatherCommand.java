@@ -1,16 +1,17 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import dev.qixils.crowdcontrol.common.Global;
-import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.saveddata.WeatherData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -35,44 +36,30 @@ public class WeatherCommand extends ModdedCommand {
 			throw new IllegalArgumentException("Storms can only be used with rain");
 	}
 
+	private CCEffectResponse executeEffect(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request) {
+		try {
+			playerSupplier.get(); // validate now is ok to start
+		} catch (Exception e) {
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Players unable to use global effects");
+		}
+
+		MinecraftServer server = plugin.server();
+		WeatherData data = server.getWeatherData();
+		if ((storm && data.isThundering()) || (rain && data.isRaining()) || (!rain && !data.isRaining() && !data.isThundering()))
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Requested weather is already active");
+
+		if (!rain)
+			server.setWeatherParameters(ticks, 0, false, false);
+		else
+			server.setWeatherParameters(0, ticks, true, storm);
+
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+	}
+
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
-			playerSupplier.get(); // validate now is ok to start
-			boolean success = false;
-			for (ServerLevel world : plugin.server().getAllLevels()) {
-				if (!world.dimension().identifier().getPath().equals("overworld"))
-					continue;
-				if (storm && world.isThundering())
-					continue;
-				if (rain && world.isRaining())
-					continue;
-				if (!rain && !world.isRaining() && !world.isThundering())
-					continue;
-				if (!rain)
-					sync(() -> {
-						var weather = world.getWeatherData();
-						weather.setClearWeatherTime(ticks);
-						weather.setRainTime(0);
-						weather.setThunderTime(0);
-						weather.setRaining(false);
-						weather.setThundering(false);
-					});
-				else
-					sync(() -> {
-						var weather = world.getWeatherData();
-						weather.setClearWeatherTime(0);
-						weather.setRainTime(ticks);
-						weather.setThunderTime(ticks); // this is what the old method did, as odd as it looks
-						weather.setRaining(false);
-						weather.setThundering(true);
-					});
-				success = true;
-			}
-			return success
-				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Requested weather is already active");
-		}));
+		// we don't want to spam retry this, it'll succeed or it won't
+		ccPlayer.sendResponse(executeEffect(playerSupplier, request));
 	}
 
 	public static WeatherCommand clear(ModdedCrowdControlPlugin plugin) {
