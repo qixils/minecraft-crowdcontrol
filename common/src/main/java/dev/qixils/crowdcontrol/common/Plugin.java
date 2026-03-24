@@ -846,7 +846,7 @@ public abstract class Plugin<P, S> {
 			crowdcontrolExecuteCmd = LiteralArgumentBuilder.<S>literal("execute")
 				.requires(mapper::isAdmin)
 				.then(
-					RequiredArgumentBuilder.<S, String>argument("execute", StringArgumentType.word())
+					RequiredArgumentBuilder.<S, String>argument("effect", StringArgumentType.word())
 						.suggests(
 							(ctx, builder) -> CompletableFuture.supplyAsync(() -> {
 								String remaining = builder.getRemainingLowerCase();
@@ -872,7 +872,7 @@ public abstract class Plugin<P, S> {
 							Command<P> effect = commandRegister().getCommandByName(commandContext.getArgument("effect", String.class));
 							List<P> players = new ArrayList<>(Collections.singletonList(player));
 							// TODO: add simpler constructors
-							effect.execute(
+							CompletableFuture.runAsync(() -> effect.execute(
 								() -> players,
 								new PublicEffectPayload(
 									UUID.randomUUID(),
@@ -908,7 +908,7 @@ public abstract class Plugin<P, S> {
 									1
 								),
 								optionalCCPlayer(player).orElseThrow()
-							);
+							));
 							return 1;
 						})
 				);

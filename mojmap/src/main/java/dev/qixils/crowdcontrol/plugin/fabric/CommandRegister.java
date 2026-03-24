@@ -127,7 +127,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> EntitySizeCommand.decrease(plugin),
 			() -> new RandomFallingBlockCommand(plugin),
 			() -> new LavaCommand(plugin),
-			() -> new LanguageCommand(plugin)
+			() -> new LanguageCommand(plugin),
+			() -> new AgeCommand(plugin, true),
+			() -> new AgeCommand(plugin, false)
 		));
 
 		// entity commands
