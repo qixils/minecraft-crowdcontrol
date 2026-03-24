@@ -9,8 +9,11 @@ interface NeoVersions {
     versions: string[]
 }
 
-export async function downloadNeoForge(to: string, forceVersion?: string) {
-    if (forceVersion) forceVersion = forceVersion.split(".", 2)[1] + "." // 1.21.5 -> 21.5.
+export async function downloadNeoForge(to: string, forceVersion: string, java: keyof (typeof jrePaths)) {
+    const force_split = forceVersion.split(".")
+    if (force_split[0] === '1') force_split.shift();
+    force_split.push('') // for `.startswith` (yes it's hacky lol)
+    forceVersion = force_split.join('.')
 
     const root = await mkdir(path.resolve(to, `NeoForge`), { empty: true })
     await writeEula(root)
@@ -21,7 +24,7 @@ export async function downloadNeoForge(to: string, forceVersion?: string) {
 
     const neoVersions = await fetch("https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge", uaheaderfull).then(r => r.json()) as NeoVersions
     const neoLatest = neoVersions.versions.reverse().find(ver => forceVersion ? ver.startsWith(forceVersion) : !ver.includes("beta"))!
-    const minecraft = `1.${neoLatest.split(".", 3).slice(0, 2).join(".")}`
+    const minecraft = forceVersion
 
     console.info(`Downloading NeoForge ${neoLatest} installer`)
     const installerJar = path.resolve(to, `neoforge-${neoLatest}.jar`)
@@ -37,7 +40,7 @@ export async function downloadNeoForge(to: string, forceVersion?: string) {
     }
     await fs.unlink(installerJar)
 
-    const jre = jrePaths[21]
+    const jre = jrePaths[java]
     const batFile = path.resolve(root, "run.bat")
     await fs.writeFile(batFile, `@echo off
 start ..\\java\\${jre}\\bin\\java.exe -Xmx2048M -Xms2048M @user_jvm_args.txt @libraries/net/neoforged/neoforge/${neoLatest}/win_args.txt %* > log.txt 2> errorlog.txt`)

@@ -51,6 +51,7 @@ export const paperVersions: Version[] = autoVersion([
 export const paperLatest = findLatest(paperVersions)
 
 export const fabricVersions: Version[] = autoVersion([
+    { id: "26.1", supported: true, legacy: false },
     { id: "1.21.11", supported: true, legacy: false },
     { id: "1.21.10", supported: true, legacy: false },
     { id: "1.21.8", supported: true, legacy: false },
@@ -66,10 +67,12 @@ export const fabricVersions: Version[] = autoVersion([
     { id: "1.20.1", supported: false, legacy: true },
     { id: "1.19.4", supported: false, legacy: true },
     { id: "1.19.2", supported: false, legacy: true },
+    { id: "1.16.1", supported: true, legacy: false },
 ])
 export const fabricLatest = findLatest(fabricVersions)
 
 export const neoForgeVersions: Version[] = autoVersion([
+    { id: "26.1", supported: true, legacy: false },
     { id: "1.21.11", supported: true, legacy: false },
     { id: "1.21.10", supported: true, legacy: false },
     { id: "1.21.8", supported: true, legacy: false },
