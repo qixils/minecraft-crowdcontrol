@@ -11,7 +11,6 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +37,7 @@ public class WaterCommand extends ModdedCommand {
 					.origin(player)
 					.locationValidator(loc -> {
 						var block = loc.block();
-						if (block.is(BlockTags.AIR)) return true;
+						if (block.is(Blocks.AIR)) return true;
 						var waterlogged = block.getOptionalValue(BlockStateProperties.WATERLOGGED);
 						if (waterlogged.isEmpty()) return false; // waterloggable
 						if (waterlogged.get()) return false; // but not watterlogged
@@ -54,9 +53,9 @@ public class WaterCommand extends ModdedCommand {
 			sync(() -> locations.forEach(loc -> {
 				var block = loc.block();
 				loc.block(
-					block.is(BlockTags.AIR)
+					block.is(Blocks.AIR) || block.getOptionalValue(BlockStateProperties.WATERLOGGED).isEmpty()
 						? Blocks.WATER.defaultBlockState()
-						: block.trySetValue(BlockStateProperties.WATERLOGGED, true)
+						: block.setValue(BlockStateProperties.WATERLOGGED, true)
 				);
 			}));
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
