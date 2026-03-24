@@ -29,7 +29,6 @@ subprojects {
     apply {
         plugin("java-library")
         plugin("io.freefair.lombok")
-//        plugin("com.gradleup.shadow")
     }
 
     repositories {
@@ -81,6 +80,20 @@ subprojects {
     if (isPlatform) {
         // inherit resources from common module
         sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
+
+        // paper still uses shadowjar
+        if (isModded) {
+            tasks {
+                jar {
+                    // set name of output file to CrowdControl-PLATFORM+VERSION.jar
+                    var titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
+                    if (titleCaseName == "Neoforge") titleCaseName = "NeoForge"
+                    archiveBaseName.set("CrowdControl-$titleCaseName+$version")
+                    archiveClassifier.set("")
+                    archiveVersion.set("")
+                }
+            }
+        }
     }
 
     if (isModded) {

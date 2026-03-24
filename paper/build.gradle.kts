@@ -64,6 +64,11 @@ tasks {
     }
 
     shadowJar {
+        // set name of output file to CrowdControl-PLATFORM+VERSION.jar
+        archiveBaseName.set("CrowdControl-Paper+$version")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+
         exclude("net/kyori/adventure/text/minimessage/")
         exclude("net/kyori/adventure/text/serializer/")
 
