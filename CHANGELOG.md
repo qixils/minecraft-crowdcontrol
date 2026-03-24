@@ -5,6 +5,7 @@ A list of all changes made to the software in reverse chronological order.
 ## 4.5.0
 
 - Added new effect _Replace Air with Water_
+- Fixed _Spectator Mode_ effect showing in chat twice
 - Fabric: Added support for 1.16.1
 - Fabric/NeoForge: Added support for 26.1
 - Fabric/NeoForge 26.1+: Added new effects _Age Nearby Mobs to Babies_ and _Adults_
