@@ -1,21 +1,15 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
-import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
-import me.shedaniel.clothconfig2.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +22,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-@Environment(EnvType.CLIENT)
+//@Environment(EnvType.CLIENT)
 public abstract class ModdedPlatformClient {
 	protected final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
 	protected final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -81,29 +75,7 @@ public abstract class ModdedPlatformClient {
 	}
 
 	public static Screen createConfigScreen(Screen parent) {
-		ModdedCrowdControlPlugin plugin = ModdedCrowdControlPlugin.getInstance();
-		plugin.loadConfig();
-		ConfigBuilder builder = ConfigBuilder.create()
-			// I wish I could hide the search bar
-			.setParentScreen(parent)
-			.setTitle(Component.translatable("config.crowdcontrol.title"))
-			.setSavingRunnable(plugin::saveConfig);
-		ConfigCategory category = builder.getOrCreateCategory(Component.translatable("config.crowdcontrol.category.general"));
-		ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-		category.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.crowdcontrol.announce.name"), plugin.announceEffects())
-			.setDefaultValue(true)
-			.setTooltip(Component.translatable("config.crowdcontrol.announce.description"))
-			.setSaveConsumer(plugin::setAnnounceEffects)
-			.build());
-		category.addEntry(entryBuilder.startEnumSelector(Component.translatable("config.crowdcontrol.hide_names.name"), HideNames.class, plugin.getHideNames())
-			.setDefaultValue(HideNames.NONE)
-			.setTooltip(Component.translatable("config.crowdcontrol.hide_names.description"))
-			.setSaveConsumer(plugin::setHideNames)
-			.setEnumNameProvider(enumValue -> Component.translatable("config.crowdcontrol.hide_names.option." + ((HideNames) enumValue).getConfigCode()))
-			.build());
-		category.addEntry(entryBuilder.startTextDescription(Component.translatable("config.crowdcontrol.advanced_settings")).build());
-		// TODO: add entity & item limits
-		return builder.build();
+		return parent; // TODO yacl
 	}
 
 	public void handleRequestVersion(@NotNull RequestVersionS2C payload, @NotNull ClientPacketContext context) {
@@ -128,7 +100,7 @@ public abstract class ModdedPlatformClient {
 
 	public void handleMovementStatus(@NotNull MovementStatusS2C payload, @NotNull ClientPacketContext context) {
 		if (payload.statusType() == null || payload.statusValue() == null) return;
-		context.player().cc$setMovementStatus(payload.statusType(), payload.statusValue());
+		((MovementStatus) context.player()).cc$setMovementStatus(payload.statusType(), payload.statusValue());
 	}
 
 	public abstract void sendToServer(@NotNull CustomPacketPayload payload);

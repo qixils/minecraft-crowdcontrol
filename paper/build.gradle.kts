@@ -1,7 +1,6 @@
 import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
-val cloudPaperVersion: String by project
 val minecraftVersion: String by project
 val paperlibVersion: String by project
 val configurateVersion: String by project
@@ -16,11 +15,11 @@ plugins {
     id("de.eldoria.plugin-yml.bukkit") // Generates plugin.yml
     id("io.papermc.paperweight.userdev")
     id("me.modmuss50.mod-publish-plugin")
+    id("com.gradleup.shadow")
 }
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("org.incendo:cloud-paper:$cloudPaperVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
     implementation("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
@@ -64,8 +63,27 @@ tasks {
     }
 
     shadowJar {
+        // set name of output file to CrowdControl-PLATFORM+VERSION.jar
+        archiveBaseName.set("CrowdControl-Paper+$minecraftVersion-$version")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+
+        exclude("net/kyori/adventure/text/minimessage/")
+        exclude("net/kyori/adventure/text/serializer/")
+
+        dependencies {
+            exclude("net.kyori.adventure.text.minimessage::")
+            exclude("net.kyori.adventure.text.serializer.legacy::")
+            exclude("net.kyori.adventure.text.serializer.plain::")
+        }
+
         relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
         relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
+        relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations") // TODO: can i just strip these they dont even really need to exist
+        relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
+        relocate("javassist", "dev.qixils.relocated.javassist")
+        relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
+        relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
     }
 }
 

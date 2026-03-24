@@ -8,6 +8,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -27,7 +28,7 @@ public final class CraftItemCondition extends AbstractBooleanListeningCondition 
 		this.item = item;
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.craft." + key,
-				ModdedCrowdControlPlugin.getInstance().adventure().asAdventure(item.getName()).color(NamedTextColor.GREEN)
+				ModdedCrowdControlPlugin.getInstance().adventure().asAdventure(item.getName(new ItemStack(item))).color(NamedTextColor.GREEN)
 		);
 	}
 

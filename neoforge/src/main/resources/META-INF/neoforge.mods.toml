@@ -14,6 +14,12 @@ The Ultimate Interactive Experience for Streamers
 '''
 logoFile = "assets/crowdcontrol/icon.png"
 
+# In neoforge.mods.toml:
+[[accessTransformers]]
+## The file is relative to the output directory of the resources, or the root path inside the jar when compiled
+## The 'resources' directory represents the root output directory of the resources
+file="META-INF/accesstransformer.cfg"
+
 [[dependencies.crowdcontrol]]
 modId = "neoforge"
 type = "required"
@@ -24,7 +30,7 @@ side = "BOTH"
 [[dependencies.crowdcontrol]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.11,1.22)"
+versionRange = "[26.0,26.2)"
 ordering = "NONE"
 side = "BOTH"
 

@@ -62,7 +62,7 @@ public class PlantTreeCommand extends ModdedCommand {
 				// so this is run as sync to avoid confusing, useless errors
 				sync(() -> {
 					ServerLevel level = player.level();
-					if (treeType.place(level, level.getChunkSource().getGenerator(), level.random, player.blockPosition()))
+					if (treeType.place(level, level.getChunkSource().getGenerator(), level.getRandom(), player.blockPosition()))
 						success.set(true);
 					future.complete(null);
 				});

@@ -33,12 +33,10 @@
   "accessWidener" : "crowdcontrol.accesswidener",
   "depends": {
     "fabricloader": "*",
-    "fabric": "*",
-    "minecraft": ">=1.21.11- <1.22",
-    "cloud": "*",
+    "fabric-api": "*",
+    "minecraft": ">=26.1- <26.2",
     "adventure-platform-fabric": "*",
     "net_kyori_adventure-api": "*",
-    "cloth-config": "*",
     "fabric-permissions-api-v0": "*"
   },
   "recommends": {

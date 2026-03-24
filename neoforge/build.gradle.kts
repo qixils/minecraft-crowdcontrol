@@ -1,136 +1,106 @@
 import me.modmuss50.mpp.ReleaseType
 
 val neoforgeVersion: String by project
-val mojmapVersion: String by project
 val adventurePlatformModVersion: String by project
-val clothConfigVersion: String by project
-val cloudMojmapVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
+val jacksonVersion: String by project
+val crowdControlVersion: String by project
+val adventureVersion: String by project
+val geantyrefVersion: String by project
+val minecraft_version: String by project
+val neoforge_version: String by project
+val mod_id: String by project
 
-val versionId = project.version.toString() + "+neoforge-$mojmapVersion"
+val versionId = project.version.toString() + "+neoforge-$minecraft_version"
 
 plugins {
-    id("com.gradleup.shadow")
-    id("architectury-plugin")
-    id("dev.architectury.loom")
+    id("multiloader-loader")
+    id("net.neoforged.moddev")
     id("me.modmuss50.mod-publish-plugin")
 }
 
-architectury {
-    platformSetupLoomIde()
-    neoForge()
+neoForge {
+    version = neoforge_version
+    // Automatically enable neoforge AccessTransformers if the file exists
+    val at = project(":mojmap-common").file("src/main/resources/META-INF/accesstransformer.cfg")
+    if (!at.exists()) {
+        throw RuntimeException("Could not load access transformer")
+    }
+    accessTransformers.from(at.absolutePath)
+//    parchment {
+//        minecraftVersion.set(parchment_minecraft)
+//        mappingsVersion.set(parchment_version)
+//    }
+    runs {
+        configureEach {
+            systemProperty("neoforge.enabledGameTestNamespaces", mod_id)
+            ideName = "NeoForge ${name.replaceFirstChar { it.uppercase() }} (${project.path})"
+        }
+        create("client") {
+            client()
+        }
+        create("data") {
+            clientData()
+            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            programArguments.addAll("--mod", mod_id, "--all", "--output", file("src/generated/resources/").absolutePath, "--existing", file("src/main/resources/").absolutePath)
+        }
+        create("server") {
+            server()
+        }
+    }
+    mods {
+        create(mod_id) {
+            sourceSet(sourceSets["main"])
+        }
+    }
+}
+
+sourceSets["main"].resources.srcDir("src/generated/resources")
+
+val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
+listOf("apiElements", "runtimeElements"/*, "sourcesElements", "javadocElements"*/).forEach { variant ->
+    configurations.named(variant) {
+        attributes.attribute(loaderAttribute, "neoforge")
+    }
+}
+sourceSets.configureEach {
+    listOf(compileClasspathConfigurationName, runtimeClasspathConfigurationName, getTaskName(null, "jarJar")).forEach { variant ->
+        configurations.named(variant) {
+            attributes.attribute(loaderAttribute, "neoforge")
+        }
+    }
 }
 
 //// dependency configuration
-
-// architectury
-val common: Configuration by configurations.creating {
-    isCanBeResolved = true
-    isCanBeConsumed = false
-}
-
-// Files in this configuration will be bundled into your mod using the Shadow plugin.
-// Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
-val shadowBundle: Configuration by configurations.creating {
-    isCanBeResolved = true
-    isCanBeConsumed = false
-}
-
-configurations {
-    compileClasspath.get().extendsFrom(common)
-    runtimeClasspath.get().extendsFrom(common)
-    implementation.get().extendsFrom(shadowBundle)
-    getByName("developmentNeoForge").extendsFrom(common)
-}
 
 repositories {
     maven(url = "https://maven.su5ed.dev/releases")
 }
 
 dependencies {
-    minecraft("net.minecraft:minecraft:$mojmapVersion")
-    mappings(loom.officialMojangMappings())
+    implementation(jarJar("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
+    compileOnly("net.luckperms:api:$luckPermsVersion")
 
-    neoForge("net.neoforged:neoforge:$neoforgeVersion")
-
-    modImplementation(include("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
-    modImplementation(include("org.incendo:cloud-neoforge:$cloudMojmapVersion")!!)
-    modImplementation(include("me.shedaniel.cloth:cloth-config-neoforge:$clothConfigVersion")!!)
-    modCompileOnly("net.luckperms:api:$luckPermsVersion")
-
-    shadowBundle(project(":base-common")) {
-        exclude(group = "com.google.code.gson")
-        exclude(group = "com.google.auto.service")
-        exclude(group = "com.google.inject")
-        exclude(group = "com.google.guava")
-        exclude(group = "com.google.errorprone")
-        exclude(group = "com.google.j2objc")
-        exclude(group = "com.google.code.findbugs")
-        exclude(group = "org.incendo", module = "cloud-core")
-        exclude(group = "com.fasterxml.jackson.annotation")
-        exclude(group = "com.fasterxml.jackson.core") // TODO: jarjar? not sure where this is pulled in from
-        // TODO: jarjar geantryref, websockets
-    }
-    common(project(path = ":mojmap-common", configuration = "namedElements")) { isTransitive = false }
-    shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
-
-    // jarInJar/include is not transitive so we have to do this cope instead
-    shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion") {
-        exclude(group = "net.kyori")
-    }
-    modImplementation(include("net.kyori:option:1.1.0")!!)
-}
-
-tasks.processResources {
-    inputs.property("version", project.version)
-    inputs.property("minecraftVersion", mojmapVersion)
-    filteringCharset = "UTF-8"
-
-    filesMatching("META-INF/neoforge.mods.toml") {
-        expand("version" to versionId)
-    }
-}
-
-loom {
-//    mixin {
-//        useLegacyMixinAp.set(true)
-//        defaultRefmapName.set("crowd-control-refmap.json")
-//    }
-//    accessWidenerPath = project(":mojmap-common").projectDir.resolve("src/main/resources/crowdcontrol.accesswidener")
-}
-
-// loom.neoForge {}
-
-tasks.shadowJar {
-    configurations = listOf(shadowBundle)
-    archiveBaseName.set("shadow-CrowdControl")
-    archiveVersion.set("")
-
-    exclude("org/slf4j/")
-    exclude("io/leangen/geantyref/")
-    exclude("net/kyori/option/")
-
-    dependencies {
-        exclude("org.slf4j::")
-        exclude("io.leangen.geantyref::")
-        exclude("net.kyori:option:")
-    }
-}
-
-tasks.remapJar {
-    // configure remapJar to use output of shadowJar
-    dependsOn(tasks.shadowJar)
-    inputFile.set(tasks.shadowJar.get().archiveFile)
-    archiveBaseName.set("CrowdControl-NeoForge+$mojmapVersion")
-    archiveClassifier.set("")
+    // add transitive deps
+    jarJar(project(":base-common")) // this is available via api of mojmap-common (which is available via multiloader plugin) but not added to jar
+    jarJar("dev.qixils:cc4j-pubsub:$crowdControlVersion")
+    jarJar("org.spongepowered:configurate-core:$configurateVersion")
+    jarJar("org.spongepowered:configurate-hocon:$configurateVersion")
+    jarJar("net.kyori:adventure-serializer-configurate4:$adventureVersion")
+    jarJar("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+    jarJar("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    jarJar("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    jarJar("io.leangen.geantyref:geantyref:$geantyrefVersion")
+    jarJar("net.kyori:option:1.1.0")
 }
 
 publishMods {
-    val versionFrom = "1.21.11"
-    val versionTo = "1.21.11"
+    val versionFrom = "26.1"
+    val versionTo = "26.1"
 
-    file.set(tasks.remapJar.get().archiveFile)
+    file.set(tasks.jar.get().archiveFile)
     modLoaders.add("neoforge")
     type.set(ReleaseType.STABLE)
     changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
@@ -155,7 +125,7 @@ publishMods {
         javaVersions.add(JavaVersion.VERSION_21)
         serverRequired.set(true)
         clientRequired.set(false)
-        embeds("cloth-config")
+//        embeds("yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -176,6 +146,6 @@ publishMods {
             }
             append(")")
         })
-        embeds("cloth-config", "adventure-platform-mod")
+        embeds("adventure-platform-mod")
     }
 }

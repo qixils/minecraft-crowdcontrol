@@ -1,15 +1,15 @@
 val nettyVersion: String by project
-val mojmapVersion: String by project
+val minecraft_version: String by project
 
 plugins {
     id("java-library") apply true
-    id("io.freefair.lombok") version "8.14" apply false
-    id("com.gradleup.shadow") version "8.3.7" apply true
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
+    id("io.freefair.lombok") version "9.2.0" apply false
+    id("com.gradleup.shadow") version "8.3.10" apply true
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
+    id("net.neoforged.moddev") version "2.0.141" apply false
     id("xyz.jpenilla.run-paper") version "2.3.1" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("de.eldoria.plugin-yml.bukkit") version "0.8.0" apply false // Generates plugin.yml
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" apply false
-    id("architectury-plugin") version "3.4-SNAPSHOT" apply true
     id("me.modmuss50.mod-publish-plugin") version "1.1.0" apply false
 }
 
@@ -18,19 +18,17 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-architectury {
-    minecraft = mojmapVersion
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 subprojects {
     apply {
         plugin("java-library")
         plugin("io.freefair.lombok")
-        plugin("com.gradleup.shadow")
     }
 
     repositories {
@@ -42,6 +40,9 @@ subprojects {
         }
         maven("https://maven.neoforged.net/releases") {
             name = "NeoForged"
+        }
+        maven("https://libraries.minecraft.net") {
+            name = "Minecraft Libraries"
         }
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
             name = "sonatype-oss-snapshots"
@@ -57,7 +58,7 @@ subprojects {
         compileOnly("io.netty:netty-buffer:$nettyVersion")
     }
 
-    val targetJavaVersion = 21
+    val targetJavaVersion = 25
     tasks.withType<JavaCompile>().configureEach {
         options.release.set(targetJavaVersion)
         options.encoding = Charsets.UTF_8.name()
@@ -76,40 +77,20 @@ subprojects {
     val isPlatform = project.name.endsWith("-platform")
     val isModded = listOf("mojmap-common", "fabric-platform", "neoforge-platform").contains(project.name)
 
-    tasks.shadowJar {
-        relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
-        relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
-        relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")
-        relocate("net.kyori.adventure.serializer", "dev.qixils.relocated.adventure.serializer")
-        relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations")
-        relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
-        relocate("javassist", "dev.qixils.relocated.javassist")
-        relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
-        relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
-
-        if (!isModded) {
-            relocate("org.incendo.cloud", "dev.qixils.relocated.cloud")
-        }
-    }
-
     if (isPlatform) {
         // inherit resources from common module
         sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
 
-        tasks {
-            // TODO: disable output of non-shaded jars? or make their file names more obvious?
-            shadowJar {
-                // set name of output file to CrowdControl-XYZ-VERSION.jar
-                val titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
-                archiveBaseName.set("CrowdControl-$titleCaseName")
-                archiveClassifier.set("")
-            }
-        }
-
-        if (project.name != "fabric-platform") {
+        // paper still uses shadowjar
+        if (isModded) {
             tasks {
-                build {
-                    dependsOn(shadowJar)
+                jar {
+                    // set name of output file to CrowdControl-PLATFORM+VERSION.jar
+                    var titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
+                    if (titleCaseName == "Neoforge") titleCaseName = "NeoForge"
+                    archiveBaseName.set("CrowdControl-$titleCaseName+$minecraft_version-$version")
+                    archiveClassifier.set("")
+                    archiveVersion.set("")
                 }
             }
         }

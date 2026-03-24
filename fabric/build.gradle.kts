@@ -2,49 +2,26 @@ import me.modmuss50.mpp.ReleaseType
 
 val adventureVersion: String by project
 val adventurePlatformModVersion: String by project
-val clothConfigVersion: String by project
-val cloudMojmapVersion: String by project
 val fabricVersion: String by project
 val loaderVersion: String by project
 val modMenuVersion: String by project
-val mojmapVersion: String by project
 val configurateVersion: String by project
 val luckoPermissionsApiVersion: String by project
 val languageReloadVersion: String by project
+val crowdControlVersion: String by project
+val jacksonVersion: String by project
+val geantyrefVersion: String by project
+val minecraft_version: String by project
+val fabric_loader_version: String by project
+val fabric_version: String by project
+val mod_id: String by project
 
-val versionId = project.version.toString() + "+fabric-$mojmapVersion"
+val versionId = project.version.toString() + "+fabric-$minecraft_version"
 
 plugins {
-    id("architectury-plugin")
-    id("dev.architectury.loom")
+    id("multiloader-loader")
+    id("net.fabricmc.fabric-loom")
     id("me.modmuss50.mod-publish-plugin")
-}
-
-architectury {
-    platformSetupLoomIde()
-    fabric()
-}
-
-//// dependency configuration
-
-// architectury
-val common: Configuration by configurations.creating {
-    isCanBeResolved = true
-    isCanBeConsumed = false
-}
-
-// Files in this configuration will be bundled into your mod using the Shadow plugin.
-// Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
-val shadowBundle: Configuration by configurations.creating {
-    isCanBeResolved = true
-    isCanBeConsumed = false
-}
-
-configurations {
-    compileClasspath.get().extendsFrom(common)
-    runtimeClasspath.get().extendsFrom(common)
-    implementation.get().extendsFrom(shadowBundle)
-    getByName("developmentFabric").extendsFrom(common)
 }
 
 repositories {
@@ -60,79 +37,77 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:$mojmapVersion")
-    mappings(loom.officialMojangMappings())
+    minecraft("com.mojang:minecraft:$minecraft_version")
+    implementation("net.fabricmc:fabric-loader:$fabric_loader_version")
+    implementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modCompileOnly("net.fabricmc:fabric-loader:$loaderVersion")
-    modCompileOnly("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
-    modImplementation(include("org.incendo:cloud-fabric:$cloudMojmapVersion")!!)
-    modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
-    modImplementation(include("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {
-        exclude(group = "net.fabricmc.fabric-api")
-    })
-    modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
-    modImplementation("maven.modrinth:language-reload:$languageReloadVersion")
+    implementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
+    implementation("com.terraformersmc:modmenu:$modMenuVersion")
+    implementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
+//    implementation("maven.modrinth:language-reload:$languageReloadVersion")
 
-    // misc includes
-    include("net.kyori:adventure-api:$adventureVersion")
-
-    shadowBundle(project(":base-common")) {
-        exclude(group = "com.google.code.gson")
-        exclude(group = "com.google.auto.service")
-        exclude(group = "com.google.inject")
-        exclude(group = "com.google.guava")
-        exclude(group = "com.google.errorprone")
-        exclude(group = "com.google.j2objc")
-        exclude(group = "com.google.code.findbugs")
-        exclude(group = "org.incendo", module = "cloud-core")
-    }
-    common(project(path = ":mojmap-common", configuration = "namedElements")) // { isTransitive = false }
-    shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionNeoForge"))
-    shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion")
+    // transitives
+    include(project(":base-common")) // this is available via api of mojmap-common (which is available via multiloader plugin) but not added to jar
+    include("dev.qixils:cc4j-pubsub:$crowdControlVersion")
+    include("org.spongepowered:configurate-core:$configurateVersion")
+    include("org.spongepowered:configurate-hocon:$configurateVersion")
+    include("net.kyori:adventure-serializer-configurate4:$adventureVersion")
+    include("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+    include("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    include("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    include("io.leangen.geantyref:geantyref:$geantyrefVersion")
 }
 
-tasks.processResources {
-    inputs.property("version", project.version)
-    inputs.property("minecraftVersion", mojmapVersion)
-    filteringCharset = "UTF-8"
-
-    filesMatching("fabric.mod.json") {
-        expand("version" to versionId)
-    }
-}
-
-// configure loom
 loom {
-//    mixin {
-//        useLegacyMixinAp.set(true)
-//        defaultRefmapName.set("crowd-control-refmap.json")
+    val aw = file("src/main/resources/$mod_id.accesswidener")
+    if (!aw.exists()) {
+        throw RuntimeException("Could not find access widener")
+    }
+    accessWidenerPath.set(aw)
+
+    runs {
+        named("client") {
+            client()
+            configName = "Fabric Client"
+        }
+        named("server") {
+            server()
+            configName = "Fabric Server"
+        }
+    }
+}
+
+val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
+listOf("apiElements", "runtimeElements"/*, "sourcesElements", "javadocElements"*/, "includeInternal", "modCompileClasspath").forEach { variant ->
+    configurations.named(variant) {
+        attributes.attribute(loaderAttribute, "fabric")
+    }
+}
+sourceSets.configureEach {
+    listOf(compileClasspathConfigurationName, runtimeClasspathConfigurationName).forEach { variant ->
+        configurations.named(variant) {
+            attributes.attribute(loaderAttribute, "fabric")
+        }
+    }
+}
+// end todo
+
+// TODO: is this still necessary?
+//tasks.processResources {
+//    inputs.property("version", project.version)
+//    inputs.property("minecraftVersion", mojmapVersion)
+//    filteringCharset = "UTF-8"
+//
+//    filesMatching("fabric.mod.json") {
+//        expand("version" to versionId)
 //    }
-    accessWidenerPath = project(":mojmap-common").projectDir.resolve("src/main/resources/crowdcontrol.accesswidener")
-}
-
-// configure shadowJar
-tasks.shadowJar {
-    configurations = listOf(shadowBundle)
-    archiveBaseName.set("shadow-CrowdControl")
-    archiveVersion.set("")
-
-    relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
-}
-
-tasks.remapJar {
-    // configure remapJar to use output of shadowJar
-    dependsOn(tasks.shadowJar)
-    inputFile.set(tasks.shadowJar.get().archiveFile)
-    archiveBaseName.set("CrowdControl-Fabric+$mojmapVersion")
-    archiveClassifier.set("")
-}
+//}
 
 publishMods {
-    val versionFrom = "1.21.11"
-    val versionTo = "1.21.11"
+    val versionFrom = "26.1"
+    val versionTo = "26.1"
 
-    file.set(tasks.remapJar.get().archiveFile)
+    file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")
     modLoaders.add("quilt")
     type.set(ReleaseType.STABLE)
@@ -160,7 +135,7 @@ publishMods {
         clientRequired.set(false)
         requires("fabric-api")
         optional("modmenu", "language-reload")
-        embeds("cloth-config")
+//        embeds("yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -183,6 +158,6 @@ publishMods {
         })
         requires("fabric-api")
         optional("modmenu", "language-reload")
-        embeds("cloth-config", "adventure-platform-mod")
+        embeds("adventure-platform-mod")
     }
 }

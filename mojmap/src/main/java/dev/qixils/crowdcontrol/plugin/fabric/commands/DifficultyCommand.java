@@ -17,6 +17,7 @@ import net.minecraft.world.Difficulty;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 @Getter
@@ -27,7 +28,7 @@ public class DifficultyCommand extends ModdedCommand {
 	private final Component displayName;
 
 	private static String effectNameOf(Difficulty difficulty) {
-		return "difficulty_" + difficulty.getKey();
+		return "difficulty_" + difficulty.name().toLowerCase(Locale.US);
 	}
 
 	public DifficultyCommand(ModdedCrowdControlPlugin plugin, Difficulty difficulty) {

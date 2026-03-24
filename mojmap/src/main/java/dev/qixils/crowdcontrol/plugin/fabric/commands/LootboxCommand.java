@@ -12,6 +12,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Holder;
@@ -198,7 +199,9 @@ public class LootboxCommand extends ModdedCommand {
 		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
 			itemStack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
 
-		if (random.nextInt(ARMOR_TRIM_ODDS) == 0) {
+		// TODO: probably a better way to detect "normal" armor vs non-normal (tags?)
+		var equippable = itemStack.get(DataComponents.EQUIPPABLE);
+		if (random.nextInt(ARMOR_TRIM_ODDS) == 0 && equippable != null && equippable.slot().getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !itemStack.is(Items.ELYTRA) && !itemStack.is(Items.TURTLE_HELMET)) {
 			itemStack.set(DataComponents.TRIM, new ArmorTrim(
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_MATERIAL, registryAccess)),
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_PATTERN, registryAccess))
@@ -228,14 +231,14 @@ public class LootboxCommand extends ModdedCommand {
 			Holder<Enchantment> enchantment = enchantmentList.removeFirst();
 
 			// block conflicting vanilla enchantments (unless the die roll decides otherwise)
-			boolean isVanilla = enchantment.unwrapKey().map(ResourceKey::identifier).orElse(nullKey).namespace().equals(Identifier.DEFAULT_NAMESPACE);
+			boolean isVanilla = enchantment.unwrapKey().map(ResourceKey::identifier).orElse(nullKey).getNamespace().equals(Identifier.DEFAULT_NAMESPACE);
 			if (addedEnchantments.stream().anyMatch(
 				x -> !Enchantment.areCompatible(x, enchantment)
 				&& (
 					// allow skipping if one of the enchants isn't vanilla
 					// or if a 90% chance procs
 					!isVanilla
-						|| !x.unwrapKey().map(ResourceKey::identifier).orElse(nullKey).namespace().equals(Identifier.DEFAULT_NAMESPACE)
+						|| !x.unwrapKey().map(ResourceKey::identifier).orElse(nullKey).getNamespace().equals(Identifier.DEFAULT_NAMESPACE)
 						|| random.nextDouble() >= (.1d + (luck * .1d))
 				)
 			))
@@ -322,12 +325,14 @@ public class LootboxCommand extends ModdedCommand {
 			for (ServerPlayer player : players) {
 				if (isLootboxOpen(player)) continue;
 
+				Audience audience = plugin.adventure().audience(player);
+
 				// init container
 				SimpleContainer container = new SimpleContainer(27);
 				for (int slot : CommandConstants.lootboxItemSlots(luck)) {
 					ItemStack itemStack = createRandomItem(luck, player.registryAccess());
 					List<Component> lore = getLore(itemStack);
-					lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), player));
+					lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), audience));
 					setLore(itemStack, lore);
 					container.setItem(slot, itemStack);
 				}
@@ -338,7 +343,7 @@ public class LootboxCommand extends ModdedCommand {
 				OptionalInt val = player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container), title));
 				if (val.isEmpty()) continue;
 
-				player.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
+				audience.playSound(Sounds.LOOTBOX_CHIME.get(luck), Sound.Emitter.self());
 				OPEN_LOOTBOXES.put(player.getUUID(), (ChestMenu) player.containerMenu);
 				TITLES.put(player.getUUID(), title);
 

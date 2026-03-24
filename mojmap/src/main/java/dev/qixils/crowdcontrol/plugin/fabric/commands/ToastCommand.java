@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -74,7 +74,7 @@ public final class ToastCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			for (ServerPlayer player : playerSupplier.get()) {
 				// annoying sound
-				player.playSound(Sounds.ANNOYING.get(), Sound.Emitter.self());
+				plugin.adventure().audience(player).playSound(Sounds.ANNOYING.get(), Sound.Emitter.self());
 
 				// spam recipe toasts
 				ServerRecipeBook book = player.getRecipeBook();
@@ -143,7 +143,7 @@ public final class ToastCommand extends ModdedCommand {
 		}
 
 		@Override
-		public void clicked(int slotIndex, int buttonIndex, @NotNull ClickType clickType, @NotNull Player player) {
+		public void clicked(int slotIndex, int buttonNum, @NotNull ContainerInput containerInput, @NotNull Player player) {
 			if (!(player instanceof ServerPlayer sPlayer))
 				return;
 			sPlayer.containerMenu.sendAllDataToRemote();
