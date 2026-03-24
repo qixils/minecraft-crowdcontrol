@@ -253,7 +253,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 	public @NotNull Stream<ServerPlayer> toPlayerStream(@Nullable Collection<UUID> uuids) {
 		MinecraftServer _server = server;
 		if (uuids == null || _server == null) return Stream.empty();
-		return uuids.stream().map(id -> _server.getPlayerList().getPlayer(id)).filter(Objects::nonNull);
+		return uuids.stream().map(id -> id != null ? _server.getPlayerList().getPlayer(id) : null).filter(Objects::nonNull);
 	}
 
 	public @NotNull List<ServerPlayer> toPlayerList(@Nullable Collection<UUID> uuids) {

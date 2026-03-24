@@ -47,7 +47,8 @@
   },
   "breaks": {
     "noxesium": "<1.1.2",
-    "extrasounds": "*"
+    "extrasounds": "*",
+    "chunkumulator": "*"
   },
   "custom": {
     "modmenu": {

@@ -6,6 +6,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityMixin",
+    "GlobalTranslatorMixin",
     "LivingEntityMixin",
     "NameTagItemMixin",
     "PlayerListMixin",

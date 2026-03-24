@@ -146,10 +146,10 @@ public final class ToastCommand extends ModdedCommand {
 		public ItemStack clicked(int slotIndex, int buttonIndex, @NotNull ClickType clickType, @NotNull Player player) {
 			if (!(player instanceof ServerPlayer sPlayer))
 				return null;
-			sPlayer.containerMenu.broadcastChanges();
 			sPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, sPlayer.inventory.getCarried()));
 			if (slotIndex >= 0 && slotIndex < sPlayer.containerMenu.slots.size())
 				sPlayer.connection.send(new ClientboundContainerSetSlotPacket(sPlayer.containerMenu.containerId, slotIndex, sPlayer.containerMenu.getSlot(slotIndex).getItem()));
+			sPlayer.containerMenu.broadcastChanges();
 			return ItemStack.EMPTY;
 		}
 	}

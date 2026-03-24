@@ -286,6 +286,7 @@ public abstract class Plugin<P, S> {
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
 	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
+	protected final KyoriTranslator translator;
 	protected SemVer latestModVersionCached = null;
 	protected Instant latestModVersionCachedAt = Instant.EPOCH;
 	protected @NotNull Path defaultDataFolder = Paths.get("config", "CrowdControlData");
@@ -293,6 +294,7 @@ public abstract class Plugin<P, S> {
 	protected Plugin(@NotNull Class<P> playerClass, @NotNull Class<S> commandSenderClass) {
 		this.playerClass = playerClass;
 		this.commandSenderClass = commandSenderClass;
+		this.translator = new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US);
 	}
 
 	/**
@@ -304,6 +306,10 @@ public abstract class Plugin<P, S> {
 	@CheckReturnValue
 	public CrowdControl getCrowdControl() {
 		return crowdControl;
+	}
+
+	public KyoriTranslator getTranslator() {
+		return translator;
 	}
 
 	/**
@@ -635,7 +641,7 @@ public abstract class Plugin<P, S> {
 	 */
 	public void registerChatCommands() {
 		try {
-			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US));
+			GlobalTranslator.translator().addSource(translator);
 		} catch (Exception e) {
 			getSLF4JLogger().error("Failed to initialize i18n", e);
 		}

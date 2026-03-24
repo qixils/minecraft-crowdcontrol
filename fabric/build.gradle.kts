@@ -11,6 +11,7 @@ val mojmapVersion: String by project
 val configurateVersion: String by project
 val luckoPermissionsApiVersion: String by project
 val languageReloadVersion: String by project
+val slf4jVersion: String by project
 
 val versionId = project.version.toString() + "+fabric-$mojmapVersion"
 
@@ -81,6 +82,7 @@ dependencies {
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
     include("net.kyori:adventure-key:$adventureVersion") // wtf adventure LMFAO
+    include("org.slf4j:slf4j-simple:$slf4jVersion")
 
     shadowBundle(project(":base-common")) {
         exclude(group = "com.google.code.gson")

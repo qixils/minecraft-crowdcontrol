@@ -43,6 +43,7 @@ public class ServerPlayerMapper implements PlayerEntityMapper<ServerPlayer> {
 
 	@Override
 	public @NotNull Optional<ServerPlayer> getPlayer(@NotNull UUID uuid) {
+		if (uuid == null) return Optional.empty();
 		return Optional.ofNullable(plugin.getServer()).map(server -> server.getPlayerList().getPlayer(uuid));
 	}
 

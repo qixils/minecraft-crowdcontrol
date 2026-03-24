@@ -90,6 +90,7 @@ public final class FreezeCommand extends ModdedCommand implements CCTimedEffect 
 			return;
 		locations.forEach((uuid, data) -> {
 			DATA.get(uuid).remove(data);
+			if (uuid == null) return;
 			ServerPlayer player = server.getPlayerList().getPlayer(uuid);
 			if (player == null)
 				return;
