@@ -1441,7 +1441,7 @@ public abstract class Plugin<P, S> {
 			switch (status) {
 				// NOTE: TIMED_BEGIN also emits SUCCESS !
 				case SUCCESS:
-					List<Audience> audiences = new ArrayList<>(3);
+					Set<Audience> audiences = new HashSet<>();
 
 					initTo(audiences, this::getConsole);
 					if (announce) {

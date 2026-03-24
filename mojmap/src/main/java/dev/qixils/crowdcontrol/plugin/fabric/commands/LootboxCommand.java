@@ -199,7 +199,9 @@ public class LootboxCommand extends ModdedCommand {
 		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
 			itemStack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
 
-		if (random.nextInt(ARMOR_TRIM_ODDS) == 0) {
+		// TODO: probably a better way to detect "normal" armor vs non-normal (tags?)
+		var equippable = itemStack.get(DataComponents.EQUIPPABLE);
+		if (random.nextInt(ARMOR_TRIM_ODDS) == 0 && equippable != null && equippable.slot().getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !itemStack.is(Items.ELYTRA) && !itemStack.is(Items.TURTLE_HELMET)) {
 			itemStack.set(DataComponents.TRIM, new ArmorTrim(
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_MATERIAL, registryAccess)),
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_PATTERN, registryAccess))
