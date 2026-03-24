@@ -8,12 +8,16 @@ val modMenuVersion: String by project
 val configurateVersion: String by project
 val luckoPermissionsApiVersion: String by project
 val languageReloadVersion: String by project
+val crowdControlVersion: String by project
+val jacksonVersion: String by project
+val geantyrefVersion: String by project
 val minecraft_version: String by project
 val fabric_loader_version: String by project
 val fabric_version: String by project
 val mod_id: String by project
 
-val versionId = project.version.toString() + "+fabric-$minecraft_version"
+val versionId = rootProject.version.toString() + "+fabric-$minecraft_version"
+version = "$minecraft_version-${rootProject.version}"
 
 plugins {
     id("multiloader-loader")
@@ -33,17 +37,6 @@ repositories {
     }
 }
 
-// Files in this configuration will be bundled into your mod using the Shadow plugin.
-// Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
-val shadowBundle: Configuration by configurations.creating {
-    isCanBeResolved = true
-    isCanBeConsumed = false
-}
-
-configurations {
-    implementation.get().extendsFrom(shadowBundle)
-}
-
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
     implementation("net.fabricmc:fabric-loader:$fabric_loader_version")
@@ -54,21 +47,16 @@ dependencies {
     implementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
 //    implementation("maven.modrinth:language-reload:$languageReloadVersion")
 
-    // misc includes
-    include("net.kyori:adventure-api:$adventureVersion")
-
-    // TODO: is this still needed? should we shadow everythimg manually? (probably)
-    shadowBundle(project(":base-common")) {
-        exclude(group = "com.google.code.gson")
-        exclude(group = "com.google.auto.service")
-        exclude(group = "com.google.inject")
-        exclude(group = "com.google.guava")
-        exclude(group = "com.google.errorprone")
-        exclude(group = "com.google.j2objc")
-        exclude(group = "com.google.code.findbugs")
-        exclude(group = "org.incendo", module = "cloud-core")
-    }
-    shadowBundle("org.spongepowered:configurate-hocon:$configurateVersion")
+    // transitives
+    include(project(":base-common")) // this is available via api of mojmap-common (which is available via multiloader plugin) but not added to jar
+    include("dev.qixils:cc4j-pubsub:$crowdControlVersion")
+    include("org.spongepowered:configurate-core:$configurateVersion")
+    include("org.spongepowered:configurate-hocon:$configurateVersion")
+    include("net.kyori:adventure-serializer-configurate4:$adventureVersion")
+    include("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+    include("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    include("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    include("io.leangen.geantyref:geantyref:$geantyrefVersion")
 }
 
 loom {
@@ -78,24 +66,20 @@ loom {
     }
     accessWidenerPath.set(aw)
 
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
-    }
-
     runs {
         named("client") {
             client()
-            setConfigName("Fabric Client")
+            configName = "Fabric Client"
         }
         named("server") {
             server()
-            setConfigName("Fabric Server")
+            configName = "Fabric Server"
         }
     }
 }
 
 val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
-listOf("apiElements", "runtimeElements", "sourcesElements", "javadocElements", "includeInternal", "modCompileClasspath").forEach { variant ->
+listOf("apiElements", "runtimeElements"/*, "sourcesElements", "javadocElements"*/, "includeInternal", "modCompileClasspath").forEach { variant ->
     configurations.named(variant) {
         attributes.attribute(loaderAttribute, "fabric")
     }
@@ -111,7 +95,7 @@ sourceSets.configureEach {
 
 // TODO: is this still necessary?
 //tasks.processResources {
-//    inputs.property("version", project.version)
+//    inputs.property("version", rootProject.version)
 //    inputs.property("minecraftVersion", mojmapVersion)
 //    filteringCharset = "UTF-8"
 //
@@ -120,17 +104,11 @@ sourceSets.configureEach {
 //    }
 //}
 
-// configure shadowJar
-tasks.shadowJar {
-    configurations = listOf(shadowBundle)
-    relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
-}
-
 publishMods {
     val versionFrom = "26.1"
     val versionTo = "26.1"
 
-    file.set(tasks.shadowJar.get().archiveFile)
+    file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")
     modLoaders.add("quilt")
     type.set(ReleaseType.STABLE)
@@ -151,7 +129,7 @@ publishMods {
                 append(versionTo)
             }
             append("] v")
-            append(project.version.toString())
+            append(rootProject.version.toString())
         })
         javaVersions.add(JavaVersion.VERSION_21)
         serverRequired.set(true)
@@ -170,7 +148,7 @@ publishMods {
         version.set(versionId)
         displayName.set(buildString {
             append("v")
-            append(project.version.toString())
+            append(rootProject.version.toString())
             append(" (Fabric ")
             append(versionFrom)
             if (versionFrom != versionTo) {

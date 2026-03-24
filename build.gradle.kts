@@ -29,7 +29,7 @@ subprojects {
     apply {
         plugin("java-library")
         plugin("io.freefair.lombok")
-        plugin("com.gradleup.shadow")
+//        plugin("com.gradleup.shadow")
     }
 
     repositories {
@@ -78,42 +78,9 @@ subprojects {
     val isPlatform = project.name.endsWith("-platform")
     val isModded = listOf("mojmap-common", "fabric-platform", "neoforge-platform").contains(project.name)
 
-    tasks.shadowJar {
-        isZip64 = true // wtf
-
-        relocate("net.kyori.adventure.text.minimessage", "dev.qixils.relocated.adventure.minimessage")
-        relocate("net.kyori.adventure.text.serializer.legacy", "dev.qixils.relocated.adventure.serializer.legacy")
-        relocate("net.kyori.adventure.text.serializer.plain", "dev.qixils.relocated.adventure.serializer.plain")
-        relocate("net.kyori.adventure.serializer", "dev.qixils.relocated.adventure.serializer")
-        relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations")
-        relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
-        relocate("javassist", "dev.qixils.relocated.javassist")
-        relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
-        relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
-    }
-
     if (isPlatform) {
         // inherit resources from common module
         sourceSets.main { resources.srcDir(project(":base-common").sourceSets["main"].resources.srcDirs) }
-
-        tasks {
-            // TODO: disable output of non-shaded jars? or make their file names more obvious?
-            shadowJar {
-                // set name of output file to CrowdControl-XYZ-VERSION.jar
-                var titleCaseName = project.name[0].uppercaseChar() + project.name.substring(1, project.name.indexOf("-platform"))
-                if (titleCaseName == "Neoforge") titleCaseName = "NeoForge"
-                archiveBaseName.set("CrowdControl-$titleCaseName")
-                archiveClassifier.set("")
-            }
-        }
-
-        if (project.name != "fabric-platform") {
-            tasks {
-                build {
-                    dependsOn(shadowJar)
-                }
-            }
-        }
     }
 
     if (isModded) {

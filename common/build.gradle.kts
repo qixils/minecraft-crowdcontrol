@@ -20,9 +20,6 @@ dependencies {
     api("net.kyori:adventure-text-serializer-plain:$adventureVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    api("net.kyori:adventure-text-serializer-legacy:$adventureVersion") {
-        exclude(group = "net.kyori", module = "adventure-api")
-    }
     api("org.slf4j:slf4j-api:$slf4jVersion")
 
     api("org.spongepowered:configurate-core:$configurateVersion")

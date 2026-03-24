@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Client (:neoforge-platform)",
+      "presentation": {
+        "group": "Mod Development - neoforge-platform",
+        "order": 0
+      },
+      "projectName": "neoforge-platform",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\build\\moddev\\clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcrowdcontrol%%C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\neoforge\\run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Data (:neoforge-platform)",
+      "presentation": {
+        "group": "Mod Development - neoforge-platform",
+        "order": 1
+      },
+      "projectName": "neoforge-platform",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\build\\moddev\\dataRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\build\\moddev\\dataRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcrowdcontrol%%C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\neoforge\\run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Server (:neoforge-platform)",
+      "presentation": {
+        "group": "Mod Development - neoforge-platform",
+        "order": 2
+      },
+      "projectName": "neoforge-platform",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\build\\moddev\\serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcrowdcontrol%%C:\\Users\\lexikiq\\IdeaProjects\\minecraft-crowdcontrol\\neoforge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\neoforge\\run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    }
+  ]
+}

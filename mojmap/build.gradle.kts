@@ -30,14 +30,10 @@ dependencies {
     compileOnly("org.ow2.asm:asm:9.9.1")
 
     //
-    implementation(project(":base-common"))
-    implementation("org.spongepowered:configurate-hocon:$configurateVersion")
+    api(project(":base-common"))
+    api("org.spongepowered:configurate-hocon:$configurateVersion")
 
     compileOnly("net.kyori:adventure-platform-mod-shared:$adventurePlatformModVersion")
-
-    // TODO: adventure is being weird
-    compileOnly("net.kyori:adventure-api:$adventureVersion")
-    compileOnly("net.kyori:adventure-platform-api:$adventurePlatformVersion")
 }
 
 val commonJava by configurations.creating {
@@ -56,7 +52,7 @@ artifacts {
 }
 
 val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
-listOf("apiElements", "runtimeElements", "sourcesElements", "javadocElements").forEach { variant ->
+listOf("apiElements", "runtimeElements"/*, "sourcesElements", "javadocElements"*/).forEach { variant ->
     configurations.named(variant) {
         attributes.attribute(loaderAttribute, "common")
     }

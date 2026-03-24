@@ -15,6 +15,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -46,7 +47,7 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 		}
 
 		modBus.addListener(this::registerPayloadHandlers);
-		modBus.addListener(this::registerChatCommandsEvent);
+		NeoForge.EVENT_BUS.addListener(this::registerChatCommandsEvent);
 
 		onInitialize();
 	}
