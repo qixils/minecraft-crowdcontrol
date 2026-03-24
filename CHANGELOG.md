@@ -7,8 +7,10 @@ A list of all changes made to the software in reverse chronological order.
 - Fabric: Added support for 1.16.1
 - Fabric/NeoForge: Added support for 26.1
 - Fabric/NeoForge: Fixed run-command in custom effects
-- Fabric/NeoForge: Migrate config UI to YACL and made optional to reduce filesize
-- Fabric/NeoForge: Added more options to the config UI
+- Fabric/NeoForge: Fixed armor trims being given to non-armor items in lootboxes
+- Fabric/NeoForge (26.1+): Migrate config UI to YACL and made optional to reduce filesize
+  - Temporarily disabled while waiting for YACL to publish a NeoForge build
+- Fabric/NeoForge (26.1+): Added more options to the config UI
 
 ## 4.4.2
 
