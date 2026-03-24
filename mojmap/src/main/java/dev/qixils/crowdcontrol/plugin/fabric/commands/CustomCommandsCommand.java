@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandAction;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandData;
@@ -14,7 +12,6 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
@@ -37,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Getter
@@ -120,16 +118,12 @@ public class CustomCommandsCommand extends ModdedCommand {
 
 		try {
 			Commands commands = plugin.server().getCommands();
-			CommandDispatcher<CommandSourceStack> dispatcher = commands.getDispatcher();
-			ParseResults<CommandSourceStack> results = dispatcher.parse(commandLine, player.createCommandSourceStack().withSuppressedOutput());
-			CommandSourceStack commandSourceStack = results.getContext().getSource();
-
-			int result = commands.performCommand(commandSourceStack, commandLine);
+			int result = commands.getDispatcher().execute(commandLine, player.createCommandSourceStack().withSuppressedOutput());
 			return result != 0;
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to run command", e);
+			return false;
 		}
-		return false;
 	}
 
 	public static final @NotNull Map<String, Executor> EXECUTORS = Map.ofEntries(
@@ -199,6 +193,6 @@ public class CustomCommandsCommand extends ModdedCommand {
 			return success
 				? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
 				: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to execute custom actions");
-		}));
+		}, plugin.getSyncExecutor()));
 	}
 }
