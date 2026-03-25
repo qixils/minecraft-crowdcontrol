@@ -14,7 +14,7 @@ await downloadJRE(root, 25)
 const modVersions = await Promise.allSettled([
     downloadPaper(root, "1.21.11", 21),
     downloadFabric(root, "26.1", 25),
-    downloadNeoForge(root, "1.21.11", 21),
+    downloadNeoForge(root, "26.1", 25),
 ])
 
 const modVersion = modVersions
@@ -24,8 +24,9 @@ const modVersion = modVersions
 .at(-1)!
 
 console.log(modVersion)
-if (modVersions.some(v => v.status === 'rejected')) {
-    console.error('!!! something failed !!!')
+for (const v of modVersions) {
+    if (v.status !== 'rejected') continue
+    console.error('!!! something failed !!!', v.reason)
 }
 
 // await fs.writeFile(path.resolve(root, "ccver"), modVersion)
