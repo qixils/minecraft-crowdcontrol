@@ -64,6 +64,7 @@ tasks {
     }
 
     shadowJar {
+        archiveFileName.set("CrowdControl-Paper+$minecraftVersion-$version.jar")
         relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
         relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
     }
