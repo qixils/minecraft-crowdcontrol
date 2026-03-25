@@ -122,7 +122,7 @@ publishMods {
             append("] v")
             append(project.version.toString())
         })
-        javaVersions.add(JavaVersion.VERSION_21)
+        javaVersions.add(JavaVersion.VERSION_25)
         serverRequired.set(true)
         clientRequired.set(false)
 //        embeds("yacl")
