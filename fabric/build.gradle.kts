@@ -109,8 +109,8 @@ sourceSets.configureEach {
 //}
 
 publishMods {
-    val versionFrom = "26.1"
-    val versionTo = "26.1"
+    val versionFrom = "26w14a"
+    val versionTo = "26w14a"
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")
@@ -120,10 +120,7 @@ publishMods {
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
         projectId.set("830331")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
-        }
+        minecraftVersions.add("26.1-snapshot")
         version.set(versionId)
         displayName.set(buildString {
             append("[Fabric ")
@@ -139,16 +136,12 @@ publishMods {
         serverRequired.set(true)
         clientRequired.set(false)
         requires("fabric-api")
-        optional("modmenu", "language-reload")
-//        embeds("yacl")
+        optional("modmenu", "language-reload", "yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
-        }
+        minecraftVersions.add(versionFrom)
         version.set(versionId)
         displayName.set(buildString {
             append("v")
@@ -162,7 +155,7 @@ publishMods {
             append(")")
         })
         requires("fabric-api")
-        optional("modmenu", "language-reload")
+        optional("modmenu", "language-reload", "yacl")
         embeds("adventure-platform-mod")
     }
 }
