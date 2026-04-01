@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
@@ -43,10 +42,10 @@ public enum Condition {
 			Blocks.STRIPPED_WARPED_HYPHAE
 	)),
 	// obtain...
-	OBTAIN_STONE(new ObtainItemCondition(4, "generic_block", Items.STONE)),
+//	OBTAIN_STONE(new ObtainItemCondition(4, "generic_block", Items.STONE)),
 	// craft...
-	CRAFT_STONE_HOE(new CraftItemCondition(3, "generic", Items.STONE_HOE)),
-	CRAFT_WOODEN_HOE(new CraftItemCondition(2, "generic", Items.WOODEN_HOE)),
+//	CRAFT_STONE_HOE(new CraftItemCondition(3, "generic", Items.STONE_HOE)),
+//	CRAFT_WOODEN_HOE(new CraftItemCondition(2, "generic", Items.WOODEN_HOE)),
 
 	//// overworld-only ////
 	// stand on...
@@ -72,20 +71,20 @@ public enum Condition {
 			Blocks.BLACK_BED
 	)),
 	// obtain...
-	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(2, "generic_alt", ConditionFlags.OVERWORLD, Items.WHEAT_SEEDS)),
+//	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(2, "generic_alt", ConditionFlags.OVERWORLD, Items.WHEAT_SEEDS)),
 	// craft...
-	CRAFT_SANDSTONE(new CraftItemCondition(2, "generic_block", Items.SANDSTONE, ConditionFlags.OVERWORLD)),
+//	CRAFT_SANDSTONE(new CraftItemCondition(2, "generic_block", Items.SANDSTONE, ConditionFlags.OVERWORLD)),
 
 	//// nether-only ////
 	// stand on...
 	STAND_ON_FIRE(new StandOnBlockCondition(2, "generic", ConditionFlags.NETHER, Blocks.FIRE)),
 	// obtain...
-	OBTAIN_NETHER_BRICK(new ObtainItemCondition(4, "generic", ConditionFlags.NETHER, Items.NETHER_BRICK)),
-	OBTAIN_OBSIDIAN(new ObtainItemCondition(4, "generic_alt", ConditionFlags.NETHER, Items.OBSIDIAN)),
+//	OBTAIN_NETHER_BRICK(new ObtainItemCondition(4, "generic", ConditionFlags.NETHER, Items.NETHER_BRICK)),
+//	OBTAIN_OBSIDIAN(new ObtainItemCondition(4, "generic_alt", ConditionFlags.NETHER, Items.OBSIDIAN)),
 	// craft...
-	CRAFT_QUARTZ(new CraftItemCondition(2, "generic", Items.QUARTZ_BLOCK, ConditionFlags.NETHER)),
-	CRAFT_GOLD_INGOT(new CraftItemCondition(2, "generic", Items.GOLD_INGOT, ConditionFlags.NETHER)),
-	CRAFT_GLOWSTONE(new CraftItemCondition(2, "generic_block", Items.GLOWSTONE, ConditionFlags.NETHER)),
+//	CRAFT_QUARTZ(new CraftItemCondition(2, "generic", Items.QUARTZ_BLOCK, ConditionFlags.NETHER)),
+//	CRAFT_GOLD_INGOT(new CraftItemCondition(2, "generic", Items.GOLD_INGOT, ConditionFlags.NETHER)),
+//	CRAFT_GLOWSTONE(new CraftItemCondition(2, "generic_block", Items.GLOWSTONE, ConditionFlags.NETHER)),
 
 	//// miscellaneous ////
 	JUMP(new JumpingJacksCondition(49)),

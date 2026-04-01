@@ -1,7 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.commands.FreezeCommand.FreezeData;
@@ -15,8 +13,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gamerules.GameRule;
-import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.UUID;
-
-import static dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil.keepInventoryRedirect;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements GameTypeEffectComponent {
@@ -93,14 +87,6 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 
 		for (FreezeData datum : data)
 			datum.previousLocation = dest;
-	}
-
-	@WrapOperation(
-			method = "restoreFrom",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;")
-	)
-	private Object restoreFromRedirectKeepInventory(GameRules gameRules, GameRule<Boolean> key, Operation<Boolean> original) {
-		return keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 
 	@Inject(method = "die", at = @At("HEAD"), cancellable = true)

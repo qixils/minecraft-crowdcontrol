@@ -23,6 +23,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.entity.vehicle.boat.AbstractChestBoat;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
@@ -70,7 +72,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new SmallAntCommand(plugin),
 			() -> new SwapCommand(plugin),
 			() -> new DinnerboneCommand(plugin),
-			() -> new ClutterCommand(plugin),
+//			() -> new ClutterCommand(plugin),
 			() -> new LootboxCommand(plugin, 0),
 			() -> new LootboxCommand(plugin, 5),
 			() -> new LootboxCommand(plugin, 10),
@@ -86,22 +88,22 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new TorchCommand(plugin, false),
 			() -> new GravelCommand(plugin),
 			() -> new DigCommand(plugin),
-			() -> new ItemDurabilityCommand.Repair(plugin),
-			() -> new ItemDurabilityCommand.Damage(plugin),
+//			() -> new ItemDurabilityCommand.Repair(plugin),
+//			() -> new ItemDurabilityCommand.Damage(plugin),
 			() -> new RemoveEnchantsCommand(plugin),
-			() -> new HatCommand(plugin),
+//			() -> new HatCommand(plugin),
 			() -> new RespawnCommand(plugin),
-			() -> new DropItemCommand(plugin),
-			() -> new DeleteItemCommand(plugin),
-			() -> new BucketClutchCommand(plugin),
+//			() -> new DropItemCommand(plugin),
+//			() -> new DeleteItemCommand(plugin),
+//			() -> new BucketClutchCommand(plugin),
 			() -> MovementStatusCommand.disableJumping(plugin),
 			() -> MovementStatusCommand.invertControls(plugin),
 			() -> MovementStatusCommand.invertCamera(plugin),
 			() -> new EntityChaosCommand(plugin),
 			() -> new FlightCommand(plugin),
-			() -> new KeepInventoryCommand(plugin, true),
-			() -> new KeepInventoryCommand(plugin, false),
-			() -> new ClearInventoryCommand(plugin),
+//			() -> new KeepInventoryCommand(plugin, true),
+//			() -> new KeepInventoryCommand(plugin, false),
+//			() -> new ClearInventoryCommand(plugin),
 			() -> new PlantTreeCommand(plugin),
 			() -> new DoOrDieCommand(plugin),
 			() -> new ExplodeCommand(plugin),
@@ -116,7 +118,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> GravityCommand.maximum(plugin),
 			() -> new BiomeCommand(plugin),
 			() -> new StructureCommand(plugin),
-			() -> new DeleteRandomItemCommand(plugin),
+//			() -> new DeleteRandomItemCommand(plugin),
 			() -> new UniteCommand(plugin),
 			() -> TickRateCommand.doubleRate(plugin),
 			() -> TickRateCommand.halfRate(plugin),
@@ -129,7 +131,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
 			() -> new WaterCommand(plugin),
-			() -> new LanguageCommand(plugin),
 			() -> new AgeCommand(plugin, true),
 			() -> new AgeCommand(plugin, false)
 		));
@@ -237,13 +238,24 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			initTo(commands, () -> new FallingBlockCommand(plugin, block));
 
 		// enchantments
-		for (Holder<Enchantment> enchantment : plugin.registryHolders(Registries.ENCHANTMENT, null))
+		var armorItems = List.of(
+			new ItemStack(Items.DIAMOND_HELMET),
+			new ItemStack(Items.DIAMOND_CHESTPLATE),
+			new ItemStack(Items.DIAMOND_LEGGINGS),
+			new ItemStack(Items.DIAMOND_BOOTS)
+		);
+		for (Holder<Enchantment> enchantment : plugin.registryHolders(Registries.ENCHANTMENT, null)) {
+			// only armor items can be enchanted in this snapshot (kinda)
+			if (armorItems.stream().noneMatch(item -> enchantment.isBound() && enchantment.value().canEnchant(item))) {
+				continue;
+			}
 			initTo(commands, () -> new EnchantmentCommand(plugin, enchantment));
+		}
 
 		// give/take items
 		for (Item item : giveTakeItems) {
 			initTo(commands, () -> new GiveItemCommand(plugin, item));
-			initTo(commands, () -> new TakeItemCommand(plugin, item));
+//			initTo(commands, () -> new TakeItemCommand(plugin, item));
 		}
 
 		// gamemode commands

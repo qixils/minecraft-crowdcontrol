@@ -14,7 +14,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
@@ -39,12 +38,9 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 
 	@Blocking
 	public static void giveItemTo(ServerPlayer player, ItemStack itemStack) {
-		ItemEntity entity = player.spawnAtLocation(player.level(), itemStack);
-		if (entity == null)
+		var entities = player.spawnAtLocation(player.level(), itemStack);
+		if (entities == null || entities.isEmpty())
 			throw new IllegalStateException("Could not spawn item entity");
-		entity.setTarget(player.getUUID());
-		entity.setThrower(player);
-		entity.setPickUpDelay(0);
 	}
 
 	@Override

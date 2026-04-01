@@ -10,7 +10,6 @@
     "NameTagItemMixin",
     "PlayerListMixin",
     "PlayerMixin",
-    "ResultSlotMixin",
     "ServerGamePacketListenerImplMixin",
     "ServerPlayerMixin",
     "TickMixin"

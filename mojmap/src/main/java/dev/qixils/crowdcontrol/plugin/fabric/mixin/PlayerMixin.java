@@ -1,25 +1,19 @@
 package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gamerules.GameRule;
-import net.minecraft.world.level.gamerules.GameRules;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.EnumMap;
@@ -68,21 +62,5 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 		event.fire();
 		if (event.cancelled())
 			ci.cancel();
-	}
-
-	@WrapOperation(
-			method = "dropEquipment",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;")
-	)
-	private Object equipmentKeepInventoryRedirect(GameRules gameRules, GameRule<@NotNull Boolean> key, Operation<Boolean> original) {
-		return EntityUtil.keepInventoryRedirect(this, original.call(gameRules, key), key);
-	}
-
-	@WrapOperation(
-			method = "getBaseExperienceReward",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;")
-	)
-	private Object experienceKeepInventoryRedirect(GameRules gameRules, GameRule<@NotNull Boolean> key, Operation<Boolean> original) {
-		return EntityUtil.keepInventoryRedirect(this, original.call(gameRules, key), key);
 	}
 }
