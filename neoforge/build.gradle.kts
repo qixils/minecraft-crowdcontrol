@@ -127,7 +127,7 @@ publishMods {
         javaVersions.add(JavaVersion.VERSION_25)
         serverRequired.set(true)
         clientRequired.set(false)
-//        embeds("yacl")
+        optional("yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -148,6 +148,7 @@ publishMods {
             }
             append(")")
         })
+        optional("yacl")
         embeds("adventure-platform-mod")
     }
 }

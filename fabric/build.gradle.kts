@@ -139,8 +139,7 @@ publishMods {
         serverRequired.set(true)
         clientRequired.set(false)
         requires("fabric-api")
-        optional("modmenu", "language-reload")
-//        embeds("yacl")
+        optional("modmenu", "language-reload", "yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -162,7 +161,7 @@ publishMods {
             append(")")
         })
         requires("fabric-api")
-        optional("modmenu", "language-reload")
+        optional("modmenu", "language-reload", "yacl")
         embeds("adventure-platform-mod")
     }
 }
