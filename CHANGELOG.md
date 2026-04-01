@@ -2,6 +2,12 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.5.1
+
+- Fabric: Added support for Herdcraft/26w14a/Minecraft's April Fools
+- Fabric/NeoForge 26.1+: Config GUI is now available when YACL is installed
+    - Additional options will be available at a later date
+
 ## 4.5.0
 
 - Added new effect _Replace Air with Water_
