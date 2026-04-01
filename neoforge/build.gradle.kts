@@ -104,15 +104,12 @@ publishMods {
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("neoforge")
-    type.set(ReleaseType.STABLE)
+    type.set(ReleaseType.ALPHA)
     changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
         projectId.set("830331")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
-        }
+        minecraftVersions.add("26.1-snapshot")
         version.set(versionId)
         displayName.set(buildString {
             append("[NeoForge ")
@@ -132,10 +129,7 @@ publishMods {
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
-        }
+        minecraftVersions.add(versionFrom)
         version.set(versionId)
         displayName.set(buildString {
             append("v")

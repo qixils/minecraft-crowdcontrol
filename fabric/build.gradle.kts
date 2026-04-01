@@ -115,7 +115,7 @@ publishMods {
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")
     modLoaders.add("quilt")
-    type.set(ReleaseType.STABLE)
+    type.set(ReleaseType.ALPHA)
     changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
