@@ -87,7 +87,7 @@ custom-effects:
 soft-lock-observer:
 
   # How long the monitoring period is, in seconds.
-  period: 120
+  period: 60
 
   # How many deaths must be counted within the monitoring period to trigger the fail-safes.
   deaths: 5
