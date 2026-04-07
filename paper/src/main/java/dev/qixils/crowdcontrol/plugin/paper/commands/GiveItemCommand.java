@@ -55,7 +55,7 @@ public class GiveItemCommand extends RegionalCommandSync implements ItemCommand 
 
 	@Override
 	protected int getPlayerLimit() {
-		return getPlugin().getLimitConfig().getItemLimit(item.getKey().getKey());
+		return getPlugin().getLimitConfig().getItemLimit(item.getKey().asMinimalString());
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
@@ -19,6 +20,7 @@ import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -184,16 +186,42 @@ public class CustomCommandsCommand extends ModdedCommand {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			boolean success = false;
-			for (ServerPlayer player : playerSupplier.get()) {
-				for (CustomCommandAction action : data.actions()) {
-					Executor executor = EXECUTORS.get(action.type());
-					if (executor == null) continue;
+			for (CustomCommandAction action : data.actions()) {
+				Executor executor = EXECUTORS.get(action.type());
+				if (executor == null) continue;
 
-					try {
-						success |= executor.execute(getPlugin(), player, action, request, ccPlayer);
-					} catch (Exception e) {
-						plugin.getSLF4JLogger().warn("Failed to execute custom action", e);
+				int limit = 0;
+				try {
+					if ("give-item".equals(action.type())) {
+						var itemType = action.getString("item", "");
+						assert !itemType.isEmpty();
+						var location = ResourceLocation.parse(itemType);
+						var item = BuiltInRegistries.ITEM.getOptional(location);
+						assert item.isPresent();
+						limit = plugin.getLimitConfig().getItemLimit(location.asMinimalString());
+					} else if ("summon-entity".equals(action.type())) {
+						var itemType = action.getString("type", "");
+						assert !itemType.isEmpty();
+						var location = ResourceLocation.parse(itemType);
+						var item = BuiltInRegistries.ENTITY_TYPE.getOptional(location);
+						assert item.isPresent();
+						limit = plugin.getLimitConfig().getEntityLimit(location.asMinimalString());
 					}
+				} catch (Exception e) {
+					plugin.getSLF4JLogger().atDebug().setCause(e).log("Unknown item/entity for limits");
+				}
+
+				try {
+					CCEffectResponse executed = executeLimit(request, playerSupplier.get(), limit, player -> {
+						boolean result = executor.execute(getPlugin(), player, action, request, ccPlayer);
+						return result
+							? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
+							: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Failed to execute custom action");
+					});
+
+					success |= executed.getStatus() == ResponseStatus.SUCCESS;
+				} catch (Exception e) {
+					plugin.getSLF4JLogger().warn("Failed to execute custom action", e);
 				}
 			}
 
