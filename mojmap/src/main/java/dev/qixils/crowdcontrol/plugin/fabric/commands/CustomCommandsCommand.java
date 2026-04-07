@@ -1,6 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
 import com.mojang.brigadier.StringReader;
+import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandAction;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandData;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
@@ -12,22 +13,19 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.arguments.item.ItemParser;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
@@ -39,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 @Getter
@@ -191,17 +188,17 @@ public class CustomCommandsCommand extends ModdedCommand {
 					if ("give-item".equals(action.type())) {
 						var itemType = action.getString("item", "");
 						assert !itemType.isEmpty();
-						var location = ResourceLocation.parse(itemType);
-						var item = BuiltInRegistries.ITEM.getOptional(location);
+						var location = new ResourceLocation(itemType);
+						var item = Registry.ITEM.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getItemLimit(location.asMinimalString());
+						limit = plugin.getLimitConfig().getItemLimit(CommandConstants.asMinimalString(FabricAudiences.toAdventure(location)));
 					} else if ("summon-entity".equals(action.type())) {
 						var itemType = action.getString("type", "");
 						assert !itemType.isEmpty();
-						var location = ResourceLocation.parse(itemType);
-						var item = BuiltInRegistries.ENTITY_TYPE.getOptional(location);
+						var location = new ResourceLocation(itemType);
+						var item = Registry.ENTITY_TYPE.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getEntityLimit(location.asMinimalString());
+						limit = plugin.getLimitConfig().getEntityLimit(CommandConstants.asMinimalString(FabricAudiences.toAdventure(location)));
 					}
 				} catch (Exception e) {
 					plugin.getSLF4JLogger().atDebug().setCause(e).log("Unknown item/entity for limits");

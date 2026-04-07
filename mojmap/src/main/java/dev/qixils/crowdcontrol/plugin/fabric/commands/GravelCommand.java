@@ -11,7 +11,6 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +34,7 @@ public class GravelCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get())
 				locations.addAll(BlockFinder.builder()
 					.origin(player)
-					.locationValidator(loc -> !loc.block().isAir() && !loc.block().is(Blocks.GRAVEL) && !loc.block().liquid())
+					.locationValidator(loc -> !loc.block().isAir() && !loc.block().is(Blocks.GRAVEL) && !loc.block().getMaterial().isLiquid())
 					.shuffleLocations(false)
 					.maxRadius(7)
 					.build().getAll());
