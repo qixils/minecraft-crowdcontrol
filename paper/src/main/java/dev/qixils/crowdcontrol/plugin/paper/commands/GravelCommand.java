@@ -33,7 +33,7 @@ public class GravelCommand extends RegionalCommandSync {
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		List<Location> locations = BlockUtil.BlockFinder.builder()
 			.origin(player.getLocation())
-			.locationValidator(loc -> !loc.getBlock().isEmpty() && loc.getBlock().getType() != Material.GRAVEL)
+			.locationValidator(loc -> !loc.getBlock().isEmpty() && loc.getBlock().getType() != Material.GRAVEL && !loc.getBlock().isLiquid())
 			.shuffleLocations(false)
 			.maxRadius(7)
 			.build().getAll();

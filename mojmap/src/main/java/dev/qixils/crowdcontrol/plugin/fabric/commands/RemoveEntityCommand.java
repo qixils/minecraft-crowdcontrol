@@ -10,6 +10,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
@@ -95,7 +96,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getEntityLimit(Registry.ENTITY_TYPE.getKey(entityType).getPath());
+			int playerLimit = config.getEntityLimit(MinecraftAudiences.asAdventure(Registry.ENTITY_TYPE.getKey(entityType)).asMinimalString());
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;

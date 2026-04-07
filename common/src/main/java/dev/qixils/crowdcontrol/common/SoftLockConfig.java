@@ -9,12 +9,13 @@ import java.time.Duration;
  */
 public class SoftLockConfig {
 
-	public static final int DEF_PERIOD = 120;
-	public static final int DEF_DEATHS = 6;
+	public static final int DEF_PERIOD = 60;
+	public static final int DEF_DEATHS = 5;
 	public static final int DEF_SEARCH_HORIZ = 20;
 	public static final int DEF_SEARCH_VERT = 8;
 
-	private final Duration period;
+	private final int period;
+	private transient final Duration periodDuration;
 	private final int deaths;
 	private final int searchHoriz;
 	private final int searchVert;
@@ -29,26 +30,24 @@ public class SoftLockConfig {
 	/**
 	 * Creates a new soft-lock config.
 	 *
-	 * @param period the monitoring period
+	 * @param period the monitoring period, in seconds
 	 * @param deaths the death count threshold
-	 * @param searchHoriz the horizontal search radius
-	 * @param searchVert the vertical search radius
 	 */
-	public SoftLockConfig(Duration period, int deaths, int searchHoriz, int searchVert) {
+	public SoftLockConfig(int period, int deaths, int searchHoriz, int searchVert) {
 		this.period = period;
+		this.periodDuration = Duration.ofSeconds(period);
 		this.deaths = deaths;
 		this.searchHoriz = searchHoriz;
 		this.searchVert = searchVert;
 	}
 
 	/**
-	 * Creates a new soft-lock config.
+	 * How long the monitoring period is in seconds.
 	 *
-	 * @param period the monitoring period, in seconds
-	 * @param deaths the death count threshold
+	 * @return monitoring period in seconds
 	 */
-	public SoftLockConfig(int period, int deaths, int searchHoriz, int searchVert) {
-		this(Duration.ofSeconds(period), deaths, searchHoriz, searchVert);
+	public int getPeriod() {
+		return period;
 	}
 
 	/**
@@ -57,8 +56,8 @@ public class SoftLockConfig {
 	 * @return monitoring period
 	 */
 	@NotNull
-	public Duration getPeriod() {
-		return period;
+	public Duration getPeriodDuration() {
+		return periodDuration;
 	}
 
 	/**
