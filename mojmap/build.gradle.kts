@@ -2,6 +2,7 @@ val configurateVersion: String by project
 val adventurePlatformModVersion: String by project
 val adventureVersion: String by project
 val adventurePlatformVersion: String by project
+val yaclVersion: String by project
 val neo_form_version: String by project
 
 plugins {
@@ -34,6 +35,7 @@ dependencies {
     api("org.spongepowered:configurate-hocon:$configurateVersion")
 
     compileOnly("net.kyori:adventure-platform-mod-shared:$adventurePlatformModVersion")
+    compileOnly("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")
 }
 
 val commonJava by configurations.creating {

@@ -13,6 +13,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -106,18 +107,14 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 			: _cmd;
 
 		try {
-			net.minecraft.commands.Commands commands = ((org.bukkit.craftbukkit.CraftServer) Bukkit.getServer()).getServer().getCommands();
-			com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.CommandSourceStack> dispatcher = commands.getDispatcher();
-			com.mojang.brigadier.ParseResults<net.minecraft.commands.CommandSourceStack> results = dispatcher.parse(commandLine, ((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle().createCommandSourceStack().withSuppressedOutput());
-
-			// we have Commands.finishParsing at home:
-			// (this catches undefined commands, since finishParsing itself is private and performCommand does not throw an exception if it returns null)
-			net.minecraft.commands.Commands.validateParseResults(results);
-			com.mojang.brigadier.context.ContextChain.tryFlatten(results.getContext().build(commandLine)).orElseThrow(() -> com.mojang.brigadier.exceptions.CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().createWithContext(results.getReader()));
-
-			// ok we can run the command now; if it errors then `return true;` is skipped
-			commands.performCommand(results, commandLine, true);
-			return true;
+			return Bukkit.dispatchCommand(
+				new org.bukkit.craftbukkit.command.ProxiedNativeCommandSender(
+					((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle().createCommandSourceStack().withSuppressedOutput(),
+					player,
+					player
+				),
+				commandLine
+			);
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to run command", e);
 		}
@@ -136,6 +133,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 	private final byte priority = 100;
 	private final int price;
 	private final boolean inactive = false;
+	private final int playerLimit;
 
 	public CustomCommandsCommand(PaperCrowdControlPlugin plugin, CustomCommandData data) {
 		super(plugin);
@@ -154,6 +152,31 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 		for (CustomCommandAction action : data.actions()) {
 			if (!executors.containsKey(action.type())) throw new RuntimeException("Invalid action \"" + action.type() + '"');
 		}
+
+		int limit = 0;
+		if (data.actions().size() == 1) {
+			try {
+				CustomCommandAction action = data.actions().getFirst();
+				if ("give-item".equals(action.type())) {
+					var itemType = action.getString("item", "");
+					assert !itemType.isEmpty();
+					var location = Key.key(itemType);
+					var item = Registry.ITEM.get(location);
+					assert item != null;
+					limit = plugin.getLimitConfig().getItemLimit(location.asMinimalString());
+				} else if ("summon-entity".equals(action.type())) {
+					var itemType = action.getString("type", "");
+					assert !itemType.isEmpty();
+					var location = Key.key(itemType);
+					var item = Registry.ENTITY_TYPE.get(location);
+					assert item != null;
+					limit = plugin.getLimitConfig().getEntityLimit(location.asMinimalString());
+				}
+			} catch (Exception e) {
+				plugin.getSLF4JLogger().atDebug().setCause(e).log("Unknown item/entity for limits");
+			}
+		}
+		playerLimit = limit;
 	}
 
 	@Override
@@ -178,6 +201,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 
 	@Override
 	protected boolean executeRegionallySync(Player player, PublicEffectPayload request, CCPlayer ccPlayer) {
+		// TODO: support item/entity limits
 		boolean success = false;
 		for (CustomCommandAction action : data.actions()) {
 			Executor executor = executors.get(action.type());

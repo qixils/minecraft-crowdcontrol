@@ -8,6 +8,7 @@ val jacksonVersion: String by project
 val crowdControlVersion: String by project
 val adventureVersion: String by project
 val geantyrefVersion: String by project
+val yaclVersion: String by project
 val minecraft_version: String by project
 val neoforge_version: String by project
 val mod_id: String by project
@@ -81,6 +82,7 @@ repositories {
 
 dependencies {
     implementation(jarJar("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
+    implementation(jarJar("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")!!)
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     // add transitive deps
@@ -98,7 +100,7 @@ dependencies {
 
 publishMods {
     val versionFrom = "26.1"
-    val versionTo = "26.1"
+    val versionTo = "26.1.1"
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("neoforge")
@@ -122,10 +124,10 @@ publishMods {
             append("] v")
             append(project.version.toString())
         })
-        javaVersions.add(JavaVersion.VERSION_21)
+        javaVersions.add(JavaVersion.VERSION_25)
         serverRequired.set(true)
         clientRequired.set(false)
-//        embeds("yacl")
+        optional("yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -146,6 +148,7 @@ publishMods {
             }
             append(")")
         })
+        optional("yacl")
         embeds("adventure-platform-mod")
     }
 }

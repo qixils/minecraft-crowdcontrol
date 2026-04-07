@@ -11,6 +11,7 @@ val languageReloadVersion: String by project
 val crowdControlVersion: String by project
 val jacksonVersion: String by project
 val geantyrefVersion: String by project
+val yaclVersion: String by project
 val minecraft_version: String by project
 val fabric_loader_version: String by project
 val fabric_version: String by project
@@ -45,6 +46,10 @@ dependencies {
     implementation("com.terraformersmc:modmenu:$modMenuVersion")
     implementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
 //    implementation("maven.modrinth:language-reload:$languageReloadVersion")
+    implementation(include("dev.isxander:yet-another-config-lib:$yaclVersion-fabric") {
+        // TODO is this even in there
+        exclude(group = "net.fabricmc.fabric-api")
+    })
 
     // transitives
     include(project(":base-common")) // this is available via api of mojmap-common (which is available via multiloader plugin) but not added to jar
@@ -105,7 +110,7 @@ sourceSets.configureEach {
 
 publishMods {
     val versionFrom = "26.1"
-    val versionTo = "26.1"
+    val versionTo = "26.1.1"
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")
@@ -130,12 +135,11 @@ publishMods {
             append("] v")
             append(project.version.toString())
         })
-        javaVersions.add(JavaVersion.VERSION_21)
+        javaVersions.add(JavaVersion.VERSION_25)
         serverRequired.set(true)
         clientRequired.set(false)
         requires("fabric-api")
-        optional("modmenu", "language-reload")
-//        embeds("yacl")
+        optional("modmenu", "language-reload", "yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -157,7 +161,7 @@ publishMods {
             append(")")
         })
         requires("fabric-api")
-        optional("modmenu", "language-reload")
+        optional("modmenu", "language-reload", "yacl")
         embeds("adventure-platform-mod")
     }
 }

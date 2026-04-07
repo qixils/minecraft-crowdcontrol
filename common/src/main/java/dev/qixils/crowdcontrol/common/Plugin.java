@@ -335,6 +335,10 @@ public abstract class Plugin<P, S> {
 		return global;
 	}
 
+	public void setIsGlobal(boolean isGlobal) {
+		global = isGlobal;
+	}
+
 	/**
 	 * Returns a collection of strings representing the names of hosts.
 	 * <p>
@@ -348,6 +352,14 @@ public abstract class Plugin<P, S> {
 	@NotNull
 	public Collection<String> getHosts() {
 		return hosts;
+	}
+
+	public Collection<String> getRawHosts() {
+		return new ArrayList<>(hosts);
+	}
+
+	public void setRawHosts(Collection<String> hosts) {
+		this.hosts = new HashSet<>(hosts);
 	}
 
 	/**
@@ -989,7 +1001,7 @@ public abstract class Plugin<P, S> {
 	public void saveConfig() {
 		try {
 			// TODO: add comments
-			// TODO: custom
+			// TODO: custom effects
 			ConfigurationNode config = getConfigLoader().createNode();
 			TypeToken<Set<String>> hostToken = new TypeToken<>() {};
 			TypeToken<Map<String, Integer>> limitToken = new TypeToken<>() {};

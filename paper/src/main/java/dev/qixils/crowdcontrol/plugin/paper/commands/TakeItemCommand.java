@@ -37,6 +37,11 @@ public class TakeItemCommand extends RegionalCommandSync implements ItemCommand 
 	}
 
 	@Override
+	protected int getPlayerLimit() {
+		return getPlugin().getLimitConfig().getItemLimit(item.getKey().asMinimalString());
+	}
+
+	@Override
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		int amount = request.getQuantity();
 		PlayerInventory inventory = player.getInventory();
