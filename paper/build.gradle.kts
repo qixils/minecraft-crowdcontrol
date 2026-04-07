@@ -64,9 +64,7 @@ tasks {
 
     shadowJar {
         // set name of output file to CrowdControl-PLATFORM+VERSION.jar
-        archiveBaseName.set("CrowdControl-Paper+$minecraftVersion-$version")
-        archiveClassifier.set("")
-        archiveVersion.set("")
+        archiveFileName.set("CrowdControl-Paper+$minecraftVersion-$version.jar")
 
         exclude("net/kyori/adventure/text/minimessage/")
         exclude("net/kyori/adventure/text/serializer/")
