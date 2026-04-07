@@ -198,14 +198,14 @@ public class CustomCommandsCommand extends ModdedCommand {
 						var location = Identifier.parse(itemType);
 						var item = BuiltInRegistries.ITEM.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getItemLimit(location.asMinimalString());
+						limit = plugin.getLimitConfig().getItemLimit(location.toShortString());
 					} else if ("summon-entity".equals(action.type())) {
 						var itemType = action.getString("type", "");
 						assert !itemType.isEmpty();
 						var location = Identifier.parse(itemType);
 						var item = BuiltInRegistries.ENTITY_TYPE.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getEntityLimit(location.asMinimalString());
+						limit = plugin.getLimitConfig().getEntityLimit(location.toShortString());
 					}
 				} catch (Exception e) {
 					plugin.getSLF4JLogger().atDebug().setCause(e).log("Unknown item/entity for limits");

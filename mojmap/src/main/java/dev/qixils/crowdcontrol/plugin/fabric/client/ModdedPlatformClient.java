@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.*;
 import dev.qixils.crowdcontrol.common.HideNames;
+import dev.qixils.crowdcontrol.common.SoftLockConfig;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -23,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -136,9 +136,9 @@ public abstract class ModdedPlatformClient {
 							.name(Component.translatable("config.crowdcontrol.soft_lock.period.name"))
 							.description(OptionDescription.of(Component.translatable("config.crowdcontrol.soft_lock.period.description")))
 							.binding(
-								120,
-								() -> Math.toIntExact(plugin.getSoftLockConfig().getPeriod().getSeconds()),
-								value -> plugin.getSoftLockConfig().setPeriod(Duration.ofSeconds(value))
+								SoftLockConfig.DEF_PERIOD,
+								() -> Math.toIntExact(plugin.getSoftLockConfig().getPeriod()),
+								value -> plugin.getSoftLockConfig().setPeriod(value)
 							)
 							.controller(opt -> IntegerFieldControllerBuilder.create(opt).min(0))
 							.build())
@@ -146,7 +146,7 @@ public abstract class ModdedPlatformClient {
 							.name(Component.translatable("config.crowdcontrol.soft_lock.deaths.name"))
 							.description(OptionDescription.of(Component.translatable("config.crowdcontrol.soft_lock.deaths.description")))
 							.binding(
-								5,
+								SoftLockConfig.DEF_DEATHS,
 								() -> Math.toIntExact(plugin.getSoftLockConfig().getDeaths()),
 								value -> plugin.getSoftLockConfig().setDeaths(value)
 							)
@@ -156,7 +156,7 @@ public abstract class ModdedPlatformClient {
 							.name(Component.translatable("config.crowdcontrol.soft_lock.horiz_radius.name"))
 							.description(OptionDescription.of(Component.translatable("config.crowdcontrol.soft_lock.radius.description")))
 							.binding(
-								20,
+								SoftLockConfig.DEF_SEARCH_HORIZ,
 								() -> Math.toIntExact(plugin.getSoftLockConfig().getSearchH()),
 								value -> plugin.getSoftLockConfig().setSearchH(value)
 							)
@@ -166,7 +166,7 @@ public abstract class ModdedPlatformClient {
 							.name(Component.translatable("config.crowdcontrol.soft_lock.vert_radius.name"))
 							.description(OptionDescription.of(Component.translatable("config.crowdcontrol.soft_lock.radius.description")))
 							.binding(
-								8,
+								SoftLockConfig.DEF_SEARCH_VERT,
 								() -> Math.toIntExact(plugin.getSoftLockConfig().getSearchV()),
 								value -> plugin.getSoftLockConfig().setSearchV(value)
 							)
