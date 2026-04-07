@@ -115,25 +115,14 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 			: _cmd;
 
 		try {
-			net.minecraft.commands.Commands commands = ((org.bukkit.craftbukkit.CraftServer) Bukkit.getServer()).getServer().getCommands();
-			com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.CommandSourceStack> dispatcher = commands.getDispatcher();
-			com.mojang.brigadier.ParseResults<net.minecraft.commands.CommandSourceStack> results = dispatcher.parse(commandLine, ((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle().createCommandSourceStack().withSuppressedOutput());
-
-			// we have Commands.finishParsing at home:
-			// (this catches undefined commands, since finishParsing itself is private and performCommand does not throw an exception if it returns null)
-			net.minecraft.commands.Commands.validateParseResults(results);
-			com.mojang.brigadier.context.ContextChain.tryFlatten(results.getContext().build(commandLine)).orElseThrow(() -> com.mojang.brigadier.exceptions.CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().createWithContext(results.getReader()));
-
-			// ok we can run the command now; if it errors then `return true;` is skipped
-			try {
-				commands.performCommand(results, commandLine, commandLine, true);
-			} catch (NoSuchMethodError e) {
-				// changed some time between now and 1.21.10, idk if this will even work lmao? im not sure if paper obfuscates functions that it made itself??
-				// but hey the changelog warns this shit isn't stable on paper so not too serious if it doesn't work
-				net.minecraft.commands.Commands.class.getMethod("performCommand", com.mojang.brigadier.ParseResults.class, String.class, boolean.class).invoke(commands, results, commandLine, true);
-			}
-
-			return true;
+			return Bukkit.dispatchCommand(
+				new org.bukkit.craftbukkit.command.ProxiedNativeCommandSender(
+					((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle().createCommandSourceStack().withSuppressedOutput(),
+					player,
+					player
+				),
+				commandLine
+			);
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to run command", e);
 		}

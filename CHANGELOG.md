@@ -4,15 +4,18 @@ A list of all changes made to the software in reverse chronological order.
 
 ## 4.5.2
 
-- Paper: Added support for 26.1.1
+- Paper: Added support for 26.1.1 and its new _Age Nearby Mobs_ effects
+- Paper: Fixed _Take Item_ not respecting limits
+- _Replace Blocks with Gravel_ no longer replaces liquids
+- Fixed minor issues with the Soft Lock Observer and tweaked its default settings
 - Custom Effects now respect item and entity limit settings
   - Due to limitations in the Paper mod this only works on custom effects with 1 action for now
   - On Fabric/NeoForge, stacked actions may target different random players
-- Paper: Fixed _Take Item_ not respecting limits
+- Fabric/NeoForge 26.1+: More config options are available in the GUI
 
 ## 4.5.1
 
-- Fabric/NeoForge 26.1: Config GUI is now available when YACL is installed
+- Fabric/NeoForge 26.1+: Config GUI is now available when YACL is installed
 - Fabric: Added support for Herdcraft/26w14a/Minecraft's April Fools
 
 ## 4.5.0
