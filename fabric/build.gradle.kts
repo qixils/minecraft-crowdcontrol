@@ -110,7 +110,7 @@ sourceSets.configureEach {
 
 publishMods {
     val versionFrom = "26.1"
-    val versionTo = "26.1"
+    val versionTo = "26.1.1"
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")

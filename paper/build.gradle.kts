@@ -24,8 +24,8 @@ dependencies {
     implementation("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
-    paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
-//    compileOnly("io.papermc.paper:paper-api:$minecraftVersion-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("$minecraftVersion.build.+")
+//    compileOnly("io.papermc.paper:paper-api:$minecraftVersion.build.+")
 }
 
 // plugin.yml generation
@@ -54,13 +54,13 @@ tasks {
         configure(minecraftVersion)
     }
     // create extra runServer tasks for later versions of Minecraft
-    for (mcVersion in listOf<String>("1.21.11")) {
-        register("runServer$mcVersion", RunServer::class.java) {
-            configure(mcVersion)
-            dependsOn("shadowJar")
-            pluginJars(shadowJar.get().archiveFile)
-        }
-    }
+//    for (mcVersion in listOf<String>("1.21.11")) {
+//        register("runServer$mcVersion", RunServer::class.java) {
+//            configure(mcVersion)
+//            dependsOn("shadowJar")
+//            pluginJars(shadowJar.get().archiveFile)
+//        }
+//    }
 
     shadowJar {
         // set name of output file to CrowdControl-PLATFORM+VERSION.jar
@@ -94,8 +94,8 @@ fun RunServer.configure(mcVersion: String) {
 }
 
 publishMods {
-    val versionFrom = "1.21.9"
-    val versionTo = "1.21.11"
+    val versionFrom = "26.1"
+    val versionTo = "26.1.1"
 
     file.set(tasks.shadowJar.get().archiveFile)
     modLoaders.add("paper")

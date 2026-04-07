@@ -100,7 +100,9 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new RandomFallingBlockCommand(plugin),
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
-			() -> new WaterCommand(plugin)
+			() -> new WaterCommand(plugin),
+			() -> new AgeCommand(plugin, true),
+			() -> new AgeCommand(plugin, false)
 		));
 
 		// entity commands
