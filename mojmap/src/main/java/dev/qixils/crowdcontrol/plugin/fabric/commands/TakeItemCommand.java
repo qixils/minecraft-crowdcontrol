@@ -69,7 +69,7 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).getPath());
+			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).asMinimalString());
 
 			int amount = request.getQuantity();
 
