@@ -114,7 +114,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 
 	@Override
 	protected int getPlayerLimit() {
-		return getPlugin().getLimitConfig().getEntityLimit(entityType.getKey().getKey());
+		return getPlugin().getLimitConfig().getEntityLimit(entityType.getKey().asMinimalString());
 	}
 
 	@Override

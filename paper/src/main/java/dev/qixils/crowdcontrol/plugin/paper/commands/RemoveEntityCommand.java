@@ -58,7 +58,7 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 
 	@Override
 	protected int getPlayerLimit() {
-		return plugin.getLimitConfig().getEntityLimit(entityType.getKey().getKey());
+		return plugin.getLimitConfig().getEntityLimit(entityType.getKey().asMinimalString());
 	}
 
 	@Override

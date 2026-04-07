@@ -52,8 +52,10 @@ public abstract class SoftLockObserver<P> {
 	 * @param player The player who died.
 	 */
 	protected void onDeath(P player) {
-		UUID uuid = plugin.playerMapper().tryGetUniqueId(player)
-				.orElseThrow(() -> new IllegalArgumentException("Expected player to have a UUID"));
+		Optional<UUID> uuidOpt = plugin.playerMapper().tryGetUniqueId(player);
+		if (uuidOpt.isEmpty()) return;
+		UUID uuid = uuidOpt.get();
+
 		DeathData data = deathData.computeIfAbsent(uuid, $ -> new DeathData(plugin.getSoftLockConfig()));
 		if (data.isSoftLocked()) {
 			onSoftLock(player);
@@ -67,13 +69,12 @@ public abstract class SoftLockObserver<P> {
 
 		public DeathData(@NotNull SoftLockConfig config) {
 			this.config = config;
-			addDeath();
 		}
 
 		private void addDeath() {
 			LocalDateTime now = LocalDateTime.now();
-			deaths.removeIf(d -> d.isBefore(now.minus(config.getPeriod())));
 			deaths.add(now);
+			deaths.removeIf(d -> d.isBefore(now.minus(config.getPeriodDuration())));
 		}
 
 		public boolean isSoftLocked() {
