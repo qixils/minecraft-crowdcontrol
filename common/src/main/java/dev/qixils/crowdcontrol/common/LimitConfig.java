@@ -13,11 +13,11 @@ import static dev.qixils.crowdcontrol.exceptions.ExceptionUtil.validateNotNullEl
  * The configuration for effect limits.
  */
 public final class LimitConfig {
-	private final boolean hostsBypass;
-	private final @NotNull Map<String, Integer> itemLimits;
-	private final int itemDefaultLimit;
-	private final @NotNull Map<String, Integer> entityLimits;
-	private final int entityDefaultLimit;
+	private boolean hostsBypass;
+	private @NotNull Map<String, Integer> itemLimits;
+	private int itemDefaultLimit;
+	private @NotNull Map<String, Integer> entityLimits;
+	private int entityDefaultLimit;
 
 	/**
 	 * Constructs a new limit configuration.
@@ -30,10 +30,8 @@ public final class LimitConfig {
 					   @Nullable Map<String, Integer> itemLimits,
 					   @Nullable Map<String, Integer> entityLimits) {
 		this.hostsBypass = hostsBypass;
-		this.itemLimits = new HashMap<>(validateNotNullElseGet(itemLimits, Collections::emptyMap));
-		itemDefaultLimit = this.itemLimits.getOrDefault("default", 0);
-		this.entityLimits = new HashMap<>(validateNotNullElseGet(entityLimits, Collections::emptyMap));
-		entityDefaultLimit = this.entityLimits.getOrDefault("default", 0);
+		itemLimits(validateNotNullElseGet(itemLimits, Collections::emptyMap));
+		entityLimits(validateNotNullElseGet(entityLimits, Collections::emptyMap));
 	}
 
 	/**
@@ -51,6 +49,19 @@ public final class LimitConfig {
 	 */
 	public boolean hostsBypass() {
 		return hostsBypass;
+	}
+
+	public void hostsBypass(boolean hostsBypass) {
+		this.hostsBypass = hostsBypass;
+	}
+
+	public int defaultItemLimit() {
+		return itemDefaultLimit;
+	}
+
+	public void defaultItemLimit(int defaultItemLimit) {
+		itemLimits.put("default", defaultItemLimit);
+		this.itemDefaultLimit = defaultItemLimit;
 	}
 
 	/**
@@ -72,6 +83,20 @@ public final class LimitConfig {
 		return Collections.unmodifiableMap(itemLimits);
 	}
 
+	public void itemLimits(Map<String, Integer> itemLimits) {
+		this.itemLimits = new HashMap<>(itemLimits);
+		itemDefaultLimit = this.itemLimits.getOrDefault("default", 0);
+	}
+
+	public int defaultEntityLimit() {
+		return entityDefaultLimit;
+	}
+
+	public void defaultEntityLimit(int defaultEntityLimit) {
+		entityLimits.put("default", defaultEntityLimit);
+		this.entityDefaultLimit = defaultEntityLimit;
+	}
+
 	/**
 	 * Gets the limit on the given entity effect.
 	 *
@@ -89,6 +114,11 @@ public final class LimitConfig {
 	 */
 	public @NotNull Map<String, Integer> entityLimits() {
 		return Collections.unmodifiableMap(entityLimits);
+	}
+
+	public void entityLimits(Map<String, Integer> entityLimits) {
+		this.entityLimits = new HashMap<>(entityLimits);
+		entityDefaultLimit = this.entityLimits.getOrDefault("default", 0);
 	}
 
 	@Override
