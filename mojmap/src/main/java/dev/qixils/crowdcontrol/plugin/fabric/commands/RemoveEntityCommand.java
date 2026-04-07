@@ -96,7 +96,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath());
+			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).asMinimalString());
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;

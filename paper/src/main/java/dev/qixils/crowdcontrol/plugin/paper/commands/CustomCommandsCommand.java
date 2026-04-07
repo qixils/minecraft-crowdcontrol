@@ -13,6 +13,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -151,6 +152,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 	private final byte priority = 100;
 	private final int price;
 	private final boolean inactive = false;
+	private final int playerLimit;
 
 	public CustomCommandsCommand(PaperCrowdControlPlugin plugin, CustomCommandData data) {
 		super(plugin);
@@ -169,6 +171,31 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 		for (CustomCommandAction action : data.actions()) {
 			if (!executors.containsKey(action.type())) throw new RuntimeException("Invalid action \"" + action.type() + '"');
 		}
+
+		int limit = 0;
+		if (data.actions().size() == 1) {
+			try {
+				CustomCommandAction action = data.actions().getFirst();
+				if ("give-item".equals(action.type())) {
+					var itemType = action.getString("item", "");
+					assert !itemType.isEmpty();
+					var location = Key.key(itemType);
+					var item = Registry.ITEM.get(location);
+					assert item != null;
+					limit = plugin.getLimitConfig().getItemLimit(location.asMinimalString());
+				} else if ("summon-entity".equals(action.type())) {
+					var itemType = action.getString("type", "");
+					assert !itemType.isEmpty();
+					var location = Key.key(itemType);
+					var item = Registry.ENTITY_TYPE.get(location);
+					assert item != null;
+					limit = plugin.getLimitConfig().getEntityLimit(location.asMinimalString());
+				}
+			} catch (Exception e) {
+				plugin.getSLF4JLogger().atDebug().setCause(e).log("Unknown item/entity for limits");
+			}
+		}
+		playerLimit = limit;
 	}
 
 	@Override
@@ -193,6 +220,7 @@ public class CustomCommandsCommand extends RegionalCommandSync {
 
 	@Override
 	protected boolean executeRegionallySync(Player player, PublicEffectPayload request, CCPlayer ccPlayer) {
+		// TODO: support item/entity limits
 		boolean success = false;
 		for (CustomCommandAction action : data.actions()) {
 			Executor executor = executors.get(action.type());

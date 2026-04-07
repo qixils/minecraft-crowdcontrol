@@ -454,10 +454,10 @@ public interface Command<P> extends CCEffect {
 	}
 
 	default CCEffectResponse executeLimit(@NotNull PublicEffectPayload request, @NotNull List<P> players, int playerLimit, @NotNull Function<P, CCEffectResponse> supplier) {
-		if (isMainThread()) {
-			getPlugin().getSLF4JLogger().error("Effect {} is implemented incorrectly, invoking executeLimit from main thread, please report this!", getEffectName());
-			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Effect is implemented incorrectly");
-		}
+//		if (isMainThread()) {
+//			getPlugin().getSLF4JLogger().error("Effect {} is implemented incorrectly, invoking executeLimit from main thread, please report this!", getEffectName());
+//			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_PERMANENT, "Effect is implemented incorrectly");
+//		}
 		boolean hostsBypass = getPlugin().getLimitConfig().hostsBypass();
 		int victims = 0;
 		CCEffectResponse successResp = null;
