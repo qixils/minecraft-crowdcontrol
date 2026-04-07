@@ -195,14 +195,14 @@ public class CustomCommandsCommand extends ModdedCommand {
 					if ("give-item".equals(action.type())) {
 						var itemType = action.getString("item", "");
 						assert !itemType.isEmpty();
-						var location = ResourceLocation.parse(itemType);
+						var location = Identifier.parse(itemType);
 						var item = BuiltInRegistries.ITEM.getOptional(location);
 						assert item.isPresent();
 						limit = plugin.getLimitConfig().getItemLimit(location.asMinimalString());
 					} else if ("summon-entity".equals(action.type())) {
 						var itemType = action.getString("type", "");
 						assert !itemType.isEmpty();
-						var location = ResourceLocation.parse(itemType);
+						var location = Identifier.parse(itemType);
 						var item = BuiltInRegistries.ENTITY_TYPE.getOptional(location);
 						assert item.isPresent();
 						limit = plugin.getLimitConfig().getEntityLimit(location.asMinimalString());
