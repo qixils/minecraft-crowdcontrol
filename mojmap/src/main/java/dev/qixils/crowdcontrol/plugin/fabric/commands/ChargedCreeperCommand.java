@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Blocking;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 	public ChargedCreeperCommand(ModdedCrowdControlPlugin plugin) {
-		super(plugin, "entity_charged_creeper", null, EntityType.CREEPER);
+		super(plugin, "entity_charged_creeper", null, EntityTypes.CREEPER);
 	}
 
 	@Override

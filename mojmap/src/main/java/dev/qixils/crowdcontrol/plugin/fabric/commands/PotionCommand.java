@@ -51,7 +51,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 		this.potionEffectType = potionEffectType;
 		Identifier loc = potionEffectType.unwrapKey().orElseThrow().identifier();
 		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(MinecraftAudiences.asAdventure(loc));
-		this.isMinimal = potionEffectType.value().isInstantenous();
+		this.isMinimal = potionEffectType.value().isInstantaneous();
 		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
 		this.displayName = _displayName;
 		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.potion.extension")));

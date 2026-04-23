@@ -111,8 +111,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			if (!isWhitelistedEntity(entity) && !Mob.class.isAssignableFrom(entity.getEntityClass())) continue;
 			initTo(commands, () -> new SummonEntityCommand(plugin, entity));
 
-			if (entity.equals(EntityType.LIGHTNING_BOLT)) continue;
-			if (entity.equals(EntityType.TNT)) continue;
+			if (entity.equals(EntityTypes.LIGHTNING_BOLT)) continue;
+			if (entity.equals(EntityTypes.TNT)) continue;
 			initTo(commands, () -> new RemoveEntityCommand(plugin, entity));
 		}
 

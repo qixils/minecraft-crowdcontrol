@@ -40,7 +40,7 @@ fun incl(asPath: String, fromPath: String) {
 }
 
 incl(":base-common", "common")
-incl(":paper-platform", "paper")
+//incl(":paper-platform", "paper")
 incl(":mojmap-common", "mojmap")
 incl(":fabric-platform", "fabric")
-incl(":neoforge-platform", "neoforge")
+//incl(":neoforge-platform", "neoforge")

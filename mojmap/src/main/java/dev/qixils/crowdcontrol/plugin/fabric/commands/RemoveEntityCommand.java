@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,14 +73,14 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 	@Override
 	public boolean isMonster() {
-		if (entityType == EntityType.ENDER_DRAGON)
+		if (entityType == EntityTypes.ENDER_DRAGON)
 			return false; // ender dragon is persistent regardless of difficulty so allow it to be removed
 		return EntityCommand.super.isMonster();
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
 		ServerLevel level = player.level();
-		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return false;
+		if (entityType == EntityTypes.ENDER_DRAGON && level.getDragonFight() != null) return false;
 
 		Vec3 playerPosition = player.position();
 		List<Entity> entities = StreamSupport.stream(level.getAllEntities().spliterator(), false)

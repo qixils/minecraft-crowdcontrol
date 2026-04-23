@@ -12,7 +12,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +43,7 @@ public class DinnerboneCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get()) {
 				entities.addAll(StreamSupport.stream(player.level().getAllEntities().spliterator(), false)
 					.filter(entity -> entity instanceof LivingEntity
-						&& entity.getType() != EntityType.PLAYER
+						&& entity.getType() != EntityTypes.PLAYER
 						&& entity.position().distanceToSqr(player.position()) <= (ENTITY_SEARCH_RADIUS * ENTITY_SEARCH_RADIUS))
 					.map(entity -> (LivingEntity) entity)
 					.toList());

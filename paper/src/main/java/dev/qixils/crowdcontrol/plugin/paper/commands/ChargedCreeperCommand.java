@@ -18,7 +18,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand {
 	private final Component displayName = getDefaultDisplayName();
 
 	public ChargedCreeperCommand(PaperCrowdControlPlugin plugin) {
-		super(plugin, EntityType.CREEPER);
+		super(plugin, EntityTypes.CREEPER);
 	}
 
 	@Override

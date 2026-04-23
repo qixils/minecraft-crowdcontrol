@@ -41,7 +41,7 @@ public class EntityChaosCommand extends PaperCommand {
 			if (players.stream().anyMatch(plugin::globalEffectsUsableFor)) {
 				for (World world : Bukkit.getWorlds()) {
 					for (Entity entity : world.getEntities()) {
-						if (entity.getType() == EntityType.PLAYER) continue;
+						if (entity.getType() == EntityTypes.PLAYER) continue;
 						entities.add(entity);
 					}
 				}
@@ -49,7 +49,7 @@ public class EntityChaosCommand extends PaperCommand {
 				for (Player player : players) {
 					// TODO: folia ...?
 					for (Entity entity : player.getNearbyEntities(R, R, R)) {
-						if (entity.getType() == EntityType.PLAYER) continue;
+						if (entity.getType() == EntityTypes.PLAYER) continue;
 						entities.add(entity);
 					}
 				}

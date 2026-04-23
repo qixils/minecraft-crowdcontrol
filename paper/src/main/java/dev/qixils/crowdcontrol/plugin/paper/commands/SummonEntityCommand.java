@@ -134,7 +134,7 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 
 	protected static Entity spawnEntity(@Nullable Component viewer, @NotNull Player player, @NotNull EntityType entityType, @NotNull NamespacedKey mobKey) {
 		World world = player.getWorld();
-		if (entityType == EntityType.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END) return null;
+		if (entityType == EntityTypes.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END) return null;
 
 		Entity entity = world.spawnEntity(player.getLocation(), entityType);
 		if (viewer != null) {

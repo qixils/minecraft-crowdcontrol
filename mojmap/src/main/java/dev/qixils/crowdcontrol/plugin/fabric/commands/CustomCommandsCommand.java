@@ -26,10 +26,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +54,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 
 		Registry<EntityType<?>> entities = player.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE);
 		Holder.Reference<EntityType<?>> entityType = entities.get(entityId).or(() -> {
-			var pig = entities.wrapAsHolder(EntityType.PIG);
+			var pig = entities.wrapAsHolder(EntityTypes.PIG);
 			if (pig instanceof Holder.Reference<EntityType<?>> refPig) return Optional.of(refPig);
 			return Optional.empty();
 		}).orElse(null);

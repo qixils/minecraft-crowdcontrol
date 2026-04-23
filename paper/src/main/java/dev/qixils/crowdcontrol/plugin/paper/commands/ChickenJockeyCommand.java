@@ -13,7 +13,7 @@ public class ChickenJockeyCommand extends SummonEntityCommand {
 	private final Component displayName = getDefaultDisplayName();
 
 	public ChickenJockeyCommand(PaperCrowdControlPlugin plugin) {
-		super(plugin, EntityType.CHICKEN);
+		super(plugin, EntityTypes.CHICKEN);
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class ChickenJockeyCommand extends SummonEntityCommand {
 		if (chicken == null) return null;
 		chicken.setIsChickenJockey(true);
 
-		Zombie zombie = (Zombie) spawnEntity(viewer, player, EntityType.ZOMBIE, getMobKey());
+		Zombie zombie = (Zombie) spawnEntity(viewer, player, EntityTypes.ZOMBIE, getMobKey());
 		if (zombie == null) return chicken;
 		zombie.setBaby();
 

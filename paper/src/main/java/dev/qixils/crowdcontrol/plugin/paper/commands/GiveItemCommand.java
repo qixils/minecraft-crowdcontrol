@@ -38,7 +38,7 @@ public class GiveItemCommand extends RegionalCommandSync implements ItemCommand 
 	@Blocking
 	public static boolean giveItemTo(Entity player, ItemStack itemStack) {
 		Location location = player.getLocation();
-		Item item = (Item) player.getWorld().spawnEntity(location, EntityType.ITEM);
+		Item item = (Item) player.getWorld().spawnEntity(location, EntityTypes.ITEM);
 		item.setItemStack(itemStack);
 		item.setOwner(player.getUniqueId());
 		item.setThrower(player.getUniqueId());

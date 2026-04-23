@@ -62,7 +62,7 @@ public interface EntityCommand extends FeatureElementCommand {
 			World world = player.getWorld();
 			if (isMonster() && levelIsPeaceful(world))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
-			else if (getEntityType() == EntityType.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END)
+			else if (getEntityType() == EntityTypes.ENDER_DRAGON && world.getEnvironment() == World.Environment.THE_END)
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
 			else if (!world.isEnabled(getEntityType()))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");

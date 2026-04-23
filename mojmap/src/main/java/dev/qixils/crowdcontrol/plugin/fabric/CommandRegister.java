@@ -19,6 +19,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.entity.vehicle.boat.AbstractChestBoat;
@@ -145,8 +146,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 				if (!allowed) continue;
 				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
 
-				if (entry.getValue().equals(EntityType.LIGHTNING_BOLT)) continue;
-				if (entry.getValue().equals(EntityType.TNT)) continue;
+				if (entry.getValue().equals(EntityTypes.LIGHTNING_BOLT)) continue;
+				if (entry.getValue().equals(EntityTypes.TNT)) continue;
 				initTo(commands, () -> new RemoveEntityCommand<>(plugin, entry.getValue()));
 			} catch (Exception e) {
 				plugin.getSLF4JLogger().warn("Failed to check if entity is allowed; ignoring", e);
@@ -155,28 +156,28 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 
 		// misc grouped summons
 		EntityType<AbstractBoat>[] boats = new EntityType[] {
-			EntityType.OAK_BOAT,
-			EntityType.BIRCH_BOAT,
-			EntityType.ACACIA_BOAT,
-			EntityType.CHERRY_BOAT,
-			EntityType.DARK_OAK_BOAT,
-			EntityType.JUNGLE_BOAT,
-			EntityType.MANGROVE_BOAT,
-			EntityType.PALE_OAK_BOAT,
-			EntityType.SPRUCE_BOAT,
-			EntityType.BAMBOO_RAFT
+			EntityTypes.OAK_BOAT,
+			EntityTypes.BIRCH_BOAT,
+			EntityTypes.ACACIA_BOAT,
+			EntityTypes.CHERRY_BOAT,
+			EntityTypes.DARK_OAK_BOAT,
+			EntityTypes.JUNGLE_BOAT,
+			EntityTypes.MANGROVE_BOAT,
+			EntityTypes.PALE_OAK_BOAT,
+			EntityTypes.SPRUCE_BOAT,
+			EntityTypes.BAMBOO_RAFT
 		};
 		EntityType<AbstractChestBoat>[] chestBoats = new EntityType[] {
-			EntityType.OAK_CHEST_BOAT,
-			EntityType.BIRCH_CHEST_BOAT,
-			EntityType.ACACIA_CHEST_BOAT,
-			EntityType.CHERRY_CHEST_BOAT,
-			EntityType.DARK_OAK_CHEST_BOAT,
-			EntityType.JUNGLE_CHEST_BOAT,
-			EntityType.MANGROVE_CHEST_BOAT,
-			EntityType.PALE_OAK_CHEST_BOAT,
-			EntityType.SPRUCE_CHEST_BOAT,
-			EntityType.BAMBOO_CHEST_RAFT
+			EntityTypes.OAK_CHEST_BOAT,
+			EntityTypes.BIRCH_CHEST_BOAT,
+			EntityTypes.ACACIA_CHEST_BOAT,
+			EntityTypes.CHERRY_CHEST_BOAT,
+			EntityTypes.DARK_OAK_CHEST_BOAT,
+			EntityTypes.JUNGLE_CHEST_BOAT,
+			EntityTypes.MANGROVE_CHEST_BOAT,
+			EntityTypes.PALE_OAK_CHEST_BOAT,
+			EntityTypes.SPRUCE_CHEST_BOAT,
+			EntityTypes.BAMBOO_CHEST_RAFT
 		};
 		initTo(commands, () -> new SummonEntityCommand<>(
 			plugin,
