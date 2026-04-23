@@ -154,7 +154,7 @@ public final class KyoriTranslator {
 			String value = intermediate.getTranslationString(key, locale);
 			if (value == null) continue; // !?
 
-			translator.register(key, locale, value.replaceAll("<(\\d+)>", "<arg:$1>"));
+			translator.register(key, locale, value.replaceAll("<(\\d+)>", "<arg:$1>").replaceAll("''", "'"));
 		}
 
 		logger.info("Registered locale {}", locale);
