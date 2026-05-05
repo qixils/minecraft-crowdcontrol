@@ -8,13 +8,13 @@ import { downloadNeoForge } from './neoforge.js';
 const root = await mkdir(path.resolve("output", "Minecraft"))
 
 // await downloadJRE(root, 8)
-await downloadJRE(root, 21)
+// await downloadJRE(root, 21)
 await downloadJRE(root, 25)
 
 const modVersions = await Promise.allSettled([
-    downloadPaper(root, "1.21.11", 21),
-    downloadFabric(root, "26.1.1", 25),
-    downloadNeoForge(root, "26.1.1", 25),
+    downloadPaper(root, "26.1.2", 25),
+    downloadFabric(root, "26.1.2", 25),
+    downloadNeoForge(root, "26.1.2", 25),
 ])
 
 const modVersion = modVersions
