@@ -3,6 +3,7 @@ import { useVersion } from '~/composables/useVersion'
 import VersionWarning from '~/components/VersionWarning.vue'
 import PortInstructions from '~/components/PortInstructions.vue'
 import * as versions from '~/utils/versions'
+import JoinGuide from '~/components/JoinGuide.vue'
 
 const versionData = useVersion(versions.neoForgeML)
 const { version } = versionData
@@ -62,5 +63,7 @@ useSeoMeta({
       This prevents unknown players from joining the server and potentially griefing your builds.
       Additionally, you can use permissions mods such as LuckPerms to restrict the <code>crowdcontrol.use</code> permission to trusted users.
     </p>
+
+    <JoinGuide embedded />
   </div>
 </template>

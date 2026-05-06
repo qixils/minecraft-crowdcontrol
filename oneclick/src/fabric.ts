@@ -59,6 +59,7 @@ export async function downloadFabric(to: string, forceVersion: string, java: key
         await downloadMod(mods, "fabric", latestGame.version, { project: "lithium", filename: "Lithium.jar" })
     } catch {
         console.warn("could not download lithium")
+        // TODO: write empty zip file? to help with updating from prior versions to avoid crashes
     }
     return await downloadMod(mods, "fabric", latestGame.version, { filename: "CrowdControl-Fabric.jar" })
 }
