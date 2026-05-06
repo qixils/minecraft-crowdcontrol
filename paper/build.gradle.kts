@@ -5,6 +5,7 @@ val minecraftVersion: String by project
 val paperlibVersion: String by project
 val configurateVersion: String by project
 val luckPermsVersion: String by project
+val paperBuild: String by project
 
 val mcVersionSplit = minecraftVersion.split(".")
 val versionId = project.version.toString() + "+paper-" + minecraftVersion
@@ -24,7 +25,7 @@ dependencies {
     implementation("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
-    paperweight.paperDevBundle("$minecraftVersion.build.+")
+    paperweight.paperDevBundle("$minecraftVersion.build.$paperBuild")
 //    compileOnly("io.papermc.paper:paper-api:$minecraftVersion.build.+")
 }
 
@@ -93,7 +94,7 @@ fun RunServer.configure(mcVersion: String) {
 
 publishMods {
     val versionFrom = "26.1"
-    val versionTo = "26.1.1"
+    val versionTo = "26.1.2"
 
     file.set(tasks.shadowJar.get().archiveFile)
     modLoaders.add("paper")
