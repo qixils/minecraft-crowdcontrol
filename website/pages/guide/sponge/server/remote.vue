@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import JoinGuide from '~/components/JoinGuide.vue'
 import { useVersion } from '~/composables/useVersion'
 import * as versions from '~/utils/versions'
 
@@ -61,5 +62,7 @@ useSeoMeta({
     <p>Users, including yourself, may now connect using the <NuxtLink :to="`/guide/join?v=${version.id}`"><strong>Joining a Server</strong></NuxtLink> guide. Make sure to provide the server's IP address and the password used in the config file (default: <code>crowdcontrol</code>) to your streamers.</p>
 
     <p>For extra security, consider enabling a user whitelist using the vanilla <code>/whitelist</code> command. This prevents unknown players from joining the server and potentially griefing your builds.</p>
+
+    <JoinGuide embedded />
   </div>
 </template>
