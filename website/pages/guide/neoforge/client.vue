@@ -2,6 +2,7 @@
 import { useVersion } from '~/composables/useVersion'
 import VersionWarning from '~/components/VersionWarning.vue'
 import * as versions from '~/utils/versions'
+import JoinGuide from '~/components/JoinGuide.vue'
 
 const versionData = useVersion(versions.neoForgeML)
 const { version } = versionData
@@ -84,5 +85,7 @@ useSeoMeta({
       <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
       <li>Open the <strong>Effect Manager</strong> in the Crowd Control app to test effects.</li>
     </ol>
+
+    <JoinGuide embedded />
   </div>
 </template>
