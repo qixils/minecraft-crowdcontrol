@@ -39,9 +39,12 @@ public class DigCommand extends ModdedCommand {
 				for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 					for (int y = depth; y <= 0; ++y) {
 						for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
-							Location block = playerLocation.add(x, y, z);
-							if (!block.block().isAir())
-								locations.add(block);
+							Location loc = playerLocation.add(x, y, z);
+							var block = loc.block();
+							if (block.isAir()) continue;
+							if (block.hasBlockEntity()) continue;
+
+							locations.add(loc);
 						}
 					}
 				}
