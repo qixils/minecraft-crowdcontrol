@@ -34,7 +34,7 @@ public class GravelCommand extends ModdedCommand {
 			for (ServerPlayer player : playerSupplier.get())
 				locations.addAll(BlockFinder.builder()
 					.origin(player)
-					.locationValidator(loc -> !loc.block().isAir() && !loc.block().is(Blocks.GRAVEL) && !loc.block().getMaterial().isLiquid() && !loc.block().hasBlockEntity())
+					.locationValidator(loc -> !loc.block().isAir() && !loc.block().is(Blocks.GRAVEL) && !loc.block().getMaterial().isLiquid() && !loc.block().getBlock().isEntityBlock())
 					.shuffleLocations(false)
 					.maxRadius(7)
 					.build().getAll());

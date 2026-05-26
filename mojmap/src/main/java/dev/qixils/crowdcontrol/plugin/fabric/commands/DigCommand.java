@@ -42,7 +42,7 @@ public class DigCommand extends ModdedCommand {
 							Location loc = playerLocation.add(x, y, z);
 							var block = loc.block();
 							if (block.isAir()) continue;
-							if (block.hasBlockEntity()) continue;
+							if (block.getBlock().isEntityBlock()) continue;
 
 							locations.add(loc);
 						}
