@@ -634,7 +634,7 @@ public abstract class Plugin<P, S> {
 	 */
 	public Iterable<LiteralArgumentBuilder<S>> registerChatCommands() {
 		try {
-			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US));
+			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US).getTranslator());
 		} catch (Exception e) {
 			getSLF4JLogger().error("Failed to initialize i18n", e);
 		}
@@ -1414,7 +1414,7 @@ public abstract class Plugin<P, S> {
 			UserToken user = ccPlayer.getUserToken();
 			if (user == null) return; // !?
 			playerMapper().getPlayer(ccPlayer.getUuid()).ifPresent(p -> playerMapper().asAudience(p)
-				.sendMessage(PREFIX_COMPONENT.append(translatable("cc.join.authenticated").args(text(user.getName())))));
+				.sendMessage(PREFIX_COMPONENT.append(translatable("cc.join.authenticated").arguments(text(user.getName())))));
 			// start session
 			getScheduledExecutor().schedule(
 				() -> startSession(ccPlayer),

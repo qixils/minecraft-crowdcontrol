@@ -21,6 +21,7 @@ import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.TranslationArgument;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
@@ -248,14 +249,14 @@ public interface Command<P> extends CCEffect {
 			return displayName;
 
 		TranslatableComponent translatable = (TranslatableComponent) displayName;
-		List<Component> args = new ArrayList<>(translatable.args());
+		List<TranslationArgument> args = new ArrayList<>(translatable.arguments());
 		Component quantity = Component.text(request.getQuantity());
 		if (style == QuantityStyle.APPEND || style == QuantityStyle.APPEND_X) {
-			args.add(quantity);
+			args.add(TranslationArgument.component(quantity));
 		} else if (style == QuantityStyle.PREPEND || style == QuantityStyle.PREPEND_X) {
-			args.add(0, quantity);
+			args.add(0, TranslationArgument.component(quantity));
 		}
-		translatable = translatable.args(args);
+		translatable = translatable.arguments(args);
 
 		if ((style == QuantityStyle.APPEND_X || style == QuantityStyle.PREPEND_X) && request.getQuantity() > 1) {
 			String[] keyParts = translatable.key().split("\\.");

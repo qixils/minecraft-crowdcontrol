@@ -3,6 +3,7 @@ import { useVersion } from '~/composables/useVersion'
 import VersionWarning from '~/components/VersionWarning.vue'
 import PortInstructions from '~/components/PortInstructions.vue'
 import * as versions from '~/utils/versions'
+import JoinGuide from '~/components/JoinGuide.vue'
 
 const versionData = useVersion(versions.paperML)
 const { version } = versionData
@@ -62,5 +63,7 @@ useSeoMeta({
       You may also be interested in setting up <a href="https://geysermc.org/">GeyserMC</a>
       to allow Bedrock edition users (i.e. console players) to play.
     </p>
+
+    <JoinGuide embedded />
   </div>
 </template>
