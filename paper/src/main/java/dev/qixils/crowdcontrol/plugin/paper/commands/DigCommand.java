@@ -10,6 +10,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,11 +38,12 @@ public class DigCommand extends RegionalCommandSync {
 		for (double x = -DIG_RADIUS; x <= DIG_RADIUS; ++x) {
 			for (int y = depth; y <= 0; ++y) {
 				for (double z = -DIG_RADIUS; z <= DIG_RADIUS; ++z) {
-					Location block = playerLocation.clone().add(x, y, z);
-					if (!block.getBlock().isEmpty()) {
-						block.getBlock().setType(Material.AIR);
-						success = true;
-					}
+					Location loc = playerLocation.clone().add(x, y, z);
+					if (loc.getBlock().isEmpty()) continue;
+					if (loc.getBlock().getState() instanceof TileState) continue;
+
+					loc.getBlock().setType(Material.AIR);
+					success = true;
 				}
 			}
 		}
