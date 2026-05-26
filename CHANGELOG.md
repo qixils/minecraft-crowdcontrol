@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.5.3
+
+- Gravel, Ore Vein, and Dig Hole effects no longer replace tile entities
+
 ## 4.5.2
 
 - Paper: Added support for 26.1.1 and its new _Age Nearby Mobs_ effects

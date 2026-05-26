@@ -80,7 +80,7 @@ public class VeinCommand extends ModdedCommand {
 				BlockFinder finder = BlockFinder.builder()
 					.origin(new Location(player))
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(loc -> !loc.block().isAir())
+					.locationValidator(loc -> !loc.block().isAir() && !loc.block().hasBlockEntity())
 					.build();
 
 				Registry<Block> registry = player.level().registryAccess().lookupOrThrow(Registries.BLOCK);

@@ -14,6 +14,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +73,7 @@ public class VeinCommand extends RegionalCommandSync {
 		BlockFinder finder = BlockFinder.builder()
 			.origin(player.getLocation())
 			.maxRadius(VEIN_RADIUS)
-			.locationValidator(loc -> !loc.getBlock().isEmpty())
+			.locationValidator(loc -> !loc.getBlock().isEmpty() && !(loc.getBlock().getState() instanceof TileState))
 			.build();
 
 		boolean success = false;
