@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import JoinGuide from '~/components/JoinGuide.vue'
 import { useVersion } from '~/composables/useVersion'
 import * as versions from '~/utils/versions'
 
@@ -98,5 +99,7 @@ useSeoMeta({
       <li>Select <strong>Start Session</strong> in the Crowd Control app.</li>
       <li>Open the <strong>Effect Manager</strong> in the Crowd Control app to test effects.</li>
     </ol>
+
+    <JoinGuide embedded />
   </div>
 </template>

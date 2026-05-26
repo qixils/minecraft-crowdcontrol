@@ -2,6 +2,7 @@
 import { useVersion } from '~/composables/useVersion'
 import PortForward from '~/components/PortForward.vue'
 import * as versions from '~/utils/versions'
+import JoinGuide from '~/components/JoinGuide.vue'
 
 const versionData = useVersion(versions.spongeML)
 const { version } = versionData
@@ -86,5 +87,7 @@ useSeoMeta({
 
     <p>For extra security, consider enabling a user whitelist using the vanilla <code>/whitelist</code> command. This
       prevents unknown players from joining the server and potentially griefing your builds.</p>
+
+    <JoinGuide embedded />
   </div>
 </template>

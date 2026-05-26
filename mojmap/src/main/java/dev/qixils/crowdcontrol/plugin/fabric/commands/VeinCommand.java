@@ -53,9 +53,12 @@ public class VeinCommand extends ModdedCommand {
 				for (int z = 0; z <= 2; ++z) {
 					Location loc = base.add(x, y, z);
 					BlockState block = loc.block();
+					if (block.isAir()) continue;
+					if (loc.block().hasBlockEntity()) continue;
+
 					if (block.is(ORE_BEARING_GROUND_DEEPSLATE)) {
 						deepslateBlocks.add(loc);
-					} else if (!block.isAir()) {
+					} else {
 						stoneBlocks.add(loc);
 					}
 				}
@@ -80,7 +83,7 @@ public class VeinCommand extends ModdedCommand {
 				BlockFinder finder = BlockFinder.builder()
 					.origin(new Location(player))
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(loc -> !loc.block().isAir())
+					.locationValidator(loc -> !loc.block().isAir() && !loc.block().hasBlockEntity())
 					.build();
 
 				Registry<Block> registry = player.level().registryAccess().lookupOrThrow(Registries.BLOCK);
