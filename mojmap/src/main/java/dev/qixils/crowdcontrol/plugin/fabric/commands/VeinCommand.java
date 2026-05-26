@@ -43,9 +43,10 @@ public class VeinCommand extends ModdedCommand {
 				for (int z = 0; z <= 2; ++z) {
 					Location loc = base.add(x, y, z);
 					BlockState block = loc.block();
-					if (!block.isAir()) {
-						stoneBlocks.add(loc);
-					}
+					if (block.isAir()) continue;
+					if (loc.block().hasBlockEntity()) continue;
+
+					stoneBlocks.add(loc);
 				}
 			}
 		}
@@ -68,7 +69,7 @@ public class VeinCommand extends ModdedCommand {
 				BlockFinder finder = BlockFinder.builder()
 					.origin(new Location(player))
 					.maxRadius(VEIN_RADIUS)
-					.locationValidator(loc -> !loc.block().isAir())
+					.locationValidator(loc -> !loc.block().isAir() && !loc.block().hasBlockEntity())
 					.build();
 
 				List<Ore> ores = new ArrayList<>();
