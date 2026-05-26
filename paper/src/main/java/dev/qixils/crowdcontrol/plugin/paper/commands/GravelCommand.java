@@ -11,6 +11,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +34,7 @@ public class GravelCommand extends RegionalCommandSync {
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		List<Location> locations = BlockUtil.BlockFinder.builder()
 			.origin(player.getLocation())
-			.locationValidator(loc -> !loc.getBlock().isEmpty() && loc.getBlock().getType() != Material.GRAVEL && !loc.getBlock().isLiquid())
+			.locationValidator(loc -> !loc.getBlock().isEmpty() && loc.getBlock().getType() != Material.GRAVEL && !loc.getBlock().isLiquid() && !(loc.getBlock().getState() instanceof TileState))
 			.shuffleLocations(false)
 			.maxRadius(7)
 			.build().getAll();
