@@ -53,9 +53,12 @@ public class VeinCommand extends ModdedCommand {
 				for (int z = 0; z <= 2; ++z) {
 					Location loc = base.add(x, y, z);
 					BlockState block = loc.block();
+					if (block.isAir()) continue;
+					if (loc.block().hasBlockEntity()) continue;
+
 					if (block.is(ORE_BEARING_GROUND_DEEPSLATE)) {
 						deepslateBlocks.add(loc);
-					} else if (!block.isAir()) {
+					} else {
 						stoneBlocks.add(loc);
 					}
 				}

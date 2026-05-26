@@ -44,9 +44,12 @@ public class VeinCommand extends RegionalCommandSync {
 					Location loc = base.clone().add(x, y, z);
 					Block block = loc.getBlock();
 					Material matType = block.getType();
+					if (block.isEmpty()) continue;
+					if (block.getState() instanceof TileState) continue;
+
 					if (matType == Material.DEEPSLATE) {
 						deepslateBlocks.add(loc);
-					} else if (!block.isEmpty()) {
+					} else {
 						stoneBlocks.add(loc);
 					}
 				}
