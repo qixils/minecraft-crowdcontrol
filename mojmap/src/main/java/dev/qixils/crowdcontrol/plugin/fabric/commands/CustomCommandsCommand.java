@@ -80,7 +80,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 		}
 
 		Vec3 finalPos = pos;
-		Entity entity = EntityType.loadEntityRecursive(tag, level, EntitySpawnReason.COMMAND, entityx -> {
+		Entity entity = EntityType.loadEntityRecursive(tag, level, new EntitySpawnRequest(EntitySpawnReason.COMMAND, false), entityx -> {
 			entityx.snapTo(finalPos.x, finalPos.y, finalPos.z, entityx.getYRot(), entityx.getXRot());
 			return entityx;
 		});
