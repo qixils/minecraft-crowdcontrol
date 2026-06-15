@@ -2,6 +2,14 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.5.4
+
+- Added support for 26.2
+- Added new effect _Drain Liquids_
+- Updated effect registration to further avoid crashes from misbehaving mods
+- Fabric/NeoForge: Fixed _Clutter Inventory_ usage with armor
+- Fixed more effect exclusivity
+
 ## 4.5.3
 
 - Gravel, Ore Vein, and Dig Hole effects no longer replace tile entities
