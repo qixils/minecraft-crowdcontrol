@@ -1,7 +1,6 @@
 val configurateVersion: String by project
 val adventurePlatformModVersion: String by project
 val adventureVersion: String by project
-val adventurePlatformVersion: String by project
 val yaclVersion: String by project
 val neo_form_version: String by project
 

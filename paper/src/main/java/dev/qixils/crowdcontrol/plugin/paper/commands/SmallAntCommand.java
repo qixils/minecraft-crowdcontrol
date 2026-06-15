@@ -21,7 +21,7 @@ public class SmallAntCommand extends SummonEntityCommand {
 	private final Component displayName = getDefaultDisplayName();
 
 	public SmallAntCommand(PaperCrowdControlPlugin plugin) {
-		super(plugin, EntityTypes.SPIDER);
+		super(plugin, EntityType.SPIDER);
 	}
 
 	@Override

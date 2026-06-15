@@ -35,7 +35,7 @@ public abstract class MinecraftClientMixin extends ReentrantBlockableEventLoop<R
 		else cc.resumeAll();
 	}
 
-	@Inject(at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V", shift = At.Shift.AFTER, remap = false), method = "destroy")
+	@Inject(at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V", shift = At.Shift.AFTER, remap = false), method = "exitWorldAndClose")
 	private void onStopping(CallbackInfo ci) {
 		ClientMinecraftEvents.CLIENT_STOPPING.fire((Minecraft) (Object) this);
 	}

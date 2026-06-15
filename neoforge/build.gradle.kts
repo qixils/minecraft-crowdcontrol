@@ -99,8 +99,8 @@ dependencies {
 }
 
 publishMods {
-    val versionFrom = "26.1"
-    val versionTo = "26.1.2"
+    val versionFrom = "26.2-rc-2"
+    val versionTo = "26.2-rc-2"
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("neoforge")
@@ -109,9 +109,13 @@ publishMods {
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
         projectId.set("830331")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
+        if (versionFrom != versionTo) {
+            minecraftVersionRange {
+                start.set(versionFrom)
+                end.set(versionTo)
+            }
+        } else {
+            minecraftVersions.add(versionFrom)
         }
         version.set(versionId)
         displayName.set(buildString {
@@ -132,9 +136,13 @@ publishMods {
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
+        if (versionFrom != versionTo) {
+            minecraftVersionRange {
+                start.set(versionFrom)
+                end.set(versionTo)
+            }
+        } else {
+            minecraftVersions.add(versionFrom)
         }
         version.set(versionId)
         displayName.set(buildString {

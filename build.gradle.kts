@@ -42,6 +42,14 @@ subprojects {
         maven("https://maven.neoforged.net/releases") {
             name = "NeoForged"
         }
+        maven {
+            name = "Maven for PR #3198" // https://github.com/neoforged/NeoForge/pull/3198
+            url = uri("https://prmaven.neoforged.net/NeoForge/pr3198")
+            content {
+                includeModule("net.neoforged", "neoforge")
+                includeModule("net.neoforged", "testframework")
+            }
+        }
         maven("https://libraries.minecraft.net") {
             name = "Minecraft Libraries"
         }

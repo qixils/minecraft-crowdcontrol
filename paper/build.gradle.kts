@@ -7,6 +7,7 @@ val configurateVersion: String by project
 val luckPermsVersion: String by project
 val paperBuild: String by project
 
+val mcVersionSeries = minecraftVersion.split("-")[0]
 val mcVersionSplit = minecraftVersion.split(".")
 val versionId = project.version.toString() + "+paper-" + minecraftVersion
 description = "Minecraft Crowd Control: Paper"
@@ -34,7 +35,7 @@ bukkit {
     name = "CrowdControl"
     version = versionId
     main = "dev.qixils.crowdcontrol.plugin.paper.PaperLoader"
-    apiVersion = minecraftVersion
+    apiVersion = mcVersionSeries
     prefix = "CrowdControl"
     authors = listOf("qixils")
     description = "The Ultimate Interactive Experience for Streamers"
@@ -93,8 +94,8 @@ fun RunServer.configure(mcVersion: String) {
 }
 
 publishMods {
-    val versionFrom = "26.1"
-    val versionTo = "26.1.2"
+    val versionFrom = "26.2-rc-2"
+    val versionTo = "26.2-rc-2"
 
     file.set(tasks.shadowJar.get().archiveFile)
     modLoaders.add("paper")
@@ -105,9 +106,13 @@ publishMods {
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
-        minecraftVersionRange {
-            start.set(versionFrom)
-            end.set(versionTo)
+        if (versionFrom != versionTo) {
+            minecraftVersionRange {
+                start.set(versionFrom)
+                end.set(versionTo)
+            }
+        } else {
+            minecraftVersions.add(versionFrom)
         }
         version.set(versionId)
         displayName.set(buildString {
