@@ -11,7 +11,7 @@ import lombok.Getter;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,16 +41,16 @@ public class EntityChaosCommand extends ModdedCommand {
 			if (players.stream().anyMatch(plugin::globalEffectsUsableFor)) {
 				for (ServerLevel level : plugin.server().getAllLevels()) {
 					for (Entity entity : level.getAllEntities()) {
-						if (entity.getType() == EntityType.PLAYER) continue;
+						if (entity.getType() == EntityTypes.PLAYER) continue;
 						entities.add(entity);
 					}
 				}
 			} else {
 				for (ServerPlayer player : playerSupplier.get()) {
 					Vec3 pp = player.position();
-					for (Entity entity : ((ServerLevel) player.level()).getAllEntities()) {
+					for (Entity entity : player.level().getAllEntities()) {
 						// TODO: I can probably reduce some loops here right?
-						if (entity.getType() == EntityType.PLAYER) continue;
+						if (entity.getType() == EntityTypes.PLAYER) continue;
 						Vec3 ep = entity.position();
 						double x = pp.x - ep.x;
 						double y = pp.y - ep.y;

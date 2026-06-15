@@ -41,24 +41,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.POPUP_TITL
 @Getter
 @EventListener
 public final class ToastCommand extends ModdedCommand {
-	private static final Item[] MATERIALS = new Item[]{
-			Items.BROWN_STAINED_GLASS_PANE,
-			Items.RED_STAINED_GLASS_PANE,
-			Items.ORANGE_STAINED_GLASS_PANE,
-			Items.YELLOW_STAINED_GLASS_PANE,
-			Items.LIME_STAINED_GLASS_PANE,
-			Items.GREEN_STAINED_GLASS_PANE,
-			Items.CYAN_STAINED_GLASS_PANE,
-			Items.LIGHT_BLUE_STAINED_GLASS_PANE,
-			Items.BLUE_STAINED_GLASS_PANE,
-			Items.PURPLE_STAINED_GLASS_PANE,
-			Items.MAGENTA_STAINED_GLASS_PANE,
-			Items.PINK_STAINED_GLASS_PANE,
-			Items.WHITE_STAINED_GLASS_PANE,
-			Items.LIGHT_GRAY_STAINED_GLASS_PANE,
-			Items.GRAY_STAINED_GLASS_PANE,
-			Items.BLACK_STAINED_GLASS_PANE
-	};
+	private static final Item[] MATERIALS = Items.STAINED_GLASS_PANE.asList().toArray(new Item[]{});
 	private static final int INVENTORY_SIZE = 9 * 3;
 	private static final Map<UUID, ToastInventory> OPEN_INVENTORIES = new HashMap<>();
 	private static Component TITLE;

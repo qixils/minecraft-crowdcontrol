@@ -18,6 +18,7 @@ import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.text.PaperComponents;
 import io.papermc.paper.world.flag.FeatureDependant;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -67,9 +68,8 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	private final SoftLockResolver softLockResolver = new SoftLockResolver(this);
 	@Getter
 	private final PaperPlayerManager playerManager = new PaperPlayerManager(this);
-	@SuppressWarnings("deprecation") // ComponentFlattenerProvider has not been implemented yet
 	@Getter
-	private final TextUtilImpl textUtil = new TextUtilImpl(Bukkit.getUnsafe().componentFlattener());
+	private final TextUtilImpl textUtil = new TextUtilImpl(PaperComponents.flattener());
 	@Getter
 	private final PaperLoader paperPlugin;
 	// actual stuff

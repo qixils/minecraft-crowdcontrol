@@ -1,0 +1,68 @@
+package dev.qixils.crowdcontrol.plugin.fabric.commands;
+
+import dev.qixils.crowdcontrol.common.util.ThreadUtil;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
+import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
+import live.crowdcontrol.cc4j.CCPlayer;
+import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
+import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
+import lombok.Getter;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
+@Getter
+public class DrainCommand extends ModdedCommand {
+	private final String effectName = "drain";
+	private final List<Block> liquids = List.of(Blocks.LAVA, Blocks.WATER);
+
+	public DrainCommand(ModdedCrowdControlPlugin plugin) {
+		super(plugin);
+	}
+
+	@Override
+	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
+		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
+			Set<Location> locations = new HashSet<>();
+			for (ServerPlayer player : playerSupplier.get())
+				locations.addAll(BlockFinder.builder()
+					.origin(player)
+					.locationValidator(loc -> {
+						var block = loc.block();
+						if (liquids.stream().anyMatch(block::is)) return true;
+
+						var waterlogged = block.getOptionalValue(BlockStateProperties.WATERLOGGED);
+						if (waterlogged.isEmpty()) return false; // waterloggable
+						if (!waterlogged.get()) return false; // and watterlogged
+
+						return true;
+					})
+					.shuffleLocations(false)
+					.maxRadius(10)
+					.build().getAll());
+
+			if (locations.isEmpty())
+				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No replaceable blocks nearby");
+
+			sync(() -> locations.forEach(loc -> {
+				var block = loc.block();
+				loc.block(
+					liquids.stream().anyMatch(block::is)
+						? Blocks.AIR.defaultBlockState()
+						: block.trySetValue(BlockStateProperties.WATERLOGGED, false)
+				);
+			}));
+			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
+		}));
+	}
+}

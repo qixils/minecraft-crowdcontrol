@@ -13,14 +13,14 @@ public class CollectionUtil {
 	private static final Logger log = LoggerFactory.getLogger(CollectionUtil.class);
 
 	@Nullable
-	public static <T> T init(@NotNull Supplier<T> supplier, @Nullable Consumer<Exception> onError) {
+	public static <T> T init(@NotNull Supplier<T> supplier, @Nullable Consumer<Throwable> onError) {
 		try {
 			return supplier.get();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			if (onError != null) {
 				try {
 					onError.accept(e);
-				} catch (Exception e2) {
+				} catch (Throwable e2) {
 					log.error("Failed to initialize {}...", supplier.getClass().getName(), e);
 					log.error("...and failed to call onError", e2);
 				}
@@ -36,7 +36,7 @@ public class CollectionUtil {
 		return init(supplier, null);
 	}
 
-	public static <T> void initTo(@NotNull Collection<T> collection, @NotNull Supplier<? extends T> supplier, @Nullable Consumer<Exception> onError) {
+	public static <T> void initTo(@NotNull Collection<T> collection, @NotNull Supplier<? extends T> supplier, @Nullable Consumer<Throwable> onError) {
 		T t = init(supplier, onError);
 		if (t != null)
 			collection.add(t);

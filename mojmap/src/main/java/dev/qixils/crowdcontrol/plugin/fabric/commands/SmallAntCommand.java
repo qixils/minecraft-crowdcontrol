@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.spider.Spider;
@@ -18,7 +18,7 @@ import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.addModif
 @Getter
 public class SmallAntCommand extends SummonEntityCommand<Spider> {
 	public SmallAntCommand(ModdedCrowdControlPlugin plugin) {
-		super(plugin, "entity_small_ant", null, EntityType.SPIDER);
+		super(plugin, "entity_small_ant", null, EntityTypes.SPIDER);
 	}
 
 	@Override

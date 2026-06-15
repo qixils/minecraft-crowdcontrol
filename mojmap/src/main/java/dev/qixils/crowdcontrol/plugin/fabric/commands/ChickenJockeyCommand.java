@@ -4,7 +4,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import org.jetbrains.annotations.Blocking;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public class ChickenJockeyCommand extends SummonEntityCommand<Chicken> {
 	public ChickenJockeyCommand(ModdedCrowdControlPlugin plugin) {
-		super(plugin, "entity_chicken_jockey", null, EntityType.CHICKEN);
+		super(plugin, "entity_chicken_jockey", null, EntityTypes.CHICKEN);
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class ChickenJockeyCommand extends SummonEntityCommand<Chicken> {
 		if (chicken == null) return null;
 		chicken.setChickenJockey(true);
 
-		Zombie zombie = spawnEntity(viewer, player, EntityType.ZOMBIE, plugin);
+		Zombie zombie = spawnEntity(viewer, player, EntityTypes.ZOMBIE, plugin);
 		if (zombie == null) return chicken;
 		zombie.setBaby(true);
 

@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
@@ -53,24 +54,7 @@ public enum Condition {
 	STAND_ON_DIRT(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Blocks.DIRT)),
 	STAND_ON_STONE(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Blocks.STONE)),
 	STAND_ON_SAND(new StandOnBlockCondition(2, "generic", ConditionFlags.OVERWORLD, Blocks.SAND)),
-	STAND_ON_A_BED(new StandOnBlockCondition(4, "bed", ConditionFlags.OVERWORLD,
-			Blocks.WHITE_BED,
-			Blocks.ORANGE_BED,
-			Blocks.MAGENTA_BED,
-			Blocks.LIGHT_BLUE_BED,
-			Blocks.YELLOW_BED,
-			Blocks.LIME_BED,
-			Blocks.PINK_BED,
-			Blocks.GRAY_BED,
-			Blocks.LIGHT_GRAY_BED,
-			Blocks.CYAN_BED,
-			Blocks.PURPLE_BED,
-			Blocks.BLUE_BED,
-			Blocks.BROWN_BED,
-			Blocks.GREEN_BED,
-			Blocks.RED_BED,
-			Blocks.BLACK_BED
-	)),
+	STAND_ON_A_BED(new StandOnBlockCondition(4, "bed", ConditionFlags.OVERWORLD, Blocks.BED.asList().toArray(new Block[]{}))),
 	// obtain...
 	OBTAIN_WHEAT_SEEDS(new ObtainItemCondition(2, "generic_alt", ConditionFlags.OVERWORLD, Items.WHEAT_SEEDS)),
 	// craft...

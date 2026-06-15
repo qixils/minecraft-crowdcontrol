@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +59,7 @@ public interface EntityCommand<E extends Entity> extends FeatureElementCommand {
 			ServerLevel level = player.level();
 			if (isMonster() && levelIsPeaceful(level))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Hostile mobs cannot be spawned while on Peaceful difficulty");
-			else if (getEntityType() == EntityType.ENDER_DRAGON && level.getDragonFight() != null)
+			else if (getEntityType() == EntityTypes.ENDER_DRAGON && level.getDragonFight() != null)
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Ender Dragons are very sensitive cannot be spawned in or removed from The End, sorry!");
 			else if (!isEnabled(player.level().enabledFeatures()))
 				error = new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Mob is not available in this version of Minecraft");
