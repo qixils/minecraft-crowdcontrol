@@ -120,7 +120,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new RandomFallingBlockCommand(plugin),
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
-			() -> new WaterCommand(plugin)
+			() -> new WaterCommand(plugin),
+			() -> new DrainCommand(plugin)
 		));
 
 		// entity commands
@@ -135,7 +136,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 				if (entry.getValue().equals(EntityType.LIGHTNING_BOLT)) continue;
 				if (entry.getValue().equals(EntityType.TNT)) continue;
 				initTo(commands, () -> new RemoveEntityCommand<>(plugin, entry.getValue()));
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				plugin.getSLF4JLogger().warn("Failed to check if entity is allowed; ignoring", e);
 			}
 		}

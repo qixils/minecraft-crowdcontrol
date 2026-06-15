@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Getter
 public class ClutterCommand extends ModdedCommand {
@@ -34,11 +35,16 @@ public class ClutterCommand extends ModdedCommand {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
 				Inventory inventory = player.inventory;
-				List<ItemStack> shuffled = InventoryUtil.viewAllItems(inventory);
+				List<ItemStack> shuffled = InventoryUtil.viewAllItems(inventory).stream().map(item -> item == null ? ItemStack.EMPTY : item.copy()).collect(Collectors.toList());
 				List<ItemStack> original = new ArrayList<>(shuffled);
 				Collections.shuffle(shuffled);
 
-				success |= !shuffled.equals(original);
+				if (shuffled.equals(original)) continue;
+
+				for (int i = 0; i < shuffled.size(); i++) {
+					inventory.setItem(i, shuffled.get(i));
+				}
+				success = true;
 			}
 
 			return success

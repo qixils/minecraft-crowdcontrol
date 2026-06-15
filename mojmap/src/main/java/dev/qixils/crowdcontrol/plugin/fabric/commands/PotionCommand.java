@@ -62,8 +62,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 			|| potionEffectType == MobEffects.CONFUSION
 			|| potionEffectType == MobEffects.NIGHT_VISION
 			|| potionEffectType == MobEffects.SLOW_FALLING
-			|| potionEffectType == MobEffects.WATER_BREATHING
-			|| potionEffectType == MobEffects.ABSORPTION;
+			|| potionEffectType == MobEffects.WATER_BREATHING;
 	}
 
 	@Override
