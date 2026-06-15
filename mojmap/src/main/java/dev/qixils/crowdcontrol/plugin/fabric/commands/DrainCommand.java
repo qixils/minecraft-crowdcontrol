@@ -59,7 +59,7 @@ public class DrainCommand extends ModdedCommand {
 				loc.block(
 					liquids.stream().anyMatch(block::is)
 						? Blocks.AIR.defaultBlockState()
-						: block.trySetValue(BlockStateProperties.WATERLOGGED, false)
+						: block.setValue(BlockStateProperties.WATERLOGGED, false)
 				);
 			}));
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);
