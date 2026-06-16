@@ -101,6 +101,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
 			() -> new WaterCommand(plugin),
+			() -> new DrainCommand(plugin),
 			() -> new AgeCommand(plugin, true),
 			() -> new AgeCommand(plugin, false)
 		));
