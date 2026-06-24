@@ -13,17 +13,14 @@ import java.util.function.Predicate;
 public final class BlockFinder extends AbstractBlockFinder<Location, BlockPos, ServerLevel> {
 	public static final Predicate<Location> SPAWNING_SPACE = location ->
 			isPassable(location)
-					&& isPassable(location.add(0, 1, 0).block())
-					&& isSolid(location.add(0, -1, 0).block());
+					&& isPassable(location.add(0, 1, 0))
+					&& isSolid(location.add(0, -1, 0));
 
 	// helper methods
 
-	public static boolean isPassable(BlockState block) {
-		return !block.blocksMotion();
-	}
-
 	public static boolean isPassable(Location location) {
-		return isPassable(location.block());
+		// TODO: verify this works as expected
+		return location.block().getCollisionShape(location.level(), location.pos()).isEmpty();
 	}
 
 	public static boolean isSolid(BlockState block) {

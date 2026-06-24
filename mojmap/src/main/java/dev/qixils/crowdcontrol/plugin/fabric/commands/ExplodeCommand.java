@@ -49,7 +49,7 @@ public class ExplodeCommand extends ModdedCommand {
 						Level.ExplosionInteraction.TNT
 					);
 					player.setDeltaMovement(0, .5, 0);
-					player.hurtMarked = true;
+					player.syncVelocity = true;
 				});
 			}
 

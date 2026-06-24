@@ -59,7 +59,7 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 					abilities.mayfly = true;
 					abilities.flying = true;
 					player.addDeltaMovement(new Vec3(0, 0.2, 0));
-					player.hurtMarked = true;
+					player.syncVelocity = true;
 					player.onUpdateAbilities();
 					// TODO: set abilities.flying=true; again after 1 tick
 				});

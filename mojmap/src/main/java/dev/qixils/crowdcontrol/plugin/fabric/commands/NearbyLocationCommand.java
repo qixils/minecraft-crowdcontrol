@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.utils.BlockFinder;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
@@ -46,7 +47,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 			BlockState block = location.block();
 			if (location.y() < (world.getMinY() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (block.getBlock().isPossibleToRespawnInThis(block) && !block.blocksMotion())
+			else if (block.getBlock().isPossibleToRespawnInThis(block) && BlockFinder.isPassable(location))
 				air += 1;
 			else if (air >= 1)
 				break;
@@ -69,7 +70,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 		Block type = block.getBlock();
 		if (Blocks.FIRE.equals(type))
 			location.block(Blocks.AIR.defaultBlockState());
-		else if (!block.blocksMotion())
+		else if (BlockFinder.isPassable(location))
 			location.block(Blocks.GLASS.defaultBlockState());
 
 		// place player on top of the block

@@ -41,7 +41,7 @@ public class FlingCommand extends ModdedCommand {
 				if (player.isPassenger()) continue;
 
 				player.setDeltaMovement(randomVector());
-				player.hurtMarked = true;
+				player.syncVelocity = true;
 				success = true;
 			}
 
