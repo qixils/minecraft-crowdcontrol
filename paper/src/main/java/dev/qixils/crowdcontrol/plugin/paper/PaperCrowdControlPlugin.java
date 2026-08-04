@@ -108,7 +108,6 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 
 		// init plugin channels
 		pluginChannel.registerOutgoingPluginChannel(VersionRequestPacketS2C.METADATA);
-		pluginChannel.registerOutgoingPluginChannel(ShaderPacketS2C.METADATA);
 		pluginChannel.registerOutgoingPluginChannel(MovementStatusPacketS2C.METADATA);
 		pluginChannel.registerOutgoingPluginChannel(SetLanguagePacketS2C.METADATA);
 		pluginChannel.registerIncomingPluginChannel(VersionResponsePacketC2S.METADATA, (player, message) -> {

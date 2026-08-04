@@ -17,7 +17,6 @@
     "TickMixin"
   ],
   "client": [
-    "GameRendererMixin",
     "KeyboardInputMixin",
     "MinecraftClientMixin"
   ],

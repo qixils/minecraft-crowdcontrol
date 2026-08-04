@@ -46,10 +46,10 @@ dependencies {
     implementation("com.terraformersmc:modmenu:$modMenuVersion")
     implementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
 //    implementation("maven.modrinth:language-reload:$languageReloadVersion")
-    implementation(include("dev.isxander:yet-another-config-lib:$yaclVersion-fabric") {
+    implementation("dev.isxander:yet-another-config-lib:$yaclVersion-fabric") {
         // TODO is this even in there
         exclude(group = "net.fabricmc.fabric-api")
-    })
+    }
 
     // transitives
     include(project(":base-common")) // this is available via api of mojmap-common (which is available via multiloader plugin) but not added to jar

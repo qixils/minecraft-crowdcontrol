@@ -82,7 +82,7 @@ repositories {
 
 dependencies {
     implementation(jarJar("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
-    implementation(jarJar("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")!!)
+    implementation("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     // add transitive deps

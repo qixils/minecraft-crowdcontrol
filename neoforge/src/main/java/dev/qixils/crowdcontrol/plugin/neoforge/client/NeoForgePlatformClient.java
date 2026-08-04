@@ -5,7 +5,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.client.neoforge.ClientPacketContext
 import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.api.distmarker.Dist;
@@ -32,10 +31,6 @@ public class NeoForgePlatformClient extends ModdedPlatformClient {
 	}
 
 	public void registerClient(final RegisterClientPayloadHandlersEvent event) {
-		event.register(SetShaderS2C.PACKET_ID, (payload, context) -> {
-			if (!(context.player() instanceof LocalPlayer localPlayer)) return;
-			handleSetShader(payload, new ClientPacketContextImpl(context, localPlayer));
-		});
 		event.register(RequestVersionS2C.PACKET_ID, (payload, context) -> {
 			if (!(context.player() instanceof LocalPlayer localPlayer)) return;
 			handleRequestVersion(payload, new ClientPacketContextImpl(context, localPlayer));
