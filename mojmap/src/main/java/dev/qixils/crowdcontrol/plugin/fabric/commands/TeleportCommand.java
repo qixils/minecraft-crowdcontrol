@@ -9,11 +9,16 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.BlockUtil;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -57,18 +62,34 @@ public class TeleportCommand extends ModdedCommand {
 				if (player.isPassenger())
 					player.stopRiding();
 				ServerLevel level = player.level();
-				double x = player.getX();
-				double y = player.getY();
-				double z = player.getZ();
-				for (int i = 0; i < 16; ++i) {
-					double destX = x + nextDoubleOffset();
-					double destY = Mth.clamp(y + nextIntOffset(), level.getMinY(), level.getMinY() + level.getLogicalHeight() - 1);
-					double destZ = z + nextDoubleOffset();
-					if (!player.randomTeleport(destX, destY, destZ, true)) continue;
-					level.playSound(null, x, y, z, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);
-					player.playSound(SoundEvents.CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);
-					success = true;
-					break;
+				Vec3 oldPos = player.position();
+				double x = oldPos.x();
+				double y = oldPos.y();
+				double z = oldPos.z();
+				// wtf mojang gives us variable names now?
+				for (int attempt = 0; attempt < 16; attempt++) {
+					double xx = x + nextDoubleOffset();
+					double yy = Mth.clamp(
+						y + nextDoubleOffset(),
+						level.getMinY(),
+						level.getMinY() + level.getLogicalHeight() - 1
+					);
+					double zz = z + nextDoubleOffset();
+
+					if (player.randomTeleport(xx, yy, zz, true, BlockTags.CONSUMABLE_DOES_NOT_TELEPORT_TO)) {
+						level.gameEvent(GameEvent.TELEPORT, oldPos, GameEvent.Context.of(player));
+
+						level.playSound(null, xx, yy, zz, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS);
+
+						BlockPos origin = BlockPos.containing(oldPos);
+						BlockPos target = player.blockPosition();
+						level.levelEvent(2017, origin, BlockUtil.clampedPackDifferenceInPosition(origin, target, 127, 127, 127));
+
+						player.resetFallDistance();
+						player.resetCurrentImpulseContext();
+						success = true;
+						break;
+					}
 				}
 			}
 			return success

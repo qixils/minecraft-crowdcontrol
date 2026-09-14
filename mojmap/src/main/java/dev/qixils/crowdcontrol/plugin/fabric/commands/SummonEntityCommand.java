@@ -32,7 +32,7 @@ import net.minecraft.world.entity.animal.rabbit.Rabbit;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.npc.villager.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
@@ -217,7 +217,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			sheep.setColor(randomElementFrom(DyeColor.values()));
 		if (entity instanceof LivingEntity livingEntity && livingEntity.canUseSlot(EquipmentSlot.SADDLE) && RandomUtil.RNG.nextBoolean())
 			livingEntity.setItemSlot(EquipmentSlot.SADDLE, new ItemStack(Items.SADDLE));
-		if (entity instanceof EnderMan enderman)
+		if (entity instanceof Enderman enderman)
 			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
