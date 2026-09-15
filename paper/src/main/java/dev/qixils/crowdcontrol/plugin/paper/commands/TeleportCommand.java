@@ -88,8 +88,8 @@ public class TeleportCommand extends RegionalCommand {
 				double zz = z + nextDoubleOffset();
 
 				// TODO use fixed tag
-				432478237842378;
-				if (randomTeleport(player, xx, yy, zz, true, Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("consumable_does_not_teleport_to"), Material.class))) {
+				Tag<Material> tag = Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("consumable_does_not_teleport_to"), Material.class);
+				if (tag != null && randomTeleport(player, xx, yy, zz, true, tag)) {
 					Location newPos = loc.clone().set(xx, yy, zz);
 					level.sendGameEvent(player, GameEvent.TELEPORT, oldPos);
 

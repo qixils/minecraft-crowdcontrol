@@ -99,9 +99,9 @@ dependencies {
 }
 
 publishMods {
-    val versionFrom = "26.2-rc-2"
-    val versionTo = "26.2-rc-2"
-    val curseforgeVersion = "26.1.2"
+    val versionFrom = "26.3"
+    val versionTo = "26.3"
+    val curseforgeVersion = ""
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("neoforge")

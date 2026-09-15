@@ -13,15 +13,12 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -48,10 +45,12 @@ public class ShaderCommand extends PaperCommand implements CCTimedEffect {
 			List<Player> players = playerSupplier.get();
 			boolean success = false;
 			for (Player player : players) {
-				if (player.getPostEffects().contains(shader))
-					continue;
-				success = true;
-				sync(() -> player.addPostEffect(shader));
+				// TODO
+//				if (player.getPostEffects().contains(shader))
+//					continue;
+//				success = true;
+//				sync(() -> player.addPostEffect(shader));
+//				478324893284958459; // TODO: note that the command is commented out in CommandRegister
 			}
 			if (!success)
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Target already has shader or cannot receive it");
@@ -64,25 +63,29 @@ public class ShaderCommand extends PaperCommand implements CCTimedEffect {
 	public void onPause(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		List<UUID> players = uuidMap.get(request.getRequestId());
 		if (players == null) return;
-		players.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(player -> player.removePostEffect(shader));
+		// TODO
+//		players.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(player -> player.removePostEffect(shader));
 	}
 
 	@Override
 	public void onResume(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		List<UUID> players = uuidMap.get(request.getRequestId());
 		if (players == null) return;
-		players.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(player -> player.addPostEffect(shader));
+		// TODO
+//		players.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(player -> player.addPostEffect(shader));
 	}
 
 	@Override
 	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		List<UUID> players = uuidMap.get(request.getRequestId());
 		if (players == null) return;
-		players.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(player -> player.removePostEffect(shader));
+		// TODO
+//		players.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(player -> player.removePostEffect(shader));
 	}
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		event.getPlayer().clearPostEffects();
+		// TODO
+//		event.getPlayer().clearPostEffects();
 	}
 }
