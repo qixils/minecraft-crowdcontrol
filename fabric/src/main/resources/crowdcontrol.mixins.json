@@ -9,6 +9,7 @@
     "GlobalTranslatorMixin",
     "LivingEntityMixin",
     "NameTagItemMixin",
+    "PlayerAdvancementsMixin",
     "PlayerListMixin",
     "PlayerMixin",
     "ResultSlotMixin",

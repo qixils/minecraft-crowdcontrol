@@ -66,7 +66,7 @@ public abstract class LivingEntityMixin extends Entity implements ViewerMob, Ori
 			tag.putString(Components.ORIGINAL_DISPLAY_NAME, Component.Serializer.toJson(cc$originalDisplayName));
 	}
 
-	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSource;getEntity()Lnet/minecraft/world/entity/Entity;"), cancellable = true)
 	private void callDeathEvent(final DamageSource cause, final CallbackInfo ci) {
 		EntityUtil.handleDie((LivingEntity) (Object) this, cause, ci);
 	}

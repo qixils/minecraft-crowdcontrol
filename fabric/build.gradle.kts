@@ -82,6 +82,7 @@ dependencies {
     // misc includes
     include("net.kyori:adventure-api:$adventureVersion")
     include("net.kyori:adventure-key:$adventureVersion") // wtf adventure LMFAO
+    modCompileOnly("net.kyori:adventure-key:$adventureVersion") // was getting classpath errors idk
     include("org.slf4j:slf4j-simple:$slf4jVersion")
 
     shadowBundle(project(":base-common")) {

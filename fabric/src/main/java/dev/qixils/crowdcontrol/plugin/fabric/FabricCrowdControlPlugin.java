@@ -4,6 +4,8 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.packets.PluginPacket;
+import dev.qixils.crowdcontrol.common.util.GameEvents;
+import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.util.FabricPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
@@ -12,10 +14,12 @@ import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +39,15 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 		super.onInitialize();
 
 		PacketUtilImpl.registerPackets();
+
+		getEventManager().register(Death.class, death -> {
+			if (death.entity() instanceof ServerPlayer player) {
+				emitGameEvent(player, GameEvents.death());
+			}
+			if (death.source().getEntity() instanceof ServerPlayer player) {
+				emitGameEvent(player, GameEvents.kill(FabricAudiences.toAdventure(EntityType.getKey(death.entity().getType()))));
+			}
+		});
 	}
 
 	@Override
