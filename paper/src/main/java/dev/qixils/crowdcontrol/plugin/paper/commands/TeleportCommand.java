@@ -88,7 +88,7 @@ public class TeleportCommand extends RegionalCommand {
 				double zz = z + nextDoubleOffset();
 
 				// TODO use fixed tag
-				289438948932; // TODO triggering me to come back to this
+				432478237842378;
 				if (randomTeleport(player, xx, yy, zz, true, Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("consumable_does_not_teleport_to"), Material.class))) {
 					Location newPos = loc.clone().set(xx, yy, zz);
 					level.sendGameEvent(player, GameEvent.TELEPORT, oldPos);
@@ -97,7 +97,7 @@ public class TeleportCommand extends RegionalCommand {
 
 					BlockPosition origin = Position.block(loc);
 					BlockPosition target = Position.block(newPos);
-					level.playEffect(loc, Effect.getById(2017)/*(TODO)*/, clampedPackDifferenceInPosition(origin, target, 127, 127, 127));
+					level.playEffect(loc, Effect.CONSUME_EFFECT_TELEPORT, clampedPackDifferenceInPosition(origin, target, 127, 127, 127));
 
 					player.setFallDistance(0);
 					// TODO player.resetCurrentImpulseContext();
@@ -130,9 +130,7 @@ public class TeleportCommand extends RegionalCommand {
 			while(pos.getBlockY() > level.getMinHeight()) {
 				pos.setY(pos.getY() - 1);
 				BlockState state = level.getBlockState(pos);
-				// TODO static tag
-				Tag<Material> tag = Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("entities_can_teleport_to"), Material.class);
-				if (tag != null && tag.isTagged(state.getType())) {
+				if (Tag.ENTITIES_CAN_TELEPORT_TO.isTagged(state.getType())) {
 					return this.checkPositionAndTeleport(player, clamped.getX(), y, clamped.getZ(), showParticles, isInvalidPosition, state, level);
 				}
 
