@@ -9,6 +9,7 @@ import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.*;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
+import dev.qixils.crowdcontrol.common.util.GameEvents;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
@@ -27,9 +28,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
@@ -186,6 +191,27 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		clientVersions.remove(uuid);
 		extraFeatures.remove(uuid);
 		onPlayerLeave(event.getPlayer());
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onDeath(PlayerDeathEvent event) {
+		emitGameEvent(event.getPlayer(), GameEvents.death());
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onAdvancement(PlayerAdvancementDoneEvent event) {
+		// only count "real" announced advancements and not roots or datapack triggers or whatever
+		if (event.message() == null) return;
+
+		emitGameEvent(event.getPlayer(), GameEvents.advancement(event.getAdvancement().key()));
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onKill(EntityDeathEvent event) {
+		Entity cause = event.getDamageSource().getCausingEntity();
+		if (!(cause instanceof Player player)) return;
+
+		emitGameEvent(player, GameEvents.kill(event.getEntityType().key()));
 	}
 
 	@Override
