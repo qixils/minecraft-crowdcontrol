@@ -16,10 +16,7 @@ import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
 import live.crowdcontrol.cc4j.*;
 import live.crowdcontrol.cc4j.websocket.UserToken;
-import live.crowdcontrol.cc4j.websocket.data.CCEffectReport;
-import live.crowdcontrol.cc4j.websocket.data.IdentifierType;
-import live.crowdcontrol.cc4j.websocket.data.ReportStatus;
-import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
+import live.crowdcontrol.cc4j.websocket.data.*;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffect;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectBuilder;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
@@ -286,6 +283,7 @@ public abstract class Plugin<P, S> {
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
 	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
+	protected final Map<UUID, List<CCGameEvent>> pendingGameEvents = new HashMap<>();
 	protected SemVer latestModVersionCached = null;
 	protected Instant latestModVersionCachedAt = Instant.EPOCH;
 	protected @NotNull Path defaultDataFolder = Paths.get("config", "CrowdControlData");
@@ -1343,6 +1341,44 @@ public abstract class Plugin<P, S> {
 	public void updateConditionalEffectVisibility() {
 		if (crowdControl == null) return;
 		crowdControl.getPlayers().forEach(this::updateConditionalEffectVisibility);
+	}
+
+	private void processPendingGameEvents(UUID uuid) {
+		List<CCGameEvent> events;
+		synchronized (pendingGameEvents) {
+			events = pendingGameEvents.remove(uuid);
+		}
+		if (events == null) return; // !?
+
+		optionalCCPlayer(uuid).ifPresent(player -> player.sendGameEvent(events.toArray(new CCGameEvent[]{})));
+	}
+
+	/**
+	 * Emits a game event for the specified player.
+	 * @param player player who triggered an event
+	 * @param event the game event
+	 */
+	public void emitGameEvent(CCPlayer player, CCGameEvent event) {
+		synchronized (pendingGameEvents) {
+			List<CCGameEvent> gameEvents = pendingGameEvents.get(player.getUuid());
+			if (gameEvents != null) {
+				if (gameEvents.size() < 10) gameEvents.add(event);
+				return;
+			}
+
+			gameEvents = new ArrayList<>();
+			gameEvents.add(event);
+			pendingGameEvents.put(player.getUuid(), gameEvents);
+			scheduledExecutor.schedule(() -> processPendingGameEvents(player.getUuid()), 3, TimeUnit.SECONDS);
+		}
+	}
+
+	public void emitGameEvent(P player, CCGameEvent event) {
+		optionalCCPlayer(player).ifPresent(ccp -> emitGameEvent(ccp, event));
+	}
+
+	public void emitGameEvent(UUID player, CCGameEvent event) {
+		optionalCCPlayer(player).ifPresent(ccp -> emitGameEvent(ccp, event));
 	}
 
 	/**
