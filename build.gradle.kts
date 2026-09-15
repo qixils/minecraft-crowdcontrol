@@ -41,6 +41,11 @@ subprojects {
         }
         maven("https://maven.neoforged.net/releases") {
             name = "NeoForged"
+            content {
+                // things that can only be found here
+                // different from exclusiveContent I think
+                includeGroup("cpw.mods")
+            }
         }
         maven("https://libraries.minecraft.net") {
             name = "Minecraft Libraries"
