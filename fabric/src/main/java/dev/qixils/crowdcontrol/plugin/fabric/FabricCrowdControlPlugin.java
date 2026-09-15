@@ -1,16 +1,19 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
 import dev.qixils.crowdcontrol.common.VersionMetadata;
+import dev.qixils.crowdcontrol.common.util.GameEvents;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.util.FabricPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.fabric.FabricServerCommandManager;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +35,15 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 		super.onInitialize();
 
 		PacketUtilImpl.registerPackets();
+
+		ServerLivingEntityEvents.AFTER_DEATH.register((target, source) -> {
+			if (target instanceof ServerPlayer player) {
+				emitGameEvent(player, GameEvents.death());
+			}
+			if (source.getEntity() instanceof ServerPlayer player) {
+				emitGameEvent(player, GameEvents.kill(EntityType.getKey(target.getType())));
+			}
+		});
 	}
 
 	@Override

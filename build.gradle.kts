@@ -37,14 +37,19 @@ subprojects {
     }
 
     repositories {
-        maven("https://repo.papermc.io/repository/maven-public/") {
-            name = "PaperMC"
+        maven("https://maven.neoforged.net/releases") {
+            name = "NeoForged"
+            content {
+                // things that can only be found here
+                // different from exclusiveContent I think
+                includeGroup("cpw.mods")
+            }
         }
         maven("https://files.minecraftforge.net/maven/") {
             name = "Minecraft Forge"
         }
-        maven("https://maven.neoforged.net/releases") {
-            name = "NeoForged"
+        maven("https://repo.papermc.io/repository/maven-public/") {
+            name = "PaperMC"
         }
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
             name = "sonatype-oss-snapshots"
