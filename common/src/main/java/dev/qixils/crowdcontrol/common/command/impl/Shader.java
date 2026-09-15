@@ -1,43 +1,49 @@
 package dev.qixils.crowdcontrol.common.command.impl;
 
+import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.Versioned;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
+import java.util.Objects;
 
 @Getter
 @Accessors(fluent = true)
-@RequiredArgsConstructor
 public enum Shader implements Versioned {
-	BUMPY(new SemVer("3.3.0")),
-	GREEN(new SemVer("3.3.0")),
-	NTSC(new SemVer("3.3.0")),
-	DESATURATE(new SemVer("3.3.0")),
-	FLIP(new SemVer("3.3.0")),
-	INVERT(new SemVer("3.3.0")),
-	BLOBS2(new SemVer("3.3.0")),
-	PENCIL(new SemVer("3.3.0")),
-	SOBEL(new SemVer("3.3.0")),
-	CC_WOBBLE(new SemVer("3.3.0")),
-	BITS(new SemVer("3.3.0")),
-	SPIDER(new SemVer("3.3.0")),
-	PHOSPHOR(new SemVer("3.3.0")),
+	// TODO: incorporate some community shaders
+	//  https://github.com/search?q=path%3A*.json+path%3A%2Fassets%5C%2F.%2B%5C%2Fpost_effect%2F&type=code&ref=advsearch
+	CREEPER(null, "green"),
+	BLUR(null),
+	SPIDER(null),
+	INVERT(null),
 	;
 
-	@NotNull
+	@Nullable
 	private final SemVer addedIn;
+	@Nullable
+	private final String customEffectId;
+
+	Shader(@Nullable SemVer addedIn, @Nullable String customEffectId) {
+		this.addedIn = addedIn;
+		this.customEffectId = customEffectId;
+	}
+
+	Shader(@Nullable SemVer addedIn) {
+		this(addedIn, null);
+	}
 
 	@NotNull
-	public String getShaderId() {
-		return name().toLowerCase(Locale.ENGLISH);
+	public Key getIdentifier() {
+		return Key.key(addedIn == null ? Key.MINECRAFT_NAMESPACE : Plugin.NAMESPACE, name().toLowerCase(Locale.ENGLISH));
 	}
 
 	@NotNull
 	public String getEffectId() {
-		return "shader_" + getShaderId().replaceFirst("^cc_", "");
+		return "shader_" + Objects.requireNonNullElseGet(customEffectId, () -> name().toLowerCase(Locale.ENGLISH));
 	}
 }

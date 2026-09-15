@@ -17,7 +17,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -64,7 +63,7 @@ public class RandomFallingBlockCommand extends ModdedCommand {
 				// the below for loop does not use <= because the main execute method performs its own
 				// checks
 				for (int y = (int) Math.floor(playerLoc.y()+1); y < position.getY(); y++) {
-					BlockState block = world.getBlockState(new BlockPos(position.getX(), y, position.getZ()));
+					Location block = new Location(world, position.getX(), y, position.getZ());
 					if (!BlockFinder.isPassable(block)) {
 						continue ploop;
 					}

@@ -41,7 +41,7 @@ public class SetTimeCommand extends ModdedCommand {
 				var clock = dimensionType.defaultClock();
 				if (clock.isEmpty()) continue;
 
-				final long ogTime = manager.getTotalTicks(clock.get());
+				final long ogTime = manager.getInstance(clock.get()).totalTicks();
 				final long setTime = (ogTime - (ogTime % 24000)) + time;
 				sync(() -> manager.setTotalTicks(clock.get(), setTime));
 			}

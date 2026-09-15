@@ -46,10 +46,10 @@ dependencies {
     implementation("com.terraformersmc:modmenu:$modMenuVersion")
     implementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
 //    implementation("maven.modrinth:language-reload:$languageReloadVersion")
-    implementation(include("dev.isxander:yet-another-config-lib:$yaclVersion-fabric") {
+    implementation("dev.isxander:yet-another-config-lib:$yaclVersion-fabric") {
         // TODO is this even in there
         exclude(group = "net.fabricmc.fabric-api")
-    })
+    }
 
     // transitives
     include(project(":base-common")) // this is available via api of mojmap-common (which is available via multiloader plugin) but not added to jar
@@ -109,9 +109,9 @@ sourceSets.configureEach {
 //}
 
 publishMods {
-    val versionFrom = "26.2-rc-2"
-    val versionTo = "26.2-rc-2"
-    val curseforgeVersion = "26.1.2"
+    val versionFrom = "26.3"
+    val versionTo = "26.3"
+    val curseforgeVersion = ""
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")

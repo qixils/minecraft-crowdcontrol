@@ -14,11 +14,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.feature.AbstractHugeMushroomFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.HugeFungusFeature;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -37,13 +36,10 @@ public class PlantTreeCommand extends ModdedCommand {
 		super(plugin);
 	}
 
-	private static List<ConfiguredFeature<?, ?>> getTreesFor(Level level) {
-		return level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE)
+	private static List<Feature> getTreesFor(Level level) {
+		return level.registryAccess().lookupOrThrow(Registries.FEATURE)
 				.stream()
-				.filter(feature -> {
-					FeatureConfiguration c = feature.config();
-					return c instanceof TreeConfiguration || c instanceof HugeFungusConfiguration || c instanceof HugeMushroomFeatureConfiguration;
-				})
+				.filter(feature -> feature instanceof TreeFeature || feature instanceof HugeFungusFeature || feature instanceof AbstractHugeMushroomFeature)
 				.collect(Collectors.toList());
 	}
 
@@ -54,7 +50,7 @@ public class PlantTreeCommand extends ModdedCommand {
 			List<ServerPlayer> players = playerSupplier.get();
 			Collection<CompletableFuture<?>> futures = new ArrayList<>(players.size());
 			for (ServerPlayer player : players) {
-				ConfiguredFeature<?, ?> treeType = RandomUtil.randomElementFrom(getTreesFor(player.level()));
+				Feature treeType = RandomUtil.randomElementFrom(getTreesFor(player.level()));
 				CompletableFuture<Void> future = new CompletableFuture<>();
 				futures.add(future);
 

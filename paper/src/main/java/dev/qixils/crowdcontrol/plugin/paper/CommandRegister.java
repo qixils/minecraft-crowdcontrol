@@ -165,6 +165,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			initTo(commands, () -> new GameModeCommand(plugin, gamemode, gamemode == GameMode.SPECTATOR ? 8L : 15L));
 		}
 
+		// TODO
 //		for (Shader shader : Shader.values()) {
 //			initTo(commands, () -> new ShaderCommand(plugin, shader));
 //		}

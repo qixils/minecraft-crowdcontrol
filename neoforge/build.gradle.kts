@@ -82,7 +82,7 @@ repositories {
 
 dependencies {
     implementation(jarJar("net.kyori:adventure-platform-neoforge:$adventurePlatformModVersion")!!)
-    implementation(jarJar("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")!!)
+    implementation("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     // add transitive deps
@@ -99,9 +99,9 @@ dependencies {
 }
 
 publishMods {
-    val versionFrom = "26.2-rc-2"
-    val versionTo = "26.2-rc-2"
-    val curseforgeVersion = "26.1.2"
+    val versionFrom = "26.3"
+    val versionTo = "26.3"
+    val curseforgeVersion = ""
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("neoforge")

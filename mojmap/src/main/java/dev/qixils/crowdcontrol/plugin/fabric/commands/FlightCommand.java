@@ -38,6 +38,13 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 		super(plugin);
 	}
 
+	private static void setFlying(ServerPlayer player, boolean flying) {
+		Abilities abilities = player.getAbilities();
+		abilities.mayfly = flying;
+		abilities.flying = flying;
+		player.onUpdateAbilities();
+	}
+
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
@@ -56,11 +63,9 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 					continue;
 				success = true;
 				sync(() -> {
-					abilities.mayfly = true;
-					abilities.flying = true;
+					setFlying(player, true);
 					player.addDeltaMovement(new Vec3(0, 0.2, 0));
-					player.hurtMarked = true;
-					player.onUpdateAbilities();
+					player.syncVelocity = true;
 					// TODO: set abilities.flying=true; again after 1 tick
 				});
 			}
@@ -72,14 +77,21 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 	}
 
 	@Override
+	public void onPause(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		List<ServerPlayer> players = plugin.toPlayerList(uuidMap.get(request.getRequestId()));
+		sync(() -> players.forEach(player -> setFlying(player, false)));
+	}
+
+	@Override
+	public void onResume(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
+		List<ServerPlayer> players = plugin.toPlayerList(uuidMap.get(request.getRequestId()));
+		sync(() -> players.forEach(player -> setFlying(player, true)));
+	}
+
+	@Override
 	public void onEnd(@NotNull PublicEffectPayload request, @NotNull CCPlayer source) {
 		List<ServerPlayer> players = plugin.toPlayerList(uuidMap.remove(request.getRequestId()));
-		sync(() -> players.forEach(player -> {
-			Abilities abilities = player.getAbilities();
-			abilities.mayfly = false;
-			abilities.flying = false;
-			player.onUpdateAbilities();
-		}));
+		sync(() -> players.forEach(player -> setFlying(player, false)));
 	}
 
 	// clear flight on login if they disconnected mid-effect
@@ -94,8 +106,6 @@ public class FlightCommand extends ModdedCommand implements CCTimedEffect {
 		Abilities abilities = player.getAbilities();
 		if (!abilities.flying && !abilities.mayfly)
 			return;
-		abilities.mayfly = false;
-		abilities.flying = false;
-		player.onUpdateAbilities();
+		setFlying(player, false);
 	}
 }

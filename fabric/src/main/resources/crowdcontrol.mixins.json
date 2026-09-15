@@ -9,6 +9,7 @@
     "IntegratedServerMixin",
     "LivingEntityMixin",
     "NameTagItemMixin",
+    "PlayerAdvancementsMixin",
     "PlayerListMixin",
     "PlayerMixin",
     "ResultSlotMixin",
@@ -17,7 +18,6 @@
     "TickMixin"
   ],
   "client": [
-    "GameRendererMixin",
     "KeyboardInputMixin",
     "MinecraftClientMixin"
   ],

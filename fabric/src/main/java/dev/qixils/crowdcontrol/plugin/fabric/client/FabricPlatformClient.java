@@ -6,7 +6,6 @@ import dev.qixils.crowdcontrol.plugin.fabric.client.fabric.ClientPacketContextIm
 import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -34,7 +33,6 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 		PacketUtilImpl.registerPackets();
 
 		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> handleRequestVersion(payload, new ClientPacketContextImpl(context)));
-		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> handleSetShader(payload, new ClientPacketContextImpl(context)));
 		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (payload, context) -> handleMovementStatus(payload, new ClientPacketContextImpl(context)));
 		ClientPlayNetworking.registerGlobalReceiver(SetLanguageS2C.PACKET_ID, (payload, context) -> handleLanguage(payload));
 	}

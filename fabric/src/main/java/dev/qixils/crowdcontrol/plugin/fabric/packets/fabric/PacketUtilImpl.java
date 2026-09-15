@@ -15,7 +15,6 @@ public class PacketUtilImpl {
 		if (registered) return;
 		registered = true;
 
-		PayloadTypeRegistry.clientboundPlay().register(SetShaderS2C.PACKET_ID, SetShaderS2C.PACKET_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);

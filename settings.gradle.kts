@@ -31,7 +31,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0")
 }
 
 fun incl(asPath: String, fromPath: String) {
@@ -43,4 +43,4 @@ incl(":base-common", "common")
 incl(":paper-platform", "paper")
 incl(":mojmap-common", "mojmap")
 incl(":fabric-platform", "fabric")
-incl(":neoforge-platform", "neoforge")
+//incl(":neoforge-platform", "neoforge") neo is updated but for some reason adventure build is failing. just gonna wait for their official release
