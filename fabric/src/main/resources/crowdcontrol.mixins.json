@@ -9,6 +9,7 @@
     "IntegratedServerMixin",
     "LivingEntityMixin",
     "NameTagItemMixin",
+    "PlayerAdvancementsMixin",
     "PlayerListMixin",
     "PlayerMixin",
     "ResultSlotMixin",

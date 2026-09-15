@@ -2,6 +2,12 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.6.0
+
+- Added support for 26.3
+- Added Game Events for Player Died, Player Killed Mob, and Player Earned Advancement
+  - With a recent Crowd Control Desktop App update, these can be hooked up to trigger different effects
+
 ## 4.5.4
 
 - Added support for 26.2
