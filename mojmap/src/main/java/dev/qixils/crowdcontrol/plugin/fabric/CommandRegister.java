@@ -32,6 +32,7 @@ import net.minecraft.world.level.block.Block;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.isWhitelistedEntity;
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
@@ -137,25 +138,6 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 		));
 
 		// entity commands
-		// TODO: could bring back the fill-in-vanilla-holes thing to have some better defaults for some modded mobs?
-		//  but there will probably be overlap and make it weird idk
-		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
-			try {
-				if (!entry.getValue().isEnabled(plugin.server().overworld().enabledFeatures())) continue;
-
-				boolean allowed = isWhitelistedEntity(MinecraftAudiences.key(entry.getKey())) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
-				if (!allowed) continue;
-				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
-
-				if (entry.getValue().equals(EntityTypes.LIGHTNING_BOLT)) continue;
-				if (entry.getValue().equals(EntityTypes.TNT)) continue;
-				initTo(commands, () -> new RemoveEntityCommand<>(plugin, entry.getValue()));
-			} catch (Throwable e) {
-				plugin.getSLF4JLogger().warn("Failed to check if entity is allowed; ignoring", e);
-			}
-		}
-
-		// misc grouped summons
 		EntityType<AbstractBoat>[] boats = new EntityType[] {
 			EntityTypes.OAK_BOAT,
 			EntityTypes.BIRCH_BOAT,
@@ -180,6 +162,26 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			EntityTypes.SPRUCE_CHEST_BOAT,
 			EntityTypes.BAMBOO_CHEST_RAFT
 		};
+		// TODO: could bring back the fill-in-vanilla-holes thing to have some better defaults for some modded mobs?
+		//  but there will probably be overlap and make it weird idk
+		for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
+			try {
+				if (!entry.getValue().isEnabled(plugin.server().overworld().enabledFeatures())) continue;
+				if (Stream.concat(Arrays.stream(boats), Arrays.stream(chestBoats)).anyMatch(boat -> boat == entry.getValue())) continue;
+
+				boolean allowed = isWhitelistedEntity(MinecraftAudiences.key(entry.getKey())) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
+				if (!allowed) continue;
+				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
+
+				if (entry.getValue().equals(EntityTypes.LIGHTNING_BOLT)) continue;
+				if (entry.getValue().equals(EntityTypes.TNT)) continue;
+				initTo(commands, () -> new RemoveEntityCommand<>(plugin, entry.getValue()));
+			} catch (Throwable e) {
+				plugin.getSLF4JLogger().warn("Failed to check if entity is allowed; ignoring", e);
+			}
+		}
+
+		// boat effects
 		initTo(commands, () -> new SummonEntityCommand<>(
 			plugin,
 			"entity_boat",

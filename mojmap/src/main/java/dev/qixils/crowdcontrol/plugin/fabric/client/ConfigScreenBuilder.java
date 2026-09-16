@@ -18,10 +18,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ConfigScreenCreator {
-	public static Screen createConfigScreen(Screen parent) {
-		ModdedCrowdControlPlugin plugin = ModdedCrowdControlPlugin.getInstance();
-		plugin.loadConfig();
+public class ConfigScreenBuilder {
+	public static Screen buildConfigScreen(ModdedCrowdControlPlugin plugin, Screen parent) {
 		return YetAnotherConfigLib.createBuilder()
 			.title(Component.translatable("config.crowdcontrol.title"))
 			.save(plugin::saveConfig)

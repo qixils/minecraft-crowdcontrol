@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands;
 
+import dev.qixils.crowdcontrol.common.LimitConfig;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import live.crowdcontrol.cc4j.CCPlayer;
@@ -16,8 +17,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
@@ -25,6 +29,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 @Getter
 public final class RemoveEntityCommand extends RegionalCommandSync implements EntityCommand {
 	private final EntityType entityType;
+	private final List<EntityType> entityTypes;
 	private final String effectName;
 	private final Component displayName;
 	private final String image = "remove_entity_creeper";
@@ -33,15 +38,28 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 	private final List<String> categories = Collections.singletonList("Remove Entity");
 
 	public RemoveEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
+		this(
+			plugin,
+			"remove_entity_" + csIdOf(entityType),
+			Component.translatable("cc.effect.remove_entity.name", Component.translatable(entityType)),
+			entityType
+		);
+	}
+
+	public RemoveEntityCommand(PaperCrowdControlPlugin plugin, String effectName, @Nullable Component displayName, EntityType firstEntity, EntityType... otherEntities) {
 		super(plugin);
-		this.entityType = entityType;
-		this.effectName = "remove_entity_" + csIdOf(entityType);
-		this.displayName = Component.translatable("cc.effect.remove_entity.name", Component.translatable(entityType));
+		this.entityType = firstEntity;
+		this.entityTypes = new ArrayList<>(1 + otherEntities.length);
+		entityTypes.add(firstEntity);
+		entityTypes.addAll(Arrays.asList(otherEntities));
+
+		this.effectName = effectName;
+		this.displayName = displayName;
 	}
 
 	@Override
 	public boolean isMonster() {
-		if (entityType == EntityType.ENDER_DRAGON)
+		if (entityTypes.contains(EntityType.ENDER_DRAGON))
 			return false; // ender dragon is persistent regardless of difficulty so allow it to be removed
 		return EntityCommand.super.isMonster();
 	}
@@ -53,18 +71,26 @@ public final class RemoveEntityCommand extends RegionalCommandSync implements En
 
 	@Override
 	protected @NotNull CCEffectResponse buildFailure(@NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No " + plugin.getTextUtil().translate(entityType) + "s found nearby to remove");
+		return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No mobs found nearby to remove");
 	}
 
 	@Override
 	protected int getPlayerLimit() {
-		return plugin.getLimitConfig().getEntityLimit(entityType.getKey().asMinimalString());
+		LimitConfig limitConfig = plugin.getLimitConfig();
+		int def = limitConfig.defaultEntityLimit();
+		return entityTypes.stream().flatMapToInt(entityType -> {
+			int limit = limitConfig.getEntityLimit(entityType.getKey().asMinimalString());
+			if (def == limit || limit <= 0) return IntStream.empty();
+			return IntStream.of(limit);
+		}).min().orElse(def);
 	}
 
 	@Override
 	protected boolean executeRegionallySync(@NotNull Player player, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
-		if (entityType == EntityType.ENDER_DRAGON && player.getWorld().getEnvironment() == World.Environment.THE_END) return false;
-		for (Entity entity : player.getLocation().getNearbyEntitiesByType(entityType.getEntityClass(), REMOVE_ENTITY_RADIUS)) {
+		if (entityTypes.contains(EntityType.ENDER_DRAGON) && player.getWorld().getEnvironment() == World.Environment.THE_END) return false;
+		for (Entity entity : player.getLocation().getNearbyEntities(REMOVE_ENTITY_RADIUS, REMOVE_ENTITY_RADIUS, REMOVE_ENTITY_RADIUS)) {
+			if (!entityTypes.contains(entity.getType())) continue;
+
 			entity.remove();
 			return true;
 		}
