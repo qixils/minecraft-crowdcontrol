@@ -45,6 +45,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
@@ -147,7 +148,12 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getEntityLimit(CommandConstants.asMinimalString(FabricAudiences.toAdventure(Registry.ENTITY_TYPE.getKey(entityType))));
+			int def = config.defaultEntityLimit();
+			int playerLimit = Arrays.stream(entityTypes).flatMapToInt(entityType -> {
+				int limit = config.getEntityLimit(CommandConstants.asMinimalString(FabricAudiences.toAdventure(Registry.ENTITY_TYPE.getKey(entityType))));
+				if (def == limit || limit <= 0) return IntStream.empty();
+				return IntStream.of(limit);
+			}).min().orElse(def);
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;
