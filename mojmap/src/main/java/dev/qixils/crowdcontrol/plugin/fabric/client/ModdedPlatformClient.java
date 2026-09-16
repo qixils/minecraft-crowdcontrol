@@ -77,11 +77,12 @@ public abstract class ModdedPlatformClient {
 	}
 
 	public static Screen createConfigScreen(Screen parent) {
+		ModdedCrowdControlPlugin plugin = ModdedCrowdControlPlugin.getInstance();
+		plugin.loadConfig();
 		try {
-			if (!ModdedCrowdControlPlugin.isInstanceAvailable()) throw new IllegalStateException("Server plugin not yet loaded?");
-			return dev.qixils.crowdcontrol.plugin.fabric.client.ConfigScreenBuilder.buildConfigScreen(ModdedCrowdControlPlugin.getInstance(), parent);
+			return dev.qixils.crowdcontrol.plugin.fabric.client.ConfigScreenBuilder.buildConfigScreen(plugin, parent);
 		} catch (Throwable e) {
-			logger.atWarn().setCause(e).log("Failed to create yacl screen");
+			plugin.getSLF4JLogger().atWarn().setCause(e).log("Failed to create yacl screen");
 			return new ConfigMissingScreen(parent);
 		}
 	}
