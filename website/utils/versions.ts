@@ -34,8 +34,9 @@ const findLatest = (versions: Version[]): Version => {
 }
 
 export const paperVersions: Version[] = autoVersion([
-    { id: "26.2", supported: true, legacy: false, latest: false },
-    { id: "26.1.2", supported: true, legacy: false, latest: true },
+    { id: "26.3", supported: true, legacy: false, latest: false },
+    { id: "26.2", supported: true, legacy: false, latest: true },
+    { id: "26.1.2", supported: true, legacy: false },
     { id: "1.21.11", supported: true, legacy: false },
     { id: "1.21.10", supported: true, legacy: false },
     { id: "1.21.8", supported: true, legacy: false },
@@ -53,6 +54,7 @@ export const paperVersions: Version[] = autoVersion([
 export const paperLatest = findLatest(paperVersions)
 
 export const fabricVersions: Version[] = autoVersion([
+    { id: "26.3", supported: true, legacy: false },
     { id: "26.2", supported: true, legacy: false },
     { id: "26.1.2", supported: true, legacy: false },
     { id: "1.21.11", supported: true, legacy: false },
@@ -75,8 +77,8 @@ export const fabricVersions: Version[] = autoVersion([
 export const fabricLatest = findLatest(fabricVersions)
 
 export const neoForgeVersions: Version[] = autoVersion([
-    { id: "26.2", supported: true, legacy: false, latest: false },
-    { id: "26.1.2", supported: true, legacy: false, latest: true },
+    { id: "26.2", supported: true, legacy: false },
+    { id: "26.1.2", supported: true, legacy: false },
     { id: "1.21.11", supported: true, legacy: false },
     { id: "1.21.10", supported: true, legacy: false },
     { id: "1.21.8", supported: true, legacy: false },
