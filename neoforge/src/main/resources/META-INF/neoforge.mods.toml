@@ -49,9 +49,10 @@ side = "BOTH"
 
 [[dependencies.crowdcontrol]]
 modId = "yet_another_config_lib_v3"
-mandatory = true
+type = "optional"
 ordering = "NONE"
 side = "CLIENT"
+referralUrl = "https://modrinth.com/mod/yacl"
 
 [[mixins]]
 config = "crowdcontrol.mixins.json"

@@ -78,7 +78,8 @@ public abstract class ModdedPlatformClient {
 
 	public static Screen createConfigScreen(Screen parent) {
 		try {
-			return ConfigScreenCreator.createConfigScreen(parent);
+			if (!ModdedCrowdControlPlugin.isInstanceAvailable()) throw new IllegalStateException("Server plugin not yet loaded?");
+			return dev.qixils.crowdcontrol.plugin.fabric.client.ConfigScreenBuilder.buildConfigScreen(ModdedCrowdControlPlugin.getInstance(), parent);
 		} catch (Throwable e) {
 			logger.atWarn().setCause(e).log("Failed to create yacl screen");
 			return new ConfigMissingScreen(parent);
