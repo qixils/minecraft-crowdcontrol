@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
-import dev.qixils.crowdcontrol.common.util.GameEvents;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
 import dev.qixils.crowdcontrol.plugin.fabric.util.FabricPermissionUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
@@ -15,7 +14,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,14 +37,7 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 			}
 		});
 
-		ServerLivingEntityEvents.AFTER_DEATH.register((target, source) -> {
-			if (target instanceof ServerPlayer player) {
-				emitGameEvent(player, GameEvents.death());
-			}
-			if (source.getEntity() instanceof ServerPlayer player) {
-				emitGameEvent(player, GameEvents.kill(EntityType.getKey(target.getType())));
-			}
-		});
+		ServerLivingEntityEvents.AFTER_DEATH.register(this::handleLivingDeath);
 	}
 
 	@Override
