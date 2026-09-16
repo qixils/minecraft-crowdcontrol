@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
@@ -150,7 +151,12 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).asMinimalString());
+			int def = config.defaultEntityLimit();
+			int playerLimit = Arrays.stream(entityTypes).flatMapToInt(entityType -> {
+				int limit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).asMinimalString());
+				if (def == limit || limit <= 0) return IntStream.empty();
+				return IntStream.of(limit);
+			}).min().orElse(def);
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;
@@ -206,7 +212,8 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 						return equippable.slot().getType() == EquipmentSlot.Type.ANIMAL_ARMOR;
 					})
 					.toList());
-				horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
+				var slot = horse.getSlot(401);
+				if (slot != null) slot.set(new ItemStack(randomElementFrom(items)));
 			}
 			horse.setOwner(player);
 			horse.setTamed(true);
