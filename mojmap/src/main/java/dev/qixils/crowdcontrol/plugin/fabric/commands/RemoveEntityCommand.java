@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.REMOVE_ENTITY_RADIUS;
@@ -71,14 +72,14 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 	@Override
 	public boolean isMonster() {
-		if (entityType == EntityType.ENDER_DRAGON)
+		if (entityTypes.contains(EntityType.ENDER_DRAGON))
 			return false; // ender dragon is persistent regardless of difficulty so allow it to be removed
 		return EntityCommand.super.isMonster();
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
 		ServerLevel level = player.level();
-		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return false;
+		if (entityTypes.contains(EntityType.ENDER_DRAGON) && level.getDragonFight() != null) return false;
 
 		Vec3 playerPosition = player.position();
 		List<Entity> entities = StreamSupport.stream(level.getAllEntities().spliterator(), false)
@@ -96,7 +97,12 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).asMinimalString());
+			int def = config.defaultEntityLimit();
+			int playerLimit = entityTypes.stream().flatMapToInt(entityType -> {
+				int limit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).asMinimalString());
+				if (def == limit || limit <= 0) return IntStream.empty();
+				return IntStream.of(limit);
+			}).min().orElse(def);
 
 			CCEffectResponse tryExecute = tryExecute(players, request, ccPlayer);
 			if (tryExecute != null) return tryExecute;
@@ -109,7 +115,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 				}
 				return success
 					? new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS)
-					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No " + plugin.getTextUtil().asPlain(entityType.getDescription()) + "s found nearby to remove");
+					: new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No mobs found nearby to remove");
 			}, getPlugin().getSyncExecutor()).join());
 		}));
 	}
