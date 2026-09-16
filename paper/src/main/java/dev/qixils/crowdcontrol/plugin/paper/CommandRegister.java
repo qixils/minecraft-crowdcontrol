@@ -120,7 +120,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			EntityType.MANGROVE_BOAT,
 			EntityType.PALE_OAK_BOAT,
 			EntityType.SPRUCE_BOAT,
-			EntityType.BAMBOO_RAFT
+			EntityType.BAMBOO_RAFT,
+			EntityType.POPLAR_BOAT
 		};
 		EntityType[] chestBoats = new EntityType[] {
 			EntityType.OAK_CHEST_BOAT,
@@ -132,7 +133,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			EntityType.MANGROVE_CHEST_BOAT,
 			EntityType.PALE_OAK_CHEST_BOAT,
 			EntityType.SPRUCE_CHEST_BOAT,
-			EntityType.BAMBOO_CHEST_RAFT
+			EntityType.BAMBOO_CHEST_RAFT,
+			EntityType.POPLAR_CHEST_BOAT
 		};
 		for (EntityType entity : Registry.ENTITY_TYPE) {
 			if (entity.getEntityClass() == null) continue;

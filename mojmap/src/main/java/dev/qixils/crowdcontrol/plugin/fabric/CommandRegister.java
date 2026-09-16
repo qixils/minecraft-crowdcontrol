@@ -148,7 +148,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			EntityTypes.MANGROVE_BOAT,
 			EntityTypes.PALE_OAK_BOAT,
 			EntityTypes.SPRUCE_BOAT,
-			EntityTypes.BAMBOO_RAFT
+			EntityTypes.BAMBOO_RAFT,
+			EntityTypes.POPLAR_BOAT
 		};
 		EntityType<AbstractChestBoat>[] chestBoats = new EntityType[] {
 			EntityTypes.OAK_CHEST_BOAT,
@@ -160,7 +161,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			EntityTypes.MANGROVE_CHEST_BOAT,
 			EntityTypes.PALE_OAK_CHEST_BOAT,
 			EntityTypes.SPRUCE_CHEST_BOAT,
-			EntityTypes.BAMBOO_CHEST_RAFT
+			EntityTypes.BAMBOO_CHEST_RAFT,
+			EntityTypes.POPLAR_CHEST_BOAT
 		};
 		// TODO: could bring back the fill-in-vanilla-holes thing to have some better defaults for some modded mobs?
 		//  but there will probably be overlap and make it weird idk
