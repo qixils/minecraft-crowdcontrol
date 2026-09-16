@@ -2,6 +2,8 @@ package dev.qixils.crowdcontrol.plugin.paper.commands;
 
 import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.loottable.LootableInventory;
+import dev.qixils.crowdcontrol.common.LimitConfig;
+import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.plugin.paper.PaperCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.paper.RegionalCommandSync;
 import dev.qixils.crowdcontrol.plugin.paper.utils.RegistryUtil;
@@ -29,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
 import static dev.qixils.crowdcontrol.common.util.RandomUtil.*;
@@ -86,21 +89,53 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 	}
 
 	protected final EntityType entityType;
+	protected final EntityType[] entityTypes;
 	private final String effectName;
 	private final Component displayName;
-	private final NamespacedKey mobKey;
 	private final String image = "entity_creeper";
 	private final int price;
 	private final byte priority = 5;
 	private final List<String> categories = Collections.singletonList("Summon Entity");
+	private final NamespacedKey mobKey = getMobKey(plugin.getPaperPlugin());
 
 	public SummonEntityCommand(PaperCrowdControlPlugin plugin, EntityType entityType) {
+		this(
+			plugin,
+			"entity_" + csIdOf(entityType),
+			Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType)),
+			entityType
+		);
+	}
+
+	public SummonEntityCommand(PaperCrowdControlPlugin plugin, String effectName, @Nullable Component displayName, EntityType firstEntity, EntityType... otherEntities) {
 		super(plugin);
-		this.entityType = entityType;
-		this.effectName = "entity_" + csIdOf(entityType);
-		this.displayName = Component.translatable("cc.effect.summon_entity.name", Component.translatable(entityType));
-		this.mobKey = getMobKey(plugin.getPaperPlugin());
-		this.price = entityType.getEntityClass() != null && Enemy.class.isAssignableFrom(entityType.getEntityClass()) ? 1000 : 500;
+		this.entityType = firstEntity;
+		this.entityTypes = new EntityType[1 + otherEntities.length];
+		this.entityTypes[0] = firstEntity;
+		System.arraycopy(otherEntities, 0, this.entityTypes, 1, otherEntities.length);
+
+		this.effectName = effectName;
+		this.displayName = displayName;
+
+		int _price = 500;
+		try {
+			Class<? extends Entity> entityClass = firstEntity.getEntityClass();
+			if (entityClass != null && Mob.class.isAssignableFrom(entityClass)) {
+				_price = 1000;
+			}
+		} catch (Exception e) {
+			plugin.getSLF4JLogger().debug("Could not generate default price for {}", firstEntity.getKey(), e);
+		}
+		this.price = _price;
+	}
+
+	public @NotNull Component getDisplayName() {
+		if (displayName != null) return displayName;
+		return getDefaultDisplayName();
+	}
+
+	public EntityType getRandomEntityType() {
+		return RandomUtil.randomElementFrom(entityTypes);
 	}
 
 	@NotNull
@@ -114,7 +149,13 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 
 	@Override
 	protected int getPlayerLimit() {
-		return getPlugin().getLimitConfig().getEntityLimit(entityType.getKey().asMinimalString());
+		LimitConfig limitConfig = plugin.getLimitConfig();
+		int def = limitConfig.defaultEntityLimit();
+		return Arrays.stream(entityTypes).flatMapToInt(entityType -> {
+			int limit = limitConfig.getEntityLimit(entityType.getKey().asMinimalString());
+			if (def == limit || limit <= 0) return IntStream.empty();
+			return IntStream.of(limit);
+		}).min().orElse(def);
 	}
 
 	@Override
@@ -143,8 +184,6 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 		}
 		if (entity instanceof Tameable tameable)
 			tameable.setOwner(player);
-		if (entity instanceof Boat boat)
-			boat.setBoatType(randomElementFrom(Boat.Type.values()));
 		if (entity instanceof CollarColorable colorable)
 			colorable.setCollarColor(randomElementFrom(DyeColor.values()));
 		if (entity instanceof MushroomCow mooshroom && RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
@@ -210,13 +249,13 @@ public class SummonEntityCommand extends RegionalCommandSync implements EntityCo
 	}
 
 	protected Entity spawnEntity(@Nullable Component viewer, @NotNull Player player) {
-		return spawnEntity(viewer, player, entityType, mobKey);
+		return spawnEntity(viewer, player, getRandomEntityType(), mobKey);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onNameTag(PlayerNameEntityEvent event) {
 		LivingEntity entity = event.getEntity();
 		if (!isMobViewerSpawned(plugin.getPaperPlugin(), entity)) return;
-		entity.getPersistentDataContainer().remove(getMobKey());
+		entity.getPersistentDataContainer().remove(mobKey);
 	}
 }

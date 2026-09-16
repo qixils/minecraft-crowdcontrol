@@ -124,11 +124,11 @@ public final class LimitConfig {
 	@Override
 	public String toString() {
 		return "LimitConfig{" +
-				"hostsBypass=" + hostsBypass +
-				", itemLimits=" + itemLimits +
-				", itemDefaultLimit=" + itemDefaultLimit +
-				", entityLimits=" + entityLimits +
-				", entityDefaultLimit=" + entityDefaultLimit +
-				'}';
+			"hostsBypass=" + hostsBypass +
+			", itemLimits=" + itemLimits +
+			", itemDefaultLimit=" + itemDefaultLimit +
+			", entityLimits=" + entityLimits +
+			", entityDefaultLimit=" + entityDefaultLimit +
+			'}';
 	}
 }

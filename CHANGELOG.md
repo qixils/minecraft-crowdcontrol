@@ -2,6 +2,21 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.6.1
+
+- Fixed issues with spawning boats and chest boats
+- Re-added some Shader effects
+  - No longer requires mod client
+  - Unavailable for now on Paper while waiting for new API; expect this in a later patch
+  - More shaders are planned in the future
+- (NeoForge patch1) Added death-related Game Events
+
+Includes fixes from 4.6.0 patches:
+
+- (26.1+) Fixed YACL being included in the mod JARs
+- (26.1+) Fixed errors when YACL isn't available
+- (26.2+) Fixed bundled copy of Adventure
+
 ## 4.6.0
 
 - Added support for 26.3
