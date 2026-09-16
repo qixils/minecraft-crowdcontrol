@@ -14,6 +14,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -48,6 +50,7 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 		}
 
 		modBus.addListener(this::register);
+		NeoForge.EVENT_BUS.addListener(LivingDeathEvent.class, event -> handleLivingDeath(event.getEntity(), event.getSource()));
 
 		onInitialize();
 	}

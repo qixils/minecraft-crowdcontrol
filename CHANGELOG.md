@@ -9,6 +9,7 @@ A list of all changes made to the software in reverse chronological order.
   - No longer requires mod client
   - Unavailable for now on Paper while waiting for new API; expect this in a later patch
   - More shaders are planned in the future
+- (NeoForge patch1) Added death-related Game Events
 
 Includes fixes from 4.6.0 patches:
 
