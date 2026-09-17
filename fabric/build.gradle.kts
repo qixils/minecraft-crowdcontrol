@@ -1,4 +1,5 @@
 import me.modmuss50.mpp.ReleaseType
+import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 
 val adventureVersion: String by project
 val adventurePlatformModVersion: String by project
@@ -156,8 +157,8 @@ publishMods {
             append(project.version.toString())
         })
         javaVersions.add(JavaVersion.VERSION_21)
-        serverRequired.set(true)
-        clientRequired.set(false)
+        server.set(true)
+        client.set(false)
         requires("fabric-api")
         optional("modmenu", "language-reload")
         embeds("cloth-config")
@@ -169,7 +170,7 @@ publishMods {
             start.set(versionFrom)
             end.set(versionTo)
         }
-        version.set(versionId)
+        version.set(versionId.take(32))
         displayName.set(buildString {
             append("v")
             append(project.version.toString())
@@ -181,6 +182,7 @@ publishMods {
             }
             append(")")
         })
+        environment.set(ModrinthEnvironment.SERVER_ONLY_CLIENT_OPTIONAL)
         requires("fabric-api")
         optional("modmenu", "language-reload")
         embeds("cloth-config", "adventure-platform-mod")

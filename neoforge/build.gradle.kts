@@ -1,4 +1,5 @@
 import me.modmuss50.mpp.ReleaseType
+import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 
 val neoforgeVersion: String by project
 val mojmapVersion: String by project
@@ -153,8 +154,8 @@ publishMods {
             append(project.version.toString())
         })
         javaVersions.add(JavaVersion.VERSION_21)
-        serverRequired.set(true)
-        clientRequired.set(false)
+        server.set(true)
+        client.set(false)
         embeds("cloth-config")
     }
     modrinth {
@@ -164,7 +165,7 @@ publishMods {
             start.set(versionFrom)
             end.set(versionTo)
         }
-        version.set(versionId)
+        version.set(versionId.take(32))
         displayName.set(buildString {
             append("v")
             append(project.version.toString())
@@ -176,6 +177,7 @@ publishMods {
             }
             append(")")
         })
+        environment.set(ModrinthEnvironment.SERVER_ONLY_CLIENT_OPTIONAL)
         embeds("cloth-config", "adventure-platform-mod")
     }
 }

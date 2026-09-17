@@ -93,7 +93,7 @@ publishMods {
             start.set(versionFrom)
             end.set(versionTo)
         }
-        version.set(versionId)
+        version.set(versionId.take(32))
         displayName.set(buildString {
             append("v")
             append(project.version.toString())
