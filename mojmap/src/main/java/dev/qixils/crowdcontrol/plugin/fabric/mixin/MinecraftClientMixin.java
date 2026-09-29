@@ -40,6 +40,11 @@ public abstract class MinecraftClientMixin extends ReentrantBlockableEventLoop<R
 		ClientMinecraftEvents.CLIENT_STOPPING.fire((Minecraft) (Object) this);
 	}
 
+	@Inject(method = "tick", at = @At("HEAD"))
+	private void onTick(CallbackInfo ci) {
+		ClientMinecraftEvents.CLIENT_TICK.fire((Minecraft) (Object) this);
+	}
+
 	// We inject after the thread field is set so `ThreadExecutor#getThread` will work
 	@Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;gameThread:Ljava/lang/Thread;", shift = At.Shift.AFTER, ordinal = 0), method = "run")
 	private void onStart(CallbackInfo ci) {

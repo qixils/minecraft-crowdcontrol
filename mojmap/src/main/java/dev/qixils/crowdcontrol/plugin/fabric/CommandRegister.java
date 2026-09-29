@@ -131,6 +131,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new RandomFallingBlockCommand(plugin),
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
+			() -> new LidarCommand(plugin),
 			() -> new WaterCommand(plugin),
 			() -> new DrainCommand(plugin),
 			() -> new AgeCommand(plugin, true),

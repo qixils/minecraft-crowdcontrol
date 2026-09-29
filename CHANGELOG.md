@@ -2,6 +2,18 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.6.2
+
+This update contains features exclusive to 26.3. These features are experimental, please
+[report any issues](https://github.com/qixils/minecraft-crowdcontrol/issues/new/choose)!
+
+- Re-added several Screen effects from Minecraft's old "Super Secret Shaders"
+  - Thanks to the abundance of options now, some less interesting ones have been removed
+- Added six brand-new Screen effects
+- Most new custom Screen effects are now usable without mods by downloading a resource pack
+  - Server admins can configure how it's served from the config file
+- Screen effects can now stack on each other
+
 ## 4.6.1
 
 - Fixed issues with spawning boats and chest boats

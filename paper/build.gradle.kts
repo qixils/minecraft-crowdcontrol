@@ -72,9 +72,9 @@ tasks {
         exclude("net/kyori/adventure/text/serializer/")
 
         dependencies {
-            exclude("net.kyori.adventure.text.minimessage::")
-            exclude("net.kyori.adventure.text.serializer.legacy::")
-            exclude("net.kyori.adventure.text.serializer.plain::")
+            exclude(dependency("net.kyori.adventure.text.minimessage:.*:.*"))
+            exclude(dependency("net.kyori.adventure.text.serializer.legacy:.*:.*"))
+            exclude(dependency("net.kyori.adventure.text.serializer.plain:.*:.*"))
         }
 
         relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")

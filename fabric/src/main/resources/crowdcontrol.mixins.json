@@ -5,6 +5,7 @@
   "refmap": "mojmap-common-mojmap-common-refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ConnectionMixin",
     "EntityMixin",
     "IntegratedServerMixin",
     "LivingEntityMixin",
@@ -13,12 +14,16 @@
     "PlayerListMixin",
     "PlayerMixin",
     "ResultSlotMixin",
+    "ServerCommonPacketListenerImplMixin",
     "ServerGamePacketListenerImplMixin",
+    "ServerHandshakePacketListenerImplMixin",
     "ServerPlayerMixin",
     "TickMixin"
   ],
   "client": [
+    "GameRendererMixin",
     "KeyboardInputMixin",
+    "LevelRendererMixin",
     "MinecraftClientMixin"
   ],
   "injectors": {

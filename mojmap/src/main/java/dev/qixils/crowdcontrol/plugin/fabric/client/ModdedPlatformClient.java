@@ -4,11 +4,9 @@ import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.client.lidar.LidarEffect;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.ExtraFeatureC2S;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.ResponseVersionC2S;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -32,6 +30,7 @@ public abstract class ModdedPlatformClient {
 	protected static @Nullable ModdedPlatformClient INSTANCE = null;
 	public static LanguageState LANGUAGE_STATE = LanguageState.RESET;
 	protected Minecraft client = null;
+	protected final LidarEffect lidar = new LidarEffect();
 
 	/**
 	 * Fetches the initialized client.
@@ -60,6 +59,7 @@ public abstract class ModdedPlatformClient {
 		ClientAdapter.setLocalPlayerIdSupplier(() -> player().map(LocalPlayer::getUUID));
 		ClientMinecraftEvents.CLIENT_STARTED.register(this::setClient);
 		ClientMinecraftEvents.CLIENT_STOPPING.register(client -> setClient(null));
+		ClientMinecraftEvents.CLIENT_TICK.register(lidar::tick);
 	}
 
 	private void setClient(@Nullable Minecraft client) {
@@ -70,6 +70,10 @@ public abstract class ModdedPlatformClient {
 			this.client = client;
 			ModdedCrowdControlPlugin.CLIENT_AVAILABLE = true;
 		}
+	}
+
+	public @NotNull LidarEffect lidar() {
+		return lidar;
 	}
 
 	public @NotNull Optional<LocalPlayer> player() {
@@ -96,6 +100,13 @@ public abstract class ModdedPlatformClient {
 	public void handleMovementStatus(@NotNull MovementStatusS2C payload, @NotNull ClientPacketContext context) {
 		if (payload.statusType() == null || payload.statusValue() == null) return;
 		((MovementStatus) context.player()).cc$setMovementStatus(payload.statusType(), payload.statusValue());
+	}
+
+	public void handleLidar(@NotNull LidarS2C payload) {
+		if (payload.duration().isPositive())
+			lidar.start(payload.duration());
+		else
+			lidar.stop();
 	}
 
 	public abstract void sendToServer(@NotNull CustomPacketPayload payload);

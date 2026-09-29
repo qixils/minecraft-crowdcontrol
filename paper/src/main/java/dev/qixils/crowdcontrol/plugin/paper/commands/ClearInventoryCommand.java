@@ -10,7 +10,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ public class ClearInventoryCommand extends RegionalCommandSync {
 	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		// Cannot use inventory effects while /gamerule keepInventory true
 		return potentialPlayers.stream()
-			.anyMatch(player -> player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY) == Boolean.TRUE)
+			.anyMatch(player -> player.getWorld().getGameRuleValue(GameRules.KEEP_INVENTORY) == Boolean.TRUE)
 			? TriState.FALSE
 			: TriState.TRUE;
 	}

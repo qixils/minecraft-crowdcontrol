@@ -8,9 +8,12 @@ import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.DebugEffectPayload;
 import dev.qixils.crowdcontrol.common.http.ModrinthVersion;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
+import dev.qixils.crowdcontrol.common.shader.ShaderPackConfig;
+import dev.qixils.crowdcontrol.common.shader.ShaderPackManager;
 import dev.qixils.crowdcontrol.common.util.Application;
 import dev.qixils.crowdcontrol.common.util.PermissionWrapper;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -18,13 +21,17 @@ import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
 import live.crowdcontrol.cc4j.*;
+import live.crowdcontrol.cc4j.websocket.ConnectedPlayer;
 import live.crowdcontrol.cc4j.websocket.UserToken;
 import live.crowdcontrol.cc4j.websocket.data.*;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffect;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectBuilder;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectsOperation;
-import live.crowdcontrol.cc4j.websocket.payload.*;
+import live.crowdcontrol.cc4j.websocket.payload.CCEffectDescription;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
+import live.crowdcontrol.cc4j.websocket.payload.CCUserRecord;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.serializer.configurate4.ConfigurateComponentSerializer;
@@ -145,6 +152,11 @@ public abstract class Plugin<P, S> {
 	 * Key for the Set Language packet.
 	 */
 	public static final Key SET_LANGUAGE_KEY = Key.key(NAMESPACE, "set-language");
+
+	/**
+	 * Key for the LiDAR packet.
+	 */
+	public static final Key LIDAR_KEY = Key.key(NAMESPACE, "lidar");
 
 	/**
 	 * Valid ID for custom effects.
@@ -275,6 +287,10 @@ public abstract class Plugin<P, S> {
 	protected LimitConfig limitConfig = new LimitConfig();
 	@NotNull
 	protected SoftLockConfig softLockConfig = new SoftLockConfig();
+	@NotNull
+	protected ShaderPackConfig shaderPackConfig = ShaderPackConfig.DEFAULT;
+	@NotNull
+	protected final ShaderPackManager<P> shaderPackManager = new ShaderPackManager<>(this);
 	@NotNull
 	protected final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
@@ -445,6 +461,51 @@ public abstract class Plugin<P, S> {
 	@NotNull
 	public SoftLockConfig getSoftLockConfig() {
 		return softLockConfig;
+	}
+
+	/**
+	 * Gets the plugin's {@link ShaderPackConfig}.
+	 *
+	 * @return shader pack config parsed from the plugin's config file
+	 */
+	@NotNull
+	public ShaderPackConfig getShaderPackConfig() {
+		return shaderPackConfig;
+	}
+
+	/**
+	 * Gets the object that offers the shader resource pack to players without the mod.
+	 *
+	 * @return shader pack manager
+	 */
+	@NotNull
+	public ShaderPackManager<P> getShaderPackManager() {
+		return shaderPackManager;
+	}
+
+	/**
+	 * The client resource pack format of the running game version, used to build the shader pack's
+	 * {@code pack.mcmeta}.
+	 * <p>
+	 * Platforms may have to read this out of the server internals, so callers should expect it to
+	 * throw after a server update.
+	 *
+	 * @return resource pack format
+	 */
+	@CheckReturnValue
+	public abstract int getResourcePackFormat();
+
+	/**
+	 * The host name the given player used to reach this server, if known.
+	 * Used as the default download host for the shader resource pack.
+	 *
+	 * @param player player to check
+	 * @return host name, or null if unknown
+	 */
+	@Nullable
+	@CheckReturnValue
+	public String getShaderPackHost(@NotNull P player) {
+		return null;
 	}
 
 	/**
@@ -847,6 +908,7 @@ public abstract class Plugin<P, S> {
 			.executes(ctx -> {
 				Audience audience = mapper.asAudience(ctx.getSource());
 				loadConfig();
+				applyShaderPackConfig();
 				audience.sendMessage(output(translatable("cc.command.crowdcontrol.reloadconfig.output")));
 				return 1;
 			});
@@ -879,46 +941,43 @@ public abstract class Plugin<P, S> {
 								audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
 								return 0;
 							}
+							CrowdControl cc = crowdControl;
+							// no account or session is needed, just the service itself
+							if (cc == null || !(optionalCCPlayer(player).orElse(null) instanceof ConnectedPlayer source)) {
+								audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline", NamedTextColor.RED)));
+								return 0;
+							}
 							Command<P> effect = commandRegister().getCommandByName(commandContext.getArgument("effect", String.class));
-							List<P> players = new ArrayList<>(Collections.singletonList(player));
+							CustomEffectDuration duration = Optional.ofNullable(effect.getDefaultDuration())
+								.map(value -> new CustomEffectDuration(value.toMillis() / 1000.0))
+								.or(() -> Optional.ofNullable(effect.getExtensionDuration()))
+								.orElseGet(() -> new CustomEffectDuration(10));
 							// TODO: add simpler constructors
-							CompletableFuture.runAsync(() -> effect.execute(
-								() -> players,
-								new PublicEffectPayload(
-									UUID.randomUUID(),
-									0L,
-									new CCEffectDescription(
-										effect.getEffectName(),
-										"game",
-										new CCName(getTextUtil().asPlain(effect.getDisplayName())),
-										null,
-										null,
-										null,
-										false,
-										false,
-										false,
-										false,
-										false,
-										false,
-										null,
-										null,
-										null,
-										new CustomEffectDuration(10)
-									),
-									new CCUserRecord(
-										"ccuid-01j7cnrvpbh5aw45pwpe1vqvdw",
-										"lexikiq",
-										ProfileType.TWITCH,
-										"106025167",
-										""
-									),
+							PublicEffectPayload payload = new DebugEffectPayload(
+								playerMapper().getUniqueId(player),
+								playerMapper().getUsername(player),
+								new CCEffectDescription(
+									effect.getEffectName().toLowerCase(Locale.ENGLISH),
+									"game",
+									new CCName(getTextUtil().asPlain(effect.getDisplayName())),
+									null,
 									null,
 									null,
 									false,
-									1
-								),
-								optionalCCPlayer(player).orElseThrow()
-							));
+									false,
+									false,
+									false,
+									false,
+									false,
+									null,
+									null,
+									null,
+									duration
+								)
+							);
+							// go through the same pipeline as a real request
+							// brings announcements, timed effect management, etc
+							cc.executeEffect(payload, source);
 							return 1;
 						})
 				);
@@ -989,11 +1048,38 @@ public abstract class Plugin<P, S> {
 			getSLF4JLogger().warn("Could not parse limits config", e);
 		}
 
+		// shader resource pack
+		shaderPackConfig = new ShaderPackConfig(
+			config.node("shader-pack", "enabled").getBoolean(shaderPackConfig.enabled()),
+			config.node("shader-pack", "port").getInt(shaderPackConfig.port()),
+			config.node("shader-pack", "bind-address").getString(shaderPackConfig.bindAddress()),
+			config.node("shader-pack", "public-address").getString(shaderPackConfig.publicAddress()),
+			config.node("shader-pack", "url").getString(shaderPackConfig.url()),
+			config.node("shader-pack", "required").getBoolean(shaderPackConfig.required())
+		);
+
 		// misc
 		global = config.node("global").getBoolean(global);
 		announce = config.node("announce").getBoolean(announce);
 		adminRequired = config.node("admin-required").getBoolean(adminRequired);
 		hideNames = HideNames.fromConfigCode(config.node("hide-names").getString(hideNames.getConfigCode()));
+	}
+
+	/**
+	 * Hands the freshly loaded shader pack settings to the {@link ShaderPackManager}.
+	 */
+	protected void applyShaderPackConfig() {
+		int packFormat;
+		try {
+			packFormat = getResourcePackFormat();
+		} catch (Throwable t) {
+			// platforms may have to dig this out of the server internals, which can break on an update
+			getSLF4JLogger().warn("Could not determine the resource pack format", t);
+			shaderPackManager.stop();
+			return;
+		}
+		// separated from `loadConfig` so it doesn't run when opening the visual config
+		shaderPackManager.reload(shaderPackConfig, packFormat);
 	}
 
 	public void saveConfig() {
@@ -1015,6 +1101,12 @@ public abstract class Plugin<P, S> {
 			config.node("soft-lock-observer", "search-horizontal").set(softLockConfig.getSearchH());
 			config.node("soft-lock-observer", "search-vertical").set(softLockConfig.getSearchV());
 			config.node("custom-effects", "autogenerated").set(customEffectsConfig.autogenerated());
+			config.node("shader-pack", "enabled").set(shaderPackConfig.enabled());
+			config.node("shader-pack", "port").set(shaderPackConfig.port());
+			config.node("shader-pack", "bind-address").set(shaderPackConfig.bindAddress());
+			config.node("shader-pack", "public-address").set(shaderPackConfig.publicAddress());
+			config.node("shader-pack", "url").set(shaderPackConfig.url());
+			config.node("shader-pack", "required").set(shaderPackConfig.required());
 			getConfigLoader().save(config);
 		} catch (ConfigurateException e) {
 			throw new RuntimeException("Could not save plugin config", e);
@@ -1191,6 +1283,7 @@ public abstract class Plugin<P, S> {
 	 */
 	public void initCrowdControl() {
 		loadConfig();
+		applyShaderPackConfig();
 		crowdControl = new CrowdControl("Minecraft", "Minecraft", Application.APPLICATION_ID, Application.APPLICATION_SECRET, getDataFolder());
 		commandRegister().register();
 		// re-trigger player join for any missed players
@@ -1198,6 +1291,7 @@ public abstract class Plugin<P, S> {
 	}
 
 	public CompletableFuture<?> shutdown() {
+		shaderPackManager.stop();
 		if (crowdControl != null) {
 			getPlayerManager().getAllPlayersFull().forEach(this::onPlayerLeave);
 			crowdControl.close();
@@ -1403,6 +1497,8 @@ public abstract class Plugin<P, S> {
 		Audience audience = mapper.asAudience(joiningPlayer);
 		audience.sendMessage(JOIN_MESSAGE);
 
+		shaderPackManager.onPlayerJoin(joiningPlayer);
+
 		if (!playerMapper().hasPermission(joiningPlayer, getUsePermission())) return;
 
 		if (playerMapper().hasPermission(joiningPlayer, Plugin.ADMIN_PERMISSION)) {
@@ -1530,6 +1626,7 @@ public abstract class Plugin<P, S> {
 		}
 		clientVersions.remove(uuid);
 		extraFeatures.remove(uuid);
+		shaderPackManager.onPlayerLeave(uuid);
 
 		if (crowdControl == null) return;
 

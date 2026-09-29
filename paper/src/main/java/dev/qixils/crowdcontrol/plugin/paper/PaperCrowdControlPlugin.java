@@ -45,6 +45,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -115,6 +116,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		pluginChannel.registerOutgoingPluginChannel(VersionRequestPacketS2C.METADATA);
 		pluginChannel.registerOutgoingPluginChannel(MovementStatusPacketS2C.METADATA);
 		pluginChannel.registerOutgoingPluginChannel(SetLanguagePacketS2C.METADATA);
+		pluginChannel.registerOutgoingPluginChannel(LidarPacketS2C.METADATA);
 		pluginChannel.registerIncomingPluginChannel(VersionResponsePacketC2S.METADATA, (player, message) -> {
 			UUID uuid = player.getUniqueId();
 			SemVer version = message.version();
@@ -164,6 +166,20 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	@Override
 	public @NotNull Audience getConsole() {
 		return Bukkit.getConsoleSender();
+	}
+
+	@Override
+	public int getResourcePackFormat() {
+		return net.minecraft.SharedConstants.getCurrentVersion()
+			.packVersion(net.minecraft.server.packs.PackType.CLIENT_RESOURCES)
+			.major();
+	}
+
+	@Override
+	public @Nullable String getShaderPackHost(@NotNull Player player) {
+		// the hostname the client dialed is our best guess at an address it can reach us on
+		InetSocketAddress virtualHost = player.getVirtualHost();
+		return virtualHost == null ? null : virtualHost.getHostString();
 	}
 
 	@EventHandler

@@ -13,7 +13,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -101,7 +101,7 @@ public class KeepInventoryCommand extends PaperCommand {
 	public TriState isVisible(@NotNull IUserRecord user, @NotNull List<Player> potentialPlayers) {
 		// Cannot use inventory effects while /gamerule keepInventory true
 		return potentialPlayers.stream()
-			.anyMatch(player -> player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY) == Boolean.TRUE)
+			.anyMatch(player -> player.getWorld().getGameRuleValue(GameRules.KEEP_INVENTORY) == Boolean.TRUE)
 			? TriState.FALSE
 			: TriState.TRUE;
 	}

@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.neoforge.client;
 
 import dev.qixils.crowdcontrol.plugin.fabric.client.ModdedPlatformClient;
 import dev.qixils.crowdcontrol.plugin.fabric.client.neoforge.ClientPacketContextImpl;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.LidarS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
@@ -40,6 +41,7 @@ public class NeoForgePlatformClient extends ModdedPlatformClient {
 			handleMovementStatus(payload, new ClientPacketContextImpl(context, localPlayer));
 		});
 		event.register(SetLanguageS2C.PACKET_ID, (payload, context) -> {});
+		event.register(LidarS2C.PACKET_ID, (payload, context) -> handleLidar(payload));
 	}
 
 	@Override

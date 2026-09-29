@@ -168,6 +168,18 @@ public interface Command<P> extends CCEffect {
 	}
 
 	/**
+	 * Gets the duration this effect should run for,
+	 * namely for {@code /crowdcontrol execute}.
+	 *
+	 * @return default duration or null
+	 */
+	@Nullable
+	@CheckReturnValue
+	default Duration getDefaultDuration() {
+		return null;
+	}
+
+	/**
 	 * This returns the priority of the effect to be considered when custom effect slots are limited.
 	 * A value of {@value Byte#MIN_VALUE} indicates the effect should not be included at all.
 	 *

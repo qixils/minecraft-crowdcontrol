@@ -1,0 +1,85 @@
+{
+    "targets": {
+        "blur_pass": {},
+        "blurred": {},
+        "swap": {}
+    },
+    "passes": [
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/box_blur",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "minecraft:main",
+                    "bilinear": true
+                }
+            ],
+            "output": "blur_pass",
+            "uniforms": {
+                "BlurConfig": [
+                    { "name": "BlurDir", "type": "vec2", "value": [ 1.0, 0.0 ] },
+                    { "name": "Radius", "type": "float", "value": 8.0 }
+                ]
+            }
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/box_blur",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "blur_pass",
+                    "bilinear": true
+                }
+            ],
+            "output": "blurred",
+            "uniforms": {
+                "BlurConfig": [
+                    { "name": "BlurDir", "type": "vec2", "value": [ 0.0, 1.0 ] },
+                    { "name": "Radius", "type": "float", "value": 8.0 }
+                ]
+            }
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "crowdcontrol:post/depth_blur",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "minecraft:main"
+                },
+                {
+                    "sampler_name": "Blur",
+                    "target": "blurred"
+                },
+                {
+                    "sampler_name": "Depth",
+                    "target": "minecraft:main",
+                    "use_depth_buffer": true
+                }
+            ],
+            "output": "swap",
+            "uniforms": {
+                "MyopiaConfig": [
+                    { "name": "NearPlane", "type": "float", "value": 0.05 },
+                    { "name": "FocusDistance", "type": "float", "value": 3.0 },
+                    { "name": "BlurDistance", "type": "float", "value": 14.0 }
+                ]
+            }
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/blit",
+            "inputs": [
+                { "sampler_name": "In", "target": "swap" }
+            ],
+            "output": "minecraft:main",
+            "uniforms": {
+                "BlitConfig": [
+                    { "name": "ColorModulate", "type": "vec4", "value": [ 1.0, 1.0, 1.0, 1.0 ] }
+                ]
+            }
+        }
+    ]
+}

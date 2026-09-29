@@ -14,6 +14,7 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Leave;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.VirtualHost;
 import dev.qixils.crowdcontrol.plugin.fabric.mc.FabricPlayer;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.ExtraFeatureC2S;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
@@ -30,6 +31,7 @@ import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
+import net.minecraft.SharedConstants;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -39,6 +41,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -229,6 +232,28 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 	@Override
 	public @NotNull Audience getConsole() {
 		return adventure().console();
+	}
+
+	@Override
+	public int getResourcePackFormat() {
+		return SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).major();
+	}
+
+	@Override
+	public @Nullable String getShaderPackHost(@NotNull ServerPlayer player) {
+		// the hostname the client dialed is our best guess at an address it can reach us on
+		try {
+			String virtualHost = player.connection == null ? null : ((VirtualHost) player.connection).cc$getVirtualHost();
+			if (virtualHost != null) return virtualHost;
+		} catch (Throwable e) {
+			getSLF4JLogger().atWarn().setCause(e).log("Failed to get virtual host for player {}", player.getUUID());
+		}
+
+		// failing that, the address the server was told to bind
+		MinecraftServer _server = server;
+		if (_server == null) return null;
+		String localIp = _server.getLocalIp();
+		return localIp == null || localIp.isBlank() ? null : localIp;
 	}
 
 	@Override
