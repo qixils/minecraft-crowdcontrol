@@ -129,7 +129,6 @@ MinecraftServer.sln
 
 # Gradle
 .gradle/
-buildSrc/
 build/
 
 # JavaScript
