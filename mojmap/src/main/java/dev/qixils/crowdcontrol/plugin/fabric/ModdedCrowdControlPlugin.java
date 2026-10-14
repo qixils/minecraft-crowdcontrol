@@ -12,6 +12,7 @@ import dev.qixils.crowdcontrol.common.packets.PluginPacket;
 import dev.qixils.crowdcontrol.common.packets.VersionRequestPacketS2C;
 import dev.qixils.crowdcontrol.common.packets.VersionResponsePacketC2S;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
+import dev.qixils.crowdcontrol.common.util.GameEvents;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.event.EventManager;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
@@ -27,6 +28,7 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
@@ -35,6 +37,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -274,6 +279,15 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 		getSLF4JLogger().info("Received features {} from client {}", features, uuid);
 		extraFeatures.put(uuid, features);
 		updateConditionalEffectVisibility(uuid);
+	}
+
+	protected void handleLivingDeath(LivingEntity target, DamageSource source) {
+		if (target instanceof ServerPlayer player) {
+			emitGameEvent(player, GameEvents.death());
+		}
+		if (source != null && source.getEntity() instanceof ServerPlayer player) {
+			emitGameEvent(player, GameEvents.kill(FabricAudiences.toAdventure(EntityType.getKey(target.getType()))));
+		}
 	}
 
 	public abstract void sendToPlayer(@NotNull ServerPlayer player, @NotNull PluginPacket payload);

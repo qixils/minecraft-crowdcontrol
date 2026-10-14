@@ -130,7 +130,6 @@ MinecraftServer.sln
 
 # Gradle
 .gradle/
-buildSrc/
 build/
 
 # JavaScript
@@ -147,3 +146,4 @@ vite.config.ts.timestamp-*
 .nitro/
 .cache/
 dist/
+mc_data/
