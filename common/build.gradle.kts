@@ -67,3 +67,8 @@ tasks.processResources {
     dependsOn("generateVersionFile")
     dependsOn("generateApplicationFile")
 }
+
+// shaded jar is never consumed directly we don't need it
+tasks.shadowJar {
+    enabled = false
+}
