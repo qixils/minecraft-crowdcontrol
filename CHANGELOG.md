@@ -17,6 +17,7 @@ This update contains features exclusive to 26.3. These features are experimental
 - Most new custom Screen effects are now usable without mods by downloading a resource pack
   - Server admins can configure how it's served from the config file
 - Screen effects can now stack on each other
+- Re-enabled Screen effects on Paper
 
 ## 4.6.1
 

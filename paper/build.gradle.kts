@@ -1,11 +1,12 @@
+import io.papermc.hangarpublishplugin.HangarPublishTask
 import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
-val minecraftVersion: String by project
-val paperlibVersion: String by project
-val configurateVersion: String by project
-val luckPermsVersion: String by project
-val paperBuild: String by project
+val minecraftVersion = project.property("minecraftVersion") as String
+val paperlibVersion = project.property("paperlibVersion") as String
+val configurateVersion = project.property("configurateVersion") as String
+val luckPermsVersion = project.property("luckPermsVersion") as String
+val paperBuild = project.property("paperBuild") as String
 
 val mcVersionSeries = minecraftVersion.split("-")[0]
 val mcVersionSplit = minecraftVersion.split(".")
@@ -17,6 +18,7 @@ plugins {
     id("de.eldoria.plugin-yml.bukkit") // Generates plugin.yml
     id("io.papermc.paperweight.userdev")
     id("me.modmuss50.mod-publish-plugin")
+    id("io.papermc.hangar-publish-plugin")
     id("com.gradleup.shadow")
 }
 
@@ -93,16 +95,19 @@ fun RunServer.configure(mcVersion: String) {
     group = "run paper"
 }
 
+val changelogGenerator = providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" }
+
 publishMods {
     val versionFrom = "26.3"
     val versionTo = "26.3"
 
+    // TODO: update `file.set` to match hangar? i guess that's for javadocs? i dont think those are enabled atm anyway
     file.set(tasks.shadowJar.get().archiveFile)
     modLoaders.add("paper")
     modLoaders.add("folia")
     modLoaders.add("purpur")
     type.set(ReleaseType.STABLE)
-    changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
+    changelog.set(changelogGenerator)
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
@@ -114,7 +119,7 @@ publishMods {
         } else {
             minecraftVersions.add(versionFrom)
         }
-        version.set(versionId)
+        version.set(versionId.take(32))
         displayName.set(buildString {
             append("v")
             append(project.version.toString())
@@ -126,5 +131,40 @@ publishMods {
             }
             append(")")
         })
+    }
+}
+
+val semVerMatcher = Regex("^[0-9.]+")
+
+hangarPublish {
+    publications.register("plugin") {
+
+        version.set(providers.provider { (semVerMatcher.find(project.version as String)!!.value + "+" + semVerMatcher.find(minecraftVersion)!!.value).take(15) })
+        id.set("CrowdControl")
+        channel.set("Release") // or PreRelease
+        changelog.set(changelogGenerator)
+        apiKey.set(providers.environmentVariable("HANGAR_KEY"))
+
+        // register platforms
+        platforms {
+            paper {
+                jar = tasks.shadowJar.flatMap { it.archiveFile }
+                platformVersions = listOf("26.3")
+                dependencies {
+//                    hangar("TestProject") {
+//                        required = false
+//                    }
+                }
+            }
+        }
+    }
+}
+
+plugins.withId("io.papermc.hangar-publish-plugin") {
+    tasks.withType<HangarPublishTask>().configureEach {
+        // released jars link to the uploaded pack, so it has to be there first
+        dependsOn(":base-common:uploadShaderPack")
+        // when releasing, wait for everything to build so that a failure stops all platforms alike
+        mustRunAfter(rootProject.subprojects.map { "${it.path}:build" })
     }
 }

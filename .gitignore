@@ -144,6 +144,5 @@ vite.config.ts.timestamp-*
 .nuxt/
 .nitro/
 .cache/
-dist
-
+dist/
 mc_data/

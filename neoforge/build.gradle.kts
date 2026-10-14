@@ -1,17 +1,17 @@
 import me.modmuss50.mpp.ReleaseType
+import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 
-val neoforgeVersion: String by project
-val adventurePlatformModVersion: String by project
-val configurateVersion: String by project
-val luckPermsVersion: String by project
-val jacksonVersion: String by project
-val crowdControlVersion: String by project
-val adventureVersion: String by project
-val geantyrefVersion: String by project
-val yaclVersion: String by project
-val minecraft_version: String by project
-val neoforge_version: String by project
-val mod_id: String by project
+val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
+val configurateVersion = project.property("configurateVersion") as String
+val luckPermsVersion = project.property("luckPermsVersion") as String
+val jacksonVersion = project.property("jacksonVersion") as String
+val crowdControlVersion = project.property("crowdControlVersion") as String
+val adventureVersion = project.property("adventureVersion") as String
+val geantyrefVersion = project.property("geantyrefVersion") as String
+val yaclVersion = project.property("yaclVersion") as String
+val minecraft_version = project.property("minecraft_version") as String
+val neoforge_version = project.property("neoforge_version") as String
+val mod_id = project.property("mod_id") as String
 
 val versionId = project.version.toString() + "+neoforge-$minecraft_version"
 
@@ -132,8 +132,8 @@ publishMods {
             append(project.version.toString())
         })
         javaVersions.add(JavaVersion.VERSION_25)
-        serverRequired.set(true)
-        clientRequired.set(false)
+        server.set(true)
+        client.set(false)
         optional("yacl")
     }
     modrinth {
@@ -147,7 +147,7 @@ publishMods {
         } else {
             minecraftVersions.add(versionFrom)
         }
-        version.set(versionId)
+        version.set(versionId.take(32))
         displayName.set(buildString {
             append("v")
             append(project.version.toString())
@@ -159,6 +159,7 @@ publishMods {
             }
             append(")")
         })
+        environment.set(ModrinthEnvironment.SERVER_ONLY_CLIENT_OPTIONAL)
         optional("yacl")
         embeds("adventure-platform-mod")
     }
