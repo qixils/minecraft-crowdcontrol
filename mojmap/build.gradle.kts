@@ -1,12 +1,12 @@
-val mojmapVersion: String by project
-val loaderVersion: String by project
-val configurateVersion: String by project
-val adventurePlatformModVersion: String by project
-val clothConfigVersion: String by project
-val adventureVersion: String by project
-val adventurePlatformVersion: String by project
-val cloudMojmapVersion: String by project
-val fabricVersion: String by project
+val mojmapVersion = project.property("mojmapVersion") as String
+val loaderVersion = project.property("loaderVersion") as String
+val configurateVersion = project.property("configurateVersion") as String
+val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
+val clothConfigVersion = project.property("clothConfigVersion") as String
+val adventureVersion = project.property("adventureVersion") as String
+val adventurePlatformVersion = project.property("adventurePlatformVersion") as String
+val cloudMojmapVersion = project.property("cloudMojmapVersion") as String
+val fabricVersion = project.property("fabricVersion") as String
 
 plugins {
     id("architectury-plugin")
