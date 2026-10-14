@@ -1,65 +1,29 @@
 package dev.qixils.crowdcontrol.common.shader;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.impl.Shader;
-import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.attribute.FileTime;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.Properties;
+import java.util.UUID;
 
 /**
- * A client resource pack containing the {@link Shader#bundled() bundled} post effects.
+ * The client resource pack containing the {@link Shader#bundled() bundled} post effects.
+ * <p>
+ * The pack is built, and for releases uploaded, alongside the plugin (see {@code common/build.gradle.kts}),
+ * so all the plugin knows about it is its hash and where the official copy lives.
+ *
+ * @param hash SHA-1 of the zipped pack, as expected by the resource pack protocol
+ * @param url  where the official copy can be downloaded from, or null if this build wasn't made for release
  */
-public final class ShaderPack {
+public record ShaderPack(@NotNull String hash, @Nullable URI url) {
 
-	/**
-	 * Clients cache packs by hash so we insert a fixed timestamp on every file to ensure consistency between restarts.
-	 */
-	private static final FileTime EPOCH = FileTime.fromMillis(0);
-
-	private static final Pattern INCLUDE_PATTERN = Pattern.compile("^\\s*#include\\s*<([^>]+)>\\s*$", Pattern.MULTILINE);
-
-	private final byte[] data;
-	private final String hash;
-	private final UUID id;
-
-	private ShaderPack(byte[] data, String hash, UUID id) {
-		this.data = data;
-		this.hash = hash;
-		this.id = id;
-	}
-
-	/**
-	 * The zipped pack.
-	 *
-	 * @return zip contents
-	 */
-	public byte @NotNull [] data() {
-		return data;
-	}
-
-	/**
-	 * The SHA-1 of {@link #data()}, as expected by the resource pack protocol.
-	 *
-	 * @return lowercase hex digest
-	 */
-	public @NotNull String hash() {
-		return hash;
-	}
+	private static final String RESOURCE = "mccc-shader-pack.properties";
 
 	/**
 	 * A stable ID derived from {@link #hash()}, used to add and remove the pack client-side.
@@ -67,148 +31,32 @@ public final class ShaderPack {
 	 * @return pack id
 	 */
 	public @NotNull UUID id() {
-		return id;
+		return UUID.nameUUIDFromBytes(hash.getBytes(StandardCharsets.US_ASCII));
 	}
 
 	/**
-	 * The file name to serve the pack under.
+	 * Reads the details of the pack that was built alongside this copy of the plugin.
 	 *
-	 * @return file name
+	 * @return pack details
+	 * @throws IOException if the details are missing or malformed
 	 */
-	public @NotNull String fileName() {
-		// include the hash so it can be appropriately cached by clients
-		return "crowdcontrol-shaders-" + hash + ".zip";
-	}
-
-	/**
-	 * Builds the pack from the post effect assets on the classpath.
-	 *
-	 * @param packFormat the client resource pack format of the running game version
-	 * @return the built pack
-	 * @throws IOException if a referenced asset is missing or unreadable
-	 */
-	public static @NotNull ShaderPack build(int packFormat) throws IOException {
-		// sorted so that zip entry order (and therefore the hash) is deterministic
-		Map<String, byte[]> files = new TreeMap<>();
-
-		for (Shader shader : Shader.values()) {
-			if (!shader.bundled()) continue;
-			String chainPath = "assets/" + Plugin.NAMESPACE + "/post_effect/" + shader.getPath() + ".json";
-			byte[] chain = read(chainPath);
-			files.put(chainPath, chain);
-			for (String program : referencedPrograms(chain))
-				addProgram(files, program);
-		}
-
-		if (files.isEmpty())
-			throw new IOException("No bundled post effects were found on the classpath");
-
-		files.put("pack.mcmeta", mcmeta(packFormat));
-
-		byte[] zipped = zip(files);
-		String hash = sha1(zipped);
-		return new ShaderPack(zipped, hash, UUID.nameUUIDFromBytes(hash.getBytes(StandardCharsets.US_ASCII)));
-	}
-
-	private static boolean isOurs(Key key) { return Plugin.NAMESPACE.equals(key.namespace()); }
-
-	/**
-	 * Adds a shader program plus anything it {@code #include}s from our own namespace.
-	 */
-	private static void addProgram(Map<String, byte[]> files, String path) throws IOException {
-		if (files.containsKey(path)) return;
-		byte[] source = read(path);
-		files.put(path, source);
-
-		Matcher matcher = INCLUDE_PATTERN.matcher(new String(source, StandardCharsets.UTF_8));
-		while (matcher.find()) {
-			Key include = Key.key(matcher.group(1));
-			if (!isOurs(include)) continue; // vanilla includes already exist client-side
-			addProgram(files, "assets/" + include.namespace() + "/shaders/include/" + include.value());
-		}
-	}
-
-	/**
-	 * Collects the {@code crowdcontrol}-namespaced shader programs a post effect chain refers to.
-	 */
-	private static Set<String> referencedPrograms(byte[] chain) throws IOException {
-		JsonNode root = new ObjectMapper().readTree(chain);
-		JsonNode passes = root.path("passes");
-		if (!passes.isArray())
-			return Collections.emptySet();
-
-		Set<String> programs = new LinkedHashSet<>();
-		for (JsonNode pass : passes) {
-			collectProgram(programs, pass.path("vertex_shader").asText(null), ".vsh");
-			collectProgram(programs, pass.path("fragment_shader").asText(null), ".fsh");
-		}
-		return programs;
-	}
-
-	private static void collectProgram(Set<String> programs, String rawId, String extension) {
-		if (rawId == null || rawId.isEmpty()) return;
-		Key id = Key.key(rawId);
-		if (!isOurs(id)) return; // shipped with the game
-		programs.add("assets/" + id.namespace() + "/shaders/" + id.value() + extension);
-	}
-
-	private static byte[] mcmeta(int packFormat) {
-		// see net.minecraft.server.packs.metadata.pack.PackFormat
-		String json = "{\n"
-			+ "    \"pack\": {\n"
-			+ "        \"description\": \"Crowd Control screen effects\",\n"
-			+ "        \"min_format\": " + packFormat + ",\n"
-			+ "        \"max_format\": " + packFormat + "\n"
-			+ "    }\n"
-			+ "}\n";
-		return json.getBytes(StandardCharsets.UTF_8);
-	}
-
-	private static byte[] read(String path) throws IOException {
-		try (InputStream stream = ShaderPack.class.getClassLoader().getResourceAsStream(path)) {
+	public static @NotNull ShaderPack load() throws IOException {
+		Properties properties = new Properties();
+		try (InputStream stream = ShaderPack.class.getClassLoader().getResourceAsStream(RESOURCE)) {
 			if (stream == null)
-				throw new IOException("Missing bundled shader asset: " + path);
-			return stream.readAllBytes();
+				throw new IOException("Could not find " + RESOURCE);
+			properties.load(stream);
 		}
-	}
 
-	private static byte[] zip(Map<String, byte[]> files) throws IOException {
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		try (ZipOutputStream zip = new ZipOutputStream(bytes, StandardCharsets.UTF_8)) {
-			// STORED keeps the output independent of the JDK's deflate implementation, which keeps
-			// the hash stable across Java versions
-			zip.setMethod(ZipOutputStream.STORED);
-			for (Map.Entry<String, byte[]> file : files.entrySet()) {
-				byte[] content = file.getValue();
-				CRC32 crc = new CRC32();
-				crc.update(content);
+		String hash = properties.getProperty("hash", "");
+		if (!hash.matches("[0-9a-f]{40}"))
+			throw new IOException("Invalid shader pack hash: " + hash);
 
-				ZipEntry entry = new ZipEntry(file.getKey());
-				entry.setSize(content.length);
-				entry.setCompressedSize(content.length);
-				entry.setCrc(crc.getValue());
-				entry.setCreationTime(EPOCH);
-				entry.setLastModifiedTime(EPOCH);
-				entry.setLastAccessTime(EPOCH);
-
-				zip.putNextEntry(entry);
-				zip.write(content);
-				zip.closeEntry();
-			}
-		}
-		return bytes.toByteArray();
-	}
-
-	private static String sha1(byte[] data) {
-		MessageDigest digest;
+		String url = properties.getProperty("url", "");
 		try {
-			digest = MessageDigest.getInstance("SHA-1");
-		} catch (NoSuchAlgorithmException e) {
-			throw new IllegalStateException("SHA-1 is unavailable", e);
+			return new ShaderPack(hash, url.isBlank() ? null : new URI(url));
+		} catch (URISyntaxException e) {
+			throw new IOException("Invalid shader pack URL: " + url, e);
 		}
-		StringBuilder hex = new StringBuilder(40);
-		for (byte b : digest.digest(data))
-			hex.append(Character.forDigit((b >> 4) & 0xF, 16)).append(Character.forDigit(b & 0xF, 16));
-		return hex.toString();
 	}
 }

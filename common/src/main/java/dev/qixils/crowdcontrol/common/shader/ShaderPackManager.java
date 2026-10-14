@@ -13,10 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Optional;
@@ -44,28 +41,26 @@ public final class ShaderPackManager<P> {
 	private final Set<UUID> loaded = ConcurrentHashMap.newKeySet();
 
 	// written on the server thread, read from the scheduler thread that offers packs to players
-	private volatile @Nullable ShaderPack pack;
-	private volatile @Nullable ShaderPackServer server;
+	private volatile @Nullable ResourcePackInfo pack;
 	private volatile @NotNull ShaderPackConfig config = ShaderPackConfig.DEFAULT;
 	private volatile boolean started;
-	private volatile boolean warnedAboutAddress;
+	private volatile boolean warnedAboutDownload;
 
 	public ShaderPackManager(@NotNull Plugin<P, ?> plugin) {
 		this.plugin = plugin;
 	}
 
 	/**
-	 * Applies the given configuration, restarting pack hosting if anything about it changed.
+	 * Applies the given configuration, restarting if anything about it changed.
 	 * Players who are already online are re-offered the pack.
 	 *
-	 * @param config     configuration to apply
-	 * @param packFormat the client resource pack format of the running game version
+	 * @param config configuration to apply
 	 */
-	public void reload(@NotNull ShaderPackConfig config, int packFormat) {
+	public void reload(@NotNull ShaderPackConfig config) {
 		if (started && this.config.equals(config)) return;
 
 		boolean isRestart = started;
-		start(config, packFormat);
+		start(config);
 
 		if (isRestart && pack != null) {
 			for (P player : plugin.getPlayerManager().getAllPlayersFull())
@@ -74,53 +69,45 @@ public final class ShaderPackManager<P> {
 	}
 
 	/**
-	 * (Re)starts pack hosting using the given configuration.
+	 * (Re)starts offering the pack using the given configuration.
 	 *
-	 * @param config     configuration to apply
-	 * @param packFormat the client resource pack format of the running game version
+	 * @param config configuration to apply
 	 */
-	public void start(@NotNull ShaderPackConfig config, int packFormat) {
+	public void start(@NotNull ShaderPackConfig config) {
 		stop();
 		this.config = config;
 		this.started = true;
-		this.warnedAboutAddress = false;
+		this.warnedAboutDownload = false;
 
 		if (!config.enabled()) {
 			plugin.getSLF4JLogger().debug("Shader resource pack is disabled");
 			return;
 		}
 
-		final ShaderPack localPack;
+		final ShaderPack shaderPack;
 		try {
-			localPack = pack = ShaderPack.build(packFormat);
+			shaderPack = ShaderPack.load();
 		} catch (IOException e) {
-			plugin.getSLF4JLogger().warn("Could not build the shader resource pack", e);
+			plugin.getSLF4JLogger().warn("Could not read the shader resource pack details", e);
 			return;
 		}
 
-		if (!config.url().isBlank()) {
-			plugin.getSLF4JLogger().info("Serving shader resource pack from the configured URL {}", config.url());
+		final URI uri;
+		if (shaderPack.url() != null) {
+			uri = shaderPack.url();
+		} else {
+			plugin.getSLF4JLogger().info("Shader pack URL unavailable, disabling");
 			return;
 		}
 
-		try {
-			final ShaderPackServer localServer = server = ShaderPackServer.start(localPack, config.bindAddress(), config.port());
-			plugin.getSLF4JLogger().info("Hosting shader resource pack on port {}", localServer.port());
-		} catch (IOException e) {
-			plugin.getSLF4JLogger().warn("Could not host the shader resource pack on port {}", config.port(), e);
-			pack = null;
-		}
+		plugin.getSLF4JLogger().info("Serving shaders from {}", uri);
+		pack = ResourcePackInfo.resourcePackInfo(shaderPack.id(), uri, shaderPack.hash());
 	}
 
 	/**
-	 * Stops pack hosting and forgets which players had the pack loaded.
+	 * Stops offering the pack and forgets which players had it loaded.
 	 */
 	public void stop() {
-		final ShaderPackServer runningServer = server;
-		if (runningServer != null) {
-			runningServer.close();
-			server = null;
-		}
 		pack = null;
 		started = false;
 		loaded.clear();
@@ -180,7 +167,7 @@ public final class ShaderPackManager<P> {
 	}
 
 	private void offerTo(UUID uuid) {
-		ShaderPack pack = this.pack;
+		ResourcePackInfo pack = this.pack;
 		if (pack == null) return;
 
 		Optional<P> optPlayer = plugin.playerMapper().getPlayer(uuid);
@@ -190,17 +177,13 @@ public final class ShaderPackManager<P> {
 		// clients whose mod holds every shader need nothing from us
 		if (!needsPack(player)) return;
 
-		URI uri = resolveUri(player);
-		if (uri == null) return;
-
-		ResourcePackInfo info = ResourcePackInfo.resourcePackInfo(pack.id(), uri, pack.hash());
 		Audience audience = plugin.playerMapper().asAudience(player);
 		// ensure the translated version is sent
 		Locale locale = plugin.playerMapper().getLocale(player).orElse(Locale.US);
 		Component prompt = GlobalTranslator.render(Component.translatable("cc.shader-pack.prompt"), locale);
 
 		audience.sendResourcePacks(ResourcePackRequest.resourcePackRequest()
-			.packs(info)
+			.packs(pack)
 			.replace(false)
 			.required(config.required())
 			.prompt(prompt)
@@ -217,55 +200,16 @@ public final class ShaderPackManager<P> {
 			loaded.remove(uuid);
 
 		plugin.getSLF4JLogger().debug("Shader resource pack {} for client {}", status, uuid);
+		if (status == ResourcePackStatus.FAILED_DOWNLOAD || status == ResourcePackStatus.INVALID_URL)
+			warnAboutDownload(status);
 		plugin.updateConditionalEffectVisibility(uuid);
 	}
 
-	/**
-	 * Works out where the given player should download the pack from.
-	 */
-	private @Nullable URI resolveUri(P player) {
-		ShaderPack pack = this.pack;
-		if (pack == null) return null;
-
-		try {
-			if (!config.url().isBlank())
-				return new URI(config.url());
-
-			ShaderPackServer server = this.server;
-			if (server == null) return null;
-
-			String host = firstNonBlank(config.publicAddress(), plugin.getShaderPackHost(player), localHost());
-			if (host == null) {
-				if (!warnedAboutAddress) {
-					warnedAboutAddress = true;
-					plugin.getSLF4JLogger().warn("Could not determine an address for clients to download the shader resource pack from; please set shader-pack.public-address in the config to enable modded shaders");
-				}
-				return null;
-			}
-
-			// URI's multi-argument constructor wants IPv6 literals bracketed
-			if (host.indexOf(':') >= 0 && !host.startsWith("["))
-				host = "[" + host + "]";
-
-			return new URI("http", null, host, server.port(), server.path(), null, null);
-		} catch (URISyntaxException e) {
-			plugin.getSLF4JLogger().warn("Could not build a shader resource pack URL", e);
-			return null;
-		}
-	}
-
-	private static @Nullable String localHost() {
-		try {
-			return InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			return null;
-		}
-	}
-
-	private static @Nullable String firstNonBlank(@Nullable String @NotNull ... values) {
-		for (String value : values) {
-			if (value != null && !value.isBlank()) return value.trim();
-		}
-		return null;
+	private void warnAboutDownload(ResourcePackStatus status) {
+		ResourcePackInfo pack = this.pack;
+		if (pack == null || warnedAboutDownload) return;
+		warnedAboutDownload = true;
+		// a mismatched hash is reported as a failed download too
+		plugin.getSLF4JLogger().warn("A player failed to download the shader pack from ({})", status);
 	}
 }

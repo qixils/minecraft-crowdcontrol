@@ -2,6 +2,10 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.6.3
+
+- The resource pack for Screen effects is now downloaded from Crowd Control's servers
+
 ## 4.6.2
 
 This update contains features exclusive to 26.3. These features are experimental, please

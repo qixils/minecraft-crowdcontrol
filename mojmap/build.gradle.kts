@@ -1,3 +1,5 @@
+import java.util.zip.ZipFile
+
 val configurateVersion: String by project
 val adventurePlatformModVersion: String by project
 val adventureVersion: String by project
@@ -66,3 +68,24 @@ sourceSets.configureEach {
         }
     }
 }
+// the screen effect resource pack is built without the game around, so check that it declares the right format
+val verifyResourcePackFormat = tasks.register("verifyResourcePackFormat") {
+    group = "verification"
+    description = "Checks resource_pack_format in gradle.properties against the game being built against"
+    val expected = providers.gradleProperty("resource_pack_format").get()
+    val gameVersion = providers.gradleProperty("minecraft_version").get()
+    val classpath: FileCollection = configurations.compileClasspath.get()
+    inputs.files(classpath)
+    doLast {
+        val versionJson = classpath.asSequence()
+            .filter { it.isFile && it.extension == "jar" }
+            .mapNotNull { jar -> ZipFile(jar).use { zip -> zip.getEntry("version.json")?.let { zip.getInputStream(it).reader().readText() } } }
+            .firstOrNull { "pack_version" in it }
+            ?: throw GradleException("Could not find Minecraft's version.json on the classpath")
+        val actual = Regex("\"resource_major\"\\s*:\\s*(\\d+)").find(versionJson)?.groupValues?.get(1)
+            ?: throw GradleException("Could not find the resource pack format in Minecraft's version.json")
+        if (actual != expected)
+            throw GradleException("resource_pack_format in gradle.properties is $expected, but Minecraft $gameVersion uses $actual; please update it")
+    }
+}
+tasks.check { dependsOn(verifyResourcePackFormat) }
