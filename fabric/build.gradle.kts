@@ -1,17 +1,17 @@
 import me.modmuss50.mpp.ReleaseType
 import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 
-val adventureVersion: String by project
-val adventurePlatformModVersion: String by project
-val clothConfigVersion: String by project
-val cloudMojmapVersion: String by project
-val fabricVersion: String by project
-val loaderVersion: String by project
-val modMenuVersion: String by project
-val mojmapVersion: String by project
-val configurateVersion: String by project
-val luckoPermissionsApiVersion: String by project
-val languageReloadVersion: String by project
+val adventureVersion = project.property("adventureVersion") as String
+val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
+val clothConfigVersion = project.property("clothConfigVersion") as String
+val cloudMojmapVersion = project.property("cloudMojmapVersion") as String
+val fabricVersion = project.property("fabricVersion") as String
+val loaderVersion = project.property("loaderVersion") as String
+val modMenuVersion = project.property("modMenuVersion") as String
+val mojmapVersion = project.property("mojmapVersion") as String
+val configurateVersion = project.property("configurateVersion") as String
+val luckoPermissionsApiVersion = project.property("luckoPermissionsApiVersion") as String
+val languageReloadVersion = project.property("languageReloadVersion") as String
 
 val versionId = project.version.toString() + "+fabric-$mojmapVersion"
 
@@ -29,14 +29,14 @@ architectury {
 //// dependency configuration
 
 // architectury
-val common: Configuration by configurations.creating {
+val common: Configuration = configurations.create("common") {
     isCanBeResolved = true
     isCanBeConsumed = false
 }
 
 // Files in this configuration will be bundled into your mod using the Shadow plugin.
 // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
-val shadowBundle: Configuration by configurations.creating {
+val shadowBundle: Configuration = configurations.create("shadowBundle") {
     isCanBeResolved = true
     isCanBeConsumed = false
 }
