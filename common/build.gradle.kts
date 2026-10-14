@@ -1,9 +1,9 @@
-val crowdControlVersion: String by project
-val adventureVersion: String by project
-val slf4jVersion: String by project
-val jacksonVersion: String by project
-val configurateVersion: String by project
-val brigadier_version: String by project
+val crowdControlVersion = project.property("crowdControlVersion") as String
+val adventureVersion = project.property("adventureVersion") as String
+val slf4jVersion = project.property("slf4jVersion") as String
+val jacksonVersion = project.property("jacksonVersion") as String
+val configurateVersion = project.property("configurateVersion") as String
+val brigadier_version = project.property("brigadier_version") as String
 
 dependencies {
     api("dev.qixils:cc4j-pubsub:$crowdControlVersion")
@@ -31,24 +31,27 @@ dependencies {
 description = "Minecraft Crowd Control: Common"
 
 // generate mccc-version.txt resource file
-val generatedResourcesFolder = File(project.buildDir, "generated/resources/")
-val versionFile = File(generatedResourcesFolder, "mccc-version.txt")
+val resourcesPath = "generated/resources/"
+val generatedResourcesFolder = project.layout.buildDirectory.dir(resourcesPath)
+val versionFile = project.layout.buildDirectory.file(resourcesPath + "mccc-version.txt")
 tasks.register("generateVersionFile") {
+    description = "Generates the mccc-version.txt resource file"
     inputs.property("version", project.version)
     outputs.file(versionFile)
     doLast {
-        generatedResourcesFolder.mkdirs()
-        versionFile.writeText(project.version.toString())
+        generatedResourcesFolder.get().asFile.mkdirs()
+        versionFile.get().asFile.writeText(project.version.toString())
     }
 }
-val applicationFile = File(generatedResourcesFolder, "mccc-application.txt")
+val applicationFile = project.layout.buildDirectory.file(resourcesPath + "mccc-application.txt")
 tasks.register("generateApplicationFile") {
+    description = "Generates the mccc-application.txt resource file"
     inputs.property("applicationId", findProperty("applicationId") ?: "")
     inputs.property("applicationSecret", findProperty("applicationSecret") ?: "")
     outputs.file(applicationFile)
     doLast {
-        generatedResourcesFolder.mkdirs()
-        applicationFile.writeText((findProperty("applicationId")?.toString() ?: "") + ':' + (findProperty("applicationSecret")?.toString() ?: ""))
+        generatedResourcesFolder.get().asFile.mkdirs()
+        applicationFile.get().asFile.writeText((findProperty("applicationId")?.toString() ?: "") + ':' + (findProperty("applicationSecret")?.toString() ?: ""))
     }
 }
 
