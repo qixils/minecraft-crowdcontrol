@@ -45,3 +45,8 @@ loom {
 //    }
     accessWidenerPath = file("src/main/resources/crowdcontrol.accesswidener")
 }
+
+// shaded jar is never consumed directly we don't need it, this just shades all of minecraft
+tasks.shadowJar {
+    enabled = false
+}
