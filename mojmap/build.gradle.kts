@@ -1,8 +1,8 @@
-val configurateVersion: String by project
-val adventurePlatformModVersion: String by project
-val adventureVersion: String by project
-val yaclVersion: String by project
-val neo_form_version: String by project
+val configurateVersion = project.property("configurateVersion") as String
+val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
+val adventureVersion = project.property("adventureVersion") as String
+val yaclVersion = project.property("yaclVersion") as String
+val neo_form_version = project.property("neo_form_version") as String
 
 plugins {
     id("multiloader-common")
@@ -37,12 +37,12 @@ dependencies {
     compileOnly("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")
 }
 
-val commonJava by configurations.creating {
+val commonJava = configurations.create("commonJava") {
     isCanBeResolved = false
     isCanBeConsumed = true
 }
 
-val commonResources by configurations.creating {
+val commonResources = configurations.create("commonResources") {
     isCanBeResolved = false
     isCanBeConsumed = true
 }
