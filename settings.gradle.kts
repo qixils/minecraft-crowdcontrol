@@ -18,6 +18,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 fun incl(asPath: String, fromPath: String) {
     include(asPath)
     project(asPath).projectDir = file(fromPath)
