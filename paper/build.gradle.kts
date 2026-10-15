@@ -3,7 +3,6 @@ import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
 val minecraftVersion = project.property("minecraftVersion") as String
-val paperlibVersion = project.property("paperlibVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
 val luckPermsVersion = project.property("luckPermsVersion") as String
 val bundleJackson = (findProperty("bundleJackson") as String?)?.toBoolean() ?: true
@@ -23,8 +22,7 @@ plugins {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("io.papermc:paperlib:$paperlibVersion")
-    implementation("org.spongepowered:configurate-yaml:$configurateVersion")
+    compileOnly("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
@@ -75,6 +73,9 @@ tasks {
             exclude(dependency("net.kyori:adventure-text-serializer-plain:.*"))
             exclude(dependency("org.slf4j:slf4j-api:.*"))
             exclude(dependency("net.kyori:option:.*"))
+            exclude(dependency("org.spongepowered:.*:.*"))
+            exclude(dependency("io.leangen.geantyref:.*:.*"))
+            exclude(dependency("org.yaml:snakeyaml:.*"))
             if (!bundleJackson) exclude(dependency("com.fasterxml.jackson.core:.*:.*"))
             // annotations are not needed at runtime
             exclude(dependency("org.jetbrains:annotations:.*"))
@@ -83,11 +84,6 @@ tasks {
             exclude(dependency("com.google.code.findbugs:jsr305:.*"))
         }
         exclude("META-INF/maven/**")
-
-        relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
-        // paper bundles its own configurate, so keep ours separate
-        relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
-        relocate("io.leangen.geantyref", "dev.qixils.relocated.geantyref")
     }
 }
 
