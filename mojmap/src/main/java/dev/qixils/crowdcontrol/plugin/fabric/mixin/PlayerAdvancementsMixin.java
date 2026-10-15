@@ -18,7 +18,8 @@ public class PlayerAdvancementsMixin {
 	@Shadow
 	private ServerPlayer player;
 
-	@Inject(method = "lambda$award$2", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
+	// lambda$award$2 on neoforge/ide, method_53637 on fabric
+	@Inject(method = {"lambda$award$2", "method_53637"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
 	public void onAnnounceAdvancement(AdvancementHolder advancementHolder, DisplayInfo displayInfo, CallbackInfo ci) {
 		if (!ModdedCrowdControlPlugin.isInstanceAvailable()) return;
 
