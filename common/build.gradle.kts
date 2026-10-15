@@ -1,9 +1,9 @@
 val crowdControlVersion = project.property("crowdControlVersion") as String
 val adventureVersion = project.property("adventureVersion") as String
-val cloudVersion = project.property("cloudVersion") as String
 val slf4jVersion = project.property("slf4jVersion") as String
 val jacksonVersion = project.property("jacksonVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
+val brigadier_version = project.property("brigadier_version") as String
 
 dependencies {
     api("dev.qixils:cc4j-pubsub:$crowdControlVersion")
@@ -11,18 +11,13 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
 
+    compileOnly("com.mojang:brigadier:$brigadier_version")
+
     compileOnly("net.kyori:adventure-api:$adventureVersion")
     api("net.kyori:adventure-text-minimessage:$adventureVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
     api("net.kyori:adventure-text-serializer-plain:$adventureVersion") {
-        exclude(group = "net.kyori", module = "adventure-api")
-    }
-    api("net.kyori:adventure-text-serializer-legacy:$adventureVersion") {
-        exclude(group = "net.kyori", module = "adventure-api")
-    }
-    api("dev.qixils.cloud:cloud-core:$cloudVersion")
-    api("dev.qixils.cloud:cloud-minecraft-extras:$cloudVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
     api("org.slf4j:slf4j-api:$slf4jVersion")

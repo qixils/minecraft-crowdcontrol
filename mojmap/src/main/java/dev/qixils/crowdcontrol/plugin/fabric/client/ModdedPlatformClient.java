@@ -6,12 +6,11 @@ import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -27,9 +26,9 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-@Environment(EnvType.CLIENT)
+//@Environment(EnvType.CLIENT)
 public abstract class ModdedPlatformClient {
-	protected final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
+	protected static final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
 	protected final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	protected static @Nullable ModdedPlatformClient INSTANCE = null;
 	public static boolean SHADER_ACTIVE = false;
@@ -129,7 +128,7 @@ public abstract class ModdedPlatformClient {
 		if (payload.statusType() == null || payload.statusValue() == null) return;
 		var player = Minecraft.getInstance().player;
 		if (player == null) return;
-		player.cc$setMovementStatus(payload.statusType(), payload.statusValue());
+		((MovementStatus) player).cc$setMovementStatus(payload.statusType(), payload.statusValue());
 	}
 
 	public abstract void sendToServer(@NotNull PluginPacket payload);

@@ -116,10 +116,6 @@ subprojects {
         relocate("javassist", "dev.qixils.relocated.javassist")
         relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
         relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
-
-        if (!isModded) {
-            relocate("org.incendo.cloud", "dev.qixils.relocated.cloud")
-        }
     }
 
     if (isPlatform) {

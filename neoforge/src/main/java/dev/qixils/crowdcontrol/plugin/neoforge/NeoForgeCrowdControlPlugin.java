@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.neoforge;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.neoforge.PacketUtilImpl;
@@ -15,11 +16,10 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +32,6 @@ import java.nio.file.Path;
 
 @Getter
 public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
-	private final NeoForgeServerCommandManager<CommandSourceStack> commandManager
-		= NeoForgeServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
 	private final PermissionUtil permissionUtil;
 	private final ModContainer container;
 
@@ -47,14 +45,22 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 			permissionUtil = new NeoForgePermissionUtil();
 		}
 
-		onInitialize();
-
 		modBus.addListener(this::register);
+		NeoForge.EVENT_BUS.addListener(this::registerChatCommandsEvent);
 		NeoForge.EVENT_BUS.addListener(LivingDeathEvent.class, event -> handleLivingDeath(event.getEntity(), event.getSource()));
+
+		onInitialize();
 	}
 
 	public void register(final RegisterPayloadHandlersEvent event) {
 		PacketUtilImpl.registerPackets(event);
+	}
+
+	public void registerChatCommandsEvent(final RegisterCommandsEvent event) {
+		var dispatcher = event.getDispatcher();
+		for (LiteralArgumentBuilder<CommandSourceStack> command : registerChatCommands()) {
+			dispatcher.register(command);
+		}
 	}
 
 	@Override

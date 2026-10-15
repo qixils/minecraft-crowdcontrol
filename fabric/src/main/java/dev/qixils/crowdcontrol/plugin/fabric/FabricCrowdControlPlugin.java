@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric;
 
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.fabric.FabricServerCommandManager;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.common.packets.PluginPacket;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Death;
@@ -11,6 +10,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.utils.PermissionUtil;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
@@ -27,8 +27,6 @@ import java.nio.file.Path;
 
 @Getter
 public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implements ModInitializer {
-	private final FabricServerCommandManager<CommandSourceStack> commandManager
-		= FabricServerCommandManager.createNative(AsynchronousCommandExecutionCoordinator.<CommandSourceStack>newBuilder().withAsynchronousParsing().build());
 	private final PermissionUtil permissionUtil = new FabricPermissionUtil();
 
 	@Override
@@ -36,6 +34,11 @@ public class FabricCrowdControlPlugin extends ModdedCrowdControlPlugin implement
 		super.onInitialize();
 
 		PacketUtilImpl.registerPackets();
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+			for (LiteralArgumentBuilder<CommandSourceStack> command : registerChatCommands()) {
+				dispatcher.register(command);
+			}
+		});
 
 		getEventManager().register(Death.class, death -> handleLivingDeath(death.entity(), death.source()));
 	}

@@ -5,7 +5,6 @@ val adventurePlatformModVersion = project.property("adventurePlatformModVersion"
 val clothConfigVersion = project.property("clothConfigVersion") as String
 val adventureVersion = project.property("adventureVersion") as String
 val adventurePlatformVersion = project.property("adventurePlatformVersion") as String
-val cloudVersion = project.property("cloudVersion") as String
 val fabricVersion = project.property("fabricVersion") as String
 
 plugins {
@@ -32,7 +31,6 @@ dependencies {
     modCompileOnly("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
-    modCompileOnly("dev.qixils.cloud:cloud-fabric:$cloudVersion")
     modCompileOnly("maven.modrinth:cloth-config:$clothConfigVersion")
 
     // TODO: adventure is being weird
@@ -53,4 +51,9 @@ loom {
 // shaded jar is never consumed directly we don't need it, this just shades all of minecraft
 tasks.shadowJar {
     enabled = false
+}
+
+// the transformer reads base-common's jar from the classpath, but doesn't know it needs to be built first
+tasks.named("transformProductionFabric") {
+    dependsOn(":base-common:jar")
 }

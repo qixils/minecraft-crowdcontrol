@@ -117,8 +117,8 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 			setServer(newServer);
 		});
 		MinecraftEvents.SERVER_STOPPING.register($ -> shutdown());
-		MinecraftEvents.SERVER_STOPPED.register(newServer -> {
-			getSLF4JLogger().debug("Server stopping");
+		MinecraftEvents.SERVER_STOPPED.register($ -> {
+			getSLF4JLogger().debug("Server stopped");
 			setServer(null);
 		});
 	}

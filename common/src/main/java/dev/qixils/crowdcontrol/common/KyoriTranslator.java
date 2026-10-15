@@ -168,18 +168,18 @@ public final class KyoriTranslator extends TranslatableComponentRenderer<Locale>
 	private void register(Locale locale) {
 		ResourceBundle bundle = ResourceBundle.getBundle("i18n." + prefix, locale, pluginClassLoader);
 		translator.registerAll(locale, bundle, false);
-		logger.warn("KyoriTranslator Registered locale {}", locale);
+		logger.info("Registered locale " + locale);
 	}
 
 	@Override
 	public @Nullable MessageFormat translate(@NotNull String key, @NotNull Locale locale) {
-		logger.warn("KyoriTranslator Plainly translating {} for {}", key, locale);
+		logger.debug("Plainly translating " + key + " for " + locale);
 		return translator.translate(key, locale);
 	}
 
 	@Override
 	protected @NotNull Component renderTranslatable(@NotNull TranslatableComponent component, @NotNull Locale context) {
-		logger.warn("KyoriTranslator Richly translating {} for {}", component.key(), context);
+		logger.debug("Richly translating " + component.key() + " for " + context);
 		final @Nullable MessageFormat format = translate(component.key(), context);
 
 		// this probably shouldn't cause a stack overflow because of the top-level check for null in the #translate method

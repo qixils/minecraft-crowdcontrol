@@ -1,17 +1,14 @@
 package dev.qixils.crowdcontrol.common;
 
-import cloud.commandframework.Command.Builder;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.keys.SimpleCloudKey;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import cloud.commandframework.permission.PredicatePermission;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.DebugEffectPayload;
 import dev.qixils.crowdcontrol.common.http.ModrinthVersion;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
@@ -22,13 +19,17 @@ import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
 import live.crowdcontrol.cc4j.*;
+import live.crowdcontrol.cc4j.websocket.ConnectedPlayer;
 import live.crowdcontrol.cc4j.websocket.UserToken;
 import live.crowdcontrol.cc4j.websocket.data.*;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffect;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectBuilder;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectsOperation;
-import live.crowdcontrol.cc4j.websocket.payload.*;
+import live.crowdcontrol.cc4j.websocket.payload.CCEffectDescription;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
+import live.crowdcontrol.cc4j.websocket.payload.CCUserRecord;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.serializer.configurate4.ConfigurateComponentSerializer;
@@ -80,7 +81,7 @@ import static net.kyori.adventure.text.Component.translatable;
  * managing Crowd Control server/client connections and handling {@link Command}s.
  *
  * @param <P> class used to represent online players
- * @param <S> class used to represent command senders in Cloud Command Framework
+ * @param <S> class used to represent command senders in Brigadier
  */
 public abstract class Plugin<P, S> {
 
@@ -282,6 +283,7 @@ public abstract class Plugin<P, S> {
 	protected final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
+	private boolean translatorRegistered = false;
 	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
 	protected final Map<UUID, List<CCGameEvent>> pendingGameEvents = new HashMap<>();
 	protected final KyoriTranslator translator;
@@ -342,6 +344,10 @@ public abstract class Plugin<P, S> {
 		return global;
 	}
 
+	public void setIsGlobal(boolean isGlobal) {
+		global = isGlobal;
+	}
+
 	/**
 	 * Returns a collection of strings representing the names of hosts.
 	 * <p>
@@ -355,6 +361,14 @@ public abstract class Plugin<P, S> {
 	@NotNull
 	public Collection<String> getHosts() {
 		return hosts;
+	}
+
+	public Collection<String> getRawHosts() {
+		return new ArrayList<>(hosts);
+	}
+
+	public void setRawHosts(Collection<String> hosts) {
+		this.hosts = new HashSet<>(hosts);
 	}
 
 	/**
@@ -476,7 +490,6 @@ public abstract class Plugin<P, S> {
 
 	/**
 	 * Returns the object that manages the registering of effects/commands.
-	 * Not to be confused with the {@link #getCommandManager() chat command manager}.
 	 *
 	 * @return command registry manager
 	 */
@@ -486,15 +499,6 @@ public abstract class Plugin<P, S> {
 	public @NotNull Path getDataFolder() {
 		return defaultDataFolder;
 	}
-
-	/**
-	 * Gets the plugin's {@link CommandManager}.
-	 *
-	 * @return command manager instance
-	 */
-	@Nullable
-	@CheckReturnValue
-	public abstract CommandManager<S> getCommandManager();
 
 	/**
 	 * Gets the plugin's SLF4J logger.
@@ -637,79 +641,74 @@ public abstract class Plugin<P, S> {
 	/**
 	 * Registers the plugin's basic chat commands.
 	 */
-	public void registerChatCommands() {
-		try {
-			GlobalTranslator.translator().addSource(translator);
-		} catch (Exception e) {
-			getSLF4JLogger().error("Failed to initialize i18n", e);
+	public Iterable<LiteralArgumentBuilder<S>> registerChatCommands() {
+		if (!translatorRegistered) {
+			translatorRegistered = true;
+			try {
+				GlobalTranslator.translator().addSource(translator);
+			} catch (Exception e) {
+				getSLF4JLogger().error("Failed to initialize i18n", e);
+			}
 		}
 
-		CommandManager<S> manager = getCommandManager();
-		if (manager == null)
-			throw new IllegalStateException("CommandManager is null");
 		EntityMapper<S> mapper = commandSenderMapper();
+		List<LiteralArgumentBuilder<S>> commands = new ArrayList<>();
 
-		// TODO: support i18n in cloud command descriptions
+		// TODO: command descriptions? i don't see a metadata
+		//  ah, paper has some overloads that could be used (no i18n tho!?)
 
 		//// Account Command ////
 
-		Builder<S> accountCmd = manager.commandBuilder("account")
-			.meta(CommandMeta.DESCRIPTION, "Manage your Crowd Control account");
-
 		// link command
-		manager.command(accountCmd.literal("link")
-			.meta(CommandMeta.DESCRIPTION, "Connect your Crowd Control account")
-			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
-			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.getSender());
+		var accountLinkCommand = LiteralArgumentBuilder.<S>literal("link")
+			.executes(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.getSource());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
-					return;
+					return 0;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSource());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
 				if (player == null) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				if (player.getToken() != null) {
 					audience.sendMessage(output(translatable("cc.join.account-linked", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				audience.sendMessage(output(translatable("cc.join.authenticating")));
 				player.regenerateAuthCode();
-			})
-		);
+				return 1;
+			});
 
 		// unlink command
-		manager.command(accountCmd.literal("unlink")
-			.meta(CommandMeta.DESCRIPTION, "Connect your Crowd Control account")
-			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
-			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.getSender());
+		var accountUnlinkCommand = LiteralArgumentBuilder.<S>literal("unlink")
+			.executes(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.getSource());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
-					return;
+					return 0;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSource());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
 				if (player == null) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				if (player.getToken() == null) {
 					audience.sendMessage(output(translatable("cc.join.account-unlinked", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				audience.sendMessage(output(translatable("cc.join.unauthenticating")));
 				player.stopSession().handle(($1, $2) -> {
@@ -717,99 +716,99 @@ public abstract class Plugin<P, S> {
 					audience.sendMessage(output(translatable("cc.join.unauthenticated")));
 					return $1;
 				});
-			})
-		);
+				return 1;
+			});
+
+		var accountCommand = LiteralArgumentBuilder.<S>literal("account")
+			.requires(user -> mapper.hasPermission(user, getUsePermission())) // TODO test (this didnt work in cloud but might work now)
+			.then(accountLinkCommand)
+			.then(accountUnlinkCommand);
+		commands.add(accountCommand);
 
 		//// Session Command ////
 
-		Builder<S> sessionCmd = manager.commandBuilder("session")
-			.meta(CommandMeta.DESCRIPTION, "Manage your Crowd Control session");
-
 		// start command
-		manager.command(sessionCmd.literal("start")
-			.meta(CommandMeta.DESCRIPTION, "Starts your Crowd Control session")
-			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
-			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.getSender());
+		var sessionStartCmd = LiteralArgumentBuilder.<S>literal("start")
+			.executes(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.getSource());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
-					return;
+					return 0;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSource());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
 				if (player == null) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				UserToken token = player.getUserToken();
 				if (token == null) {
 					audience.sendMessage(output(translatable("cc.join.needs-authentication", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				if (player.getGameSessionId() != null) {
 					audience.sendMessage(output(translatable("cc.join.session-active", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				audience.sendMessage(output(translatable("cc.join.starting")));
 				startSession(player);
-			})
-		);
+				return 1;
+			});
 
 		// stop command
-		manager.command(sessionCmd.literal("stop")
-			.meta(CommandMeta.DESCRIPTION, "Stop your Crowd Control session")
-			.permission(PredicatePermission.of(SimpleCloudKey.of(getUsePermission().getNode()),user -> mapper.hasPermission(user, getUsePermission()))) // TODO: maybe a more effective means to do this
-			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.getSender());
+		var sessionStopCmd = LiteralArgumentBuilder.<S>literal("stop")
+			.executes(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.getSource());
 				if (crowdControl == null) {
 					// TODO: custom message
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
-					return;
+					return 0;
 				}
-				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSender());
+				Optional<UUID> uuidOpt = mapper.tryGetUniqueId(commandContext.getSource());
 				if (uuidOpt.isEmpty()) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				CCPlayer player = crowdControl.getPlayer(uuidOpt.get());
 				if (player == null) {
 					audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				UserToken token = player.getUserToken();
 				if (token == null) {
 					audience.sendMessage(output(translatable("cc.join.needs-authentication", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				if (player.getGameSessionId() == null) {
 					audience.sendMessage(output(translatable("cc.join.session-inactive", NamedTextColor.RED)));
-					return;
+					return 0;
 				}
 				player.stopSession();
 				audience.sendMessage(output(translatable("cc.join.stopped")));
-			})
-		);
+				return 1;
+			});
+
+		var sessionCmd = LiteralArgumentBuilder.<S>literal("session")
+			.requires(user -> mapper.hasPermission(user, getUsePermission()))
+			.then(sessionStartCmd)
+			.then(sessionStopCmd);
+		commands.add(sessionCmd);
 
 		//// CrowdControl Command ////
 
-		// base command
-		Builder<S> ccCmd = manager.commandBuilder("crowdcontrol")
-			.meta(CommandMeta.DESCRIPTION, "View information about and manage the Crowd Control service");
-
 		// status command
-		manager.command(ccCmd.literal("status")
-			.meta(CommandMeta.DESCRIPTION, "Get the status of the Crowd Control service")
-			.permission(PredicatePermission.of(SimpleCloudKey.of(ADMIN_PERMISSION.getNode()), mapper::isAdmin))
-			.handler(commandContext -> {
-				Audience audience = mapper.asAudience(commandContext.getSender());
+		var crowdcontrolStatusCmd = LiteralArgumentBuilder.<S>literal("status")
+			.requires(mapper::isAdmin)
+			.executes(commandContext -> {
+				Audience audience = mapper.asAudience(commandContext.getSource());
 				if (crowdControl == null) {
 					audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline")));
-					return;
+					return 0;
 				}
 				TextComponent.Builder msg = text()
 					.append(PREFIX_COMPONENT)
@@ -836,12 +835,13 @@ public abstract class Plugin<P, S> {
 					));
 				}
 				audience.sendMessage(msg);
-			}));
+				return 1;
+			});
+
 		// version command
-		manager.command(ccCmd.literal("version")
-			.meta(CommandMeta.DESCRIPTION, "Get the version of the server's and players' Crowd Control mod")
-			.handler(ctx -> {
-				Audience audience = mapper.asAudience(ctx.getSender());
+		var crowdcontrolVersionCmd = LiteralArgumentBuilder.<S>literal("version")
+			.executes(ctx -> {
+				Audience audience = mapper.asAudience(ctx.getSource());
 				Component message = output(translatable("cc.command.crowdcontrol.version.server", text(SemVer.MOD.toString())));
 				audience.sendMessage(message.append(Component.space()).append(translatable("cc.command.crowdcontrol.version.clients.header")));
 				for (P player : getPlayerManager().getAllPlayersFull()) {
@@ -853,90 +853,98 @@ public abstract class Plugin<P, S> {
 						audience.sendMessage(translatable("cc.command.crowdcontrol.version.client.unknown", text(playerMapper().getUsername(player))));
 					// TODO: extra features
 				}
-			}));
+				return 1;
+			});
 		// reloadconfig command
-		manager.command(ccCmd.literal("reloadconfig")
-			.meta(CommandMeta.DESCRIPTION, "Reloads the mod's config file")
-			.handler(ctx -> {
-				Audience audience = mapper.asAudience(ctx.getSender());
+		var crowdcontrolReloadconfigCmd = LiteralArgumentBuilder.<S>literal("reloadconfig")
+			.requires(mapper::isAdmin)
+			.executes(ctx -> {
+				Audience audience = mapper.asAudience(ctx.getSource());
 				loadConfig();
 				audience.sendMessage(output(translatable("cc.command.crowdcontrol.reloadconfig.output")));
-			}));
+				return 1;
+			});
 		// execute command
+		LiteralArgumentBuilder<S> crowdcontrolExecuteCmd;
 		if (SemVer.MOD.isSnapshot()) { // TODO: make command generally available
-			manager.command(ccCmd.literal("execute")
-				.meta(CommandMeta.DESCRIPTION, "Executes the effect with the given ID")
-				.permission(PredicatePermission.of(SimpleCloudKey.of(ADMIN_PERMISSION.getNode()),mapper::isAdmin))
-				.argument(
-					StringArgument.<S>newBuilder("effect")
-						.single()
-						.asRequired()
-						.withSuggestionsProvider((context, input) -> commandRegister()
-							.getCommands()
-							.stream()
-							.map(Command::getEffectName)
-							.filter(effectName -> effectName.toLowerCase().contains(input.toLowerCase()))
-							.sorted()
-							.collect(Collectors.toList()))
-						.build()
-				)
-				.handler(commandContext -> {
-					// TODO: allow targeting multiple players
-					S sender = commandContext.getSender();
-					Audience audience = mapper.asAudience(sender);
-					P player = asPlayer(sender);
-					if (player == null) {
-						audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
-						return;
-					}
-					Command<P> effect = commandRegister().getCommandByName(commandContext.get("effect"));
-					List<P> players = new ArrayList<>(Collections.singletonList(player));
-					// TODO: add simpler constructors
-					effect.execute(
-						() -> players,
-						new PublicEffectPayload(
-							UUID.randomUUID(),
-							0L,
-							new CCEffectDescription(
-								effect.getEffectName(),
-								"game",
-								new CCName(getTextUtil().asPlain(effect.getDisplayName())),
-								null,
-								null,
-								null,
-								false,
-								false,
-								false,
-								false,
-								false,
-								false,
-								null,
-								null,
-								null,
-								new CustomEffectDuration(10)
-							),
-							new CCUserRecord(
-								"ccuid-01j7cnrvpbh5aw45pwpe1vqvdw",
-								"lexikiq",
-								ProfileType.TWITCH,
-								"106025167",
-								""
-							),
-							null,
-							null,
-							false,
-							1
-						),
-						optionalCCPlayer(player).orElseThrow()
-					);
-				})
-			);
+			crowdcontrolExecuteCmd = LiteralArgumentBuilder.<S>literal("execute")
+				.requires(mapper::isAdmin)
+				.then(
+					RequiredArgumentBuilder.<S, String>argument("effect", StringArgumentType.word())
+						.suggests(
+							(ctx, builder) -> CompletableFuture.supplyAsync(() -> {
+								String remaining = builder.getRemaining().toLowerCase(Locale.ROOT);
+								commandRegister()
+									.getCommands()
+									.stream()
+									.map(command -> command.getEffectName().toLowerCase(Locale.US))
+									.filter(command -> command.contains(remaining))
+									.sorted()
+									.forEachOrdered(builder::suggest);
+								return builder.build();
+							})
+						)
+						.executes(commandContext -> {
+							// TODO: allow targeting multiple players
+							S sender = commandContext.getSource();
+							Audience audience = mapper.asAudience(sender);
+							P player = asPlayer(sender);
+							if (player == null) {
+								audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
+								return 0;
+							}
+							CrowdControl cc = crowdControl;
+							// no account or session is needed, just the service itself
+							if (cc == null || !(optionalCCPlayer(player).orElse(null) instanceof ConnectedPlayer source)) {
+								audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline", NamedTextColor.RED)));
+								return 0;
+							}
+							Command<P> effect = commandRegister().getCommandByName(commandContext.getArgument("effect", String.class));
+							CustomEffectDuration duration = Optional.ofNullable(effect.getDefaultDuration())
+								.map(value -> new CustomEffectDuration(value.toMillis() / 1000.0))
+								.or(() -> Optional.ofNullable(effect.getExtensionDuration()))
+								.orElseGet(() -> new CustomEffectDuration(10));
+							// TODO: add simpler constructors
+							PublicEffectPayload payload = new DebugEffectPayload(
+								playerMapper().getUniqueId(player),
+								playerMapper().getUsername(player),
+								new CCEffectDescription(
+									effect.getEffectName().toLowerCase(Locale.ENGLISH),
+									"game",
+									new CCName(getTextUtil().asPlain(effect.getDisplayName())),
+									null,
+									null,
+									null,
+									false,
+									false,
+									false,
+									false,
+									false,
+									false,
+									null,
+									null,
+									null,
+									duration
+								)
+							);
+							// go through the same pipeline as a real request
+							// brings announcements, timed effect management, etc
+							cc.executeEffect(payload, source);
+							return 1;
+						})
+				);
+		} else {
+			crowdcontrolExecuteCmd = null;
 		}
 
-		new MinecraftExceptionHandler<S>()
-			.withDefaultHandlers()
-			.withDecorator(component -> output(component).color(NamedTextColor.RED))
-			.apply(manager, mapper::asAudience);
+		var crowdcontrolCmd = LiteralArgumentBuilder.<S>literal("crowdcontrol")
+			.then(crowdcontrolStatusCmd)
+			.then(crowdcontrolVersionCmd)
+			.then(crowdcontrolReloadconfigCmd);
+		if (crowdcontrolExecuteCmd != null) crowdcontrolCmd = crowdcontrolCmd.then(crowdcontrolExecuteCmd);
+		commands.add(crowdcontrolCmd);
+
+		return commands;
 	}
 
 	protected abstract ConfigurationLoader<?> getConfigLoader() throws IllegalStateException;
@@ -1001,9 +1009,9 @@ public abstract class Plugin<P, S> {
 
 	public void saveConfig() {
 		try {
-			// TODO: add comments
-			// TODO: custom
-			ConfigurationNode config = getConfigLoader().createNode();
+			// start from the existing file so that anything not tracked here is kept as-is
+			// (such as custom effects and comments)
+			ConfigurationNode config = getConfigLoader().load();
 			TypeToken<Set<String>> hostToken = new TypeToken<>() {};
 			TypeToken<Map<String, Integer>> limitToken = new TypeToken<>() {};
 			config.node("hosts").set(hostToken, new HashSet<>(hosts));
@@ -1012,6 +1020,7 @@ public abstract class Plugin<P, S> {
 			config.node("limits", "entities").set(limitToken, limitConfig.entityLimits());
 			config.node("global").set(global);
 			config.node("announce").set(announce);
+			config.node("admin-required").set(adminRequired);
 			config.node("hide-names").set(hideNames.getConfigCode());
 			config.node("soft-lock-observer", "period").set(softLockConfig.getPeriod());
 			config.node("soft-lock-observer", "deaths").set(softLockConfig.getDeaths());

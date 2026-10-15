@@ -27,7 +27,7 @@ public class CommandSourceStackMapper implements EntityMapper<CommandSourceStack
 
 	@Override
 	public final @NotNull Optional<UUID> tryGetUniqueId(@NotNull CommandSourceStack entity) {
-		return Optional.ofNullable(entity.getEntity()).map(Entity::getUUID);
+		return Optional.ofNullable(entity.getEntity()).map(Entity::getUUID).or(() -> plugin.adventure().audience(entity).get(Identity.UUID));
 	}
 
 	@Override

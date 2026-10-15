@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
@@ -185,14 +186,14 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		// set variables
 		entity.setPos(player.getX(), player.getY(), player.getZ());
 		if (viewer != null) {
-			entity.setCustomName(plugin.toNative(viewer, player));
+			entity.setCustomName(plugin.toNative(viewer, plugin.adventure().audience(player)));
 			entity.setCustomNameVisible(true);
 		}
 		if (entity instanceof Mob mob)
 			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, null, null);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
-		if (entity instanceof LivingEntity livingEntity)
+		if (entity instanceof ViewerMob livingEntity)
 			livingEntity.cc$setViewerSpawned();
 		if (entity instanceof Wolf wolf) {
 			wolf.setCollarColor(randomElementFrom(DyeColor.values()));

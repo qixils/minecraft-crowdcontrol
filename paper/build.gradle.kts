@@ -1,11 +1,12 @@
+import io.papermc.hangarpublishplugin.HangarPublishTask
 import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
-val cloudPaperVersion = project.property("cloudPaperVersion") as String
 val minecraftVersion = project.property("minecraftVersion") as String
 val paperlibVersion = project.property("paperlibVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
 val luckPermsVersion = project.property("luckPermsVersion") as String
+val bundleJackson = (findProperty("bundleJackson") as String?)?.toBoolean() ?: true
 
 val mcVersionSplit = minecraftVersion.split(".")
 val versionId = project.version.toString() + "+paper-" + minecraftVersion
@@ -17,11 +18,11 @@ plugins {
     id("io.papermc.paperweight.userdev")
     id("me.modmuss50.mod-publish-plugin")
     id("io.papermc.hangar-publish-plugin")
+    id("com.gradleup.shadow")
 }
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("org.incendo:cloud-paper:$cloudPaperVersion")
     implementation("io.papermc:paperlib:$paperlibVersion")
     implementation("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
@@ -65,9 +66,28 @@ tasks {
     }
 
     shadowJar {
+        // set name of output file to CrowdControl-PLATFORM+VERSION.jar
         archiveFileName.set("CrowdControl-Paper+$minecraftVersion-$version.jar")
+
+        dependencies {
+            // provided by paper
+            exclude(dependency("net.kyori:adventure-text-minimessage:.*"))
+            exclude(dependency("net.kyori:adventure-text-serializer-plain:.*"))
+            exclude(dependency("org.slf4j:slf4j-api:.*"))
+            exclude(dependency("net.kyori:option:.*"))
+            if (!bundleJackson) exclude(dependency("com.fasterxml.jackson.core:.*:.*"))
+            // annotations are not needed at runtime
+            exclude(dependency("org.jetbrains:annotations:.*"))
+            exclude(dependency("org.jspecify:jspecify:.*"))
+            exclude(dependency("org.checkerframework:checker-qual:.*"))
+            exclude(dependency("com.google.code.findbugs:jsr305:.*"))
+        }
+        exclude("META-INF/maven/**")
+
         relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
+        // paper bundles its own configurate, so keep ours separate
         relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
+        relocate("io.leangen.geantyref", "dev.qixils.relocated.geantyref")
     }
 }
 
@@ -135,5 +155,12 @@ hangarPublish {
                 }
             }
         }
+    }
+}
+
+plugins.withId("io.papermc.hangar-publish-plugin") {
+    tasks.withType<HangarPublishTask>().configureEach {
+        // when releasing, wait for everything to build so that a failure stops all platforms alike
+        mustRunAfter(rootProject.subprojects.map { "${it.path}:build" })
     }
 }

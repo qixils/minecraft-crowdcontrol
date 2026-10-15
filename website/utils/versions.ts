@@ -1,4 +1,4 @@
-import type { SetOptional } from "type-fest"
+import type {SetOptional} from "type-fest"
 
 // todo: improve this some day
 export const sortIds: Record<string, string> = {
@@ -34,8 +34,8 @@ const findLatest = (versions: Version[]): Version => {
 }
 
 export const paperVersions: Version[] = autoVersion([
-    { id: "26.3", supported: true, legacy: false, latest: false },
-    { id: "26.2", supported: true, legacy: false, latest: true },
+    { id: "26.3", supported: true, legacy: false },
+    { id: "26.2", supported: true, legacy: false },
     { id: "26.1.2", supported: true, legacy: false },
     { id: "1.21.11", supported: true, legacy: false },
     { id: "1.21.10", supported: true, legacy: false },
@@ -77,6 +77,7 @@ export const fabricVersions: Version[] = autoVersion([
 export const fabricLatest = findLatest(fabricVersions)
 
 export const neoForgeVersions: Version[] = autoVersion([
+    { id: "26.3", supported: true, legacy: false },
     { id: "26.2", supported: true, legacy: false },
     { id: "26.1.2", supported: true, legacy: false },
     { id: "1.21.11", supported: true, legacy: false },

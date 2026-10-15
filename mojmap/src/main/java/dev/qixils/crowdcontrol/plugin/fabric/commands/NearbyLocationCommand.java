@@ -124,7 +124,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 					if (!world.getWorldBorder().isWithinBounds(new BlockPos(destination.x(), 100, destination.z())))
 						continue;
 					player.teleportTo(destination.x(), destination.y(), destination.z());
-					player.sendActionBar(Component.translatable(
+					plugin.adventure().audience(player).sendActionBar(Component.translatable(
 						"cc.effect.nearby_location.output",
 						nameOf(searchType).color(NamedTextColor.YELLOW)
 					));

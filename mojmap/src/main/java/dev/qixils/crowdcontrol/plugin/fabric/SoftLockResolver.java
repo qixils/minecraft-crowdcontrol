@@ -34,6 +34,10 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 		super(plugin);
 	}
 
+	private ModdedCrowdControlPlugin plugin() {
+		return (ModdedCrowdControlPlugin) plugin;
+	}
+
 	@Override
 	public void onSoftLock(ServerPlayer player) {
 		// kill nearby monsters
@@ -62,7 +66,7 @@ public final class SoftLockResolver extends SoftLockObserver<ServerPlayer> {
 //		player.setRespawnPosition(Level.OVERWORLD, null, 0, false, false);
 
 		// alert player
-		player.sendMessage(ALERT);
+		plugin().adventure().audience(player).sendMessage(ALERT);
 	}
 
 	@Listener

@@ -14,11 +14,11 @@ public class SoftLockConfig {
 	public static final int DEF_SEARCH_HORIZ = 20;
 	public static final int DEF_SEARCH_VERT = 8;
 
-	private final int period;
-	private transient final Duration periodDuration;
-	private final int deaths;
-	private final int searchHoriz;
-	private final int searchVert;
+	private int period;
+	private transient Duration periodDuration;
+	private int deaths;
+	private int searchHoriz;
+	private int searchVert;
 
 	/**
 	 * Creates a new soft-lock config.
@@ -60,6 +60,15 @@ public class SoftLockConfig {
 		return periodDuration;
 	}
 
+	public void setPeriod(Duration period) {
+		setPeriod((int) period.toSeconds());
+	}
+
+	public void setPeriod(int period) {
+		this.period = period;
+		this.periodDuration = Duration.ofSeconds(period);
+	}
+
 	/**
 	 * How many deaths must be counted within the monitoring period to trigger the fail-safes.
 	 *
@@ -67,6 +76,10 @@ public class SoftLockConfig {
 	 */
 	public int getDeaths() {
 		return deaths;
+	}
+
+	public void setDeaths(int deaths) {
+		this.deaths = deaths;
 	}
 
 	/**
@@ -78,6 +91,10 @@ public class SoftLockConfig {
 		return searchHoriz;
 	}
 
+	public void setSearchH(int searchHoriz) {
+		this.searchHoriz = searchHoriz;
+	}
+
 	/**
 	 * The vertical entity search radius.
 	 *
@@ -85,5 +102,9 @@ public class SoftLockConfig {
 	 */
 	public int getSearchV() {
 		return searchVert;
+	}
+
+	public void setSearchV(int searchVert) {
+		this.searchVert = searchVert;
 	}
 }

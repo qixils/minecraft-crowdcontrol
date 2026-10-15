@@ -4,7 +4,6 @@ import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 val adventureVersion = project.property("adventureVersion") as String
 val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
 val clothConfigVersion = project.property("clothConfigVersion") as String
-val cloudVersion = project.property("cloudVersion") as String
 val fabricVersion = project.property("fabricVersion") as String
 val loaderVersion = project.property("loaderVersion") as String
 val modMenuVersion = project.property("modMenuVersion") as String
@@ -72,7 +71,6 @@ dependencies {
         exclude(group = "net.fabricmc.fabric-api")
         exclude(group = "net.fabricmc.fabric-loader")
     })
-    modImplementation(include("dev.qixils.cloud:cloud-fabric:$cloudVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation(include("maven.modrinth:cloth-config:$clothConfigVersion") {
         exclude(group = "net.fabricmc.fabric-api")
@@ -94,7 +92,6 @@ dependencies {
         exclude(group = "com.google.errorprone")
         exclude(group = "com.google.j2objc")
         exclude(group = "com.google.code.findbugs")
-        exclude(group = "org.incendo", module = "cloud-core")
     }
     common(project(path = ":mojmap-common", configuration = "namedElements")) // { isTransitive = false }
     shadowBundle(project(path = ":mojmap-common", configuration = "transformProductionFabric"))
@@ -127,6 +124,9 @@ tasks.shadowJar {
     archiveVersion.set("")
 
     relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
+
+    // only used by neoforge, which isn't built for this version
+    exclude("META-INF/accesstransformer.cfg")
 }
 
 tasks.remapJar {
