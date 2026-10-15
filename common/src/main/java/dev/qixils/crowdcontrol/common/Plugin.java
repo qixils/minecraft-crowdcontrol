@@ -1003,9 +1003,9 @@ public abstract class Plugin<P, S> {
 
 	public void saveConfig() {
 		try {
-			// TODO: add comments
-			// TODO: custom effects
-			ConfigurationNode config = getConfigLoader().createNode();
+			// start from the existing file so that anything not tracked here is kept as-is
+			// (such as custom effects and comments)
+			ConfigurationNode config = getConfigLoader().load();
 			TypeToken<Set<String>> hostToken = new TypeToken<>() {};
 			TypeToken<Map<String, Integer>> limitToken = new TypeToken<>() {};
 			config.node("hosts").set(hostToken, new HashSet<>(hosts));
@@ -1014,6 +1014,7 @@ public abstract class Plugin<P, S> {
 			config.node("limits", "entities").set(limitToken, limitConfig.entityLimits());
 			config.node("global").set(global);
 			config.node("announce").set(announce);
+			config.node("admin-required").set(adminRequired);
 			config.node("hide-names").set(hideNames.getConfigCode());
 			config.node("soft-lock-observer", "period").set(softLockConfig.getPeriod());
 			config.node("soft-lock-observer", "deaths").set(softLockConfig.getDeaths());
