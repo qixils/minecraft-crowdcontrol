@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
@@ -121,8 +122,8 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 			setServer(newServer);
 		});
 		MinecraftEvents.SERVER_STOPPING.register($ -> shutdown());
-		MinecraftEvents.SERVER_STOPPED.register(newServer -> {
-			getSLF4JLogger().debug("Server stopping");
+		MinecraftEvents.SERVER_STOPPED.register($ -> {
+			getSLF4JLogger().debug("Server stopped");
 			setServer(null);
 		});
 	}
@@ -307,7 +308,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 			emitGameEvent(player, GameEvents.death());
 		}
 		if (source != null && source.getEntity() instanceof ServerPlayer player) {
-			emitGameEvent(player, GameEvents.kill(EntityType.getKey(target.getType())));
+			emitGameEvent(player, GameEvents.kill(MinecraftAudiences.asAdventure(EntityType.getKey(target.getType()))));
 		}
 	}
 

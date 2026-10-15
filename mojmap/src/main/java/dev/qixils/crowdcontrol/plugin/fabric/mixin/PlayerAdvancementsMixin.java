@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import dev.qixils.crowdcontrol.common.util.GameEvents;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.server.PlayerAdvancements;
@@ -17,10 +18,10 @@ public class PlayerAdvancementsMixin {
 	@Shadow
 	private ServerPlayer player;
 
-	@Inject(method = "method_53637", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
+	@Inject(method = "lambda$award$2", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
 	public void onAnnounceAdvancement(AdvancementHolder advancementHolder, DisplayInfo displayInfo, CallbackInfo ci) {
 		if (!ModdedCrowdControlPlugin.isInstanceAvailable()) return;
 
-		ModdedCrowdControlPlugin.getInstance().emitGameEvent(player, GameEvents.advancement(advancementHolder.id()));
+		ModdedCrowdControlPlugin.getInstance().emitGameEvent(player, GameEvents.advancement(MinecraftAudiences.asAdventure(advancementHolder.id())));
 	}
 }

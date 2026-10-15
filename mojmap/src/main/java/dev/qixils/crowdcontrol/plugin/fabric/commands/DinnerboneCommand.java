@@ -3,6 +3,8 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.OriginalDisplayName;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
@@ -49,15 +51,17 @@ public class DinnerboneCommand extends ModdedCommand {
 			if (entities.isEmpty())
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "No nearby entities");
 			for (LivingEntity entity : entities) {
-				final @Nullable Component oldName = entity.cc$getOriginalDisplayName();
+				OriginalDisplayName ccEnt = (OriginalDisplayName) entity;
+				ViewerMob ccMob = (ViewerMob) entity;
+				final @Nullable Component oldName = ccEnt.cc$getOriginalDisplayName();
 				final @Nullable Component currentName = entity.getCustomName();
 				if (Objects.equals(currentName, DINNERBONE_COMPONENT)) {
 					entity.setCustomName(oldName);
-					entity.cc$setOriginalDisplayName(null);
-					if (entity.cc$isViewerSpawned())
+					ccEnt.cc$setOriginalDisplayName(null);
+					if (ccMob.cc$isViewerSpawned())
 						entity.setCustomNameVisible(true);
 				} else {
-					entity.cc$setOriginalDisplayName(currentName);
+					ccEnt.cc$setOriginalDisplayName(currentName);
 					entity.setCustomName(DINNERBONE_COMPONENT.copy());
 					entity.setCustomNameVisible(false);
 				}
