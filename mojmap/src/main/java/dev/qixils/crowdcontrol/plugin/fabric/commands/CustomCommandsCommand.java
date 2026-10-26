@@ -28,9 +28,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -56,8 +56,8 @@ public class CustomCommandsCommand extends ModdedCommand {
 		String entityStr = action.getString("type", "minecraft:pig");
 		ResourceLocation entityId = Objects.requireNonNullElseGet(ResourceLocation.tryParse(entityStr), () -> ResourceLocation.fromNamespaceAndPath("minecraft", "pig"));
 
-		Registry<EntityType<?>> entities = player.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE);
-		Holder.Reference<EntityType<?>> entityType = entities.get(entityId).or(() -> {
+		Registry<EntityType<?>> entities = player.registryAccess().registryOrThrow(Registries.ENTITY_TYPE);
+		Holder.Reference<EntityType<?>> entityType = entities.getHolder(entityId).or(() -> {
 			var pig = entities.wrapAsHolder(EntityType.PIG);
 			if (pig instanceof Holder.Reference<EntityType<?>> refPig) return Optional.of(refPig);
 			return Optional.empty();
@@ -84,13 +84,13 @@ public class CustomCommandsCommand extends ModdedCommand {
 		}
 
 		Vec3 finalPos = pos;
-		Entity entity = EntityType.loadEntityRecursive(tag, level, EntitySpawnReason.COMMAND, entityx -> {
-			entityx.snapTo(finalPos.x, finalPos.y, finalPos.z, entityx.getYRot(), entityx.getXRot());
+		Entity entity = EntityType.loadEntityRecursive(tag, level, entityx -> {
+			entityx.moveTo(finalPos.x, finalPos.y, finalPos.z, entityx.getYRot(), entityx.getXRot());
 			return entityx;
 		});
 		if (entity == null) return false;
 
-		if (nbt == null && entity instanceof Mob mob) mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
+		if (nbt == null && entity instanceof Mob mob) mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, null);
 
 		return level.tryAddFreshEntityWithPassengers(entity);
 	}

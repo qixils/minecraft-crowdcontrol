@@ -31,7 +31,7 @@ public class FallingBlockCommand extends BlockCommand {
 				playerLoc.x(),
 				Math.min(
 						playerLoc.y() + FALLING_BLOCK_FALL_DISTANCE,
-						world.getMaxY() - 1
+						world.getMaxBuildHeight() - 2
 				),
 				playerLoc.z()
 		);

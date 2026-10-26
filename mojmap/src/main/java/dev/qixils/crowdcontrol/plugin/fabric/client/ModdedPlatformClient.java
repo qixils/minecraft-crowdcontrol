@@ -1,5 +1,7 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
+import dev.qixils.crowdcontrol.common.components.MovementStatusType;
+import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -7,6 +9,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.MovementStatus;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.ClientAdapter;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -21,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
 
 //@Environment(EnvType.CLIENT)
 public abstract class ModdedPlatformClient {
@@ -115,5 +119,19 @@ public abstract class ModdedPlatformClient {
 	public static void sendToServerStatic(@NotNull CustomPacketPayload payload) {
 		if (INSTANCE == null) return;
 		INSTANCE.sendToServer(payload);
+	}
+
+	public static boolean handleIsDown(@NotNull Function<KeyMapping, Boolean> getResult, @NotNull KeyMapping original, @org.checkerframework.checker.nullness.qual.Nullable KeyMapping inverse, @NotNull MovementStatusType type) {
+		if (!ModdedCrowdControlPlugin.CLIENT_INITIALIZED)
+			return getResult.apply(original);
+		Optional<LocalPlayer> player = ModdedPlatformClient.get().player();
+		if (player.isEmpty())
+			return getResult.apply(original);
+		MovementStatusValue status = ((MovementStatus) player.get()).cc$getMovementStatus(type);
+		if (status == MovementStatusValue.DENIED)
+			return false;
+		if (status == MovementStatusValue.INVERTED && inverse != null)
+			return getResult.apply(inverse);
+		return getResult.apply(original);
 	}
 }

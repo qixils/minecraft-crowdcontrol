@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.interfaces.OriginalDisplayName;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -52,11 +53,10 @@ public abstract class LivingEntityMixin extends Entity implements ViewerMob, Ori
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
 	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
-		cc$isViewerSpawned = tag.getBoolean(Components.VIEWER_MOB).orElse(false);
-		cc$originalDisplayName = tag
-			.getString(Components.ORIGINAL_DISPLAY_NAME)
-			.map(json -> Component.Serializer.fromJson(json, registryAccess()))
-			.orElse(null);
+		cc$isViewerSpawned = tag.getBoolean(Components.VIEWER_MOB);
+		cc$originalDisplayName = tag.contains(Components.ORIGINAL_DISPLAY_NAME, Tag.TAG_STRING)
+			? Component.Serializer.fromJson(tag.getString(Components.ORIGINAL_DISPLAY_NAME), registryAccess())
+			: null;
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))

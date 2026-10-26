@@ -28,7 +28,7 @@ public class RespawnCommand extends ModdedCommand {
 	}
 
 	private void teleport(ServerPlayer player, ServerLevel level, BlockPos pos, float angle) {
-		sync(() -> player.teleportTo(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, Collections.emptySet(), angle, 0, false)); // boolean is unused?
+		sync(() -> player.teleportTo(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, Collections.emptySet(), angle, 0));
 	}
 
 	@Override
@@ -38,21 +38,21 @@ public class RespawnCommand extends ModdedCommand {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot fling while frozen");
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				ServerPlayer.RespawnConfig respawnConfig = player.getRespawnConfig();
+				BlockPos respawnPos = player.getRespawnPosition();
 				ServerLevel level;
 				BlockPos pos;
 				float angle;
-				if (respawnConfig == null) {
+				if (respawnPos == null) {
 					level = player.server.getLevel(Level.OVERWORLD);
 					if (level == null)
 						continue;
 					pos = level.getSharedSpawnPos();
 					angle = 0;
 				} else {
-					level = player.server.getLevel(respawnConfig.dimension());
+					level = player.server.getLevel(player.getRespawnDimension());
 					if (level == null) continue;
-					pos = respawnConfig.pos();
-					angle = respawnConfig.angle();
+					pos = respawnPos;
+					angle = player.getRespawnAngle();
 				}
 				teleport(player, level, pos, angle);
 				success = true;

@@ -4,7 +4,6 @@ import dev.qixils.crowdcontrol.common.mc.CCEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -20,9 +19,6 @@ public class FabricEntity implements CCEntity {
 
 	@Override
 	public void kill() {
-		// TODO: improve?
-		if (entity.level() instanceof ServerLevel level) {
-			entity.kill(level);
-		}
+		entity.kill();
 	}
 }

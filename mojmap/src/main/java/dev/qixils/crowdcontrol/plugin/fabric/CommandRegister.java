@@ -17,11 +17,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
-import net.minecraft.world.entity.vehicle.AbstractChestBoat;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.ChestBoat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameType;
@@ -134,29 +133,12 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 		));
 
 		// entity commands
-		EntityType<AbstractBoat>[] boats = new EntityType[] {
-			EntityType.OAK_BOAT,
-			EntityType.BIRCH_BOAT,
-			EntityType.ACACIA_BOAT,
-			EntityType.CHERRY_BOAT,
-			EntityType.DARK_OAK_BOAT,
-			EntityType.JUNGLE_BOAT,
-			EntityType.MANGROVE_BOAT,
-			EntityType.PALE_OAK_BOAT,
-			EntityType.SPRUCE_BOAT,
-			EntityType.BAMBOO_RAFT
+		// boats are a single entity type on this version; the wood type is randomized when spawned
+		EntityType<Boat>[] boats = new EntityType[] {
+			EntityType.BOAT
 		};
-		EntityType<AbstractChestBoat>[] chestBoats = new EntityType[] {
-			EntityType.OAK_CHEST_BOAT,
-			EntityType.BIRCH_CHEST_BOAT,
-			EntityType.ACACIA_CHEST_BOAT,
-			EntityType.CHERRY_CHEST_BOAT,
-			EntityType.DARK_OAK_CHEST_BOAT,
-			EntityType.JUNGLE_CHEST_BOAT,
-			EntityType.MANGROVE_CHEST_BOAT,
-			EntityType.PALE_OAK_CHEST_BOAT,
-			EntityType.SPRUCE_CHEST_BOAT,
-			EntityType.BAMBOO_CHEST_RAFT
+		EntityType<ChestBoat>[] chestBoats = new EntityType[] {
+			EntityType.CHEST_BOAT
 		};
 		// TODO: could bring back the fill-in-vanilla-holes thing to have some better defaults for some modded mobs?
 		//  but there will probably be overlap and make it weird idk
@@ -165,7 +147,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 				if (!entry.getValue().isEnabled(plugin.server().overworld().enabledFeatures())) continue;
 				if (Stream.concat(Arrays.stream(boats), Arrays.stream(chestBoats)).anyMatch(boat -> boat == entry.getValue())) continue;
 
-				boolean allowed = isWhitelistedEntity(MinecraftAudiences.key(entry.getKey())) || entry.getValue().create(plugin.server().overworld(), EntitySpawnReason.COMMAND) instanceof Mob;
+				boolean allowed = isWhitelistedEntity(MinecraftAudiences.key(entry.getKey())) || entry.getValue().create(plugin.server().overworld()) instanceof Mob;
 				if (!allowed) continue;
 				initTo(commands, () -> new SummonEntityCommand<>(plugin, entry.getValue()));
 
@@ -212,15 +194,15 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			initTo(commands, () -> new DifficultyCommand(plugin, difficulty));
 
 		// potions
-		BuiltInRegistries.MOB_EFFECT.listElements().forEach(potion -> {
+		BuiltInRegistries.MOB_EFFECT.holders().forEach(potion -> {
 			if (!potion.value().isEnabled(plugin.server().overworld().enabledFeatures())) return;
 			if (potion.is(MobEffects.LUCK)) return; // unused
 			if (potion.is(MobEffects.UNLUCK)) return; // unused
-			if (potion.is(MobEffects.JUMP_BOOST)) return; // disabled in favor of gravity
+			if (potion.is(MobEffects.JUMP)) return; // disabled in favor of gravity
 			if (potion.is(MobEffects.HUNGER)) return; // disabled in favor of take food
 			if (potion.is(MobEffects.SATURATION)) return; // disabled in favor of give food
-			if (potion.is(MobEffects.INSTANT_DAMAGE)) return; // disabled in favor of take health
-			if (potion.is(MobEffects.INSTANT_HEALTH)) return; // disabled in favor of give health
+			if (potion.is(MobEffects.HARM)) return; // disabled in favor of take health
+			if (potion.is(MobEffects.HEAL)) return; // disabled in favor of give health
 			if (potion.is(MobEffects.WITHER)) return; // we tend to avoid effects that can kill
 			if (potion.is(MobEffects.WIND_CHARGED)) return; // doesn't do much for players
 			if (potion.is(MobEffects.OOZING)) return; // doesn't do much for players

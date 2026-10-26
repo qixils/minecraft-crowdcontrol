@@ -2,7 +2,7 @@ import me.modmuss50.mpp.ReleaseType
 import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 
 val adventureVersion = project.property("adventureVersion") as String
-val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
+val adventurePlatformFabricVersion = project.property("adventurePlatformFabricVersion") as String
 val modMenuVersion = project.property("modMenuVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
 val luckoPermissionsApiVersion = project.property("luckoPermissionsApiVersion") as String
@@ -43,7 +43,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:$fabric_loader_version")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformModVersion")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
     modImplementation("maven.modrinth:language-reload:$languageReloadVersion")
@@ -64,6 +64,8 @@ dependencies {
         include("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     }
     include("io.leangen.geantyref:geantyref:$geantyrefVersion")
+    // configurate needs option 1.1.0, but adventure-platform-fabric 6.0.1 only bundles 1.0.0
+    include("net.kyori:option:1.1.0")
 
     // mojmap-common only exposes these at compile time, so they also need to be added to the dev runtime
     localRuntime(project(":base-common")) {
@@ -129,8 +131,8 @@ tasks.remapJar {
 }
 
 publishMods {
-    val versionFrom = "1.21.5"
-    val versionTo = "1.21.5"
+    val versionFrom = "1.21"
+    val versionTo = "1.21.1"
     val curseforgeVersion = ""
 
     file.set(tasks.remapJar.get().archiveFile)

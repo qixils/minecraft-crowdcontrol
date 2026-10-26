@@ -130,7 +130,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 
 	public <T> Registry<T> registry(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
 		if (accessor == null) accessor = server().registryAccess();
-		return accessor.lookupOrThrow(key);
+		return accessor.registryOrThrow(key);
 	}
 
 	public <T> Iterable<Holder.Reference<T>> registryHolders(ResourceKey<? extends Registry<? extends T>> key, @Nullable RegistryAccess accessor) {
@@ -139,7 +139,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
             @NotNull
             @Override
             public Iterator<Holder.Reference<T>> iterator() {
-                return registry.listElements().iterator();
+                return registry.holders().iterator();
             }
         };
 	}

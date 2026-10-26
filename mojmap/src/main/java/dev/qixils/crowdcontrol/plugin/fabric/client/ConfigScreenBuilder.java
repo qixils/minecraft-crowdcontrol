@@ -216,6 +216,6 @@ public class ConfigScreenBuilder {
 		if (id.equals("default")) return Optional.empty();
 		ResourceLocation location = ResourceLocation.tryParse(id);
 		if (location == null) return Optional.empty();
-		return registry.get(location).map(holder -> MinecraftAudiences.key(holder.key()).asMinimalString());
+		return registry.getHolder(location).map(holder -> MinecraftAudiences.key(holder.key()).asMinimalString());
 	}
 }

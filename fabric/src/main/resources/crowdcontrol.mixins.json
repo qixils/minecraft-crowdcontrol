@@ -18,6 +18,7 @@
   "client": [
     "GameRendererMixin",
     "KeyboardInputMixin",
+    "LocalPlayerMixin",
     "MinecraftClientMixin"
   ],
   "injectors": {

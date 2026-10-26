@@ -86,14 +86,14 @@ public class VeinCommand extends ModdedCommand {
 					.locationValidator(loc -> !loc.block().isAir() && !loc.block().hasBlockEntity())
 					.build();
 
-				Registry<Block> registry = player.level().registryAccess().lookupOrThrow(Registries.BLOCK);
+				Registry<Block> registry = player.level().registryAccess().registryOrThrow(Registries.BLOCK);
 				List<Ore> ores = new ArrayList<>();
 
 				// troll blocks
 				ores.add(new Ore(registry.wrapAsHolder(Blocks.LAVA), 1));
 				ores.add(new Ore(registry.wrapAsHolder(Blocks.INFESTED_STONE), registry.wrapAsHolder(Blocks.INFESTED_DEEPSLATE), 1));
 
-				registry.getOrThrow(ORES).stream()
+				registry.getTag(ORES).orElseThrow().stream()
 					.filter(Holder::isBound) // failsafe
 					.sorted((a, b) -> {
 						ResourceLocation keyA = a.unwrapKey().get().location();

@@ -61,7 +61,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 			|| potionEffectType.is(MobEffects.GLOWING)
 			|| potionEffectType.is(MobEffects.INFESTED)
 			|| potionEffectType.is(MobEffects.INVISIBILITY)
-			|| potionEffectType.is(MobEffects.NAUSEA)
+			|| potionEffectType.is(MobEffects.CONFUSION)
 			|| potionEffectType.is(MobEffects.NIGHT_VISION)
 			|| potionEffectType.is(MobEffects.SLOW_FALLING)
 			|| potionEffectType.is(MobEffects.WATER_BREATHING);
@@ -70,7 +70,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 	@Override
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull ServerPlayer>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
-			if (potionEffectType == MobEffects.JUMP_BOOST && isActive(ccPlayer, "disable_jumping"))
+			if (potionEffectType == MobEffects.JUMP && isActive(ccPlayer, "disable_jumping"))
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Cannot apply jump boost while Disable Jump is active");
 
 			Duration duration = Duration.ofMillis(request.getEffect().getDurationMillis());

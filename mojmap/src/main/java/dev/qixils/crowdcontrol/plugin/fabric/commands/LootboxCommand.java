@@ -24,7 +24,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Unit;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -35,13 +34,15 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.armortrim.ArmorTrim;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -197,11 +198,10 @@ public class LootboxCommand extends ModdedCommand {
 
 		// make item unbreakable with a default chance of 5% (up to 100% at 10 luck)
 		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
-			itemStack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+			itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
 
 		// TODO: probably a better way to detect "normal" armor vs non-normal (tags?)
-		var equippable = itemStack.get(DataComponents.EQUIPPABLE);
-		if (random.nextInt(ARMOR_TRIM_ODDS) == 0 && equippable != null && equippable.slot().getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !itemStack.is(Items.ELYTRA) && !itemStack.is(Items.TURTLE_HELMET)) {
+		if (random.nextInt(ARMOR_TRIM_ODDS) == 0 && itemStack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot().getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !itemStack.is(Items.ELYTRA) && !itemStack.is(Items.TURTLE_HELMET)) {
 			itemStack.set(DataComponents.TRIM, new ArmorTrim(
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_MATERIAL, registryAccess)),
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_PATTERN, registryAccess))
@@ -215,7 +215,7 @@ public class LootboxCommand extends ModdedCommand {
 		}
 		final int enchantments = _enchantments;
 		List<Holder<Enchantment>> enchantmentList = plugin.registry(Registries.ENCHANTMENT, registryAccess)
-			.listElements()
+			.holders()
 			.filter(enchantmentHolder -> enchantmentHolder.value().canEnchant(itemStack))
 			.collect(Collectors.toList());
 		if (random.nextDouble() >= (.8d - (luck * .2d))) {

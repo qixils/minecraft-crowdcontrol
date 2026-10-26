@@ -111,8 +111,8 @@ dependencies {
 }
 
 publishMods {
-    val versionFrom = "1.21.5"
-    val versionTo = "1.21.5"
+    val versionFrom = "1.21"
+    val versionTo = "1.21.1"
     val curseforgeVersion = ""
 
     file.set(tasks.jar.get().archiveFile)

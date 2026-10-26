@@ -27,7 +27,7 @@ public class DropItemCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				if (player.getInventory().getSelectedItem().isEmpty()) continue;
+				if (player.getInventory().getSelected().isEmpty()) continue;
 
 				sync(() -> {
 					player.drop(true);

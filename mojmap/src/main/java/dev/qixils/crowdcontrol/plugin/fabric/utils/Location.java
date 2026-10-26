@@ -55,7 +55,7 @@ public record Location(ServerLevel level, double x, double y, double z, float ya
 	}
 
 	public void teleportHere(ServerPlayer player) {
-		player.teleportTo(level, x, y, z, Collections.emptySet(), yaw, pitch, false); // boolean is unused?
+		player.teleportTo(level, x, y, z, Collections.emptySet(), yaw, pitch);
 	}
 
 	@CheckReturnValue

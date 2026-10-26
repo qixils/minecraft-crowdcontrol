@@ -27,7 +27,7 @@ public final class CraftItemCondition extends AbstractBooleanListeningCondition 
 		this.item = item;
 		this.component = Component.translatable(
 				"cc.effect.do_or_die.condition.craft." + key,
-				ModdedCrowdControlPlugin.getInstance().adventure().asAdventure(item.getName()).color(NamedTextColor.GREEN)
+				ModdedCrowdControlPlugin.getInstance().adventure().asAdventure(item.getDescription()).color(NamedTextColor.GREEN)
 		);
 	}
 
