@@ -3,7 +3,6 @@ val adventurePlatformModVersion = project.property("adventurePlatformModVersion"
 val adventureVersion = project.property("adventureVersion") as String
 val yaclVersion = project.property("yaclVersion") as String
 val neo_form_version = project.property("neo_form_version") as String
-val bundleJackson = (findProperty("bundleJackson") as String?)?.toBoolean() ?: true
 
 plugins {
     id("multiloader-common")
@@ -31,10 +30,7 @@ dependencies {
     compileOnly("org.ow2.asm:asm:9.6")
 
     //
-    api(project(":base-common")) {
-        // use the version of jackson provided by minecraft
-        if (!bundleJackson) exclude(group = "com.fasterxml.jackson.core")
-    }
+    api(project(":base-common"))
     api("org.spongepowered:configurate-hocon:$configurateVersion")
 
     compileOnly("net.kyori:adventure-platform-mod-shared:$adventurePlatformModVersion")
