@@ -5,7 +5,6 @@ import xyz.jpenilla.runpaper.task.RunServer
 val minecraftVersion = project.property("minecraftVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
 val luckPermsVersion = project.property("luckPermsVersion") as String
-val bundleJackson = (findProperty("bundleJackson") as String?)?.toBoolean() ?: true
 
 val mcVersionSplit = minecraftVersion.split(".")
 val versionId = project.version.toString() + "+paper-" + minecraftVersion
@@ -76,7 +75,6 @@ tasks {
             exclude(dependency("org.spongepowered:.*:.*"))
             exclude(dependency("io.leangen.geantyref:.*:.*"))
             exclude(dependency("org.yaml:snakeyaml:.*"))
-            if (!bundleJackson) exclude(dependency("com.fasterxml.jackson.core:.*:.*"))
             // annotations are not needed at runtime
             exclude(dependency("org.jetbrains:annotations:.*"))
             exclude(dependency("org.jspecify:jspecify:.*"))
