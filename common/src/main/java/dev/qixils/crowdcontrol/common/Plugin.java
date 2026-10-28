@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.Gson;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -55,6 +55,8 @@ import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -72,7 +74,6 @@ import java.util.stream.Collectors;
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
-import static live.crowdcontrol.cc4j.websocket.ConnectedPlayer.JACKSON;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 
@@ -1660,11 +1661,14 @@ public abstract class Plugin<P, S> {
 				con.setConnectTimeout(10000);
 				con.setReadTimeout(10000);
 
-				List<ModrinthVersion> versions = JACKSON.readValue(con.getInputStream(), new TypeReference<>() {
-				});
+				List<ModrinthVersion> versions;
+				try (Reader reader = new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8)) {
+					versions = new Gson().fromJson(reader, new com.google.gson.reflect.TypeToken<List<ModrinthVersion>>() {
+					}.getType());
+				}
 				if (con.getResponseCode() != 200)
 					throw new IllegalStateException("Server returned code " + con.getResponseCode());
-				if (versions.isEmpty()) return null;
+				if (versions == null || versions.isEmpty()) return null;
 				String latestVersion = versions.getFirst().getVersionNumber();
 				if (latestVersion == null) return null;
 				latestModVersionCachedAt = Instant.now();
