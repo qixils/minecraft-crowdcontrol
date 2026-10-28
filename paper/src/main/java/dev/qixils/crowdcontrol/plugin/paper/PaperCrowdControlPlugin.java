@@ -15,7 +15,6 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -133,9 +132,21 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		});
 	}
 
+	private static boolean isPaper() {
+		// the same check as PaperLib, except it checks a deprecated class so we check a new one too
+		for (String className : List.of("io.papermc.paper.configuration.Configuration", "com.destroystokyo.paper.PaperConfig")) {
+			try {
+				Class.forName(className);
+				return true;
+			} catch (Throwable ignored) {
+			}
+		}
+		return false;
+	}
+
 	@SneakyThrows
 	public void onEnable() {
-		if (!PaperLib.isPaper()) {
+		if (!isPaper()) {
 			throw new IllegalStateException("The Paper server software is required. Please upgrade from Spigot to Paper, it should be a simple and painless upgrade in 99.99% of cases.");
 		}
 		if (MINECRAFT_VERSION.isLessThan(MINECRAFT_MIN_VERSION)) {

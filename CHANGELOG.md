@@ -2,6 +2,14 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.6.4
+
+- Migrated from cloud command framework to native brigadier, saving considerable filesize
+  - Previously this was available only for 26.1+
+- (1.21.5+) Migrated from embedded cloth-config to optional YACL with more visual config options
+  - Previously this was available only for 26.1+
+- Fixed several issues with dependency conflicts and improved filesizes
+
 ## 4.6.3
 
 - The resource pack for Screen effects is now downloaded from Crowd Control's servers
