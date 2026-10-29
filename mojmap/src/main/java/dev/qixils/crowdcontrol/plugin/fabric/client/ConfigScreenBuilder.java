@@ -13,11 +13,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ConfigScreenBuilder {
 	public static Screen buildConfigScreen(ModdedCrowdControlPlugin plugin, Screen parent) {
@@ -152,7 +154,7 @@ public class ConfigScreenBuilder {
 						() -> displayedLimits(BuiltInRegistries.ITEM, plugin.getLimitConfig().itemLimits()),
 						value -> plugin.getLimitConfig().itemLimits(mergeLimits(BuiltInRegistries.ITEM, plugin.getLimitConfig().itemLimits(), value))
 					)
-					.initialKey("diamond_sword")
+					.initialKeys(() -> limitKeys(BuiltInRegistries.ITEM, "diamond_sword", "air"))
 					.initialValue(0)
 					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ITEM.entrySet().stream().map(item -> MinecraftAudiences.key(item.getKey()).asMinimalString()).toList()))
 					.valueController(opt -> IntegerFieldControllerBuilder.create(opt).min(0))
@@ -175,7 +177,7 @@ public class ConfigScreenBuilder {
 						() -> displayedLimits(BuiltInRegistries.ENTITY_TYPE, plugin.getLimitConfig().entityLimits()),
 						value -> plugin.getLimitConfig().entityLimits(mergeLimits(BuiltInRegistries.ENTITY_TYPE, plugin.getLimitConfig().entityLimits(), value))
 					)
-					.initialKey("creeper")
+					.initialKeys(() -> limitKeys(BuiltInRegistries.ENTITY_TYPE, "creeper", null))
 					.initialValue(0)
 					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ENTITY_TYPE.entrySet().stream().map(item -> MinecraftAudiences.key(item.getKey()).asMinimalString()).toList()))
 					.valueController(opt -> IntegerFieldControllerBuilder.create(opt).min(0))
@@ -183,6 +185,19 @@ public class ConfigScreenBuilder {
 				.build())
 			.build()
 			.generateScreen(parent);
+	}
+
+	/**
+	 * Gets the IDs that new limit entries can use.
+	 * @param registry  registry to fetch entries from
+	 * @param preferred first example entry
+	 * @param excluded  optional invalid entry to exclude
+	 */
+	private static <T> Iterable<String> limitKeys(Registry<T> registry, String preferred, @Nullable String excluded) {
+		return () -> Stream.concat(
+			Stream.of(preferred),
+			registry.entrySet().stream().map(entry -> MinecraftAudiences.key(entry.getKey()).asMinimalString())
+		).filter(id -> !id.equals(excluded)).iterator();
 	}
 
 	/**
