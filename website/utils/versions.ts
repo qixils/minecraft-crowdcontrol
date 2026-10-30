@@ -65,7 +65,7 @@ export const fabricVersions: Version[] = autoVersion([
     { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: false, legacy: false },
     { id: "1.21.3", supported: false, legacy: false },
-    { id: "1.21.1", supported: false, legacy: true },
+    { id: "1.21.1", supported: true, legacy: true },
     { id: "1.20.6", supported: false, legacy: true },
     { id: "1.20.4", supported: false, legacy: true },
     { id: "1.20.2", supported: false, legacy: true },
@@ -88,7 +88,7 @@ export const neoForgeVersions: Version[] = autoVersion([
     { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: false, legacy: false },
     { id: "1.21.3", supported: false, legacy: false },
-    { id: "1.21.1", supported: false, legacy: true },
+    { id: "1.21.1", supported: true, legacy: true },
 ])
 export const neoForgeLatest = findLatest(neoForgeVersions)
 

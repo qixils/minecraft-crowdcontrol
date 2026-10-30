@@ -53,6 +53,8 @@ public interface MapOption<K, V> extends OptionGroup, Option<Map<K, V>> {
 
         Builder<K, V> initialKey(@NotNull Supplier<K> initialValue);
         Builder<K, V> initialKey(@NotNull K initialValue);
+        /** Fetches the first unique key */
+        Builder<K, V> initialKeys(@NotNull Supplier<? extends Iterable<K>> candidates);
 
         Builder<K, V> initialValue(@NotNull Supplier<V> initialValue);
         Builder<K, V> initialValue(@NotNull V initialValue);

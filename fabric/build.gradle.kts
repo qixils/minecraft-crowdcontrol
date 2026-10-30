@@ -8,14 +8,13 @@ val configurateVersion = project.property("configurateVersion") as String
 val luckoPermissionsApiVersion = project.property("luckoPermissionsApiVersion") as String
 val languageReloadVersion = project.property("languageReloadVersion") as String
 val crowdControlVersion = project.property("crowdControlVersion") as String
-val jacksonVersion = project.property("jacksonVersion") as String
+val javaWebSocketVersion = project.property("javaWebSocketVersion") as String
 val geantyrefVersion = project.property("geantyrefVersion") as String
 val yaclVersion = project.property("yaclVersion") as String
 val minecraft_version = project.property("minecraft_version") as String
 val fabric_loader_version = project.property("fabric_loader_version") as String
 val fabric_version = project.property("fabric_version") as String
 val mod_id = project.property("mod_id") as String
-val bundleJackson = (findProperty("bundleJackson") as String?)?.toBoolean() ?: true
 
 val versionId = project.version.toString() + "+fabric-$minecraft_version"
 
@@ -58,19 +57,13 @@ dependencies {
     include("org.spongepowered:configurate-core:$configurateVersion")
     include("org.spongepowered:configurate-hocon:$configurateVersion")
     include("net.kyori:adventure-serializer-configurate4:$adventureVersion")
-    if (bundleJackson) {
-        include("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
-        include("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
-        include("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    }
+    include("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
     include("io.leangen.geantyref:geantyref:$geantyrefVersion")
     // configurate needs option 1.1.0, but adventure-platform-fabric 6.0.1 only bundles 1.0.0
     include("net.kyori:option:1.1.0")
 
     // mojmap-common only exposes these at compile time, so they also need to be added to the dev runtime
-    localRuntime(project(":base-common")) {
-        if (!bundleJackson) exclude(group = "com.fasterxml.jackson.core")
-    }
+    localRuntime(project(":base-common"))
     localRuntime("org.spongepowered:configurate-hocon:$configurateVersion")
 }
 
