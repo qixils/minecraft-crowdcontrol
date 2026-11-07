@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -30,12 +30,12 @@ public class ConfigMissingScreen extends Screen {
 	}
 
 	@Override
-	public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float a) {
-		super.render(graphics, mouseX, mouseY, a);
+	public void render(@NotNull PoseStack poseStack, int mouseX, int mouseY, float a) {
+		super.render(poseStack, mouseX, mouseY, a);
 
 		// Minecraft doesn't have a "label" widget, so we'll have to draw our own text.
 		// textRenderer, text, x, y, maxLineLength, color
-		graphics.drawWordWrap(this.font, Component.translatable("config.crowdcontrol.missing"), 20, 50, 200, 0xFFFFFFFF);
+		this.font.drawWordWrap(poseStack, Component.translatable("config.crowdcontrol.missing"), 20, 50, 200, 0xFFFFFFFF);
 	}
 
 	@Override

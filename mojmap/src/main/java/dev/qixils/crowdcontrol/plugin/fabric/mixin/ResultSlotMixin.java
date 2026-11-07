@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,10 +27,10 @@ public abstract class ResultSlotMixin extends Slot {
 	public void onTake(Player player, ItemStack result, CallbackInfo ci) {
 		CraftingContainer craftSlots = ((ResultSlot) (Object) this).craftSlots;
 
-		if (player.level().isClientSide) return;
-		MinecraftServer server = player.level().getServer();
+		if (player.getLevel().isClientSide) return;
+		MinecraftServer server = player.getLevel().getServer();
 		if (server == null) return; // failsafe?
-		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
+		CraftingRecipe recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.getLevel()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 
@@ -40,10 +39,10 @@ public abstract class ResultSlotMixin extends Slot {
 		CraftingContainer craftSlots = ((ResultSlot) (Object) this).craftSlots;
 		Player player = ((ResultSlot) (Object) this).player;
 
-		if (player.level().isClientSide) return;
-		MinecraftServer server = player.level().getServer();
+		if (player.getLevel().isClientSide) return;
+		MinecraftServer server = player.getLevel().getServer();
 		if (server == null) return; // failsafe?
-		RecipeHolder<CraftingRecipe> recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots.asCraftInput(), player.level()).orElse(null);
+		CraftingRecipe recipe = server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftSlots, player.getLevel()).orElse(null);
 		new Craft(player, recipe, result).fire();
 	}
 

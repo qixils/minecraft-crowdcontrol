@@ -65,8 +65,6 @@ public interface MapOption<K, V> extends OptionGroup, Option<Map<K, V>> {
         Builder<K, V> customKeyController(@NotNull Function<Option<K>, Controller<K>> control);
         Builder<K, V> customValueController(@NotNull Function<Option<V>, Controller<V>> control);
 
-        Builder<K, V> state(@NotNull StateManager<Map<K, V>> stateManager);
-
         Builder<K, V> binding(@NotNull Binding<Map<K, V>> binding);
         Builder<K, V> binding(@NotNull Map<K, V> def, @NotNull Supplier<@NotNull Map<K, V>> getter, @NotNull Consumer<@NotNull Map<K, V>> setter);
 
@@ -80,9 +78,6 @@ public interface MapOption<K, V> extends OptionGroup, Option<Map<K, V>> {
         Builder<K, V> flags(@NotNull Collection<OptionFlag> flags);
 
         Builder<K, V> collapsed(boolean collapsible);
-
-        MapOption.Builder<K, V> addListener(@NotNull OptionEventListener<Map<K, V>> listener);
-        MapOption.Builder<K, V> addListeners(@NotNull Collection<OptionEventListener<Map<K, V>>> listeners);
 
         MapOption.Builder<K, V> listener(@NotNull BiConsumer<Option<Map<K, V>>, Map<K, V>> listener);
         MapOption.Builder<K, V> listeners(@NotNull Collection<BiConsumer<Option<Map<K, V>>, Map<K, V>>> listeners);

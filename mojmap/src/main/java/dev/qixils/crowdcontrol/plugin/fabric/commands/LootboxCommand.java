@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands;
 
-import com.google.common.collect.Lists;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
@@ -15,19 +14,18 @@ import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
@@ -39,9 +37,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.armortrim.ArmorTrim;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -52,13 +47,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static dev.qixils.crowdcontrol.common.command.CommandConstants.*;
-import static dev.qixils.crowdcontrol.plugin.fabric.utils.AttributeUtil.migrateId;
-import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE;
-import static net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP;
 
 @Getter
 public class LootboxCommand extends ModdedCommand {
-	private static final List<Holder<Attribute>> ATTRIBUTES = Arrays.asList(
+	private static final List<Attribute> ATTRIBUTES = Arrays.asList(
 		Attributes.MAX_HEALTH,
 		Attributes.KNOCKBACK_RESISTANCE,
 		Attributes.MOVEMENT_SPEED,
@@ -67,19 +59,6 @@ public class LootboxCommand extends ModdedCommand {
 		Attributes.ARMOR_TOUGHNESS,
 		Attributes.ATTACK_KNOCKBACK,
 		Attributes.ATTACK_SPEED
-	);
-	private static final List<DataComponentType<?>> CURSES = List.of(
-		PREVENT_ARMOR_CHANGE,
-		PREVENT_EQUIPMENT_DROP
-	);
-	private static final Map<EquipmentSlot, EquipmentSlotGroup> SLOT_TO_GROUP = Map.of(
-		// can't use reflection cus mappings (probably)
-		EquipmentSlot.MAINHAND, EquipmentSlotGroup.MAINHAND,
-		EquipmentSlot.OFFHAND, EquipmentSlotGroup.OFFHAND,
-		EquipmentSlot.HEAD, EquipmentSlotGroup.HEAD,
-		EquipmentSlot.CHEST, EquipmentSlotGroup.CHEST,
-		EquipmentSlot.LEGS, EquipmentSlotGroup.LEGS,
-		EquipmentSlot.FEET, EquipmentSlotGroup.FEET
 	);
 	public static final Map<UUID, ChestMenu> OPEN_LOOTBOXES = new HashMap<>();
 	public static final Map<UUID, net.minecraft.network.chat.Component> TITLES = new HashMap<>();
@@ -103,7 +82,7 @@ public class LootboxCommand extends ModdedCommand {
 		allItems = BuiltInRegistries.ITEM.stream().filter(it -> it != Items.AIR).toList();
 		goodItems = allItems.stream()
 			.filter(itemType ->
-				itemType.components().getOrDefault(DataComponents.MAX_DAMAGE, 0) > 1
+				itemType.getMaxDamage() > 1
 					|| itemType == Items.GOLDEN_APPLE
 					|| itemType == Items.ENCHANTED_GOLDEN_APPLE
 					|| itemType == Items.NETHERITE_BLOCK
@@ -170,7 +149,7 @@ public class LootboxCommand extends ModdedCommand {
 
 		// determine the size of the item stack
 		int quantity = 1;
-		int maxStackSize = item.components().getOrDefault(DataComponents.MAX_STACK_SIZE, 0);
+		int maxStackSize = item.getMaxStackSize();
 		if (maxStackSize > 1) {
 			for (int i = 0; i <= luck; i++) {
 				quantity = Math.max(quantity, RandomUtil.nextInclusiveInt(1, maxStackSize));
@@ -198,11 +177,11 @@ public class LootboxCommand extends ModdedCommand {
 
 		// make item unbreakable with a default chance of 5% (up to 100% at 10 luck)
 		if (random.nextDouble() >= (UNBREAKABLE_BASE - (luck * UNBREAKABLE_DEC)))
-			itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
+			itemStack.getOrCreateTag().putBoolean("Unbreakable", true);
 
 		// TODO: probably a better way to detect "normal" armor vs non-normal (tags?)
-		if (random.nextInt(ARMOR_TRIM_ODDS) == 0 && itemStack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot().getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !itemStack.is(Items.ELYTRA) && !itemStack.is(Items.TURTLE_HELMET)) {
-			itemStack.set(DataComponents.TRIM, new ArmorTrim(
+		if (random.nextInt(ARMOR_TRIM_ODDS) == 0 && itemStack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot().getType() == EquipmentSlot.Type.ARMOR && !itemStack.is(Items.ELYTRA) && !itemStack.is(Items.TURTLE_HELMET)) {
+			ArmorTrim.setTrim(registryAccess, itemStack, new ArmorTrim(
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_MATERIAL, registryAccess)),
 				RandomUtil.randomElementFrom(plugin.registryHolders(Registries.TRIM_PATTERN, registryAccess))
 			));
@@ -214,31 +193,27 @@ public class LootboxCommand extends ModdedCommand {
 			_enchantments = Math.max(_enchantments, RandomUtil.weightedRandom(EnchantmentWeights.values(), EnchantmentWeights.TOTAL_WEIGHTS).getLevel());
 		}
 		final int enchantments = _enchantments;
-		List<Holder<Enchantment>> enchantmentList = plugin.registry(Registries.ENCHANTMENT, registryAccess)
-			.holders()
-			.filter(enchantmentHolder -> enchantmentHolder.value().canEnchant(itemStack))
+		List<Enchantment> enchantmentList = BuiltInRegistries.ENCHANTMENT.stream()
+			.filter(enchantment -> enchantment.canEnchant(itemStack))
 			.collect(Collectors.toList());
-		if (random.nextDouble() >= (.8d - (luck * .2d))) {
-			for (DataComponentType<?> curse : CURSES) {
-				enchantmentList.removeIf(holder -> holder.value().effects().has(curse));
-			}
-		}
+		if (random.nextDouble() >= (.8d - (luck * .2d)))
+			enchantmentList.removeIf(Enchantment::isCurse);
 
 		// add enchantments
-		List<Holder<Enchantment>> addedEnchantments = new ArrayList<>(enchantments);
-		ResourceLocation nullKey = ResourceLocation.fromNamespaceAndPath("null", "null");
+		List<Enchantment> addedEnchantments = new ArrayList<>(enchantments);
+		ResourceLocation nullKey = new ResourceLocation("null", "null");
 		while (addedEnchantments.size() < enchantments && !enchantmentList.isEmpty()) {
-			Holder<Enchantment> enchantment = enchantmentList.removeFirst();
+			Enchantment enchantment = enchantmentList.remove(0);
 
 			// block conflicting vanilla enchantments (unless the die roll decides otherwise)
-			boolean isVanilla = enchantment.unwrapKey().map(ResourceKey::location).orElse(nullKey).getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE);
+			boolean isVanilla = Objects.requireNonNullElse(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), nullKey).getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE);
 			if (addedEnchantments.stream().anyMatch(
-				x -> !Enchantment.areCompatible(x, enchantment)
+				x -> !x.isCompatibleWith(enchantment)
 				&& (
 					// allow skipping if one of the enchants isn't vanilla
 					// or if a 90% chance procs
 					!isVanilla
-						|| !x.unwrapKey().map(ResourceKey::location).orElse(nullKey).getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)
+						|| !Objects.requireNonNullElse(BuiltInRegistries.ENCHANTMENT.getKey(x), nullKey).getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)
 						|| random.nextDouble() >= (.1d + (luck * .1d))
 				)
 			))
@@ -246,10 +221,10 @@ public class LootboxCommand extends ModdedCommand {
 			addedEnchantments.add(enchantment);
 
 			// determine enchantment level
-			int level = enchantment.value().getMinLevel();
-			if (enchantment.value().getMaxLevel() > level) {
+			int level = enchantment.getMinLevel();
+			if (enchantment.getMaxLevel() > level) {
 				for (int j = 0; j <= luck; j++) {
-					level = Math.max(level, RandomUtil.nextInclusiveInt(enchantment.value().getMinLevel(), enchantment.value().getMaxLevel()));
+					level = Math.max(level, RandomUtil.nextInclusiveInt(enchantment.getMinLevel(), enchantment.getMaxLevel()));
 				}
 				if (random.nextDouble() >= (0.5D - (luck * .07D)))
 					level += random.nextInt(4);
@@ -266,55 +241,62 @@ public class LootboxCommand extends ModdedCommand {
 		}
 		// add attributes
 		if (attributes > 0) {
+			// get equipment slot(s)
+			EquipmentSlot[] equipmentSlots = itemStack.getItem() instanceof ArmorItem armorItem
+				? new EquipmentSlot[]{armorItem.getEquipmentSlot()}
+				: new EquipmentSlot[]{EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND};
+			// add default attributes, which would otherwise be replaced by the custom ones
+			for (EquipmentSlot type : equipmentSlots) {
+				itemStack.getItem().getDefaultAttributeModifiers(type)
+					.forEach((attribute, modifier) -> itemStack.addAttributeModifier(attribute, modifier, type));
+			}
 			// add custom attributes
-			List<Holder<Attribute>> attributeList = new ArrayList<>(ATTRIBUTES);
+			List<Attribute> attributeList = new ArrayList<>(ATTRIBUTES);
 			Collections.shuffle(attributeList, random);
 			for (int i = 0; i < attributeList.size() && i < attributes; i++) {
-				Holder<Attribute> attribute = attributeList.get(i);
+				Attribute attribute = attributeList.get(i);
+				String name = "lootbox_" + Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(attribute)).getPath();
 				// determine percent amount for the modifier
-				double max = attribute.is(Attributes.MOVEMENT_SPEED) ? 0.2d : 1d;
+				double max = attribute == Attributes.MOVEMENT_SPEED ? 0.2d : 1d;
 				double amount = -max; // just a fallback
 				for (int j = 0; j <= luck; j++) {
 					amount = Math.max(amount, random.nextDouble(-max, max + 0.001d));
 				}
 				if (Math.abs(amount) < 0.01d) continue;
 				// create & add attribute
-				AttributeModifier attributeModifier = new AttributeModifier(migrateId(UUID.randomUUID()), amount, Operation.ADD_VALUE);
-				ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-				modifiers = modifiers.withModifierAdded(attribute, attributeModifier, EquipmentSlotGroup.ANY);
-				itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
+				for (int k = 0; k < equipmentSlots.length; k++) {
+					AttributeModifier attributeModifier = new AttributeModifier(UUID.randomUUID(), name + "_" + k, amount, Operation.ADDITION);
+					itemStack.addAttributeModifier(attribute, attributeModifier, equipmentSlots[k]);
+				}
 			}
-			// add default attributes
-			// TODO: maybe these aren't needed anymore? feel like i recall a snapshot to that effect
-//			for (EquipmentSlot type : EquipmentSlot.values()) {
-//				if (!equipmentSlotGroup.test(type)) continue;
-//				itemStack.getItem().getDefaultAttributeModifiers()
-//					.forEach(type, (attribute, modifier) -> {
-//						// TODO: does any of this make sense (especially the equipmentSlotGroup)
-//						ItemAttributeModifiers modifiers = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-//						modifiers = modifiers.withModifierAdded(attribute, modifier, equipmentSlotGroup);
-//						itemStack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
-//					});
-//			}
 		}
 	}
 
 	// lore getter
 	private List<net.kyori.adventure.text.Component> getLore(ItemStack itemStack) {
-		ItemLore itemLore = itemStack.get(DataComponents.LORE);
-		if (itemLore == null || itemLore.lines().isEmpty())
+		CompoundTag displayTag = itemStack.getTagElement(ItemStack.TAG_DISPLAY);
+		if (displayTag == null)
 			return new ArrayList<>();
-		return itemLore.lines().stream().map(plugin::toAdventure).collect(Collectors.toList());
+		ListTag list = displayTag.getList(ItemStack.TAG_LORE, Tag.TAG_STRING);
+		return list.stream()
+			.map(tag -> net.minecraft.network.chat.Component.Serializer.fromJson(tag.getAsString()))
+			.filter(Objects::nonNull)
+			.map(plugin::toAdventure)
+			.collect(Collectors.toList());
 	}
 
 	// lore setter
 	private void setLore(ItemStack itemStack, List<net.kyori.adventure.text.Component> lore) {
 		if (lore.isEmpty()) {
-			itemStack.remove(DataComponents.LORE);
+			CompoundTag displayTag = itemStack.getTagElement(ItemStack.TAG_DISPLAY);
+			if (displayTag != null)
+				displayTag.remove(ItemStack.TAG_LORE);
 			return;
 		}
-		List<net.minecraft.network.chat.Component> nativeLore = Lists.transform(lore, component -> plugin.adventure().asNative(component));
-		itemStack.set(DataComponents.LORE, new ItemLore(nativeLore));
+		ListTag list = new ListTag();
+		for (Component component : lore)
+			list.add(StringTag.valueOf(net.minecraft.network.chat.Component.Serializer.toJson(plugin.adventure().toNative(component))));
+		itemStack.getOrCreateTagElement(ItemStack.TAG_DISPLAY).put(ItemStack.TAG_LORE, list);
 	}
 
 	@Override
@@ -330,7 +312,7 @@ public class LootboxCommand extends ModdedCommand {
 				// init container
 				SimpleContainer container = new SimpleContainer(27);
 				for (int slot : CommandConstants.lootboxItemSlots(luck)) {
-					ItemStack itemStack = createRandomItem(luck, player.registryAccess());
+					ItemStack itemStack = createRandomItem(luck, player.getLevel().registryAccess());
 					List<Component> lore = getLore(itemStack);
 					lore.add(plugin.adventure().renderer().render(buildLootboxLore(plugin, request), audience));
 					setLore(itemStack, lore);
@@ -338,7 +320,7 @@ public class LootboxCommand extends ModdedCommand {
 				}
 
 				// sound & open
-				var title = plugin.adventure().asNative(buildLootboxTitle(plugin, request));
+				var title = plugin.adventure().toNative(buildLootboxTitle(plugin, request));
 
 				OptionalInt val = player.openMenu(new SimpleMenuProvider((i, inventory, p) -> ChestMenu.threeRows(i, inventory, container), title));
 				if (val.isEmpty()) continue;

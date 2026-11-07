@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.ControllerBuilder;
-import dev.isxander.yacl3.impl.ProvidesBindingForDeprecation;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
@@ -21,7 +20,7 @@ import java.util.function.Supplier;
 public final class MapOptionImpl<K, V> implements MapOption<K, V> {
     private final Component name;
     private final OptionDescription description;
-    private final StateManager<Map<K, V>> stateManager;
+    private final Binding<Map<K, V>> binding;
     private final Supplier<? extends Iterable<K>> initialKeys;
     private final Supplier<V> initialValue;
     private final List<MapOptionEntry<K, V>> entries;
@@ -33,14 +32,14 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
     private final ImmutableSet<OptionFlag> flags;
     private final EntryFactory entryFactory;
 
-    private final List<OptionEventListener<Map<K, V>>> listeners;
+    private final List<BiConsumer<Option<Map<K, V>>, Map<K, V>>> listeners;
     private final List<Runnable> refreshListeners;
     private int currentListenerDepth = 0;
 
-    public MapOptionImpl(@NotNull Component name, @NotNull OptionDescription description, @NotNull StateManager<Map<K, V>> stateManager, @NotNull Supplier<? extends Iterable<K>> initialKeys, @NotNull Supplier<V> initialValue, @NotNull Function<Option<K>, Controller<K>> keyControllerFunction, @NotNull Function<Option<V>, Controller<V>> valueControllerFunction, ImmutableSet<OptionFlag> flags, boolean collapsed, boolean available, int minimumNumberOfEntries, int maximumNumberOfEntries, boolean insertEntriesAtEnd, Collection<OptionEventListener<Map<K, V>>> listeners) {
+    public MapOptionImpl(@NotNull Component name, @NotNull OptionDescription description, @NotNull Binding<Map<K, V>> binding, @NotNull Supplier<? extends Iterable<K>> initialKeys, @NotNull Supplier<V> initialValue, @NotNull Function<Option<K>, Controller<K>> keyControllerFunction, @NotNull Function<Option<V>, Controller<V>> valueControllerFunction, ImmutableSet<OptionFlag> flags, boolean collapsed, boolean available, int minimumNumberOfEntries, int maximumNumberOfEntries, boolean insertEntriesAtEnd, Collection<BiConsumer<Option<Map<K, V>>, Map<K, V>>> listeners) {
         this.name = name;
         this.description = description;
-        this.stateManager = stateManager;
+        this.binding = binding;
         this.initialKeys = initialKeys;
         this.initialValue = initialValue;
         this.entryFactory = new EntryFactory(keyControllerFunction, valueControllerFunction);
@@ -54,10 +53,6 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         this.listeners = new ArrayList<>();
         this.listeners.addAll(listeners);
         this.refreshListeners = new ArrayList<>();
-
-        this.stateManager.addListener((oldValue, newValue) ->
-                triggerListener(OptionEventListener.Event.STATE_CHANGE, false));
-        triggerListener(OptionEventListener.Event.INITIAL, false);
     }
 
     @Override
@@ -94,6 +89,10 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
                         }
                     }
                 }
+                if (child instanceof dev.isxander.yacl3.gui.tab.ListHolderWidget<?> holder && holder.getList() instanceof dev.isxander.yacl3.gui.OptionListWidget list) {
+                    list.refreshOptions();
+                    return;
+                }
                 if (child instanceof dev.isxander.yacl3.gui.OptionListWidget list) {
                     list.refreshOptions();
                     return;
@@ -108,17 +107,8 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
     }
 
     @Override
-    public @NotNull StateManager<Map<K, V>> stateManager() {
-        return stateManager;
-    }
-
-    @Override
-    @Deprecated
     public @NotNull Binding<Map<K, V>> binding() {
-        if (stateManager instanceof ProvidesBindingForDeprecation) {
-            return ((ProvidesBindingForDeprecation<Map<K, V>>) stateManager).getBinding();
-        }
-        throw new UnsupportedOperationException("Binding is not available for this option.");
+        return binding;
     }
 
     @Override
@@ -239,9 +229,9 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
 
         if (changed) {
             if (!available) {
-                this.stateManager.sync();
+                forgetPendingValue();
             }
-            this.triggerListener(OptionEventListener.Event.AVAILABILITY_CHANGE, !available);
+            this.triggerListener(!available);
         }
     }
 
@@ -259,14 +249,8 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
     }
 
     @Override
-    public void addEventListener(OptionEventListener<Map<K, V>> listener) {
-        this.listeners.add(listener);
-    }
-
-    @Override
-    @Deprecated
     public void addListener(BiConsumer<Option<Map<K, V>>, Map<K, V>> changedListener) {
-        addEventListener((opt, event) -> changedListener.accept(opt, opt.pendingValue()));
+        this.listeners.add(changedListener);
     }
 
     @Override
@@ -287,7 +271,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         return list;
     }
 
-    void triggerListener(OptionEventListener.Event event, boolean allowDepth) {
+    void triggerListener(boolean allowDepth) {
         if (allowDepth || currentListenerDepth == 0) {
             Validate.isTrue(
                     currentListenerDepth <= 10,
@@ -296,8 +280,9 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
 
             currentListenerDepth++;
 
-            for (OptionEventListener<Map<K, V>> listener : listeners) {
-                listener.onEvent(this, event);
+            Map<K, V> value = pendingValue();
+            for (BiConsumer<Option<Map<K, V>>, Map<K, V>> listener : listeners) {
+                listener.accept(this, value);
             }
 
             currentListenerDepth--;
@@ -306,7 +291,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
 
     private void onRefresh() {
         refreshListeners.forEach(Runnable::run);
-        triggerListener(OptionEventListener.Event.OTHER, true);
+        triggerListener(true);
     }
 
     private class EntryFactory {
@@ -337,10 +322,9 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         private int minimumNumberOfEntries = 0;
         private int maximumNumberOfEntries = Integer.MAX_VALUE;
         private boolean insertEntriesAtEnd = false;
-        private final List<OptionEventListener<Map<K, V>>> listeners = new ArrayList<>();
+        private final List<BiConsumer<Option<Map<K, V>>, Map<K, V>>> listeners = new ArrayList<>();
 
         private Binding<Map<K, V>> binding;
-        private StateManager<Map<K, V>> stateManager;
 
         @Override
         public Builder<K, V> name(@NotNull Component name) {
@@ -431,18 +415,8 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         }
 
         @Override
-        public Builder<K, V> state(@NotNull StateManager<Map<K, V>> stateManager) {
-            Validate.notNull(stateManager, "`stateManager` cannot be null");
-            Validate.isTrue(binding == null, "Cannot set state manager if binding is already set");
-
-            this.stateManager = stateManager;
-            return this;
-        }
-
-        @Override
         public Builder<K, V> binding(@NotNull Binding<Map<K, V>> binding) {
             Validate.notNull(binding, "`binding` cannot be null");
-            Validate.isTrue(stateManager == null, "Cannot set binding if state manager is already set");
 
             this.binding = binding;
             return this;
@@ -505,7 +479,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         }
 
         @Override
-        public Builder<K, V> addListener(@NotNull OptionEventListener<Map<K, V>> listener) {
+        public Builder<K, V> listener(@NotNull BiConsumer<Option<Map<K, V>>, Map<K, V>> listener) {
             Validate.notNull(listener, "`listener` must not be null");
 
             this.listeners.add(listener);
@@ -513,30 +487,10 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         }
 
         @Override
-        public Builder<K, V> addListeners(@NotNull Collection<@NotNull OptionEventListener<Map<K, V>>> optionEventListeners) {
-            Validate.notNull(optionEventListeners, "`optionEventListeners` must not be null");
-
-            this.listeners.addAll(optionEventListeners);
-            return this;
-        }
-
-        @Override
-        public Builder<K, V> listener(@NotNull BiConsumer<Option<Map<K, V>>, Map<K, V>> listener) {
-            Validate.notNull(listener, "`listener` must not be null");
-
-            return this.addListener((opt, event) -> listener.accept(opt, opt.pendingValue()));
-        }
-
-        @Override
         public Builder<K, V> listeners(@NotNull Collection<BiConsumer<Option<Map<K, V>>, Map<K, V>>> listeners) {
             Validate.notNull(listeners, "`listeners` must not be null");
 
-            this.addListeners(listeners.stream()
-                    .map(listener ->
-                            (OptionEventListener<Map<K, V>>) (opt, event) ->
-                                    listener.accept(opt, opt.pendingValue())
-                    ).toList()
-            );
+            this.listeners.addAll(listeners);
             return this;
         }
 
@@ -546,13 +500,9 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
             Validate.notNull(valueControllerFunction, "`valueController` must not be null");
             Validate.notNull(initialKeys, "`initialKey` must not be null");
             Validate.notNull(initialValue, "`initialValue` must not be null");
-            Validate.isTrue(stateManager != null || binding != null, "Either a state manager or binding must be set");
+            Validate.notNull(binding, "`binding` must not be null");
 
-            if (stateManager == null) {
-                stateManager = StateManager.createSimple(binding);
-            }
-
-            return new MapOptionImpl<>(name, description, stateManager, initialKeys, initialValue, keyControllerFunction, valueControllerFunction, ImmutableSet.copyOf(flags), collapsed, available, minimumNumberOfEntries, maximumNumberOfEntries, insertEntriesAtEnd, listeners);
+            return new MapOptionImpl<>(name, description, binding, initialKeys, initialValue, keyControllerFunction, valueControllerFunction, ImmutableSet.copyOf(flags), collapsed, available, minimumNumberOfEntries, maximumNumberOfEntries, insertEntriesAtEnd, listeners);
         }
     }
 }

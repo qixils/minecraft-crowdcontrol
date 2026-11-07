@@ -15,9 +15,9 @@ public final class HealthModifierManager {
 			return;
 		switch (modifier) {
 			case OHKO:
-				if (event.source().equals(player.damageSources().genericKill()) && event.amount() >= Float.MAX_VALUE)
+				if (event.source().equals(player.damageSources().outOfWorld()) && event.amount() >= Float.MAX_VALUE)
 					return; // we've caught ourselves! ignore this damage
-				player.hurt(player.damageSources().genericKill(), Float.MAX_VALUE);
+				player.hurt(player.damageSources().outOfWorld(), Float.MAX_VALUE);
 			case INVINCIBLE:
 				event.cancel();
 		}

@@ -72,7 +72,7 @@ subprojects {
         compileOnly("io.netty:netty-buffer:$nettyVersion")
     }
 
-    val targetJavaVersion = 21
+    val targetJavaVersion = 17
     tasks.withType<JavaCompile>().configureEach {
         options.release.set(targetJavaVersion)
         options.encoding = Charsets.UTF_8.name()

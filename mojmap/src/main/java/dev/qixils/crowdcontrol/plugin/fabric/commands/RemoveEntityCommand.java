@@ -10,7 +10,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -48,7 +48,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public RemoveEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(
 			plugin,
-			"remove_entity_" + csIdOf(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType))),
+			"remove_entity_" + csIdOf(FabricAudiences.toAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType))),
 			Component.translatable("cc.effect.remove_entity.name", plugin.toAdventure(entityType.getDescription())),
 			entityType
 		);
@@ -79,8 +79,8 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	}
 
 	private boolean removeEntityFrom(ServerPlayer player) {
-		ServerLevel level = player.serverLevel();
-		if (entityTypes.contains(EntityType.ENDER_DRAGON) && level.getDragonFight() != null) return false;
+		ServerLevel level = player.getLevel();
+		if (entityTypes.contains(EntityType.ENDER_DRAGON) && level.dragonFight() != null) return false;
 
 		Vec3 playerPosition = player.position();
 		List<Entity> entities = StreamSupport.stream(level.getAllEntities().spliterator(), false)
@@ -88,7 +88,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 				.sorted((entity1, entity2) -> (int) (entity1.distanceToSqr(playerPosition) - entity2.distanceToSqr(playerPosition))).toList();
 		if (entities.isEmpty())
 			return false;
-		entities.getFirst().remove(RemovalReason.KILLED);
+		entities.get(0).remove(RemovalReason.KILLED);
 		return true;
 	}
 
@@ -100,7 +100,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 			LimitConfig config = getPlugin().getLimitConfig();
 			int def = config.defaultEntityLimit();
 			int playerLimit = entityTypes.stream().flatMapToInt(entityType -> {
-				int limit = config.getEntityLimit(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)).asMinimalString());
+				int limit = config.getEntityLimit(FabricAudiences.toAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)).asMinimalString());
 				if (def == limit || limit <= 0) return IntStream.empty();
 				return IntStream.of(limit);
 			}).min().orElse(def);

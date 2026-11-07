@@ -10,7 +10,6 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -39,11 +38,9 @@ public class BucketClutchCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				Item material = player.serverLevel().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
+				Item material = player.getLevel().dimensionType().ultraWarm() ? Items.COBWEB : Items.WATER_BUCKET;
 				ItemStack giveItem = new ItemStack(material);
-				player.registryAccess().lookup(Registries.ENCHANTMENT)
-					.flatMap(registry -> registry.get(Enchantments.VANISHING_CURSE))
-					.ifPresent(enchantment -> giveItem.enchant(enchantment, 1));
+				giveItem.enchant(Enchantments.VANISHING_CURSE, 1);
 
 				Location curr = new Location(player);
 				int offset = BUCKET_CLUTCH_MAX - 1;

@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
+import dev.qixils.crowdcontrol.common.packets.PluginPacket;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.util.GameEvents;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -26,8 +27,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
-import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
+import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.kyori.adventure.pointer.Pointered;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandSourceStack;
@@ -35,8 +36,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -55,7 +56,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
 
-import static net.minecraft.resources.ResourceLocation.fromNamespaceAndPath;
 
 // TODO: can no longer connect to paper servers
 
@@ -77,7 +77,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 	@Nullable
 	protected MinecraftServer server;
 	@Nullable @Accessors(fluent = true)
-	protected MinecraftServerAudiences adventure;
+	protected FabricServerAudiences adventure;
 	@NotNull
 	private MojmapTextUtil textUtil = new MojmapTextUtil(this);
 	@NotNull
@@ -107,7 +107,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 
 	public ModdedCrowdControlPlugin() {
 		super(ServerPlayer.class, CommandSourceStack.class);
-		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(fromNamespaceAndPath(key.namespace(), key.value()));
+		CommandConstants.SOUND_VALIDATOR = key -> BuiltInRegistries.SOUND_EVENT.containsKey(new ResourceLocation(key.namespace(), key.value()));
 		instance = this;
 		getEventManager().registerListeners(softLockResolver);
 		getEventManager().register(Join.class, join -> onPlayerJoin(join.player()));
@@ -185,14 +185,14 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 	}
 
 	@NotNull
-	public MinecraftServerAudiences adventure() throws IllegalStateException {
+	public FabricServerAudiences adventure() throws IllegalStateException {
 		if (this.adventure == null)
 			throw new IllegalStateException("Tried to access Adventure without running a server");
 		return this.adventure;
 	}
 
 	@NotNull
-	public Optional<MinecraftServerAudiences> adventureOptional() {
+	public Optional<FabricServerAudiences> adventureOptional() {
 		return Optional.ofNullable(this.adventure);
 	}
 
@@ -203,7 +203,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 			this.syncExecutor = Runnable::run;
 		} else {
 			this.server = server;
-			this.adventure = MinecraftServerAudiences.of(server);
+			this.adventure = FabricServerAudiences.of(server);
 			this.syncExecutor = server;
 			this.textUtil = new MojmapTextUtil(this);
 			initCrowdControl();
@@ -260,7 +260,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 	}
 
 	public @NotNull Component toAdventure(net.minecraft.network.chat.Component vanilla) {
-		return adventure().asAdventure(vanilla);
+		return adventure().toAdventure(vanilla);
 	}
 
 	public @NotNull Component toAdventure(Component text, @NotNull Pointered viewer) {
@@ -272,7 +272,7 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 	}
 
 	public @NotNull net.minecraft.network.chat.Component toNative(Component text, @NotNull Pointered viewer) {
-		return adventure().asNative(toAdventure(text, viewer));
+		return adventure().toNative(toAdventure(text, viewer));
 	}
 
 	public abstract PermissionUtil getPermissionUtil();
@@ -308,13 +308,13 @@ public abstract class ModdedCrowdControlPlugin extends Plugin<ServerPlayer, Comm
 			emitGameEvent(player, GameEvents.death());
 		}
 		if (source != null && source.getEntity() instanceof ServerPlayer player) {
-			emitGameEvent(player, GameEvents.kill(MinecraftAudiences.asAdventure(EntityType.getKey(target.getType()))));
+			emitGameEvent(player, GameEvents.kill(FabricAudiences.toAdventure(EntityType.getKey(target.getType()))));
 		}
 	}
 
-	public abstract void sendToPlayer(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload);
+	public abstract void sendToPlayer(@NotNull ServerPlayer player, @NotNull PluginPacket payload);
 
-	public static void sendToPlayerStatic(@NotNull ServerPlayer player, @NotNull CustomPacketPayload payload) {
+	public static void sendToPlayerStatic(@NotNull ServerPlayer player, @NotNull PluginPacket payload) {
 		if (!isInstanceAvailable()) return;
 		getInstance().sendToPlayer(player, payload);
 	}

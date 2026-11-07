@@ -54,7 +54,7 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 
 	@Override
 	public void jumpFromGround(CallbackInfo ci) {
-		Jump event = new Jump((Player) (Object) this, this.level().isClientSide);
+		Jump event = new Jump((Player) (Object) this, this.getLevel().isClientSide);
 
 		boolean cantJump = cc$getMovementStatus(MovementStatusType.JUMP) == MovementStatusValue.DENIED;
 		boolean cantWalk = cc$getMovementStatus(MovementStatusType.WALK) == MovementStatusValue.DENIED;
@@ -79,7 +79,7 @@ public abstract class PlayerMixin extends LivingEntityMixin implements MovementS
 	}
 
 	@WrapOperation(
-			method = "getBaseExperienceReward",
+			method = "getExperienceReward",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z")
 	)
 	private boolean experienceKeepInventoryRedirect(GameRules gameRules, GameRules.Key<BooleanValue> key, Operation<Boolean> original) {

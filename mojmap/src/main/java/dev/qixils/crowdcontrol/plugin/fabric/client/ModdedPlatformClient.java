@@ -2,6 +2,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import dev.qixils.crowdcontrol.common.components.MovementStatusType;
 import dev.qixils.crowdcontrol.common.components.MovementStatusValue;
+import dev.qixils.crowdcontrol.common.packets.PluginPacket;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.common.util.SemVer;
@@ -13,7 +14,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -114,9 +114,9 @@ public abstract class ModdedPlatformClient {
 		((MovementStatus) context.player()).cc$setMovementStatus(payload.statusType(), payload.statusValue());
 	}
 
-	public abstract void sendToServer(@NotNull CustomPacketPayload payload);
+	public abstract void sendToServer(@NotNull PluginPacket payload);
 
-	public static void sendToServerStatic(@NotNull CustomPacketPayload payload) {
+	public static void sendToServerStatic(@NotNull PluginPacket payload) {
 		if (INSTANCE == null) return;
 		INSTANCE.sendToServer(payload);
 	}

@@ -46,7 +46,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 			BlockState block = location.block();
 			if (location.y() < (world.getMinBuildHeight() + 1)) // idk if the +1 is necessary but why not
 				return null;
-			else if (block.getBlock().isPossibleToRespawnInThis(block) && !block.blocksMotion())
+			else if (block.getBlock().isPossibleToRespawnInThis() && !block.getMaterial().blocksMotion())
 				air += 1;
 			else if (air >= 1)
 				break;
@@ -69,7 +69,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 		Block type = block.getBlock();
 		if (Blocks.FIRE.equals(type))
 			location.block(Blocks.AIR.defaultBlockState());
-		else if (!block.blocksMotion())
+		else if (!block.getMaterial().blocksMotion())
 			location.block(Blocks.GLASS.defaultBlockState());
 
 		// place player on top of the block
@@ -100,7 +100,7 @@ abstract class NearbyLocationCommand<S> extends ModdedCommand {
 
 			boolean success = false;
 			for (ServerPlayer player : playerSupplier.get()) {
-				ServerLevel world = player.serverLevel();
+				ServerLevel world = player.getLevel();
 				Location location = new Location(player);
 				S currentType = currentType(location);
 				List<S> searchTypes = new ArrayList<>(getSearchTypes(world));

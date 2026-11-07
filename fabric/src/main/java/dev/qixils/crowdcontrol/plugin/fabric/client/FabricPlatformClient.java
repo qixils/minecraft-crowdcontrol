@@ -1,26 +1,27 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
-import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
-import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import dev.qixils.crowdcontrol.common.packets.PluginPacket;
 import dev.qixils.crowdcontrol.plugin.fabric.client.fabric.ClientPacketContextImpl;
+import dev.qixils.crowdcontrol.plugin.fabric.client.vote.ProposalHandler;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
-import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetShaderS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.fabric.PacketUtilImpl;
-import jerozgen.languagereload.LanguageReload;
-import jerozgen.languagereload.config.Config;
+import dev.qixils.crowdcontrol.plugin.fabric.vote.VoteNetworking;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Locale;
+
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 @Environment(EnvType.CLIENT)
 public class FabricPlatformClient extends ModdedPlatformClient implements ClientModInitializer {
@@ -35,59 +36,45 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 
 		PacketUtilImpl.registerPackets();
 
-		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> handleRequestVersion(payload, new ClientPacketContextImpl(context)));
-		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (payload, context) -> handleSetShader(payload, new ClientPacketContextImpl(context)));
-		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (payload, context) -> handleMovementStatus(payload, new ClientPacketContextImpl(context)));
-		ClientPlayNetworking.registerGlobalReceiver(SetLanguageS2C.PACKET_ID, (payload, context) -> handleLanguage(payload));
+		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (client, handler, buf, responseSender) ->
+			client.execute(() -> handleRequestVersion(RequestVersionS2C.INSTANCE, new ClientPacketContextImpl(client, responseSender))));
+		ClientPlayNetworking.registerGlobalReceiver(SetShaderS2C.PACKET_ID, (client, handler, buf, responseSender) -> {
+			SetShaderS2C payload = new SetShaderS2C(buf);
+			client.execute(() -> handleSetShader(payload, new ClientPacketContextImpl(client, responseSender)));
+		});
+		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (client, handler, buf, responseSender) -> {
+			MovementStatusS2C payload = new MovementStatusS2C(buf);
+			client.execute(() -> handleMovementStatus(payload, new ClientPacketContextImpl(client, responseSender)));
+		});
+
+		// accept default username from the server
+		ClientPlayNetworking.registerGlobalReceiver(VoteNetworking.CHANNEL_ID, (client, handler, buf, responseSender) -> {
+			String channel = buf.readUtf();
+			client.execute(() -> {
+				if (channel.isEmpty())
+					ProposalHandler.getOptional().ifPresent(ProposalHandler::leaveChannel);
+				else
+					ProposalHandler.get().joinChannel(channel);
+			});
+		});
+		// lets streamers use the integration on servers without the mod
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(literal("ccvote")
+			.then(literal("stop").executes(ctx -> {
+				ProposalHandler.getOptional().ifPresent(ProposalHandler::leaveChannel);
+				ctx.getSource().sendFeedback(Component.translatableWithFallback("crowdcontrol.proposal.command.stop", "Your Twitch chat will no longer vote on proposals"));
+				return 1;
+			}))
+			.then(argument("channel", StringArgumentType.word()).executes(ctx -> {
+				String channel = StringArgumentType.getString(ctx, "channel").toLowerCase(Locale.ROOT);
+				ProposalHandler.get().joinChannel(channel);
+				ctx.getSource().sendFeedback(Component.translatableWithFallback("crowdcontrol.proposal.command.start", "Twitch chat for %s will now vote on proposals", channel));
+				return 1;
+			}))));
 	}
 
-	@Override
-	public @NotNull Set<ExtraFeature> getExtraFeatures() {
-		Set<ExtraFeature> features = super.getExtraFeatures();
-		if (FabricLoader.getInstance().isModLoaded("languagereload"))
-			features.add(ExtraFeature.LANGUAGE_RELOAD);
-		return features;
-	}
-
-	public void handleLanguage(SetLanguageS2C payload) {
-		if (client == null) return;
-		if (!getExtraFeatures().contains(ExtraFeature.LANGUAGE_RELOAD)) return;
-		if (LANGUAGE_STATE == payload.state()) return;
-		LANGUAGE_STATE = payload.state();
-
-		switch (LANGUAGE_STATE) {
-			case RESET -> {
-				Config config = Config.getInstance();
-				LanguageReload.setLanguage(config.previousLanguage, config.previousFallbacks);
-			}
-			case RANDOM -> {
-				Config config = Config.getInstance();
-				List<String> languages = new ArrayList<>(client.getLanguageManager().getLanguages().keySet());
-				languages.remove(config.language);
-				languages.removeAll(config.fallbacks);
-				languages.remove("en_us");
-				Collections.shuffle(languages);
-				LinkedList<String> fallback = new LinkedList<>(languages.subList(1, 6));
-				fallback.add("en_us"); // I assume this should always be loaded
-				LanguageReload.setLanguage(languages.getFirst(), fallback);
-			}
-			case null, default -> logger.warn("Unknown language state {}", LANGUAGE_STATE);
-		}
-
-		if (LANGUAGE_STATE != LanguageState.RESET)
-			executor.schedule(
-				() -> handleLanguage(new SetLanguageS2C(LanguageState.RESET, Duration.ZERO)),
-				payload.duration().toMillis(),
-				TimeUnit.MILLISECONDS
-			);
-	}
-
-	public void sendToServer(@NotNull CustomPacketPayload payload) {
-		if (!ClientPlayNetworking.canSend(payload.type())) return;
-		try {
-			ClientPlayNetworking.send(payload);
-		} catch (UnsupportedOperationException e) {
-			logger.debug("Server cannot receive packet {}", payload);
-		}
+	public void sendToServer(@NotNull PluginPacket payload) {
+		ResourceLocation channel = PacketUtilImpl.channel(payload);
+		if (!ClientPlayNetworking.canSend(channel)) return;
+		ClientPlayNetworking.send(channel, PacketUtilImpl.encode(payload));
 	}
 }

@@ -52,11 +52,6 @@ public class HiddenNameMapOptionEntry<K, V> implements MapOptionEntry<K, V> {
     }
 
     @Override
-    public @NotNull StateManager<Map.Entry<K, V>> stateManager() {
-        return option.stateManager();
-    }
-
-    @Override
     public @NotNull Controller<Map.Entry<K, V>> controller() {
         return option.controller();
     }
@@ -132,8 +127,4 @@ public class HiddenNameMapOptionEntry<K, V> implements MapOptionEntry<K, V> {
         option.addListener(changedListener);
     }
 
-    @Override
-    public void addEventListener(OptionEventListener<Map.Entry<K, V>> listener) {
-        option.addEventListener(listener);
-    }
 }

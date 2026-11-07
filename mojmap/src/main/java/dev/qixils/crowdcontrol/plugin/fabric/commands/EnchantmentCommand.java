@@ -9,10 +9,10 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -30,7 +30,6 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.csIdOf;
 
 @Getter
 public class EnchantmentCommand extends ModdedCommand {
-	protected final Holder<Enchantment> enchantmentHolder;
 	protected final Enchantment enchantment;
 	private final String effectName;
 	private final Component displayName;
@@ -40,14 +39,13 @@ public class EnchantmentCommand extends ModdedCommand {
 	private final byte priority = 0;
 	private final List<String> categories = Collections.singletonList("Enchantments");
 
-	public EnchantmentCommand(ModdedCrowdControlPlugin plugin, Holder<Enchantment> enchantment) {
+	public EnchantmentCommand(ModdedCrowdControlPlugin plugin, Enchantment enchantment) {
 		super(plugin);
-		this.enchantmentHolder = enchantment;
-		this.enchantment = enchantmentHolder.value();
-		this.effectName = "enchant_" + csIdOf(MinecraftAudiences.key(enchantment.unwrapKey().orElseThrow()));
+		this.enchantment = enchantment;
+		this.effectName = "enchant_" + csIdOf(FabricAudiences.toAdventure(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(enchantment))));
 		TranslatableComponent _displayName = Component.translatable(
 				"cc.effect.enchant.name",
-				plugin.toAdventure(Enchantment.getFullname(enchantment, enchantment.value().getMaxLevel()).copy().setStyle(Style.EMPTY))
+				plugin.toAdventure(enchantment.getFullname(enchantment.getMaxLevel()).copy().setStyle(Style.EMPTY))
 		);
 		this.displayName = _displayName;
 		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.enchant.extension")));
@@ -75,11 +73,11 @@ public class EnchantmentCommand extends ModdedCommand {
 						&& enchantment.canEnchant(item)
 						&& (
 						enchantment.getMaxLevel() != enchantment.getMinLevel()
-							|| getEnchantmentLevel(item, enchantmentHolder) != enchantment.getMaxLevel()
-							&& getEnchantmentLevel(item, enchantmentHolder) != 255
+							|| getEnchantmentLevel(item, enchantment) != enchantment.getMaxLevel()
+							&& getEnchantmentLevel(item, enchantment) != 255
 					)
 					) {
-						levelMap.put(slot, getEnchantmentLevel(item, enchantmentHolder));
+						levelMap.put(slot, getEnchantmentLevel(item, enchantment));
 					}
 				}
 				EquipmentSlot slot = levelMap.entrySet().stream()
@@ -89,11 +87,12 @@ public class EnchantmentCommand extends ModdedCommand {
 					continue;
 				// add new enchant
 				ItemStack item = getItem(inv, slot);
-				int curLevel = getEnchantmentLevel(item, enchantmentHolder);
+				int curLevel = getEnchantmentLevel(item, enchantment);
 				if (curLevel >= level)
 					level = curLevel + 1;
-				final int setLevel = level;
-				EnchantmentHelper.updateEnchantments(item, mutable -> mutable.set(enchantmentHolder, setLevel));
+				Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(item);
+				enchantments.put(enchantment, level);
+				EnchantmentHelper.setEnchantments(enchantments, item);
 				success = true;
 			}
 			return success
@@ -106,7 +105,7 @@ public class EnchantmentCommand extends ModdedCommand {
 		return inv.player.getItemBySlot(slot);
 	}
 
-	public static int getEnchantmentLevel(ItemStack item, Holder<Enchantment> enchantment) {
+	public static int getEnchantmentLevel(ItemStack item, Enchantment enchantment) {
 		return EnchantmentHelper.getItemEnchantmentLevel(enchantment, item);
 	}
 }

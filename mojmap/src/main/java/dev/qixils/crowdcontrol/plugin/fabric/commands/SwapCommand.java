@@ -38,7 +38,7 @@ public class SwapCommand extends ModdedCommand {
 			// create a list offset by one
 			List<ServerPlayer> offset = new ArrayList<>(players.size());
 			offset.addAll(players.subList(1, players.size()));
-			offset.add(players.getFirst());
+			offset.add(players.get(0));
 			// get teleport destinations
 			Map<ServerPlayer, Location> destinations = new HashMap<>(players.size());
 			for (int i = 0; i < players.size(); i++)

@@ -1,11 +1,11 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client.option;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
 import dev.isxander.yacl3.gui.TooltipButtonWidget;
 import dev.isxander.yacl3.gui.YACLScreen;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -56,7 +56,7 @@ public class MapEntryWidget<K, V> extends AbstractWidget implements ContainerEve
 	}
 
 	@Override
-	public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float a) {
+	public void render(@NotNull PoseStack graphics, int mouseX, int mouseY, float a) {
 		updateButtonStates();
 
 		removeButton.setY(getDimension().y());

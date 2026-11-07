@@ -113,7 +113,7 @@ public class DoOrDieCommand extends ModdedCommand {
 				Audience audience = plugin.adventure().audience(player);
 
 				if (condition.hasSucceeded(player)) {
-					ItemStack reward = plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(condition.getRewardLuck(), player.registryAccess());
+					ItemStack reward = plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(condition.getRewardLuck(), player.getLevel().registryAccess());
 					audience.showTitle(doOrDieSuccess(plugin.toAdventure(reward.getItem().getName(reward))));
 					notCompleted.remove(uuid);
 					audience.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());

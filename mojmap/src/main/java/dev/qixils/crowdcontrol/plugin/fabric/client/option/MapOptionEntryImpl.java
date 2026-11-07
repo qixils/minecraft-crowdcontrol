@@ -19,7 +19,7 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
     
     private K key;
     private V value;
-    private final java.util.List<OptionEventListener<Map.Entry<K, V>>> listeners = new java.util.ArrayList<>();
+    private final java.util.List<BiConsumer<Option<Map.Entry<K, V>>, Map.Entry<K, V>>> listeners = new java.util.ArrayList<>();
 
     private final VirtualOption<K> keyOption;
     private final VirtualOption<V> valueOption;
@@ -42,10 +42,10 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
                     return;
                 }
                 this.key = newKey;
-                for (OptionEventListener<Map.Entry<K, V>> listener : listeners) {
-                    listener.onEvent(MapOptionEntryImpl.this, OptionEventListener.Event.STATE_CHANGE);
+                for (BiConsumer<Option<Map.Entry<K, V>>, Map.Entry<K, V>> listener : listeners) {
+                    listener.accept(MapOptionEntryImpl.this, pendingValue());
                 }
-                group.triggerListener(OptionEventListener.Event.STATE_CHANGE, true);
+                group.triggerListener(true);
             }
         );
 
@@ -53,10 +53,10 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
             () -> this.value,
             (newValue) -> {
                 this.value = newValue;
-                for (OptionEventListener<Map.Entry<K, V>> listener : listeners) {
-                    listener.onEvent(MapOptionEntryImpl.this, OptionEventListener.Event.STATE_CHANGE);
+                for (BiConsumer<Option<Map.Entry<K, V>>, Map.Entry<K, V>> listener : listeners) {
+                    listener.accept(MapOptionEntryImpl.this, pendingValue());
                 }
-                group.triggerListener(OptionEventListener.Event.STATE_CHANGE, true);
+                group.triggerListener(true);
             }
         );
 
@@ -104,11 +104,6 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
     @Override
     public @NotNull Controller<Map.Entry<K, V>> controller() {
         return controller;
-    }
-
-    @Override
-    public @NotNull StateManager<Map.Entry<K, V>> stateManager() {
-        throw new UnsupportedOperationException("MapOptionEntryImpl does not support state managers");
     }
 
     @Override
@@ -185,12 +180,8 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
     }
 
     @Override
-    public void addEventListener(OptionEventListener<Map.Entry<K, V>> listener) {
-        this.listeners.add(listener);
-    }
-
-    @Override
     public void addListener(BiConsumer<Option<Map.Entry<K, V>>, Map.Entry<K, V>> changedListener) {
+        this.listeners.add(changedListener);
     }
 
     @ApiStatus.Internal
@@ -254,11 +245,6 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
         }
 
         @Override
-        public @NotNull StateManager<T> stateManager() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public @NotNull Binding<T> binding() {
             return binding;
         }
@@ -318,10 +304,6 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
         }
 
         @Override
-        public void addEventListener(OptionEventListener<T> listener) {
-        }
-
-        @Override
         public void addListener(BiConsumer<Option<T>, T> changedListener) {
         }
     }
@@ -351,11 +333,6 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
         @Override
         public @NotNull Controller<T> controller() {
             return option.controller();
-        }
-
-        @Override
-        public @NotNull StateManager<T> stateManager() {
-            return option.stateManager();
         }
 
         @Override
@@ -418,11 +395,6 @@ public final class MapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
         @Override
         public boolean canResetToDefault() {
             return option.canResetToDefault();
-        }
-
-        @Override
-        public void addEventListener(OptionEventListener<T> listener) {
-            option.addEventListener(listener);
         }
 
         @Override

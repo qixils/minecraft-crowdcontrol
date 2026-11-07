@@ -73,7 +73,7 @@ public class AddMapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
                 return new AbstractWidget(dim) {
                     private final TooltipButtonWidget button = new TooltipButtonWidget(
                             screen, dim.x(), dim.y(), dim.width(), 20,
-                            Component.literal("\u2795 ").append(Component.translatable("yacl.list.add_top")), null,
+                            Component.literal("+ ").append(Component.translatable("yacl.list.add_top")), null,
                             btn -> {
                                 group.insertNewEntry();
                                 MapOptionImpl.attemptRefresh(screen);
@@ -81,7 +81,7 @@ public class AddMapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
                     );
 
                     @Override
-                    public void render(@NotNull net.minecraft.client.gui.GuiGraphics graphics, int mouseX, int mouseY, float pt) {
+                    public void render(@NotNull com.mojang.blaze3d.vertex.PoseStack graphics, int mouseX, int mouseY, float pt) {
                         button.active = available();
                         button.setX(getDimension().x());
                         button.setY(getDimension().y());
@@ -103,6 +103,9 @@ public class AddMapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
 
                     @Override
                     public boolean mouseClicked(double mouseX, double mouseY, int buttonNum) {
+                        // string fields only apply their value once unfocused, which happens right before this click,
+                        // so availability has to be re-checked instead of relying on the state from the last render
+                        button.active = available();
                         return button.mouseClicked(mouseX, mouseY, buttonNum);
                     }
 
@@ -122,11 +125,6 @@ public class AddMapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
                 };
             }
         };
-    }
-
-    @Override
-    public @NotNull StateManager<Map.Entry<K, V>> stateManager() {
-        return StateManager.createSimple(binding());
     }
 
     @Override
@@ -188,6 +186,4 @@ public class AddMapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
     @Override
     public void addListener(BiConsumer<Option<Map.Entry<K, V>>, Map.Entry<K, V>> changedListener) {}
 
-    @Override
-    public void addEventListener(OptionEventListener<Map.Entry<K, V>> listener) {}
 }

@@ -107,7 +107,7 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 		EntityUtil.handleDie(this, source, ci);
 	}
 
-	@Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "hurtInternal", at = @At("HEAD"), cancellable = true)
 	private void callDamageEvent(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		EntityUtil.handleDamage(this, source, amount, cir);
 	}

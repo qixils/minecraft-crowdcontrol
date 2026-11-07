@@ -13,10 +13,10 @@ import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
 import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -33,7 +33,7 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.POTION_SEC
 
 @Getter
 public class PotionCommand extends ModdedCommand implements CCTimedEffect {
-	private final @NotNull Holder<MobEffect> potionEffectType;
+	private final @NotNull MobEffect potionEffectType;
 	private final boolean isMinimal;
 	private final @NotNull String effectName;
 	private final @NotNull Component displayName;
@@ -46,25 +46,24 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 	private final CustomEffectDuration extensionDuration = new CustomEffectDuration(POTION_SECONDS);
 
 	@SuppressWarnings("ConstantConditions")
-	public PotionCommand(@NotNull ModdedCrowdControlPlugin plugin, @NotNull Holder<MobEffect> potionEffectType) {
+	public PotionCommand(@NotNull ModdedCrowdControlPlugin plugin, @NotNull MobEffect potionEffectType) {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
-		ResourceLocation loc = potionEffectType.unwrapKey().orElseThrow().location();
-		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(MinecraftAudiences.asAdventure(loc));
-		this.isMinimal = potionEffectType.value().isInstantenous();
-		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
+		ResourceLocation loc = BuiltInRegistries.MOB_EFFECT.getKey(potionEffectType);
+		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(FabricAudiences.toAdventure(loc));
+		this.isMinimal = potionEffectType.isInstantenous();
+		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.getDisplayName()));
 		this.displayName = _displayName;
 		this.extensionName = new CCName(plugin.getTextUtil().asPlain(_displayName.key("cc.effect.potion.extension")));
-		this.exclusive = potionEffectType.is(MobEffects.BLINDNESS)
-			|| potionEffectType.is(MobEffects.DARKNESS)
-			|| potionEffectType.is(MobEffects.FIRE_RESISTANCE)
-			|| potionEffectType.is(MobEffects.GLOWING)
-			|| potionEffectType.is(MobEffects.INFESTED)
-			|| potionEffectType.is(MobEffects.INVISIBILITY)
-			|| potionEffectType.is(MobEffects.CONFUSION)
-			|| potionEffectType.is(MobEffects.NIGHT_VISION)
-			|| potionEffectType.is(MobEffects.SLOW_FALLING)
-			|| potionEffectType.is(MobEffects.WATER_BREATHING);
+		this.exclusive = potionEffectType == MobEffects.BLINDNESS
+			|| potionEffectType == MobEffects.DARKNESS
+			|| potionEffectType == MobEffects.FIRE_RESISTANCE
+			|| potionEffectType == MobEffects.GLOWING
+			|| potionEffectType == MobEffects.INVISIBILITY
+			|| potionEffectType == MobEffects.CONFUSION
+			|| potionEffectType == MobEffects.NIGHT_VISION
+			|| potionEffectType == MobEffects.SLOW_FALLING
+			|| potionEffectType == MobEffects.WATER_BREATHING;
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public class EntityChaosCommand extends ModdedCommand {
 			} else {
 				for (ServerPlayer player : playerSupplier.get()) {
 					Vec3 pp = player.position();
-					for (Entity entity : ((ServerLevel) player.level()).getAllEntities()) {
+					for (Entity entity : ((ServerLevel) player.getLevel()).getAllEntities()) {
 						// TODO: I can probably reduce some loops here right?
 						if (entity.getType() == EntityType.PLAYER) continue;
 						Vec3 ep = entity.position();
@@ -71,7 +71,7 @@ public class EntityChaosCommand extends ModdedCommand {
 					entity.ejectPassengers();
 					ServerPlayer target = players.get((i++) % players.size());
 					Vec3 dest = target.position();
-					success |= entity.teleportTo(target.serverLevel(), dest.x, dest.y, dest.z, emptySet(), entity.getYRot(), entity.getXRot());
+					success |= entity.teleportTo(target.getLevel(), dest.x, dest.y, dest.z, emptySet(), entity.getYRot(), entity.getXRot()) != null;
 				} catch (Exception ignored) {}
 			}
 

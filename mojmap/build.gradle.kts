@@ -1,40 +1,35 @@
 val configurateVersion = project.property("configurateVersion") as String
-val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
+val adventurePlatformFabricVersion = project.property("adventurePlatformFabricVersion") as String
 val adventureVersion = project.property("adventureVersion") as String
 val yaclVersion = project.property("yaclVersion") as String
-val neo_form_version = project.property("neo_form_version") as String
+val minecraft_version = project.property("minecraft_version") as String
+val mod_id = project.property("mod_id") as String
 
 plugins {
     id("multiloader-common")
-    id("net.neoforged.moddev")
+    id("net.fabricmc.fabric-loom-remap")
 }
 
-neoForge {
-    neoFormVersion = neo_form_version
-    // Automatically enable AccessTransformers if the file exists
-    val at = file("src/main/resources/META-INF/accesstransformer.cfg")
-    if (at.exists()) {
-        accessTransformers.from(at.absolutePath)
-    }
-//    parchment {
-//        minecraftVersion = parchment_minecraft
-//        mappingsVersion = parchment_version
-//    }
+loom {
+    accessWidenerPath.set(project(":fabric-platform").file("src/main/resources/$mod_id.accesswidener"))
 }
 
 dependencies {
+    minecraft("com.mojang:minecraft:$minecraft_version")
+    mappings(loom.officialMojangMappings())
+
     // multiloader common
     compileOnly("org.spongepowered:mixin:0.8.5")
+    compileOnly("org.ow2.asm:asm:9.6")
     compileOnly("io.github.llamalad7:mixinextras-common:0.5.3")
     annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.3")
-    compileOnly("org.ow2.asm:asm:9.6")
 
     //
     api(project(":base-common"))
     api("org.spongepowered:configurate-hocon:$configurateVersion")
 
-    compileOnly("net.kyori:adventure-platform-mod-shared:$adventurePlatformModVersion")
-    compileOnly("dev.isxander:yet-another-config-lib:$yaclVersion-neoforge")
+    modCompileOnly("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")
+    modCompileOnly("maven.modrinth:yacl:$yaclVersion")
 }
 
 val commonJava = configurations.create("commonJava") {

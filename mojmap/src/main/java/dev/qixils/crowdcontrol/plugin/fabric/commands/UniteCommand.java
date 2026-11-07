@@ -34,7 +34,7 @@ public class UniteCommand extends ModdedCommand {
 
 			// the player list passed into this function is already a unique instance and already shuffled
 			// so we can just pop the first player off the list and teleport everyone else to them
-			ServerPlayer target = players.removeFirst();
+			ServerPlayer target = players.remove(0);
 			Location destination = new Location(target);
 			sync(() -> players.forEach(destination::teleportHere));
 			return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.SUCCESS);

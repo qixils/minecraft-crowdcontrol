@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.qixils.crowdcontrol.plugin.fabric.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "EntityMixin",
     "LivingEntityMixin",
@@ -13,13 +13,19 @@
     "ResultSlotMixin",
     "ServerGamePacketListenerImplMixin",
     "ServerPlayerMixin",
-    "TickMixin"
+    "TickMixin",
+    "vote.VotingCostMixin"
   ],
   "client": [
     "GameRendererMixin",
     "KeyboardInputMixin",
     "LocalPlayerMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "vote.ClientCloseWorldMixin",
+    "vote.ClientTickMixin",
+    "vote.ClientVoteStorageMixin",
+    "vote.GuiMixin",
+    "vote.VotingScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

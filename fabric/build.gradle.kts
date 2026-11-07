@@ -1,12 +1,17 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import me.modmuss50.mpp.ReleaseType
 import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
+import java.security.MessageDigest
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 val adventureVersion = project.property("adventureVersion") as String
 val adventurePlatformFabricVersion = project.property("adventurePlatformFabricVersion") as String
 val modMenuVersion = project.property("modMenuVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
 val luckoPermissionsApiVersion = project.property("luckoPermissionsApiVersion") as String
-val languageReloadVersion = project.property("languageReloadVersion") as String
 val crowdControlVersion = project.property("crowdControlVersion") as String
 val javaWebSocketVersion = project.property("javaWebSocketVersion") as String
 val geantyrefVersion = project.property("geantyrefVersion") as String
@@ -36,6 +41,71 @@ repositories {
     }
 }
 
+// Patches YACL to allow running on the snapshot; see the bundled notice for legal info
+//
+// loom resolves mod dependencies (and only nests module dependencies) during configuration,
+// so the patched copy is published to a local maven repo;
+// thus also necessitates downloading the original mod directly
+val patchedYaclVersion = yaclVersion.replace("3.1.1+", "3.1.1.1+")
+val patchedYaclRepo = layout.buildDirectory.dir("patched-yacl-repo").get().asFile
+run {
+    val notice = file("src/main/yacl-patch/NOTICE-crowdcontrol.md")
+    val dir = File(patchedYaclRepo, "dev/qixils/crowdcontrol/patched/yacl/$patchedYaclVersion")
+    val output = File(dir, "yacl-$patchedYaclVersion.jar")
+    if (output.exists() && output.lastModified() > maxOf(notice.lastModified(), buildFile.lastModified()))
+        return@run
+    dir.mkdirs()
+    val original = File(dir, "original.jar")
+    uri("https://api.modrinth.com/maven/maven/modrinth/yacl/$yaclVersion/yacl-$yaclVersion.jar").toURL().openStream().use { input ->
+        original.outputStream().use { input.copyTo(it) }
+    }
+    val sha1 = MessageDigest.getInstance("SHA-1").digest(original.readBytes()).joinToString("") { "%02x".format(it) }
+    check(sha1 == "52a6c69a822c3592ed5f8b2285a2905d53a4c7aa") { "Unexpected checksum for YACL $yaclVersion: $sha1" }
+    ZipFile(original).use { zip ->
+        ZipOutputStream(output.outputStream()).use { out ->
+            for (entry in zip.entries()) {
+                if (entry.name.startsWith("META-INF/jars/yet-another-config-lib-fabric-")) continue
+                out.putNextEntry(ZipEntry(entry.name))
+                if (entry.name == "fabric.mod.json") {
+                    @Suppress("UNCHECKED_CAST")
+                    val metadata = JsonSlurper().parse(zip.getInputStream(entry)) as MutableMap<String, Any>
+                    metadata["version"] = (metadata["version"] as String).replace("3.1.1+", "3.1.1.1+")
+                    @Suppress("UNCHECKED_CAST")
+                    val depends = metadata["depends"] as MutableMap<String, Any>
+                    depends["minecraft"] = listOf(depends["minecraft"], "1.20-alpha.23.13.ab")
+                    @Suppress("UNCHECKED_CAST")
+                    metadata["jars"] = (metadata["jars"] as List<Map<String, String>>).filterNot { it["file"]!!.contains("yet-another-config-lib-fabric") }
+                    metadata["description"] = "${metadata["description"]} Modified by Crowd Control to load on 23w13a_or_b; see NOTICE-crowdcontrol.md."
+                    out.write(JsonOutput.prettyPrint(JsonOutput.toJson(metadata)).toByteArray())
+                } else {
+                    zip.getInputStream(entry).use { it.copyTo(out) }
+                }
+                out.closeEntry()
+            }
+            out.putNextEntry(ZipEntry(notice.name))
+            notice.inputStream().use { it.copyTo(out) }
+            out.closeEntry()
+        }
+    }
+    original.delete()
+    File(dir, "yacl-$patchedYaclVersion.pom").writeText("""
+        <?xml version="1.0" encoding="UTF-8"?>
+        <project xmlns="http://maven.apache.org/POM/4.0.0">
+          <modelVersion>4.0.0</modelVersion>
+          <groupId>dev.qixils.crowdcontrol.patched</groupId>
+          <artifactId>yacl</artifactId>
+          <version>$patchedYaclVersion</version>
+        </project>
+    """.trimIndent())
+}
+repositories {
+    maven {
+        name = "Patched YACL"
+        url = uri(patchedYaclRepo)
+        content { includeGroup("dev.qixils.crowdcontrol.patched") }
+    }
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
     mappings(loom.officialMojangMappings())
@@ -44,12 +114,10 @@ dependencies {
 
     modImplementation(include("net.kyori:adventure-platform-fabric:$adventurePlatformFabricVersion")!!)
     modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
-    modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion")!!)
-    modImplementation("maven.modrinth:language-reload:$languageReloadVersion")
-    modImplementation("dev.isxander:yet-another-config-lib:$yaclVersion-fabric") {
-        // TODO is this even in there
-        exclude(group = "net.fabricmc.fabric-api")
-    }
+    modImplementation(include("dev.qixils.crowdcontrol.patched:yacl:$patchedYaclVersion")!!)
+    // non-transitive filters out fabric-api update
+    modImplementation(include("me.lucko:fabric-permissions-api:$luckoPermissionsApiVersion") { isTransitive = false })
+    implementation("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
 
     // transitives
     include(project(":base-common")) // this is available via api of mojmap-common (which is available via multiloader plugin) but not added to jar
@@ -59,8 +127,12 @@ dependencies {
     include("net.kyori:adventure-serializer-configurate4:$adventureVersion")
     include("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
     include("io.leangen.geantyref:geantyref:$geantyrefVersion")
-    // configurate needs option 1.1.0, but adventure-platform-fabric 6.0.1 only bundles 1.0.0
     include("net.kyori:option:1.1.0")
+    // bundle newer apis to match platform-common
+    listOf("api", "key", "text-serializer-gson", "text-serializer-json", "text-serializer-plain", "text-minimessage", "text-logger-slf4j").forEach {
+        include("net.kyori:adventure-$it:$adventureVersion")
+        localRuntime("net.kyori:adventure-$it:$adventureVersion")
+    }
 
     // mojmap-common only exposes these at compile time, so they also need to be added to the dev runtime
     localRuntime(project(":base-common"))
@@ -124,14 +196,14 @@ tasks.remapJar {
 }
 
 publishMods {
-    val versionFrom = "1.21"
-    val versionTo = "1.21.1"
+    val versionFrom = "23w13a_or_b"
+    val versionTo = "23w13a_or_b"
     val curseforgeVersion = ""
 
     file.set(tasks.remapJar.get().archiveFile)
     modLoaders.add("fabric")
     modLoaders.add("quilt")
-    type.set(ReleaseType.STABLE)
+    type.set(ReleaseType.BETA)
     changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
@@ -157,11 +229,12 @@ publishMods {
             append("] v")
             append(project.version.toString())
         })
-        javaVersions.add(JavaVersion.VERSION_21)
+        javaVersions.add(JavaVersion.VERSION_17)
         server.set(true)
         client.set(false)
         requires("fabric-api")
-        optional("modmenu", "language-reload", "yacl")
+        optional("modmenu")
+        embeds("yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
@@ -188,7 +261,8 @@ publishMods {
         })
         environment.set(ModrinthEnvironment.SERVER_ONLY_CLIENT_OPTIONAL)
         requires("fabric-api")
-        optional("modmenu", "language-reload", "yacl")
+        optional("modmenu")
+        embeds("yacl")
         embeds("adventure-platform-mod")
     }
 }

@@ -10,7 +10,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -44,7 +44,7 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn item entity");
 		entity.setTarget(player.getUUID());
-		entity.setThrower(player);
+		entity.setThrower(player.getUUID(), false);
 		entity.setPickUpDelay(0);
 	}
 
@@ -54,7 +54,7 @@ public class GiveItemCommand extends ModdedCommand implements ItemCommand {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getItemLimit(MinecraftAudiences.asAdventure(BuiltInRegistries.ITEM.getKey(item)).asMinimalString());
+			int playerLimit = config.getItemLimit(FabricAudiences.toAdventure(BuiltInRegistries.ITEM.getKey(item)).asMinimalString());
 
 			int amount = request.getQuantity();
 			ItemStack itemStack = new ItemStack(item, amount);

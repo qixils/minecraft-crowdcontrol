@@ -29,7 +29,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +66,7 @@ public final class ToastCommand extends ModdedCommand {
 
 	public ToastCommand(ModdedCrowdControlPlugin plugin) {
 		super(plugin);
-		TITLE = plugin.adventure().asNative(POPUP_TITLE);
+		TITLE = plugin.adventure().toNative(POPUP_TITLE);
 	}
 
 	@Override
@@ -79,9 +79,9 @@ public final class ToastCommand extends ModdedCommand {
 				// spam recipe toasts
 				ServerRecipeBook book = player.getRecipeBook();
 				RecipeManager recipeManager = plugin.server().getRecipeManager();
-				Collection<RecipeHolder<?>> recipes = book.known
+				Collection<Recipe<?>> recipes = book.known
 					.stream()
-					.flatMap(location -> recipeManager.byKey(location).stream())
+					.<Recipe<?>>flatMap(location -> recipeManager.byKey(location).stream())
 					.toList();
 				book.removeRecipes(recipes, player);
 				book.addRecipes(recipes, player);

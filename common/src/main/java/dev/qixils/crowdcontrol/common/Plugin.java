@@ -1669,7 +1669,7 @@ public abstract class Plugin<P, S> {
 				if (con.getResponseCode() != 200)
 					throw new IllegalStateException("Server returned code " + con.getResponseCode());
 				if (versions == null || versions.isEmpty()) return null;
-				String latestVersion = versions.getFirst().getVersionNumber();
+				String latestVersion = versions.get(0).getVersionNumber();
 				if (latestVersion == null) return null;
 				latestModVersionCachedAt = Instant.now();
 				latestModVersionCached = new SemVer(latestVersion);

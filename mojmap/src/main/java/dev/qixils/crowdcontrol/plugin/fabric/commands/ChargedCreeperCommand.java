@@ -3,7 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands;
 import dev.qixils.crowdcontrol.common.util.sound.Sounds;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import lombok.Getter;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -25,7 +25,7 @@ public class ChargedCreeperCommand extends SummonEntityCommand<Creeper> {
 		Creeper creeper = super.spawnEntity(viewer, player);
 		creeper.getEntityData().set(Creeper.DATA_IS_POWERED, true);
 		Vec3 pos = creeper.position();
-		plugin.adventure().world(MinecraftAudiences.key(creeper.level().dimension())).playSound(
+		plugin.adventure().world(FabricAudiences.toAdventure(creeper.getLevel().dimension().location())).playSound(
 				Sounds.LIGHTNING_STRIKE.get(),
 				pos.x(),
 				pos.y(),

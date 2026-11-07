@@ -36,8 +36,8 @@ import static dev.qixils.crowdcontrol.common.command.CommandConstants.VEIN_RADIU
 @Getter
 public class VeinCommand extends ModdedCommand {
 	// we don't have fabric api imported anymore so we have to define the common tags manually
-	public static final TagKey<Block> ORES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores"));
-	public static final TagKey<Block> ORE_BEARING_GROUND_DEEPSLATE = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ore_bearing_ground/deepslate"));
+	public static final TagKey<Block> ORES = TagKey.create(Registries.BLOCK, new ResourceLocation("c", "ores"));
+	public static final TagKey<Block> ORE_BEARING_GROUND_DEEPSLATE = TagKey.create(Registries.BLOCK, new ResourceLocation("c", "ore_bearing_ground/deepslate"));
 
 	private final String effectName = "vein";
 
@@ -72,7 +72,7 @@ public class VeinCommand extends ModdedCommand {
 		Collections.shuffle(blockLocations, random);
 		int maxBlocks = 1 + random.nextInt(blockLocations.size());
 		while (blockLocations.size() > maxBlocks)
-			blockLocations.removeFirst();
+			blockLocations.remove(0);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class VeinCommand extends ModdedCommand {
 					.locationValidator(loc -> !loc.block().isAir() && !loc.block().hasBlockEntity())
 					.build();
 
-				Registry<Block> registry = player.level().registryAccess().registryOrThrow(Registries.BLOCK);
+				Registry<Block> registry = player.getLevel().registryAccess().registryOrThrow(Registries.BLOCK);
 				List<Ore> ores = new ArrayList<>();
 
 				// troll blocks
@@ -121,7 +121,7 @@ public class VeinCommand extends ModdedCommand {
 							}
 						}
 
-						ores.add(new Ore(item, item.is(registry.wrapAsHolder(Blocks.ANCIENT_DEBRIS)) ? 3 : 6));
+						ores.add(new Ore(item, item.value() == Blocks.ANCIENT_DEBRIS ? 3 : 6));
 					});
 
 				for (int iter = 0; iter < VEIN_COUNT; iter++) {

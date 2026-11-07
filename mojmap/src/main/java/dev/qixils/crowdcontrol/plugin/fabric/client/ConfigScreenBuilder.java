@@ -1,17 +1,21 @@
 package dev.qixils.crowdcontrol.plugin.fabric.client;
 
 import dev.isxander.yacl3.api.*;
-import dev.isxander.yacl3.api.controller.*;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
+import dev.isxander.yacl3.api.controller.IntegerFieldControllerBuilder;
+import dev.isxander.yacl3.api.controller.StringControllerBuilder;
+import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.SoftLockConfig;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.option.MapOption;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +55,7 @@ public class ConfigScreenBuilder {
 					)
 					.controller(opt -> EnumControllerBuilder.create(opt)
 						.enumClass(HideNames.class)
-						.formatValue(enumValue -> Component.translatable("config.crowdcontrol.hide_names.option." + enumValue.getConfigCode()))
+						.valueFormatter(enumValue -> Component.translatable("config.crowdcontrol.hide_names.option." + enumValue.getConfigCode()))
 					)
 					.build()
 				)
@@ -119,7 +123,7 @@ public class ConfigScreenBuilder {
 						plugin::setRawHosts
 					)
 					.controller(StringControllerBuilder::create)
-					.initial(() -> Minecraft.getInstance().getGameProfile().getName())
+					.initial(Minecraft.getInstance().getUser().getName())
 					.build())
 				.build()
 			)
@@ -156,7 +160,7 @@ public class ConfigScreenBuilder {
 					)
 					.initialKeys(() -> limitKeys(BuiltInRegistries.ITEM, "diamond_sword", "air"))
 					.initialValue(0)
-					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ITEM.entrySet().stream().map(item -> MinecraftAudiences.key(item.getKey()).asMinimalString()).toList()))
+					.keyController(StringControllerBuilder::create) // YACL 3.1.1 has no dropdowns; unknown IDs are dropped on save
 					.valueController(opt -> IntegerFieldControllerBuilder.create(opt).min(0))
 					.build())
 				.option(Option.<Integer>createBuilder()
@@ -179,7 +183,7 @@ public class ConfigScreenBuilder {
 					)
 					.initialKeys(() -> limitKeys(BuiltInRegistries.ENTITY_TYPE, "creeper", null))
 					.initialValue(0)
-					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ENTITY_TYPE.entrySet().stream().map(item -> MinecraftAudiences.key(item.getKey()).asMinimalString()).toList()))
+					.keyController(StringControllerBuilder::create)
 					.valueController(opt -> IntegerFieldControllerBuilder.create(opt).min(0))
 					.build())
 				.build())
@@ -196,7 +200,7 @@ public class ConfigScreenBuilder {
 	private static <T> Iterable<String> limitKeys(Registry<T> registry, String preferred, @Nullable String excluded) {
 		return () -> Stream.concat(
 			Stream.of(preferred),
-			registry.entrySet().stream().map(entry -> MinecraftAudiences.key(entry.getKey()).asMinimalString())
+			registry.entrySet().stream().map(entry -> FabricAudiences.toAdventure(entry.getKey().location()).asMinimalString())
 		).filter(id -> !id.equals(excluded)).iterator();
 	}
 
@@ -231,6 +235,6 @@ public class ConfigScreenBuilder {
 		if (id.equals("default")) return Optional.empty();
 		ResourceLocation location = ResourceLocation.tryParse(id);
 		if (location == null) return Optional.empty();
-		return registry.getHolder(location).map(holder -> MinecraftAudiences.key(holder.key()).asMinimalString());
+		return registry.getHolder(ResourceKey.create(registry.key(), location)).map(holder -> FabricAudiences.toAdventure(holder.key().location()).asMinimalString());
 	}
 }

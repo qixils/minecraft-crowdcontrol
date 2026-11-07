@@ -12,12 +12,10 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,8 +34,10 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.npc.VillagerDataHolder;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
-import net.minecraft.world.item.*;
-import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,7 +62,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	private final int price;
 	private final byte priority = 5;
 	private final List<String> categories = Collections.singletonList("Summon Entity");
-	private static List<ResourceKey<LootTable>> LOOT_TABLES = null;
+	private static List<ResourceLocation> LOOT_TABLES = null;
 	private static final Map<EntityType<?>, List<Item>> HORSE_ARMOR = new HashMap<>();
 	private static final Map<Rabbit.Variant, Integer> RABBIT_VARIANTS = Map.of(
 			Rabbit.Variant.BLACK, 16,
@@ -81,7 +81,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		for (Item item : BuiltInRegistries.ITEM) {
 			if (!(item instanceof ArmorItem armorItem)) continue;
 			EquipmentSlot slot = armorItem.getEquipmentSlot();
-			if (slot.getType() != EquipmentSlot.Type.HUMANOID_ARMOR)
+			if (slot.getType() != EquipmentSlot.Type.ARMOR)
 				continue;
 			armor.computeIfAbsent(slot, $ -> new ArrayList<>()).add(item);
 		}
@@ -95,7 +95,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public SummonEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(
 			plugin,
-			"entity_" + csIdOf(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType))),
+			"entity_" + csIdOf(FabricAudiences.toAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType))),
 			Component.translatable("cc.effect.summon_entity.name", plugin.toAdventure(entityType.getDescription())),
 			entityType
 		);
@@ -132,13 +132,11 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		return RandomUtil.randomElementFrom(entityTypes);
 	}
 
-	private static List<ResourceKey<LootTable>> getLOOT_TABLES(MinecraftServer server) {
+	private static List<ResourceLocation> getLOOT_TABLES(MinecraftServer server) {
 		if (LOOT_TABLES != null)
 			return LOOT_TABLES;
-		return LOOT_TABLES = ((HolderLookup.Provider) server.reloadableRegistries().lookup())
-			.lookupOrThrow(Registries.LOOT_TABLE)
-			.listElementIds()
-			.filter(key -> key.location().getPath().startsWith("chests/"))
+		return LOOT_TABLES = server.getLootTables().getIds().stream()
+			.filter(key -> key.getPath().startsWith("chests/"))
 			.toList();
 	}
 
@@ -150,7 +148,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			LimitConfig config = getPlugin().getLimitConfig();
 			int def = config.defaultEntityLimit();
 			int playerLimit = Arrays.stream(entityTypes).flatMapToInt(entityType -> {
-				int limit = config.getEntityLimit(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)).asMinimalString());
+				int limit = config.getEntityLimit(FabricAudiences.toAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)).asMinimalString());
 				if (def == limit || limit <= 0) return IntStream.empty();
 				return IntStream.of(limit);
 			}).min().orElse(def);
@@ -175,10 +173,10 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 
 	@Blocking
 	protected static <E extends Entity> E spawnEntity(@Nullable Component viewer, @NotNull ServerPlayer player, @NotNull EntityType<E> entityType, @NotNull ModdedCrowdControlPlugin plugin) {
-		ServerLevel level = player.serverLevel();
-		if (entityType == EntityType.ENDER_DRAGON && level.getDragonFight() != null) return null;
+		ServerLevel level = player.getLevel();
+		if (entityType == EntityType.ENDER_DRAGON && level.dragonFight() != null) return null;
 
-		E entity = entityType.create(player.serverLevel());
+		E entity = entityType.create(player.getLevel());
 		if (entity == null)
 			throw new IllegalStateException("Could not spawn entity");
 
@@ -189,23 +187,21 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			entity.setCustomNameVisible(true);
 		}
 		if (entity instanceof Mob mob)
-			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, null);
+			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, null, null);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
 		if (entity instanceof ViewerMob livingEntity)
 			livingEntity.cc$setViewerSpawned();
 		if (entity instanceof Boat boat)
 			boat.setVariant(randomElementFrom(Boat.Type.values()));
-		if (entity instanceof Wolf wolf) {
+		if (entity instanceof Wolf wolf)
 			wolf.setCollarColor(randomElementFrom(DyeColor.values()));
-			wolf.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.WOLF_VARIANT).listElements()));
-		}
 		if (entity instanceof MushroomCow mooshroom && RandomUtil.RNG.nextDouble() < MUSHROOM_COW_BROWN_CHANCE)
 			mooshroom.setVariant(MushroomCow.MushroomType.BROWN);
 		if (entity instanceof AbstractHorse horse) {
-			if (horse.canUseSlot(EquipmentSlot.BODY) && RandomUtil.RNG.nextBoolean()) {
+			if (horse.canWearArmor() && RandomUtil.RNG.nextBoolean()) {
 				List<Item> items = HORSE_ARMOR.computeIfAbsent(entityType, $ -> BuiltInRegistries.ITEM.stream()
-					.filter(item -> item instanceof ArmorItem armorItem && armorItem.getEquipmentSlot().getType() == EquipmentSlot.Type.ANIMAL_ARMOR && horse.isBodyArmorItem(new ItemStack(item)))
+					.filter(item -> horse.isArmor(new ItemStack(item)))
 					.toList());
 				if (!items.isEmpty()) horse.getSlot(401).set(new ItemStack(randomElementFrom(items)));
 			}
@@ -215,13 +211,13 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		if (entity instanceof Sheep sheep) // TODO: jeb
 			sheep.setColor(randomElementFrom(DyeColor.values()));
 		if (entity instanceof Saddleable saddleable && saddleable.isSaddleable() && RandomUtil.RNG.nextBoolean())
-			saddleable.equipSaddle(new ItemStack(Items.SADDLE), null);
+			saddleable.equipSaddle(null);
 		if (entity instanceof EnderMan enderman)
 			enderman.setCarriedBlock(randomElementFrom(BuiltInRegistries.BLOCK).defaultBlockState());
 		if (entity instanceof AbstractChestedHorse chested)
 			chested.setChest(RandomUtil.RNG.nextBoolean());
 		if (entity instanceof Frog frog)
-			frog.setVariant(randomElementFrom(level.registryAccess().lookupOrThrow(Registries.FROG_VARIANT).listElements()));
+			frog.setVariant(randomElementFrom(BuiltInRegistries.FROG_VARIANT));
 		if (entity instanceof Axolotl axolotl)
 			axolotl.setVariant(randomElementFrom(Axolotl.Variant.values()));
 		if (entity instanceof Rabbit rabbit)

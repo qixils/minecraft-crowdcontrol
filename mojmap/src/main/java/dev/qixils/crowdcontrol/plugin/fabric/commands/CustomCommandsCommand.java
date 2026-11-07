@@ -12,7 +12,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
-import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
+import net.kyori.adventure.platform.fabric.FabricAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.CompoundTagArgument;
@@ -24,6 +24,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,13 +52,13 @@ public class CustomCommandsCommand extends ModdedCommand {
 	}
 
 	public static boolean onSummonEntity(ModdedCrowdControlPlugin plugin, ServerPlayer player, CustomCommandAction action, PublicEffectPayload request, CCPlayer ccPlayer) {
-		ServerLevel level = player.serverLevel();
+		ServerLevel level = player.getLevel();
 
 		String entityStr = action.getString("type", "minecraft:pig");
-		ResourceLocation entityId = Objects.requireNonNullElseGet(ResourceLocation.tryParse(entityStr), () -> ResourceLocation.fromNamespaceAndPath("minecraft", "pig"));
+		ResourceLocation entityId = Objects.requireNonNullElseGet(ResourceLocation.tryParse(entityStr), () -> new ResourceLocation("minecraft", "pig"));
 
-		Registry<EntityType<?>> entities = player.registryAccess().registryOrThrow(Registries.ENTITY_TYPE);
-		Holder.Reference<EntityType<?>> entityType = entities.getHolder(entityId).or(() -> {
+		Registry<EntityType<?>> entities = player.getLevel().registryAccess().registryOrThrow(Registries.ENTITY_TYPE);
+		Holder.Reference<EntityType<?>> entityType = entities.getHolder(ResourceKey.create(Registries.ENTITY_TYPE, entityId)).or(() -> {
 			var pig = entities.wrapAsHolder(EntityType.PIG);
 			if (pig instanceof Holder.Reference<EntityType<?>> refPig) return Optional.of(refPig);
 			return Optional.empty();
@@ -90,7 +91,7 @@ public class CustomCommandsCommand extends ModdedCommand {
 		});
 		if (entity == null) return false;
 
-		if (nbt == null && entity instanceof Mob mob) mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, null);
+		if (nbt == null && entity instanceof Mob mob) mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, null, null);
 
 		return level.tryAddFreshEntityWithPassengers(entity);
 	}
@@ -99,8 +100,8 @@ public class CustomCommandsCommand extends ModdedCommand {
 		String itemStr = action.getString("item", "minecraft:dirt");
 		ItemStack stack;
 		try {
-			ItemParser.ItemResult result = new ItemParser(player.registryAccess()).parse(new StringReader(itemStr));
-			ItemInput input = new ItemInput(result.item(), result.components());
+			ItemParser.ItemResult result = ItemParser.parseForItem(BuiltInRegistries.ITEM.asLookup(), new StringReader(itemStr));
+			ItemInput input = new ItemInput(result.item(), result.nbt());
 			stack = input.createItemStack(1, false);
 		} catch (Exception e) {
 			plugin.getSLF4JLogger().warn("Failed to generate item stack", e);
@@ -196,17 +197,17 @@ public class CustomCommandsCommand extends ModdedCommand {
 					if ("give-item".equals(action.type())) {
 						var itemType = action.getString("item", "");
 						assert !itemType.isEmpty();
-						var location = ResourceLocation.parse(itemType);
+						var location = new ResourceLocation(itemType);
 						var item = BuiltInRegistries.ITEM.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getItemLimit(MinecraftAudiences.asAdventure(location).asMinimalString());
+						limit = plugin.getLimitConfig().getItemLimit(FabricAudiences.toAdventure(location).asMinimalString());
 					} else if ("summon-entity".equals(action.type())) {
 						var itemType = action.getString("type", "");
 						assert !itemType.isEmpty();
-						var location = ResourceLocation.parse(itemType);
+						var location = new ResourceLocation(itemType);
 						var item = BuiltInRegistries.ENTITY_TYPE.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getEntityLimit(MinecraftAudiences.asAdventure(location).asMinimalString());
+						limit = plugin.getLimitConfig().getEntityLimit(FabricAudiences.toAdventure(location).asMinimalString());
 					}
 				} catch (Exception e) {
 					plugin.getSLF4JLogger().atDebug().setCause(e).log("Unknown item/entity for limits");
