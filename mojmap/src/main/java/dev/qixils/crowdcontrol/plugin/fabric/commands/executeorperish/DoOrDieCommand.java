@@ -17,6 +17,7 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Data;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -75,8 +76,7 @@ public class DoOrDieCommand extends ModdedCommand {
 				plugin,
 				plugin.server().getTickCount(),
 				players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
-				condition,
-				condition.getComponent()
+				condition
 			);
 			if (!task.run(null))
 				task.register();
@@ -91,7 +91,6 @@ public class DoOrDieCommand extends ModdedCommand {
 		private final int startedAt;
 		private final Set<UUID> notCompleted;
 		private final SuccessCondition condition;
-		private final Component subtitle;
 		private int pastValue = 0;
 
 		public int ticksElapsed(@Nullable Tick event) {
@@ -109,21 +108,23 @@ public class DoOrDieCommand extends ModdedCommand {
 				ServerPlayer player = plugin.theGame().playerList().getPlayer(uuid);
 				if (player == null) continue;
 
+				Audience audience = plugin.adventure().audience(player);
+
 				if (condition.hasSucceeded(player)) {
 					ItemStack reward = plugin.commandRegister().getCommandByName("lootbox", LootboxCommand.class).createRandomItem(condition.getRewardLuck(), player.registryAccess());
-					player.showTitle(doOrDieSuccess(plugin.toAdventure(reward.getItem().getName(reward))));
+					audience.showTitle(doOrDieSuccess(plugin.toAdventure(reward.getItem().getName(reward))));
 					notCompleted.remove(uuid);
-					player.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());
+					audience.playSound(Sounds.DO_OR_DIE_SUCCESS_CHIME.get(), Sound.Emitter.self());
 					sync(() -> GiveItemCommand.giveItemTo(player, reward));
 				} else if (isTimeUp) {
 					condition.reset(player);
-					player.showTitle(DO_OR_DIE_FAILURE);
+					audience.showTitle(DO_OR_DIE_FAILURE);
 					player.kill(player.serverLevel());
 				} else {
 					Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-					player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+					audience.showTitle(Title.title(main, condition.getComponent(player), DO_OR_DIE_TIMES));
 					if (isNewValue)
-						player.playSound(Sounds.DO_OR_DIE_TICK.get(), Sound.Emitter.self());
+						audience.playSound(Sounds.DO_OR_DIE_TICK.get(), Sound.Emitter.self());
 				}
 			}
 			return isTimeUp;

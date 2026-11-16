@@ -2,15 +2,15 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.plugin.fabric.event.Jump;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public final class JumpingJacksCondition extends AbstractListeningCondition<Integer> {
 	private final int goal;
-	@Getter
 	private final @NotNull Component component;
 
 	public JumpingJacksCondition(int goal) {
@@ -31,5 +31,10 @@ public final class JumpingJacksCondition extends AbstractListeningCondition<Inte
 	@Override
 	public boolean hasSucceeded(@NotNull ServerPlayer player) {
 		return getStatus(player) >= goal;
+	}
+
+	@Override
+	public @NotNull Component getComponent(UUID player) {
+		return component;
 	}
 }

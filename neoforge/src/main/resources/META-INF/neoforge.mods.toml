@@ -14,6 +14,9 @@ The Ultimate Interactive Experience for Streamers
 '''
 logoFile = "assets/crowdcontrol/icon.png"
 
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
 [[dependencies.crowdcontrol]]
 modId = "neoforge"
 type = "required"
@@ -24,7 +27,7 @@ side = "BOTH"
 [[dependencies.crowdcontrol]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.5,1.22)"
+versionRange = "[1.21.5,1.21.6)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -40,6 +43,13 @@ modId = "adventure_platform_neoforge"
 type = "required"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.crowdcontrol]]
+modId = "yet_another_config_lib_v3"
+type = "optional"
+ordering = "NONE"
+side = "CLIENT"
+referralUrl = "https://modrinth.com/mod/yacl"
 
 [[mixins]]
 config = "crowdcontrol.mixins.json"

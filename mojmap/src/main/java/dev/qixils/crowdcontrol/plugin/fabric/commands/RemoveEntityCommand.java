@@ -10,6 +10,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -47,7 +48,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public RemoveEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(
 			plugin,
-			"remove_entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)),
+			"remove_entity_" + csIdOf(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType))),
 			Component.translatable("cc.effect.remove_entity.name", plugin.toAdventure(entityType.getDescription())),
 			entityType
 		);
@@ -99,7 +100,7 @@ public class RemoveEntityCommand<E extends Entity> extends ModdedCommand impleme
 			LimitConfig config = getPlugin().getLimitConfig();
 			int def = config.defaultEntityLimit();
 			int playerLimit = entityTypes.stream().flatMapToInt(entityType -> {
-				int limit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).asMinimalString());
+				int limit = config.getEntityLimit(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)).asMinimalString());
 				if (def == limit || limit <= 0) return IntStream.empty();
 				return IntStream.of(limit);
 			}).min().orElse(def);

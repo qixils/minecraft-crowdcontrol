@@ -41,6 +41,7 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 	private final boolean exclusive;
 	private final List<String> categories = Collections.singletonList("Potion Effects");
 	private final CustomEffectDuration extensionDuration = new CustomEffectDuration(POTION_SECONDS);
+	private final List<String> effectGroups = new ArrayList<>();
 
 	public PotionCommand(PaperCrowdControlPlugin plugin, PotionEffectType potionEffectType) {
 		super(plugin);
@@ -60,6 +61,10 @@ public class PotionCommand extends PaperCommand implements CCTimedEffect {
 			|| potionEffectType.equals(PotionEffectType.NIGHT_VISION)
 			|| potionEffectType.equals(PotionEffectType.SLOW_FALLING)
 			|| potionEffectType.equals(PotionEffectType.WATER_BREATHING);
+
+		if (potionEffectType.equals(PotionEffectType.WEAKNESS) || potionEffectType.equals(PotionEffectType.STRENGTH)) {
+			effectGroups.add("mob_health_modifiers");
+		}
 	}
 
 	private static String nameOf(PotionEffectType type) {

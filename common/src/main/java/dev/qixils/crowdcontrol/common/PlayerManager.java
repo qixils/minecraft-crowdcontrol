@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
+import dev.qixils.crowdcontrol.common.command.DebugEffectPayload;
 import live.crowdcontrol.cc4j.IUserRecord;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import org.jetbrains.annotations.CheckReturnValue;
@@ -73,6 +74,8 @@ public interface PlayerManager<P> {
 	@CheckReturnValue
 	@NotNull
 	default Stream<@NotNull P> getPlayers(final @NotNull PublicEffectPayload request) {
+		if (request instanceof DebugEffectPayload debug)
+			return getPlugin().playerMapper().getPlayer(debug.getPlayer()).filter(player -> canApply(player, request)).stream();
 		return getPotentialPlayers(request.getTarget()).filter(player -> canApply(player, request));
 	}
 
