@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.paper;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.EntityMapper;
 import dev.qixils.crowdcontrol.common.PlayerEntityMapper;
 import dev.qixils.crowdcontrol.common.Plugin;
@@ -14,10 +15,10 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.world.flag.FeatureDependant;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -41,8 +42,6 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.paper.PaperCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -60,6 +59,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
 	public static final PersistentDataType<String, MovementStatusValue> MOVEMENT_STATUS_VALUE_TYPE = new EnumDataType<>(MovementStatusValue.class, o -> o.orElse(MovementStatusValue.ALLOWED));
+	public static PaperCrowdControlPlugin INSTANCE = null;
 
 	@Getter
 	private final Executor syncExecutor;
@@ -83,8 +83,6 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	private final PaperLoader paperPlugin;
 	// actual stuff
 	@Getter
-	private PaperCommandManager<CommandSourceStack> commandManager;
-	@Getter
 	@Accessors(fluent = true)
 	private final CommandRegister commandRegister = new CommandRegister(this);
 	@Getter
@@ -101,6 +99,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		asyncExecutor = runnable -> Bukkit.getAsyncScheduler().runNow(paperPlugin, $ -> runnable.run());
 		this.dataFolder = paperPlugin.getDataPath().resolve("Data");
 		this.configLoader = createConfigLoader(paperPlugin.getDataPath(), "config.yml", YamlConfigurationLoader.builder());
+		INSTANCE = this;
 	}
 
 	public void onLoad() {
@@ -138,9 +137,21 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		});
 	}
 
+	private static boolean isPaper() {
+		// the same check as PaperLib, except it checks a deprecated class so we check a new one too
+		for (String className : List.of("io.papermc.paper.configuration.Configuration", "com.destroystokyo.paper.PaperConfig")) {
+			try {
+				Class.forName(className);
+				return true;
+			} catch (Throwable ignored) {
+			}
+		}
+		return false;
+	}
+
 	@SneakyThrows
 	public void onEnable() {
-		if (!PaperLib.isPaper()) {
+		if (!isPaper()) {
 			throw new IllegalStateException("The Paper server software is required. Please upgrade from Spigot to Paper, it should be a simple and painless upgrade in 99.99% of cases.");
 		}
 		if (MINECRAFT_VERSION.isLessThan(MINECRAFT_MIN_VERSION)) {
@@ -151,15 +162,12 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 
 		Bukkit.getPluginManager().registerEvents(this, paperPlugin);
 		Bukkit.getPluginManager().registerEvents(softLockResolver, paperPlugin);
-
-		try {
-			commandManager = PaperCommandManager.builder()
-				.executionCoordinator(ExecutionCoordinator.asyncCoordinator())
-				.buildOnEnable(paperPlugin);
-			registerChatCommands();
-		} catch (Exception exception) {
-			throw new IllegalStateException("The command manager was unable to load. Please ensure you are using the latest version of Paper.", exception);
-		}
+		paperPlugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+			var registrar = commands.registrar();
+			for (LiteralArgumentBuilder<CommandSourceStack> command : registerChatCommands()) {
+				registrar.register(command.build());
+			}
+		});
 	}
 
 	@Override

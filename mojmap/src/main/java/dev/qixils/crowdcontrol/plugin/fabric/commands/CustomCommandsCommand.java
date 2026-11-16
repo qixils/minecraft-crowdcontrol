@@ -12,6 +12,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.CompoundTagArgument;
@@ -198,14 +199,14 @@ public class CustomCommandsCommand extends ModdedCommand {
 						var location = ResourceLocation.parse(itemType);
 						var item = BuiltInRegistries.ITEM.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getItemLimit(location.asMinimalString());
+						limit = plugin.getLimitConfig().getItemLimit(MinecraftAudiences.asAdventure(location).asMinimalString());
 					} else if ("summon-entity".equals(action.type())) {
 						var itemType = action.getString("type", "");
 						assert !itemType.isEmpty();
 						var location = ResourceLocation.parse(itemType);
 						var item = BuiltInRegistries.ENTITY_TYPE.getOptional(location);
 						assert item.isPresent();
-						limit = plugin.getLimitConfig().getEntityLimit(location.asMinimalString());
+						limit = plugin.getLimitConfig().getEntityLimit(MinecraftAudiences.asAdventure(location).asMinimalString());
 					}
 				} catch (Exception e) {
 					plugin.getSLF4JLogger().atDebug().setCause(e).log("Unknown item/entity for limits");

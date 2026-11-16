@@ -17,8 +17,10 @@ public final class HealthModifierManager implements Listener {
 		switch (modifier) {
 			case OHKO:
 				player.setHealth(0);
+				// intentional switch fallthrough, to avoid triggering iframes
 			case INVINCIBLE:
 				event.setCancelled(true);
+				break;
 		}
 	}
 }
