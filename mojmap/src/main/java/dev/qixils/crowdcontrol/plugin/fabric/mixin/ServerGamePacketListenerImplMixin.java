@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.mixin;
 
 import dev.qixils.crowdcontrol.plugin.fabric.commands.LootboxCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Chat;
-import net.minecraft.network.chat.LastSeenMessages;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,8 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Optional;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerGamePacketListenerImplMixin {
@@ -26,9 +23,9 @@ public class ServerGamePacketListenerImplMixin {
 		LootboxCommand.onInventoryClose(((ServerGamePacketListenerImpl) (Object) this).player);
 	}
 
-	@Inject(method = {"lambda$handleChat$6", "method_44900"}, at = @At("HEAD"), cancellable = true)
-	public void onChat(ServerboundChatPacket packet, Optional<LastSeenMessages> optional, CallbackInfo ci) {
-		var event = new Chat(player, packet.message());
+	@Inject(method = "handleChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/ChatType;Ljava/util/UUID;)V"), cancellable = true)
+	public void onChat(ServerboundChatPacket packet, CallbackInfo ci) {
+		var event = new Chat(player, packet.getMessage());
 		event.fire();
 		if (event.cancelled()) {
 			ci.cancel();

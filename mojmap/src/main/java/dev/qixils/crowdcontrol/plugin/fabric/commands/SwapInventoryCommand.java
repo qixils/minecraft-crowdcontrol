@@ -43,10 +43,10 @@ public class SwapInventoryCommand extends ModdedCommand {
 			// get inventories
 			Map<ServerPlayer, List<ItemStack>> destinations = new HashMap<>(players.size());
 			for (int i = 0; i < players.size(); i++)
-				destinations.put(players.get(i), InventoryUtil.viewAllItems(offset.get(i).getInventory()).stream().map(item -> item == null ? ItemStack.EMPTY : item.copy()).toList());
+				destinations.put(players.get(i), InventoryUtil.viewAllItems(offset.get(i).inventory).stream().map(item -> item == null ? ItemStack.EMPTY : item.copy()).toList());
 			// set inventories
 			sync(() -> destinations.forEach((player, items) -> {
-				var inv = player.getInventory();
+				var inv = player.inventory;
 				for (int i = 0; i < items.size(); i++) {
 					inv.setItem(i, items.get(i));
 				}

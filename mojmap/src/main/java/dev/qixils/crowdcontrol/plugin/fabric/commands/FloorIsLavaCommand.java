@@ -72,10 +72,10 @@ public class FloorIsLavaCommand extends ModdedCommand implements CCTimedEffect {
 			ServerPlayer player = plugin.server().getPlayerList().getPlayer(uuid);
 			if (player == null) continue;
 			// TODO: replace? see paper
-			if (!player.onGround()) continue;
+			if (!player.isOnGround()) continue;
 
 			var pos = player.position();
-			var block = player.level().getBlockState(BlockPos.containing(pos.x(), pos.y() - 1, pos.z())).getBlock();
+			var block = player.level.getBlockState(new BlockPos(pos.x(), pos.y() - 1, pos.z())).getBlock();
 			if (!LAVA_BLOCKS.contains(block)) continue;
 
 			player.setRemainingFireTicks(Math.max(player.getRemainingFireTicks(), 20));

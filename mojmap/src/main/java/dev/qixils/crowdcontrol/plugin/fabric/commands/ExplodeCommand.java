@@ -12,7 +12,6 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -67,8 +66,8 @@ public class ExplodeCommand extends ModdedCommand {
 	public void onDamage(Damage event) {
 		if (!(event.entity() instanceof ServerPlayer)) return; // must be player
 		if (EXPLODING.isEmpty()) return; // SOMEONE must be exploding
-		var typeHolder = event.source().typeHolder();
-		if (!typeHolder.is(DamageTypes.EXPLOSION) && !typeHolder.is(DamageTypes.PLAYER_EXPLOSION)) return; // must be explosion
+		var typeHolder = event.source();
+		if (!"explosion.player".equals(typeHolder.msgId) && !"explosion".equals(typeHolder.msgId)) return; // must be explosion
 
 		event.cancel();
 	}
