@@ -14,7 +14,7 @@ public final class MobHealthModifierManager {
 		if (event.entity() instanceof ServerPlayer)
 			return; // no PvP
 
-		Level level = event.entity().level();
+		Level level = event.entity().level;
 		if (!(level instanceof ServerLevel serverLevel))
 			return;
 

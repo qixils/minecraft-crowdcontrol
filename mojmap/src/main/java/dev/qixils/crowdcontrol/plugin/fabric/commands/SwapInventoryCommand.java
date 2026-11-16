@@ -39,7 +39,7 @@ public class SwapInventoryCommand extends ModdedCommand {
 			// create a list offset by one
 			List<ServerPlayer> offset = new ArrayList<>(players.size());
 			offset.addAll(players.subList(1, players.size()));
-			offset.add(players.getFirst());
+			offset.add(players.get(0));
 			// get inventories
 			Map<ServerPlayer, List<ItemStack>> destinations = new HashMap<>(players.size());
 			for (int i = 0; i < players.size(); i++)
