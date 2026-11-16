@@ -2,6 +2,7 @@ import type {SetOptional} from "type-fest"
 
 // todo: improve this some day
 export const sortIds: Record<string, string> = {
+    "23w13a_or_b": "1.19.4-AF",
     "25w14craftmine": "1.21.05-AF",
     "1.21.9": "1.21.09",
     "1.21.8": "1.21.08",
@@ -65,11 +66,12 @@ export const fabricVersions: Version[] = autoVersion([
     { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: false, legacy: false },
     { id: "1.21.3", supported: false, legacy: false },
-    { id: "1.21.1", supported: true, legacy: true },
+    { id: "1.21.1", supported: true, legacy: false },
     { id: "1.20.6", supported: false, legacy: true },
     { id: "1.20.4", supported: false, legacy: true },
     { id: "1.20.2", supported: false, legacy: true },
     { id: "1.20.1", supported: false, legacy: true },
+    { id: "23w13a_or_b", supported: true, legacy: false },
     { id: "1.19.4", supported: false, legacy: true },
     { id: "1.19.2", supported: false, legacy: true },
     { id: "1.16.1", supported: true, legacy: false },
@@ -88,7 +90,7 @@ export const neoForgeVersions: Version[] = autoVersion([
     { id: "1.21.5", supported: true, legacy: false },
     { id: "1.21.4", supported: false, legacy: false },
     { id: "1.21.3", supported: false, legacy: false },
-    { id: "1.21.1", supported: true, legacy: true },
+    { id: "1.21.1", supported: true, legacy: false },
 ])
 export const neoForgeLatest = findLatest(neoForgeVersions)
 
