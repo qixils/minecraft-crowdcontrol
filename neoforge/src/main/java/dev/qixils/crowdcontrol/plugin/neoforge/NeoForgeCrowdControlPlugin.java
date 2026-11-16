@@ -1,5 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.neoforge;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.qixils.crowdcontrol.common.VersionMetadata;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.*;
@@ -15,13 +16,12 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.neoforge.NeoForgeServerCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +34,6 @@ import java.nio.file.Path;
 
 @Getter
 public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
-	private final NeoForgeServerCommandManager<CommandSourceStack> commandManager
-		= NeoForgeServerCommandManager.createNative(ExecutionCoordinator.asyncCoordinator());
 	private final PermissionUtil permissionUtil;
 	private final ModContainer container;
 
@@ -50,6 +48,7 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 		}
 
 		modBus.addListener(this::register);
+		NeoForge.EVENT_BUS.addListener(this::registerChatCommandsEvent);
 		NeoForge.EVENT_BUS.addListener(LivingDeathEvent.class, event -> handleLivingDeath(event.getEntity(), event.getSource()));
 
 		onInitialize();
@@ -74,6 +73,13 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 	private void onFeaturePacket(ExtraFeatureC2S payload, IPayloadContext context) {
 		if (!(context.player() instanceof ServerPlayer serverPlayer)) return;
 		handleExtraFeatures(payload, new ServerPacketContext(serverPlayer));
+	}
+
+	public void registerChatCommandsEvent(final RegisterCommandsEvent event) {
+		var dispatcher = event.getDispatcher();
+		for (LiteralArgumentBuilder<CommandSourceStack> command : registerChatCommands()) {
+			dispatcher.register(command);
+		}
 	}
 
 	@Override

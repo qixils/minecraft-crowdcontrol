@@ -5,6 +5,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Join;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.GameTypeEffectComponent;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.CCTimedEffect;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
@@ -65,7 +66,7 @@ public class GameModeCommand extends ModdedCommand implements CCTimedEffect {
 			return;
 		sync(() -> players.forEach(player -> {
 			player.setGameMode(gamemode);
-			player.cc$setGameTypeEffect(enabling ? gamemode : null);
+			((GameTypeEffectComponent) player).cc$setGameTypeEffect(enabling ? gamemode : null);
 		}));
 	}
 
@@ -73,9 +74,10 @@ public class GameModeCommand extends ModdedCommand implements CCTimedEffect {
 		@Listener
 		public void onJoin(Join event) {
 			ServerPlayer player = event.player();
-			GameType gameMode = player.cc$getGameTypeEffect();
+			GameTypeEffectComponent ccEnt = (GameTypeEffectComponent) player;
+			GameType gameMode = ccEnt.cc$getGameTypeEffect();
 			if (gameMode == null) return;
-			player.cc$setGameTypeEffect(null);
+			ccEnt.cc$setGameTypeEffect(null);
 			player.setGameMode(GameType.SURVIVAL);
 		}
 	}

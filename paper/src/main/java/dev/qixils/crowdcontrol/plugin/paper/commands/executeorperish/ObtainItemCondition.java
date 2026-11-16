@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
 
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -9,7 +8,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
+import java.util.UUID;
+
 public final class ObtainItemCondition extends AbstractCondition {
 	private final Material item;
 	private final Component component;
@@ -30,5 +30,10 @@ public final class ObtainItemCondition extends AbstractCondition {
 	@Override
 	public boolean hasSucceeded(@NotNull Player player) {
 		return player.getInventory().contains(item);
+	}
+
+	@Override
+	public @NotNull Component getComponent(UUID player) {
+		return component;
 	}
 }

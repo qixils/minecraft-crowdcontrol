@@ -29,7 +29,7 @@ public class SoundCommand extends ModdedCommand {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			for (ServerPlayer player : playerSupplier.get()) {
 				Vec3 playAt = player.position().add(new Vec3(player.getDirection().getOpposite().step()));
-				player.playSound(
+				plugin.adventure().audience(player).playSound(
 					Sounds.SPOOKY.get(),
 					playAt.x(),
 					playAt.y(),
