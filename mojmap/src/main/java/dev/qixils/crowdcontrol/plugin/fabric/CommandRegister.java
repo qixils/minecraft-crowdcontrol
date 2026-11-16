@@ -70,6 +70,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new ChickenJockeyCommand(plugin),
 			() -> new SmallAntCommand(plugin),
 			() -> new SwapCommand(plugin),
+			() -> new SwapInventoryCommand(plugin),
 			() -> new DinnerboneCommand(plugin),
 			() -> new ClutterCommand(plugin),
 			() -> new LootboxCommand(plugin, 0),
@@ -130,7 +131,9 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
 			() -> new WaterCommand(plugin),
-			() -> new DrainCommand(plugin)
+			() -> new DrainCommand(plugin),
+			() -> new FloorIsLavaCommand(plugin),
+			() -> new MegaMineCommand(plugin)
 		));
 
 		// entity commands
@@ -272,6 +275,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 	protected void onFirstRegistry() {
 		plugin.getEventManager().registerListeners(new GameModeCommand.Manager());
 		plugin.getEventManager().registerListeners(new HealthModifierManager());
+		plugin.getEventManager().registerListeners(new MobHealthModifierManager());
 		plugin.getEventManager().registerListeners(new FreezeCommand.Manager(plugin));
 	}
 }

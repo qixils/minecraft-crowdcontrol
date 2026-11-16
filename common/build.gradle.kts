@@ -1,29 +1,26 @@
 val crowdControlVersion = project.property("crowdControlVersion") as String
 val adventureVersion = project.property("adventureVersion") as String
-val cloudVersion = project.property("cloudVersion") as String
-val cloudExtrasVersion = project.property("cloudExtrasVersion") as String
 val slf4jVersion = project.property("slf4jVersion") as String
-val jacksonVersion = project.property("jacksonVersion") as String
+val gsonVersion = project.property("gsonVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
+val brigadier_version = project.property("brigadier_version") as String
 
 dependencies {
-    api("dev.qixils:cc4j-pubsub:$crowdControlVersion")
-    api("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
-    api("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
-    api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    api("dev.qixils:cc4j-pubsub:$crowdControlVersion") {
+        // provided by minecraft and paper
+        exclude(group = "com.google.code.gson")
+        exclude(group = "org.slf4j")
+    }
+
+    compileOnly("com.mojang:brigadier:$brigadier_version")
+    // provided by minecraft and paper
+    compileOnly("com.google.code.gson:gson:$gsonVersion")
 
     compileOnly("net.kyori:adventure-api:$adventureVersion")
     api("net.kyori:adventure-text-minimessage:$adventureVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
     api("net.kyori:adventure-text-serializer-plain:$adventureVersion") {
-        exclude(group = "net.kyori", module = "adventure-api")
-    }
-    api("net.kyori:adventure-text-serializer-legacy:$adventureVersion") {
-        exclude(group = "net.kyori", module = "adventure-api")
-    }
-    api("org.incendo:cloud-core:$cloudVersion")
-    api("org.incendo:cloud-minecraft-extras:$cloudExtrasVersion") {
         exclude(group = "net.kyori", module = "adventure-api")
     }
     api("org.slf4j:slf4j-api:$slf4jVersion")
@@ -66,9 +63,4 @@ sourceSets.main { resources.srcDir(generatedResourcesFolder) }
 tasks.processResources {
     dependsOn("generateVersionFile")
     dependsOn("generateApplicationFile")
-}
-
-// shaded jar is never consumed directly we don't need it
-tasks.shadowJar {
-    enabled = false
 }

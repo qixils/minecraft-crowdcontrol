@@ -9,6 +9,7 @@ import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.Holder;
@@ -43,7 +44,7 @@ public class EnchantmentCommand extends ModdedCommand {
 		super(plugin);
 		this.enchantmentHolder = enchantment;
 		this.enchantment = enchantmentHolder.value();
-		this.effectName = "enchant_" + csIdOf(enchantment.unwrapKey().orElseThrow());
+		this.effectName = "enchant_" + csIdOf(MinecraftAudiences.key(enchantment.unwrapKey().orElseThrow()));
 		TranslatableComponent _displayName = Component.translatable(
 				"cc.effect.enchant.name",
 				plugin.toAdventure(Enchantment.getFullname(enchantment, enchantment.value().getMaxLevel()).copy().setStyle(Style.EMPTY))

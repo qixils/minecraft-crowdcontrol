@@ -5,12 +5,14 @@ import dev.qixils.crowdcontrol.common.util.RandomUtil;
 import dev.qixils.crowdcontrol.common.util.ThreadUtil;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCommand;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
+import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
 import live.crowdcontrol.cc4j.CCPlayer;
 import live.crowdcontrol.cc4j.websocket.data.CCEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
@@ -98,7 +100,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 	public SummonEntityCommand(ModdedCrowdControlPlugin plugin, EntityType<E> entityType) {
 		this(
 			plugin,
-			"entity_" + csIdOf(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)),
+			"entity_" + csIdOf(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType))),
 			Component.translatable("cc.effect.summon_entity.name", plugin.toAdventure(entityType.getDescription())),
 			entityType
 		);
@@ -153,7 +155,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			LimitConfig config = getPlugin().getLimitConfig();
 			int def = config.defaultEntityLimit();
 			int playerLimit = Arrays.stream(entityTypes).flatMapToInt(entityType -> {
-				int limit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).asMinimalString());
+				int limit = config.getEntityLimit(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)).asMinimalString());
 				if (def == limit || limit <= 0) return IntStream.empty();
 				return IntStream.of(limit);
 			}).min().orElse(def);
@@ -188,14 +190,14 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 		// set variables
 		entity.setPos(player.position());
 		if (viewer != null) {
-			entity.setCustomName(plugin.toNative(viewer, player));
+			entity.setCustomName(plugin.toNative(viewer, plugin.adventure().audience(player)));
 			entity.setCustomNameVisible(true);
 		}
 		if (entity instanceof Mob mob)
 			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, null);
 		if (entity instanceof TamableAnimal tamable)
 			tamable.tame(player);
-		if (entity instanceof LivingEntity livingEntity)
+		if (entity instanceof ViewerMob livingEntity)
 			livingEntity.cc$setViewerSpawned();
 		if (entity instanceof Wolf wolf) {
 			wolf.setCollarColor(randomElementFrom(DyeColor.values()));

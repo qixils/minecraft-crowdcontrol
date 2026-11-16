@@ -11,6 +11,7 @@ import live.crowdcontrol.cc4j.websocket.data.CCInstantEffectResponse;
 import live.crowdcontrol.cc4j.websocket.data.ResponseStatus;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -69,7 +70,7 @@ public class TakeItemCommand extends ModdedCommand implements ItemCommand {
 			List<ServerPlayer> players = playerSupplier.get();
 
 			LimitConfig config = getPlugin().getLimitConfig();
-			int playerLimit = config.getItemLimit(BuiltInRegistries.ITEM.getKey(item).asMinimalString());
+			int playerLimit = config.getItemLimit(MinecraftAudiences.asAdventure(BuiltInRegistries.ITEM.getKey(item)).asMinimalString());
 
 			int amount = request.getQuantity();
 

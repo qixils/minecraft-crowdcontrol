@@ -13,6 +13,7 @@ import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
 import live.crowdcontrol.cc4j.websocket.payload.CCName;
 import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.Getter;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.minecraft.core.Holder;
@@ -49,7 +50,7 @@ public class PotionCommand extends ModdedCommand implements CCTimedEffect {
 		super(plugin);
 		this.potionEffectType = potionEffectType;
 		Identifier loc = potionEffectType.unwrapKey().orElseThrow().identifier();
-		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(loc);
+		this.effectName = "potion_" + CommandConstants.asMinimalSafeString(MinecraftAudiences.asAdventure(loc));
 		this.isMinimal = potionEffectType.value().isInstantenous();
 		TranslatableComponent _displayName = Component.translatable("cc.effect.potion.name", plugin.toAdventure(potionEffectType.value().getDisplayName()));
 		this.displayName = _displayName;
