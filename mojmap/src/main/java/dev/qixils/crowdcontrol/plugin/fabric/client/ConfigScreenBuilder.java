@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -229,7 +229,7 @@ public class ConfigScreenBuilder {
 	 */
 	private static <T> Optional<String> displayedId(Registry<T> registry, String id) {
 		if (id.equals("default")) return Optional.empty();
-		ResourceLocation location = ResourceLocation.tryParse(id);
+		Identifier location = Identifier.tryParse(id);
 		if (location == null) return Optional.empty();
 		return registry.get(location).map(holder -> MinecraftAudiences.key(holder.key()).asMinimalString());
 	}
