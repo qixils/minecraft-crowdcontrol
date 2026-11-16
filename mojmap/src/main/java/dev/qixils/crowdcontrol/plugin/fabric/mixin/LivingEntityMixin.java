@@ -6,6 +6,7 @@ import dev.qixils.crowdcontrol.plugin.fabric.interfaces.Components;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.OriginalDisplayName;
 import dev.qixils.crowdcontrol.plugin.fabric.interfaces.ViewerMob;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.EntityUtil;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.damagesource.DamageSource;
@@ -13,8 +14,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -57,7 +56,7 @@ public abstract class LivingEntityMixin extends Entity implements ViewerMob, Ori
 	}
 
 	@Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-	void onReadAdditionalSaveData(ValueInput tag, CallbackInfo ci) {
+	void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
 		cc$isViewerSpawned = tag.getBooleanOr(Components.VIEWER_MOB, false);
 		cc$originalDisplayName = tag
 			.read(Components.ORIGINAL_DISPLAY_NAME, ComponentSerialization.CODEC)
@@ -65,7 +64,7 @@ public abstract class LivingEntityMixin extends Entity implements ViewerMob, Ori
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-	void onAddAdditionalSaveData(ValueOutput tag, CallbackInfo ci) {
+	void onAddAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
 		if (cc$isViewerSpawned)
 			tag.putBoolean(Components.VIEWER_MOB, true);
 		if (cc$originalDisplayName != null)
