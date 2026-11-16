@@ -27,7 +27,7 @@ side = "BOTH"
 [[dependencies.crowdcontrol]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.6,1.21.6)"
+versionRange = "[1.21.6,1.21.7)"
 ordering = "NONE"
 side = "BOTH"
 
