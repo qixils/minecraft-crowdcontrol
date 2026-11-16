@@ -4,16 +4,15 @@ import dev.qixils.crowdcontrol.common.EventListener;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Craft;
 import dev.qixils.crowdcontrol.plugin.fabric.event.Listener;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-@Getter
 @EventListener
 public final class CraftItemCondition extends AbstractBooleanListeningCondition {
 	private final Item item;
@@ -40,5 +39,10 @@ public final class CraftItemCondition extends AbstractBooleanListeningCondition 
 		if (event.result().getItem() != item)
 			return;
 		statuses.put(uuid, true);
+	}
+
+	@Override
+	public @NotNull Component getComponent(UUID player) {
+		return component;
 	}
 }

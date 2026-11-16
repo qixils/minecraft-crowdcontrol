@@ -56,6 +56,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
 	public static final PersistentDataType<String, MovementStatusValue> MOVEMENT_STATUS_VALUE_TYPE = new EnumDataType<>(MovementStatusValue.class, o -> o.orElse(MovementStatusValue.ALLOWED));
+	public static PaperCrowdControlPlugin INSTANCE = null;
 
 	@Getter
 	private final Executor syncExecutor;
@@ -95,6 +96,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		asyncExecutor = runnable -> Bukkit.getAsyncScheduler().runNow(paperPlugin, $ -> runnable.run());
 		this.dataFolder = paperPlugin.getDataPath().resolve("Data");
 		this.configLoader = createConfigLoader(paperPlugin.getDataPath(), "config.yml", YamlConfigurationLoader.builder());
+		INSTANCE = this;
 	}
 
 	public void onLoad() {

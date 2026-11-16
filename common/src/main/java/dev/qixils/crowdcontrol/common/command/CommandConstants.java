@@ -615,19 +615,17 @@ public class CommandConstants {
 
 	/**
 	 * The power of the explosion that should be used in the "Explode" command.
-	 * This returns a random positive double that tends towards 4 (TNT strength) but can be any
-	 * value between 2.5 (a little less than a creeper; inclusive)
-	 * and 7 (wither skull spawn; exclusive).
 	 *
-	 * @return random value between [2.5,7) that tends towards 4
+	 * @return explosion power
 	 */
 	public static double explosionPower() {
-		return Math.max(
-			Math.round(RNG.doubles(4, 1, 7)
-				.average()
-				.orElse(5)), // failsafe? shouldn't be necessary though lol
-			2.5
-		);
+//		return Math.max(
+//			Math.round(RNG.doubles(4, 1, 7)
+//				.average()
+//				.orElse(5)), // failsafe? shouldn't be necessary though lol
+//			2.5
+//		);
+		return 20d;
 	}
 
 	/**

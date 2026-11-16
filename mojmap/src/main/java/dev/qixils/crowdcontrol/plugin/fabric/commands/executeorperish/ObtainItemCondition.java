@@ -1,7 +1,6 @@
 package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,7 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
+import java.util.UUID;
+
 public final class ObtainItemCondition extends AbstractCondition {
 	private final ItemStack stack;
 	private final Component component;
@@ -31,5 +31,10 @@ public final class ObtainItemCondition extends AbstractCondition {
 	@Override
 	public boolean hasSucceeded(@NotNull ServerPlayer player) {
 		return player.inventory.contains(stack);
+	}
+
+	@Override
+	public @NotNull Component getComponent(UUID player) {
+		return component;
 	}
 }
