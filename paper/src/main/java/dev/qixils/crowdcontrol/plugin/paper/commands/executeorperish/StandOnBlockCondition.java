@@ -1,6 +1,5 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
 
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -11,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 
-@Getter
 public final class StandOnBlockCondition extends AbstractCondition {
 	private final Set<Material> blocks;
 	private final Component component;
@@ -35,5 +34,10 @@ public final class StandOnBlockCondition extends AbstractCondition {
 		Location location = player.getLocation();
 		return blocks.contains(location.getBlock().getType())
 				|| blocks.contains(location.subtract(0, 1, 0).getBlock().getType());
+	}
+
+	@Override
+	public @NotNull Component getComponent(UUID player) {
+		return component;
 	}
 }

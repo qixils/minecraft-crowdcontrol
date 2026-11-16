@@ -2,13 +2,33 @@
 
 A list of all changes made to the software in reverse chronological order.
 
-## 4.6.4
+## 4.7.0
+
+### Additions
+
+- Added math problems to the Do-or-Die effect
+- New timed effect **Floor Is Lava** sets the player on fire if they walk on some naturally generating blocks like grass
+- New timed effect **3x3 mining** "upgrades" your 1x1 digging radius to 3x3
+- New effect **Huge Explosion** destroys a large radius of blocks; off by default!
+- New effect **Swap Inventories** shuffles around inventories in multiplayer
+- New timed effect **One-Hit KO Mobs** allows the player to defeat mobs in one hit
+- New timed effect **Invincible Mobs** prevents the player from directly harming mobs
+- Backported to 1.21.1 (Fabric/NeoForge) and 23w13a_or_b (Fabric)
+  - These versions have been popular in support tickets and our promotional material
+    so we are restoring support for them for now.
+
+### Changes
 
 - Migrated from cloud command framework to native brigadier, saving considerable filesize
   - Previously this was available only for 26.1+
-- (1.21.5+) Migrated from embedded cloth-config to optional YACL with more visual config options
+- (>1.16.1) Migrated from embedded cloth-config to optional YACL with more visual config options
   - Previously this was available only for 26.1+
-- Fixed several issues with dependency conflicts and improved filesizes
+- Fixed several issues with dependency conflicts
+- Further improved filesizes
+
+### Fixes
+
+- Fixed 
 
 ## 4.6.3
 

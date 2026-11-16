@@ -76,8 +76,7 @@ public class DoOrDieCommand extends ModdedCommand {
 				plugin,
 				plugin.server().getTickCount(),
 				players.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet()),
-				condition,
-				condition.getComponent()
+				condition
 			);
 			if (!task.run(null))
 				task.register();
@@ -92,7 +91,6 @@ public class DoOrDieCommand extends ModdedCommand {
 		private final int startedAt;
 		private final Set<UUID> notCompleted;
 		private final SuccessCondition condition;
-		private final Component subtitle;
 		private int pastValue = 0;
 
 		public int ticksElapsed(@Nullable Tick event) {
@@ -124,7 +122,7 @@ public class DoOrDieCommand extends ModdedCommand {
 					player.kill();
 				} else {
 					Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-					audience.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+					audience.showTitle(Title.title(main, condition.getComponent(player), DO_OR_DIE_TIMES));
 					if (isNewValue)
 						audience.playSound(Sounds.DO_OR_DIE_TICK.get(), Sound.Emitter.self());
 				}

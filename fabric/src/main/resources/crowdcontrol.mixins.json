@@ -12,6 +12,7 @@
     "PlayerMixin",
     "ResultSlotMixin",
     "ServerGamePacketListenerImplMixin",
+    "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "TickMixin",
     "vote.VotingCostMixin"

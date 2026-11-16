@@ -44,6 +44,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new ChickenJockeyCommand(plugin),
 			() -> new SmallAntCommand(plugin),
 			() -> new SwapCommand(plugin),
+			() -> new SwapInventoryCommand(plugin),
 			() -> new DinnerboneCommand(plugin),
 			() -> new ClutterCommand(plugin),
 			() -> new LootboxCommand(plugin, 0),
@@ -104,7 +105,9 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
 			() -> new WaterCommand(plugin),
-			() -> new DrainCommand(plugin)
+			() -> new DrainCommand(plugin),
+			() -> new FloorIsLavaCommand(plugin),
+			() -> new MegaMineCommand(plugin)
 		));
 
 		// entity commands
@@ -249,5 +252,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		Bukkit.getPluginManager().registerEvents(new FreezeCommand.Manager(plugin), paperPlugin);
 		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(paperPlugin), paperPlugin);
 		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new MobHealthModifierManager(), paperPlugin);
 	}
 }

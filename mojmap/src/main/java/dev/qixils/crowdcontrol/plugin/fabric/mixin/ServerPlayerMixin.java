@@ -25,7 +25,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.UUID;
@@ -105,10 +104,5 @@ public abstract class ServerPlayerMixin extends Player implements GameTypeEffect
 	@Inject(method = "die", at = @At("HEAD"), cancellable = true)
 	private void callDeathEvent(final DamageSource source, final CallbackInfo ci) {
 		EntityUtil.handleDie(this, source, ci);
-	}
-
-	@Inject(method = "hurtInternal", at = @At("HEAD"), cancellable = true)
-	private void callDamageEvent(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		EntityUtil.handleDamage(this, source, amount, cir);
 	}
 }
