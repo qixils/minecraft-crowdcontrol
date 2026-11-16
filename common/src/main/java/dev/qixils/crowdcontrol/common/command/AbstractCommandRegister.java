@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.common.command;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.impl.HalfHealthCommand;
 import dev.qixils.crowdcontrol.common.command.impl.HealthModifierCommand;
+import dev.qixils.crowdcontrol.common.command.impl.MobHealthModifierCommand;
 import dev.qixils.crowdcontrol.common.command.impl.exp.ExpAddCommand;
 import dev.qixils.crowdcontrol.common.command.impl.exp.ExpSubCommand;
 import dev.qixils.crowdcontrol.common.command.impl.exp.ResetExpCommand;
@@ -75,6 +76,10 @@ public abstract class AbstractCommandRegister<PLAYER, PLUGIN extends Plugin<PLAY
 
 		for (HealthModifierCommand.Modifier modifier : HealthModifierCommand.Modifier.values()) {
 			initTo(commands, () -> new HealthModifierCommand<>(plugin, modifier));
+		}
+
+		for (MobHealthModifierCommand.Modifier modifier : MobHealthModifierCommand.Modifier.values()) {
+			initTo(commands, () -> new MobHealthModifierCommand<>(plugin, modifier));
 		}
 	}
 

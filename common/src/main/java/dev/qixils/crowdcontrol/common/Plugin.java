@@ -895,10 +895,10 @@ public abstract class Plugin<P, S> {
 								return 0;
 							}
 							Command<P> effect = commandRegister().getCommandByName(commandContext.getArgument("effect", String.class));
-							CustomEffectDuration duration = Optional.ofNullable(effect.getDefaultDuration())
+							@Nullable CustomEffectDuration duration = Optional.ofNullable(effect.getDefaultDuration())
 								.map(value -> new CustomEffectDuration(value.toMillis() / 1000.0))
 								.or(() -> Optional.ofNullable(effect.getExtensionDuration()))
-								.orElseGet(() -> new CustomEffectDuration(10));
+								.orElseGet(() -> effect instanceof CCTimedEffect ? new CustomEffectDuration(10) : null);
 							// TODO: add simpler constructors
 							PublicEffectPayload payload = new DebugEffectPayload(
 								playerMapper().getUniqueId(player),
