@@ -8,7 +8,7 @@ plugins {
     id("io.freefair.lombok") version "9.8.1" apply false
     id("com.gradleup.shadow") version "9.6.1" apply true
     id("net.fabricmc.fabric-loom-remap") version "1.17-SNAPSHOT" apply false
-    id("net.neoforged.moddev") version "2.0.147" apply false
+    id("net.neoforged.moddev") version "2.0.110" apply false
     id("xyz.jpenilla.run-paper") version "3.1.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("de.eldoria.plugin-yml.bukkit") version "0.9.0" apply false // Generates plugin.yml
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.24" apply false

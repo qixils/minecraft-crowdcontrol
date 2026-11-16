@@ -69,7 +69,7 @@ public class FloorIsLavaCommand extends ModdedCommand implements CCTimedEffect {
 	public void onTick(Tick event) {
 		Set<UUID> playerIds = playerMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 		for (UUID uuid : playerIds) {
-			ServerPlayer player = plugin.server().getPlayerList().getPlayer(uuid);
+			ServerPlayer player = plugin.theGame().playerList().getPlayer(uuid);
 			if (player == null) continue;
 			// TODO: replace? see paper
 			if (!player.onGround()) continue;

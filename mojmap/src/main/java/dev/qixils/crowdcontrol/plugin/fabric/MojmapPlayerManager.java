@@ -23,7 +23,7 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 	@Override
 	public @NotNull List<@NotNull ServerPlayer> getAllPlayersFull() {
 		if (getPlugin().getTheGame() == null) return Collections.emptyList();
-		PlayerList playerList = getPlugin().getTheGame().getPlayerList();
+		PlayerList playerList = getPlugin().getTheGame().playerList();
 		// dedicated servers only create the player list partway through starting up
 		//noinspection ConstantValue
 		if (playerList == null) return new ArrayList<>();
