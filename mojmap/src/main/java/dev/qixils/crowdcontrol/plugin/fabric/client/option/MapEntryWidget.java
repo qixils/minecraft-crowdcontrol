@@ -9,6 +9,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -116,34 +119,34 @@ public class MapEntryWidget<K, V> extends AbstractWidget implements ContainerEve
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button);
+	public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubleClick) {
+		return ContainerEventHandler.super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public boolean mouseReleased(@NotNull MouseButtonEvent event) {
 		this.setDragging(false);
-		return ContainerEventHandler.super.mouseReleased(mouseX, mouseY, button);
+		return ContainerEventHandler.super.mouseReleased(event);
 	}
 
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
-		return ContainerEventHandler.super.mouseDragged(mouseX, mouseY, button, dx, dy);
+	public boolean mouseDragged(@NotNull MouseButtonEvent event, double dx, double dy) {
+		return ContainerEventHandler.super.mouseDragged(event, dx, dy);
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		return ContainerEventHandler.super.keyPressed(keyCode, scanCode, modifiers);
+	public boolean keyPressed(@NotNull KeyEvent event) {
+		return ContainerEventHandler.super.keyPressed(event);
 	}
 
 	@Override
-	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-		return ContainerEventHandler.super.keyReleased(keyCode, scanCode, modifiers);
+	public boolean keyReleased(@NotNull KeyEvent event) {
+		return ContainerEventHandler.super.keyReleased(event);
 	}
 
 	@Override
-	public boolean charTyped(char chr, int modifiers) {
-		return ContainerEventHandler.super.charTyped(chr, modifiers);
+	public boolean charTyped(@NotNull CharacterEvent event) {
+		return ContainerEventHandler.super.charTyped(event);
 	}
 }

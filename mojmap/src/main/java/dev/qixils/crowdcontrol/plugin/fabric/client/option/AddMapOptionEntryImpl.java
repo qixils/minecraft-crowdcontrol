@@ -6,6 +6,7 @@ import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
 import dev.isxander.yacl3.gui.TooltipButtonWidget;
 import dev.isxander.yacl3.gui.YACLScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -102,18 +103,18 @@ public class AddMapOptionEntryImpl<K, V> implements MapOptionEntry<K, V> {
                     }
 
                     @Override
-                    public boolean mouseClicked(double mouseX, double mouseY, int buttonNum) {
-                        return button.mouseClicked(mouseX, mouseY, buttonNum);
+                    public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubleClick) {
+                        return button.mouseClicked(event, doubleClick);
                     }
 
                     @Override
-                    public boolean mouseReleased(double mouseX, double mouseY, int buttonNum) {
-                        return button.mouseReleased(mouseX, mouseY, buttonNum);
+                    public boolean mouseReleased(@NotNull MouseButtonEvent event) {
+                        return button.mouseReleased(event);
                     }
 
                     @Override
-                    public boolean mouseDragged(double mouseX, double mouseY, int buttonNum, double deltaX, double deltaY) {
-                        return button.mouseDragged(mouseX, mouseY, buttonNum, deltaX, deltaY);
+                    public boolean mouseDragged(@NotNull MouseButtonEvent event, double deltaX, double deltaY) {
+                        return button.mouseDragged(event, deltaX, deltaY);
                     }
 
                     public void updateNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {

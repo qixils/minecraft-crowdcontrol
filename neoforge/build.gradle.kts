@@ -96,14 +96,13 @@ dependencies {
     jarJar("net.kyori:option:1.1.0")
 
     // mojmap-common only exposes these at compile time, so they also need to be added to the dev runtime
-    // (newer versions of neoforge use runtimeOnly instead)
-    "additionalRuntimeClasspath"(project(":base-common")) { isTransitive = false }
-    "additionalRuntimeClasspath"("dev.qixils:cc4j-pubsub:$crowdControlVersion") { isTransitive = false }
-    "additionalRuntimeClasspath"("org.java-websocket:Java-WebSocket:$javaWebSocketVersion") { isTransitive = false }
-    "additionalRuntimeClasspath"("org.spongepowered:configurate-core:$configurateVersion") { isTransitive = false }
-    "additionalRuntimeClasspath"("org.spongepowered:configurate-hocon:$configurateVersion") { isTransitive = false }
-    "additionalRuntimeClasspath"("net.kyori:adventure-serializer-configurate4:$adventureVersion") { isTransitive = false }
-    "additionalRuntimeClasspath"("io.leangen.geantyref:geantyref:$geantyrefVersion") { isTransitive = false }
+    runtimeOnly(project(":base-common")) { isTransitive = false }
+    runtimeOnly("dev.qixils:cc4j-pubsub:$crowdControlVersion") { isTransitive = false }
+    runtimeOnly("org.java-websocket:Java-WebSocket:$javaWebSocketVersion") { isTransitive = false }
+    runtimeOnly("org.spongepowered:configurate-core:$configurateVersion") { isTransitive = false }
+    runtimeOnly("org.spongepowered:configurate-hocon:$configurateVersion") { isTransitive = false }
+    runtimeOnly("net.kyori:adventure-serializer-configurate4:$adventureVersion") { isTransitive = false }
+    runtimeOnly("io.leangen.geantyref:geantyref:$geantyrefVersion") { isTransitive = false }
 }
 
 publishMods {

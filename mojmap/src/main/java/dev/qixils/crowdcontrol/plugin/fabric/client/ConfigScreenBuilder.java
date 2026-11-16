@@ -119,7 +119,7 @@ public class ConfigScreenBuilder {
 						plugin::setRawHosts
 					)
 					.controller(StringControllerBuilder::create)
-					.initial(() -> Minecraft.getInstance().getGameProfile().getName())
+					.initial(() -> Minecraft.getInstance().getGameProfile().name())
 					.build())
 				.build()
 			)
