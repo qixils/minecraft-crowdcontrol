@@ -8,7 +8,11 @@ import java.util.Collection;
 import java.util.UUID;
 
 public interface SuccessCondition {
-	@NotNull Component getComponent();
+	default @NotNull Component getComponent(ServerPlayer player) {
+		return getComponent(player.getUUID());
+	}
+
+	@NotNull Component getComponent(UUID player);
 
 	default boolean canApply(@NotNull ServerPlayer player) {
 		return !hasSucceeded(player);
