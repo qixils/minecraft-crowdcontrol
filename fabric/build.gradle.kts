@@ -198,7 +198,7 @@ tasks.remapJar {
 publishMods {
     val versionFrom = "23w13a_or_b"
     val versionTo = "23w13a_or_b"
-    val curseforgeVersion = ""
+    val curseforgeVersion = "1.20-Snapshot"
 
     file.set(tasks.remapJar.get().archiveFile)
     modLoaders.add("fabric")
