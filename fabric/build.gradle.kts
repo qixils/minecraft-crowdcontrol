@@ -8,7 +8,7 @@ val configurateVersion = project.property("configurateVersion") as String
 val luckoPermissionsApiVersion = project.property("luckoPermissionsApiVersion") as String
 val languageReloadVersion = project.property("languageReloadVersion") as String
 val crowdControlVersion = project.property("crowdControlVersion") as String
-val jacksonVersion = project.property("jacksonVersion") as String
+val javaWebSocketVersion = project.property("javaWebSocketVersion") as String
 val geantyrefVersion = project.property("geantyrefVersion") as String
 val yaclVersion = project.property("yaclVersion") as String
 val minecraft_version = project.property("minecraft_version") as String
@@ -56,10 +56,12 @@ dependencies {
     include("org.spongepowered:configurate-core:$configurateVersion")
     include("org.spongepowered:configurate-hocon:$configurateVersion")
     include("net.kyori:adventure-serializer-configurate4:$adventureVersion")
-    include("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
-    include("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
-    include("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    include("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
     include("io.leangen.geantyref:geantyref:$geantyrefVersion")
+
+    // mojmap-common only exposes these at compile time, so they also need to be added to the dev runtime
+    localRuntime(project(":base-common"))
+    localRuntime("org.spongepowered:configurate-hocon:$configurateVersion")
 }
 
 loom {
@@ -94,6 +96,18 @@ sourceSets.configureEach {
         }
     }
 }
+
+// TODO: is this still necessary?
+//tasks.processResources {
+//    inputs.property("version", project.version)
+//    inputs.property("minecraftVersion", mojmapVersion)
+//    filteringCharset = "UTF-8"
+//
+//    filesMatching("fabric.mod.json") {
+//        expand("version" to versionId)
+//    }
+//}
+
 // end todo
 
 // TODO: is this still necessary?

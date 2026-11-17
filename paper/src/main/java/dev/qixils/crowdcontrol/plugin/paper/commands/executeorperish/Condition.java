@@ -1,16 +1,8 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-@RequiredArgsConstructor
-@Getter
 public enum Condition {
 	// stand on...
 	STAND_ON_COBBLESTONE(new StandOnBlockCondition(2, "generic", Material.COBBLESTONE)),
@@ -89,20 +81,18 @@ public enum Condition {
 
 	//// miscellaneous ////
 	JUMP(new JumpingJacksCondition(49)),
+	MATH(new MathCondition()),
 	;
 
-	private static final @NotNull List<SuccessCondition> CONDITIONS;
-
-	static {
-		List<SuccessCondition> conditions = new ArrayList<>(values().length);
-		for (Condition cond : values())
-			conditions.add(cond.getCondition());
-		CONDITIONS = Collections.unmodifiableList(conditions);
-	}
+	// instance
 
 	private final @NotNull SuccessCondition condition;
 
-	public static @NotNull List<@NotNull SuccessCondition> items() {
-		return CONDITIONS;
+	Condition(@NotNull SuccessCondition condition) {
+		this.condition = condition;
+	}
+
+	public @NotNull SuccessCondition getCondition() {
+		return condition;
 	}
 }

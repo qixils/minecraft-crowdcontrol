@@ -47,11 +47,12 @@ public class EntityUtil {
 		if (event.cancelled()) ci.cancel();
 	}
 
-	public static void handleDamage(final Entity entity, final DamageSource cause, final float amount, final CallbackInfoReturnable<Boolean> cir) {
-		if (entity.level().isClientSide()) return;
-		if (!ModdedCrowdControlPlugin.isInstanceAvailable()) return;
+	public static float handleDamage(final Entity entity, final DamageSource cause, final float amount, final CallbackInfoReturnable<Boolean> cir) {
+		if (entity.level().isClientSide()) return amount;
+		if (!ModdedCrowdControlPlugin.isInstanceAvailable()) return amount;
 		Damage event = new Damage(entity, cause, amount);
 		event.fire(ModdedCrowdControlPlugin.getInstance());
 		if (event.cancelled()) cir.setReturnValue(false);
+		return event.amount();
 	}
 }

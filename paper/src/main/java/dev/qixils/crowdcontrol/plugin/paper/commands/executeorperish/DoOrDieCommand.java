@@ -36,8 +36,8 @@ public class DoOrDieCommand extends PaperCommand implements CCTimedEffect {
 
 	public DoOrDieCommand(@NotNull PaperCrowdControlPlugin plugin) {
 		super(plugin);
-		for (SuccessCondition condition : Condition.items()) {
-			if (condition instanceof Listener listener) {
+		for (Condition condition : Condition.values()) {
+			if (condition.getCondition() instanceof Listener listener) {
 				Bukkit.getPluginManager().registerEvents(listener, plugin.getPaperPlugin());
 			}
 		}
@@ -47,7 +47,7 @@ public class DoOrDieCommand extends PaperCommand implements CCTimedEffect {
 	public void execute(@NotNull Supplier<@NotNull List<@NotNull Player>> playerSupplier, @NotNull PublicEffectPayload request, @NotNull CCPlayer ccPlayer) {
 		ccPlayer.sendResponse(ThreadUtil.waitForSuccess(request, () -> {
 			List<Player> players = playerSupplier.get();
-			List<SuccessCondition> conditions = new ArrayList<>(Condition.items());
+			List<SuccessCondition> conditions = Arrays.stream(Condition.values()).map(Condition::getCondition).collect(Collectors.toList());
 			Collections.shuffle(conditions, random);
 
 			CompletableFuture<SuccessCondition> cond = new CompletableFuture<>();
@@ -65,8 +65,6 @@ public class DoOrDieCommand extends PaperCommand implements CCTimedEffect {
 			if (condition == null) {
 				return new CCInstantEffectResponse(request.getRequestId(), ResponseStatus.FAIL_TEMPORARY, "Could not find a challenge to apply");
 			}
-
-			Component subtitle = condition.getComponent();
 
 			Set<UUID> notCompleted = players.stream().map(Player::getUniqueId).collect(Collectors.toSet());
 			players.forEach(player -> player.getScheduler().run(plugin.getPaperPlugin(), $ -> condition.track(player), null));
@@ -96,7 +94,7 @@ public class DoOrDieCommand extends PaperCommand implements CCTimedEffect {
 							player.setHealth(0);
 						} else {
 							Component main = Component.text(secondsLeft).color(doOrDieColor(secondsLeft));
-							player.showTitle(Title.title(main, subtitle, DO_OR_DIE_TIMES));
+							player.showTitle(Title.title(main, condition.getComponent(player), DO_OR_DIE_TIMES));
 							if (isNewValue)
 								player.playSound(Sounds.DO_OR_DIE_TICK.get(), player);
 						}
@@ -105,7 +103,7 @@ public class DoOrDieCommand extends PaperCommand implements CCTimedEffect {
 
 				if (isTimeUp)
 					task.cancel();
-			}, 1, tickRate);
+			}, 2, tickRate);
 
 			return new CCTimedEffectResponse(request.getRequestId(), ResponseStatus.TIMED_BEGIN, request.getEffect().getDurationMillis());
 		}));

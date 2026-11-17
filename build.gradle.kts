@@ -42,11 +42,14 @@ subprojects {
         maven("https://files.minecraftforge.net/maven/") {
             name = "Minecraft Forge"
         }
-        maven("https://maven.neoforged.net/releases") {
-            name = "NeoForged"
-            content {
-                // things that can only be found here
-                // different from exclusiveContent I think
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.neoforged.net/releases") {
+                    name = "NeoForged"
+                }
+            }
+            filter {
+                // other repositories (i.e. PaperMC) have the metadata but not the jars
                 includeGroup("cpw.mods")
             }
         }

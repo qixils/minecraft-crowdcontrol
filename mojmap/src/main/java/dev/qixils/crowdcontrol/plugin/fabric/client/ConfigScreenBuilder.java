@@ -6,16 +6,19 @@ import dev.qixils.crowdcontrol.common.HideNames;
 import dev.qixils.crowdcontrol.common.SoftLockConfig;
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.client.option.MapOption;
+import net.kyori.adventure.platform.modcommon.MinecraftAudiences;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ConfigScreenBuilder {
@@ -56,7 +59,7 @@ public class ConfigScreenBuilder {
 					.name(Component.translatable("config.crowdcontrol.global.name"))
 					.description(OptionDescription.of(Component.translatable("config.crowdcontrol.global.description")))
 					.binding(
-						true,
+						false,
 						plugin::isGlobal,
 						plugin::setIsGlobal
 					)
@@ -148,32 +151,12 @@ public class ConfigScreenBuilder {
 					.description(OptionDescription.of(Component.translatable("config.crowdcontrol.item_limit.description")))
 					.binding(
 						new HashMap<>(),
-						() -> plugin.getLimitConfig().itemLimits().entrySet().stream().flatMap(entry -> {
-							if (entry.getKey().equals("default")) return Stream.empty();
-							try {
-								var item = BuiltInRegistries.ITEM.get(Identifier.parse(entry.getKey()));
-								assert item.isPresent() && item.get().isBound();
-								return Stream.of(Map.entry(item.get().key().identifier().toShortString(), entry.getValue()));
-							} catch (Exception e) {
-								plugin.getSLF4JLogger().atDebug().setCause(e).log("Reading unknown limit item");
-							}
-							return Stream.empty();
-						}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b)),
-						value -> plugin.getLimitConfig().itemLimits(value.entrySet().stream().flatMap(entry -> {
-							if (entry.getKey().equals("default")) return Stream.empty();
-							try {
-								var item = BuiltInRegistries.ITEM.get(Identifier.parse(entry.getKey()));
-								assert item.isPresent() && item.get().isBound();
-								return Stream.of(Map.entry(item.get().key().identifier().toShortString(), entry.getValue()));
-							} catch (Exception e) {
-								plugin.getSLF4JLogger().atDebug().setCause(e).log("Setting unknown limit item");
-							}
-							return Stream.empty();
-						}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b)))
+						() -> displayedLimits(BuiltInRegistries.ITEM, plugin.getLimitConfig().itemLimits()),
+						value -> plugin.getLimitConfig().itemLimits(mergeLimits(BuiltInRegistries.ITEM, plugin.getLimitConfig().itemLimits(), value))
 					)
-					.initialKey("diamond_sword")
+					.initialKeys(() -> limitKeys(BuiltInRegistries.ITEM, "diamond_sword", "air"))
 					.initialValue(0)
-					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ITEM.entrySet().stream().map(item -> item.getKey().identifier().toShortString()).toList()))
+					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ITEM.entrySet().stream().map(item -> MinecraftAudiences.key(item.getKey()).asMinimalString()).toList()))
 					.valueController(opt -> IntegerFieldControllerBuilder.create(opt).min(0))
 					.build())
 				.option(Option.<Integer>createBuilder()
@@ -191,36 +174,63 @@ public class ConfigScreenBuilder {
 					.description(OptionDescription.of(Component.translatable("config.crowdcontrol.entity_limit.description")))
 					.binding(
 						new HashMap<>(),
-						() -> plugin.getLimitConfig().entityLimits().entrySet().stream().flatMap(entry -> {
-							if (entry.getKey().equals("default")) return Stream.empty();
-							try {
-								var entity = BuiltInRegistries.ENTITY_TYPE.get(Identifier.parse(entry.getKey()));
-								assert entity.isPresent() && entity.get().isBound();
-								return Stream.of(Map.entry(entity.get().key().identifier().toShortString(), entry.getValue()));
-							} catch (Exception e) {
-								plugin.getSLF4JLogger().atDebug().setCause(e).log("Reading unknown limit entity");
-							}
-							return Stream.empty();
-						}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b)),
-						value -> plugin.getLimitConfig().entityLimits(value.entrySet().stream().flatMap(entry -> {
-							if (entry.getKey().equals("default")) return Stream.empty();
-							try {
-								var entity = BuiltInRegistries.ENTITY_TYPE.get(Identifier.parse(entry.getKey()));
-								assert entity.isPresent() && entity.get().isBound();
-								return Stream.of(Map.entry(entity.get().key().identifier().toShortString(), entry.getValue()));
-							} catch (Exception e) {
-								plugin.getSLF4JLogger().atDebug().setCause(e).log("Setting unknown limit item");
-							}
-							return Stream.empty();
-						}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b)))
+						() -> displayedLimits(BuiltInRegistries.ENTITY_TYPE, plugin.getLimitConfig().entityLimits()),
+						value -> plugin.getLimitConfig().entityLimits(mergeLimits(BuiltInRegistries.ENTITY_TYPE, plugin.getLimitConfig().entityLimits(), value))
 					)
-					.initialKey("creeper")
+					.initialKeys(() -> limitKeys(BuiltInRegistries.ENTITY_TYPE, "creeper", null))
 					.initialValue(0)
-					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ENTITY_TYPE.entrySet().stream().map(item -> item.getKey().identifier().toShortString()).toList()))
+					.keyController(opt -> DropdownStringControllerBuilder.create(opt).values(BuiltInRegistries.ENTITY_TYPE.entrySet().stream().map(item -> MinecraftAudiences.key(item.getKey()).asMinimalString()).toList()))
 					.valueController(opt -> IntegerFieldControllerBuilder.create(opt).min(0))
 					.build())
 				.build())
 			.build()
 			.generateScreen(parent);
+	}
+
+	/**
+	 * Gets the IDs that new limit entries can use.
+	 * @param registry  registry to fetch entries from
+	 * @param preferred first example entry
+	 * @param excluded  optional invalid entry to exclude
+	 */
+	private static <T> Iterable<String> limitKeys(Registry<T> registry, String preferred, @Nullable String excluded) {
+		return () -> Stream.concat(
+			Stream.of(preferred),
+			registry.entrySet().stream().map(entry -> MinecraftAudiences.key(entry.getKey()).asMinimalString())
+		).filter(id -> !id.equals(excluded)).iterator();
+	}
+
+	/**
+	 * Gets the limits that can be shown in the config screen,
+	 * skipping the default limit (which has its own option)
+	 * and any IDs that aren't registered.
+	 */
+	private static <T> Map<String, Integer> displayedLimits(Registry<T> registry, Map<String, Integer> limits) {
+		Map<String, Integer> displayed = new HashMap<>();
+		limits.forEach((id, limit) -> displayedId(registry, id).ifPresent(key -> displayed.put(key, limit)));
+		return displayed;
+	}
+
+	/**
+	 * Merges the limits edited in the config screen into the existing limits,
+	 * keeping the ones that the config screen couldn't show.
+	 */
+	private static <T> Map<String, Integer> mergeLimits(Registry<T> registry, Map<String, Integer> existing, Map<String, Integer> edited) {
+		Map<String, Integer> merged = new HashMap<>();
+		existing.forEach((id, limit) -> {
+			if (displayedId(registry, id).isEmpty()) merged.put(id, limit);
+		});
+		merged.putAll(displayedLimits(registry, edited));
+		return merged;
+	}
+
+	/**
+	 * Gets the ID that the config screen uses for a limit, if it can be shown there.
+	 */
+	private static <T> Optional<String> displayedId(Registry<T> registry, String id) {
+		if (id.equals("default")) return Optional.empty();
+		Identifier location = Identifier.tryParse(id);
+		if (location == null) return Optional.empty();
+		return registry.get(location).map(holder -> MinecraftAudiences.key(holder.key()).asMinimalString());
 	}
 }
