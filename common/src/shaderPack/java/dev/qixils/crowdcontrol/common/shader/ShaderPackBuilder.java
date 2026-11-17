@@ -1,15 +1,16 @@
 package dev.qixils.crowdcontrol.common.shader;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import dev.qixils.crowdcontrol.common.Plugin;
 import dev.qixils.crowdcontrol.common.command.impl.Shader;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -103,17 +104,40 @@ public final class ShaderPackBuilder {
 	 * Collects the {@code crowdcontrol}-namespaced shader programs a post effect chain refers to.
 	 */
 	private static Set<String> referencedPrograms(byte[] chain) throws IOException {
-		JsonNode root = new ObjectMapper().readTree(chain);
-		JsonNode passes = root.path("passes");
-		if (!passes.isArray())
+		JsonElement root;
+		try (Reader reader = new InputStreamReader(new ByteArrayInputStream(chain), StandardCharsets.UTF_8)) {
+			// instance method for compatibility with older gson versions (static parseReader is 2.8.6+)
+			//noinspection deprecation
+			root = new JsonParser().parse(reader);
+		} catch (JsonParseException e) {
+			throw new IOException("Invalid post effect chain", e);
+		}
+		if (!root.isJsonObject())
+			return Collections.emptySet();
+		JsonElement passes = root.getAsJsonObject().get("passes");
+		if (passes == null || !passes.isJsonArray())
 			return Collections.emptySet();
 
 		Set<String> programs = new LinkedHashSet<>();
-		for (JsonNode pass : passes) {
-			collectProgram(programs, pass.path("vertex_shader").asText(null), ".vsh");
-			collectProgram(programs, pass.path("fragment_shader").asText(null), ".fsh");
+		for (JsonElement pass : passes.getAsJsonArray()) {
+			if (!pass.isJsonObject()) continue;
+			JsonObject passObject = pass.getAsJsonObject();
+			collectProgram(programs, text(passObject, "vertex_shader"), ".vsh");
+			collectProgram(programs, text(passObject, "fragment_shader"), ".fsh");
 		}
 		return programs;
+	}
+
+	/**
+	 * Returns the provided field as text, or {@code null} if it's missing or not a text value.
+	 * @param object object to index
+	 * @param field  field name to index by
+	 * @return string or null
+	 */
+	private static @Nullable String text(JsonObject object, String field) {
+		JsonElement value = object.get(field);
+		if (value == null || !value.isJsonPrimitive()) return null;
+		return value.getAsString();
 	}
 
 	private static void collectProgram(Set<String> programs, String rawId, String extension) {
