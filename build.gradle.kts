@@ -1,3 +1,5 @@
+import me.modmuss50.mpp.PublishModTask
+
 val nettyVersion = project.property("nettyVersion") as String
 val mojmapVersion = project.property("mojmapVersion") as String
 
