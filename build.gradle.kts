@@ -1,3 +1,5 @@
+import me.modmuss50.mpp.PublishModTask
+
 val nettyVersion = project.property("nettyVersion") as String
 val minecraft_version = project.property("minecraft_version") as String
 
@@ -5,7 +7,7 @@ plugins {
     id("java-library") apply true
     id("io.freefair.lombok") version "9.8.1" apply false
     id("com.gradleup.shadow") version "9.6.1" apply true
-    id("net.fabricmc.fabric-loom") version "1.16-SNAPSHOT" apply false
+    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT" apply false
     id("net.neoforged.moddev") version "2.0.147" apply false
     id("xyz.jpenilla.run-paper") version "3.1.0" apply false // Adds runServer and runMojangMappedServer tasks for testing
     id("de.eldoria.plugin-yml.bukkit") version "0.9.0" apply false // Generates plugin.yml
@@ -40,11 +42,14 @@ subprojects {
         maven("https://files.minecraftforge.net/maven/") {
             name = "Minecraft Forge"
         }
-        maven("https://maven.neoforged.net/releases") {
-            name = "NeoForged"
-            content {
-                // things that can only be found here
-                // different from exclusiveContent I think
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.neoforged.net/releases") {
+                    name = "NeoForged"
+                }
+            }
+            filter {
+                // other repositories (i.e. PaperMC) have the metadata but not the jars
                 includeGroup("cpw.mods")
             }
         }
@@ -129,4 +134,22 @@ subprojects {
             }
         }
     }
+}
+
+tasks.register("release") {
+    group = "publishing"
+    description = "Builds every module, then publishes the platform jars"
+    dependsOn(subprojects.map { "${it.path}:build" })
+    dependsOn(subprojects.filter { it.name.endsWith("-platform") }.map { "${it.path}:publishMods" })
+    dependsOn("paper-platform:publishAllPublicationsToHangar")
+}
+
+subprojects {
+    plugins.withId("me.modmuss50.mod-publish-plugin") {
+        tasks.withType<PublishModTask>().configureEach {
+            // when releasing, wait for everything to build so that a failure stops all platforms alike
+            mustRunAfter(rootProject.subprojects.map { "${it.path}:build" })
+        }
+    }
+    // hangar equivalent is in its build file
 }

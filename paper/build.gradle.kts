@@ -1,8 +1,8 @@
+import io.papermc.hangarpublishplugin.HangarPublishTask
 import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
 val minecraftVersion = project.property("minecraftVersion") as String
-val paperlibVersion = project.property("paperlibVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
 val luckPermsVersion = project.property("luckPermsVersion") as String
 val paperBuild = project.property("paperBuild") as String
@@ -23,8 +23,7 @@ plugins {
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("io.papermc:paperlib:$paperlibVersion")
-    implementation("org.spongepowered:configurate-yaml:$configurateVersion")
+    compileOnly("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     paperweight.paperDevBundle("$minecraftVersion.build.$paperBuild")
@@ -69,22 +68,22 @@ tasks {
         // set name of output file to CrowdControl-PLATFORM+VERSION.jar
         archiveFileName.set("CrowdControl-Paper+$minecraftVersion-$version.jar")
 
-        exclude("net/kyori/adventure/text/minimessage/")
-        exclude("net/kyori/adventure/text/serializer/")
-
         dependencies {
-            exclude(dependency("net.kyori.adventure.text.minimessage::"))
-            exclude(dependency("net.kyori.adventure.text.serializer.legacy::"))
-            exclude(dependency("net.kyori.adventure.text.serializer.plain::"))
+            // provided by paper
+            exclude(dependency("net.kyori:adventure-text-minimessage:.*"))
+            exclude(dependency("net.kyori:adventure-text-serializer-plain:.*"))
+            exclude(dependency("org.slf4j:slf4j-api:.*"))
+            exclude(dependency("net.kyori:option:.*"))
+            exclude(dependency("org.spongepowered:.*:.*"))
+            exclude(dependency("io.leangen.geantyref:.*:.*"))
+            exclude(dependency("org.yaml:snakeyaml:.*"))
+            // annotations are not needed at runtime
+            exclude(dependency("org.jetbrains:annotations:.*"))
+            exclude(dependency("org.jspecify:jspecify:.*"))
+            exclude(dependency("org.checkerframework:checker-qual:.*"))
+            exclude(dependency("com.google.code.findbugs:jsr305:.*"))
         }
-
-        relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
-        relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
-        relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations") // TODO: can i just strip these they dont even really need to exist
-        relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
-        relocate("javassist", "dev.qixils.relocated.javassist")
-        relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
-        relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
+        exclude("META-INF/maven/**")
     }
 }
 
@@ -156,5 +155,12 @@ hangarPublish {
                 }
             }
         }
+    }
+}
+
+plugins.withId("io.papermc.hangar-publish-plugin") {
+    tasks.withType<HangarPublishTask>().configureEach {
+        // when releasing, wait for everything to build so that a failure stops all platforms alike
+        mustRunAfter(rootProject.subprojects.map { "${it.path}:build" })
     }
 }

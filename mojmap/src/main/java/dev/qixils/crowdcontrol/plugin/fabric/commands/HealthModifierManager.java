@@ -18,8 +18,10 @@ public final class HealthModifierManager {
 				if (event.source().equals(player.damageSources().genericKill()) && event.amount() >= Float.MAX_VALUE)
 					return; // we've caught ourselves! ignore this damage
 				player.hurt(player.damageSources().genericKill(), Float.MAX_VALUE);
+				// intentional switch fallthrough, to avoid triggering iframes
 			case INVINCIBLE:
 				event.cancel();
+				break;
 		}
 	}
 }

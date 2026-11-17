@@ -1,15 +1,20 @@
 val crowdControlVersion = project.property("crowdControlVersion") as String
 val adventureVersion = project.property("adventureVersion") as String
 val slf4jVersion = project.property("slf4jVersion") as String
-val jacksonVersion = project.property("jacksonVersion") as String
+val gsonVersion = project.property("gsonVersion") as String
 val configurateVersion = project.property("configurateVersion") as String
 val brigadier_version = project.property("brigadier_version") as String
 
 dependencies {
-    api("dev.qixils:cc4j-pubsub:$crowdControlVersion")
-    api("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
-    api("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
-    api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    api("dev.qixils:cc4j-pubsub:$crowdControlVersion") {
+        // provided by minecraft and paper
+        exclude(group = "com.google.code.gson")
+        exclude(group = "org.slf4j")
+    }
+
+    compileOnly("com.mojang:brigadier:$brigadier_version")
+    // provided by minecraft and paper
+    compileOnly("com.google.code.gson:gson:$gsonVersion")
 
     compileOnly("com.mojang:brigadier:$brigadier_version")
 
