@@ -1,6 +1,6 @@
 package dev.qixils.crowdcontrol.common;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.Gson;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -8,6 +8,7 @@ import dev.qixils.crowdcontrol.TrackedEffect;
 import dev.qixils.crowdcontrol.TriState;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
+import dev.qixils.crowdcontrol.common.command.DebugEffectPayload;
 import dev.qixils.crowdcontrol.common.http.ModrinthVersion;
 import dev.qixils.crowdcontrol.common.mc.MCCCPlayer;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
@@ -18,13 +19,17 @@ import dev.qixils.crowdcontrol.common.util.TextUtil;
 import dev.qixils.crowdcontrol.exceptions.ExceptionUtil;
 import io.leangen.geantyref.TypeToken;
 import live.crowdcontrol.cc4j.*;
+import live.crowdcontrol.cc4j.websocket.ConnectedPlayer;
 import live.crowdcontrol.cc4j.websocket.UserToken;
 import live.crowdcontrol.cc4j.websocket.data.*;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffect;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectBuilder;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectDuration;
 import live.crowdcontrol.cc4j.websocket.http.CustomEffectsOperation;
-import live.crowdcontrol.cc4j.websocket.payload.*;
+import live.crowdcontrol.cc4j.websocket.payload.CCEffectDescription;
+import live.crowdcontrol.cc4j.websocket.payload.CCName;
+import live.crowdcontrol.cc4j.websocket.payload.CCUserRecord;
+import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.serializer.configurate4.ConfigurateComponentSerializer;
@@ -50,6 +55,8 @@ import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -68,7 +75,6 @@ import java.util.stream.Stream;
 import static dev.qixils.crowdcontrol.common.SoftLockConfig.*;
 import static dev.qixils.crowdcontrol.common.util.CollectionUtil.initTo;
 import static dev.qixils.crowdcontrol.common.util.OptionalUtil.stream;
-import static live.crowdcontrol.cc4j.websocket.ConnectedPlayer.JACKSON;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 
@@ -279,6 +285,7 @@ public abstract class Plugin<P, S> {
 	protected final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 	protected final Map<UUID, SemVer> clientVersions = new HashMap<>();
 	protected final Map<UUID, Set<ExtraFeature>> extraFeatures = new HashMap<>();
+	private boolean translatorRegistered = false;
 	protected final Map<UUID, TrackedEffect> trackedEffects = new HashMap<>();
 	protected final Map<UUID, List<CCGameEvent>> pendingGameEvents = new HashMap<>();
 	protected SemVer latestModVersionCached = null;
@@ -631,10 +638,13 @@ public abstract class Plugin<P, S> {
 	 * Registers the plugin's basic chat commands.
 	 */
 	public Iterable<LiteralArgumentBuilder<S>> registerChatCommands() {
-		try {
-			GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US).getTranslator());
-		} catch (Exception e) {
-			getSLF4JLogger().error("Failed to initialize i18n", e);
+		if (!translatorRegistered) {
+			translatorRegistered = true;
+			try {
+				GlobalTranslator.translator().addSource(new KyoriTranslator("crowdcontrol", "CrowdControl", this, Locale.US).getTranslator());
+			} catch (Exception e) {
+				getSLF4JLogger().error("Failed to initialize i18n", e);
+			}
 		}
 
 		EntityMapper<S> mapper = commandSenderMapper();
@@ -879,46 +889,43 @@ public abstract class Plugin<P, S> {
 								audience.sendMessage(output(translatable("cc.command.cast-error", NamedTextColor.RED)));
 								return 0;
 							}
+							CrowdControl cc = crowdControl;
+							// no account or session is needed, just the service itself
+							if (cc == null || !(optionalCCPlayer(player).orElse(null) instanceof ConnectedPlayer source)) {
+								audience.sendMessage(output(translatable("cc.command.crowdcontrol.status.offline", NamedTextColor.RED)));
+								return 0;
+							}
 							Command<P> effect = commandRegister().getCommandByName(commandContext.getArgument("effect", String.class));
-							List<P> players = new ArrayList<>(Collections.singletonList(player));
+							@Nullable CustomEffectDuration duration = Optional.ofNullable(effect.getDefaultDuration())
+								.map(value -> new CustomEffectDuration(value.toMillis() / 1000.0))
+								.or(() -> Optional.ofNullable(effect.getExtensionDuration()))
+								.orElseGet(() -> effect instanceof CCTimedEffect ? new CustomEffectDuration(10) : null);
 							// TODO: add simpler constructors
-							CompletableFuture.runAsync(() -> effect.execute(
-								() -> players,
-								new PublicEffectPayload(
-									UUID.randomUUID(),
-									0L,
-									new CCEffectDescription(
-										effect.getEffectName(),
-										"game",
-										new CCName(getTextUtil().asPlain(effect.getDisplayName())),
-										null,
-										null,
-										null,
-										false,
-										false,
-										false,
-										false,
-										false,
-										false,
-										null,
-										null,
-										null,
-										new CustomEffectDuration(10)
-									),
-									new CCUserRecord(
-										"ccuid-01j7cnrvpbh5aw45pwpe1vqvdw",
-										"lexikiq",
-										ProfileType.TWITCH,
-										"106025167",
-										""
-									),
+							PublicEffectPayload payload = new DebugEffectPayload(
+								playerMapper().getUniqueId(player),
+								playerMapper().getUsername(player),
+								new CCEffectDescription(
+									effect.getEffectName().toLowerCase(Locale.ENGLISH),
+									"game",
+									new CCName(getTextUtil().asPlain(effect.getDisplayName())),
+									null,
 									null,
 									null,
 									false,
-									1
-								),
-								optionalCCPlayer(player).orElseThrow()
-							));
+									false,
+									false,
+									false,
+									false,
+									false,
+									null,
+									null,
+									null,
+									duration
+								)
+							);
+							// go through the same pipeline as a real request
+							// brings announcements, timed effect management, etc
+							cc.executeEffect(payload, source);
 							return 1;
 						})
 				);
@@ -998,9 +1005,9 @@ public abstract class Plugin<P, S> {
 
 	public void saveConfig() {
 		try {
-			// TODO: add comments
-			// TODO: custom effects
-			ConfigurationNode config = getConfigLoader().createNode();
+			// start from the existing file so that anything not tracked here is kept as-is
+			// (such as custom effects and comments)
+			ConfigurationNode config = getConfigLoader().load();
 			TypeToken<Set<String>> hostToken = new TypeToken<>() {};
 			TypeToken<Map<String, Integer>> limitToken = new TypeToken<>() {};
 			config.node("hosts").set(hostToken, new HashSet<>(hosts));
@@ -1009,6 +1016,7 @@ public abstract class Plugin<P, S> {
 			config.node("limits", "entities").set(limitToken, limitConfig.entityLimits());
 			config.node("global").set(global);
 			config.node("announce").set(announce);
+			config.node("admin-required").set(adminRequired);
 			config.node("hide-names").set(hideNames.getConfigCode());
 			config.node("soft-lock-observer", "period").set(softLockConfig.getPeriod());
 			config.node("soft-lock-observer", "deaths").set(softLockConfig.getDeaths());
@@ -1675,11 +1683,14 @@ public abstract class Plugin<P, S> {
 				con.setConnectTimeout(10000);
 				con.setReadTimeout(10000);
 
-				List<ModrinthVersion> versions = JACKSON.readValue(con.getInputStream(), new TypeReference<>() {
-				});
+				List<ModrinthVersion> versions;
+				try (Reader reader = new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8)) {
+					versions = new Gson().fromJson(reader, new com.google.gson.reflect.TypeToken<List<ModrinthVersion>>() {
+					}.getType());
+				}
 				if (con.getResponseCode() != 200)
 					throw new IllegalStateException("Server returned code " + con.getResponseCode());
-				if (versions.isEmpty()) return null;
+				if (versions == null || versions.isEmpty()) return null;
 				String latestVersion = versions.getFirst().getVersionNumber();
 				if (latestVersion == null) return null;
 				latestModVersionCachedAt = Instant.now();

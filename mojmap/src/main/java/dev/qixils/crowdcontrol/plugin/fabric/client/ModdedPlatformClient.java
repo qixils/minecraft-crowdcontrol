@@ -24,7 +24,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 //@Environment(EnvType.CLIENT)
 public abstract class ModdedPlatformClient {
-	protected final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
+	protected static final Logger logger = LoggerFactory.getLogger("CrowdControl/Client");
 	protected final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	protected static @Nullable ModdedPlatformClient INSTANCE = null;
 	public static boolean SHADER_ACTIVE = false;

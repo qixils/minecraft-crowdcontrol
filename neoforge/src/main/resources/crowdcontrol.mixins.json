@@ -11,6 +11,7 @@
     "PlayerListMixin",
     "PlayerMixin",
     "ServerGamePacketListenerImplMixin",
+    "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "TickMixin"
   ],

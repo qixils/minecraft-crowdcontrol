@@ -2,7 +2,6 @@ package dev.qixils.crowdcontrol.plugin.fabric.commands.executeorperish;
 
 import dev.qixils.crowdcontrol.plugin.fabric.ModdedCrowdControlPlugin;
 import dev.qixils.crowdcontrol.plugin.fabric.utils.Location;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
-@Getter
 public final class StandOnBlockCondition extends AbstractCondition {
 	private final List<Block> blocks;
 	private final Component component;
@@ -35,5 +34,10 @@ public final class StandOnBlockCondition extends AbstractCondition {
 		Location location = new Location(player);
 		return blocks.contains(location.block().getBlock())
 				|| blocks.contains(location.add(0, -1, 0).block().getBlock());
+	}
+
+	@Override
+	public @NotNull Component getComponent(UUID player) {
+		return component;
 	}
 }

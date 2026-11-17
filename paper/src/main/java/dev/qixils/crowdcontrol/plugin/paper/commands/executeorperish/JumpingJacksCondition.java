@@ -1,16 +1,16 @@
 package dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public final class JumpingJacksCondition extends AbstractListeningCondition<Integer> {
 	private final int goal;
-	@Getter
 	private final @NotNull Component component;
 
 	public JumpingJacksCondition(int goal) {
@@ -30,5 +30,10 @@ public final class JumpingJacksCondition extends AbstractListeningCondition<Inte
 	@Override
 	public boolean hasSucceeded(@NotNull Player player) {
 		return getStatus(player) >= goal;
+	}
+
+	@Override
+	public @NotNull Component getComponent(UUID player) {
+		return component;
 	}
 }

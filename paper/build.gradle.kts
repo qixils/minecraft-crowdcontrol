@@ -1,11 +1,11 @@
+import io.papermc.hangarpublishplugin.HangarPublishTask
 import me.modmuss50.mpp.ReleaseType
 import xyz.jpenilla.runpaper.task.RunServer
 
-val minecraftVersion: String by project
-val paperlibVersion: String by project
-val configurateVersion: String by project
-val luckPermsVersion: String by project
-val paperBuild: String by project
+val minecraftVersion = project.property("minecraftVersion") as String
+val configurateVersion = project.property("configurateVersion") as String
+val luckPermsVersion = project.property("luckPermsVersion") as String
+val paperBuild = project.property("paperBuild") as String
 
 val mcVersionSplit = minecraftVersion.split(".")
 val versionId = project.version.toString() + "+paper-" + minecraftVersion
@@ -16,13 +16,13 @@ plugins {
     id("de.eldoria.plugin-yml.bukkit") // Generates plugin.yml
     id("io.papermc.paperweight.userdev")
     id("me.modmuss50.mod-publish-plugin")
+    id("io.papermc.hangar-publish-plugin")
     id("com.gradleup.shadow")
 }
 
 dependencies {
     implementation(project(":base-common"))
-    implementation("io.papermc:paperlib:$paperlibVersion")
-    implementation("org.spongepowered:configurate-yaml:$configurateVersion")
+    compileOnly("org.spongepowered:configurate-yaml:$configurateVersion")
     compileOnly("net.luckperms:api:$luckPermsVersion")
 
     paperweight.paperDevBundle("$minecraftVersion.build.$paperBuild")
@@ -67,22 +67,22 @@ tasks {
         // set name of output file to CrowdControl-PLATFORM+VERSION.jar
         archiveFileName.set("CrowdControl-Paper+$minecraftVersion-$version.jar")
 
-        exclude("net/kyori/adventure/text/minimessage/")
-        exclude("net/kyori/adventure/text/serializer/")
-
         dependencies {
-            exclude("net.kyori.adventure.text.minimessage::")
-            exclude("net.kyori.adventure.text.serializer.legacy::")
-            exclude("net.kyori.adventure.text.serializer.plain::")
+            // provided by paper
+            exclude(dependency("net.kyori:adventure-text-minimessage:.*"))
+            exclude(dependency("net.kyori:adventure-text-serializer-plain:.*"))
+            exclude(dependency("org.slf4j:slf4j-api:.*"))
+            exclude(dependency("net.kyori:option:.*"))
+            exclude(dependency("org.spongepowered:.*:.*"))
+            exclude(dependency("io.leangen.geantyref:.*:.*"))
+            exclude(dependency("org.yaml:snakeyaml:.*"))
+            // annotations are not needed at runtime
+            exclude(dependency("org.jetbrains:annotations:.*"))
+            exclude(dependency("org.jspecify:jspecify:.*"))
+            exclude(dependency("org.checkerframework:checker-qual:.*"))
+            exclude(dependency("com.google.code.findbugs:jsr305:.*"))
         }
-
-        relocate("io.papermc.lib", "dev.qixils.relocated.paperlib")
-        relocate("org.spongepowered.configurate", "dev.qixils.relocated.configurate")
-        relocate("org.jetbrains.annotations", "dev.qixils.relocated.annotations") // TODO: can i just strip these they dont even really need to exist
-        relocate("org.intellij.lang.annotations", "dev.qixils.relocated.annotations.alt")
-        relocate("javassist", "dev.qixils.relocated.javassist")
-        relocate("javax.annotation", "dev.qixils.relocated.javax.annotation")
-        relocate("org.checkerframework", "dev.qixils.relocated.checkerframework")
+        exclude("META-INF/maven/**")
     }
 }
 
@@ -92,16 +92,19 @@ fun RunServer.configure(mcVersion: String) {
     group = "run paper"
 }
 
+val changelogGenerator = providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" }
+
 publishMods {
     val versionFrom = "26.1"
     val versionTo = "26.1.2"
 
+    // TODO: update `file.set` to match hangar? i guess that's for javadocs? i dont think those are enabled atm anyway
     file.set(tasks.shadowJar.get().archiveFile)
     modLoaders.add("paper")
     modLoaders.add("folia")
     modLoaders.add("purpur")
     type.set(ReleaseType.STABLE)
-    changelog.set(providers.fileContents(parent!!.layout.projectDirectory.file("CHANGELOG.md")).asText.map { it.split(Regex("## [\\d.]+")).getOrNull(1)?.trim() ?: "" })
+    changelog.set(changelogGenerator)
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
@@ -109,7 +112,7 @@ publishMods {
             start.set(versionFrom)
             end.set(versionTo)
         }
-        version.set(versionId)
+        version.set(versionId.take(32))
         displayName.set(buildString {
             append("v")
             append(project.version.toString())
@@ -121,5 +124,38 @@ publishMods {
             }
             append(")")
         })
+    }
+}
+
+val semVerMatcher = Regex("^[0-9.]+")
+
+hangarPublish {
+    publications.register("plugin") {
+
+        version.set(providers.provider { (semVerMatcher.find(project.version as String)!!.value + "+" + semVerMatcher.find(minecraftVersion)!!.value).take(15) })
+        id.set("CrowdControl")
+        channel.set("Release") // or PreRelease
+        changelog.set(changelogGenerator)
+        apiKey.set(providers.environmentVariable("HANGAR_KEY"))
+
+        // register platforms
+        platforms {
+            paper {
+                jar = tasks.shadowJar.flatMap { it.archiveFile }
+                platformVersions = listOf("26.1", "26.1.1", "26.1.2")
+                dependencies {
+//                    hangar("TestProject") {
+//                        required = false
+//                    }
+                }
+            }
+        }
+    }
+}
+
+plugins.withId("io.papermc.hangar-publish-plugin") {
+    tasks.withType<HangarPublishTask>().configureEach {
+        // when releasing, wait for everything to build so that a failure stops all platforms alike
+        mustRunAfter(rootProject.subprojects.map { "${it.path}:build" })
     }
 }

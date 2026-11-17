@@ -1,21 +1,20 @@
 import me.modmuss50.mpp.ReleaseType
+import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 
-val adventureVersion: String by project
-val adventurePlatformModVersion: String by project
-val fabricVersion: String by project
-val loaderVersion: String by project
-val modMenuVersion: String by project
-val configurateVersion: String by project
-val luckoPermissionsApiVersion: String by project
-val languageReloadVersion: String by project
-val crowdControlVersion: String by project
-val jacksonVersion: String by project
-val geantyrefVersion: String by project
-val yaclVersion: String by project
-val minecraft_version: String by project
-val fabric_loader_version: String by project
-val fabric_version: String by project
-val mod_id: String by project
+val adventureVersion = project.property("adventureVersion") as String
+val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
+val modMenuVersion = project.property("modMenuVersion") as String
+val configurateVersion = project.property("configurateVersion") as String
+val luckoPermissionsApiVersion = project.property("luckoPermissionsApiVersion") as String
+val languageReloadVersion = project.property("languageReloadVersion") as String
+val crowdControlVersion = project.property("crowdControlVersion") as String
+val javaWebSocketVersion = project.property("javaWebSocketVersion") as String
+val geantyrefVersion = project.property("geantyrefVersion") as String
+val yaclVersion = project.property("yaclVersion") as String
+val minecraft_version = project.property("minecraft_version") as String
+val fabric_loader_version = project.property("fabric_loader_version") as String
+val fabric_version = project.property("fabric_version") as String
+val mod_id = project.property("mod_id") as String
 
 val versionId = project.version.toString() + "+fabric-$minecraft_version"
 
@@ -57,10 +56,12 @@ dependencies {
     include("org.spongepowered:configurate-core:$configurateVersion")
     include("org.spongepowered:configurate-hocon:$configurateVersion")
     include("net.kyori:adventure-serializer-configurate4:$adventureVersion")
-    include("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
-    include("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
-    include("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    include("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
     include("io.leangen.geantyref:geantyref:$geantyrefVersion")
+
+    // mojmap-common only exposes these at compile time, so they also need to be added to the dev runtime
+    localRuntime(project(":base-common"))
+    localRuntime("org.spongepowered:configurate-hocon:$configurateVersion")
 }
 
 loom {
@@ -95,6 +96,18 @@ sourceSets.configureEach {
         }
     }
 }
+
+// TODO: is this still necessary?
+//tasks.processResources {
+//    inputs.property("version", project.version)
+//    inputs.property("minecraftVersion", mojmapVersion)
+//    filteringCharset = "UTF-8"
+//
+//    filesMatching("fabric.mod.json") {
+//        expand("version" to versionId)
+//    }
+//}
+
 // end todo
 
 // TODO: is this still necessary?
@@ -111,6 +124,7 @@ sourceSets.configureEach {
 publishMods {
     val versionFrom = "26w14a"
     val versionTo = "26w14a"
+    val curseforgeVersion = "26.1-snapshot"
 
     file.set(tasks.jar.get().archiveFile)
     modLoaders.add("fabric")
@@ -120,7 +134,16 @@ publishMods {
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
         projectId.set("830331")
-        minecraftVersions.add("26.1-snapshot")
+        if (curseforgeVersion.isNotEmpty()) {
+            minecraftVersions.add(curseforgeVersion)
+        } else if (versionFrom != versionTo) {
+            minecraftVersionRange {
+                start.set(versionFrom)
+                end.set(versionTo)
+            }
+        } else {
+            minecraftVersions.add(versionFrom)
+        }
         version.set(versionId)
         displayName.set(buildString {
             append("[Fabric ")
@@ -133,16 +156,23 @@ publishMods {
             append(project.version.toString())
         })
         javaVersions.add(JavaVersion.VERSION_25)
-        serverRequired.set(true)
-        clientRequired.set(false)
+        server.set(true)
+        client.set(false)
         requires("fabric-api")
         optional("modmenu", "language-reload", "yacl")
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_API_KEY"))
         projectId.set("6XhH9LqD")
-        minecraftVersions.add(versionFrom)
-        version.set(versionId)
+        if (versionFrom != versionTo) {
+            minecraftVersionRange {
+                start.set(versionFrom)
+                end.set(versionTo)
+            }
+        } else {
+            minecraftVersions.add(versionFrom)
+        }
+        version.set(versionId.take(32))
         displayName.set(buildString {
             append("v")
             append(project.version.toString())
@@ -154,6 +184,7 @@ publishMods {
             }
             append(")")
         })
+        environment.set(ModrinthEnvironment.SERVER_ONLY_CLIENT_OPTIONAL)
         requires("fabric-api")
         optional("modmenu", "language-reload", "yacl")
         embeds("adventure-platform-mod")

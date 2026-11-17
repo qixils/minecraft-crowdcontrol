@@ -88,6 +88,7 @@ public enum Condition {
 
 	//// miscellaneous ////
 	JUMP(new JumpingJacksCondition(49)),
+	MATH(new MathCondition())
 	;
 
 	private static final List<SuccessCondition> CONDITIONS;
