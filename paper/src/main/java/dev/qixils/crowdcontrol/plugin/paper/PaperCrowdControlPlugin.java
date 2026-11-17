@@ -15,12 +15,12 @@ import dev.qixils.crowdcontrol.common.util.SemVer;
 import dev.qixils.crowdcontrol.common.util.TextUtilImpl;
 import dev.qixils.crowdcontrol.plugin.paper.mc.PaperPlayer;
 import dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.text.PaperComponents;
 import io.papermc.paper.world.flag.FeatureDependant;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -57,6 +57,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 	public static final PersistentDataType<Byte, Boolean> BOOLEAN_TYPE = new BooleanDataType();
 	public static final PersistentDataType<String, Component> COMPONENT_TYPE = new ComponentDataType();
 	public static final PersistentDataType<String, MovementStatusValue> MOVEMENT_STATUS_VALUE_TYPE = new EnumDataType<>(MovementStatusValue.class, o -> o.orElse(MovementStatusValue.ALLOWED));
+	public static PaperCrowdControlPlugin INSTANCE = null;
 
 	@Getter
 	private final Executor syncExecutor;
@@ -95,6 +96,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		asyncExecutor = runnable -> Bukkit.getAsyncScheduler().runNow(paperPlugin, $ -> runnable.run());
 		this.dataFolder = paperPlugin.getDataPath().resolve("Data");
 		this.configLoader = createConfigLoader(paperPlugin.getDataPath(), "config.yml", YamlConfigurationLoader.builder());
+		INSTANCE = this;
 	}
 
 	public void onLoad() {
@@ -115,6 +117,7 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		pluginChannel.registerOutgoingPluginChannel(VersionRequestPacketS2C.METADATA);
 		pluginChannel.registerOutgoingPluginChannel(MovementStatusPacketS2C.METADATA);
 		pluginChannel.registerOutgoingPluginChannel(SetLanguagePacketS2C.METADATA);
+		pluginChannel.registerOutgoingPluginChannel(LidarPacketS2C.METADATA);
 		pluginChannel.registerIncomingPluginChannel(VersionResponsePacketC2S.METADATA, (player, message) -> {
 			UUID uuid = player.getUniqueId();
 			SemVer version = message.version();
@@ -131,9 +134,21 @@ public final class PaperCrowdControlPlugin extends Plugin<Player, CommandSourceS
 		});
 	}
 
+	private static boolean isPaper() {
+		// the same check as PaperLib, except it checks a deprecated class so we check a new one too
+		for (String className : List.of("io.papermc.paper.configuration.Configuration", "com.destroystokyo.paper.PaperConfig")) {
+			try {
+				Class.forName(className);
+				return true;
+			} catch (Throwable ignored) {
+			}
+		}
+		return false;
+	}
+
 	@SneakyThrows
 	public void onEnable() {
-		if (!PaperLib.isPaper()) {
+		if (!isPaper()) {
 			throw new IllegalStateException("The Paper server software is required. Please upgrade from Spigot to Paper, it should be a simple and painless upgrade in 99.99% of cases.");
 		}
 		if (MINECRAFT_VERSION.isLessThan(MINECRAFT_MIN_VERSION)) {

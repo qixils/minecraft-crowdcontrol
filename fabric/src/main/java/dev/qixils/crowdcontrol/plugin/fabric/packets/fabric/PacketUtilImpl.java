@@ -18,6 +18,7 @@ public class PacketUtilImpl {
 		PayloadTypeRegistry.clientboundPlay().register(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(LidarS2C.PACKET_ID, LidarS2C.PACKET_CODEC);
 
 		PayloadTypeRegistry.serverboundPlay().register(ResponseVersionC2S.PACKET_ID, ResponseVersionC2S.PACKET_CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(ResponseVersionC2S.PACKET_ID, (payload, context) -> {

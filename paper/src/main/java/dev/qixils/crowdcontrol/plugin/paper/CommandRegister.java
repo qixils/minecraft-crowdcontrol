@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.paper;
 import dev.qixils.crowdcontrol.common.command.AbstractCommandRegister;
 import dev.qixils.crowdcontrol.common.command.Command;
 import dev.qixils.crowdcontrol.common.command.CommandConstants;
+import dev.qixils.crowdcontrol.common.command.impl.Shader;
 import dev.qixils.crowdcontrol.common.custom.CustomCommandData;
 import dev.qixils.crowdcontrol.plugin.paper.commands.*;
 import dev.qixils.crowdcontrol.plugin.paper.commands.executeorperish.DoOrDieCommand;
@@ -44,6 +45,7 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new ChickenJockeyCommand(plugin),
 			() -> new SmallAntCommand(plugin),
 			() -> new SwapCommand(plugin),
+			() -> new SwapInventoryCommand(plugin),
 			() -> new DinnerboneCommand(plugin),
 			() -> new ClutterCommand(plugin),
 			() -> new LootboxCommand(plugin, 0),
@@ -103,7 +105,11 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			() -> new RandomFallingBlockCommand(plugin),
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
+			() -> new LidarCommand(plugin),
 			() -> new WaterCommand(plugin),
+			() -> new DrainCommand(plugin),
+			() -> new FloorIsLavaCommand(plugin),
+			() -> new MegaMineCommand(plugin),
 			() -> new DrainCommand(plugin),
 			() -> new AgeCommand(plugin, true),
 			() -> new AgeCommand(plugin, false)
@@ -120,7 +126,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			EntityType.MANGROVE_BOAT,
 			EntityType.PALE_OAK_BOAT,
 			EntityType.SPRUCE_BOAT,
-			EntityType.BAMBOO_RAFT
+			EntityType.BAMBOO_RAFT,
+			EntityType.POPLAR_BOAT
 		};
 		EntityType[] chestBoats = new EntityType[] {
 			EntityType.OAK_CHEST_BOAT,
@@ -132,7 +139,8 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			EntityType.MANGROVE_CHEST_BOAT,
 			EntityType.PALE_OAK_CHEST_BOAT,
 			EntityType.SPRUCE_CHEST_BOAT,
-			EntityType.BAMBOO_CHEST_RAFT
+			EntityType.BAMBOO_CHEST_RAFT,
+			EntityType.POPLAR_CHEST_BOAT
 		};
 		for (EntityType entity : Registry.ENTITY_TYPE) {
 			if (entity.getEntityClass() == null) continue;
@@ -223,10 +231,9 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 			initTo(commands, () -> new GameModeCommand(plugin, gamemode, gamemode == GameMode.SPECTATOR ? 8L : 15L));
 		}
 
-		// TODO
-//		for (Shader shader : Shader.values()) {
-//			initTo(commands, () -> new ShaderCommand(plugin, shader));
-//		}
+		for (Shader shader : Shader.values()) {
+			initTo(commands, () -> new ShaderCommand(plugin, shader));
+		}
 
 		if (plugin.getCustomEffectsConfig().effects() != null) {
 			for (CustomCommandData data : plugin.getCustomEffectsConfig().effects()) {
@@ -252,5 +259,6 @@ public class CommandRegister extends AbstractCommandRegister<Player, PaperCrowdC
 		Bukkit.getPluginManager().registerEvents(new FreezeCommand.Manager(plugin), paperPlugin);
 		Bukkit.getPluginManager().registerEvents(new GameModeCommand.Manager(paperPlugin), paperPlugin);
 		Bukkit.getPluginManager().registerEvents(new HealthModifierManager(), paperPlugin);
+		Bukkit.getPluginManager().registerEvents(new MobHealthModifierManager(), paperPlugin);
 	}
 }

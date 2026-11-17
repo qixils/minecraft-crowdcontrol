@@ -2,6 +2,51 @@
 
 A list of all changes made to the software in reverse chronological order.
 
+## 4.7.0
+
+### Additions
+
+- Added math problems to the Do-or-Die effect
+- New timed effect **Floor Is Lava** sets the player on fire if they walk on some naturally generating blocks like grass
+- New timed effect **3x3 mining** "upgrades" your 1x1 digging radius to 3x3
+- New effect **Huge Explosion** destroys a large radius of blocks; off by default!
+- New effect **Swap Inventories** shuffles around inventories in multiplayer
+- New timed effect **One-Hit KO Mobs** allows the player to defeat mobs in one hit
+- New timed effect **Invincible Mobs** prevents the player from directly harming mobs
+- Backported to 1.21.1 (Fabric/NeoForge) and 23w13a_or_b (Fabric)
+  - These versions have been popular in support tickets and our promotional material
+    so we are restoring support for them for now.
+
+### Changes
+
+- Migrated from cloud command framework to native brigadier, saving considerable filesize
+  - Previously this was available only for 26.1+
+- (>1.16.1) Migrated from embedded cloth-config to optional YACL with more visual config options
+  - Previously this was available only for 26.1+
+- Further improved filesizes
+
+### Fixes
+
+- Fixed several issues with dependency conflicts
+- Fixed adding new limits in YACL
+
+## 4.6.3
+
+- The resource pack for Screen effects is now downloaded from Crowd Control's servers
+
+## 4.6.2
+
+This update contains features exclusive to 26.3. These features are experimental, please
+[report any issues](https://github.com/qixils/minecraft-crowdcontrol/issues/new/choose)!
+
+- Re-added several Screen effects from Minecraft's old "Super Secret Shaders"
+  - Thanks to the abundance of options now, some less interesting ones have been removed
+- Added six brand-new Screen effects
+- Most new custom Screen effects are now usable without mods by downloading a resource pack
+  - Server admins can configure how it's served from the config file
+- Screen effects can now stack on each other
+- Re-enabled Screen effects on Paper
+
 ## 4.6.1
 
 - Fixed issues with spawning boats and chest boats

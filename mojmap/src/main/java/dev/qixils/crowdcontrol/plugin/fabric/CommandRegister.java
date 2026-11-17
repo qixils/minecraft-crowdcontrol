@@ -72,6 +72,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new ChickenJockeyCommand(plugin),
 			() -> new SmallAntCommand(plugin),
 			() -> new SwapCommand(plugin),
+			() -> new SwapInventoryCommand(plugin),
 			() -> new DinnerboneCommand(plugin),
 			() -> new ClutterCommand(plugin),
 			() -> new LootboxCommand(plugin, 0),
@@ -131,7 +132,11 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			() -> new RandomFallingBlockCommand(plugin),
 			() -> new LavaCommand(plugin),
 			() -> new LanguageCommand(plugin),
+			() -> new LidarCommand(plugin),
 			() -> new WaterCommand(plugin),
+			() -> new DrainCommand(plugin),
+			() -> new FloorIsLavaCommand(plugin),
+			() -> new MegaMineCommand(plugin),
 			() -> new DrainCommand(plugin),
 			() -> new AgeCommand(plugin, true),
 			() -> new AgeCommand(plugin, false)
@@ -148,7 +153,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			EntityTypes.MANGROVE_BOAT,
 			EntityTypes.PALE_OAK_BOAT,
 			EntityTypes.SPRUCE_BOAT,
-			EntityTypes.BAMBOO_RAFT
+			EntityTypes.BAMBOO_RAFT,
+			EntityTypes.POPLAR_BOAT
 		};
 		EntityType<AbstractChestBoat>[] chestBoats = new EntityType[] {
 			EntityTypes.OAK_CHEST_BOAT,
@@ -160,7 +166,8 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 			EntityTypes.MANGROVE_CHEST_BOAT,
 			EntityTypes.PALE_OAK_CHEST_BOAT,
 			EntityTypes.SPRUCE_CHEST_BOAT,
-			EntityTypes.BAMBOO_CHEST_RAFT
+			EntityTypes.BAMBOO_CHEST_RAFT,
+			EntityTypes.POPLAR_CHEST_BOAT
 		};
 		// TODO: could bring back the fill-in-vanilla-holes thing to have some better defaults for some modded mobs?
 		//  but there will probably be overlap and make it weird idk
@@ -276,6 +283,7 @@ public class CommandRegister extends AbstractCommandRegister<ServerPlayer, Modde
 	protected void onFirstRegistry() {
 		plugin.getEventManager().registerListeners(new GameModeCommand.Manager());
 		plugin.getEventManager().registerListeners(new HealthModifierManager());
+		plugin.getEventManager().registerListeners(new MobHealthModifierManager());
 		plugin.getEventManager().registerListeners(new FreezeCommand.Manager(plugin));
 	}
 }

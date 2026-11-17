@@ -1,0 +1,48 @@
+{
+    "targets": {
+        "swap": {}
+    },
+    "passes": [
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "crowdcontrol:post/depth_sweep",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "minecraft:main"
+                },
+                {
+                    "sampler_name": "Depth",
+                    "target": "minecraft:main",
+                    "use_depth_buffer": true
+                }
+            ],
+            "output": "swap",
+            "uniforms": {
+                "SonarConfig": [
+                    { "name": "NearPlane", "type": "float", "value": 0.05 },
+                    { "name": "Ambient", "type": "float", "value": 0.22 },
+                    { "name": "SweepStart", "type": "float", "value": -8.0 },
+                    { "name": "SweepRange", "type": "float", "value": 56.0 },
+                    { "name": "SweepWidth", "type": "float", "value": 7.0 },
+                    { "name": "SweepSpeed", "type": "float", "value": 300.0 },
+                    { "name": "FadeIn", "type": "float", "value": 0.1 },
+                    { "name": "FadeOut", "type": "float", "value": 0.35 }
+                ]
+            }
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/blit",
+            "inputs": [
+                { "sampler_name": "In", "target": "swap" }
+            ],
+            "output": "minecraft:main",
+            "uniforms": {
+                "BlitConfig": [
+                    { "name": "ColorModulate", "type": "vec4", "value": [ 1.0, 1.0, 1.0, 1.0 ] }
+                ]
+            }
+        }
+    ]
+}

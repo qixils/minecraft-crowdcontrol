@@ -3,6 +3,7 @@ package dev.qixils.crowdcontrol.plugin.fabric.client;
 import dev.qixils.crowdcontrol.common.packets.util.ExtraFeature;
 import dev.qixils.crowdcontrol.common.packets.util.LanguageState;
 import dev.qixils.crowdcontrol.plugin.fabric.client.fabric.ClientPacketContextImpl;
+import dev.qixils.crowdcontrol.plugin.fabric.packets.LidarS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.MovementStatusS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.RequestVersionS2C;
 import dev.qixils.crowdcontrol.plugin.fabric.packets.SetLanguageS2C;
@@ -35,6 +36,7 @@ public class FabricPlatformClient extends ModdedPlatformClient implements Client
 		ClientPlayNetworking.registerGlobalReceiver(RequestVersionS2C.PACKET_ID, (payload, context) -> handleRequestVersion(payload, new ClientPacketContextImpl(context)));
 		ClientPlayNetworking.registerGlobalReceiver(MovementStatusS2C.PACKET_ID, (payload, context) -> handleMovementStatus(payload, new ClientPacketContextImpl(context)));
 		ClientPlayNetworking.registerGlobalReceiver(SetLanguageS2C.PACKET_ID, (payload, context) -> handleLanguage(payload));
+		ClientPlayNetworking.registerGlobalReceiver(LidarS2C.PACKET_ID, (payload, context) -> handleLidar(payload));
 	}
 
 	@Override

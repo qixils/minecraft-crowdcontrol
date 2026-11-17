@@ -155,7 +155,7 @@ public class SummonEntityCommand<E extends Entity> extends ModdedCommand impleme
 			LimitConfig config = getPlugin().getLimitConfig();
 			int def = config.defaultEntityLimit();
 			int playerLimit = Arrays.stream(entityTypes).flatMapToInt(entityType -> {
-				int limit = config.getEntityLimit(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toShortString());
+				int limit = config.getEntityLimit(MinecraftAudiences.asAdventure(BuiltInRegistries.ENTITY_TYPE.getKey(entityType)).asMinimalString());
 				if (def == limit || limit <= 0) return IntStream.empty();
 				return IntStream.of(limit);
 			}).min().orElse(def);

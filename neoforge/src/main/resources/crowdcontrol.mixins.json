@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityMixin",
-    "IntegratedServerMixin",
     "LivingEntityMixin",
     "NameTagItemMixin",
     "PlayerAdvancementsMixin",
@@ -13,11 +12,14 @@
     "PlayerMixin",
     "ResultSlotMixin",
     "ServerGamePacketListenerImplMixin",
+    "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "TickMixin"
   ],
   "client": [
+    "GameRendererMixin",
     "KeyboardInputMixin",
+    "LevelRendererMixin",
     "MinecraftClientMixin"
   ],
   "injectors": {

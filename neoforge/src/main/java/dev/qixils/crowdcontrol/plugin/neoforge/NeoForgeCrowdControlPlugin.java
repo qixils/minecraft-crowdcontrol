@@ -62,6 +62,7 @@ public class NeoForgeCrowdControlPlugin extends ModdedCrowdControlPlugin {
 		registrar.playToClient(RequestVersionS2C.PACKET_ID, RequestVersionS2C.PACKET_CODEC);
 		registrar.playToClient(MovementStatusS2C.PACKET_ID, MovementStatusS2C.PACKET_CODEC);
 		registrar.playToClient(SetLanguageS2C.PACKET_ID, SetLanguageS2C.PACKET_CODEC);
+		registrar.playToClient(LidarS2C.PACKET_ID, LidarS2C.PACKET_CODEC);
 	}
 
 	public void registerChatCommandsEvent(final RegisterCommandsEvent event) {
