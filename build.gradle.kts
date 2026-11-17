@@ -173,3 +173,21 @@ subprojects {
         }
     }
 }
+
+tasks.register("release") {
+    group = "publishing"
+    description = "Builds every module, then publishes the platform jars"
+    dependsOn(subprojects.map { "${it.path}:build" })
+    dependsOn(subprojects.filter { it.name.endsWith("-platform") }.map { "${it.path}:publishMods" })
+    findProject(":paper-platform")?.let { dependsOn("${it.path}:publishAllPublicationsToHangar") }
+}
+
+subprojects {
+    plugins.withId("me.modmuss50.mod-publish-plugin") {
+        tasks.withType<PublishModTask>().configureEach {
+            // when releasing, wait for everything to build so that a failure stops all platforms alike
+            mustRunAfter(rootProject.subprojects.map { "${it.path}:build" })
+        }
+    }
+    // hangar equivalent is in its build file
+}
