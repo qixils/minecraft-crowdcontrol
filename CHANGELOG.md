@@ -23,12 +23,12 @@ A list of all changes made to the software in reverse chronological order.
   - Previously this was available only for 26.1+
 - (>1.16.1) Migrated from embedded cloth-config to optional YACL with more visual config options
   - Previously this was available only for 26.1+
-- Fixed several issues with dependency conflicts
 - Further improved filesizes
 
 ### Fixes
 
-- Fixed 
+- Fixed several issues with dependency conflicts
+- Fixed adding new limits in YACL
 
 ## 4.6.3
 
