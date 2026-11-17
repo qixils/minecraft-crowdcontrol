@@ -141,7 +141,7 @@ tasks.register("release") {
     description = "Builds every module, then publishes the platform jars"
     dependsOn(subprojects.map { "${it.path}:build" })
     dependsOn(subprojects.filter { it.name.endsWith("-platform") }.map { "${it.path}:publishMods" })
-    dependsOn("paper-platform:publishAllPublicationsToHangar")
+    findProject(":paper-platform")?.let { dependsOn("${it.path}:publishAllPublicationsToHangar") }
 }
 
 subprojects {
