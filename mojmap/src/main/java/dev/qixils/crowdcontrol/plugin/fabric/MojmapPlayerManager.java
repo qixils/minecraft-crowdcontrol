@@ -7,6 +7,7 @@ import live.crowdcontrol.cc4j.websocket.payload.PublicEffectPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +21,11 @@ public class MojmapPlayerManager extends AbstractPlayerManager<ServerPlayer> {
 
 	@Override
 	public @NotNull List<@NotNull ServerPlayer> getAllPlayersFull() {
-		return new ArrayList<>(getPlugin().server().getPlayerList().getPlayers());
+		PlayerList playerList = getPlugin().server().getPlayerList();
+		// dedicated servers only create the player list partway through starting up
+		//noinspection ConstantValue
+		if (playerList == null) return new ArrayList<>();
+		return new ArrayList<>(playerList.getPlayers());
 	}
 
 	@Override

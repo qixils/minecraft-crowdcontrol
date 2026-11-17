@@ -61,11 +61,12 @@ public class SoftLockConfig {
 	}
 
 	public void setPeriod(Duration period) {
-		this.period = (int) period.toSeconds();
+		setPeriod((int) period.toSeconds());
 	}
 
 	public void setPeriod(int period) {
 		this.period = period;
+		this.periodDuration = Duration.ofSeconds(period);
 	}
 
 	/**

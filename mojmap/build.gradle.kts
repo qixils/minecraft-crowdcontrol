@@ -1,7 +1,6 @@
 val configurateVersion = project.property("configurateVersion") as String
 val adventurePlatformModVersion = project.property("adventurePlatformModVersion") as String
 val adventureVersion = project.property("adventureVersion") as String
-val adventurePlatformVersion = project.property("adventurePlatformVersion") as String
 val yaclVersion = project.property("yaclVersion") as String
 val neo_form_version = project.property("neo_form_version") as String
 

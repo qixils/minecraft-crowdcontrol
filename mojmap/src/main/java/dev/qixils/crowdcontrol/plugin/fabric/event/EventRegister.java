@@ -21,7 +21,7 @@ public class EventRegister<T> {
 			try {
 				listener.accept(event);
 			} catch (Exception e) {
-				log.warn("Consumer {} failed to accept event {}", listener.getClass(), event);
+				log.warn("Consumer {} failed to accept event {}", listener.getClass(), event, e);
 			}
 		}
 	}

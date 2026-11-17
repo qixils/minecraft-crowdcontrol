@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -21,7 +22,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
     private final Component name;
     private final OptionDescription description;
     private final StateManager<Map<K, V>> stateManager;
-    private final Supplier<K> initialKey;
+    private final Supplier<? extends Iterable<K>> initialKeys;
     private final Supplier<V> initialValue;
     private final List<MapOptionEntry<K, V>> entries;
     private final boolean collapsed;
@@ -36,11 +37,11 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
     private final List<Runnable> refreshListeners;
     private int currentListenerDepth = 0;
 
-    public MapOptionImpl(@NotNull Component name, @NotNull OptionDescription description, @NotNull StateManager<Map<K, V>> stateManager, @NotNull Supplier<K> initialKey, @NotNull Supplier<V> initialValue, @NotNull Function<Option<K>, Controller<K>> keyControllerFunction, @NotNull Function<Option<V>, Controller<V>> valueControllerFunction, ImmutableSet<OptionFlag> flags, boolean collapsed, boolean available, int minimumNumberOfEntries, int maximumNumberOfEntries, boolean insertEntriesAtEnd, Collection<OptionEventListener<Map<K, V>>> listeners) {
+    public MapOptionImpl(@NotNull Component name, @NotNull OptionDescription description, @NotNull StateManager<Map<K, V>> stateManager, @NotNull Supplier<? extends Iterable<K>> initialKeys, @NotNull Supplier<V> initialValue, @NotNull Function<Option<K>, Controller<K>> keyControllerFunction, @NotNull Function<Option<V>, Controller<V>> valueControllerFunction, ImmutableSet<OptionFlag> flags, boolean collapsed, boolean available, int minimumNumberOfEntries, int maximumNumberOfEntries, boolean insertEntriesAtEnd, Collection<OptionEventListener<Map<K, V>>> listeners) {
         this.name = name;
         this.description = description;
         this.stateManager = stateManager;
-        this.initialKey = initialKey;
+        this.initialKeys = initialKeys;
         this.initialValue = initialValue;
         this.entryFactory = new EntryFactory(keyControllerFunction, valueControllerFunction);
         this.entries = createEntries(binding().getValue());
@@ -147,7 +148,8 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
 
     @Override
     public MapOptionEntry<K, V> insertNewEntry() {
-        K key = initialKey.get();
+        K key = nextKey();
+        if (key == null) return null;
         MapOptionEntry<K, V> newEntry = entryFactory.create(key, initialValue.get());
         if (insertEntriesAtEnd) {
             entries.add(newEntry);
@@ -167,7 +169,14 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
     }
 
     public boolean canInsertNewEntry() {
-        return available() && numberOfEntries() < maximumNumberOfEntries() && !hasKey(initialKey.get());
+        return available() && numberOfEntries() < maximumNumberOfEntries() && nextKey() != null;
+    }
+
+    private @Nullable K nextKey() {
+        for (K key : initialKeys.get()) {
+            if (!hasKey(key)) return key;
+        }
+        return null;
     }
 
     @Override
@@ -321,7 +330,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         private Function<Option<K>, Controller<K>> keyControllerFunction;
         private Function<Option<V>, Controller<V>> valueControllerFunction;
         private final Set<OptionFlag> flags = new HashSet<>();
-        private Supplier<K> initialKey;
+        private Supplier<? extends Iterable<K>> initialKeys;
         private Supplier<V> initialValue;
         private boolean collapsed = false;
         private boolean available = true;
@@ -353,7 +362,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         public Builder<K, V> initialKey(@NotNull Supplier<K> initialValue) {
             Validate.notNull(initialValue, "`initialValue` cannot be empty");
 
-            this.initialKey = initialValue;
+            this.initialKeys = () -> Collections.singleton(initialValue.get());
             return this;
         }
 
@@ -361,7 +370,15 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         public Builder<K, V> initialKey(@NotNull K initialValue) {
             Validate.notNull(initialValue, "`initialValue` cannot be empty");
 
-            this.initialKey = () -> initialValue;
+            this.initialKeys = () -> Collections.singleton(initialValue);
+            return this;
+        }
+
+        @Override
+        public Builder<K, V> initialKeys(@NotNull Supplier<? extends Iterable<K>> candidates) {
+            Validate.notNull(candidates, "`candidates` cannot be null");
+
+            this.initialKeys = candidates;
             return this;
         }
 
@@ -527,7 +544,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
         public MapOption<K, V> build() {
             Validate.notNull(keyControllerFunction, "`keyController` must not be null");
             Validate.notNull(valueControllerFunction, "`valueController` must not be null");
-            Validate.notNull(initialKey, "`initialKey` must not be null");
+            Validate.notNull(initialKeys, "`initialKey` must not be null");
             Validate.notNull(initialValue, "`initialValue` must not be null");
             Validate.isTrue(stateManager != null || binding != null, "Either a state manager or binding must be set");
 
@@ -535,7 +552,7 @@ public final class MapOptionImpl<K, V> implements MapOption<K, V> {
                 stateManager = StateManager.createSimple(binding);
             }
 
-            return new MapOptionImpl<>(name, description, stateManager, initialKey, initialValue, keyControllerFunction, valueControllerFunction, ImmutableSet.copyOf(flags), collapsed, available, minimumNumberOfEntries, maximumNumberOfEntries, insertEntriesAtEnd, listeners);
+            return new MapOptionImpl<>(name, description, stateManager, initialKeys, initialValue, keyControllerFunction, valueControllerFunction, ImmutableSet.copyOf(flags), collapsed, available, minimumNumberOfEntries, maximumNumberOfEntries, insertEntriesAtEnd, listeners);
         }
     }
 }

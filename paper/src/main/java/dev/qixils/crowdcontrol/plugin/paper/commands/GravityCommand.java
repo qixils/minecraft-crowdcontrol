@@ -24,8 +24,7 @@ import static dev.qixils.crowdcontrol.plugin.paper.utils.AttributeUtil.removeMod
 import static dev.qixils.crowdcontrol.plugin.paper.utils.PaperUtil.toPlayers;
 
 @Getter
-public class
-GravityCommand extends PaperCommand implements CCTimedEffect {
+public class GravityCommand extends PaperCommand implements CCTimedEffect {
 	private final String effectName;
 	private final String effectGroup = "gravity";
 	private final List<String> effectGroups = Collections.singletonList(effectGroup);
